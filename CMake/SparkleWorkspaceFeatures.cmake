@@ -1,6 +1,5 @@
 option(SPARKLE_ENABLE_CONTENT_PIPELINE "Build source import, conversion, and asset/texture cooking tools" ON)
 option(SPARKLE_ENABLE_SHADER_COMPILER "Build offline shader compiler tooling" ON)
-option(SPARKLE_ENABLE_KTX_SUPPORT "Fetch and build KTX tooling support for the content pipeline" OFF)
 option(SPARKLE_ENABLE_NVIDIA_STREAMLINE "Fetch and stage NVIDIA Streamline SDK runtime for DLSS providers" ON)
 option(SPARKLE_BUILD_SHARED "Build Sparkle modules as shared libraries (DLLs)" OFF)
 option(SPARKLE_WITH_GPU_CRASH_DEBUGGING "Build the opt-in NVIDIA GPU crash debugging variant" OFF)
@@ -16,3 +15,7 @@ if(SPARKLE_WITH_GPU_CRASH_DEBUGGING)
     include(${CMAKE_CURRENT_LIST_DIR}/Dependencies/GpuCrashInputs.cmake)
     sparkle_verify_gpu_crash_inputs("${SPARKLE_AFTERMATH_SDK_ROOT}" Aftermath)
 endif()
+
+# Shared by workspace acquisition and standalone Launcher cache identity checks.
+set(SPARKLE_DIRECTXTEX_REVISION 4feb3e11a020f35b796fc769a74216a555d4f5ef)
+set(SPARKLE_KTX_REVISION 91ace88675ac59a97e55d0378a6602a9ae6b98bd)

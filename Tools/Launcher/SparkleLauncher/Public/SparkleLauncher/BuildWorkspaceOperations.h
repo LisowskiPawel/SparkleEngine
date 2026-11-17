@@ -69,7 +69,6 @@ namespace SparkleLauncher
 	{
 		bool bContentPipelineEnabled = false;
 		bool bShaderCompilerEnabled = false;
-		bool bKtxSupportEnabled = false;
 		bool bNvidiaStreamlineEnabled = false;
 	};
 

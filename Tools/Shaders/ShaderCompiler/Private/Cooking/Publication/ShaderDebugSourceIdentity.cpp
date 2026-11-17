@@ -6,13 +6,13 @@
 #include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Json/JsonInputAdmission.h"
+#include "Core/Public/Paths/PathUtils.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 #include <nlohmann/json.hpp>
 #include <algorithm>
 #include <array>
 #include <optional>
-#include "Core/Public/Paths/PathUtils.h"
-#include "Core/Public/Strings/StringUtils.h"
 
 void ShaderDebugArtifactWriter::RecordSourceCandidate()
 {
@@ -27,16 +27,31 @@ void ShaderDebugArtifactWriter::RecordSourceCandidate()
 	try
 	{
 		Json::InputAdmission admission(receipt, 32u * 1024u * 1024u);
-		constexpr std::array<std::string_view, 8> fields{"product", "profile", "variant", "revision", "sourceInputsSha256", "dirtyPatchSha256", "executableSha256", "sourceFiles"};
+		const std::array<std::string_view, 8> fields{"product", "profile", "variant", "revision", "sourceInputsSha256", "dirtyPatchSha256", "executableSha256", "sourceFiles"};
 		std::map<std::string, std::optional<std::string>> sourceFiles;
 		std::size_t fileCount = 0;
 		bool bSourceFiles = false;
+		bool bIdentityField = false;
+		bool bRecordField = false;
+
 		const auto document = nlohmann::json::parse(
 		    receipt.begin(),
 		    receipt.end(),
 		    [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
 		    {
 			    using Event = nlohmann::json::parse_event_t;
+			    const bool bContainerStart = event == Event::object_start || event == Event::array_start;
+			    const bool bIdentityContainer = depth == 1 && bIdentityField;
+			    const bool bInRecord = depth == 3 && bSourceFiles;
+			    const bool bRecordContainer = bInRecord && bRecordField;
+			    if (bContainerStart && (bIdentityContainer || bRecordContainer))
+			    {
+				    throw Diagnostics::Error("Source receipt identity and file fields require scalar values.");
+			    }
+			    if (bSourceFiles && depth == 1 && event == Event::object_start)
+			    {
+				    throw Diagnostics::Error("Source receipt membership must be an array.");
+			    }
 			    if (event == Event::object_start)
 			    {
 				    admission.BeginObject(depth);
@@ -59,14 +74,22 @@ void ShaderDebugArtifactWriter::RecordSourceCandidate()
 				    if (depth == 1)
 				    {
 					    bSourceFiles = key == "sourceFiles";
-					    if (std::ranges::find(fields, key) == fields.end())
+					    const bool bConsumed = std::find(fields.begin(), fields.end(), key) != fields.end();
+					    bIdentityField = bConsumed && !bSourceFiles;
+					    if (!bConsumed)
 					    {
 						    return false;
 					    }
 				    }
-				    else if (!bSourceFiles || depth != 3 || (key != "Path" && key != "Sha256"))
+				    else
 				    {
-					    return false;
+					    const bool bFileKey = depth == 3 && bSourceFiles;
+					    const bool bConsumed = key == "Path" || key == "Sha256";
+					    bRecordField = bFileKey && bConsumed;
+					    if (!bRecordField)
+					    {
+						    return false;
+					    }
 				    }
 				    admission.ReadKey(depth, key);
 			    }

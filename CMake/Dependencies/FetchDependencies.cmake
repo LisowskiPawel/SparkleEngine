@@ -91,7 +91,7 @@ function(sparkle_add_dependency_subdirectory source_dir binary_dir)
 endfunction()
 
 # Skip Git LFS entirely - we only need source code, not test assets.
-# Prevents multi-GB LFS pulls from compressonator and KTX repos.
+# Prevents multi-GB LFS pulls from the KTX repository.
 # GIT_LFS_SKIP_SMUDGE prevents downloading LFS blobs.
 # GIT_CONFIG_PARAMETERS overrides the LFS filter commands with empty strings
 # so checkouts succeed even when git-lfs was previously configured but the
@@ -369,18 +369,19 @@ if(_sparkle_fetch_tinyexr
     OR (_sparkle_fetch_stb AND (SPARKLE_ENABLE_CONTENT_PIPELINE OR NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")))
 
     if(_sparkle_fetch_stb AND (SPARKLE_ENABLE_CONTENT_PIPELINE OR NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL ""))
-        # stb - Header-only image loading and resizing
+        # stb - Header-only raster source decoding
         # https://github.com/nothings/stb
         #
-        # Provides: stb_image.h (image loading), stb_image_resize2.h (mip generation)
+        # Provides: stb_image.h for source formats outside native DirectXTex loaders.
         #
         # Target:  stb (INTERFACE)
         # Usage:   target_link_libraries(YourTarget PRIVATE stb)
         #          #define STB_IMAGE_IMPLEMENTATION  (in exactly one .cpp)
+        set(_sparkle_stb_revision 2c980bb59875b0d32144a71867fbdebb2f77cd20)
         sparkle_declare_git_dependency(stb
             https://github.com/nothings/stb.git
-            2c980bb59875b0d32144a71867fbdebb2f77cd20)
-        sparkle_log_dependency_step(4 12 "stb" "2c980bb59875b0d32144a71867fbdebb2f77cd20" "~5 MB" "Header-only image loading and mip resize helpers" "https://github.com/nothings/stb.git")
+            ${_sparkle_stb_revision})
+        sparkle_log_dependency_step(4 12 "stb" "2c980bb59875b0d32144a71867fbdebb2f77cd20" "~5 MB" "PSD/PIC/PNM/TGA source decoding" "https://github.com/nothings/stb.git")
         FetchContent_Populate(stb)
 
         if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
@@ -389,6 +390,8 @@ if(_sparkle_fetch_tinyexr
         endif()
 
         add_library(stb INTERFACE)
+        set_property(TARGET stb PROPERTY SPARKLE_SOURCE_PACKAGE
+            "{\"name\":\"stb\",\"versionInfo\":\"${_sparkle_stb_revision}\",\"licenseDeclared\":\"MIT\",\"downloadLocation\":\"https://github.com/nothings/stb/tree/${_sparkle_stb_revision}\"}")
         target_include_directories(stb INTERFACE ${stb_SOURCE_DIR})
 
         sparkle_log_dependency_ready("stb" "${stb_SOURCE_DIR}" "~5 MB")
@@ -401,9 +404,10 @@ if(_sparkle_fetch_tinyexr
         # Target:  tinyexr (INTERFACE)
         # Usage:   target_link_libraries(YourTarget PRIVATE tinyexr)
         #          #define TINYEXR_IMPLEMENTATION (in exactly one .cpp)
+        set(_sparkle_tinyexr_revision 6e8cac308cdf4d717078f3f37c4aa39bf3b356b4)
         sparkle_declare_git_dependency(tinyexr
             https://github.com/syoyo/tinyexr.git
-            6e8cac308cdf4d717078f3f37c4aa39bf3b356b4)
+            ${_sparkle_tinyexr_revision})
         sparkle_log_dependency_step(5 12 "tinyexr" "v1.0.7" "~1 MB" "Header-only OpenEXR image loading/writing support" "https://github.com/syoyo/tinyexr.git")
         FetchContent_Populate(tinyexr)
 
@@ -413,12 +417,9 @@ if(_sparkle_fetch_tinyexr
         endif()
 
         add_library(tinyexr INTERFACE)
-        target_include_directories(tinyexr INTERFACE
-            ${tinyexr_SOURCE_DIR}
-            ${tinyexr_SOURCE_DIR}/deps
-            ${tinyexr_SOURCE_DIR}/deps/miniz
-            ${tinyexr_SOURCE_DIR}/miniz
-        )
+        set_property(TARGET tinyexr PROPERTY SPARKLE_SOURCE_PACKAGE
+            "{\"name\":\"tinyexr\",\"versionInfo\":\"1.0.7\",\"licenseDeclared\":\"BSD-3-Clause\",\"downloadLocation\":\"https://github.com/syoyo/tinyexr/tree/${_sparkle_tinyexr_revision}\"}")
+        target_include_directories(tinyexr INTERFACE ${tinyexr_SOURCE_DIR})
 
         sparkle_log_dependency_ready("tinyexr" "${tinyexr_SOURCE_DIR}" "~1 MB")
     endif()
@@ -489,9 +490,10 @@ if(_sparkle_fetch_zlib
         #
         # Target:  zlibstatic
         # Usage:   target_link_libraries(YourTarget PRIVATE zlibstatic)
+        set(_sparkle_zlib_revision 51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf)
         sparkle_declare_git_dependency(zlib
             https://github.com/madler/zlib.git
-            51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf)
+            ${_sparkle_zlib_revision})
         sparkle_log_dependency_step(7 12 "zlib" "v1.3.1" "~1 MB" "Compression backend used by TinyEXR and Assimp" "https://github.com/madler/zlib.git")
         FetchContent_Populate(zlib)
 
@@ -502,6 +504,8 @@ if(_sparkle_fetch_zlib
 
         set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
         sparkle_add_dependency_subdirectory(${zlib_SOURCE_DIR} ${zlib_BINARY_DIR} EXCLUDE_FROM_ALL)
+        set_property(TARGET zlibstatic PROPERTY SPARKLE_SOURCE_PACKAGE
+            "{\"name\":\"zlib\",\"versionInfo\":\"1.3.1\",\"licenseDeclared\":\"Zlib\",\"downloadLocation\":\"https://github.com/madler/zlib/tree/${_sparkle_zlib_revision}\"}")
 
         if(TARGET zlibstatic AND NOT TARGET ZLIB::ZLIB)
             add_library(ZLIB::ZLIB ALIAS zlibstatic)
@@ -572,111 +576,75 @@ if(_sparkle_fetch_zlib
     endif()
 endif()
 
-sparkle_source_dependency_selected("compressonator" _sparkle_fetch_compressonator)
-if(_sparkle_fetch_compressonator AND (SPARKLE_ENABLE_CONTENT_PIPELINE OR NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL ""))
-    # AMD Compressonator - BC1-BC7 texture block compression
-    # https://github.com/GPUOpen-Tools/compressonator
-    #
-    # We build ONLY CMP_Core - the self-contained block compression library.
-    # The full Compressonator project pollutes global CMake state with
-    # add_compile_options(), global output dirs, etc. so we avoid their
-    # top-level CMakeLists.txt and build CMP_Core from source ourselves.
-    #
-    # SPARSE CHECKOUT: The full repo is ~450 MB. We only need cmp_core/ and
-    # applications/_libs/cmp_math/ (~5 MB). Using git's partial clone +
-    # sparse checkout downloads only the trees and the blobs we need.
-    #
-    # Target:  CMP_Core (STATIC)
-    # Usage:   target_link_libraries(YourTarget PRIVATE CMP_Core)
-    #          #include "cmp_core.h"
-    # API:     CompressBlockBC7(), DecompressBlockBC7(), etc.
-    set(_comp_revision "f4b53d79ec5abbb50924f58aebb7bf2793200b94")
-    sparkle_log_dependency_step(9 12 "Compressonator" "${_comp_revision} (sparse)" "~5 MB" "AMD BC1-BC7 texture block compression; sparse checkout of cmp_core only" "https://github.com/GPUOpen-Tools/compressonator.git")
-
-    set(_comp_src "${FETCHCONTENT_BASE_DIR}/compressonator-src")
-    if(NOT EXISTS "${_comp_src}")
-        execute_process(
-            COMMAND "${_git_exe}" clone --no-checkout --filter=blob:none --sparse
-            ${_sparkle_git_progress_args}
-            https://github.com/GPUOpen-Tools/compressonator.git "${_comp_src}"
-            RESULT_VARIABLE _rc
-        )
-        if(_rc)
-            message(FATAL_ERROR "Failed to clone Compressonator (exit code ${_rc})")
-        endif()
-        execute_process(
-            COMMAND "${_git_exe}" sparse-checkout set cmp_core applications/_libs/cmp_math
-            WORKING_DIRECTORY "${_comp_src}" RESULT_VARIABLE _rc
-        )
-        if(_rc)
-            message(FATAL_ERROR "Failed to set Compressonator sparse checkout (exit code ${_rc})")
-        endif()
-        execute_process(
-            COMMAND "${_git_exe}" checkout --detach "${_comp_revision}"
-            WORKING_DIRECTORY "${_comp_src}" RESULT_VARIABLE _rc
-        )
-        if(_rc)
-            message(FATAL_ERROR "Failed to check out pinned Compressonator revision ${_comp_revision}")
-        endif()
-    endif()
-
-    # A cached checkout is an input, not permission to reset or delete local edits.
-    execute_process(
-        COMMAND "${_git_exe}" rev-parse HEAD
-        WORKING_DIRECTORY "${_comp_src}" RESULT_VARIABLE _comp_head_rc
-        OUTPUT_VARIABLE _comp_head OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET
-    )
-    execute_process(
-        COMMAND "${_git_exe}" status --porcelain --untracked-files=all
-        WORKING_DIRECTORY "${_comp_src}" RESULT_VARIABLE _comp_status_rc
-        OUTPUT_VARIABLE _comp_status OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET
-    )
-    if(NOT _comp_head_rc EQUAL 0 OR NOT _comp_status_rc EQUAL 0 OR
-        NOT _comp_head STREQUAL _comp_revision OR NOT "${_comp_status}" STREQUAL "" OR
-        NOT EXISTS "${_comp_src}/cmp_core/source/cmp_core.cpp" OR
-        NOT EXISTS "${_comp_src}/applications/_libs/cmp_math/cmp_math_common.cpp")
-        message(FATAL_ERROR
-            "Compressonator cache must be clean at ${_comp_revision}: ${_comp_src}. "
-        "Preserve any local work, move this cache aside, and retry Launcher dependency sync.")
-    endif()
-
-    set(compressonator_SOURCE_DIR "${_comp_src}")
-
+sparkle_source_dependency_selected("directxtex" _sparkle_fetch_directxtex)
+if(_sparkle_fetch_directxtex AND (SPARKLE_ENABLE_CONTENT_PIPELINE OR NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL ""))
+    sparkle_declare_git_dependency(directxtex
+        https://github.com/microsoft/DirectXTex.git
+        ${SPARKLE_DIRECTXTEX_REVISION})
+    sparkle_log_dependency_step(9 12 "DirectXTex" "may2026 / 2.1.1" "~1 MB" "Tool-only CPU texture decoding, conversion, mip generation and BC encoding" "https://github.com/microsoft/DirectXTex.git")
+    FetchContent_Populate(directxtex)
+    sparkle_prepare_git_fetchcontent_source(directxtex
+        EXPECTED_REVISION "${SPARKLE_DIRECTXTEX_REVISION}"
+        REQUIRED_PATHS CMakeLists.txt DirectXTex/DirectXTex.h DirectXTex/DirectXTexDDS.cpp
+        DirectXTex/DirectXTexMipmaps.cpp DirectXTex/DirectXTexCompress.cpp LICENSE)
     if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
-        sparkle_log_dependency_ready("Compressonator" "${compressonator_SOURCE_DIR}/cmp_core" "~5 MB, sparse")
+        sparkle_log_dependency_ready("DirectXTex" "${directxtex_SOURCE_DIR}" "~1 MB")
         return()
     endif()
-
-    include("${CMAKE_CURRENT_LIST_DIR}/CompressonatorTargets.cmake")
-
-    sparkle_log_dependency_ready("Compressonator" "${compressonator_SOURCE_DIR}/cmp_core" "~5 MB, sparse")
+    # Keep upstream's generic options local to this dependency composition.
+    function(sparkle_add_directxtex)
+        set(BUILD_SHARED_LIBS OFF)
+        set(BUILD_TOOLS OFF)
+        set(BUILD_SAMPLE OFF)
+        set(BUILD_DX11 OFF)
+        set(BUILD_DX12 OFF)
+        set(BC_USE_OPENMP OFF)
+        set(ENABLE_OPENEXR_SUPPORT OFF)
+        set(ENABLE_LIBJPEG_SUPPORT OFF)
+        set(ENABLE_LIBPNG_SUPPORT OFF)
+        sparkle_add_dependency_subdirectory(${directxtex_SOURCE_DIR} ${directxtex_BINARY_DIR} EXCLUDE_FROM_ALL)
+        set_target_properties(DirectXTex PROPERTIES FOLDER "ThirdParty/DirectXTex")
+        set_property(TARGET DirectXTex PROPERTY SPARKLE_SOURCE_PACKAGE
+            "{\"name\":\"DirectXTex\",\"versionInfo\":\"may2026\",\"licenseDeclared\":\"MIT\",\"downloadLocation\":\"https://github.com/microsoft/DirectXTex/tree/${SPARKLE_DIRECTXTEX_REVISION}\"}")
+    endfunction()
+    sparkle_add_directxtex()
+    sparkle_log_dependency_ready("DirectXTex" "${directxtex_SOURCE_DIR}" "~1 MB")
 endif()
 
 sparkle_source_dependency_selected("ktx" _sparkle_fetch_ktx)
-if(_sparkle_fetch_ktx AND (SPARKLE_ENABLE_KTX_SUPPORT OR NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL ""))
-    # KTX-Software - KTX2 texture container read/write
-    # https://github.com/KhronosGroup/KTX-Software
-    #
-    # v4.3.2 builds the ktx target from its root CMakeLists.txt. We disable
-    # tests, tools, docs, and JNI/Python bindings to keep the build minimal.
-    # We also skip the CTS git submodule (tests/cts) to avoid an extra clone.
-    #
-    # Target:  ktx (STATIC)
-    # Usage:   target_link_libraries(YourTarget PRIVATE ktx)
-    #          #include <ktx.h>
-    set(_sparkle_ktx_revision 91ace88675ac59a97e55d0378a6602a9ae6b98bd)
-    sparkle_prepare_git_fetchcontent_source(ktx EXPECTED_REVISION "${_sparkle_ktx_revision}")
-    FetchContent_Declare(ktx
-        GIT_REPOSITORY https://github.com/KhronosGroup/KTX-Software.git
-        GIT_TAG ${_sparkle_ktx_revision}
-        GIT_SHALLOW FALSE
-        GIT_PROGRESS ${_sparkle_git_progress}
-        GIT_SUBMODULES "")
-    sparkle_log_dependency_step(10 12 "KTX-Software" "v4.3.2" "~46 MB (largest dependency)" "KTX2 texture container read/write, with tests/tools/docs/JNI/Python disabled" "https://github.com/KhronosGroup/KTX-Software.git")
-    FetchContent_Populate(ktx)
-
+if(_sparkle_fetch_ktx AND (SPARKLE_ENABLE_CONTENT_PIPELINE OR NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL ""))
+    # Reuse the owned Git cache with a sparse source checkout, without upstream test media.
+    set(_ktx_source "${FETCHCONTENT_BASE_DIR}/ktx-src")
+    if(NOT EXISTS "${_ktx_source}")
+        execute_process(COMMAND "${GIT_EXECUTABLE}" clone --no-checkout --filter=blob:none --sparse
+            ${_sparkle_git_progress_args} https://github.com/KhronosGroup/KTX-Software.git "${_ktx_source}"
+            RESULT_VARIABLE _ktx_result)
+        if(NOT _ktx_result EQUAL 0)
+            message(FATAL_ERROR "KTX clone was interrupted or failed. Cache preserved at '${_ktx_source}'. Explicitly Clean KTX before retrying.")
+        endif()
+        execute_process(COMMAND "${GIT_EXECUTABLE}" sparse-checkout set --no-cone
+            "/*" "!/*/" "/include/" "/lib/" "!/lib/astc-encoder/Test/" "!/lib/basisu/webgl/"
+            "!/lib/basisu/contrib/" "!/lib/basisu/test_files/" "/other_include/" "/cmake/" "/utils/"
+            "/LICENSES/" "/tools/" "/interface/" "/tests/CMakeLists.txt"
+            WORKING_DIRECTORY "${_ktx_source}" RESULT_VARIABLE _ktx_result)
+        if(NOT _ktx_result EQUAL 0)
+            message(FATAL_ERROR "KTX sparse checkout failed. Cache preserved at '${_ktx_source}'.")
+        endif()
+        execute_process(COMMAND "${GIT_EXECUTABLE}" checkout --detach "${SPARKLE_KTX_REVISION}"
+            WORKING_DIRECTORY "${_ktx_source}" RESULT_VARIABLE _ktx_result)
+        if(NOT _ktx_result EQUAL 0)
+            message(FATAL_ERROR "KTX checkout failed. Cache preserved at '${_ktx_source}'.")
+        endif()
+    endif()
+    sparkle_prepare_git_fetchcontent_source(ktx EXPECTED_REVISION "${SPARKLE_KTX_REVISION}"
+        REQUIRED_PATHS CMakeLists.txt include/ktx.h lib/texture.c lib/texture1.c lib/texture2.c
+        lib/basis_transcode.cpp lib/miniz_wrapper.cpp lib/basisu/encoder/basisu_miniz.h
+        lib/basisu/zstd/zstd.c cmake/version.cmake include/KHR/khr_df.h
+        LICENSE.md NOTICE.md LICENSES/Apache-2.0.txt LICENSES/BSD-1-Clause.txt LICENSES/LicenseRef-ETCSLA.txt lib/basisu/zstd/LICENSE)
+    set(ktx_SOURCE_DIR "${_ktx_source}")
+    set(ktx_BINARY_DIR "${FETCHCONTENT_BASE_DIR}/ktx-build")
     if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
-        sparkle_log_dependency_ready("KTX-Software" "${ktx_SOURCE_DIR}" "~46 MB")
+        sparkle_log_dependency_ready("KTX-Software" "${ktx_SOURCE_DIR}" "sparse source checkout")
         return()
     endif()
 
@@ -690,6 +658,7 @@ if(_sparkle_fetch_ktx AND (SPARKLE_ENABLE_KTX_SUPPORT OR NOT SPARKLE_SYNC_SOURCE
     set(KTX_FEATURE_LOADTEST_APPS "" CACHE STRING "" FORCE)
     set(KTX_FEATURE_VK_UPLOAD OFF CACHE BOOL "" FORCE)
     set(KTX_FEATURE_GL_UPLOAD OFF CACHE BOOL "" FORCE)
+    set(BASISU_SUPPORT_OPENCL OFF CACHE BOOL "" FORCE)
 
     # CMake 4.2 can reach CTestTargets before the fetched binary tree has created
     # its CMakeFiles directory on repeated configure passes. Seed the sub-build
@@ -697,17 +666,28 @@ if(_sparkle_fetch_ktx AND (SPARKLE_ENABLE_KTX_SUPPORT OR NOT SPARKLE_SYNC_SOURCE
     file(MAKE_DIRECTORY "${ktx_BINARY_DIR}")
     file(MAKE_DIRECTORY "${ktx_BINARY_DIR}/CMakeFiles")
 
-    # Build from root CMakeLists.txt (v4.3.2 has no lib/CMakeLists.txt)
-    sparkle_add_dependency_subdirectory(${ktx_SOURCE_DIR} ${ktx_BINARY_DIR})
+    # Use the upstream read-only target; the writer/encoders stay excluded from tool builds.
+    sparkle_add_dependency_subdirectory(${ktx_SOURCE_DIR} ${ktx_BINARY_DIR} EXCLUDE_FROM_ALL)
 
     if(TARGET ktx)
         set_target_properties(ktx PROPERTIES FOLDER "ThirdParty/KTX")
     endif()
     if(TARGET ktx_read)
         set_target_properties(ktx_read PROPERTIES FOLDER "ThirdParty/KTX")
+        # Upstream recognizes only the literal Debug profile. Map its target-local
+        # optimization/definitions to Sparkle's Debug profiles without changing SDK sources.
+        foreach(_property IN ITEMS COMPILE_OPTIONS COMPILE_DEFINITIONS INTERFACE_COMPILE_DEFINITIONS)
+            get_target_property(_options ktx_read ${_property})
+            if(_options)
+                string(REPLACE "$<CONFIG:Debug>" "$<CONFIG:Debug,DebugEditor,DebugGame>" _options "${_options}")
+                set_property(TARGET ktx_read PROPERTY ${_property} ${_options})
+            endif()
+        endforeach()
+        set_property(TARGET ktx_read PROPERTY SPARKLE_SOURCE_PACKAGE
+            "{\"name\":\"KTX-Software\",\"versionInfo\":\"4.3.2\",\"licenseDeclared\":\"Apache-2.0 AND BSD-1-Clause AND BSD-3-Clause AND LicenseRef-ETCSLA\",\"downloadLocation\":\"https://github.com/KhronosGroup/KTX-Software/tree/${SPARKLE_KTX_REVISION}\"}")
     endif()
 
-    sparkle_log_dependency_ready("KTX-Software" "${ktx_SOURCE_DIR}" "~46 MB")
+    sparkle_log_dependency_ready("KTX-Software" "${ktx_SOURCE_DIR}" "sparse source checkout")
 endif()
 
 sparkle_source_dependency_selected("spirv-reflect" _sparkle_fetch_spirv_reflect)

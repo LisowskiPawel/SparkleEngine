@@ -12,6 +12,7 @@
 #include <vector>
 
 class CompiledTaskGraph;
+class TaskExecutionContext;
 class TaskNodeHandle;
 struct TaskExecutorConfig;
 
@@ -35,11 +36,12 @@ public:
 private:
 	TaskExecutorConfig BuildExecutorConfig() const;
 	CompiledTaskGraph BuildTaskGraph(std::vector<TaskNodeHandle>& outTaskHandles);
-	TaskResult CookRequest(std::uint32_t index);
+	TaskResult CookRequest(std::uint32_t index, TaskExecutionContext& context);
 	static std::uint32_t ResolveBackgroundWorkerCount();
 
 	const std::vector<TextureCookRequest>& m_requests;
 	TextureCookMemoryLimiter m_memoryLimiter;
+	TextureCookMemoryLimiter m_sourceMemoryLimiter;
 	std::function<void(std::size_t, std::size_t)> m_progress;
 	std::atomic<std::size_t> m_completedRequests{0};
 	std::vector<TextureCookBatchItemResult> m_items;

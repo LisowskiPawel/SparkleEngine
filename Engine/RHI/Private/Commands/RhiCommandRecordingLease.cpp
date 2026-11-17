@@ -40,7 +40,7 @@ RhiCommandRecordingLease& RhiCommandRecordingLease::operator=(RhiCommandRecordin
 RenderCommandList& RhiCommandRecordingLease::GetCommandList() noexcept
 {
 	assert(m_commandList != nullptr);
-	assert(!m_closed);
+	assert(!m_bClosed);
 	BeginRecording();
 	return *m_commandList;
 }

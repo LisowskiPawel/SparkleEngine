@@ -15,7 +15,6 @@ struct DefaultTextureCookDesc final
 	std::string_view SourceRelativePath;
 	DefaultTexture Product;
 	TextureColorSpace ColorSpace;
-	TextureMipFilter MipFilter;
 	TextureColorProcessingPolicy ColorProcessingPolicy;
 	TextureGroup Group;
 	TextureDimension Dimension;
@@ -26,7 +25,6 @@ static constexpr std::array DefaultTextures = {
         "Assets/Textures/Defaults/default_checkerboard.png",
         DefaultTexture::Checkerboard,
         TextureColorSpace::Srgb,
-        TextureMipFilter::Kaiser,
         TextureColorProcessingPolicy::SrgbLinearize,
         TextureGroup::Diffuse,
         TextureDimension::Texture2D},
@@ -34,7 +32,6 @@ static constexpr std::array DefaultTextures = {
         "Assets/Textures/Defaults/default_white.png",
         DefaultTexture::White,
         TextureColorSpace::Srgb,
-        TextureMipFilter::Regular,
         TextureColorProcessingPolicy::SrgbLinearize,
         TextureGroup::Diffuse,
         TextureDimension::Texture2D},
@@ -42,7 +39,6 @@ static constexpr std::array DefaultTextures = {
         "Assets/Textures/Defaults/default_black.png",
         DefaultTexture::Black,
         TextureColorSpace::Srgb,
-        TextureMipFilter::Regular,
         TextureColorProcessingPolicy::SrgbLinearize,
         TextureGroup::Diffuse,
         TextureDimension::Texture2D},
@@ -50,7 +46,6 @@ static constexpr std::array DefaultTextures = {
         "Assets/Textures/Defaults/default_red.png",
         DefaultTexture::Red,
         TextureColorSpace::Srgb,
-        TextureMipFilter::Regular,
         TextureColorProcessingPolicy::SrgbLinearize,
         TextureGroup::Diffuse,
         TextureDimension::Texture2D},
@@ -58,7 +53,6 @@ static constexpr std::array DefaultTextures = {
         "Assets/Textures/Defaults/default_green.png",
         DefaultTexture::Green,
         TextureColorSpace::Srgb,
-        TextureMipFilter::Regular,
         TextureColorProcessingPolicy::SrgbLinearize,
         TextureGroup::Diffuse,
         TextureDimension::Texture2D},
@@ -66,7 +60,6 @@ static constexpr std::array DefaultTextures = {
         "Assets/Textures/Defaults/default_blue.png",
         DefaultTexture::Blue,
         TextureColorSpace::Srgb,
-        TextureMipFilter::Regular,
         TextureColorProcessingPolicy::SrgbLinearize,
         TextureGroup::Diffuse,
         TextureDimension::Texture2D},
@@ -74,7 +67,6 @@ static constexpr std::array DefaultTextures = {
         "Assets/Textures/Defaults/default_normal.png",
         DefaultTexture::Normal,
         TextureColorSpace::Linear,
-        TextureMipFilter::NormalAware,
         TextureColorProcessingPolicy::Linear,
         TextureGroup::NormalMap,
         TextureDimension::Texture2D},
@@ -82,7 +74,6 @@ static constexpr std::array DefaultTextures = {
         "Assets/Textures/Sky/evening_road_01_puresky_4k.exr",
         DefaultTexture::Sky,
         TextureColorSpace::Linear,
-        TextureMipFilter::Regular,
         TextureColorProcessingPolicy::Linear,
         TextureGroup::Default,
         TextureDimension::Texture2D},
@@ -104,7 +95,6 @@ static void AppendRequest(const DefaultTextureCookDesc& description, TextureCook
 	request.outputPath = (Filesystem::GetCookedTextureRootPath() / std::filesystem::path(product.path)).lexically_normal();
 	request.policy.colorSpace = description.ColorSpace;
 	request.policy.mipPolicy = TextureMipPolicy::Generate;
-	request.policy.mipFilter = description.MipFilter;
 	request.policy.colorProcessingPolicy = description.ColorProcessingPolicy;
 	request.policy.textureGroup = description.Group;
 	request.policy.dimension = description.Dimension;

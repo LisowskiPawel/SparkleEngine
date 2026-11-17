@@ -63,9 +63,6 @@ namespace SparkleLauncher
 #if SPARKLE_ENABLE_SHADER_COMPILER
 		settings.bShaderCompilerEnabled = true;
 #endif
-#if SPARKLE_ENABLE_KTX_SUPPORT
-		settings.bKtxSupportEnabled = true;
-#endif
 #if SPARKLE_ENABLE_NVIDIA_STREAMLINE
 		settings.bNvidiaStreamlineEnabled = hostGraphics.bHasNvidiaAdapter;
 #endif

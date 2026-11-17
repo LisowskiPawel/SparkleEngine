@@ -1,6 +1,8 @@
 #include "SparkleLauncher/SourceDependencyState.h"
 
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
+#include "SparkleLauncher/ToolResolver.h"
+#include "Core/Public/Process/ChildProcess.h"
 
 #include <cstdint>
 #include <sstream>
@@ -66,19 +68,44 @@ namespace SparkleLauncher
 		        true,
 		        true},
 		    {"cgltf", "cgltf", "v1.15", "Single-header glTF 2.0 parser for source scene imports.", "cgltf-src", {"cgltf.h"}, false, features.bContentPipelineEnabled},
-		    {"stb", "stb", "git 2c980bb", "Header-only image loading and mip resize helpers.", "stb-src", {"stb_image.h", "stb_image_resize2.h"}, false, features.bContentPipelineEnabled},
-		    {"tinyexr", "tinyexr", "v1.0.7", "Header-only OpenEXR image loading support.", "tinyexr-src", {"tinyexr.h", "deps/miniz/miniz.h"}, false, features.bContentPipelineEnabled},
-		    {"zlib", "zlib", "v1.3.1", "Compression backend used by Assimp.", "zlib-src", {"zlib.h", "CMakeLists.txt"}, false, features.bContentPipelineEnabled},
+		    {"stb", "stb", "git 2c980bb", "PSD/PIC/PNM/TGA source decoding.", "stb-src", {"stb_image.h", "LICENSE"}, false, features.bContentPipelineEnabled},
+		    {"tinyexr", "tinyexr", "v1.0.7", "Header-only OpenEXR image loading support.", "tinyexr-src", {"tinyexr.h"}, false, features.bContentPipelineEnabled},
+		    {"zlib", "zlib", "v1.3.1", "Compression backend used by Assimp and EXR decoding.", "zlib-src", {"zlib.h", "CMakeLists.txt"}, false, features.bContentPipelineEnabled},
 		    {"assimp", "Assimp", "v5.4.3", "FBX and DCC scene import support.", "assimp-src", {"include/assimp/Importer.hpp", "CMakeLists.txt"}, false, features.bContentPipelineEnabled},
-		    {"compressonator",
-		        "Compressonator",
-		        "git f4b53d7 (sparse)",
-		        "AMD BC1-BC7 texture block compression support.",
-		        "compressonator-src",
-		        {"cmp_core/source/cmp_core.cpp", "applications/_libs/cmp_math/cmp_math_common.cpp"},
+		    {"directxtex",
+		        "DirectXTex",
+		        "may2026 / git 4feb3e1",
+		        "CPU texture decoding, conversion, mip generation and BC encoding.",
+		        "directxtex-src",
+		        {"CMakeLists.txt", "DirectXTex/DirectXTex.h", "DirectXTex/DirectXTexDDS.cpp", "DirectXTex/DirectXTexMipmaps.cpp", "DirectXTex/DirectXTexCompress.cpp", "LICENSE"},
 		        false,
-		        features.bContentPipelineEnabled},
-		    {"ktx", "KTX-Software", "v4.3.2", "KTX2 texture container read/write support.", "ktx-src", {"include/ktx.h", "CMakeLists.txt"}, false, features.bKtxSupportEnabled},
+		        features.bContentPipelineEnabled,
+		        SPARKLE_DIRECTXTEX_REVISION},
+		    {"ktx",
+		        "KTX-Software",
+		        "v4.3.2",
+		        "Native KTX1/KTX2 source containers.",
+		        "ktx-src",
+		        {"include/ktx.h",
+		            "CMakeLists.txt",
+		            "lib/texture.c",
+		            "lib/texture1.c",
+		            "lib/texture2.c",
+		            "lib/basis_transcode.cpp",
+		            "lib/miniz_wrapper.cpp",
+		            "lib/basisu/encoder/basisu_miniz.h",
+		            "lib/basisu/zstd/zstd.c",
+		            "cmake/version.cmake",
+		            "include/KHR/khr_df.h",
+		            "LICENSE.md",
+		            "NOTICE.md",
+		            "LICENSES/Apache-2.0.txt",
+		            "LICENSES/BSD-1-Clause.txt",
+		            "LICENSES/LicenseRef-ETCSLA.txt",
+		            "lib/basisu/zstd/LICENSE"},
+		        false,
+		        features.bContentPipelineEnabled,
+		        SPARKLE_KTX_REVISION},
 		    {"spirv-reflect",
 		        "SPIRV-Reflect",
 		        "vulkan-sdk-1.3.290.0",
@@ -142,7 +169,28 @@ namespace SparkleLauncher
 			}
 		}
 
-		validation.bReady = validation.MissingRelativePaths.empty();
+		if (!dependency.ExpectedGitRevision.empty() && validation.MissingRelativePaths.empty())
+		{
+			const ToolResolveResult git = ResolveKnownTool(KnownTool::Git);
+			Process::ChildProcessRequest request;
+			request.ExecutablePath = git.Path;
+			request.WorkingDirectory = validation.CachePath;
+			request.Environment = {{"GIT_TERMINAL_PROMPT", "0"}, {"GIT_NO_LAZY_FETCH", "1"}};
+			request.Arguments = {"rev-parse", "HEAD"};
+			const auto revision = Process::RunChildProcess(request);
+			request.Arguments = {"status", "--porcelain", "--untracked-files=all"};
+			const auto state = Process::RunChildProcess(request);
+			const std::string expectedLine = dependency.ExpectedGitRevision + "\n";
+			const std::string expectedWindowsLine = dependency.ExpectedGitRevision + "\r\n";
+			const bool bExpectedRevision = revision.CapturedOutput == expectedLine || revision.CapturedOutput == expectedWindowsLine;
+			const bool bCommandsSucceeded = revision.Succeeded() && state.Succeeded();
+			const bool bClean = state.CapturedOutput.empty() && bExpectedRevision;
+			if (!bCommandsSucceeded || !bClean)
+			{
+				validation.IdentityFailure = "Cache must be clean at " + dependency.ExpectedGitRevision + ". Preserve edits, then explicitly Clean and Sync this dependency.";
+			}
+		}
+		validation.bReady = validation.MissingRelativePaths.empty() && validation.IdentityFailure.empty();
 		return validation;
 	}
 
@@ -180,7 +228,8 @@ namespace SparkleLauncher
 			}
 
 			status.bAllEnabledDependenciesReady = false;
-			status.ReadinessMessages.push_back(dependency.Label + " cache is incomplete. Missing: " + JoinPaths(validation.MissingRelativePaths) + ".");
+			const std::string reason = validation.IdentityFailure.empty() ? "Missing: " + JoinPaths(validation.MissingRelativePaths) + "." : validation.IdentityFailure;
+			status.ReadinessMessages.push_back(dependency.Label + " cache is not ready. " + reason);
 		}
 
 		if (status.EnabledDependencyCount == 0)

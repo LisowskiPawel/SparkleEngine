@@ -24,15 +24,14 @@ struct TextureSourceLocation final
 
 static TextureColorSpace ResolveColorSpace(TextureGroup textureGroup) noexcept;
 static TextureMipPolicy ResolveMipPolicy(const std::filesystem::path& sourceTexturePath);
-static TextureMipFilter ResolveMipFilter(TextureGroup textureGroup) noexcept;
 static std::filesystem::path NormalizeSourceTexturePath(const std::filesystem::path& sourceTexturePath);
 static TextureSourceLocation ResolveSourceLocation(const std::filesystem::path& sourcePath);
 
 static std::string BuildTextureSourceKey(const TextureCookRequest& request, const TextureSourceLocation& location)
 {
 	return std::string(location.rootName) + ":" + GetTextureColorSpaceName(request.policy.colorSpace) + ":" + GetTextureMipPolicyName(request.policy.mipPolicy) + ":"
-	    + GetTextureMipFilterName(request.policy.mipFilter) + ":" + GetTextureColorProcessingPolicyName(request.policy.colorProcessingPolicy) + ":" + GetTextureGroupName(request.policy.textureGroup)
-	    + ":" + GetTextureDimensionName(request.policy.dimension) + ":" + GetTextureChannelMaskName(request.policy.channelMask) + ":" + location.relativePath.generic_string();
+	    + GetTextureColorProcessingPolicyName(request.policy.colorProcessingPolicy) + ":" + GetTextureGroupName(request.policy.textureGroup) + ":" + GetTextureDimensionName(request.policy.dimension)
+	    + ":" + GetTextureChannelMaskName(request.policy.channelMask) + ":" + location.relativePath.generic_string();
 }
 
 static std::filesystem::path BuildTextureOutputPath(const TextureCookRequest& request, const TextureSourceLocation& location)
@@ -48,7 +47,6 @@ TextureCookRequest BuildTextureCookRequest(const std::filesystem::path& sourceTe
 	request.sourcePath = NormalizeSourceTexturePath(sourceTexturePath);
 	request.policy.colorSpace = ResolveColorSpace(textureGroup);
 	request.policy.mipPolicy = ResolveMipPolicy(request.sourcePath);
-	request.policy.mipFilter = ResolveMipFilter(textureGroup);
 	request.policy.colorProcessingPolicy = request.IsSrgb() ? TextureColorProcessingPolicy::SrgbLinearize : TextureColorProcessingPolicy::Linear;
 	request.policy.textureGroup = textureGroup;
 	request.policy.channelMask = channelMask;
@@ -99,34 +97,13 @@ static TextureColorSpace ResolveColorSpace(TextureGroup textureGroup) noexcept
 
 static TextureMipPolicy ResolveMipPolicy(const std::filesystem::path& sourceTexturePath)
 {
-	if (Paths::GetLowercaseExtension(sourceTexturePath) == L".dds")
+	const auto extension = Paths::GetLowercaseExtension(sourceTexturePath);
+	const bool bKtx = extension == L".ktx" || extension == L".ktx2";
+	if (extension == L".dds" || bKtx)
 	{
 		return TextureMipPolicy::PreserveExisting;
 	}
 	return TextureMipPolicy::Generate;
-}
-
-static TextureMipFilter ResolveMipFilter(TextureGroup textureGroup) noexcept
-{
-	switch (textureGroup)
-	{
-		case TextureGroup::Diffuse:
-			return TextureMipFilter::Kaiser;
-
-		case TextureGroup::NormalMap:
-			return TextureMipFilter::NormalAware;
-
-		case TextureGroup::Default:
-		case TextureGroup::Roughness:
-		case TextureGroup::Metallic:
-		case TextureGroup::AmbientOcclusion:
-		case TextureGroup::Emissive:
-		case TextureGroup::SubsurfaceColor:
-		case TextureGroup::SubsurfaceStrength:
-		case TextureGroup::HdrColor:
-		default:
-			return TextureMipFilter::Regular;
-	}
 }
 
 static std::filesystem::path NormalizeSourceTexturePath(const std::filesystem::path& sourceTexturePath)

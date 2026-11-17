@@ -78,7 +78,7 @@ Build the [three portfolio cases](Goals.md#the-three-cases) from the completed t
 
 These changes support rendering and add no first-release prerequisites. Start with [JSON](ThirdPartyMigration.md#candidates-and-expected-benefit). Investigate task execution and cooked metadata next, followed by texture cooking and native window/input. The migration guide records candidate benefits and requirements; other candidates remain deferred.
 
-Texture cooking stages 1–2 are complete for baseline capture and a **NO-GO evaluation on 2026-11-17**. No replacement processor qualified; the migration is blocked and stages 3–6 remain unstarted. The [final disposition](Implementation/TextureCooking.md#stage-2-final-disposition--2026-11-17) records the evidence and the SDK/capability changes required to reopen selection. Keep the working cooker until a candidate qualifies.
+Texture cooking selected Microsoft DirectXTex after the user relaxed exact legacy filter equivalence on 2026-11-17. The combined dependency and consumer migration is under qualification; the [implementation plan](Implementation/TextureCooking.md#progress-and-evidence) records results and remaining fault, native upload, visual and delivery acceptance.
 
 ## Choosing the next task
 

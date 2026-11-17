@@ -1,7 +1,6 @@
 #include "PCH.h"
 #include "Cooking/CookedTextureAssetWriter.h"
-
-#include "Pipeline/TextureLoadResult.h"
+#include "SourceLoading/TextureSource.h"
 #include "Textures/CookedTextureAsset.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/BinaryStreamWriter.h"
@@ -11,103 +10,91 @@
 #include <limits>
 #include <vector>
 
-static std::vector<CookedTextureMipHeader> BuildMipHeaders(const TextureLoadResult& cookedTexture)
+void WriteCookedTextureAsset(const DirectX::ScratchImage& texture, TextureMipPolicy policy, const std::filesystem::path& outputPath, std::stop_token cancellation)
 {
+	CheckTextureCancellation(cancellation);
+	const auto& metadata = texture.GetMetadata();
+	const std::size_t levels = policy == TextureMipPolicy::NoMips ? 1 : metadata.mipLevels;
 	std::vector<CookedTextureMipHeader> mipHeaders;
-	mipHeaders.reserve(cookedTexture.GetSubresourceCount());
-	for (const TextureArraySliceData& arraySlice : cookedTexture.arraySlices)
+	mipHeaders.reserve(metadata.arraySize * levels);
+	for (std::size_t item = 0; item < metadata.arraySize; ++item)
 	{
-		for (const TextureMipLevelData& mipLevel : arraySlice)
+		for (std::size_t mip = 0; mip < levels; ++mip)
 		{
-			if (mipLevel.data.size() > (std::numeric_limits<std::uint32_t>::max)())
+			const auto* image = texture.GetImage(mip, item, 0);
+			if (!image || !image->pixels || image->slicePitch > (std::numeric_limits<std::uint32_t>::max)())
 			{
-				throw Diagnostics::Error("Texture mip payload is too large to serialize into a cooked texture asset.");
+				throw Diagnostics::Error("Native output contains an invalid or oversized subresource.");
 			}
-
-			CookedTextureMipHeader mipHeader;
-			mipHeader.width = mipLevel.width;
-			mipHeader.height = mipLevel.height;
-			mipHeader.rowPitch = mipLevel.rowPitch;
-			mipHeader.slicePitch = mipLevel.slicePitch;
-			mipHeader.dataSize = static_cast<std::uint32_t>(mipLevel.data.size());
-			mipHeaders.push_back(mipHeader);
+			std::size_t row = 0;
+			std::size_t slice = 0;
+			CheckTextureOperation(DirectX::ComputePitch(metadata.format, image->width, image->height, row, slice), "measure output subresource");
+			if (image->rowPitch != row || image->slicePitch != slice)
+			{
+				throw Diagnostics::Error("Cooked textures require canonical tightly packed native rows.");
+			}
+			CookedTextureMipHeader header{};
+			header.width = static_cast<std::uint32_t>(image->width);
+			header.height = static_cast<std::uint32_t>(image->height);
+			header.rowPitch = static_cast<std::uint32_t>(row);
+			header.slicePitch = header.dataSize = static_cast<std::uint32_t>(slice);
+			mipHeaders.push_back(header);
 		}
 	}
-	return mipHeaders;
-}
-
-static CookedTextureAssetHeader BuildHeader(const TextureLoadResult& cookedTexture)
-{
-	CookedTextureAssetHeader header;
+	CookedTextureAssetHeader header{};
 	header.magic = kCookedTextureAssetMagic;
-	header.width = cookedTexture.width;
-	header.height = cookedTexture.height;
-	header.format = static_cast<std::uint32_t>(cookedTexture.dxgiFormat);
-	header.formatIntent = static_cast<std::uint32_t>(cookedTexture.formatIntent);
-	header.mipCount = cookedTexture.GetMipCount();
-	header.packedLayout = PackCookedTextureLayout(cookedTexture.dimension, cookedTexture.GetArraySize());
-	return header;
-}
-
-static void WriteMipPayloads(std::ofstream& output, const TextureLoadResult& cookedTexture, std::string& fileError)
-{
-	for (const TextureArraySliceData& arraySlice : cookedTexture.arraySlices)
-	{
-		for (const TextureMipLevelData& mipLevel : arraySlice)
-		{
-			if (!Files::BinaryStreamWriter::WriteBytes(output, mipLevel.data.data(), mipLevel.data.size(), fileError))
-			{
-				throw Diagnostics::Error(fileError);
-			}
-		}
-	}
-}
-
-void WriteCookedTextureAsset(const TextureLoadResult& cookedTexture, const std::filesystem::path& outputPath)
-{
-	const std::vector<CookedTextureMipHeader> mipHeaders = BuildMipHeaders(cookedTexture);
-	const CookedTextureAssetHeader header = BuildHeader(cookedTexture);
-	const std::filesystem::path temporaryOutputPath = Files::BuildTemporaryPath(outputPath);
-	Files::CleanupTemporaryFile(temporaryOutputPath);
-
+	header.width = static_cast<std::uint32_t>(metadata.width);
+	header.height = static_cast<std::uint32_t>(metadata.height);
+	header.format = static_cast<std::uint32_t>(metadata.format);
+	header.formatIntent = static_cast<std::uint32_t>(DirectX::IsSRGB(metadata.format) ? TextureFormatIntent::ColorSrgb : TextureFormatIntent::DataLinear);
+	header.mipCount = static_cast<std::uint16_t>(levels);
+	const auto dimension = metadata.IsCubemap() ? TextureResourceDimension::TextureCube : TextureResourceDimension::Texture2D;
+	header.packedLayout = PackCookedTextureLayout(dimension, static_cast<std::uint16_t>(metadata.arraySize));
+	const auto temporaryPath = Files::BuildTemporaryPath(outputPath);
+	Files::CleanupTemporaryFile(temporaryPath);
 	std::ofstream output;
-	std::string fileError;
+	std::string error;
 	try
 	{
-		if (!Files::TryOpenBinaryOutput(temporaryOutputPath, output, fileError))
+		if (!Files::TryOpenBinaryOutput(temporaryPath, output, error))
 		{
-			throw Diagnostics::Error(fileError);
+			throw Diagnostics::Error(error);
 		}
-
-		const bool bHeaderWritten = Files::BinaryStreamWriter::WriteValue(output, header, fileError);
-		const bool bMipHeadersWritten = bHeaderWritten && Files::BinaryStreamWriter::WriteBytes(output, mipHeaders.data(), sizeof(CookedTextureMipHeader) * mipHeaders.size(), fileError);
-
+		const bool bHeaderWritten = Files::BinaryStreamWriter::WriteValue(output, header, error);
+		const bool bMipHeadersWritten = bHeaderWritten && Files::BinaryStreamWriter::WriteBytes(output, mipHeaders.data(), mipHeaders.size() * sizeof(CookedTextureMipHeader), error);
 		if (!bMipHeadersWritten)
 		{
-			throw Diagnostics::Error(fileError);
+			throw Diagnostics::Error(error);
 		}
-
-		WriteMipPayloads(output, cookedTexture, fileError);
-
+		for (std::size_t item = 0; item < metadata.arraySize; ++item)
+		{
+			for (std::size_t mip = 0; mip < levels; ++mip)
+			{
+				CheckTextureCancellation(cancellation);
+				const auto& image = *texture.GetImage(mip, item, 0);
+				const bool bWritten = Files::BinaryStreamWriter::WriteBytes(output, image.pixels, image.slicePitch, error);
+				if (!bWritten)
+				{
+					throw Diagnostics::Error(error);
+				}
+			}
+		}
 		output.flush();
 		if (!output.good())
 		{
-			throw Diagnostics::Error("Failed to flush cooked texture output '" + temporaryOutputPath.string() + "'.");
+			throw Diagnostics::Error("Failed to flush cooked texture output.");
 		}
-
-		if (!Files::TryCloseOutput(output, temporaryOutputPath, fileError))
+		CheckTextureCancellation(cancellation);
+		const bool bClosed = Files::TryCloseOutput(output, temporaryPath, error);
+		const bool bFinalized = bClosed && Files::TryFinalizeTemporaryFile(temporaryPath, outputPath, error);
+		if (!bFinalized)
 		{
-			throw Diagnostics::Error(fileError);
-		}
-
-		if (!Files::TryFinalizeTemporaryFile(temporaryOutputPath, outputPath, fileError))
-		{
-			throw Diagnostics::Error(fileError);
+			throw Diagnostics::Error(error);
 		}
 	}
 	catch (...)
 	{
-		Files::CleanupTemporaryFile(temporaryOutputPath, &output);
+		Files::CleanupTemporaryFile(temporaryPath, &output);
 		throw;
 	}
 }

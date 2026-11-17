@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Core/Public/Assets/TextureGroup.h"
 #include "Core/Public/Assets/TextureProperties.h"
@@ -21,14 +21,6 @@ enum class TextureMipPolicy : std::uint8_t
 	NoMips = 2,
 };
 
-enum class TextureMipFilter : std::uint8_t
-{
-	Regular = 0,
-	Kaiser = 1,
-	NormalAware = 2,
-	Angular = 3,
-};
-
 enum class TextureColorProcessingPolicy : std::uint8_t
 {
 	Linear = 0,
@@ -39,7 +31,6 @@ struct TextureCookPolicy final
 {
 	TextureColorSpace colorSpace = TextureColorSpace::Linear;
 	TextureMipPolicy mipPolicy = TextureMipPolicy::Generate;
-	TextureMipFilter mipFilter = TextureMipFilter::Regular;
 	TextureColorProcessingPolicy colorProcessingPolicy = TextureColorProcessingPolicy::Linear;
 	TextureGroup textureGroup = TextureGroup::Default;
 	TextureDimension dimension = TextureDimension::Texture2D;
@@ -84,7 +75,6 @@ void ValidateTextureCookRequest(const TextureCookRequest& request);
 
 const char* GetTextureColorSpaceName(TextureColorSpace colorSpace) noexcept;
 const char* GetTextureMipPolicyName(TextureMipPolicy mipPolicy) noexcept;
-const char* GetTextureMipFilterName(TextureMipFilter mipFilter) noexcept;
 const char* GetTextureColorProcessingPolicyName(TextureColorProcessingPolicy colorProcessingPolicy) noexcept;
 const char* GetTextureGroupName(TextureGroup textureGroup) noexcept;
 const char* GetTextureDimensionName(TextureDimension dimension) noexcept;

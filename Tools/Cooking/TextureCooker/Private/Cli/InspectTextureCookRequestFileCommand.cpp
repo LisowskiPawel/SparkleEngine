@@ -15,10 +15,10 @@
 static void PrintRequest(const TextureCookRequest& request)
 {
 	std::cout << "  Texture '" << Formatting::FormatHexUInt64(request.assetId) << "' colorSpace='" << GetTextureColorSpaceName(request.policy.colorSpace) << "' mipPolicy='"
-	          << GetTextureMipPolicyName(request.policy.mipPolicy) << "' mipFilter='" << GetTextureMipFilterName(request.policy.mipFilter) << "' colorProcessing='"
-	          << GetTextureColorProcessingPolicyName(request.policy.colorProcessingPolicy) << "' textureGroup='" << GetTextureGroupName(request.policy.textureGroup) << "' dimension='"
-	          << GetTextureDimensionName(request.policy.dimension) << "' channelMask='" << GetTextureChannelMaskName(request.policy.channelMask) << "' output='"
-	          << Strings::ToNarrow(request.outputPath.wstring()) << "' source='" << Strings::ToNarrow(request.sourcePath.wstring()) << "'\n";
+	          << GetTextureMipPolicyName(request.policy.mipPolicy) << "' colorProcessing='" << GetTextureColorProcessingPolicyName(request.policy.colorProcessingPolicy) << "' textureGroup='"
+	          << GetTextureGroupName(request.policy.textureGroup) << "' dimension='" << GetTextureDimensionName(request.policy.dimension) << "' channelMask='"
+	          << GetTextureChannelMaskName(request.policy.channelMask) << "' output='" << Strings::ToNarrow(request.outputPath.wstring()) << "' source='"
+	          << Strings::ToNarrow(request.sourcePath.wstring()) << "'\n";
 }
 
 int InspectTextureCookRequestFile(const std::filesystem::path& requestFilePath)

@@ -66,14 +66,11 @@ namespace SparkleLauncher
 		const WorkspaceFeatureSettings featureSettings = GetLauncherWorkspaceFeatureSettings();
 		const std::string selectedContentPipeline = ToCMakeBool(featureSettings.bContentPipelineEnabled);
 		const std::string selectedShaderCompiler = ToCMakeBool(featureSettings.bShaderCompilerEnabled);
-		const std::string selectedKtxSupport = ToCMakeBool(featureSettings.bKtxSupportEnabled);
 		const std::string selectedNvidiaStreamline = ToCMakeBool(featureSettings.bNvidiaStreamlineEnabled);
 		const std::string cacheContentPipeline = ReadCMakeCacheValue(status.CachePath, "SPARKLE_ENABLE_CONTENT_PIPELINE").value_or(std::string());
 		const std::string cacheShaderCompiler = ReadCMakeCacheValue(status.CachePath, "SPARKLE_ENABLE_SHADER_COMPILER").value_or(std::string());
-		const std::string cacheKtxSupport = ReadCMakeCacheValue(status.CachePath, "SPARKLE_ENABLE_KTX_SUPPORT").value_or(std::string());
 		const std::string cacheNvidiaStreamline = ReadCMakeCacheValue(status.CachePath, "SPARKLE_ENABLE_NVIDIA_STREAMLINE").value_or(std::string());
-		if (cacheContentPipeline != selectedContentPipeline || cacheShaderCompiler != selectedShaderCompiler || cacheKtxSupport != selectedKtxSupport
-		    || cacheNvidiaStreamline != selectedNvidiaStreamline)
+		if (cacheContentPipeline != selectedContentPipeline || cacheShaderCompiler != selectedShaderCompiler || cacheNvidiaStreamline != selectedNvidiaStreamline)
 		{
 			status.State = BuildFilesFreshnessState::FeatureSetMismatch;
 			status.Summary = "CMake cache workspace feature toggles differ from the launcher feature set.";
@@ -105,8 +102,7 @@ namespace SparkleLauncher
 		const bool bStampShaderCompilerMatches = bStampContentPipelineMatches
 		    && ReadBuildFilesFreshnessStampValue(status.StampPath, "shaderCompiler").value_or(std::string()) == selectedShaderCompiler;
 
-		const bool bStampKtxMatches = bStampShaderCompilerMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "ktxSupport").value_or(std::string()) == selectedKtxSupport;
-		const bool bStampStreamlineMatches = bStampKtxMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "nvidiaStreamline").value_or(std::string()) == selectedNvidiaStreamline;
+		const bool bStampStreamlineMatches = bStampShaderCompilerMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "nvidiaStreamline").value_or(std::string()) == selectedNvidiaStreamline;
 
 		if (!bStampStreamlineMatches)
 		{
@@ -185,7 +181,6 @@ namespace SparkleLauncher
 		       << "    \"vulkanSdkRoot\": \"" << Strings::EscapeJsonString(toolchain.VulkanSdkRoot.generic_string()) << "\",\n"
 		       << "    \"contentPipeline\": \"" << ToCMakeBool(featureSettings.bContentPipelineEnabled) << "\",\n"
 		       << "    \"shaderCompiler\": \"" << ToCMakeBool(featureSettings.bShaderCompilerEnabled) << "\",\n"
-		       << "    \"ktxSupport\": \"" << ToCMakeBool(featureSettings.bKtxSupportEnabled) << "\",\n"
 		       << "    \"nvidiaStreamline\": \"" << ToCMakeBool(featureSettings.bNvidiaStreamlineEnabled) << "\",\n"
 		       << "    \"sourceListHash\": \"" << *sourceListHash << "\",\n"
 		       << "    \"updatedUtc\": \"" << BuildUtcTimestamp() << "\"\n"

@@ -55,7 +55,8 @@ namespace SparkleLauncher
 	ThirdPartyDependencyUiStatus BuildThirdPartyDependencyStatus(const ThirdPartyDependencyUiEntry& dependency, const std::filesystem::path& dependencyCachePath)
 	{
 		const SourceDependencyValidation validation = ValidateDependency(dependency, dependencyCachePath);
-		const QString detail = dependency.Purpose.isEmpty() ? dependency.Version : QStringLiteral("%1 · %2").arg(dependency.Version, dependency.Purpose);
+		const QString description = dependency.Purpose.isEmpty() ? dependency.Version : QStringLiteral("%1 · %2").arg(dependency.Version, dependency.Purpose);
+		const QString detail = validation.IdentityFailure.empty() ? description : ToQString(validation.IdentityFailure);
 		return validation.bReady ? ThirdPartyDependencyUiStatus{"Synced", detail, "ok", true} : ThirdPartyDependencyUiStatus{"Missing", detail, "warning", false};
 	}
 }

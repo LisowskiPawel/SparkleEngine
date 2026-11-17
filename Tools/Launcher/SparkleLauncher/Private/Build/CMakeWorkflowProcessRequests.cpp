@@ -62,7 +62,6 @@ namespace SparkleLauncher
 		const WorkspaceFeatureSettings featureSettings = GetLauncherWorkspaceFeatureSettings();
 		process.Arguments.push_back("-DSPARKLE_ENABLE_CONTENT_PIPELINE=" + ToCMakeBool(featureSettings.bContentPipelineEnabled));
 		process.Arguments.push_back("-DSPARKLE_ENABLE_SHADER_COMPILER=" + ToCMakeBool(featureSettings.bShaderCompilerEnabled));
-		process.Arguments.push_back("-DSPARKLE_ENABLE_KTX_SUPPORT=" + ToCMakeBool(featureSettings.bKtxSupportEnabled));
 		process.Arguments.push_back("-DSPARKLE_ENABLE_NVIDIA_STREAMLINE=" + ToCMakeBool(featureSettings.bNvidiaStreamlineEnabled));
 		process.Arguments.push_back("-Wno-dev");
 		process.Arguments.push_back(Strings::ToNarrow(workspaceRoot.wstring()));

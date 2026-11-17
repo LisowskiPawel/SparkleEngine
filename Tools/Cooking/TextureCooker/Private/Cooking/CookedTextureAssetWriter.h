@@ -1,7 +1,12 @@
 #pragma once
 
-#include <filesystem>
+#include <stop_token>
 
-struct TextureLoadResult;
+#include "TextureCookRequestList.h"
 
-void WriteCookedTextureAsset(const TextureLoadResult& cookedTexture, const std::filesystem::path& outputPath);
+namespace DirectX
+{
+	class ScratchImage;
+}
+
+void WriteCookedTextureAsset(const DirectX::ScratchImage& texture, TextureMipPolicy policy, const std::filesystem::path& outputPath, std::stop_token cancellation);

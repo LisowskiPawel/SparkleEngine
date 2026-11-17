@@ -6,6 +6,7 @@
 #include "Cooking/TextureCookBatchExecutor.h"
 
 #include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Strings/StringUtils.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Files/FileSetPublication.h"
 #include "Core/Public/Formatting/HexFormat.h"
@@ -52,7 +53,7 @@ int TextureCookRequestBatchProcessor::CookRequestFile(const std::filesystem::pat
 		    requests,
 		    textureCookMemoryBudget,
 		    [&progress, &requests, totalWork](std::size_t requestIndex, std::size_t completed)
-		    { progress.Report("Cooked texture", requests[requestIndex].sourcePath.filename().string(), completed, totalWork); });
+		    { progress.Report("Cooked texture", Strings::ToNarrow(requests[requestIndex].sourcePath.filename().wstring()), completed, totalWork); });
 		const std::vector<TextureCookBatchItemResult>& results = executor.Execute();
 
 		if (ReportFailures(requests, results) != 0)

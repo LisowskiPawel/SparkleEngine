@@ -6,9 +6,10 @@
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Files/FileSetPublication.h"
 #include "Core/Public/Json/JsonInputAdmission.h"
+#include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 #include <nlohmann/json.hpp>
-#include "Core/Public/Diagnostics/Error.h"
 
 #include <algorithm>
 #include <charconv>
@@ -20,6 +21,7 @@ static nlohmann::json ReadExportDocument(std::string_view text, std::initializer
 	Json::InputAdmission admission(text, 32u * 1024u * 1024u);
 	bool bJobs = false;
 	std::size_t jobCount = 0;
+
 	auto document = nlohmann::json::parse(
 	    text.begin(),
 	    text.end(),
@@ -68,6 +70,7 @@ static nlohmann::json ReadExportDocument(std::string_view text, std::initializer
 		    }
 		    return true;
 	    });
+
 	if (!document.is_object())
 	{
 		throw Diagnostics::Error("Shader export requires an object root.");
@@ -106,7 +109,7 @@ static bool ReadExportShader(std::string_view text, ShaderTarget target, ShaderD
 
 static bool ResolveExportRequest(const std::filesystem::path& cookDirectory, const std::string& name, std::filesystem::path& request)
 {
-	const std::filesystem::path relative(name);
+	const std::filesystem::path relative(Strings::ToWide(std::string_view{name}));
 	const bool bInvalidRoot = relative.has_root_path() || relative.filename() != "compile-request.json";
 	const bool bInvalidName = name.find(':') != std::string::npos || name.find('\0') != std::string::npos;
 	const bool bTraversal = std::any_of(relative.begin(), relative.end(), [](const auto& component) { return component == ".."; });

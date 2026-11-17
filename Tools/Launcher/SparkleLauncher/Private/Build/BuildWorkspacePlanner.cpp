@@ -112,7 +112,7 @@ namespace SparkleLauncher
 		switch (plan.Kind)
 		{
 			case BuildWorkspaceOperationKind::SyncCode:
-				if (!RequireConfigurePrerequisites(plan))
+				if (plan.Request.SourceDependencyId.empty() && !RequireConfigurePrerequisites(plan))
 				{
 					return false;
 				}
