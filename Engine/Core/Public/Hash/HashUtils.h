@@ -5,7 +5,6 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
-#include <filesystem>
 #include <span>
 #include <string>
 #include <string_view>
@@ -40,9 +39,7 @@ namespace Hash
 
 	SPARKLE_CORE_API uint64_t Fnv1a64(std::string_view str) noexcept;
 	SPARKLE_CORE_API uint64_t Fnv1a64(const void* data, size_t size) noexcept;
-	SPARKLE_CORE_API bool TryFnv1a64File(const std::filesystem::path& path, uint64_t& outHash, std::string& outErrorMessage);
 	SPARKLE_CORE_API bool TrySha256(const void* data, size_t size, Sha256Digest& outHash, std::string& outErrorMessage);
-	SPARKLE_CORE_API bool TrySha256File(const std::filesystem::path& path, Sha256Digest& outHash, std::string& outErrorMessage);
 	SPARKLE_CORE_API std::string Sha256ToHex(const Sha256Digest& hash);
 	SPARKLE_CORE_API bool TrySha256Hex(std::span<const std::byte> bytes, std::string& outHashHex, std::string& outErrorMessage);
 	SPARKLE_CORE_API bool TrySha256Hex(std::string_view text, std::string& outHashHex, std::string& outErrorMessage);

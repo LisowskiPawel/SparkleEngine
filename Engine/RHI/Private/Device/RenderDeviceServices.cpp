@@ -1,6 +1,11 @@
 #include "PCH.h"
+#include "RHI/Public/Device/RenderHardwareInterface.h"
+#include "RHI/Public/Device/RhiDeviceLaunch.h"
+#include "RHI/Public/Descriptors/RhiDescriptorService.h"
 
 #include "Device/RenderDeviceServices.h"
+#include "Device/RhiDeviceLaunch.h"
+#include "Core/RhiBackendSelection.h"
 #include "Diagnostics/RhiExternalCapture.h"
 #include "Device/RenderDeviceBackendFactory.h"
 #include "Device/RenderDeviceBackendServices.h"

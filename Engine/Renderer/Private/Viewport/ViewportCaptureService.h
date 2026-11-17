@@ -3,7 +3,6 @@
 #include "RHI/Public/Capture/RhiCaptureService.h"
 #include "Viewport/ViewportCaptureCompletion.h"
 
-#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <vector>

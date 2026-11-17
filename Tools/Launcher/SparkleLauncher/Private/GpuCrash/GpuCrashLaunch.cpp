@@ -1,4 +1,5 @@
 #include "GpuCrash/GpuCrashLaunch.h"
+#include "Core/Public/Hash/FileHash.h"
 
 #include "SparkleLauncher/LevelRunOperations.h"
 #include "SparkleLauncher/GpuCrashIncident.h"

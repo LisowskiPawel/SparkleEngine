@@ -4,6 +4,7 @@
 #include "Descriptors/RhiDescriptorService.h"
 #include "Frame/RhiFrameConstants.h"
 #include "Interop/RhiNativeHandles.h"
+#include "RHI/Public/Interop/ResourceState.h"
 
 #include <memory>
 #include <array>

@@ -6,8 +6,6 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-Add-Type -AssemblyName System.IO.Compression
 . (Join-Path $PSScriptRoot '../SourceIdentity.ps1')
 . (Join-Path $PSScriptRoot 'Payload/PackageInputs.ps1')
 . (Join-Path $PSScriptRoot 'Payload/PackageOutputs.ps1')

@@ -5,6 +5,7 @@
 #include <d3d12.h>
 
 #if SPARKLE_RHI_WITH_D3D12_NVAPI
+  #include <dxgi.h>
   #include <nvapi.h>
 #endif
 

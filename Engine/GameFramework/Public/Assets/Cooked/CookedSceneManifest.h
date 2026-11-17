@@ -3,9 +3,6 @@
 #include "Core/Public/Math/MathUtils.h"
 #include "GameFramework/Public/Assets/Cooked/CookedAssetCommon.h"
 #include "GameFramework/Public/Assets/Cooked/CookedMeshAsset.h"
-#include "GameFramework/Public/Assets/Cooked/CookedSceneCameraRecord.h"
-#include "GameFramework/Public/Assets/Cooked/CookedSceneLightRecord.h"
-#include "GameFramework/Public/Assets/Cooked/CookedSceneMetadataRecords.h"
 
 #include <DirectXMath.h>
 

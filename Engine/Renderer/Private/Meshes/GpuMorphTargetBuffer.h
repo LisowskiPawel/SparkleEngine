@@ -1,7 +1,5 @@
 #pragma once
 
-#include "GameFramework/Public/Scene/Meshes/MeshMorphData.h"
-
 #include "RHI/Public/Descriptors/RhiDescriptorHandles.h"
 #include "RHI/Public/Resources/RhiResourceHandles.h"
 #include "RHI/Public/Resources/RhiResourceView.h"

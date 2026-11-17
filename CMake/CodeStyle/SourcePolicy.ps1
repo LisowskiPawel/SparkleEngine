@@ -56,7 +56,7 @@ function Get-SourcePolicyViolations
         {
             $policyViolations.Add("${relativePath}:${lineNumber}: boolean variables require bUpperCamelCase, after any existing scope prefix")
         }
-        $lines = @(Get-Content -LiteralPath $absolutePath)
+        $lines = $sourceText.Replace("`r`n", "`n").Replace("`r", "`n").Split("`n")
         for ($lineIndex = 0; $lineIndex -lt $lines.Count; ++$lineIndex)
         {
             $line = $lines[$lineIndex]

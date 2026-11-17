@@ -3,6 +3,7 @@
 #include "Execution/TaskFunctionInvoker.h"
 #include "Execution/SerialTaskExecution.h"
 #include "Core/Public/Diagnostics/Verify.h"
+#include "Core/Public/Diagnostics/Logger.h"
 #include "Profiling/TaskProfiler.h"
 
 #include <cassert>

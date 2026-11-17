@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Assets/Cooked/CookedAssetCommon.h"
 #include "Assets/SceneMaterialVariantPayload.h"
 #include "Assets/SceneMeshAssetPayload.h"
 #include "Animation/AnimationClipResource.h"

@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Commands/RenderCommandContext.h"
+#include "RHI/Public/RayTracing/RhiRayTracingPipelineDesc.h"
 
 #include <cstdio>
 

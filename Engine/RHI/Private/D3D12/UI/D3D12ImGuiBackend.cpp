@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "RHI/Public/Interop/RhiInteropService.h"
 
 #include "D3D12/UI/D3D12ImGuiBackend.h"
 

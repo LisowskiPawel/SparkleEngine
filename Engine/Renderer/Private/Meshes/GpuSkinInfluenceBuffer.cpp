@@ -1,4 +1,6 @@
 #include "PCH.h"
+#include "RHI/Public/Descriptors/RhiDescriptorService.h"
+#include "RHI/Public/Resources/RhiResourceService.h"
 
 #include "Meshes/GpuSkinInfluenceBuffer.h"
 

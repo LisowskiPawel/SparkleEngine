@@ -3,7 +3,6 @@
 #include "../Core/RhiGenerationalHandle.h"
 #include "../RHIAPI.h"
 #include "../Formats/PixelFormat.h"
-#include "RhiResourceDesc.h"
 #include "RhiResourceHandles.h"
 #include "TextureTypes.h"
 

@@ -4,6 +4,7 @@
 #include "../Interop/RhiNativeHandles.h"
 #include "../Resources/RhiResourceView.h"
 #include "../RHIAPI.h"
+#include "RHI/Public/Interop/ResourceState.h"
 
 #include <cstdint>
 

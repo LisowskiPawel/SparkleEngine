@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "RHI/Public/Resources/RhiResourceService.h"
 
 #include "FrameGraph/FrameGraph.h"
 

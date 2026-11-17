@@ -5,7 +5,6 @@
 #include "../../../Renderer/Public/UI/UiTextureHandle.h"
 #include "Input/Dispatch/InputLayer.h"
 
-#include <cstdint>
 #include <memory>
 
 class EditorIconService;

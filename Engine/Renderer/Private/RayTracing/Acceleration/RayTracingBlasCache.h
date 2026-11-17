@@ -7,7 +7,6 @@
 #include <DirectXMath.h>
 
 #include <cstdint>
-#include <functional>
 #include <map>
 #include <span>
 #include <unordered_map>

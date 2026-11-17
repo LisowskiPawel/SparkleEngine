@@ -7,7 +7,6 @@
 #include <array>
 #include <cstdint>
 #include <functional>
-#include <string>
 
 class UsedMeshesPanel final
 {

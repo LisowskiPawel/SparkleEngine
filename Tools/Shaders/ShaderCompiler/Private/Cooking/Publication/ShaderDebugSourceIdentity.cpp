@@ -161,7 +161,9 @@ void ShaderDebugArtifactWriter::RecordSourceCandidate()
 				}
 				continue;
 			}
-			if (HashFile(source) != *expected || !m_sourceFileHashes.emplace(Paths::MakePathKey(source), std::move(*file.mapped())).second)
+			const bool bHashMatches = HashFile(source) == *expected;
+			const bool bUnique = bHashMatches && m_sourceFileHashes.emplace(Paths::MakePathKey(source), std::move(*file.mapped())).second;
+			if (!bUnique)
 			{
 				throw Diagnostics::Error("Source changed since the diagnostic compiler build; rebuild the candidate.");
 			}

@@ -1,4 +1,7 @@
 #include "PCH.h"
+#include "GameFramework/Public/Assets/Cooked/CookedSceneCameraRecord.h"
+#include "GameFramework/Public/Assets/Cooked/CookedSceneLightRecord.h"
+#include "GameFramework/Public/Assets/Cooked/CookedSceneMetadataRecords.h"
 
 #include "Assets/Loaders/SceneManifestLoader.h"
 

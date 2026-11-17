@@ -1,6 +1,25 @@
 Set-StrictMode -Version Latest
 
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+Add-Type -AssemblyName System.IO.Compression
 . (Join-Path $PSScriptRoot '../../Artifacts/ArtifactIdentity.ps1')
+
+function Expand-PackageArchive
+{
+    param([string] $ArchivePath, [string] $Stage)
+    $zip = [IO.Compression.ZipFile]::OpenRead($ArchivePath)
+    try
+    {
+        $paths = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+        foreach ($entry in $zip.Entries)
+        {
+            Assert-ArtifactPath $entry.FullName
+            if (!$paths.Add($entry.FullName)) { throw 'Duplicate archive member.' }
+        }
+        [IO.Compression.ZipFile]::ExtractToDirectory($ArchivePath, $Stage)
+    }
+    finally { $zip.Dispose() }
+}
 
 function Write-PackageArchive
 {

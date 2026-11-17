@@ -5,7 +5,6 @@
 #include "Diagnostics/ShaderDiagnostics.h"
 #include "Meshes/MeshDiagnostics.h"
 #include "Resources/Textures/TextureDiagnostics.h"
-#include "Viewport/ViewportContracts.h"
 #include "Core/Public/Console/CVarControl.h"
 #include "Renderer/Public/Settings/EngineRenderingSettings.h"
 

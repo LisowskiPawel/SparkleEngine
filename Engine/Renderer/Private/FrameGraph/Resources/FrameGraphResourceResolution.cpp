@@ -1,5 +1,7 @@
 #include "PCH.h"
 #include "FrameGraph/FrameGraph.h"
+#include "RHI/Public/Descriptors/RhiDescriptorService.h"
+#include "RHI/Public/Presentation/RhiPresentationService.h"
 
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 

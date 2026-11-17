@@ -1,5 +1,6 @@
 #include "../PCH.h"
 #include "Core/Public/Paths/CookedAssetPaths.h"
+#include "RHI/Public/Core/RhiCapabilities.h"
 
 #include "RenderPassRuntimeCache.h"
 

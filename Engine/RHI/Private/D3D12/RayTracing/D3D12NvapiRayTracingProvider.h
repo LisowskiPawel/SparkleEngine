@@ -3,7 +3,6 @@
 #include "RayTracing/RhiPtlasDesc.h"
 
 #include <cstdint>
-#include <string_view>
 
 struct ID3D12Device10;
 struct ID3D12GraphicsCommandList7;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtCore/QString>
-#include <filesystem>
 #include <functional>
 
 class QVBoxLayout;

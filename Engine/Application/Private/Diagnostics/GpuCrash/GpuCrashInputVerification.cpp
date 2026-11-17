@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "Core/Public/Hash/FileHash.h"
 
 #include "Diagnostics/GpuCrash/GpuCrashInputVerification.h"
 

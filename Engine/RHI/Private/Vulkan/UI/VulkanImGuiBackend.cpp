@@ -1,4 +1,5 @@
 #include "Vulkan/VulkanPCH.h"
+#include "RHI/Public/Interop/RhiInteropService.h"
 
 #include "Vulkan/UI/VulkanImGuiBackend.h"
 

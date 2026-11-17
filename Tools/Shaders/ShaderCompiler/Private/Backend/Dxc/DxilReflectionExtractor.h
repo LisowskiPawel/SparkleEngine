@@ -12,11 +12,8 @@
 #include <ObjIdl.h>
 #include <Unknwn.h>
 
-#include <cstdint>
 #include <d3d12shader.h>
 #include <dxcapi.h>
-#include <span>
-#include <string>
 
 // DXIL -> ShaderReflection extractor for compiled DXC binaries.
 // DXC and D3D12 reflection symbols stay confined to Backends/Dxc/.

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Meshes/GpuMesh.h"
+#include "Meshes/GpuMeshHandle.h"
 #include "Rendering/RenderSceneDelta.h"
 #include "Rendering/RenderSceneDynamicData.h"
 

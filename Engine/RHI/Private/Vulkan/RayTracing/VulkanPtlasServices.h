@@ -3,7 +3,6 @@
 #include "Resources/RhiResourceHandles.h"
 #include "RayTracing/RhiPtlasService.h"
 
-#include <cstdint>
 #include <string_view>
 
 class VulkanGpuMemoryAllocator;

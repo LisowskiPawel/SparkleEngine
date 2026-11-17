@@ -4,7 +4,6 @@
 #include "RHI/Public/Shaders/Authoring/GlobalShader.h"
 
 #include <cstddef>
-#include <cstdint>
 #include <span>
 #include <string>
 #include <type_traits>

@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Editor/Artifacts/ArtifactBundlePublication.h"
+#include "Core/Public/Hash/FileHash.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/FileUtils.h"

@@ -6,7 +6,6 @@
 #include "World/Resources/AnimationClipResourceStore.h"
 #include "World/Resources/SkeletonResourceStore.h"
 
-#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <span>

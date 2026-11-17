@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RHI/Public/Core/RhiBackendApi.h"
-#include "RHI/Public/Diagnostics/RhiExternalCapture.h"
+#include "RHI/Public/Diagnostics/ExternalCaptureProvider.h"
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "RHI/Public/Diagnostics/RhiGpuCrash.h"
 #endif

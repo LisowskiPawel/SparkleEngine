@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "RHI/Public/Pipeline/RhiPipelineService.h"
 
 #include "Pipeline/RayTracingPipelineRuntime.h"
 

@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "RHI/Public/Descriptors/RhiDescriptorService.h"
 
 #include "Scene/Materials/MaterialCache.h"
 

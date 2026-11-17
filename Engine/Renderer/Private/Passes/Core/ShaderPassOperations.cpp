@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Passes/Core/ShaderPassOperations.h"
+#include "RHI/Public/Bindings/RenderBindingLayout.h"
 
 namespace ShaderPassOperations
 {

@@ -27,7 +27,7 @@ function Assert-ArtifactFile
     {
         if (($current.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)
         {
-            throw "Reparse point is not a artifact input: '$($current.FullName)'."
+            throw "Reparse point is not an artifact input: '$($current.FullName)'."
         }
         $current = Get-Item -LiteralPath (Join-Path $current.FullName $part) -Force
     }
@@ -60,8 +60,8 @@ function Get-LocalArtifactFile
 
 function Get-TextSha256
 {
-    param([string] $Json)
+    param([string] $Text)
     $hash = [Security.Cryptography.SHA256]::Create()
-    try { return [BitConverter]::ToString($hash.ComputeHash([Text.Encoding]::UTF8.GetBytes($Json))).Replace('-','').ToLowerInvariant() }
+    try { return [BitConverter]::ToString($hash.ComputeHash([Text.Encoding]::UTF8.GetBytes($Text))).Replace('-','').ToLowerInvariant() }
     finally { $hash.Dispose() }
 }

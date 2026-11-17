@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "RHI/Private/D3D12/ThirdParty/D3DX12Includes.h"
 
 #include "D3D12/Commands/D3D12RecordingUploadPage.h"
 

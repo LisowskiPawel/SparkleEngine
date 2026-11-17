@@ -1,5 +1,7 @@
 #include "PCH.h"
 #include "FrameGraph/FrameGraph.h"
+#include "RHI/Public/Descriptors/RhiDescriptorService.h"
+#include "RHI/Public/Resources/RhiResourceService.h"
 
 #include "Commands/RenderCommandContext.h"
 #include "Core/Public/Diagnostics/Verify.h"

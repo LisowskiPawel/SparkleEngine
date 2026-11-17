@@ -6,7 +6,6 @@
 #include "../Resources/RhiResourceDesc.h"
 
 #include <array>
-#include <cstddef>
 #include <cstdint>
 
 class RenderBindingLayout;

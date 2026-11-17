@@ -4,7 +4,6 @@
 #include "Assets/Cooked/CookedMeshAsset.h"
 #include "Assets/Cooked/CookedSceneManifest.h"
 #include "Scene/Materials/MaterialHandle.h"
-#include "Scene/Meshes/MeshData.h"
 #include "Scene/Meshes/MeshInstanceGroup.h"
 #include "Scene/Meshes/SkeletalMeshData.h"
 #include "Scene/Meshes/StaticMeshData.h"

@@ -3,8 +3,6 @@
 #include "ShaderStage.h"
 
 #include <cstdint>
-#include <span>
-#include <string_view>
 #include <type_traits>
 
 // ShaderReflection — backend-neutral reflection metadata extracted from a

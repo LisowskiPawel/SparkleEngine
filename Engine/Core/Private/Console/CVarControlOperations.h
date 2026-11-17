@@ -3,7 +3,6 @@
 #include "Core/Public/Console/CVarControl.h"
 
 #include <string>
-#include <string_view>
 #include <vector>
 
 class ConsoleVariableBase;

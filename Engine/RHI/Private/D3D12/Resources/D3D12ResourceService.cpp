@@ -5,6 +5,7 @@
 #include "D3D12/Memory/D3D12GpuAllocation.h"
 #include "D3D12/Memory/D3D12GpuMemoryAllocator.h"
 #include "RHI/Public/Diagnostics/RhiDiagnostics.h"
+#include "Core/Public/Diagnostics/Logger.h"
 #include "Validation/RhiContract.h"
 
 #include <algorithm>

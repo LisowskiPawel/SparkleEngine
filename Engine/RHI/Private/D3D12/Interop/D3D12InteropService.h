@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Interop/RhiInteropService.h"
+#include "RHI/Public/Interop/ResourceState.h"
 
 class D3D12RenderHardwareInterface;
 

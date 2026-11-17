@@ -24,6 +24,7 @@ function Test-PackageStage
 {
     param([string] $Stage, $Manifest)
     Assert-PackageManifest $Manifest
+    Assert-PackageLayout $Manifest
     $expected = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
     [void] $expected.Add('manifests/sparkle-package-manifest.json')
     foreach ($file in $Manifest.Files)

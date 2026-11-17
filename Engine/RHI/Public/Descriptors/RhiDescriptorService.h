@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Bindings/RenderBindingSet.h"
-#include "../Core/RhiCapabilities.h"
 #include "../Descriptors/RhiDescriptorHandles.h"
 #include "../Resources/RhiResourceView.h"
 #include "../Samplers/RhiSamplerDesc.h"

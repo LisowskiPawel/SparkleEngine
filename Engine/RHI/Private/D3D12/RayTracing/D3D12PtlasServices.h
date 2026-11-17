@@ -2,7 +2,6 @@
 
 #include "RayTracing/RhiPtlasService.h"
 
-#include <cstdint>
 #include <string_view>
 
 class D3D12GpuMemoryAllocator;

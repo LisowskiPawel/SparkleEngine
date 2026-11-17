@@ -7,7 +7,6 @@
 #include <cstddef>
 #include <filesystem>
 #include <map>
-#include <string>
 #include <vector>
 
 typedef std::uint64_t TextureAssetId;

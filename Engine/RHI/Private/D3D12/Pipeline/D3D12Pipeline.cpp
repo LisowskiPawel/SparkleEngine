@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "RHI/Public/Diagnostics/RhiDiagnostics.h"
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "D3D12/Diagnostics/GpuCrash/D3D12GpuCrash.h"
 #endif

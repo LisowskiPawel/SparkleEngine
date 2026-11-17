@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Meshes/GpuMesh.h"
+#include "RHI/Public/Resources/RhiResourceService.h"
 
 #include "Commands/RenderCommandContext.h"
 #include "Core/Public/Diagnostics/Verify.h"

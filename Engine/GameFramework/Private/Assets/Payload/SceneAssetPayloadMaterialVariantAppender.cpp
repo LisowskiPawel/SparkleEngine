@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Assets/Loaders/CookedAssetAllocationBudget.h"
+#include "GameFramework/Public/Assets/Cooked/CookedSceneMetadataRecords.h"
 
 #include "Assets/Payload/SceneAssetPayloadMaterialVariantAppender.h"
 

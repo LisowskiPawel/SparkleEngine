@@ -2,7 +2,6 @@
 
 #include "Compiler/ShaderCompileRequest.h"
 
-#include <cstdint>
 #include <string>
 #include <string_view>
 

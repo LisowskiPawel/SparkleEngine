@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Diagnostics/GpuCrash/GpuCrashSession.h"
+#include "Core/Public/Hash/FileHash.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Diagnostics/Verify.h"

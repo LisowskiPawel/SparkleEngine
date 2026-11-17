@@ -7,7 +7,6 @@
 #include "Pipeline/RenderPassShaderRuntime.h"
 #include "Pipeline/RayTracingPipelineRuntime.h"
 #include "RHI/Public/Shaders/Authoring/GlobalShader.h"
-#include "RHI/Public/Shaders/ShaderParameterLayoutBuilder.h"
 
 #include <cstddef>
 #include <algorithm>

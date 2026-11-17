@@ -3,7 +3,6 @@
 #include "World/WorldEditCommand.h"
 
 #include <optional>
-#include <string>
 
 class EditorSceneModel;
 struct SceneObjectSelection;

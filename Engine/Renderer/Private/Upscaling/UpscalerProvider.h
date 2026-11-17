@@ -5,7 +5,6 @@
 #include "RHI/Public/Interop/RhiInteropService.h"
 #include "RHI/Public/Interop/RhiNativeHandles.h"
 
-#include <cstdint>
 struct ImageProviderFrameInput;
 struct RhiCapabilities;
 

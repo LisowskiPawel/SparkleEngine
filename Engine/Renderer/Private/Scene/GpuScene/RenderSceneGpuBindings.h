@@ -1,7 +1,6 @@
 #pragma once
 
 #include "RHI/Public/Resources/RhiResourceHandles.h"
-#include "ShaderData/LightGpuData.h"
 #include "ShaderData/SceneLightingUniformData.h"
 
 #include <cstdint>

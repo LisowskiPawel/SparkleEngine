@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/Public/Assets/TextureGroup.h"
 #include "RHI/Public/Descriptors/RhiDescriptorHandles.h"
 #include "ShaderData/PerObjectConstantBufferData.h"
 #include "ShaderData/MaterialTextureMappingData.h"

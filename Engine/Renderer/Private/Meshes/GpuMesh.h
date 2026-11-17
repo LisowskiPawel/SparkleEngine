@@ -5,10 +5,9 @@
 #include "Meshes/GpuMeshHandle.h"
 #include "RayTracing/RayTracingHitData.h"
 #include "RHI/Public/Descriptors/RhiDescriptorHandles.h"
-#include "RHI/Public/RayTracing/RhiRayTracingDesc.h"
+#include "RHI/Public/RayTracing/RhiAccelerationStructureDesc.h"
 #include "RHI/Public/Pipeline/RhiPipelineDesc.h"
 #include "RHI/Public/Resources/RhiResourceHandles.h"
-#include "RHI/Public/Resources/RhiResourceView.h"
 #include "Scene/Meshes/MeshSkinningData.h"
 
 #include <DirectXMath.h>

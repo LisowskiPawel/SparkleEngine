@@ -1,4 +1,6 @@
 #include "PCH.h"
+#include "RHI/Public/RayTracing/RhiRayTracingService.h"
+#include "RHI/Public/Resources/RhiResourceService.h"
 
 #include "RayTracing/Acceleration/RayTracingTlasBuilder.h"
 #include "RayTracing/Acceleration/RayTracingBlasCache.h"

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../../RHI/Public/Descriptors/RhiDescriptorHandles.h"
-#include "../../../RHI/Public/Resources/RhiResourceDesc.h"
 #include "../../../RHI/Public/Samplers/RhiSamplerDesc.h"
 #include "../../../RHI/Public/ShaderParameters/PassParameterLayout.h"
 #include "../FrameGraph/FrameGraphAccelerationStructureHandle.h"

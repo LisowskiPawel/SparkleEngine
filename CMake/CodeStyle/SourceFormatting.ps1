@@ -199,7 +199,6 @@ function Invoke-CppFormatting
                 }
             }
         }
-
     }
     finally
     {
@@ -207,7 +206,6 @@ function Invoke-CppFormatting
         {
             Remove-Item -LiteralPath $braceCheckStylePath -Force
         }
-
     }
 
     return $formatFailed

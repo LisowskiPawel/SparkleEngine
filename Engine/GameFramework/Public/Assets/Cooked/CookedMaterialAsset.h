@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "GameFramework/Public/Assets/Cooked/CookedAssetCommon.h"
-#include "GameFramework/Public/Assets/Cooked/CookedTextureReference.h"
 
 #include <DirectXMath.h>
 

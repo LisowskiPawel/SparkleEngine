@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
 #include <string_view>
 
 inline constexpr int kExitCodeSuccess = 0;

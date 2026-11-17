@@ -8,8 +8,6 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-Add-Type -AssemblyName System.IO.Compression
 . (Join-Path $PSScriptRoot 'Payload/PackageMetadata.ps1')
 . (Join-Path $PSScriptRoot 'Payload/PackageDependencies.ps1')
 . (Join-Path $PSScriptRoot 'Publication/PackageStage.ps1')
@@ -34,18 +32,7 @@ try
     [void] (New-Item -ItemType Directory -Force -Path $transaction)
     $lockPath = Join-Path $transactionRoot 'import.lock'
     $lock = [IO.File]::Open($lockPath, [IO.FileMode]::OpenOrCreate, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
-    $zip = [IO.Compression.ZipFile]::OpenRead($Archive)
-    try
-    {
-        $paths = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
-        foreach ($entry in $zip.Entries)
-        {
-            Assert-ArtifactPath $entry.FullName
-            if (!$paths.Add($entry.FullName)) { throw 'Duplicate archive member.' }
-        }
-        [IO.Compression.ZipFile]::ExtractToDirectory($Archive, $stage)
-    }
-    finally { $zip.Dispose() }
+    Expand-PackageArchive $Archive $stage
     $manifest = Get-Content -LiteralPath (Join-Path $stage 'manifests/sparkle-package-manifest.json') -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($manifest.Revision -cne $revision.Trim()) { throw 'Product sync archive belongs to a different source revision.' }
     Test-PackageArchive $Archive $stage $manifest

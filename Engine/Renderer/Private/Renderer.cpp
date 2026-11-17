@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Renderer.h"
+#include "Renderer/Public/Resources/Textures/TextureDiagnostics.h"
 
 #include "Concurrency/Coordinator/RenderCoordinator.h"
 #include "GameFramework/Public/Rendering/RenderFrameSubmission.h"

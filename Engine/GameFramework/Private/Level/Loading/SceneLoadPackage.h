@@ -4,7 +4,6 @@
 #include "Level/LevelDesc.h"
 
 #include <cstdint>
-#include <string>
 #include <vector>
 
 namespace Assets

@@ -6,7 +6,8 @@
 #include "../Diagnostics/RhiDiagnostics.h"
 #include "../Interop/ResourceState.h"
 #include "../Interop/RhiNativeHandles.h"
-#include "../RayTracing/RhiRayTracingDesc.h"
+#include "../RayTracing/RhiAccelerationStructureDesc.h"
+#include "../RayTracing/RhiTlasDesc.h"
 #include "../Resources/RhiResourceDesc.h"
 #include "../Resources/RhiResourceHandles.h"
 #include "../RHIAPI.h"
@@ -20,6 +21,7 @@ class RenderBindingLayout;
 class RenderPipeline;
 class RayTracingPipeline;
 struct TraceRaysDesc;
+struct RhiPtlasBuildCommandDesc;
 
 class SPARKLE_RHI_API RenderCommandList
 {

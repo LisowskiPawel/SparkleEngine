@@ -1,5 +1,7 @@
 #include "../PCH.h"
 #include "Pipeline/PassBindingOperations.h"
+#include "RHI/Public/Descriptors/RhiDescriptorService.h"
+#include "RHI/Public/Resources/RhiUploadService.h"
 
 #include "Commands/RenderCommandContext.h"
 #include "FrameGraph/Execution/FrameGraphResourceCommands.h"

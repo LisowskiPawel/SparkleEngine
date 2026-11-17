@@ -1,4 +1,7 @@
 #include "../PCH.h"
+#include "RHI/Public/Bindings/RenderBindingLayout.h"
+#include "RHI/Public/Core/RhiCapabilities.h"
+#include "RHI/Public/Pipeline/RhiPipelineService.h"
 
 #include "PipelineMaterialization.h"
 

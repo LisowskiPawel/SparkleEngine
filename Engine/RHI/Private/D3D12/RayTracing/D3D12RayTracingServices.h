@@ -4,6 +4,7 @@
 #include "D3D12/RayTracing/D3D12NvapiRayTracingProvider.h"
 #include "D3D12/RayTracing/D3D12PtlasServices.h"
 #include "RayTracing/RhiRayTracingService.h"
+#include "RHI/Public/RayTracing/RhiRayTracingDesc.h"
 
 #include <memory>
 #include <cstdint>

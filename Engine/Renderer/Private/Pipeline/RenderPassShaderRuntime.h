@@ -7,7 +7,6 @@
 #include "RHI/Public/ShaderParameters/PassParameterLayout.h"
 #include "RHI/Public/Shaders/ShaderParameterLayoutBuilder.h"
 
-#include <array>
 #include <format>
 #include <memory>
 #include <string>

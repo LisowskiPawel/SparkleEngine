@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <filesystem>
 #include <optional>
-#include <string>
 
 class TaskExecutor;
 class TaskScope;

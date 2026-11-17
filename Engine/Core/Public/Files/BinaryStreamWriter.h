@@ -1,9 +1,8 @@
-﻿#pragma once
+#pragma once
 
 #include "Core/Public/CoreAPI.h"
 
 #include <cstddef>
-#include <cstdint>
 #include <ostream>
 #include <limits>
 #include <string>

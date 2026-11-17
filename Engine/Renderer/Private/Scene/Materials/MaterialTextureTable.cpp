@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Scene/Materials/MaterialTextureTable.h"
+#include "RHI/Public/Descriptors/RhiDescriptorService.h"
 
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Scene/Materials/MaterialTextureTableCapability.h"

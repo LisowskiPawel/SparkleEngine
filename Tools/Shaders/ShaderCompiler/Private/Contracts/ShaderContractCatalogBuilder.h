@@ -3,7 +3,6 @@
 #include "Contracts/ShaderContractCatalog.h"
 
 #include <cstdint>
-#include <string>
 #include <string_view>
 
 enum class ShaderContractSelectionKind : std::uint8_t

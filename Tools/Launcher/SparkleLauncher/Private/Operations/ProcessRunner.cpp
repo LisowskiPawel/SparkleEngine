@@ -3,6 +3,7 @@
 #include "Core/Public/Strings/StringUtils.h"
 #include "Core/Public/Process/ChildProcess.h"
 #include "Core/Public/Process/CommandLineUtils.h"
+#include "Core/Public/Json/JsonInputAdmission.h"
 
 #include <nlohmann/json.hpp>
 
@@ -54,14 +55,14 @@ namespace SparkleLauncher
 				const auto suffix = line.substr(prefix.size());
 				const auto first = suffix.find_first_not_of(" \t\r");
 				const bool bStringRoot = first != std::string_view::npos && suffix[first] == '"';
-				const bool bInvalidSuffix = !bStringRoot || suffix.find('\0') != std::string_view::npos;
-				if (bSeenRecord || bInvalidSuffix)
+				if (bSeenRecord || !bStringRoot)
 				{
 					return {};
 				}
 				bSeenRecord = true;
 				try
 				{
+					Json::InputAdmission admission(suffix, 32u * 1024u * 1024u);
 					const auto value = nlohmann::json::parse(suffix.begin(), suffix.end());
 					const auto& path = value.get_ref<const std::string&>();
 					if (path.find('\0') != std::string::npos)

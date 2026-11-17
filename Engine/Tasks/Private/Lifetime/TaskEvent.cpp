@@ -1,6 +1,7 @@
 #include "TaskEvent.h"
 
 #include "Core/Public/Diagnostics/Verify.h"
+#include "Core/Public/Diagnostics/Logger.h"
 
 #include <atomic>
 #include <condition_variable>

@@ -1,6 +1,8 @@
 #include "PCH.h"
 #include "D3D12/Pipeline/D3D12RootSignatureBuilder.h"
 #include "D3D12/Pipeline/D3D12RootSignature.h"
+#include "D3D12/ThirdParty/D3DX12Includes.h"
+#include "RHI/Private/D3D12/ThirdParty/D3DX12Includes.h"
 
 std::uint32_t D3D12RootSignatureBuilder::AddConstantBufferView(std::uint32_t shaderRegister, std::uint32_t registerSpace, D3D12_SHADER_VISIBILITY visibility)
 {

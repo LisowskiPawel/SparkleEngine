@@ -1,5 +1,7 @@
 #include "PCH.h"
 #include "Renderer/Private/FrameGraph/Resources/FrameGraphTransientAllocator.h"
+#include "RHI/Public/Descriptors/RhiDescriptorService.h"
+#include "RHI/Public/Resources/RhiResourceService.h"
 
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 

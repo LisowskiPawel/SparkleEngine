@@ -2,6 +2,7 @@
 
 #include "RendererAPI.h"
 #include "Concurrency/RendererExecutionConfig.h"
+#include "Resources/Textures/TextureDiagnostics.h"
 
 #include <cstdint>
 #include <memory>
@@ -20,7 +21,6 @@ struct CVarControlResult;
 struct ShaderDiagnosticsSnapshot;
 struct MeshDiagnosticsSnapshot;
 struct MeshPreviewGeometry;
-struct TextureDiagnosticsSnapshot;
 struct RendererMemoryDiagnosticsSnapshot;
 struct ViewportCaptureAdmission;
 struct ViewportCaptureRequest;

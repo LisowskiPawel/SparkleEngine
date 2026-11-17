@@ -1,11 +1,9 @@
 #pragma once
 
-#include "../Memory/RhiMemoryTypes.h"
 #include "../RayTracing/RhiTlasService.h"
 #include "../RayTracing/RhiPtlasService.h"
-#include "../RayTracing/RhiRayTracingDesc.h"
+#include "RhiAccelerationStructureDesc.h"
 #include "../RayTracing/RhiRayTracingPipelineDesc.h"
-#include "../Resources/RhiResourceDesc.h"
 #include "../Resources/RhiResourceHandles.h"
 #include "../RHIAPI.h"
 

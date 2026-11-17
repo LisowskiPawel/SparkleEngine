@@ -8,11 +8,9 @@
 
 #include <atomic>
 #include <array>
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <mutex>
-#include <span>
 #include <vector>
 
 class VulkanRhi;

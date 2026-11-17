@@ -7,7 +7,6 @@
 #include <QtGui/QIcon>
 #include <QtWidgets/QFrame>
 
-#include <cstdint>
 #include <functional>
 
 class QLabel;
