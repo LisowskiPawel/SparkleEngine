@@ -1,8 +1,10 @@
 #pragma once
 
+#include "Core/Public/CoreAPI.h"
+
 #include <cstdint>
 
-enum class Key : std::uint16_t
+enum class Key : std::uint8_t
 {
 	Unknown = 0,
 
@@ -120,32 +122,9 @@ enum class Key : std::uint16_t
 	Count
 };
 
-constexpr bool IsLetterKey(Key key) noexcept
-{
-	return key >= Key::A && key <= Key::Z;
-}
-
-constexpr bool IsNumberKey(Key key) noexcept
-{
-	return key >= Key::Num0 && key <= Key::Num9;
-}
-
-constexpr bool IsFunctionKey(Key key) noexcept
-{
-	return key >= Key::F1 && key <= Key::F12;
-}
-
-constexpr bool IsNumpadKey(Key key) noexcept
-{
-	return key >= Key::Numpad0 && key <= Key::NumpadDivide;
-}
-
-constexpr bool IsModifierKey(Key key) noexcept
-{
-	return key >= Key::LeftShift && key <= Key::RightSuper;
-}
-
-constexpr bool IsNavigationKey(Key key) noexcept
-{
-	return key >= Key::Up && key <= Key::Delete;
-}
+SPARKLE_CORE_API bool IsLetterKey(Key key) noexcept;
+SPARKLE_CORE_API bool IsNumberKey(Key key) noexcept;
+SPARKLE_CORE_API bool IsFunctionKey(Key key) noexcept;
+SPARKLE_CORE_API bool IsNumpadKey(Key key) noexcept;
+SPARKLE_CORE_API bool IsModifierKey(Key key) noexcept;
+SPARKLE_CORE_API bool IsNavigationKey(Key key) noexcept;

@@ -62,7 +62,7 @@ namespace SparkleLauncher
 
 	LauncherOperationService::~LauncherOperationService() = default;
 
-	void LauncherOperationService::Launch(LauncherOperationCategory category, LauncherOperationRequest request, std::string title, OutputCallback outputCallback, CompletionCallback completionCallback)
+	void LauncherOperationService::Launch(LauncherOperationRequest request, std::string title, OutputCallback outputCallback, CompletionCallback completionCallback)
 	{
 		m_implementation->ReapSettledOperations();
 		const std::string runId = request.RunId.isEmpty() ? request.OperationId.toStdString() : request.RunId.toStdString();
@@ -98,8 +98,7 @@ namespace SparkleLauncher
 
 			const TaskNodeHandle execute = graph.Add(
 			    TaskDesc{TaskName("Launcher operation"), TaskLane::BlockingIo},
-			    [category, request = std::move(request), processRunnerFactory = m_implementation->m_processRunnerFactory, outputCallback = std::move(outputCallback), record](
-			        TaskExecutionContext& context)
+			    [request = std::move(request), processRunnerFactory = m_implementation->m_processRunnerFactory, outputCallback = std::move(outputCallback), record](TaskExecutionContext& context)
 			    {
 				    try
 				    {
@@ -108,7 +107,8 @@ namespace SparkleLauncher
 					    {
 						    throw std::runtime_error("No process runner is available for this Launcher operation.");
 					    }
-					    *record = ExecuteLauncherOperation(category, request.OperationId.toStdString(), request, *processRunner, context, outputCallback);
+
+					    *record = ExecuteLauncherOperation(request, *processRunner, context, outputCallback);
 					    return TaskResult::Success();
 				    }
 				    catch (const std::exception& exception)

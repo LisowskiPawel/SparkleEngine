@@ -18,6 +18,4 @@ struct ImportedMorphTarget
 	std::string name;
 	float defaultWeight = 0.0f;
 	std::vector<ImportedMorphTargetDelta> deltas;
-
-	bool IsValidForVertexCount(std::uint32_t vertexCount) const noexcept { return deltas.size() == vertexCount; }
 };

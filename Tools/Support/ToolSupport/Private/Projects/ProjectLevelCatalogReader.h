@@ -13,8 +13,7 @@
 class ProjectLevelCatalogReader final
 {
 public:
-	static ProjectLevelCatalog Read(const std::filesystem::path& projectRoot);
-	static void ValidateText(const std::filesystem::path& projectRoot, std::string_view text);
+	static ProjectLevelCatalog Parse(const std::filesystem::path& projectRoot, std::istream& input);
 
 private:
 	enum class Section : std::uint8_t

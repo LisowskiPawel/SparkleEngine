@@ -263,6 +263,10 @@ void ValidateProjectLevelCatalog(const ProjectLevelCatalog& catalog, const std::
 		{
 			downloadablePacks.push_back(&pack);
 		}
+	}
+
+	for (const auto& [packId, pack] : catalog.assetPacks)
+	{
 		ValidateParentChain(catalog, pack);
 	}
 

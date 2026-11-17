@@ -33,7 +33,7 @@ namespace SparkleLauncher
 		{
 			try
 			{
-				m_catalog = ProjectLevelCatalogFile::Load(m_content.RootPath);
+				m_catalog = LoadProjectLevelCatalog(m_content.RootPath);
 				m_model.bLoaded = true;
 			}
 			catch (const Diagnostics::Error& error)

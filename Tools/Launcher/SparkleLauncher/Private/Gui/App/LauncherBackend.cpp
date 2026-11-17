@@ -21,15 +21,8 @@ namespace SparkleLauncher
 		LauncherOperationResult result;
 		result.GpuCrash = operation.GpuCrash;
 		result.ShaderExportPath = QString::fromStdWString(operation.ShaderExportPath.wstring());
-		result.Status = QString::fromStdString(ToString(operation.Status));
-		result.bSucceeded = operation.Status == OperationStatus::Succeeded;
-		result.bSkipped = operation.Status == OperationStatus::Skipped;
-		result.bCanceled = operation.Status == OperationStatus::Canceled;
-		if (operation.ExitCode.has_value())
-		{
-			result.ExitCode = *operation.ExitCode;
-			result.bHasExitCode = true;
-		}
+		result.Status = operation.Status;
+		result.ExitCode = operation.ExitCode;
 		if (!operation.LogPath.empty())
 		{
 			result.LogPath = QString::fromStdString(operation.LogPath.string());
@@ -84,12 +77,10 @@ namespace SparkleLauncher
 		}
 
 		emit OperationStarted(runId, operation->Id, operation->DisplayName);
-		const LauncherOperationCategory category = operation->Category;
 		const QString title = operation->DisplayName;
 		const QString operationIdText = operation->Id;
 
 		m_operationService->Launch(
-		    category,
 		    std::move(request),
 		    title.toStdString(),
 		    [this, runId, operationIdText](std::string_view output) { QueueOperationOutput(runId, operationIdText, std::string(output)); },
@@ -159,51 +150,31 @@ namespace SparkleLauncher
 		for (const BuildWorkspaceOperationDefinition& definition : GetBuildWorkspaceOperationDefinitions())
 		{
 			m_operations.push_back(
-			    {QString::fromStdString(definition.Id),
-			        QString::fromStdString(definition.Group),
-			        QString::fromStdString(definition.DisplayName),
-			        QString::fromStdString(definition.Description),
-			        LauncherOperationCategory::Workspace});
+			    {QString::fromStdString(definition.Id), QString::fromStdString(definition.Group), QString::fromStdString(definition.DisplayName), QString::fromStdString(definition.Description)});
 		}
 
 		for (const CookOperationDefinition& definition : GetCookOperationDefinitions())
 		{
 			m_operations.push_back(
-			    {QString::fromStdString(definition.Id),
-			        QString::fromStdString(definition.Group),
-			        QString::fromStdString(definition.DisplayName),
-			        QString::fromStdString(definition.Description),
-			        LauncherOperationCategory::Cooking});
+			    {QString::fromStdString(definition.Id), QString::fromStdString(definition.Group), QString::fromStdString(definition.DisplayName), QString::fromStdString(definition.Description)});
 		}
 
 		for (const LevelOperationDefinition& definition : GetLevelOperationDefinitions())
 		{
 			m_operations.push_back(
-			    {QString::fromStdString(definition.Id),
-			        QString::fromStdString(definition.Group),
-			        QString::fromStdString(definition.DisplayName),
-			        QString::fromStdString(definition.Description),
-			        LauncherOperationCategory::Levels});
+			    {QString::fromStdString(definition.Id), QString::fromStdString(definition.Group), QString::fromStdString(definition.DisplayName), QString::fromStdString(definition.Description)});
 		}
 
 		for (const LevelRunOperationDefinition& definition : GetLevelRunOperationDefinitions())
 		{
 			m_operations.push_back(
-			    {QString::fromStdString(definition.Id),
-			        QString::fromStdString(definition.Group),
-			        QString::fromStdString(definition.DisplayName),
-			        QString::fromStdString(definition.Description),
-			        LauncherOperationCategory::LevelRun});
+			    {QString::fromStdString(definition.Id), QString::fromStdString(definition.Group), QString::fromStdString(definition.DisplayName), QString::fromStdString(definition.Description)});
 		}
 
 		for (const MaintenanceOperationDefinition& definition : GetMaintenanceOperationDefinitions())
 		{
 			m_operations.push_back(
-			    {QString::fromStdString(definition.Id),
-			        QString::fromStdString(definition.Group),
-			        QString::fromStdString(definition.DisplayName),
-			        QString::fromStdString(definition.Description),
-			        LauncherOperationCategory::Maintenance});
+			    {QString::fromStdString(definition.Id), QString::fromStdString(definition.Group), QString::fromStdString(definition.DisplayName), QString::fromStdString(definition.Description)});
 		}
 	}
 

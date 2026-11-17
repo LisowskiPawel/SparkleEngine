@@ -57,7 +57,8 @@ namespace SparkleLauncher
 		{
 			return;
 		}
-		const ProjectLevelCatalog catalog = ProjectLevelCatalogFile::Load(ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId));
+
+		const ProjectLevelCatalog catalog = LoadProjectLevelCatalog(ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId));
 		plan.Request.RequestedLevelIds.clear();
 		for (const ProjectLevelCatalogEntry& level : catalog.levels)
 		{

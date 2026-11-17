@@ -30,7 +30,9 @@ namespace PathLightSampling
 
 		const RayTracingHitInstance instance = RayTracingHitInstances[instanceId];
 
-		return (instance.Flags & HitSurface::InstanceFlagValid) != 0u && (RayTracingHitMaterials[instance.MaterialSlot].Flags & HitSurface::MaterialFlagEmissive) != 0u ? instance.IndexCount / 3u : 0u;
+		return (instance.Flags & RayTracingHitData::InstanceFlagValid) != 0u && (RayTracingHitMaterials[instance.MaterialSlot].Flags & RayTracingHitData::MaterialFlagEmissive) != 0u
+		    ? instance.IndexCount / 3u
+		    : 0u;
 	}
 
 	uint CountEmissiveTriangles()
@@ -161,7 +163,7 @@ namespace PathLightSampling
 		const float twiceArea = length(normalUnnormalized);
 		emissiveTriangle.Normal = RayEndpoints::TransformGeometricNormal(normalObject, emissiveTriangle.Mesh);
 		emissiveTriangle.Area = 0.5f * twiceArea;
-		emissiveTriangle.bTwoSided = (evaluated.Instance.Flags & HitSurface::InstanceFlagTwoSided) != 0u;
+		emissiveTriangle.bTwoSided = (evaluated.Instance.Flags & RayTracingHitData::InstanceFlagTwoSided) != 0u;
 		return emissiveTriangle;
 	}
 

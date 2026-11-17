@@ -2,8 +2,6 @@
 
 namespace CommonRandom
 {
-	static const float InterleavedGradientNoiseFrameStep = 5.588238f;
-
 	uint Hash(uint value)
 	{
 		value ^= 2747636419u;
@@ -117,18 +115,5 @@ namespace CommonRandom
 		const uint lower = CategoricalBoundary(index, count);
 		const uint bucketSize = index + 1u == count ? 0u - lower : CategoricalBoundary(index + 1u, count) - lower;
 		return (float)bucketSize * 0x1.0p-32f;
-	}
-
-	float InterleavedGradientNoise(float2 pixelCoord, uint frameIndex, float2 offset)
-	{
-		const float frameOffset = InterleavedGradientNoiseFrameStep * (float)(frameIndex & 63u);
-		const float2 animatedPixel = pixelCoord + offset + frameOffset.xx;
-		const float gradient = frac(dot(animatedPixel, float2(0.06711056f, 0.00583715f)));
-		return frac(52.9829189f * gradient);
-	}
-
-	float2 InterleavedGradientNoise2(float2 pixelCoord, uint frameIndex, float2 offset)
-	{
-		return float2(InterleavedGradientNoise(pixelCoord, frameIndex, offset), InterleavedGradientNoise(pixelCoord, frameIndex, offset + float2(19.19f, 73.73f)));
 	}
 }

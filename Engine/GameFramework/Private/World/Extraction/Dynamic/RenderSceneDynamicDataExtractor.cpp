@@ -6,7 +6,7 @@
 #include "World/Extraction/Identity/RenderObjectIdentityMap.h"
 #include "World/Extraction/Structural/RenderObjectDeltaExtractor.h"
 #include "World/Extraction/WorldExtractionStorage.h"
-#include "Animation/AnimationOutputStorage.h"
+#include "Animation/AnimationEvaluationStorage.h"
 #include "World/Resources/MorphWeightStorage.h"
 #include "World/Resources/SkeletonResourceStore.h"
 #include "World/WorldReadView.h"
@@ -66,37 +66,38 @@ namespace ECS
 	void RenderSceneDynamicDataExtractor::ExtractSkinning(
 	    const ComponentStorage<SkinningState>& skinningStates,
 	    const ComponentStorage<AnimationState>& animationStates,
-	    const AnimationOutputStorage& animation,
+	    const AnimationEvaluationStorage& animation,
 	    const SkeletonResourceStore& skeletons,
 	    std::span<const WorldExtractionStorage::MeshSlot> meshes,
 	    const RenderObjectDeltaExtractor& objects,
 	    RenderSceneDynamicData& dynamic)
 	{
-		const AnimationOutput& output = animation.GetOutput();
+		const auto poses = animation.GetPoseWork();
 		for (const WorldExtractionStorage::MeshSlot& mesh : meshes)
 		{
 			const SkinningState* skinning = skinningStates.Get(mesh.Entity);
-			const bool bInvalidSkinningOutputPose = skinning == nullptr || !skinning->Pose.IsValid();
-			const bool bSkinningOutputAnimationOutput = bInvalidSkinningOutputPose || (skinning->Pose.Generation != animation.GetTargetGeneration());
-			const bool bInvalidSkinningOutput = bSkinningOutputAnimationOutput || (skinning->Pose.Slot >= output.poses.size());
-
-			if (bInvalidSkinningOutput)
+			if (skinning == nullptr || !skinning->Pose.IsValid())
 			{
 				continue;
 			}
-			const AnimationPoseOutput& pose = output.poses[skinning->Pose.Slot];
-			const SkeletonResourceHandle skeleton = skeletons.Find(pose.skeletonAssetId);
-			const AnimationState* playback = animationStates.Get(pose.animationEntity);
+			if (skinning->Pose.Generation != animation.GetTargetGeneration() || skinning->Pose.Slot >= poses.size())
+			{
+				continue;
+			}
+
+			const AnimationEvaluationStorage::PoseWorkSlot& pose = poses[skinning->Pose.Slot];
+			const SkeletonResourceHandle skeleton = skeletons.Find(skinning->SkeletonAssetId);
+			const AnimationState* playback = animationStates.Get(pose.Entity);
 			const std::uint32_t jointMatrixOffset = static_cast<std::uint32_t>(dynamic.JointMatrices.size());
-			dynamic.JointMatrices.insert(dynamic.JointMatrices.end(), pose.jointMatrices.begin(), pose.jointMatrices.end());
+			dynamic.JointMatrices.insert(dynamic.JointMatrices.end(), pose.JointMatrices.begin(), pose.JointMatrices.end());
 
 			dynamic.JointMatrixRanges.push_back(
 			    RenderJointMatrixRange{
 			        .Object = objects.FindObject(mesh.Entity),
-			        .Skeleton = skeleton.IsValid() ? RenderSkeletonAssetHandle(pose.skeletonAssetId) : RenderSkeletonAssetHandle{},
-			        .Animation = playback != nullptr ? RenderAnimationAssetHandle(pose.animationAssetId) : RenderAnimationAssetHandle{},
+			        .Skeleton = skeleton.IsValid() ? RenderSkeletonAssetHandle(skinning->SkeletonAssetId) : RenderSkeletonAssetHandle{},
+			        .Animation = playback != nullptr ? RenderAnimationAssetHandle(playback->AnimationAssetId) : RenderAnimationAssetHandle{},
 			        .JointMatrixOffset = jointMatrixOffset,
-			        .JointMatrixCount = static_cast<std::uint32_t>(pose.jointMatrices.size())});
+			        .JointMatrixCount = static_cast<std::uint32_t>(pose.JointMatrices.size())});
 		}
 		std::sort(dynamic.JointMatrixRanges.begin(), dynamic.JointMatrixRanges.end(), [](const RenderJointMatrixRange& lhs, const RenderJointMatrixRange& rhs) { return lhs.Object < rhs.Object; });
 	}
@@ -104,7 +105,7 @@ namespace ECS
 	void RenderSceneDynamicDataExtractor::ExtractMorphWeights(
 	    const ComponentStorage<MorphState>& morphStates,
 	    const ComponentStorage<AnimationState>& animationStates,
-	    const AnimationOutputStorage& animation,
+	    const AnimationEvaluationStorage& animation,
 	    const MorphWeightStorage& weights,
 	    const RenderObjectDeltaExtractor& objects,
 	    RenderSceneDynamicData& dynamic)
@@ -113,32 +114,27 @@ namespace ECS
 		ExtractMorphWeightRanges(morphStates, weights, objects, dynamic);
 	}
 
-	void RenderSceneDynamicDataExtractor::BuildMorphMetadata(const AnimationOutputStorage& animation, const ComponentStorage<AnimationState>& animationStates)
+	void RenderSceneDynamicDataExtractor::BuildMorphMetadata(const AnimationEvaluationStorage& animation, const ComponentStorage<AnimationState>& animationStates)
 	{
-		const AnimationOutput& output = animation.GetOutput();
 		const auto samples = animation.GetMorphSamples();
 
 		m_morphMetadata.clear();
 		m_morphMetadata.reserve(animation.GetMorphBindings().size());
-		for (const AnimationOutputStorage::MorphTargetBinding& binding : animation.GetMorphBindings())
+		for (const AnimationEvaluationStorage::MorphTargetBinding& binding : animation.GetMorphBindings())
 		{
 			if (binding.SampleIndex >= samples.size())
 			{
 				continue;
 			}
-			const std::uint32_t outputIndex = samples[binding.SampleIndex].OutputIndex;
-			if (outputIndex >= output.morphWeights.size())
-			{
-				continue;
-			}
-			const MorphWeightOutput& morph = output.morphWeights[outputIndex];
-			const AnimationState* playback = animationStates.Get(morph.animationEntity);
+
+			const AnimationEvaluationStorage::MorphSampleSlot& sample = samples[binding.SampleIndex];
+			const AnimationState* playback = animationStates.Get(sample.AnimationEntity);
 
 			m_morphMetadata.push_back(
 			    MorphMetadata{
 			        .Entity = binding.TargetEntity,
 			        .Animation = playback != nullptr ? RenderAnimationAssetHandle(playback->AnimationAssetId) : RenderAnimationAssetHandle{},
-			        .TargetNodeIndex = morph.targetNodeIndex});
+			        .TargetNodeIndex = sample.TargetNodeIndex});
 		}
 		std::stable_sort(m_morphMetadata.begin(), m_morphMetadata.end(), [](const MorphMetadata& left, const MorphMetadata& right) { return left.Entity < right.Entity; });
 	}

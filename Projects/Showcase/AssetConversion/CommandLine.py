@@ -10,11 +10,15 @@ def parse_arguments(asset_name: str, source_name: str, description: str) -> argp
     asset_directory = Path(__file__).resolve().parents[1] / "Assets" / "Meshes" / asset_name
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
-        "--source", type=Path, default=asset_directory / "Publisher" / source_name,
+        "--source",
+        type=Path,
+        default=asset_directory / "Publisher" / source_name,
         help=f"Path to the publisher's {source_name} file.",
     )
     parser.add_argument(
-        "--output", type=Path, default=asset_directory / f"{asset_name}.glb",
+        "--output",
+        type=Path,
+        default=asset_directory / f"{asset_name}.glb",
         help="Path for the generated GLB artifact.",
     )
     arguments = parser.parse_args()

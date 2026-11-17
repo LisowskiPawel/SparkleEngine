@@ -2,6 +2,7 @@
 #define SPARKLE_RAY_TRACING_PATH_SAMPLING_HLSLI
 
 #include "/Engine/Common/Random.hlsli"
+#include "/Engine/Common/Color.hlsli"
 #include "/Engine/Lighting/SurfaceLighting.hlsli"
 #include "/Engine/RayTracing/PathBsdf.hlsli"
 #include "/Engine/RayTracing/PathSurface.hlsli"
@@ -31,9 +32,8 @@ namespace PathSampling
 
 	float DiffuseLobeProbability(RayTracingPathSurface surface, float3 f0)
 	{
-		const float3 luminanceWeights = float3(0.2126f, 0.7152f, 0.0722f);
-		const float diffuseWeight = max(dot(surface.BaseColor, luminanceWeights) * (1.0f - surface.Metallic), 0.0f);
-		const float specularWeight = max(dot(f0, luminanceWeights), 0.0f);
+		const float diffuseWeight = max(CommonColor::LuminanceRec709(surface.BaseColor) * (1.0f - surface.Metallic), 0.0f);
+		const float specularWeight = max(CommonColor::LuminanceRec709(f0), 0.0f);
 		const float totalWeight = diffuseWeight + specularWeight;
 		return totalWeight > 0.0f ? saturate(diffuseWeight / totalWeight) : 0.5f;
 	}

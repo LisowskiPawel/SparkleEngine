@@ -7,6 +7,7 @@
 #include "Core/Public/Strings/StringUtils.h"
 #include "Core/Public/Process/CommandLineUtils.h"
 
+#include <Windows.h>
 #include <string>
 #include <string_view>
 

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import math
 
-from .Glb import GlbBuffer, TRIANGLES_MODE
-from .LPSHeadObj import ConvertedMesh
+from .Glb import GlbBuffer
+from .LPSHeadMesh import HeadMesh
 
 
 ASSET_METADATA = {
@@ -13,19 +13,6 @@ ASSET_METADATA = {
     "generator": "SparkleEngine deterministic LPS Head OBJ-to-glTF conversion",
     "version": "2.0",
 }
-
-
-def append_primitive(buffer: GlbBuffer, mesh: ConvertedMesh) -> dict[str, object]:
-    position_accessor = buffer.append_vectors(mesh.positions, include_bounds=True)
-    normal_accessor = buffer.append_vectors(mesh.normals)
-    texcoord_accessor = buffer.append_vectors(mesh.texcoords, include_bounds=True)
-    index_accessor = buffer.append_indices(mesh.indices)
-    return {
-        "attributes": {"NORMAL": normal_accessor, "POSITION": position_accessor, "TEXCOORD_0": texcoord_accessor},
-        "indices": index_accessor,
-        "material": 0,
-        "mode": TRIANGLES_MODE,
-    }
 
 
 def build_scene(primitive: dict[str, object]) -> dict[str, object]:
@@ -50,8 +37,8 @@ def build_scene(primitive: dict[str, object]) -> dict[str, object]:
     }
 
 
-def build_glb(mesh: ConvertedMesh) -> bytes:
+def build_glb(mesh: HeadMesh) -> bytes:
     buffer = GlbBuffer()
-    primitive = append_primitive(buffer, mesh)
+    primitive = buffer.append_primitive(mesh.positions, mesh.normals, mesh.indices, 0, texcoords=mesh.texcoords)
     scene = build_scene(primitive)
     return buffer.encode(ASSET_METADATA, scene)

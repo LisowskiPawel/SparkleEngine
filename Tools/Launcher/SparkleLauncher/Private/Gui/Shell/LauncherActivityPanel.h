@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SparkleLauncher/OperationModel.h"
+
 #include <QtCore/QHash>
 #include <QtCore/QString>
 #include <QtGui/QIcon>
@@ -37,16 +39,6 @@ namespace SparkleLauncher
 		bool HasActiveRun() const;
 
 	private:
-		enum class RunState : std::uint8_t
-		{
-			Queued,
-			Running,
-			Done,
-			Blocked,
-			Canceled,
-			Failed,
-		};
-
 		struct RunWidgets
 		{
 			QWidget* Root = nullptr;
@@ -59,7 +51,7 @@ namespace SparkleLauncher
 		{
 			QListWidgetItem* Item = nullptr;
 			RunWidgets Widgets;
-			RunState State = RunState::Queued;
+			OperationStatus State = OperationStatus::Pending;
 			QString Title;
 			QString Output;
 			QString ProgressPhase;
@@ -69,11 +61,11 @@ namespace SparkleLauncher
 		};
 
 		RunWidgets CreateRunWidgets(const QString& title);
-		QIcon IconForState(RunState state) const;
+		QIcon IconForState(OperationStatus state) const;
 		void DisplaySelectedRunOutput(QListWidgetItem* currentItem);
 		void CopySelectedRunOutput();
 		void ToggleExpanded();
-		void SetRunState(const QString& runId, RunState state, const QString& title);
+		void SetRunState(const QString& runId, OperationStatus state, const QString& title);
 		void UpdateRunProgressPresentation(RunRecord& run);
 		void SetExpanded(bool bExpanded);
 		void UpdateRunSelectionVisuals();

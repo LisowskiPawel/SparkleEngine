@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SourceImportOutput.h"
+#include "Types/ImportedScene.h"
 
 #include <DirectXMath.h>
 
@@ -20,20 +20,20 @@ struct GltfMeshGpuInstancingTransforms;
 class GltfGeometryImporter final
 {
 public:
-	static std::size_t CountImportedMeshInstances(const cgltf_data* data);
-	static void ImportGeometry(const cgltf_data* data, SourceImportOutput& output);
+	static std::size_t CountImportedMeshInstances(const cgltf_data& data);
+	static void ImportGeometry(const cgltf_data& data, ImportedScene& importedScene);
 
 private:
 	struct NodeImportContext;
 
-	static void ImportNode(const cgltf_data& data, const cgltf_node& node, std::uint32_t nodeIndex, SourceImportOutput& output);
-	static void ImportPrimitive(const NodeImportContext& context, const cgltf_primitive& primitive, std::uint32_t primitiveIndex, SourceImportOutput& output);
+	static void ImportNode(const cgltf_data& data, const cgltf_node& node, std::uint32_t nodeIndex, ImportedScene& importedScene);
+	static void ImportPrimitive(const NodeImportContext& context, const cgltf_primitive& primitive, std::uint32_t primitiveIndex, ImportedScene& importedScene);
 	static ImportedMeshPrimitiveIndex ResolveImportedPrimitive(
 	    const NodeImportContext& context,
 	    const cgltf_primitive& primitive,
 	    std::uint32_t primitiveIndex,
 	    std::string_view primitiveLabel,
-	    SourceImportOutput& output);
+	    ImportedScene& importedScene);
 	static void ValidateDeformation(
 	    const ImportedMeshGeometry& geometry,
 	    const cgltf_primitive& primitive,
@@ -46,7 +46,8 @@ private:
 	    ImportedMeshPrimitiveIndex primitiveIndex,
 	    ImportedMaterialIndex materialIndex,
 	    std::span<const float> morphWeights,
-	    SourceImportOutput& output);
+	    ImportedScene& importedScene);
+	static ImportedMaterialIndex ResolveMaterialIndex(const cgltf_data& data, const cgltf_primitive& primitive, std::string_view primitiveLabel, const ImportedScene& importedScene);
 	static void ValidateSkinInfluences(const ImportedMeshGeometry& geometry, const ImportedSkeleton& skeleton, std::string_view primitiveLabel);
 	static ImportedMeshPrimitiveIndex FindImportedPrimitiveIndex(const ImportedScene& scene, std::uint32_t sourceMeshIndex, std::uint32_t sourcePrimitiveIndex) noexcept;
 	static std::string BuildPrimitiveLabel(const cgltf_node& node, std::size_t primitiveIndex);

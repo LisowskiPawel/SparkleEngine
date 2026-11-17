@@ -4,7 +4,7 @@
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "RHI/Public/Shaders/ShaderMap.h"
-#include "ShaderContractCatalog.h"
+#include "Contracts/ShaderContractCatalog.h"
 #include "Shaders/Authoring/GlobalShader.h"
 #include "Shaders/ShaderParameterLayoutBuilder.h"
 
@@ -43,7 +43,6 @@ ShaderContractCatalog BuildShaderContractCatalog(ShaderContractSelectionKind sel
 		{
 			shader.parameterStruct = registration.BuildParameterStructDescriptor();
 			shader.parameterLayout = BuildShaderParameterLayout(registration);
-			shader.bHasParameterStruct = true;
 		}
 		catalog.push_back(std::move(shader));
 	}

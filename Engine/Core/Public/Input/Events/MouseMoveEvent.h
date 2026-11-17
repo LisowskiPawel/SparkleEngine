@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../CoreAPI.h"
 #include "../Mouse/MousePosition.h"
 #include "../Keyboard/ModifierFlags.h"
 #include "../Device/InputDevice.h"
@@ -12,5 +13,5 @@ struct MouseMoveEvent
 
 	constexpr InputDevice GetDevice() const noexcept { return InputDevice::Mouse; }
 
-	constexpr bool HasModifier(ModifierFlags flag) const noexcept { return HasAnyFlag(Modifiers, flag); }
+	SPARKLE_CORE_API bool HasModifier(ModifierFlags flag) const noexcept;
 };

@@ -15,7 +15,7 @@ class ShaderToolsPanel final
 public:
 	using CommandHandler = std::function<void()>;
 
-	void SetOpen(bool bOpen) noexcept { m_bIsOpen = bOpen; }
+	void SetOpen(bool bOpen) noexcept;
 
 	void SetDiagnosticsProvider(RegisteredShaderListModel::DiagnosticsProvider provider);
 	void SetReloadHandler(CommandHandler handler);

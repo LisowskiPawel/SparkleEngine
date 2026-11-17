@@ -2,15 +2,15 @@
 # Native window and input ownership
 # Dependencies: SparkleCore
 
-file(GLOB_RECURSE SPARKLE_PLATFORM_PUBLIC_HEADERS
+file(GLOB_RECURSE SPARKLE_PLATFORM_PUBLIC_HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/*.h
 )
 
-file(GLOB_RECURSE SPARKLE_PLATFORM_PRIVATE_SOURCES
+file(GLOB_RECURSE SPARKLE_PLATFORM_PRIVATE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/*.cpp
 )
 
-file(GLOB_RECURSE SPARKLE_PLATFORM_PRIVATE_HEADERS
+file(GLOB_RECURSE SPARKLE_PLATFORM_PRIVATE_HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/*.h
 )
 
@@ -47,8 +47,8 @@ sparkle_target_precompile_headers(SparklePlatform
 )
 
 # Platform depends on Core
-target_link_libraries(SparklePlatform 
-    PUBLIC 
+target_link_libraries(SparklePlatform
+    PUBLIC
         SparkleCore
     PRIVATE
         dwmapi

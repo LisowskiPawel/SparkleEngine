@@ -61,7 +61,7 @@ namespace Process
 		std::string CapturedOutput;
 		std::string FailureReason;
 
-		bool Succeeded() const noexcept { return bLaunched && !bCancelled && (bReady || ExitCode == 0) && FailureReason.empty(); }
+		SPARKLE_CORE_API bool Succeeded() const noexcept;
 	};
 
 	SPARKLE_CORE_API ChildProcessResult RunChildProcess(const ChildProcessRequest& request);

@@ -19,7 +19,6 @@ struct RenderGpuMeshHitDataOffsets final
 	std::uint32_t FirstVertex = 0;
 	std::uint32_t FirstIndex = 0;
 	std::uint32_t FirstMorphTargetDelta = 0;
-	std::uint32_t VertexCount = 0;
 	std::uint32_t IndexCount = 0;
 };
 
@@ -61,7 +60,6 @@ static RenderGpuMeshHitDataOffsets ResolveMeshOffsets(MeshHitDataOffsets& meshOf
 	    .FirstVertex = static_cast<std::uint32_t>(payloads.Vertices.size()),
 	    .FirstIndex = static_cast<std::uint32_t>(payloads.Indices.size()),
 	    .FirstMorphTargetDelta = static_cast<std::uint32_t>(payloads.MorphTargetDeltas.size()),
-	    .VertexCount = static_cast<std::uint32_t>(meshVertices.size()),
 	    .IndexCount = static_cast<std::uint32_t>(meshIndices.size())};
 
 	payloads.Vertices.insert(payloads.Vertices.end(), meshVertices.begin(), meshVertices.end());
@@ -82,54 +80,6 @@ static RenderGpuMeshHitDataOffsets ResolveMeshOffsets(MeshHitDataOffsets& meshOf
 	return offsets;
 }
 
-static std::uint32_t BuildMaterialFlags(const MaterialData& material) noexcept
-{
-	std::uint32_t flags = material.bDoubleSided ? RayTracingHitData::MaterialFlag_DoubleSided : 0u;
-	if (material.alphaMode == 0)
-	{
-		flags |= RayTracingHitData::MaterialFlag_Opaque;
-	}
-	else if (material.alphaMode == 1)
-	{
-		flags |= RayTracingHitData::MaterialFlag_AlphaTested;
-	}
-	else if (material.alphaMode == 2)
-	{
-		flags |= RayTracingHitData::MaterialFlag_AlphaBlended;
-	}
-	if (material.textureFlags != 0)
-	{
-		flags |= RayTracingHitData::MaterialFlag_Textured;
-	}
-	if (material.emissiveColor.x > 0.0f || material.emissiveColor.y > 0.0f || material.emissiveColor.z > 0.0f)
-	{
-		flags |= RayTracingHitData::MaterialFlag_Emissive;
-	}
-	return flags;
-}
-
-static std::uint32_t BuildGeometryFlags(const MeshDraw& draw, const MaterialData& material) noexcept
-{
-	std::uint32_t flags = draw.Geometry.MeshKind == RenderMeshKind::Skeletal ? RayTracingHitData::GeometryFlag_SkinnedMesh : RayTracingHitData::GeometryFlag_StaticMesh;
-	if (material.alphaMode == 1)
-	{
-		flags |= RayTracingHitData::GeometryFlag_AlphaTested;
-	}
-	else if (material.alphaMode == 2)
-	{
-		flags |= RayTracingHitData::GeometryFlag_AlphaBlended;
-	}
-	if (material.textureFlags != 0)
-	{
-		flags |= RayTracingHitData::GeometryFlag_TexturedMaterial;
-	}
-	if (material.bDoubleSided)
-	{
-		flags |= RayTracingHitData::GeometryFlag_DoubleSided;
-	}
-	return flags;
-}
-
 static void Clear(RenderGpuRayTracingPayloads& payloads) noexcept
 {
 	payloads.Vertices.clear();
@@ -147,6 +97,9 @@ static void AppendMaterials(const PreparedRenderScene& preparedScene, RenderGpuR
 	payloads.Materials.reserve(preparedScene.materials.size());
 	for (const MaterialData& material : preparedScene.materials)
 	{
+		const bool bEmissiveRedOrGreen = material.emissiveColor.x > 0.0f || material.emissiveColor.y > 0.0f;
+		const bool bEmissive = bEmissiveRedOrGreen || material.emissiveColor.z > 0.0f;
+
 		RayTracingHitMaterial rayTracingMaterial{
 		    .BaseColor = material.baseColor,
 		    .EmissiveColor = material.emissiveColor,
@@ -158,7 +111,7 @@ static void AppendMaterials(const PreparedRenderScene& preparedScene, RenderGpuR
 		    .TextureFlags = material.textureFlags,
 		    .SubsurfaceColor = material.subsurfaceColor,
 		    .SubsurfaceStrength = material.subsurfaceStrength,
-		    .Flags = BuildMaterialFlags(material),
+		    .Flags = bEmissive ? RayTracingHitData::MaterialFlagEmissive : 0u,
 		    .TextureIndices0 =
 		        DirectX::XMUINT4{
 		            material.materialTextureIndices[MaterialTextureSlots::BaseColor],
@@ -233,22 +186,14 @@ static void AppendInstance(
 
 	const MaterialData& material = preparedScene.materials[draw.MaterialSlot];
 	const RenderGpuMeshHitDataOffsets offsets = ResolveMeshOffsets(meshOffsets, *gpuMesh, payloads);
-	RayTracingHitInstance& instance = payloads.Instances[input.GpuSceneSlot];
 
-	instance = RayTracingHitInstance{
+	payloads.Instances[input.GpuSceneSlot] = RayTracingHitInstance{
 	    .FirstVertex = offsets.FirstVertex,
 	    .FirstIndex = offsets.FirstIndex,
-	    .VertexCount = offsets.VertexCount,
 	    .IndexCount = offsets.IndexCount,
 	    .MaterialSlot = draw.MaterialSlot,
-	    .Flags = RayTracingHitData::InstanceFlag_Valid | (material.alphaMode == 0 ? RayTracingHitData::InstanceFlag_Opaque : 0u)
-	        | (draw.Geometry.MeshKind == RenderMeshKind::Static ? RayTracingHitData::InstanceFlag_StaticMesh : 0u) | (material.bDoubleSided ? RayTracingHitData::InstanceFlag_TwoSided : 0u),
-	    .GeometryFlags = BuildGeometryFlags(draw, material),
-	    .RejectionReason = RayTracingHitData::Reason_None,
-	    .AlphaMode = material.alphaMode,
-	    .MaterialTextureFlags = material.textureFlags};
-
-	instance.MorphTargetDeltaOffset = offsets.FirstMorphTargetDelta;
+	    .Flags = RayTracingHitData::InstanceFlagValid | (material.bDoubleSided ? RayTracingHitData::InstanceFlagTwoSided : 0u),
+	    .MorphTargetDeltaOffset = offsets.FirstMorphTargetDelta};
 }
 
 void BuildRenderGpuRayTracingPayloads(const PreparedRenderScene& preparedScene, const GpuMeshCache& meshes, RenderGpuRayTracingPayloads& payloads)

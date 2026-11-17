@@ -13,78 +13,56 @@
 #include <cstdint>
 #include <span>
 
-class SPARKLE_CORE_API InputState
+class SPARKLE_CORE_API InputState final
 {
 public:
-	InputState() = default;
+	InputState();
 
-	~InputState() = default;
+	~InputState();
 
 	InputState(const InputState&) = delete;
 	InputState& operator=(const InputState&) = delete;
 
-	InputState(InputState&&) = default;
-	InputState& operator=(InputState&&) = default;
+	InputState(InputState&&) noexcept;
+	InputState& operator=(InputState&&) noexcept;
 
-	bool IsKeyDown(Key InKey) const noexcept;
+	bool IsKeyDown(Key key) const noexcept;
+	bool IsKeyPressed(Key key) const noexcept;
+	bool IsKeyReleased(Key key) const noexcept;
+	bool IsKeyHeld(Key key) const noexcept;
+	ButtonState GetKeyState(Key key) const noexcept;
 
-	bool IsKeyPressed(Key InKey) const noexcept;
-
-	bool IsKeyReleased(Key InKey) const noexcept;
-
-	bool IsKeyHeld(Key InKey) const noexcept;
-
-	ButtonState GetKeyState(Key InKey) const noexcept;
-
-	bool IsMouseButtonDown(MouseButton InButton) const noexcept;
-
-	bool IsMouseButtonPressed(MouseButton InButton) const noexcept;
-
-	bool IsMouseButtonReleased(MouseButton InButton) const noexcept;
-
-	bool IsMouseButtonHeld(MouseButton InButton) const noexcept;
-
-	ButtonState GetMouseButtonState(MouseButton InButton) const noexcept;
+	bool IsMouseButtonDown(MouseButton button) const noexcept;
+	bool IsMouseButtonPressed(MouseButton button) const noexcept;
+	bool IsMouseButtonReleased(MouseButton button) const noexcept;
+	bool IsMouseButtonHeld(MouseButton button) const noexcept;
+	ButtonState GetMouseButtonState(MouseButton button) const noexcept;
 
 	MousePosition GetMousePosition() const noexcept;
-
-	MousePosition GetMouseDelta() const noexcept;
-
+	MouseDelta GetMouseDelta() const noexcept;
 	float GetMouseWheelDelta() const noexcept;
-
 	float GetMouseWheelHorizontalDelta() const noexcept;
 
 	ModifierFlags GetModifiers() const noexcept;
-
-	bool HasModifier(ModifierFlags InModifier) const noexcept;
-
+	bool HasModifier(ModifierFlags modifier) const noexcept;
 	bool IsShiftDown() const noexcept;
-
 	bool IsCtrlDown() const noexcept;
-
 	bool IsAltDown() const noexcept;
 
 	bool IsMouseCaptured() const noexcept;
-
 	bool IsCursorHidden() const noexcept;
 
 	// The acquisition owner updates state between observed frames; readers borrow const state.
-	void SetKeyState(Key InKey, ButtonState InState) noexcept;
+	void SetKeyState(Key key, ButtonState state) noexcept;
+	void SetMouseButtonState(MouseButton button, ButtonState state) noexcept;
 
-	void SetMouseButtonState(MouseButton InButton, ButtonState InState) noexcept;
+	void SetMousePosition(std::int32_t x, std::int32_t y) noexcept;
+	void AccumulateMouseDelta(std::int32_t deltaX, std::int32_t deltaY) noexcept;
+	void AccumulateWheelDelta(float delta) noexcept;
+	void AccumulateWheelHorizontalDelta(float delta) noexcept;
 
-	void SetMousePosition(int32_t X, int32_t Y) noexcept;
-
-	void AccumulateMouseDelta(int32_t DeltaX, int32_t DeltaY) noexcept;
-
-	void AccumulateWheelDelta(float Delta) noexcept;
-
-	void AccumulateWheelHorizontalDelta(float Delta) noexcept;
-
-	void SetModifiers(ModifierFlags InModifiers) noexcept;
-
+	void SetModifiers(ModifierFlags modifiers) noexcept;
 	void SetMouseCaptured(bool bCaptured) noexcept;
-
 	void SetCursorHidden(bool bHidden) noexcept;
 
 	void BeginFrame() noexcept;
@@ -94,25 +72,18 @@ private:
 	static void AdvanceButtonStates(std::span<ButtonState> states) noexcept;
 	void ResetFrameDeltas() noexcept;
 
-	static constexpr std::size_t KeyCount = static_cast<std::size_t>(Key::Count);
+	static constexpr std::size_t kKeyCount = static_cast<std::size_t>(Key::Count);
+	static constexpr std::size_t kMouseButtonCount = static_cast<std::size_t>(MouseButton::Count);
 
-	static constexpr std::size_t MouseButtonCount = static_cast<std::size_t>(MouseButton::Count);
+	std::array<ButtonState, kKeyCount> m_keyStates{};
+	std::array<ButtonState, kMouseButtonCount> m_mouseButtonStates{};
 
-	std::array<ButtonState, KeyCount> m_KeyStates{};
+	MousePosition m_mousePosition;
+	MouseDelta m_mouseDelta;
+	float m_wheelDelta = 0.0f;
+	float m_wheelHorizontalDelta = 0.0f;
 
-	std::array<ButtonState, MouseButtonCount> m_MouseButtonStates{};
-
-	int32_t m_MouseX = 0;
-	int32_t m_MouseY = 0;
-
-	int32_t m_MouseDeltaX = 0;
-	int32_t m_MouseDeltaY = 0;
-
-	float m_WheelDelta = 0.0f;
-	float m_WheelHorizontalDelta = 0.0f;
-
-	ModifierFlags m_Modifiers = ModifierFlags::None;
-
+	ModifierFlags m_modifiers = ModifierFlags::None;
 	bool m_bMouseCaptured = false;
 	bool m_bCursorHidden = false;
 };

@@ -1,7 +1,7 @@
 #include "Vulkan/VulkanPCH.h"
 
 #include "Vulkan/Descriptors/VulkanDescriptorWrites.h"
-#include "Pipeline/RhiPipelineDesc.h"
+#include "Bindings/RenderBindingLayout.h"
 #include "Core/Public/Diagnostics/Verify.h"
 
 #include <algorithm>
@@ -164,12 +164,7 @@ void VulkanDescriptorWrites::Write(VkDevice device, VkDescriptorSet descriptorSe
 	{
 		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, "Vulkan descriptor write requires a descriptor set and at least one descriptor.");
 	}
-	const bool bDescriptorCountDescriptorCount = entries.size() > binding.DescriptorCount;
-	const bool bInvalidDescriptorCountBindless = !bDescriptorCountDescriptorCount && (!binding.Bindless.bBindlessEligible);
-	const bool bFixedCountMismatch = bInvalidDescriptorCountBindless && (entries.size() != binding.DescriptorCount);
-	const bool bInvalidDescriptorCount = bDescriptorCountDescriptorCount || bFixedCountMismatch;
-
-	if (bInvalidDescriptorCount)
+	if (entries.size() > binding.DescriptorCount)
 	{
 		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, "Vulkan descriptor write cardinality does not match the compiled shader binding.");
 	}

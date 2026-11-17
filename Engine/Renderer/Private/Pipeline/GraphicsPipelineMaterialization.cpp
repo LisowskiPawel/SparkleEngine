@@ -127,8 +127,8 @@ GraphicsPipelineDesc BuildGraphicsPipelineDesc(
 {
 	return GraphicsPipelineDesc{
 	    .BindingLayout = &bindingLayout,
-	    .VertexShader = RhiShaderStageDesc{&vertexShader},
-	    .PixelShader = RhiShaderStageDesc{&pixelShader},
+	    .VertexShader = &vertexShader,
+	    .PixelShader = &pixelShader,
 	    .Blend = request.Blend,
 	    .Rasterizer = request.Rasterizer,
 	    .Depth = request.Depth,

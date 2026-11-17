@@ -22,7 +22,6 @@ namespace SparkleTools
 		std::filesystem::path DiagnosticsRoot;
 		std::filesystem::path SymbolsRoot;
 
-		ToolTargetOutputPaths RuntimeSupportTargetOutputs(std::string_view targetName, std::string_view profileName) const;
 		ToolTargetOutputPaths LauncherTargetOutputs(std::string_view profileName) const;
 		ToolTargetOutputPaths ToolTargetOutputs(std::string_view toolName, std::string_view profileName) const;
 		std::filesystem::path ToolScratchDirectory(std::string_view toolName, std::string_view profileName) const;

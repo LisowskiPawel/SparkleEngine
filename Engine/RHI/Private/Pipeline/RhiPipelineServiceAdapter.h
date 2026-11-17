@@ -2,6 +2,7 @@
 
 #include "Pipeline/RhiPipelineService.h"
 
+#include "Shaders/GlobalShaderMap.h"
 #include "Core/Public/Diagnostics/Logger.h"
 #include "Core/Public/Diagnostics/Verify.h"
 
@@ -26,7 +27,8 @@ public:
 
 	std::unique_ptr<RenderPipeline> CreateGraphicsPipeline(const GraphicsPipelineDesc& desc) override
 	{
-		if (desc.BindingLayout == nullptr || !desc.VertexShader.IsValid())
+		const bool bShaderValid = desc.VertexShader != nullptr && desc.VertexShader->IsValid();
+		if (desc.BindingLayout == nullptr || !bShaderValid)
 		{
 			Fail("Graphics-pipeline creation received an incomplete pipeline description.");
 		}
@@ -35,7 +37,8 @@ public:
 
 	std::unique_ptr<RenderPipeline> CreateComputePipeline(const ComputePipelineDesc& desc) override
 	{
-		if (desc.BindingLayout == nullptr || !desc.ComputeShader.IsValid())
+		const bool bShaderValid = desc.ComputeShader != nullptr && desc.ComputeShader->IsValid();
+		if (desc.BindingLayout == nullptr || !bShaderValid)
 		{
 			Fail("Compute-pipeline creation received an incomplete pipeline description.");
 		}

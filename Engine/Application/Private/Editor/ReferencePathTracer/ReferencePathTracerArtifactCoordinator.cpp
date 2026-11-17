@@ -12,8 +12,8 @@
 #include <optional>
 #include <utility>
 
-ReferencePathTracerArtifactCoordinator::ReferencePathTracerArtifactCoordinator(EditorOperationRuntime& operations) noexcept :
-    m_writeOperation(operations)
+ReferencePathTracerArtifactCoordinator::ReferencePathTracerArtifactCoordinator(TaskExecutor& executor, TaskScope& scope) noexcept :
+    m_writeOperation(executor, scope)
 {
 }
 

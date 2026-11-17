@@ -1,6 +1,7 @@
 #include "PCH.h"
 
 #include "Pipeline/RhiPipelineDesc.h"
+#include "Shaders/GlobalShaderMap.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Validation/RhiContract.h"
@@ -32,9 +33,10 @@ namespace RhiPipelineDescValidation
 		}
 	}
 
-	void RequireShaderStage(const RhiShaderStageDesc& shader, ShaderStage expectedStage, const char* message)
+	void RequireShaderStage(const ResolvedShader* shader, ShaderStage expectedStage, const char* message)
 	{
-		Require(shader.IsValid() && shader.Shader->Entry->Stage == expectedStage, message);
+		Require(shader != nullptr && shader->IsValid(), message);
+		Require(shader->Entry->Stage == expectedStage, message);
 	}
 }
 
@@ -42,7 +44,7 @@ void RhiContract::ValidateGraphicsPipelineDesc(const GraphicsPipelineDesc& desc)
 {
 	RhiPipelineDescValidation::Require(desc.BindingLayout != nullptr, "Graphics pipeline requires a binding layout.");
 	RhiPipelineDescValidation::RequireShaderStage(desc.VertexShader, ShaderStage::Vertex, "Graphics pipeline requires a valid vertex shader stage.");
-	if (desc.PixelShader.Shader != nullptr)
+	if (desc.PixelShader != nullptr)
 	{
 		RhiPipelineDescValidation::RequireShaderStage(desc.PixelShader, ShaderStage::Pixel, "Graphics pipeline pixel shader descriptor is invalid or has the wrong stage.");
 	}

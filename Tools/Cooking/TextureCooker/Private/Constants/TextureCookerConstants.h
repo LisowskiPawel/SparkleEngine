@@ -10,7 +10,6 @@ public:
 
 	static constexpr int ExitSuccess = 0;
 	static constexpr int ExitUsageError = 1;
-	static constexpr int ExitComInitializationFailed = 4;
 	static constexpr int ExitInspectRequestFileFailed = 5;
 	static constexpr int ExitLoadRequestFileFailed = 6;
 	static constexpr int ExitCookFailed = 7;

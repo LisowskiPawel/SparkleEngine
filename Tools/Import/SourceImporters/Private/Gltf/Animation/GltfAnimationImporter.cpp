@@ -66,7 +66,7 @@ namespace GltfAnimationImporter
 		return (std::numeric_limits<std::uint32_t>::max)();
 	}
 
-	static ImportedSkeletonIndex FindSkeletonForSkin(const SourceImportOutput& output, const cgltf_data& data, const cgltf_skin* skin) noexcept
+	static ImportedSkeletonIndex FindSkeletonForSkin(const ImportedScene& importedScene, const cgltf_data& data, const cgltf_skin* skin) noexcept
 	{
 		if (skin == nullptr)
 		{
@@ -77,9 +77,10 @@ namespace GltfAnimationImporter
 		{
 			return kInvalidImportedSkeletonIndex;
 		}
-		for (std::size_t skeletonIndex = 0; skeletonIndex < output.scene.skeletons.size(); ++skeletonIndex)
+
+		for (std::size_t skeletonIndex = 0; skeletonIndex < importedScene.skeletons.size(); ++skeletonIndex)
 		{
-			if (output.scene.skeletons[skeletonIndex].sourceSkinIndex == sourceSkinIndex)
+			if (importedScene.skeletons[skeletonIndex].sourceSkinIndex == sourceSkinIndex)
 			{
 				return static_cast<ImportedSkeletonIndex>(skeletonIndex);
 			}
@@ -92,7 +93,7 @@ namespace GltfAnimationImporter
 	    const cgltf_animation& animation,
 	    const cgltf_animation_channel& channel,
 	    std::size_t channelIndex,
-	    const SourceImportOutput& output,
+	    const ImportedScene& importedScene,
 	    std::vector<ImportedAnimationTargetPath>& samplerTargetPaths,
 	    ImportedAnimationClip& clip)
 	{
@@ -122,8 +123,8 @@ namespace GltfAnimationImporter
 		}
 
 		const std::uint32_t targetNodeIndex = static_cast<std::uint32_t>(cgltf_node_index(&data, channel.target_node));
-		const auto [jointSkeletonIndex, targetJointIndex] = output.scene.FindSkeletonJointForNode(targetNodeIndex);
-		const ImportedSkeletonIndex targetSkeletonIndex = targetPath == ImportedAnimationTargetPath::Weights ? FindSkeletonForSkin(output, data, channel.target_node->skin) : jointSkeletonIndex;
+		const auto [jointSkeletonIndex, targetJointIndex] = importedScene.FindSkeletonJointForNode(targetNodeIndex);
+		const ImportedSkeletonIndex targetSkeletonIndex = targetPath == ImportedAnimationTargetPath::Weights ? FindSkeletonForSkin(importedScene, data, channel.target_node->skin) : jointSkeletonIndex;
 		if (targetSkeletonIndex == kInvalidImportedSkeletonIndex || (targetPath != ImportedAnimationTargetPath::Weights && targetJointIndex == (std::numeric_limits<std::uint32_t>::max)()))
 		{
 			throw Diagnostics::Error(std::format("glTF animation channel {} is not owned by an imported skeleton.", channelIndex));
@@ -148,28 +149,25 @@ namespace GltfAnimationImporter
 	}
 }
 
-void GltfAnimationImporter::ImportAnimations(const cgltf_data* data, SourceImportOutput& output)
+void GltfAnimationImporter::ImportAnimations(const cgltf_data& data, ImportedScene& importedScene)
 {
-	if (data == nullptr)
-	{
-		throw Diagnostics::Error("glTF animation import has no parsed scene.");
-	}
-	if (data->animations_count == 0)
-	{
-		return;
-	}
-	// Sparkle animation clips are skeleton-owned. Preserve static scene import for
-	// glTF assets that contain only node or morph animation until a node-animation
-	// runtime exists; skeletal assets continue through strict channel validation.
-	if (output.scene.skeletons.empty())
+	if (data.animations_count == 0)
 	{
 		return;
 	}
 
-	output.scene.animations.reserve(data->animations_count);
-	for (cgltf_size animationIndex = 0; animationIndex < data->animations_count; ++animationIndex)
+	// Sparkle animation clips are skeleton-owned. Preserve static scene import for
+	// glTF assets that contain only node or morph animation until a node-animation
+	// runtime exists; skeletal assets continue through strict channel validation.
+	if (importedScene.skeletons.empty())
 	{
-		const cgltf_animation& animation = data->animations[animationIndex];
+		return;
+	}
+
+	importedScene.animations.reserve(data.animations_count);
+	for (cgltf_size animationIndex = 0; animationIndex < data.animations_count; ++animationIndex)
+	{
+		const cgltf_animation& animation = data.animations[animationIndex];
 		ImportedAnimationClip clip;
 		clip.name = animation.name != nullptr ? animation.name : "";
 		clip.sourceAnimationIndex = static_cast<std::uint32_t>(animationIndex);
@@ -179,13 +177,14 @@ void GltfAnimationImporter::ImportAnimations(const cgltf_data* data, SourceImpor
 
 		for (cgltf_size channelIndex = 0; channelIndex < animation.channels_count; ++channelIndex)
 		{
-			ImportChannel(*data, animation, animation.channels[channelIndex], channelIndex, output, samplerTargetPaths, clip);
+			ImportChannel(data, animation, animation.channels[channelIndex], channelIndex, importedScene, samplerTargetPaths, clip);
 		}
 
 		if (!clip.IsValid())
 		{
 			throw Diagnostics::Error(std::format("glTF animation {} has no complete channel set.", animationIndex));
 		}
-		output.scene.animations.push_back(std::move(clip));
+
+		importedScene.animations.push_back(std::move(clip));
 	}
 }

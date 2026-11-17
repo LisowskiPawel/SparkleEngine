@@ -1,0 +1,28 @@
+#include "PCH.h"
+
+#include "EditorApplicationLaunch.h"
+
+#include "Host/Application.h"
+#include "Editor/Host/EditorApplication.h"
+#include "Core/Public/Threading/ThreadOwnership.h"
+
+#include <Windows.h>
+#include <exception>
+#include <utility>
+
+int RunEditorApplication(EditorShaderCompileAction compileShaders)
+{
+	Threading::SetCurrentThreadRole("Sparkle.EditorThread");
+	try
+	{
+		Application::ConfigureProcessFromCommandLine();
+		EditorApplication app(std::move(compileShaders));
+		app.Run();
+		return 0;
+	}
+	catch (const std::exception& error)
+	{
+		MessageBoxA(nullptr, error.what(), "Sparkle Editor could not complete the operation", MB_OK | MB_ICONERROR);
+		return 1;
+	}
+}

@@ -15,7 +15,7 @@ class SlangShaderBackend final : public IShaderBackend
 {
 public:
 	SlangShaderBackend();
-	~SlangShaderBackend() override = default;
+	~SlangShaderBackend() override;
 
 	SlangShaderBackend(const SlangShaderBackend&) = delete;
 	SlangShaderBackend& operator=(const SlangShaderBackend&) = delete;

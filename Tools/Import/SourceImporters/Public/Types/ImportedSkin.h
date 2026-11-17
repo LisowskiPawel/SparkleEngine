@@ -41,5 +41,5 @@ struct ImportedSkeleton
 	std::uint32_t sourceSkeletonRootNodeIndex = (std::numeric_limits<std::uint32_t>::max)();
 	std::vector<ImportedJoint> joints;
 
-	bool IsValid() const noexcept { return !joints.empty(); }
+	bool IsValid() const noexcept;
 };

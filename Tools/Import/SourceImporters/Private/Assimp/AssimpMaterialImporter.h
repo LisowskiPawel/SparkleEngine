@@ -4,9 +4,9 @@
 #include <span>
 
 struct aiScene;
-struct SourceImportOutput;
+struct ImportedScene;
 
 namespace AssimpMaterialImporter
 {
-	void ImportMaterials(const aiScene& scene, const std::filesystem::path& sourceDirectory, std::span<const std::filesystem::path> embeddedTexturePaths, SourceImportOutput& output);
+	void ImportMaterials(const aiScene& scene, const std::filesystem::path& sourceDirectory, std::span<const std::filesystem::path> embeddedTexturePaths, ImportedScene& importedScene);
 }

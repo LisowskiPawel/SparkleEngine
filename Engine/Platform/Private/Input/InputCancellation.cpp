@@ -1,25 +1,27 @@
 #include "PCH.h"
-#include "Input/InputSystem.h"
-#include "Input/InputDispatchState.h"
+#include "Input/InputSystemState.h"
 #include "Input/Backends/Win32PointerControl.h"
 
 #include <utility>
 
-void InputSystem::CancelInput()
+void InputSystem::State::CancelInput()
 {
+	++CancellationEpoch;
+
 	// These snapshots outlive publication of empty state while cancellation callbacks run.
-	InputState canceledGlobal = std::move(m_inputState);
-	auto canceledLayers = std::move(m_layerStates);
-	m_inputState = InputState{};
-	m_layerStates = {};
-	m_mouseCaptureLayer = InputLayer::System;
-	m_bHasLastMousePosition = false;
-	m_dispatch->FocusRouter.ResetFocus();
-	m_dispatch->EventDispatcher.CancelAllEvents();
+	InputState canceledGlobal = std::move(GlobalState);
+	auto canceledLayers = std::move(LayerStates);
+
+	GlobalState = InputState{};
+	LayerStates = {};
+	MouseCaptureLayer = InputLayer::System;
+	bHasLastMousePosition = false;
+	FocusRouter.ResetFocus();
+	Dispatcher.CancelAllEvents();
 
 	if (canceledGlobal.IsMouseCaptured())
 	{
-		ReleaseWin32MouseCapture(m_windowHandle);
+		ReleaseWin32MouseCapture(WindowHandle);
 	}
 	if (canceledGlobal.IsCursorHidden())
 	{
@@ -32,11 +34,12 @@ void InputSystem::CancelInput()
 		ReleaseStateKeys(canceledLayers[index], layer);
 		ReleaseStateMouseButtons(canceledLayers[index], layer);
 	}
+
 	ReleaseStateKeys(canceledGlobal, InputLayer::System);
 	ReleaseStateMouseButtons(canceledGlobal, InputLayer::System);
 }
 
-InputState InputSystem::TakePointerState(InputState& state) noexcept
+InputState InputSystem::State::TakePointerState(InputState& state) noexcept
 {
 	InputState canceled;
 	for (std::size_t index = 0; index < static_cast<std::size_t>(MouseButton::Count); ++index)
@@ -44,6 +47,7 @@ InputState InputSystem::TakePointerState(InputState& state) noexcept
 		const auto button = static_cast<MouseButton>(index);
 		canceled.SetMouseButtonState(button, state.GetMouseButtonState(button));
 	}
+
 	const MousePosition position = state.GetMousePosition();
 	canceled.SetMousePosition(position.X, position.Y);
 	canceled.SetModifiers(state.GetModifiers());
@@ -54,21 +58,23 @@ InputState InputSystem::TakePointerState(InputState& state) noexcept
 	return canceled;
 }
 
-void InputSystem::CancelPointerInput()
+void InputSystem::State::CancelPointerInput()
 {
-	InputState canceledGlobal = TakePointerState(m_inputState);
+	++CancellationEpoch;
+	InputState canceledGlobal = TakePointerState(GlobalState);
 	std::array<InputState, RoutedLayerCount> canceledLayers;
 	for (std::size_t index = 0; index < RoutedLayerCount; ++index)
 	{
-		canceledLayers[index] = TakePointerState(m_layerStates[index]);
+		canceledLayers[index] = TakePointerState(LayerStates[index]);
 	}
-	m_mouseCaptureLayer = InputLayer::System;
-	m_bHasLastMousePosition = false;
-	m_dispatch->EventDispatcher.CancelPointerEvents();
+
+	MouseCaptureLayer = InputLayer::System;
+	bHasLastMousePosition = false;
+	Dispatcher.CancelPointerEvents();
 
 	if (canceledGlobal.IsMouseCaptured())
 	{
-		ReleaseWin32MouseCapture(m_windowHandle);
+		ReleaseWin32MouseCapture(WindowHandle);
 	}
 	if (canceledGlobal.IsCursorHidden())
 	{
@@ -79,10 +85,11 @@ void InputSystem::CancelPointerInput()
 	{
 		ReleaseStateMouseButtons(canceledLayers[index], static_cast<InputLayer>(index + 1));
 	}
+
 	ReleaseStateMouseButtons(canceledGlobal, InputLayer::System);
 }
 
-void InputSystem::CancelLayer(InputLayer layer)
+void InputSystem::State::CancelLayer(InputLayer layer)
 {
 	InputState* state = FindLayerState(layer);
 	if (state == nullptr)
@@ -92,8 +99,8 @@ void InputSystem::CancelLayer(InputLayer layer)
 
 	InputState canceled = std::move(*state);
 	*state = InputState{};
-	m_dispatch->EventDispatcher.CancelLayerEvents(layer);
-	if (m_mouseCaptureLayer == layer)
+	Dispatcher.CancelLayerEvents(layer);
+	if (MouseCaptureLayer == layer)
 	{
 		ReleaseMouse();
 		SetCursorVisibility(true);
@@ -103,7 +110,7 @@ void InputSystem::CancelLayer(InputLayer layer)
 	ReleaseStateMouseButtons(canceled, layer);
 }
 
-void InputSystem::ReleaseStateKeys(const InputState& state, InputLayer layer)
+void InputSystem::State::ReleaseStateKeys(const InputState& state, InputLayer layer)
 {
 	for (std::size_t index = 0; index < static_cast<std::size_t>(Key::Count); ++index)
 	{
@@ -113,12 +120,12 @@ void InputSystem::ReleaseStateKeys(const InputState& state, InputLayer layer)
 			KeyboardEvent event{};
 			event.KeyCode = key;
 			event.Modifiers = state.GetModifiers();
-			m_dispatch->EventDispatcher.DispatchCancellation(event, layer);
+			Dispatcher.DispatchCancellation(event, layer);
 		}
 	}
 }
 
-void InputSystem::ReleaseStateMouseButtons(const InputState& state, InputLayer layer)
+void InputSystem::State::ReleaseStateMouseButtons(const InputState& state, InputLayer layer)
 {
 	for (std::size_t index = 0; index < static_cast<std::size_t>(MouseButton::Count); ++index)
 	{
@@ -129,7 +136,7 @@ void InputSystem::ReleaseStateMouseButtons(const InputState& state, InputLayer l
 			event.Button = button;
 			event.Position = state.GetMousePosition();
 			event.Modifiers = state.GetModifiers();
-			m_dispatch->EventDispatcher.DispatchCancellation(event, layer);
+			Dispatcher.DispatchCancellation(event, layer);
 		}
 	}
 }

@@ -1,8 +1,8 @@
 #include "PCH.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 #include "Textures/TextureCache.h"
 
 #include "Core/Public/Diagnostics/Verify.h"
-#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Paths/PathUtils.h"
 #include "RHI/Public/Commands/RenderCommandList.h"
 #include "RHI/Public/Commands/RhiCommandSubmissionService.h"

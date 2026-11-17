@@ -29,17 +29,12 @@ namespace GltfCameraImporter
 		return {};
 	}
 
-	void ImportCameras(const cgltf_data* data, SourceImportOutput& output)
+	void ImportCameras(const cgltf_data& data, ImportedScene& importedScene)
 	{
-		if (data == nullptr)
+		importedScene.cameras.reserve(data.cameras_count);
+		for (cgltf_size nodeIndex = 0; nodeIndex < data.nodes_count; ++nodeIndex)
 		{
-			throw Diagnostics::Error("glTF camera import has no parsed scene.");
-		}
-
-		output.scene.cameras.reserve(data->cameras_count);
-		for (cgltf_size nodeIndex = 0; nodeIndex < data->nodes_count; ++nodeIndex)
-		{
-			const cgltf_node& node = data->nodes[nodeIndex];
+			const cgltf_node& node = data.nodes[nodeIndex];
 			if (node.camera == nullptr)
 			{
 				continue;
@@ -59,30 +54,29 @@ namespace GltfCameraImporter
 			const cgltf_camera_perspective& perspective = sourceCamera.data.perspective;
 			// The renderer derives aspect ratio from the current viewport. A source aspect ratio is therefore intentionally
 			// discarded, while the vertical field of view and finite clip range remain authoritative camera data.
-			const bool bFarPlaneSpecified = perspective.has_zfar;
-			const bool bProjectionFiniteYfov = bFarPlaneSpecified && std::isfinite(perspective.yfov);
-			const bool bProjectionFiniteZnear = bProjectionFiniteYfov && (std::isfinite(perspective.znear));
-			const bool bProjectionFinite = bProjectionFiniteZnear && (std::isfinite(perspective.zfar));
-			const bool bInvalidNearRange = perspective.yfov <= 0.0f || perspective.znear <= 0.0f;
-			const bool bProjectionOrderedZnear = bInvalidNearRange || (perspective.zfar <= perspective.znear);
-			const bool bProjectionRangeValid = !bProjectionOrderedZnear;
-			const bool bProjectionOrdered = bProjectionFinite && bProjectionRangeValid;
-			const bool bCheckAspect = bProjectionOrdered && perspective.has_aspect_ratio;
-			const bool bAspectFinite = bCheckAspect && std::isfinite(perspective.aspect_ratio);
-			const bool bAspectPositive = bAspectFinite && perspective.aspect_ratio > 0.0f;
-			const bool bAspectReady = !bCheckAspect || bAspectPositive;
-			const bool bProjectionReady = bProjectionOrdered && bAspectReady;
-
-			if (!bProjectionReady)
+			const bool bFovFinite = std::isfinite(perspective.yfov);
+			const bool bClipPlanesFinite = std::isfinite(perspective.znear) && std::isfinite(perspective.zfar);
+			const bool bProjectionFinite = bFovFinite && bClipPlanesFinite;
+			const bool bPositiveNearRange = perspective.yfov > 0.0f && perspective.znear > 0.0f;
+			const bool bClipPlanesOrdered = bPositiveNearRange && perspective.zfar > perspective.znear;
+			if (!perspective.has_zfar || !bProjectionFinite || !bClipPlanesOrdered)
 			{
 				throw Diagnostics::Error(std::format("glTF camera {} uses unsupported perspective parameters.", nodeIndex));
+			}
+			if (perspective.has_aspect_ratio)
+			{
+				const bool bAspectValid = std::isfinite(perspective.aspect_ratio) && perspective.aspect_ratio > 0.0f;
+				if (!bAspectValid)
+				{
+					throw Diagnostics::Error(std::format("glTF camera {} uses unsupported perspective parameters.", nodeIndex));
+				}
 			}
 
 			camera.projectionKind = ImportedCameraProjectionKind::Perspective;
 			camera.fovYRadians = perspective.yfov;
 			camera.nearZ = perspective.znear;
 			camera.farZ = perspective.zfar;
-			output.scene.cameras.push_back(std::move(camera));
+			importedScene.cameras.push_back(std::move(camera));
 		}
 	}
 }

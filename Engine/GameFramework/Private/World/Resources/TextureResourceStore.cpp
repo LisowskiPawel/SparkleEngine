@@ -1,8 +1,7 @@
 #include "PCH.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "World/Resources/TextureResourceStore.h"
-
-#include "Core/Public/Paths/FileSystemPaths.h"
 
 static RenderTextureTable BuildRenderTextureTable(std::span<const std::filesystem::path> paths, std::uint32_t generation)
 {

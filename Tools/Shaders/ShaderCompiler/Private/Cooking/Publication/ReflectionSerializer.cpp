@@ -231,7 +231,7 @@ static void DecodeSpecializationConstants(const GlobalShaderMap& map, const Cook
 	}
 }
 
-void BuildShaderReflectionTables(std::span<const ShaderReflection> reflections, Strings::StringTableBuilder& stringTable, ShaderReflectionTables& outOutput)
+void BuildShaderReflectionTables(std::span<const ShaderReflection* const> reflections, Strings::StringTableBuilder& stringTable, ShaderReflectionTables& outOutput)
 {
 	outOutput.reflectionRecords.clear();
 	outOutput.resourceBindings.clear();
@@ -243,14 +243,14 @@ void BuildShaderReflectionTables(std::span<const ShaderReflection> reflections, 
 
 	outOutput.reflectionRecords.reserve(reflections.size());
 
-	for (const ShaderReflection& reflection : reflections)
+	for (const ShaderReflection* reflection : reflections)
 	{
-		const auto record = BeginReflectionRecord(reflection, outOutput);
-		AppendConstantBuffers(reflection.ConstantBuffers, stringTable, outOutput);
-		AppendResourceBindings(reflection.Bindings, stringTable, outOutput, record.ConstantBufferOffset);
-		AppendInputElements(reflection.InputElements, stringTable, outOutput);
-		AppendPushConstants(reflection.PushConstants, outOutput);
-		AppendSpecializationConstants(reflection.SpecializationConstants, stringTable, outOutput);
+		const auto record = BeginReflectionRecord(*reflection, outOutput);
+		AppendConstantBuffers(reflection->ConstantBuffers, stringTable, outOutput);
+		AppendResourceBindings(reflection->Bindings, stringTable, outOutput, record.ConstantBufferOffset);
+		AppendInputElements(reflection->InputElements, stringTable, outOutput);
+		AppendPushConstants(reflection->PushConstants, outOutput);
+		AppendSpecializationConstants(reflection->SpecializationConstants, stringTable, outOutput);
 		outOutput.reflectionRecords.push_back(record);
 	}
 }

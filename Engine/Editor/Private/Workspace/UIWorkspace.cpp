@@ -7,7 +7,6 @@
 #include "Console/EditorConsoleSystem.h"
 #include "Input/InputSystem.h"
 #include "Level/LevelSession.h"
-#include "Level/Level.h"
 #include "Workspace/MainMenuBarPanel.h"
 #include "Scene/Inspection/SceneInspectorPanel.h"
 #include "Scene/SceneOutlinerPanel.h"
@@ -17,28 +16,29 @@
 #include "AssetInspection/UsedTexturesPanel.h"
 #include "Viewport/ViewportPanel.h"
 #include "Viewport/ViewportToolbar.h"
-#include "Scene/Transactions/EditorTransactionHistory.h"
 #include "Timer.h"
 
 #include <imgui.h>
 
 #include <algorithm>
+#include <string_view>
 
 void UI::Implementation::NewFrame()
 {
-	const float deltaSeconds = static_cast<float>(m_timer->GetDelta(TimeDomain::Unscaled, TimeUnit::Seconds));
+	const float deltaSeconds = static_cast<float>(m_timer.GetDelta(TimeDomain::Unscaled, TimeUnit::Seconds));
 	m_imguiContext->BeginFrame(deltaSeconds);
 }
 
 void UI::Implementation::Build()
 {
-	if (m_transactionHistory && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+	EditorTransactionHistory& history = m_scene.GetHistory();
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 	{
-		m_transactionHistory->FinishInteraction();
+		history.FinishInteraction();
 	}
-	UpdateSceneModel();
-	HandleTransactionShortcuts();
+	m_scene.Refresh();
 	const bool bDisableInteraction = m_levelSession != nullptr && m_levelSession->IsLevelChangeInProgress();
+	HandleTransactionShortcuts(bDisableInteraction);
 	BeginInputRouting(bDisableInteraction);
 	const float mainMenuBarHeight = BuildMainMenuBar();
 	BuildSceneOutliner(bDisableInteraction, mainMenuBarHeight);
@@ -51,47 +51,53 @@ void UI::Implementation::Build()
 	ImGui::ShowDemoWindow(&bShowDemoWindow);
 #endif
 
-	if (m_mainMenuBar)
-	{
-		m_mainMenuBar->BuildOverlays();
-	}
+	m_mainMenuBar->BuildOverlays();
 
-	if (m_transactionHistory && !ImGui::IsAnyItemActive())
+	if (!ImGui::IsAnyItemActive())
 	{
-		m_transactionHistory->FinishInteraction();
+		history.FinishInteraction();
 	}
 	ImGui::Render();
 }
 
-void UI::Implementation::BeginInputRouting(bool bDisableInteraction)
+void UI::Implementation::HandleTransactionShortcuts(bool bDisableInteraction)
 {
-	if (m_inputSystem == nullptr)
+	if (bDisableInteraction || ImGui::GetIO().WantTextInput)
 	{
 		return;
 	}
 
+	const EditorSceneModel* model = m_scene.GetModel();
+	if (model == nullptr)
+	{
+		return;
+	}
+
+	EditorTransactionHistory& history = m_scene.GetHistory();
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Z, ImGuiInputFlags_RouteGlobal))
+	{
+		(void) history.Undo(model->GetWorldGeneration());
+	}
+	else if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Y, ImGuiInputFlags_RouteGlobal))
+	{
+		(void) history.Redo(model->GetWorldGeneration());
+	}
+}
+
+void UI::Implementation::BeginInputRouting(bool bDisableInteraction)
+{
 	const ImGuiIO& io = ImGui::GetIO();
-	m_inputSystem->BeginInputRoutingFrame(bDisableInteraction, io.WantTextInput || io.WantCaptureKeyboard);
+	m_inputSystem.BeginInputRoutingFrame(bDisableInteraction, io.WantTextInput || io.WantCaptureKeyboard);
 }
 
 float UI::Implementation::BuildMainMenuBar()
 {
-	if (!m_mainMenuBar)
-	{
-		return 0.0f;
-	}
-
 	m_mainMenuBar->BuildUI();
 	return m_mainMenuBar->GetHeight();
 }
 
 void UI::Implementation::BuildSceneOutliner(bool bDisableInteraction, float mainMenuBarHeight)
 {
-	if (!m_sceneOutlinerPanel)
-	{
-		return;
-	}
-
 	m_sceneOutlinerPanel->SetTopInset(mainMenuBarHeight);
 	m_sceneOutlinerPanel->BuildUI(bDisableInteraction);
 }
@@ -99,41 +105,29 @@ void UI::Implementation::BuildSceneOutliner(bool bDisableInteraction, float main
 void UI::Implementation::BuildCenterWorkspace(bool bDisableInteraction, float mainMenuBarHeight)
 {
 	const ImGuiIO& io = ImGui::GetIO();
-	const float outlinerWidth = m_sceneOutlinerPanel ? m_sceneOutlinerPanel->GetWidth() : EditorWorkspaceLayout::SceneOutlinerWidth;
-	const float inspectorWidth = m_sceneInspectorPanel ? m_sceneInspectorPanel->GetWidth() : EditorWorkspaceLayout::SceneInspectorWidth;
+	const float outlinerWidth = m_sceneOutlinerPanel->GetWidth();
+	const float inspectorWidth = m_sceneInspectorPanel->GetWidth();
 	const float availableCenterHeight = (std::max) (0.0f, io.DisplaySize.y - mainMenuBarHeight);
 	const float viewportWidth = (std::max) (EditorWorkspaceLayout::MinimumViewportExtent, io.DisplaySize.x - outlinerWidth - inspectorWidth);
 
-	float viewportToolbarHeight = 0.0f;
-	if (m_viewportToolbar)
+	m_viewportToolbar->SetGeometry(outlinerWidth, mainMenuBarHeight, viewportWidth);
+	const std::string_view activeLevelName = m_levelSession != nullptr ? m_levelSession->GetActiveLevelName() : std::string_view{};
+	const auto selectedMode = m_viewportToolbar->Draw(activeLevelName.empty() ? "<None>" : activeLevelName, GetViewportRenderRequest().ViewMode, bDisableInteraction);
+	if (selectedMode)
 	{
-		m_viewportToolbar->SetGeometry(outlinerWidth, mainMenuBarHeight, viewportWidth);
-		const LevelAsset* activeLevel = m_levelSession != nullptr ? m_levelSession->GetActiveLevel() : nullptr;
-		const auto selectedMode = m_viewportToolbar->Draw(activeLevel != nullptr ? activeLevel->GetName() : "<None>", GetViewportRenderRequest().ViewMode, bDisableInteraction);
-		if (selectedMode && m_viewportPanel)
-		{
-			m_viewportPanel->SetViewMode(*selectedMode);
-		}
-		viewportToolbarHeight = m_viewportToolbar->GetHeightPixels();
+		m_viewportPanel->SetViewMode(*selectedMode);
 	}
+	const float viewportToolbarHeight = m_viewportToolbar->GetHeightPixels();
 
 	const float availableViewportHeight = (std::max) (0.0f, availableCenterHeight - viewportToolbarHeight);
-	const float consoleDockHeight = m_editorConsoleSystem ? m_editorConsoleSystem->GetDockHeight(availableViewportHeight) : 0.0f;
+	const float consoleDockHeight = m_editorConsoleSystem->GetDockHeight(availableViewportHeight);
 	BuildViewport(bDisableInteraction, mainMenuBarHeight + viewportToolbarHeight, consoleDockHeight, outlinerWidth, inspectorWidth);
 
-	if (m_editorConsoleSystem)
-	{
-		m_editorConsoleSystem->BuildDockedUI(outlinerWidth, mainMenuBarHeight + availableCenterHeight, viewportWidth, availableViewportHeight, bDisableInteraction);
-	}
+	m_editorConsoleSystem->BuildDockedUI(outlinerWidth, mainMenuBarHeight + availableCenterHeight, viewportWidth, availableViewportHeight, bDisableInteraction);
 }
 
 void UI::Implementation::BuildViewport(bool bDisableInteraction, float topInset, float bottomInset, float outlinerWidth, float inspectorWidth)
 {
-	if (!m_viewportPanel)
-	{
-		return;
-	}
-
 	m_viewportPanel->SetTopInset(topInset);
 	m_viewportPanel->SetBottomInset(bottomInset);
 	m_viewportPanel->SetSideInsets(outlinerWidth, inspectorWidth);
@@ -143,11 +137,6 @@ void UI::Implementation::BuildViewport(bool bDisableInteraction, float topInset,
 
 void UI::Implementation::RegisterViewportInputRegion()
 {
-	if (!m_viewportPanel || !m_inputSystem)
-	{
-		return;
-	}
-
 	float viewportLeft = 0.0f;
 	float viewportTop = 0.0f;
 	float viewportRight = 0.0f;
@@ -157,36 +146,19 @@ void UI::Implementation::RegisterViewportInputRegion()
 		return;
 	}
 
-	m_inputSystem->RegisterInputTargetRegion(viewportLeft, viewportTop, viewportRight, viewportBottom, m_viewportPanel->GetTargetInputLayer());
+	m_inputSystem.RegisterInputTargetRegion(viewportLeft, viewportTop, viewportRight, viewportBottom, m_viewportPanel->GetTargetInputLayer());
 }
 
 void UI::Implementation::BuildSceneInspector(bool bDisableInteraction, float mainMenuBarHeight)
 {
-	if (!m_sceneInspectorPanel)
-	{
-		return;
-	}
-
 	m_sceneInspectorPanel->SetTopInset(mainMenuBarHeight);
 	m_sceneInspectorPanel->BuildUI(bDisableInteraction);
 }
 
 void UI::Implementation::BuildUtilityPanels(bool bDisableInteraction)
 {
-	if (m_shaderToolsPanel)
-	{
-		m_shaderToolsPanel->BuildUI(bDisableInteraction);
-	}
-	if (m_usedMeshesPanel)
-	{
-		m_usedMeshesPanel->BuildUI(bDisableInteraction);
-	}
-	if (m_usedTexturesPanel)
-	{
-		m_usedTexturesPanel->BuildUI(bDisableInteraction);
-	}
-	if (m_settingsPanel)
-	{
-		m_settingsPanel->BuildUI(bDisableInteraction);
-	}
+	m_shaderToolsPanel->BuildUI(bDisableInteraction);
+	m_usedMeshesPanel->BuildUI(bDisableInteraction);
+	m_usedTexturesPanel->BuildUI(bDisableInteraction);
+	m_settingsPanel->BuildUI(bDisableInteraction);
 }

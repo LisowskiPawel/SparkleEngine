@@ -1,14 +1,11 @@
 #pragma once
 
-#include <utility>
 #include <cstddef>
 #include <cstdint>
-#include <memory>
 #include <span>
 #include <string>
 
-class EditorSceneModel;
-class EditorTransactionHistory;
+class EditorSceneSession;
 struct EditorSceneEntry;
 struct SceneObjectSelection;
 
@@ -23,13 +20,11 @@ enum class SceneOutlinerFilter : std::uint8_t
 class SceneOutlinerPanel final
 {
 public:
-	SceneOutlinerPanel(SceneObjectSelection& selection, EditorTransactionHistory& transactionHistory, float widthPixels = 320.0f) noexcept;
+	explicit SceneOutlinerPanel(EditorSceneSession& scene, float widthPixels = 320.0f) noexcept;
 
 	float GetWidth() const noexcept { return m_widthPixels; }
 
 	void SetTopInset(float topInsetPixels) noexcept;
-
-	void SetModel(std::shared_ptr<const EditorSceneModel> model) noexcept { m_model = std::move(model); }
 
 	void BuildUI(bool bDisableInteraction = false);
 
@@ -38,22 +33,16 @@ private:
 	void BuildToolbar() noexcept;
 	void BuildSceneTable() noexcept;
 	void BuildFooter() noexcept;
-	bool IsSelectionValid() const noexcept;
-	void EnsureValidSelection() noexcept;
 	void DrawEntrySection(SceneOutlinerFilter filter, const char* id, const char* label, const char* emptyText, std::span<const EditorSceneEntry> entries) noexcept;
 	bool PassesActiveFilter(const SceneObjectSelection& selection) const noexcept;
 	bool MatchesFilter(const EditorSceneEntry& entry) const noexcept;
 	std::size_t CountVisibleEntries() const noexcept;
 	bool IsEntryVisible(const SceneObjectSelection& selection) const noexcept;
-	void ToggleEntryVisibility(const SceneObjectSelection& selection) noexcept;
-	void SelectEntry(const SceneObjectSelection& selection) noexcept;
 	void DrawSectionRow(const char* id, const char* label, std::size_t count, bool& bOpen) noexcept;
 	void DrawSelectionCell(const char* label, const SceneObjectSelection& selection, bool bIsSelected, int flags) noexcept;
 	void DrawSelectionEntry(const char* label, const char* typeLabel, const SceneObjectSelection& selection) noexcept;
 
-	std::shared_ptr<const EditorSceneModel> m_model;
-	EditorTransactionHistory* m_transactionHistory = nullptr;
-	SceneObjectSelection* m_selection = nullptr;
+	EditorSceneSession& m_scene;
 	float m_widthPixels = 320.0f;
 	float m_topInsetPixels = 0.0f;
 	SceneOutlinerFilter m_activeFilter = SceneOutlinerFilter::All;

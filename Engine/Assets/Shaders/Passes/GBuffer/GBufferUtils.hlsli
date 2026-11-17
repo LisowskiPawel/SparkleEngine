@@ -34,11 +34,6 @@ bool HasSubsurface(GBufferData gBuffer)
 	return gBuffer.SubsurfaceStrength > 0.0f && any(gBuffer.SubsurfaceColor > 0.0f);
 }
 
-float GetSkySceneDepthValue()
-{
-	return SceneDepthUtils::SkyDepth(FarZ);
-}
-
 bool IsSkyPixel(float sceneDepth)
 {
 	return SceneDepthUtils::IsSkyDepth(sceneDepth, FarZ);

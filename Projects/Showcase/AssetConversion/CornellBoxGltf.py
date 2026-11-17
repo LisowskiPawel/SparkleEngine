@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import math
-from collections import OrderedDict
 
 from .CornellBoxObj import Material, Primitive
-from .Glb import GlbBuffer, TRIANGLES_MODE
+from .Glb import GlbBuffer
 
 
 ASSET_METADATA = {
@@ -17,7 +16,7 @@ ASSET_METADATA = {
 
 
 def build_material(material: Material) -> dict[str, object]:
-    roughness = math.sqrt(2.0 / (max(material.specular_exponent, 0.0) + 2.0))
+    roughness = math.sqrt(2.0 / (material.specular_exponent + 2.0))
     document: dict[str, object] = {
         "name": material.name,
         "pbrMetallicRoughness": {
@@ -34,20 +33,9 @@ def build_material(material: Material) -> dict[str, object]:
     return document
 
 
-def append_primitive(buffer: GlbBuffer, primitive: Primitive, material_index: int) -> dict[str, object]:
-    position_accessor = buffer.append_vectors(primitive.positions, include_bounds=True)
-    normal_accessor = buffer.append_vectors(primitive.normals)
-    index_accessor = buffer.append_indices(primitive.indices)
-    return {
-        "attributes": {"NORMAL": normal_accessor, "POSITION": position_accessor},
-        "indices": index_accessor,
-        "material": material_index,
-        "mode": TRIANGLES_MODE,
-    }
-
-
 def build_scene(
-    materials: OrderedDict[str, Material], mesh_primitives: list[dict[str, object]],
+    materials: dict[str, Material],
+    mesh_primitives: list[dict[str, object]],
 ) -> dict[str, object]:
     return {
         "extensionsUsed": ["KHR_materials_emissive_strength"],
@@ -59,15 +47,9 @@ def build_scene(
     }
 
 
-def append_primitives(
-    buffer: GlbBuffer, materials: OrderedDict[str, Material], primitives: OrderedDict[str, Primitive],
-) -> list[dict[str, object]]:
-    material_indices = {name: index for index, name in enumerate(materials)}
-    return [append_primitive(buffer, primitive, material_indices[name]) for name, primitive in primitives.items()]
-
-
-def build_glb(materials: OrderedDict[str, Material], primitives: OrderedDict[str, Primitive]) -> bytes:
+def build_glb(materials: dict[str, Material], primitives: dict[str, Primitive]) -> bytes:
     buffer = GlbBuffer()
-    mesh_primitives = append_primitives(buffer, materials, primitives)
+    material_indices = {name: index for index, name in enumerate(materials)}
+    mesh_primitives = [buffer.append_primitive(primitive.positions, primitive.normals, primitive.indices, material_indices[name]) for name, primitive in primitives.items()]
     scene = build_scene(materials, mesh_primitives)
     return buffer.encode(ASSET_METADATA, scene)

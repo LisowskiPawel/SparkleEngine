@@ -50,7 +50,7 @@ namespace SparkleLauncher
 
 	std::vector<MaintenanceCleanPathSpec> BuildLevelCleanPaths(const std::filesystem::path& contentRoot, std::string_view levelId)
 	{
-		const ProjectLevelCatalog catalog = ProjectLevelCatalogFile::Load(contentRoot);
+		const ProjectLevelCatalog catalog = LoadProjectLevelCatalog(contentRoot);
 		std::set<std::string, std::less<>> retained;
 		if (!levelId.empty())
 		{

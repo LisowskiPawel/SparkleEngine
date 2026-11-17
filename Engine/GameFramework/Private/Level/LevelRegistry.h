@@ -24,8 +24,6 @@ public:
 
 	std::vector<std::string> GetLevelNames() const;
 
-	void SaveLevel(const LevelAsset& level) const;
-
 	std::string_view GetDefaultLevelName() const noexcept;
 
 private:

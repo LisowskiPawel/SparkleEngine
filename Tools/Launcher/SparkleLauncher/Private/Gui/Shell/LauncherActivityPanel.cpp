@@ -186,8 +186,8 @@ namespace SparkleLauncher
 		item->setText(QString());
 		const RunWidgets rowWidgets = CreateRunWidgets(title);
 		m_runList->setItemWidget(item, rowWidgets.Root);
-		m_runs.insert(runId, {item, rowWidgets, RunState::Queued, title, title + " queued.\n"});
-		SetRunState(runId, RunState::Queued, title);
+		m_runs.insert(runId, {item, rowWidgets, OperationStatus::Pending, title, title + " queued.\n"});
+		SetRunState(runId, OperationStatus::Pending, title);
 		m_runList->setCurrentItem(item);
 		m_activeRunId = runId;
 		SetExpanded(m_bExpanded);
@@ -197,7 +197,7 @@ namespace SparkleLauncher
 	{
 		const auto run = m_runs.constFind(runId);
 		const QString effectiveTitle = run == m_runs.constEnd() ? title : run->Title;
-		SetRunState(runId, RunState::Running, effectiveTitle);
+		SetRunState(runId, OperationStatus::Running, effectiveTitle);
 		AppendRunOutput(runId, effectiveTitle + " started.\n");
 		ShowRunOutput(runId);
 		SetExpanded(true);
@@ -215,7 +215,7 @@ namespace SparkleLauncher
 	void LauncherActivityPanel::UpdateOperationProgress(const QString& runId, const QString& phase, quint64 completed, quint64 total)
 	{
 		auto run = m_runs.find(runId);
-		if (run == m_runs.end() || run->State != RunState::Running)
+		if (run == m_runs.end() || run->State != OperationStatus::Running)
 		{
 			return;
 		}
@@ -238,12 +238,12 @@ namespace SparkleLauncher
 	{
 		auto run = m_runs.find(runId);
 		const QString effectiveTitle = run == m_runs.end() ? title : run->Title;
-		const RunState terminalState = result.bSucceeded ? RunState::Done : result.bSkipped ? RunState::Blocked : result.bCanceled ? RunState::Canceled : RunState::Failed;
-		SetRunState(runId, terminalState, effectiveTitle);
+		SetRunState(runId, result.Status, effectiveTitle);
+		const QString statusText = QString::fromStdString(ToString(result.Status));
 
-		if (result.bSucceeded)
+		if (result.Status == OperationStatus::Succeeded)
 		{
-			AppendRunOutput(runId, "\nResult: " + result.Status + "\n");
+			AppendRunOutput(runId, "\nResult: " + statusText + "\n");
 		}
 		else
 		{
@@ -252,13 +252,14 @@ namespace SparkleLauncher
 			{
 				return effectiveTitle;
 			}
-			QString diagnosis = "Result: " + result.Status + "\n";
+
+			QString diagnosis = "Result: " + statusText + "\n";
 			diagnosis += "Problem type: " + result.ProblemKind + "\n";
 			diagnosis += "What failed: " + result.Problem + "\n";
 			diagnosis += "Next action: " + result.ExpectedAction + "\n";
-			if (result.bHasExitCode)
+			if (result.ExitCode.has_value())
 			{
-				diagnosis += QStringLiteral("Exit code: %1\n").arg(result.ExitCode);
+				diagnosis += QStringLiteral("Exit code: %1\n").arg(*result.ExitCode);
 			}
 			if (!result.LogPath.isEmpty())
 			{
@@ -290,7 +291,7 @@ namespace SparkleLauncher
 
 	void LauncherActivityPanel::UpdateRunProgressPresentation(RunRecord& run)
 	{
-		if (run.State != RunState::Running || run.Widgets.StateLabel == nullptr)
+		if (run.State != OperationStatus::Running || run.Widgets.StateLabel == nullptr)
 		{
 			return;
 		}
@@ -317,19 +318,19 @@ namespace SparkleLauncher
 
 		m_activeRunId = runId;
 		UpdateRunSelectionVisuals();
-		const RunState state = run->State;
-		m_cancelRunButton->setVisible(state == RunState::Queued || state == RunState::Running);
+		const OperationStatus state = run->State;
+		m_cancelRunButton->setVisible(state == OperationStatus::Pending || state == OperationStatus::Running);
 		const QString& title = run->Title;
 		QString stateName;
 		switch (state)
 		{
-			case RunState::Queued:
+			case OperationStatus::Pending:
 				stateName = "queued";
 
 				m_selectedRunSummary->setText("Queued: " + title + ". Waiting to start.");
 				break;
 
-			case RunState::Running:
+			case OperationStatus::Running:
 				stateName = "running";
 
 				if (run->bHasProgress)
@@ -350,25 +351,25 @@ namespace SparkleLauncher
 				}
 				break;
 
-			case RunState::Done:
+			case OperationStatus::Succeeded:
 				stateName = "done";
 
 				m_selectedRunSummary->setText("Done: " + title + ". Output is available below.");
 				break;
 
-			case RunState::Blocked:
+			case OperationStatus::Skipped:
 				stateName = "blocked";
 
 				m_selectedRunSummary->setText("Blocked: " + title + ". Follow the next action below.");
 				break;
 
-			case RunState::Canceled:
+			case OperationStatus::Canceled:
 				stateName = "canceled";
 
 				m_selectedRunSummary->setText("Canceled: " + title + ". Run it again when ready.");
 				break;
 
-			case RunState::Failed:
+			case OperationStatus::Failed:
 				stateName = "failed";
 
 				m_selectedRunSummary->setText("Failed: " + title + ". Follow the next action below.");
@@ -378,7 +379,7 @@ namespace SparkleLauncher
 		m_selectedRunSummary->style()->unpolish(m_selectedRunSummary);
 		m_selectedRunSummary->style()->polish(m_selectedRunSummary);
 
-		const bool bShowProgress = state == RunState::Running && run->bHasProgress;
+		const bool bShowProgress = state == OperationStatus::Running && run->bHasProgress;
 		m_progressBar->setVisible(bShowProgress);
 		if (bShowProgress)
 		{
@@ -396,7 +397,7 @@ namespace SparkleLauncher
 			m_progressBar->setAccessibleDescription(m_selectedRunSummary->text());
 		}
 
-		const bool bCompactOutput = state == RunState::Done;
+		const bool bCompactOutput = state == OperationStatus::Succeeded;
 		m_operationOutput->setMinimumHeight(bCompactOutput ? LauncherUi::OperationOutput::MinHeight : LauncherUi::OperationOutput::ProminentMinHeight);
 		m_operationOutput->setMaximumHeight(bCompactOutput ? LauncherUi::OperationOutput::CompactMaxHeight : LauncherUi::OperationOutput::MaxHeight);
 		m_operationOutput->setPlainText(run->Output);
@@ -410,7 +411,7 @@ namespace SparkleLauncher
 
 	bool LauncherActivityPanel::HasActiveRun() const
 	{
-		return std::any_of(m_runs.cbegin(), m_runs.cend(), [](const RunRecord& run) { return run.State == RunState::Queued || run.State == RunState::Running; });
+		return std::any_of(m_runs.cbegin(), m_runs.cend(), [](const RunRecord& run) { return run.State == OperationStatus::Pending || run.State == OperationStatus::Running; });
 	}
 
 	LauncherActivityPanel::RunWidgets LauncherActivityPanel::CreateRunWidgets(const QString& title)
@@ -447,21 +448,21 @@ namespace SparkleLauncher
 		return widgets;
 	}
 
-	QIcon LauncherActivityPanel::IconForState(RunState state) const
+	QIcon LauncherActivityPanel::IconForState(OperationStatus state) const
 	{
 		switch (state)
 		{
-			case RunState::Queued:
+			case OperationStatus::Pending:
 				return m_queuedIcon;
-			case RunState::Running:
+			case OperationStatus::Running:
 				return m_runningIcon;
-			case RunState::Done:
+			case OperationStatus::Succeeded:
 				return m_doneIcon;
-			case RunState::Blocked:
+			case OperationStatus::Skipped:
 				return m_canceledIcon;
-			case RunState::Canceled:
+			case OperationStatus::Canceled:
 				return m_canceledIcon;
-			case RunState::Failed:
+			case OperationStatus::Failed:
 				return m_failedIcon;
 		}
 
@@ -478,8 +479,8 @@ namespace SparkleLauncher
 		const QString runId = currentItem->data(Qt::UserRole).toString();
 		ShowRunOutput(runId);
 		const auto run = m_runs.constFind(runId);
-		const RunState state = run == m_runs.constEnd() ? RunState::Done : run->State;
-		if (state == RunState::Running || state == RunState::Blocked || state == RunState::Canceled || state == RunState::Failed)
+		const OperationStatus state = run == m_runs.constEnd() ? OperationStatus::Succeeded : run->State;
+		if (state == OperationStatus::Running || state == OperationStatus::Skipped || state == OperationStatus::Canceled || state == OperationStatus::Failed)
 		{
 			SetExpanded(true);
 		}
@@ -496,10 +497,11 @@ namespace SparkleLauncher
 		{
 			return;
 		}
+
 		SetExpanded(!m_bExpanded);
 	}
 
-	void LauncherActivityPanel::SetRunState(const QString& runId, RunState state, const QString& title)
+	void LauncherActivityPanel::SetRunState(const QString& runId, OperationStatus state, const QString& title)
 	{
 		auto run = m_runs.find(runId);
 		if (run == m_runs.end() || run->Item == nullptr)
@@ -513,27 +515,27 @@ namespace SparkleLauncher
 		QString stateText;
 		switch (state)
 		{
-			case RunState::Queued:
+			case OperationStatus::Pending:
 				stateText = "Queued";
 				break;
 
-			case RunState::Running:
+			case OperationStatus::Running:
 				stateText = "Running";
 				break;
 
-			case RunState::Done:
+			case OperationStatus::Succeeded:
 				stateText = "Done";
 				break;
 
-			case RunState::Blocked:
+			case OperationStatus::Skipped:
 				stateText = "Blocked";
 				break;
 
-			case RunState::Canceled:
+			case OperationStatus::Canceled:
 				stateText = "Canceled";
 				break;
 
-			case RunState::Failed:
+			case OperationStatus::Failed:
 				stateText = "Failed";
 				break;
 		}

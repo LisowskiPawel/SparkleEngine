@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SparkleLauncher/GpuCrashIncident.h"
+#include "SparkleLauncher/OperationModel.h"
 #include <optional>
 
 #include <QtCore/QMetaType>
@@ -10,18 +10,14 @@ namespace SparkleLauncher
 {
 	struct LauncherOperationResult final
 	{
-		QString Status;
+		OperationStatus Status = OperationStatus::Pending;
 		std::optional<GpuCrashIncident> GpuCrash;
 		QString ShaderExportPath;
 		QString ProblemKind;
 		QString Problem;
 		QString ExpectedAction;
 		QString LogPath;
-		int ExitCode = 0;
-		bool bHasExitCode = false;
-		bool bSucceeded = false;
-		bool bSkipped = false;
-		bool bCanceled = false;
+		std::optional<int> ExitCode;
 	};
 }
 

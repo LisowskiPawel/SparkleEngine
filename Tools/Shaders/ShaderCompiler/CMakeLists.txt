@@ -113,7 +113,7 @@ target_include_directories(ShaderCompilerCli PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Private
     ${CMAKE_SOURCE_DIR}/Engine
     ${CMAKE_SOURCE_DIR}/Engine/Core/Public/Diagnostics)
-target_link_libraries(ShaderCompilerCli PRIVATE CLI11::CLI11 SparkleCore ShaderContracts ToolSupport)
+target_link_libraries(ShaderCompilerCli PRIVATE CLI11::CLI11 nlohmann_json::nlohmann_json SparkleCore SparkleRHI ToolSupport)
 target_compile_features(ShaderCompilerCli PRIVATE cxx_std_20)
 sparkle_target_precompile_headers(ShaderCompilerCli <CLI/CLI.hpp>)
 target_link_libraries(ShaderCompiler PRIVATE ShaderCompilerCli)
@@ -131,8 +131,8 @@ sparkle_target_precompile_headers(ShaderCompiler
 
 target_link_libraries(ShaderCompiler
     PRIVATE
+        nlohmann_json::nlohmann_json
         ToolSupport
-        ShaderContracts
         SparkleCore
         SparkleTasks
         SparkleRHI

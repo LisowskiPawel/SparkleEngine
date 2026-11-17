@@ -16,7 +16,6 @@
 #include "Gui/Widgets/LauncherLayoutWidgets.h"
 #include "Gui/Models/LauncherLevelUiModel.h"
 #include "Gui/Models/LauncherOperationRequestFactory.h"
-#include "Gui/Operations/LauncherOperationRequestMapping.h"
 #include "Gui/Models/LauncherContentModel.h"
 #include "Gui/App/LauncherSettings.h"
 #include "Gui/Models/LauncherToolchainUiModel.h"
@@ -398,10 +397,10 @@ namespace SparkleLauncher
 			return;
 		}
 
-		const QVector<LauncherCleanTarget> cleanTargets = SupportsActionSpecificClean(m_selectedOperationId.toStdString())
-		    ? BuildActionSpecificCleanTargets(
+		const std::vector<MaintenanceCleanPathSpec> cleanTargets = SupportsActionSpecificClean(m_selectedOperationId.toStdString())
+		    ? BuildActionCleanPaths(
 		          BuildActionCleanTargetRequest(m_workspaceRoot, m_contentModel, m_settings, std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()), m_selectedOperationId))
-		    : QVector<LauncherCleanTarget>();
+		    : std::vector<MaintenanceCleanPathSpec>();
 
 		const bool bCleanWorkspaceSelected = m_selectedOperationId == "workspace.clean";
 		const QString cleanScopeError = bCleanWorkspaceSelected ? CleanScopeSelectionError(m_settings.CleanScope()) : QString();
@@ -412,10 +411,11 @@ namespace SparkleLauncher
 		}
 		if (bIsLevelCatalog)
 		{
-			m_sceneCatalog->UpdateActionAvailability(*m_cleanButton, *m_runButton, !cleanTargets.isEmpty());
+			m_sceneCatalog->UpdateActionAvailability(*m_cleanButton, *m_runButton, !cleanTargets.empty());
 			return;
 		}
-		const bool bCanClean = !cleanTargets.isEmpty();
+
+		const bool bCanClean = !cleanTargets.empty();
 
 		ApplyActionAvailability(
 		    *m_cleanButton,
@@ -439,7 +439,7 @@ namespace SparkleLauncher
 		if (FindCookOperationDefinition(m_selectedOperationId.toStdString()).has_value())
 		{
 			const LauncherOperationRequest operationRequest = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, m_selectedOperationId);
-			const CookOperationPlan plan = PlanCookOperation(m_selectedOperationId.toStdString(), LauncherOperationRequestMapping::Cook(operationRequest));
+			const CookOperationPlan plan = PlanCookOperation(m_selectedOperationId.toStdString(), std::get<CookOperationRequest>(operationRequest.Inputs));
 
 			const QString reason = plan.bCanRun
 			    ? "Run " + DisplayNameForOperation(m_selectedOperationId) + ". Existing runs keep going."

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Bindings/RenderBindingLayout.h"
 #include "../Pipeline/RhiPipelineDesc.h"
 #include "../RayTracing/RhiRayTracingPipelineDesc.h"
 #include "../RHIAPI.h"

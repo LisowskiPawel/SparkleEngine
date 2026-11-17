@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Pipeline/RhiPipelineDesc.h"
+#include "../Shaders/ShaderMap.h"
 #include "../Resources/RhiResourceHandles.h"
 #include "../RHIAPI.h"
 
@@ -10,6 +10,9 @@
 #include <string>
 #include <string_view>
 #include <vector>
+
+class RenderBindingLayout;
+struct ResolvedShader;
 
 enum class ERhiRayTracingHitGroupKind : std::uint8_t
 {

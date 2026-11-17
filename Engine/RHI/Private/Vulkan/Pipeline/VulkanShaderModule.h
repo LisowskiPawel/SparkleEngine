@@ -1,19 +1,20 @@
 #pragma once
 
-#include "Pipeline/RhiPipelineDesc.h"
+#include "Shaders/ShaderStage.h"
 #include "Vulkan/VulkanIncludes.h"
 
 #include <string>
 #include <string_view>
 
 class VulkanRhi;
+struct ResolvedShader;
 
 class VulkanShaderModule final
 {
 public:
 	VulkanShaderModule() = default;
 
-	VulkanShaderModule(VulkanRhi& rhi, const RhiShaderStageDesc& desc, std::string_view pipelineName);
+	VulkanShaderModule(VulkanRhi& rhi, const ResolvedShader* resolvedShader, std::string_view pipelineName);
 	~VulkanShaderModule() noexcept;
 
 	VulkanShaderModule(const VulkanShaderModule&) = delete;

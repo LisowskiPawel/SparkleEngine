@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <limits>
 #include <thread>
 
 struct AssetCookerSceneBatch::Item final
@@ -17,6 +18,12 @@ struct AssetCookerSceneBatch::Item final
 
 bool AssetCookerSceneBatch::Execute(const std::vector<AssetCookerSceneEntry>& sceneEntries, AssetCookerDiagnostics& diagnostics, const ToolWorkProgressCallback& progress)
 {
+	if (sceneEntries.size() > (std::numeric_limits<std::uint32_t>::max)())
+	{
+		diagnostics.AddError(AssetCookerCategory::SceneAssets, "Scene cook count exceeds task capacity.");
+		return false;
+	}
+
 	const std::size_t totalWork = sceneEntries.size() + 1;
 	if (progress)
 	{

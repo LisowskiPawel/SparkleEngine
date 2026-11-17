@@ -53,7 +53,6 @@ target_include_directories(AssetCookerCore
 
 target_compile_features(AssetCookerCore PRIVATE cxx_std_20)
 set(ASSET_COOKER_COOKING_LINK_LIBRARIES
-    ole32
     SourceImporters
     MeshCooker
     MaterialCooker

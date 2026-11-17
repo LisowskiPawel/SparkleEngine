@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "Core/Public/Paths/FileSystemPaths.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "Assets/SceneAssetRegistry.h"
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../CoreAPI.h"
 #include "../Mouse/MouseButton.h"
 #include "../Mouse/MousePosition.h"
 #include "../Keyboard/ModifierFlags.h"
@@ -18,7 +19,7 @@ struct MouseButtonEvent
 
 	constexpr bool IsReleased() const noexcept { return !bPressed; }
 
-	constexpr bool HasModifier(ModifierFlags flag) const noexcept { return HasAnyFlag(Modifiers, flag); }
+	SPARKLE_CORE_API bool HasModifier(ModifierFlags flag) const noexcept;
 
 	constexpr bool IsLeftButton() const noexcept { return Button == MouseButton::Left; }
 

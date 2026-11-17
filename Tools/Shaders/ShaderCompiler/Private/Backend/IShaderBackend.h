@@ -12,7 +12,7 @@
 class IShaderBackend
 {
 public:
-	virtual ~IShaderBackend() = default;
+	virtual ~IShaderBackend();
 
 	IShaderBackend(const IShaderBackend&) = delete;
 	IShaderBackend& operator=(const IShaderBackend&) = delete;
@@ -29,5 +29,5 @@ public:
 	virtual CompiledShader Compile(const ShaderCompileRequest& request) = 0;
 
 protected:
-	IShaderBackend() = default;
+	IShaderBackend();
 };

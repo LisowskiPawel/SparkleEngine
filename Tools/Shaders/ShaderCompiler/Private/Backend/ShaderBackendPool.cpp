@@ -13,12 +13,6 @@ IShaderBackend& ShaderBackendPool::ResolveAndAcquire(std::string_view sourcePath
 	return Acquire(backendName, target);
 }
 
-IShaderBackend* ShaderBackendPool::Find(std::string_view backendName) const noexcept
-{
-	const auto it = m_backends.find(std::string(backendName));
-	return it != m_backends.end() ? it->second.get() : nullptr;
-}
-
 IShaderBackend& ShaderBackendPool::Acquire(std::string_view backendName, ShaderTarget target)
 {
 	const auto existing = m_backends.find(std::string(backendName));

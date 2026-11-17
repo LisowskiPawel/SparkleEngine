@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "Cooking/Compilation/ShaderCompileBatch.h"
 
@@ -7,7 +8,6 @@
 #include "Cooking/Compilation/ShaderCompileJobExecutor.h"
 #include "Cooking/ShaderCookSettings.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Paths/FileSystemPaths.h"
 #include "TaskExecutor.h"
 #include "Verification/ShaderParameterStructCookVerifier.h"
 
@@ -26,44 +26,6 @@ struct ProducerMap final
 	std::vector<std::size_t> ProducerForJob;
 };
 
-static bool HasSameCompilerInput(const ShaderCompileJob& lhs, const ShaderCompileJob& rhs) noexcept
-{
-	const bool bSourceIdentityMatchesClosureHash = lhs.SourceContentHash == rhs.SourceContentHash && lhs.DependencyClosureHash == rhs.DependencyClosureHash;
-	const bool bSourceIdentityMatchesRequestHash = bSourceIdentityMatchesClosureHash && (lhs.RequestHash == rhs.RequestHash);
-	const bool bSourceIdentityMatches = bSourceIdentityMatchesRequestHash && (lhs.VirtualDependencies == rhs.VirtualDependencies);
-	const bool bBackendIdentityMatchesBackendName = bSourceIdentityMatches && lhs.BackendName == rhs.BackendName;
-	const bool bIdentityMatchesBackendVersion = bBackendIdentityMatchesBackendName && (lhs.BackendVersion == rhs.BackendVersion);
-	const bool bBackendIdentityMatches = bIdentityMatchesBackendVersion && (lhs.TargetProfile == rhs.TargetProfile);
-	const bool bProgramIdentityMatchesRequest = bBackendIdentityMatches && lhs.Request.VirtualSourcePath == rhs.Request.VirtualSourcePath;
-	const bool bSourceMatches = bProgramIdentityMatchesRequest && (lhs.Request.SourceCode == rhs.Request.SourceCode);
-	const bool bEntryPointMatches = bSourceMatches && (lhs.Request.EntryPoint == rhs.Request.EntryPoint);
-	const bool bStageMatches = bEntryPointMatches && (lhs.Request.Stage == rhs.Request.Stage);
-	const bool bTargetMatches = bStageMatches && (lhs.Request.Target == rhs.Request.Target);
-	const bool bUnitKindMatches = bTargetMatches && (lhs.Request.UnitKind == rhs.Request.UnitKind);
-	const bool bProgramIdentityMatches = bUnitKindMatches && (lhs.Request.RequiredFeatures == rhs.Request.RequiredFeatures);
-	const bool bCompileOptionsMatchRequest = bProgramIdentityMatches && lhs.Request.bEnableDebugInfo == rhs.Request.bEnableDebugInfo;
-	const bool bOptimizationsMatch = bCompileOptionsMatchRequest && (lhs.Request.bEnableOptimizations == rhs.Request.bEnableOptimizations);
-	const bool bWarningPolicyMatches = bOptimizationsMatch && (lhs.Request.bTreatWarningsAsErrors == rhs.Request.bTreatWarningsAsErrors);
-	const bool bDebugPolicyMatches = bWarningPolicyMatches && (lhs.Request.bStripDebugInfo == rhs.Request.bStripDebugInfo);
-	const bool bCompileOptionsMatch = bDebugPolicyMatches && (lhs.Request.Defines == rhs.Request.Defines);
-	const bool bRemapCountsMatch = bCompileOptionsMatch && lhs.Request.DescriptorBindingRemaps.size() == rhs.Request.DescriptorBindingRemaps.size();
-
-	if (!bRemapCountsMatch)
-	{
-		return false;
-	}
-	for (std::size_t index = 0; index < lhs.Request.DescriptorBindingRemaps.size(); ++index)
-	{
-		const ShaderDescriptorBindingRemap& left = lhs.Request.DescriptorBindingRemaps[index];
-		const ShaderDescriptorBindingRemap& right = rhs.Request.DescriptorBindingRemaps[index];
-		if (left.Name != right.Name || left.Set != right.Set || left.Binding != right.Binding)
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
 static ProducerMap SelectProducers(std::span<const ShaderCompileJob> jobs)
 {
 	ProducerMap result;
@@ -78,7 +40,7 @@ static ProducerMap SelectProducers(std::span<const ShaderCompileJob> jobs)
 		{
 			for (const std::size_t candidateProducer : matchingHash->second)
 			{
-				if (HasSameCompilerInput(jobs[result.ProducerJobIndices[candidateProducer]], job))
+				if (jobs[result.ProducerJobIndices[candidateProducer]].HasSameCompilerInput(job))
 				{
 					producerIndex = candidateProducer;
 					break;

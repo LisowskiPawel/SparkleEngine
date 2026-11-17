@@ -34,11 +34,11 @@ sparkle_target_precompile_headers(MaterialCooker
 
 target_link_libraries(MaterialCooker
     PUBLIC
-        SourceImporters
-        TextureCookShared
         SparkleCore
         SparkleGameFramework
     PRIVATE
+        SourceImporters
+        TextureCookShared
         ToolSupport
 )
 

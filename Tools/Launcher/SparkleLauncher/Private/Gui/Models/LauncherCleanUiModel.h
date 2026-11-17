@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Gui/Operations/LauncherOperationRequest.h"
 #include "SparkleLauncher/MaintenanceOperations.h"
 
 #include <QtCore/QString>
-#include <QtCore/QStringList>
-#include <QtCore/QVector>
 
 #include <filesystem>
+#include <optional>
+#include <vector>
 
 namespace SparkleLauncher
 {
@@ -23,8 +22,7 @@ namespace SparkleLauncher
 	std::filesystem::path ResolveCleanScopePreviewPath(const std::filesystem::path& workspaceRoot, const QString& projectId, const QString& scope);
 
 	QString CleanScopeDisplayName(const QString& scopeValue);
+	std::optional<std::vector<CleanScope>> ParseCleanScopeSelection(const QString& scopeSelection);
 	QString CleanScopeSelectionError(const QString& scopeSelection);
 	bool CleanScopeSelectionRequiresContent(const QString& scopeSelection);
-
-	QVector<LauncherCleanTarget> BuildActionSpecificCleanTargets(const ActionCleanTargetRequest& request);
 }

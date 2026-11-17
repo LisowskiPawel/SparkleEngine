@@ -24,15 +24,15 @@ public:
 	Event(Event&&) = delete;
 	Event& operator=(Event&&) = delete;
 
-	EventHandle Add(CallbackType Callback) noexcept
+	EventHandle Add(CallbackType callback) noexcept
 	{
 		for (std::size_t i = 0; i < Capacity; ++i)
 		{
-			if (!m_Entries[i].Handle.IsValid())
+			if (!m_entries[i].Handle.IsValid())
 			{
-				m_Entries[i].Handle.Id = ++m_NextId;
-				m_Entries[i].Callback = std::move(Callback);
-				return m_Entries[i].Handle;
+				m_entries[i].Handle.Id = ++m_nextId;
+				m_entries[i].Callback = std::move(callback);
+				return m_entries[i].Handle;
 			}
 		}
 
@@ -40,19 +40,19 @@ public:
 		return EventHandle{};
 	}
 
-	void Remove(EventHandle Handle) noexcept
+	void Remove(EventHandle handle) noexcept
 	{
-		if (!Handle.IsValid())
+		if (!handle.IsValid())
 		{
 			return;
 		}
 
 		for (std::size_t i = 0; i < Capacity; ++i)
 		{
-			if (m_Entries[i].Handle == Handle)
+			if (m_entries[i].Handle == handle)
 			{
-				m_Entries[i].Handle.Invalidate();
-				m_Entries[i].Callback = nullptr;
+				m_entries[i].Handle.Invalidate();
+				m_entries[i].Callback = nullptr;
 				return;
 			}
 		}
@@ -62,18 +62,18 @@ public:
 	{
 		for (std::size_t i = 0; i < Capacity; ++i)
 		{
-			m_Entries[i].Handle.Invalidate();
-			m_Entries[i].Callback = nullptr;
+			m_entries[i].Handle.Invalidate();
+			m_entries[i].Callback = nullptr;
 		}
 	}
 
-	void Broadcast(Args... InArgs) const noexcept
+	void Broadcast(Args... args) const noexcept
 	{
 		for (std::size_t i = 0; i < Capacity; ++i)
 		{
-			if (m_Entries[i].Handle.IsValid() && m_Entries[i].Callback)
+			if (m_entries[i].Handle.IsValid() && m_entries[i].Callback)
 			{
-				m_Entries[i].Callback(InArgs...);
+				m_entries[i].Callback(args...);
 			}
 		}
 	}
@@ -82,7 +82,7 @@ public:
 	{
 		for (std::size_t i = 0; i < Capacity; ++i)
 		{
-			if (m_Entries[i].Handle.IsValid())
+			if (m_entries[i].Handle.IsValid())
 			{
 				return true;
 			}
@@ -92,15 +92,15 @@ public:
 
 	std::size_t GetBoundCount() const noexcept
 	{
-		std::size_t Count = 0;
+		std::size_t count = 0;
 		for (std::size_t i = 0; i < Capacity; ++i)
 		{
-			if (m_Entries[i].Handle.IsValid())
+			if (m_entries[i].Handle.IsValid())
 			{
-				++Count;
+				++count;
 			}
 		}
-		return Count;
+		return count;
 	}
 
 	static constexpr std::size_t GetCapacity() noexcept { return Capacity; }
@@ -112,6 +112,6 @@ private:
 		CallbackType Callback;
 	};
 
-	std::array<Entry, Capacity> m_Entries{};
-	std::uint32_t m_NextId = 0;
+	std::array<Entry, Capacity> m_entries{};
+	std::uint32_t m_nextId = 0;
 };

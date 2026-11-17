@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/Public/CoreAPI.h"
+
 #include <cstdint>
 
 enum class ButtonState : std::uint8_t
@@ -10,22 +12,7 @@ enum class ButtonState : std::uint8_t
 	Released = 3,
 };
 
-constexpr bool IsDown(ButtonState state) noexcept
-{
-	return state == ButtonState::Pressed || state == ButtonState::Held;
-}
-
-constexpr bool IsUp(ButtonState state) noexcept
-{
-	return state == ButtonState::Up || state == ButtonState::Released;
-}
-
-constexpr bool IsEdge(ButtonState state) noexcept
-{
-	return state == ButtonState::Pressed || state == ButtonState::Released;
-}
-
-constexpr bool IsContinuous(ButtonState state) noexcept
-{
-	return state == ButtonState::Up || state == ButtonState::Held;
-}
+SPARKLE_CORE_API bool IsDown(ButtonState state) noexcept;
+SPARKLE_CORE_API bool IsUp(ButtonState state) noexcept;
+SPARKLE_CORE_API bool IsEdge(ButtonState state) noexcept;
+SPARKLE_CORE_API bool IsContinuous(ButtonState state) noexcept;

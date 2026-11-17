@@ -1,49 +1,47 @@
 #include "ToolWorkProgress.h"
-#include "ToolWorkProgressEvent.h"
+
+#include "Core/Public/Diagnostics/Error.h"
 
 #include <algorithm>
+#include <charconv>
 #include <cstddef>
-#include <limits>
-#include <mutex>
 #include <optional>
-#include <ostream>
-#include <sstream>
 #include <string>
 #include <string_view>
+#include <system_error>
 
 static constexpr std::string_view kWorkProgressPrefix = "[PROGRESS] ";
 static constexpr std::string_view kIndeterminateProgressPrefix = "? ";
-static constexpr std::size_t kDecimalRadix = 10;
 
 static std::optional<std::size_t> ParseProgressCount(std::string_view text);
 
-static std::string FormatProgressItem(std::string_view action, std::string_view item)
-{
-	std::string phase(action);
-	if (!item.empty())
-	{
-		phase += ": ";
-		phase += item;
-	}
-	std::ranges::replace(phase, '\r', ' ');
-	std::ranges::replace(phase, '\n', ' ');
-	return phase;
-}
-
 std::string FormatToolWorkProgress(std::string_view phase, std::size_t completed, std::size_t total)
 {
-	std::ostringstream output;
-	output << kWorkProgressPrefix;
+	if (phase.empty())
+	{
+		throw Diagnostics::Error("Tool progress phase is empty.");
+	}
+	if (total != 0 && completed > total)
+	{
+		throw Diagnostics::Error("Tool progress count exceeds its total.");
+	}
+
+	std::string output(kWorkProgressPrefix);
 	if (total == 0)
 	{
-		output << kIndeterminateProgressPrefix;
+		output += kIndeterminateProgressPrefix;
 	}
 	else
 	{
-		output << completed << '/' << total << ' ';
+		output += std::to_string(completed) + '/' + std::to_string(total) + ' ';
 	}
-	output << phase << '\n';
-	return output.str();
+
+	std::string label(phase);
+	std::ranges::replace(label, '\r', ' ');
+	std::ranges::replace(label, '\n', ' ');
+	output += label;
+	output += '\n';
+	return output;
 }
 
 std::optional<ToolWorkProgress> ParseToolWorkProgress(std::string_view line)
@@ -91,51 +89,11 @@ static std::optional<std::size_t> ParseProgressCount(std::string_view text)
 	}
 
 	std::size_t value = 0;
-	for (const char character : text)
+	const auto [end, error] = std::from_chars(text.data(), text.data() + text.size(), value);
+	if (error != std::errc{} || end != text.data() + text.size())
 	{
-		if (character < '0' || character > '9')
-		{
-			return std::nullopt;
-		}
-		const std::size_t digit = static_cast<std::size_t>(character - '0');
-		if (value > (std::numeric_limits<std::size_t>::max() - digit) / kDecimalRadix)
-		{
-			return std::nullopt;
-		}
-		value = (value * kDecimalRadix) + digit;
+		return std::nullopt;
 	}
+
 	return value;
-}
-
-ToolWorkProgressWriter::ToolWorkProgressWriter(std::ostream& output) noexcept :
-    m_output(output)
-{
-}
-
-void ToolWorkProgressWriter::Report(std::string_view phase, std::size_t completed, std::size_t total)
-{
-	Report(phase, {}, completed, total);
-}
-
-void ToolWorkProgressWriter::Report(const ToolWorkProgressEvent& progress)
-{
-	Report(progress.Action, progress.Item, progress.Completed, progress.Total);
-}
-
-void ToolWorkProgressWriter::Report(std::string_view action, std::string_view item, std::size_t completed, std::size_t total)
-{
-	std::scoped_lock lock(m_mutex);
-	const std::size_t percentage = total != 0 ? static_cast<std::size_t>(static_cast<double>(completed) * 100.0 / static_cast<double>(total)) : std::numeric_limits<std::size_t>::max();
-	const bool bSamePhase = m_lastAction == action && m_lastTotal == total;
-	if (bSamePhase && (total == 0 || percentage <= m_lastPercentage))
-	{
-		return;
-	}
-
-	const std::string phase = FormatProgressItem(action, item);
-	const std::string record = FormatToolWorkProgress(phase, completed, total);
-	m_output << record << std::flush;
-	m_lastAction = action;
-	m_lastTotal = total;
-	m_lastPercentage = percentage;
 }

@@ -14,6 +14,11 @@
 
 #include <imgui.h>
 
+void UsedTexturesPanel::SetOpen(bool bOpen) noexcept
+{
+	m_bIsOpen = bOpen;
+}
+
 void UsedTexturesPanel::SetDiagnosticsProvider(DiagnosticsProvider provider)
 {
 	m_diagnosticsProvider = std::move(provider);

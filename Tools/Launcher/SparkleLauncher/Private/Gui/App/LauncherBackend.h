@@ -26,7 +26,6 @@ namespace SparkleLauncher
 		QString Group;
 		QString DisplayName;
 		QString Description;
-		LauncherOperationCategory Category = LauncherOperationCategory::Workspace;
 	};
 
 	class LauncherBackend final : public QObject

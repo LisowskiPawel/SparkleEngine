@@ -1,7 +1,7 @@
 #include "Cooking/AssetCookStages.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Cooking/AssetCookerSceneBatch.h"
-#include "ToolWorkProgress.h"
+#include "ToolWorkProgressWriter.h"
 
 #include <iostream>
 

@@ -62,7 +62,7 @@ namespace RenderPassShaderRuntime
 		storage.BindingLayout = PipelineMaterialization::CreateBindingLayout(renderHardwareInterface, storage.ParameterLayout, storage.Shaders, false, debugName.c_str());
 		ComputePipelineDesc pipeline;
 		pipeline.BindingLayout = storage.BindingLayout.get();
-		pipeline.ComputeShader = RhiShaderStageDesc{&storage.Shaders.front()};
+		pipeline.ComputeShader = &storage.Shaders.front();
 		pipeline.DebugName = debugName.c_str();
 		pipelineStorage = PipelineMaterialization::CreateComputePipeline(renderHardwareInterface, pipeline);
 	}

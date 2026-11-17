@@ -2,7 +2,7 @@
 
 #include "AnimationSystemExecution.h"
 
-#include "Animation/AnimationOutputStorage.h"
+#include "Animation/AnimationEvaluationStorage.h"
 #include "Animation/AnimationPoseEvaluator.h"
 #include "Animation/MorphWeightEvaluator.h"
 #include "Animation/SkinningMatrixEvaluator.h"
@@ -20,13 +20,13 @@ namespace ECS
 	    EntityRegistry& registry,
 	    const AnimationClipResourceStore& clips,
 	    const SkeletonResourceStore& skeletons,
-	    AnimationOutputStorage& output,
+	    AnimationEvaluationStorage& output,
 	    MorphWeightStorage& weights,
 	    float deltaSeconds) :
 	    m_registry(registry),
 	    m_clips(clips),
 	    m_skeletons(skeletons),
-	    m_output(output),
+	    m_evaluation(output),
 	    m_weights(weights),
 	    m_deltaSeconds((std::max) (0.0f, deltaSeconds))
 	{
@@ -39,12 +39,12 @@ namespace ECS
 
 	std::uint32_t AnimationSystemExecution::GetPoseCount() const noexcept
 	{
-		return static_cast<std::uint32_t>(m_output.GetPoseWork().size());
+		return static_cast<std::uint32_t>(m_evaluation.GetPoseWork().size());
 	}
 
 	std::uint32_t AnimationSystemExecution::GetMorphSampleCount() const noexcept
 	{
-		return static_cast<std::uint32_t>(m_output.GetMorphSamples().size());
+		return static_cast<std::uint32_t>(m_evaluation.GetMorphSamples().size());
 	}
 
 	bool AnimationSystemExecution::RunPlayback(std::uint32_t begin, std::uint32_t end)
@@ -71,27 +71,28 @@ namespace ECS
 
 	bool AnimationSystemExecution::RunPose(std::uint32_t begin, std::uint32_t end)
 	{
-		const auto work = m_output.GetPoseWork();
-		AnimationOutput& output = m_output.GetMutableOutput();
+		const auto work = m_evaluation.GetPoseWork();
 		if (begin > end || end > work.size())
 		{
 			return false;
 		}
+
 		for (std::uint32_t index = begin; index < end; ++index)
 		{
-			AnimationOutputStorage::PoseWorkSlot& slot = work[index];
+			AnimationEvaluationStorage::PoseWorkSlot& slot = work[index];
 			const AnimationState* state = m_registry.Get<AnimationState>(slot.Entity);
-			if (state == nullptr || slot.PoseOutputIndex >= output.poses.size())
+			if (state == nullptr)
 			{
 				continue;
 			}
+
 			const ResolvedAnimationClip clip = m_clips.Resolve(slot.Clip);
 			const SkeletonEvaluationData skeleton = m_skeletons.Resolve(slot.Skeleton);
 			const bool bClipAvailable = clip.IsValid();
 			const bool bPoseEvaluated = bClipAvailable && AnimationPoseEvaluator::Evaluate(*clip.Resource, skeleton, state->TimeSeconds, slot.LocalTransforms, slot.ModelSpaceTransforms);
-			if (bPoseEvaluated)
+			if (!bPoseEvaluated)
 			{
-				output.poses[slot.PoseOutputIndex].playbackTimeSeconds = state->TimeSeconds;
+				return false;
 			}
 		}
 		return true;
@@ -99,48 +100,49 @@ namespace ECS
 
 	bool AnimationSystemExecution::RunMorphSamples(std::uint32_t begin, std::uint32_t end)
 	{
-		const auto samples = m_output.GetMorphSamples();
-		AnimationOutput& output = m_output.GetMutableOutput();
+		const auto samples = m_evaluation.GetMorphSamples();
 		if (begin > end || end > samples.size())
 		{
 			return false;
 		}
+
 		for (std::uint32_t index = begin; index < end; ++index)
 		{
-			const AnimationOutputStorage::MorphSampleSlot& sample = samples[index];
+			AnimationEvaluationStorage::MorphSampleSlot& sample = samples[index];
 			const AnimationState* state = m_registry.Get<AnimationState>(sample.AnimationEntity);
 			if (state == nullptr)
 			{
 				continue;
 			}
+
 			const ResolvedAnimationClip clip = m_clips.Resolve(sample.Clip);
-			if (!clip.IsValid() || sample.OutputIndex >= output.morphWeights.size())
+			if (!clip.IsValid())
 			{
 				continue;
 			}
-			MorphWeightEvaluator::Evaluate(*clip.Resource, sample.ChannelIndex, state->TimeSeconds, output.morphWeights[sample.OutputIndex].weights);
+
+			const bool bWeightsEvaluated = MorphWeightEvaluator::Evaluate(*clip.Resource, sample.ChannelIndex, state->TimeSeconds, sample.Weights);
+			if (!bWeightsEvaluated)
+			{
+				return false;
+			}
 		}
 		return true;
 	}
 
 	bool AnimationSystemExecution::RunSkinning(std::uint32_t begin, std::uint32_t end)
 	{
-		std::span<AnimationOutputStorage::PoseWorkSlot> work = m_output.GetPoseWork();
-		AnimationOutput& output = m_output.GetMutableOutput();
+		std::span<AnimationEvaluationStorage::PoseWorkSlot> work = m_evaluation.GetPoseWork();
 		if (begin > end || end > work.size())
 		{
 			return false;
 		}
+
 		for (std::uint32_t index = begin; index < end; ++index)
 		{
-			AnimationOutputStorage::PoseWorkSlot& slot = work[index];
-			if (slot.PoseOutputIndex >= output.poses.size())
-			{
-				continue;
-			}
-
+			AnimationEvaluationStorage::PoseWorkSlot& slot = work[index];
 			const auto& skeleton = m_skeletons.Resolve(slot.Skeleton);
-			const bool bMatricesEvaluated = SkinningMatrixEvaluator::Evaluate(skeleton, slot.ModelSpaceTransforms, output.poses[slot.PoseOutputIndex].jointMatrices);
+			const bool bMatricesEvaluated = SkinningMatrixEvaluator::Evaluate(skeleton, slot.ModelSpaceTransforms, slot.JointMatrices);
 
 			if (!bMatricesEvaluated)
 			{
@@ -152,20 +154,17 @@ namespace ECS
 
 	bool AnimationSystemExecution::CommitMorphOutputs()
 	{
-		const auto bindings = m_output.GetMorphBindings();
-		const auto samples = m_output.GetMorphSamples();
-		const AnimationOutput& output = m_output.GetOutput();
+		const auto bindings = m_evaluation.GetMorphBindings();
+		const auto samples = m_evaluation.GetMorphSamples();
 		for (std::size_t index = 0; index < bindings.size(); ++index)
 		{
-			const AnimationOutputStorage::MorphTargetBinding& binding = bindings[index];
+			const AnimationEvaluationStorage::MorphTargetBinding& binding = bindings[index];
 			if (binding.SampleIndex >= samples.size())
 			{
 				return false;
 			}
 
-			const std::uint32_t outputIndex = samples[binding.SampleIndex].OutputIndex;
-			const bool bMorphOutputAvailable = outputIndex < output.morphWeights.size();
-			const bool bMorphWeightsWritten = bMorphOutputAvailable && m_weights.Write(binding.TargetWeights, output.morphWeights[outputIndex].weights);
+			const bool bMorphWeightsWritten = m_weights.Write(binding.TargetWeights, samples[binding.SampleIndex].Weights);
 
 			if (!bMorphWeightsWritten)
 			{

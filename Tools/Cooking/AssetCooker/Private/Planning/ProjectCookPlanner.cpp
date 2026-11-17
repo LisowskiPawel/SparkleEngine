@@ -186,7 +186,7 @@ bool ProjectCookPlanner::CollectSceneIds(const std::filesystem::path& projectRoo
 	ProjectLevelCatalog catalog;
 	try
 	{
-		catalog = ProjectLevelCatalogFile::Load(projectRoot);
+		catalog = LoadProjectLevelCatalog(projectRoot);
 	}
 	catch (const Diagnostics::Error& error)
 	{
@@ -266,7 +266,7 @@ bool ProjectCookPlanner::ResolveSceneEntry(const std::filesystem::path& projectR
 	return true;
 }
 
-bool ProjectCookPlanner::IsSceneIdSafe(const std::filesystem::path& relativeScenePath) noexcept
+bool ProjectCookPlanner::IsSceneIdSafe(const std::filesystem::path& relativeScenePath)
 {
 	return !relativeScenePath.empty() && !relativeScenePath.is_absolute() && !relativeScenePath.generic_string().starts_with("..");
 }

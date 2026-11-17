@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ShaderContractCatalog.h"
+#include "RHI/Public/Shaders/ShaderMap.h"
 
 #include <cstddef>
 #include <filesystem>

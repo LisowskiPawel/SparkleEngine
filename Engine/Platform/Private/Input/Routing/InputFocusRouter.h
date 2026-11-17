@@ -2,17 +2,19 @@
 
 #include "Input/Dispatch/InputLayer.h"
 #include "Input/Mouse/MousePosition.h"
+#include "Input/Events/KeyboardEvent.h"
+#include "Input/Events/MouseButtonEvent.h"
+#include "Input/Events/MouseMoveEvent.h"
+#include "Input/Events/MouseWheelEvent.h"
 
 #include <vector>
-
-struct InputBackendResult;
 
 class InputFocusRouter final
 {
 public:
-	InputFocusRouter() noexcept = default;
+	InputFocusRouter() noexcept;
 
-	~InputFocusRouter() = default;
+	~InputFocusRouter();
 
 	InputFocusRouter(const InputFocusRouter&) = delete;
 	InputFocusRouter& operator=(const InputFocusRouter&) = delete;
@@ -22,7 +24,10 @@ public:
 	void BeginFrame(bool bInteractionDisabled, bool bTextInputActive);
 	void RegisterTargetRegion(float left, float top, float right, float bottom, InputLayer targetLayer);
 
-	InputLayer ResolveTargetLayer(const InputBackendResult& result) const noexcept;
+	InputLayer ResolveTargetLayer(const KeyboardEvent& event) const noexcept;
+	InputLayer ResolveTargetLayer(const MouseButtonEvent& event) const noexcept;
+	InputLayer ResolveTargetLayer(const MouseMoveEvent& event) const noexcept;
+	InputLayer ResolveTargetLayer(const MouseWheelEvent& event) const noexcept;
 	InputLayer GetActiveTargetLayer() const noexcept;
 	void SetActiveTargetLayer(InputLayer layer) noexcept;
 	void ResetFocus() noexcept;
@@ -41,8 +46,6 @@ private:
 	};
 
 	InputLayer ResolvePointTarget(MousePosition position) const noexcept;
-	InputLayer ResolveMouseMoveTarget(MousePosition position) const noexcept;
-
 	std::vector<TargetRegion> m_targetRegions;
 	InputLayer m_activeTargetLayer = InputLayer::Gameplay;
 	bool m_bHasRoutingFrame = false;

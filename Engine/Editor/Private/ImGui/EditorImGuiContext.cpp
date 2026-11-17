@@ -54,9 +54,8 @@ bool EditorImGuiContext::InitializePlatformBackend()
 		return false;
 	}
 
-	ImGui_ImplWin32_Init(m_window.GetHWND());
-	m_bPlatformInitialized = true;
-	return true;
+	m_bPlatformInitialized = ImGui_ImplWin32_Init(m_window.GetHWND());
+	return m_bPlatformInitialized;
 }
 
 void EditorImGuiContext::ApplyDpiScale(float dpiScale) noexcept
@@ -67,11 +66,6 @@ void EditorImGuiContext::ApplyDpiScale(float dpiScale) noexcept
 	SparkleUiTheme::ApplyEditorialDarkTheme();
 	style.FontScaleDpi = dpiScale;
 	style.ScaleAllSizes(dpiScale);
-}
-
-bool EditorImGuiContext::IsReady() const noexcept
-{
-	return m_context != nullptr && m_bPlatformInitialized;
 }
 
 void EditorImGuiContext::SubscribeToWindowEvents(ShortcutHandler shortcutHandler)

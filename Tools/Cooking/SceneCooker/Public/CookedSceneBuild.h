@@ -39,7 +39,7 @@ struct CookedSceneIdentity final
 
 struct CookedSceneManifestBuildData final
 {
-	Assets::CookedSceneManifestHeader header;
+	std::uint32_t featureFlags = 0;
 	std::vector<Assets::CookedSceneMeshAssetRef> meshAssetReferences;
 	std::vector<Assets::CookedSceneMaterialAssetRef> materialAssetReferences;
 	std::vector<Assets::CookedSceneInstanceRecord> instances;
@@ -66,10 +66,4 @@ struct CookedSceneBuild final
 	CookedSceneIdentity identity;
 	CookedSceneManifestBuildData manifest;
 	CookedSceneAssetOutputs outputs;
-
-	void ResetManifest();
-	void FinalizeManifestHeader() noexcept;
-
-	void ApplyMeshOutput(MeshCookOutput&& meshOutput);
-	void ApplyMaterialOutput(MaterialCookOutput&& materialOutput);
 };

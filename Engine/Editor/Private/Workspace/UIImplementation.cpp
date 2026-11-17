@@ -23,15 +23,13 @@
 #include "Renderer/Public/UI/ImGuiRenderPacketBuilder.h"
 #include "Renderer/Public/UI/UiRenderPacket.h"
 #include "Renderer/Public/Viewport/ViewportContracts.h"
-#include "Scene/Model/EditorSceneModel.h"
-#include "Scene/Model/EditorSceneModelBuilder.h"
-#include "Scene/Transactions/EditorTransactionHistory.h"
 #include "Viewport/EditorViewportSession.h"
 #include "Window/Window.h"
 
 #include <imgui.h>
 
 #include <memory>
+#include <stdexcept>
 #include <utility>
 
 void UI::Implementation::AppendConsoleOutput(ConsoleOutputRecord record, bool bShowConsole)
@@ -45,33 +43,22 @@ void UI::Implementation::AppendConsoleOutput(ConsoleOutputRecord record, bool bS
 
 const ViewportRenderRequest& UI::Implementation::GetViewportRenderRequest() const noexcept
 {
-	static const ViewportRenderRequest defaultRequest = []
-	{
-		ViewportRenderRequest request{};
-		request.ViewportId = 1;
-		request.ViewKind = RenderViewKind::Scene;
-		request.RequestedOutputs = RenderOutputFlags::FinalColorLdr | RenderOutputFlags::SceneDepth;
-		return request;
-	}();
-
-	return m_viewportPanel ? m_viewportPanel->GetRenderRequest() : defaultRequest;
+	return m_viewportPanel->GetRenderRequest();
 }
 
-RenderViewCameraData UI::Implementation::UpdateViewportCamera(const CameraInputIntent& intent, float deltaSeconds) noexcept
+RenderViewCameraData UI::Implementation::UpdateViewportCamera(const CameraInputIntent& intent, float deltaSeconds)
 {
-	UpdateSceneModel();
-	if (!m_viewportSession || !m_sceneModel)
+	m_scene.Refresh();
+	const EditorSceneModel* model = m_scene.GetModel();
+	if (model == nullptr)
 	{
 		return {};
 	}
 
 	const RenderViewportExtent extent = GetViewportRenderRequest().Extent;
-	m_viewportSession->SynchronizeWorld(m_sceneModel->GetCameras(), m_sceneModel->GetWorldGeneration());
+	m_viewportSession->SynchronizeWorld(model->GetCameras(), model->GetWorldGeneration());
 	const RenderViewCameraData camera = m_viewportSession->UpdateCamera(intent, deltaSeconds, extent);
-	if (m_viewportPanel)
-	{
-		m_viewportPanel->SetExposureOverrides(m_viewportSession->GetSettings().Exposure);
-	}
+	m_viewportPanel->SetExposureOverrides(m_viewportSession->GetSettings().Exposure);
 	return camera;
 }
 
@@ -83,37 +70,22 @@ void UI::Implementation::SetViewportOverlay(std::unique_ptr<ViewportOverlay> ove
 void UI::Implementation::SetViewportRenderProducts(const ViewportRenderProducts& products) noexcept
 {
 	m_viewportGeneration = products.GetGeneration();
-	if (m_viewportPanel)
-	{
-		m_viewportPanel->SetRenderProducts(products);
-	}
+	m_viewportPanel->SetRenderProducts(products);
 }
 
 void UI::Implementation::SetViewportFinalColorTexture(UiTextureHandle texture) noexcept
 {
-	if (m_viewportPanel)
-	{
-		m_viewportPanel->SetFinalColorTexture(texture);
-	}
+	m_viewportPanel->SetFinalColorTexture(texture);
 }
 
 void UI::Implementation::SetDiagnosticsProviders(EditorDiagnosticsProviders providers)
 {
 	m_memoryDiagnosticsProvider = std::move(providers.MemoryDiagnostics);
 
-	if (m_shaderToolsPanel)
-	{
-		m_shaderToolsPanel->SetDiagnosticsProvider(std::move(providers.Shaders));
-	}
-	if (m_usedMeshesPanel)
-	{
-		m_usedMeshesPanel->SetDiagnosticsProvider(std::move(providers.MeshDiagnostics));
-		m_usedMeshesPanel->SetPreviewGeometryProvider(std::move(providers.MeshPreview));
-	}
-	if (m_usedTexturesPanel)
-	{
-		m_usedTexturesPanel->SetDiagnosticsProvider(std::move(providers.TextureDiagnostics));
-	}
+	m_shaderToolsPanel->SetDiagnosticsProvider(std::move(providers.Shaders));
+	m_usedMeshesPanel->SetDiagnosticsProvider(std::move(providers.MeshDiagnostics));
+	m_usedMeshesPanel->SetPreviewGeometryProvider(std::move(providers.MeshPreview));
+	m_usedTexturesPanel->SetDiagnosticsProvider(std::move(providers.TextureDiagnostics));
 }
 
 RendererMemoryDiagnosticsSnapshot UI::Implementation::CaptureMemoryDiagnostics() const
@@ -141,7 +113,7 @@ void UI::Implementation::SetShaderCompileStatus(bool bBusy, std::string_view mes
 
 ViewportOutputAction UI::Implementation::ConsumeViewportOutputAction() noexcept
 {
-	return m_viewportPanel ? m_viewportPanel->ConsumeOutputAction() : ViewportOutputAction::None;
+	return m_viewportPanel->ConsumeOutputAction();
 }
 
 UiRenderPacket UI::Implementation::ConsumeRenderPacket()
@@ -150,23 +122,22 @@ UiRenderPacket UI::Implementation::ConsumeRenderPacket()
 }
 
 UI::Implementation::Implementation(EditorHostServices hostServices) :
-    m_timer(&hostServices.GameTimer),
+    m_scene(EditorSceneSource{.AcquireReadView = std::move(hostServices.AcquireWorldReadView), .MaterialVariants = std::move(hostServices.MaterialVariants)}, std::move(hostServices.SubmitWorldEdit)),
+    m_timer(hostServices.GameTimer),
     m_levelSession(hostServices.Levels),
-    m_window(&hostServices.HostWindow),
-    m_inputSystem(&hostServices.Input),
-    m_sceneSelection(SceneObjectSelection::None())
+    m_window(hostServices.HostWindow),
+    m_inputSystem(hostServices.Input)
 {
-	InitializeSceneEditing(hostServices);
 	m_renderPacketBuilder = std::make_unique<ImGuiRenderPacketBuilder>();
 
 	InitializeRenderingSettings(hostServices);
 	InitializeConsole(std::move(hostServices.ConsoleVariables));
 
 	InitializeImGuiContext();
-	m_imguiContext->ApplyDpiScale(m_window->GetDpiScale());
+	m_imguiContext->ApplyDpiScale(m_window.GetDpiScale());
 	if (!m_imguiContext->InitializePlatformBackend())
 	{
-		return;
+		throw std::runtime_error("Editor platform backend initialization failed.");
 	}
 
 	InitializeWorkspace(std::move(hostServices.RequestRestart));
@@ -176,25 +147,11 @@ UI::Implementation::Implementation(EditorHostServices hostServices) :
 UI::Implementation::~Implementation() noexcept
 {
 	m_imguiContext->UnsubscribeFromWindowEvents();
-	m_viewportPanel.reset();
-	m_viewportToolbar.reset();
-	m_icons.reset();
-	m_imguiContext.reset();
 }
 
 void UI::Implementation::Update()
 {
-	if (!IsReady())
-	{
-		return;
-	}
-
 	NewFrame();
 	Build();
 	m_renderPacket = m_renderPacketBuilder->Build(*ImGui::GetDrawData(), UiPresentationMode::Viewport, m_viewportGeneration);
-}
-
-bool UI::Implementation::IsReady() const noexcept
-{
-	return m_imguiContext != nullptr && m_imguiContext->IsReady();
 }

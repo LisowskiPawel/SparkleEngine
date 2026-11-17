@@ -139,10 +139,11 @@ namespace GltfSkinImporter
 		{
 			throw Diagnostics::Error("glTF skin has a non-invertible SkinReferenceSpace-to-WorldSpace transform.");
 		}
+
 		return skinReferenceToWorld;
 	}
 
-	ImportedSkeletonIndex ImportSkeleton(const cgltf_data* data, const cgltf_skin* skin, SourceImportOutput& output)
+	ImportedSkeletonIndex ImportSkeleton(const cgltf_data* data, const cgltf_skin* skin, ImportedScene& importedScene)
 	{
 		constexpr const char* invalidSkin = "glTF skin has incomplete joints or incompatible inverse-bind matrices.";
 		constexpr cgltf_size maxJointCount = static_cast<cgltf_size>((std::numeric_limits<std::uint16_t>::max)()) + 1u;
@@ -170,9 +171,9 @@ namespace GltfSkinImporter
 		}
 
 		const std::uint32_t sourceSkinIndex = static_cast<std::uint32_t>(sourceSkinIndexValue);
-		for (std::size_t skeletonIndex = 0; skeletonIndex < output.scene.skeletons.size(); ++skeletonIndex)
+		for (std::size_t skeletonIndex = 0; skeletonIndex < importedScene.skeletons.size(); ++skeletonIndex)
 		{
-			if (output.scene.skeletons[skeletonIndex].sourceSkinIndex == sourceSkinIndex)
+			if (importedScene.skeletons[skeletonIndex].sourceSkinIndex == sourceSkinIndex)
 			{
 				return static_cast<ImportedSkeletonIndex>(skeletonIndex);
 			}
@@ -226,8 +227,8 @@ namespace GltfSkinImporter
 			skeleton.joints.push_back(std::move(joint));
 		}
 
-		const ImportedSkeletonIndex skeletonIndex = static_cast<ImportedSkeletonIndex>(output.scene.skeletons.size());
-		output.scene.skeletons.push_back(std::move(skeleton));
+		const ImportedSkeletonIndex skeletonIndex = static_cast<ImportedSkeletonIndex>(importedScene.skeletons.size());
+		importedScene.skeletons.push_back(std::move(skeleton));
 		return skeletonIndex;
 	}
 }

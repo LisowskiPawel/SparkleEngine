@@ -2,7 +2,6 @@
 
 #include "World/WorldEditCommand.h"
 
-#include <utility>
 #include <cstdint>
 #include <functional>
 #include <optional>
@@ -14,27 +13,21 @@ class EditorTransactionHistory final
 public:
 	using SubmitFunction = std::function<WorldEditResult(WorldEditCommand, std::uint64_t)>;
 
-	EditorTransactionHistory() = default;
-
-	explicit EditorTransactionHistory(SubmitFunction submit) :
-	    m_submit(std::move(submit))
-	{
-	}
+	explicit EditorTransactionHistory(SubmitFunction submit);
 
 	WorldEditResult Execute(WorldEditCommand forward, WorldEditCommand inverse, std::uint64_t worldGeneration, std::string coalescingKey = {});
 	WorldEditResult Undo(std::uint64_t worldGeneration);
 	WorldEditResult Redo(std::uint64_t worldGeneration);
 	void InvalidateForWorldGeneration(std::uint64_t worldGeneration) noexcept;
 
-	void FinishInteraction() noexcept { m_bCoalescing = false; }
+	void FinishInteraction() noexcept;
 
-	bool CanUndo() const noexcept { return !m_undo.empty(); }
-
-	bool CanRedo() const noexcept { return !m_redo.empty(); }
+	bool CanUndo() const noexcept;
+	bool CanRedo() const noexcept;
 
 	const std::optional<WorldEditResult>& GetLastResult() const noexcept { return m_lastResult; }
 
-	void DismissLastResult() noexcept { m_lastResult.reset(); }
+	void DismissLastResult() noexcept;
 
 private:
 	struct Transaction final

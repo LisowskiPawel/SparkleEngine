@@ -9,13 +9,12 @@ namespace Files
 }
 
 struct CookedMaterialAssetBuild;
-struct MaterialCookOutput;
 struct SourceImportOutput;
-struct TextureCookRequest;
+class TextureCookRequestSet;
 
 namespace MaterialCooker
 {
-	MaterialCookOutput BuildMaterialAssets(const SourceImportOutput& importOutput, std::string_view sceneAssetId);
-	std::vector<TextureCookRequest> CollectTextureCookRequests(const SourceImportOutput& importOutput);
+	std::vector<CookedMaterialAssetBuild> BuildMaterialAssets(const SourceImportOutput& importOutput, std::string_view sceneAssetId);
+	void AppendTextureCookRequests(const SourceImportOutput& importOutput, TextureCookRequestSet& requests);
 	void StageMaterialAssets(const std::vector<CookedMaterialAssetBuild>& materialAssets, std::vector<Files::FilePublication>& outPublication);
 }

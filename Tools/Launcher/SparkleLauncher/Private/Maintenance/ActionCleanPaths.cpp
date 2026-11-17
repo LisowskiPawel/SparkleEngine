@@ -1,19 +1,22 @@
 #include "SparkleLauncher/MaintenanceOperations.h"
 
 #include "SparkleLauncher/BuildProfileCatalog.h"
+#include "SparkleLauncher/BuildWorkspaceOperations.h"
+#include "SparkleLauncher/CookOperations.h"
 #include "ToolOutputPaths.h"
 
 #include <algorithm>
+#include <initializer_list>
 #include <utility>
 
 namespace SparkleLauncher
 {
-	static bool HasScope(const std::vector<std::string>& scopes, std::string_view scope)
+	template <typename Scope> static bool HasScope(const std::vector<Scope>& scopes, Scope scope)
 	{
 		return std::ranges::find(scopes, scope) != scopes.end();
 	}
 
-	static bool IncludesBuildScope(const ActionCleanTargetRequest& request, std::string_view scope)
+	static bool IncludesBuildScope(const ActionCleanTargetRequest& request, BuildWorkspaceScope scope)
 	{
 		return request.OperationId == "workspace.build" && HasScope(request.BuildScopes, scope);
 	}
@@ -42,10 +45,11 @@ namespace SparkleLauncher
 
 	static void AppendLauncherCleanPaths(const ActionCleanTargetRequest& request, const SparkleTools::ToolOutputPaths& outputs, std::vector<MaintenanceCleanPathSpec>& paths)
 	{
-		if (request.OperationId != "launcher.build.self" && !IncludesBuildScope(request, "launcher"))
+		if (request.OperationId != "launcher.build.self" && !IncludesBuildScope(request, BuildWorkspaceScope::Launcher))
 		{
 			return;
 		}
+
 		const auto launcher = outputs.LauncherTargetOutputs(request.EditorProfile);
 		AppendTargetFiles(paths, launcher, "SparkleLauncher", "Launcher direct build outputs. The currently running launcher executable is preserved until restart.", request.RunningLauncherPath);
 		AppendCleanPath(paths, "SparkleLauncherCore library", launcher.LibraryDirectory / "SparkleLauncherCore.lib", "Launcher support library built for the selected editor profile.");
@@ -75,7 +79,7 @@ namespace SparkleLauncher
 
 	static void AppendCookToolCleanPaths(const ActionCleanTargetRequest& request, const SparkleTools::ToolOutputPaths& outputs, std::vector<MaintenanceCleanPathSpec>& paths)
 	{
-		if (request.OperationId != "cook.tools.prepare" && !IncludesBuildScope(request, "cook-tools"))
+		if (request.OperationId != "cook.tools.prepare" && !IncludesBuildScope(request, BuildWorkspaceScope::CookTools))
 		{
 			return;
 		}
@@ -91,43 +95,70 @@ namespace SparkleLauncher
 	static void AppendBuildCleanPaths(const ActionCleanTargetRequest& request, const SparkleTools::ToolOutputPaths& outputs, std::vector<MaintenanceCleanPathSpec>& paths)
 	{
 		AppendLauncherCleanPaths(request, outputs, paths);
-		if (request.OperationId == "workspace.build.editor" || IncludesBuildScope(request, "editor"))
+		if (request.OperationId == "workspace.build.editor" || IncludesBuildScope(request, BuildWorkspaceScope::Editor))
 		{
 			AppendProjectCleanPaths(request, outputs, request.EditorProfile, "Editor target outputs.", paths);
 		}
-		if (request.OperationId == "workspace.build.game" || IncludesBuildScope(request, "game"))
+		if (request.OperationId == "workspace.build.game" || IncludesBuildScope(request, BuildWorkspaceScope::Game))
 		{
 			AppendProjectCleanPaths(request, outputs, request.GameProfile, "Game target outputs.", paths);
 		}
 		AppendCookToolCleanPaths(request, outputs, paths);
 	}
 
+	static void AppendCookedScopeCleanPaths(const std::filesystem::path& content, CookWorkspaceScope scope, std::vector<MaintenanceCleanPathSpec>& paths)
+	{
+		switch (scope)
+		{
+			case CookWorkspaceScope::Shaders:
+				AppendCleanPath(paths, "Cooked shaders", content / "Shaders", "Generated shader outputs.");
+				return;
+			case CookWorkspaceScope::Textures:
+				AppendCleanPath(paths, "Cooked textures", content / "Textures", "Generated texture outputs.");
+				return;
+			case CookWorkspaceScope::SceneAssets:
+				AppendCleanPath(paths, "Cooked scene manifests", content / "SceneManifests", "Generated scene manifests.");
+				AppendCleanPath(paths, "Cooked meshes", content / "Meshes", "Generated mesh outputs.");
+				AppendCleanPath(paths, "Cooked materials", content / "Materials", "Generated material outputs.");
+				AppendCleanPath(paths, "Cooked skeletons", content / "Skeletons", "Generated skeleton outputs.");
+				AppendCleanPath(paths, "Cooked animations", content / "Animations", "Generated animation outputs.");
+				AppendCleanPath(paths, "Cooked scene registry", content / "SceneAssetRegistry.sreg", "Generated scene asset registry.");
+				return;
+		}
+	}
+
 	static void AppendCookedCleanPaths(const ActionCleanTargetRequest& request, const SparkleTools::ToolOutputPaths& outputs, std::vector<MaintenanceCleanPathSpec>& paths)
 	{
+		const auto definition = FindCookOperationDefinition(request.OperationId);
+		if (!definition)
+		{
+			return;
+		}
+
 		const auto content = outputs.CookedProjectDirectory(request.ContentId);
-		if (request.OperationId == "cook.workspace")
+		switch (definition->Kind)
 		{
-			if (HasScope(request.CookScopes, "textures") || HasScope(request.CookScopes, "assets"))
-			{
-				AppendCleanPath(paths, "Cooked content", content, "Generated texture, scene, mesh, and material outputs selected by Cook Workspace.");
-			}
-			if (HasScope(request.CookScopes, "shaders"))
-			{
-				AppendCleanPath(paths, "Cooked shaders", content / "Shaders", "Generated shader outputs selected by Cook Workspace.");
-			}
-		}
-		else if (request.OperationId == "cook.all")
-		{
-			AppendCleanPath(paths, "Cooked content", content, "All generated cooked content.");
-			AppendCleanPath(paths, "Cooked shaders", content / "Shaders", "Generated shader outputs refreshed by cook operations.");
-		}
-		else if (request.OperationId == "cook.shaders")
-		{
-			AppendCleanPath(paths, "Cooked shaders", content / "Shaders", "Generated shader outputs refreshed by shader cooking.");
-		}
-		else if (request.OperationId == "cook.textures" || request.OperationId == "cook.assets")
-		{
-			AppendCleanPath(paths, "Cooked content", content, request.OperationId == "cook.textures" ? "Cooked texture outputs." : "Cooked mesh and material outputs.");
+			case CookOperationKind::CookWorkspace:
+				for (const auto scope : {CookWorkspaceScope::Shaders, CookWorkspaceScope::Textures, CookWorkspaceScope::SceneAssets})
+				{
+					if (HasScope(request.CookScopes, scope))
+					{
+						AppendCookedScopeCleanPaths(content, scope, paths);
+					}
+				}
+				return;
+			case CookOperationKind::CookShaders:
+				AppendCookedScopeCleanPaths(content, CookWorkspaceScope::Shaders, paths);
+				return;
+			case CookOperationKind::BuildTextures:
+				AppendCookedScopeCleanPaths(content, CookWorkspaceScope::Textures, paths);
+				return;
+			case CookOperationKind::BuildSceneAssets:
+				AppendCookedScopeCleanPaths(content, CookWorkspaceScope::SceneAssets, paths);
+				return;
+			case CookOperationKind::CookAllAssets:
+				AppendCleanPath(paths, "Cooked content", content, "All generated cooked content.");
+				return;
 		}
 	}
 
@@ -139,15 +170,16 @@ namespace SparkleLauncher
 
 	std::vector<MaintenanceCleanPathSpec> BuildActionCleanPaths(const ActionCleanTargetRequest& request)
 	{
-		const bool bNeedsContentBuildScope = IncludesBuildScope(request, "editor") || IncludesBuildScope(request, "game");
-		const bool bNeedsContentOperationId = bNeedsContentBuildScope || (request.OperationId == "workspace.build.editor");
-		const bool bBuildNeedsContent = bNeedsContentOperationId || (request.OperationId == "workspace.build.game");
-		const bool bNeedsContent = bBuildNeedsContent || (request.OperationId.starts_with("cook."));
+		const bool bSelectedProjectBuild = IncludesBuildScope(request, BuildWorkspaceScope::Editor) || IncludesBuildScope(request, BuildWorkspaceScope::Game);
+		const bool bDirectProjectBuild = request.OperationId == "workspace.build.editor" || request.OperationId == "workspace.build.game";
+		const bool bBuildNeedsContent = bSelectedProjectBuild || bDirectProjectBuild;
+		const bool bNeedsContent = bBuildNeedsContent || FindCookOperationDefinition(request.OperationId).has_value();
 
 		if (bNeedsContent && request.ContentId.empty())
 		{
 			return {};
 		}
+
 		const auto outputs = SparkleTools::ResolveToolOutputPaths(request.WorkspaceRoot);
 		std::vector<MaintenanceCleanPathSpec> paths;
 		AppendBuildCleanPaths(request, outputs, paths);

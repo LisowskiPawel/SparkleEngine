@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-enum class ImportedAlphaMode : std::uint32_t
+enum class ImportedAlphaMode : std::uint8_t
 {
 	Opaque = 0,
 	Mask = 1,

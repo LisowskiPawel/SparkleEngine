@@ -5,7 +5,7 @@
 #include "SourceAssetPaths.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Paths/PathUtils.h"
-#include "Core/Public/Paths/ProductFilePaths.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include <optional>
 

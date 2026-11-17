@@ -6,44 +6,9 @@
 // The orchestrator picks the first backend that supports the requested target.
 struct ShaderBackendCapabilities final
 {
-	bool SupportsTarget(ShaderTarget target) const noexcept
-	{
-		if (IsDxilTarget(target))
-		{
-			return bSupportsDxil;
-		}
-		if (IsSpirVTarget(target))
-		{
-			return bSupportsSpirV;
-		}
-		return false;
-	}
-
-	bool SupportsRayTracingLibrary(ShaderTarget target) const noexcept
-	{
-		if (IsDxilTarget(target))
-		{
-			return bSupportsDxilRayTracingLibrary;
-		}
-		if (IsSpirVTarget(target))
-		{
-			return bSupportsSpirVRayTracingLibrary;
-		}
-		return false;
-	}
-
-	bool SupportsInlineRayQuery(ShaderTarget target) const noexcept
-	{
-		if (IsDxilTarget(target))
-		{
-			return bSupportsDxilInlineRayQuery;
-		}
-		if (IsSpirVTarget(target))
-		{
-			return bSupportsSpirVInlineRayQuery;
-		}
-		return false;
-	}
+	bool SupportsTarget(ShaderTarget target) const noexcept;
+	bool SupportsRayTracingLibrary(ShaderTarget target) const noexcept;
+	bool SupportsInlineRayQuery(ShaderTarget target) const noexcept;
 
 	bool bSupportsDxil = false;
 	bool bSupportsSpirV = false;

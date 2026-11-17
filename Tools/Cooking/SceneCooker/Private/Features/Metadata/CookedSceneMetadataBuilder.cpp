@@ -78,5 +78,5 @@ public:
 
 void CookedSceneMetadataBuilder::BuildMetadata(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild)
 {
-	outBuild.manifest.header.featureFlags = CookedSceneFeatureMetadata::BuildFeatureFlags(importOutput);
+	outBuild.manifest.featureFlags = CookedSceneFeatureMetadata::BuildFeatureFlags(importOutput);
 }

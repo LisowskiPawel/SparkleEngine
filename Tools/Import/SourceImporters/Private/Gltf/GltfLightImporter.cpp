@@ -48,17 +48,12 @@ public:
 	}
 };
 
-void GltfLightImporter::ImportLights(const cgltf_data* data, SourceImportOutput& output)
+void GltfLightImporter::ImportLights(const cgltf_data& data, ImportedScene& importedScene)
 {
-	if (data == nullptr)
+	importedScene.lights.reserve(data.lights_count);
+	for (cgltf_size nodeIndex = 0; nodeIndex < data.nodes_count; ++nodeIndex)
 	{
-		throw Diagnostics::Error("glTF light import has no parsed scene.");
-	}
-
-	output.scene.lights.reserve(data->lights_count);
-	for (cgltf_size nodeIndex = 0; nodeIndex < data->nodes_count; ++nodeIndex)
-	{
-		const cgltf_node& node = data->nodes[nodeIndex];
+		const cgltf_node& node = data.nodes[nodeIndex];
 		if (node.light == nullptr)
 		{
 			continue;
@@ -89,6 +84,6 @@ void GltfLightImporter::ImportLights(const cgltf_data* data, SourceImportOutput&
 		light.sourceNodeIndex = static_cast<std::uint32_t>(nodeIndex);
 		light.direction = GltfCoordinateConverter::TransformDirection(worldTransform, {WorldCoordinates::kForwardX, WorldCoordinates::kForwardY, WorldCoordinates::kForwardZ});
 		DirectX::XMStoreFloat4x4(&light.worldTransform, worldTransform);
-		output.scene.lights.push_back(std::move(light));
+		importedScene.lights.push_back(std::move(light));
 	}
 }

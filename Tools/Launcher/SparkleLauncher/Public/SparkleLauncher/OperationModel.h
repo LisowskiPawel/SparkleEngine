@@ -12,15 +12,6 @@
 
 namespace SparkleLauncher
 {
-	enum class LauncherOperationCategory : std::uint8_t
-	{
-		Workspace,
-		Levels,
-		LevelRun,
-		Cooking,
-		Maintenance
-	};
-
 	enum class OperationStatus : std::uint8_t
 	{
 		Pending,

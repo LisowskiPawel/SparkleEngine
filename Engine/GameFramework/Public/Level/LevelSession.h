@@ -52,9 +52,7 @@ public:
 	void ProcessPendingLevelChange() noexcept;
 	void RequestLevelReload() noexcept;
 
-	LevelAsset* GetActiveLevel() noexcept { return m_activeLevel; }
-
-	const LevelAsset* GetActiveLevel() const noexcept { return m_activeLevel; }
+	std::string_view GetActiveLevelName() const noexcept;
 
 	bool SaveActiveLevel() noexcept;
 

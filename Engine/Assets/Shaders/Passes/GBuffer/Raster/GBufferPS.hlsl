@@ -1,7 +1,7 @@
 #include "/Engine/Resources/ViewUniformData.hlsli"
 
 #include "/Engine/Geometry/PixelInput.hlsli"
-#include "/Engine/Material/Material.hlsli"
+#include "/Engine/Passes/GBuffer/Raster/RasterMaterial.hlsli"
 #include "/Engine/Passes/GBuffer/GBufferPacking.hlsli"
 #include "/Engine/Passes/GBuffer/MotionVector.hlsli"
 
@@ -17,20 +17,20 @@ struct GBufferOutput
 	uint InstanceIdentity : SV_Target7;
 };
 
-void main(in PS::Input Input, out GBufferOutput Output)
+void main(in PS::Input input, out GBufferOutput output)
 {
-	PS::PrepareInput(Input);
+	PS::PrepareInput(input);
 
-	Material::Properties MatProps = Material::Sample(Input);
+	const RasterMaterial::Properties material = RasterMaterial::Sample(input);
 
-	Output.BaseColor = GBufferPacking::PackBaseColor(MatProps.BaseColor, MatProps.Alpha, MatProps.AlphaMode, Material::AlphaModeBlend);
-	Output.WorldNormal = GBufferPacking::PackWorldNormal(MatProps.NormalWorld);
-	const float3 worldTangent = OrthonormalizeTangent(Input.TangentWorld.xyz, Input.NormalWorld);
-	Output.WorldTangent = GBufferPacking::PackWorldTangent(Input.bIsFrontFace ? worldTangent : -worldTangent);
-	Output.Material = GBufferPacking::PackMaterial(MatProps.Metallic, MatProps.Roughness, MatProps.AmbientOcclusion, MatProps.DielectricF0);
-	Output.Emissive = GBufferPacking::PackEmissive(MatProps.Emissive);
-	Output.Subsurface = GBufferPacking::PackSubsurface(MatProps.SubsurfaceColor, MatProps.SubsurfaceStrength);
+	output.BaseColor = GBufferPacking::PackBaseColor(material.BaseColor, material.Alpha, material.AlphaMode);
+	output.WorldNormal = GBufferPacking::PackWorldNormal(material.NormalWorld);
+	const float3 worldTangent = OrthonormalizeTangent(input.TangentWorld.xyz, input.NormalWorld);
+	output.WorldTangent = GBufferPacking::PackWorldTangent(input.bIsFrontFace ? worldTangent : -worldTangent);
+	output.Material = GBufferPacking::PackMaterial(material.Metallic, material.Roughness, material.AmbientOcclusion, material.DielectricF0);
+	output.Emissive = GBufferPacking::PackEmissive(material.Emissive);
+	output.Subsurface = GBufferPacking::PackSubsurface(material.SubsurfaceColor, material.SubsurfaceStrength);
 
-	Output.InstanceIdentity = GBufferWriteInstanceIdentity != 0u ? Input.GpuSceneSlot + 1u : 0u;
-	Output.MotionVector = MotionVectors::ComputeRaster(Input.Position.xy, Input.PrevClipPosition, ViewportSize);
+	output.InstanceIdentity = GBufferWriteInstanceIdentity != 0u ? input.GpuSceneSlot + 1u : 0u;
+	output.MotionVector = MotionVectors::ComputeRaster(input.Position.xy, input.PrevClipPosition, ViewportSize);
 }

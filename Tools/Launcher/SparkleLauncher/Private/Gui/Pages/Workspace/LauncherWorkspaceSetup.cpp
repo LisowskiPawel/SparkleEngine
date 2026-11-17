@@ -8,7 +8,6 @@
 #include "Gui/Models/LauncherDependencyUiModel.h"
 #include "Gui/Widgets/LauncherLayoutWidgets.h"
 #include "Gui/Models/LauncherOperationRequestFactory.h"
-#include "Gui/Operations/LauncherOperationRequestMapping.h"
 #include "Gui/Models/LauncherContentModel.h"
 #include "Gui/App/LauncherSettings.h"
 #include "Gui/Models/LauncherToolchainUiModel.h"
@@ -140,7 +139,7 @@ namespace SparkleLauncher
 	void LauncherWorkspaceSetup::InstallHostTool(const ToolchainItemStatus& item)
 	{
 		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, "workspace.install-host-tool");
-		request.HostToolId = QString::fromStdString(item.Id);
+		std::get<BuildWorkspaceOperationRequest>(request.Inputs).HostToolId = item.Id;
 		m_startOperation(std::move(request), "Install " + QString::fromStdString(item.DisplayName));
 	}
 
@@ -369,7 +368,7 @@ namespace SparkleLauncher
 	void LauncherWorkspaceSetup::AddCookEnvironmentStatus(QVBoxLayout& layout, const QString& operationId)
 	{
 		const LauncherOperationRequest operationRequest = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, operationId);
-		const CookOperationPlan cookPlan = PlanCookOperation(operationId.toStdString(), LauncherOperationRequestMapping::Cook(operationRequest));
+		const CookOperationPlan cookPlan = PlanCookOperation(operationId.toStdString(), std::get<CookOperationRequest>(operationRequest.Inputs));
 		QVBoxLayout* issueLayout = nullptr;
 
 		const auto ensureIssueLayout = [&]() -> QVBoxLayout*

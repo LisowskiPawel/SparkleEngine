@@ -1,8 +1,8 @@
 #include "PCH.h"
 
 #include "Assimp/AssimpGeometryImporter.h"
-#include "Fbx/FbxNodeTransformConverter.h"
-#include "Fbx/FbxSkinImporter.h"
+#include "Assimp/AssimpNodeTransformConverter.h"
+#include "Assimp/AssimpSkinImporter.h"
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <format>
@@ -18,13 +18,13 @@ std::size_t AssimpGeometryImporter::CountImportedMeshInstances(const aiNode& nod
 	return meshInstanceCount;
 }
 
-void AssimpGeometryImporter::ImportGeometry(const aiScene& scene, SourceImportOutput& output)
+void AssimpGeometryImporter::ImportGeometry(const aiScene& scene, ImportedScene& importedScene)
 {
 	std::uint32_t nextNodeIndex = 0;
-	ExtractNodeMeshes(scene, *scene.mRootNode, aiMatrix4x4(), nextNodeIndex, output);
+	ExtractNodeMeshes(scene, *scene.mRootNode, aiMatrix4x4(), nextNodeIndex, importedScene);
 }
 
-void AssimpGeometryImporter::ExtractNodeMeshes(const aiScene& scene, const aiNode& node, const aiMatrix4x4& parentTransform, std::uint32_t& nextNodeIndex, SourceImportOutput& output)
+void AssimpGeometryImporter::ExtractNodeMeshes(const aiScene& scene, const aiNode& node, const aiMatrix4x4& parentTransform, std::uint32_t& nextNodeIndex, ImportedScene& importedScene)
 {
 	const std::uint32_t sourceNodeIndex = nextNodeIndex++;
 	const aiMatrix4x4 worldTransform = parentTransform * node.mTransformation;
@@ -37,12 +37,12 @@ void AssimpGeometryImporter::ExtractNodeMeshes(const aiScene& scene, const aiNod
 			throw Diagnostics::Error(std::format("Assimp node '{}' references unknown mesh index {}.", GetNodeName(node), sceneMeshIndex));
 		}
 
-		AppendMeshInstance(scene, node, *scene.mMeshes[sceneMeshIndex], sceneMeshIndex, sourceNodeIndex, worldTransform, output);
+		AppendMeshInstance(scene, node, *scene.mMeshes[sceneMeshIndex], sceneMeshIndex, sourceNodeIndex, worldTransform, importedScene);
 	}
 
 	for (unsigned int childIndex = 0; childIndex < node.mNumChildren; ++childIndex)
 	{
-		ExtractNodeMeshes(scene, *node.mChildren[childIndex], worldTransform, nextNodeIndex, output);
+		ExtractNodeMeshes(scene, *node.mChildren[childIndex], worldTransform, nextNodeIndex, importedScene);
 	}
 }
 
@@ -53,7 +53,7 @@ void AssimpGeometryImporter::AppendMeshInstance(
     std::uint32_t sourceMeshIndex,
     std::uint32_t sourceNodeIndex,
     const aiMatrix4x4& worldTransform,
-    SourceImportOutput& output)
+    ImportedScene& importedScene)
 {
 	// aiProcess_SortByPType separates publisher-authored helper curves and points
 	// from renderable geometry. They carry no triangles for Sparkle to rasterize,
@@ -63,35 +63,36 @@ void AssimpGeometryImporter::AppendMeshInstance(
 		return;
 	}
 
-	const ImportedSkeletonIndex skeletonIndex = FbxSkinImporter::ImportSkeleton(scene, node, mesh, sourceMeshIndex, output);
+	const ImportedSkeletonIndex skeletonIndex = AssimpSkinImporter::ImportSkeleton(scene, node, mesh, sourceMeshIndex, importedScene);
 	if (mesh.HasBones() && skeletonIndex == kInvalidImportedSkeletonIndex)
 	{
 		throw Diagnostics::Error(std::format("Assimp mesh '{}' has bones but no imported skeleton.", GetMeshName(mesh)));
 	}
-	const ImportedSkeleton* skeleton = skeletonIndex < output.scene.skeletons.size() ? &output.scene.skeletons[skeletonIndex] : nullptr;
 
-	ImportedMeshPrimitiveIndex importedPrimitiveIndex = FindImportedPrimitiveIndex(output.scene, sourceMeshIndex);
+	const ImportedSkeleton* skeleton = skeletonIndex < importedScene.skeletons.size() ? &importedScene.skeletons[skeletonIndex] : nullptr;
+
+	ImportedMeshPrimitiveIndex importedPrimitiveIndex = FindImportedPrimitiveIndex(importedScene, sourceMeshIndex);
 	if (importedPrimitiveIndex == kInvalidImportedMeshPrimitiveIndex)
 	{
-		ImportedMeshGeometry meshGeometry = ExtractMeshGeometry(mesh, node, skeleton, output);
+		ImportedMeshGeometry meshGeometry = ExtractMeshGeometry(mesh, node, skeleton);
 
 		ImportedMeshPrimitive primitiveEntry;
 		primitiveEntry.geometry = std::move(meshGeometry);
 		primitiveEntry.displayName = BuildMeshDisplayName(node, mesh);
 		primitiveEntry.sourceMeshIndex = sourceMeshIndex;
 		primitiveEntry.sourcePrimitiveIndex = 0;
-		importedPrimitiveIndex = static_cast<ImportedMeshPrimitiveIndex>(output.scene.meshPrimitives.size());
-		output.scene.meshPrimitives.push_back(std::move(primitiveEntry));
+		importedPrimitiveIndex = static_cast<ImportedMeshPrimitiveIndex>(importedScene.meshPrimitives.size());
+		importedScene.meshPrimitives.push_back(std::move(primitiveEntry));
 	}
 
 	ImportedMeshInstance instanceEntry;
 	instanceEntry.primitiveIndex = importedPrimitiveIndex;
-	instanceEntry.worldTransform = FbxNodeTransformConverter::ConvertAssimpTransformToEngine(worldTransform);
-	instanceEntry.materialIndex = ResolveMaterialIndex(mesh, output);
+	instanceEntry.worldTransform = AssimpNodeTransformConverter::ConvertAssimpTransformToEngine(worldTransform);
+	instanceEntry.materialIndex = ResolveMaterialIndex(mesh, importedScene);
 	instanceEntry.skeletonIndex = skeletonIndex;
 	instanceEntry.sourceNodeIndex = sourceNodeIndex;
 	instanceEntry.sourceNodeName = GetNodeName(node);
-	output.scene.meshInstances.push_back(std::move(instanceEntry));
+	importedScene.meshInstances.push_back(std::move(instanceEntry));
 }
 
 ImportedMeshPrimitiveIndex AssimpGeometryImporter::FindImportedPrimitiveIndex(const ImportedScene& scene, std::uint32_t sourceMeshIndex) noexcept
@@ -108,7 +109,7 @@ ImportedMeshPrimitiveIndex AssimpGeometryImporter::FindImportedPrimitiveIndex(co
 	return kInvalidImportedMeshPrimitiveIndex;
 }
 
-ImportedMeshGeometry AssimpGeometryImporter::ExtractMeshGeometry(const aiMesh& mesh, const aiNode& node, const ImportedSkeleton* skeleton, SourceImportOutput& output)
+ImportedMeshGeometry AssimpGeometryImporter::ExtractMeshGeometry(const aiMesh& mesh, const aiNode& node, const ImportedSkeleton* skeleton)
 {
 	if (!mesh.HasPositions())
 	{
@@ -121,7 +122,7 @@ ImportedMeshGeometry AssimpGeometryImporter::ExtractMeshGeometry(const aiMesh& m
 	}
 
 	ImportedMeshGeometry meshGeometry;
-	meshGeometry.Reserve(mesh.mNumVertices, mesh.mNumFaces * 3);
+	meshGeometry.indices.reserve(static_cast<std::size_t>(mesh.mNumFaces) * 3u);
 	meshGeometry.vertices.resize(mesh.mNumVertices);
 	PopulateVertices(mesh, meshGeometry);
 	AppendTriangleIndices(mesh, meshGeometry);
@@ -131,7 +132,7 @@ ImportedMeshGeometry AssimpGeometryImporter::ExtractMeshGeometry(const aiMesh& m
 	}
 	if (mesh.HasBones())
 	{
-		FbxSkinImporter::ImportSkinInfluences(mesh, *skeleton, meshGeometry);
+		AssimpSkinImporter::ImportSkinInfluences(mesh, *skeleton, meshGeometry);
 	}
 
 	if (!meshGeometry.IsValid())
@@ -198,14 +199,14 @@ void AssimpGeometryImporter::AppendTriangleIndices(const aiMesh& mesh, ImportedM
 	}
 }
 
-ImportedMaterialIndex AssimpGeometryImporter::ResolveMaterialIndex(const aiMesh& mesh, const SourceImportOutput& output)
+ImportedMaterialIndex AssimpGeometryImporter::ResolveMaterialIndex(const aiMesh& mesh, const ImportedScene& importedScene)
 {
-	if (output.scene.materials.empty())
+	if (importedScene.materials.empty())
 	{
 		return kInvalidImportedMaterialIndex;
 	}
 
-	if (mesh.mMaterialIndex < output.scene.materials.size())
+	if (mesh.mMaterialIndex < importedScene.materials.size())
 	{
 		return static_cast<ImportedMaterialIndex>(mesh.mMaterialIndex);
 	}

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Core/Public/Paths/ProductUserStatePaths.h"
-
 #include <filesystem>
 
 namespace Filesystem
@@ -9,7 +7,6 @@ namespace Filesystem
 	struct FileSystemPathState final
 	{
 		std::filesystem::path workspacePath;
-		ProductUserStatePaths productUserStatePaths;
 		std::filesystem::path cookedAssetRootPath;
 		std::filesystem::path cookedShaderRootPath;
 		std::filesystem::path globalShaderMapPath;
@@ -22,9 +19,7 @@ namespace Filesystem
 		std::filesystem::path cookedAnimationRootPath;
 		std::filesystem::path sceneAssetRegistryPath;
 		std::filesystem::path projectPath;
-		std::filesystem::path projectAssetsPath;
 		std::filesystem::path enginePath;
-		std::filesystem::path engineAssetsPath;
 		std::filesystem::path workingDirectory;
 		std::filesystem::path executableDirectory;
 	};

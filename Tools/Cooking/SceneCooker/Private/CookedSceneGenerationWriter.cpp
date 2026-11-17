@@ -1,15 +1,15 @@
 #include "PCH.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "CookedSceneGenerationWriter.h"
 
 #include "CookedSceneBuild.h"
-#include "CookedAnimationAssetWriter.h"
+#include "Features/Animations/CookedAnimationAssetWriter.h"
 #include "CookedMeshAssetWriter.h"
-#include "CookedSkeletonAssetWriter.h"
+#include "Features/Skeletons/CookedSkeletonAssetWriter.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Files/FileSetPublication.h"
-#include "Core/Public/Paths/FileSystemPaths.h"
 #include "MaterialCooker.h"
 #include "CookedSceneManifestWriter.h"
 

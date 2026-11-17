@@ -13,30 +13,13 @@
 struct ShaderBackendDescriptor final
 {
 	std::string_view Name;
-	std::span<const std::string_view> SourceExtensions;
-	std::span<const ShaderTarget> CodegenTargets;
-	std::span<const std::string_view> BinaryFormats;
+	std::string_view SourceExtension;
 	ShaderBackendCapabilities Capabilities;
 	std::uint64_t Version = 0;
-	bool bIsAvailable = false;
-	std::string UnavailableReason;
-};
-
-struct ShaderBinaryFormatDescriptor final
-{
-	std::string_view Name;
-	bool bIsAvailable = true;
-};
-
-struct ShaderCodegenTargetDescriptor final
-{
-	ShaderTarget Target = kDefaultShaderTarget;
-	std::string_view BinaryFormat;
-	bool bIsAvailable = true;
 };
 
 std::vector<ShaderBackendDescriptor> ListShaderBackends();
-std::span<const ShaderBinaryFormatDescriptor> ListShaderBinaryFormats() noexcept;
-std::span<const ShaderCodegenTargetDescriptor> ListShaderCodegenTargets() noexcept;
+std::span<const std::string_view> ListShaderBinaryFormats() noexcept;
+std::span<const ShaderTarget> ListShaderCodegenTargets() noexcept;
 std::unique_ptr<IShaderBackend> CreateShaderBackend(std::string_view name);
 std::string ResolveShaderBackendName(std::string_view sourcePath, ShaderTarget target, std::string_view requestedName);

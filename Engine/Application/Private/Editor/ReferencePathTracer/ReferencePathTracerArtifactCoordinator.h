@@ -1,19 +1,20 @@
 #pragma once
 
 #include "Editor/Capture/ViewportCaptureSlot.h"
-#include "EditorOperations/EditorOperationSlot.h"
+#include "Editor/Operations/EditorOperationSlot.h"
 #include "Editor/ReferencePathTracer/ReferencePathTracerArtifact.h"
 
 #include <filesystem>
 #include <optional>
 
-class EditorOperationRuntime;
+class TaskExecutor;
+class TaskScope;
 class Renderer;
 
 class ReferencePathTracerArtifactCoordinator final
 {
 public:
-	explicit ReferencePathTracerArtifactCoordinator(EditorOperationRuntime& operations) noexcept;
+	ReferencePathTracerArtifactCoordinator(TaskExecutor& executor, TaskScope& scope) noexcept;
 
 	void Request(
 	    ReferencePathTracerArtifactKind kind,

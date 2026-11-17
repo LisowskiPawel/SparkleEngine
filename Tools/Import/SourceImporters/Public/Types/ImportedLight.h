@@ -8,7 +8,7 @@
 #include <limits>
 #include <string>
 
-enum class ImportedLightKind : std::uint32_t
+enum class ImportedLightKind : std::uint8_t
 {
 	Directional = 0,
 	Point = 1,

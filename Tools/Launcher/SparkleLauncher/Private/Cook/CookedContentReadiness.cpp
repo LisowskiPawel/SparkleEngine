@@ -1,6 +1,6 @@
 #include "Cook/CookedContentReadiness.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
-#include "Core/Public/Paths/FileSystemPaths.h"
 #include "ToolOutputPaths.h"
 
 #include <array>

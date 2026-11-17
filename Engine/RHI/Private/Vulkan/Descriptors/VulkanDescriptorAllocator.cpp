@@ -2,7 +2,7 @@
 
 #include "Vulkan/Descriptors/VulkanDescriptorAllocator.h"
 
-#include "Pipeline/RhiPipelineDesc.h"
+#include "Bindings/RenderBindingLayout.h"
 #include "Vulkan/Core/VulkanResult.h"
 #include "Vulkan/Descriptors/VulkanDescriptorHandles.h"
 #include "Vulkan/Device/VulkanRhi.h"
@@ -300,7 +300,7 @@ void VulkanDescriptorAllocator::WriteDescriptorTable(VkDescriptorSet descriptorS
 	}
 
 	const std::size_t availableDescriptorCount = table.Entries->size() - tableBinding.DescriptorIndex;
-	if (binding.DescriptorCount == 0 || availableDescriptorCount == 0 || (!binding.Bindless.bBindlessEligible && availableDescriptorCount < binding.DescriptorCount))
+	if (binding.DescriptorCount == 0 || availableDescriptorCount == 0)
 	{
 		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor table does not contain the binding's complete descriptor range.");
 	}

@@ -10,9 +10,10 @@
 #include "Core/Public/Files/FileSetPublication.h"
 #include "Core/Public/Formatting/HexFormat.h"
 #include "ToolConsole.h"
-#include "ToolWorkProgress.h"
+#include "ToolWorkProgressWriter.h"
 
 #include <iostream>
+#include <exception>
 
 int TextureCookRequestBatchProcessor::CookRequestFile(const std::filesystem::path& requestFilePath) const
 {
@@ -37,7 +38,6 @@ int TextureCookRequestBatchProcessor::CookRequestFile(const std::filesystem::pat
 	ToolWorkProgressWriter progress(std::cout);
 	progress.Report("Cooking textures", 0, totalWork);
 
-	std::vector<TextureCookBatchItemResult> results;
 	try
 	{
 		std::vector<std::filesystem::path> roots;
@@ -48,27 +48,28 @@ int TextureCookRequestBatchProcessor::CookRequestFile(const std::filesystem::pat
 		}
 		Files::FileSetPublisher publisher(roots);
 
-		results = TextureCookBatchExecutor::Execute(
+		TextureCookBatchExecutor executor(
 		    requests,
 		    textureCookMemoryBudget,
 		    [&progress, &requests, totalWork](std::size_t requestIndex, std::size_t completed)
 		    { progress.Report("Cooked texture", requests[requestIndex].sourcePath.filename().string(), completed, totalWork); });
+		const std::vector<TextureCookBatchItemResult>& results = executor.Execute();
 
 		if (ReportFailures(requests, results) != 0)
 		{
-			CleanupStagedOutputs(results);
 			return TextureCookerConstants::ExitCookFailed;
 		}
+
 		progress.Report("Publishing cooked textures", requests.size(), totalWork);
 
 		PublishGeneration(requests, results, publisher);
 	}
-	catch (const Diagnostics::Error& error)
+	catch (const std::exception& error)
 	{
-		CleanupStagedOutputs(results);
-		ToolConsole::Error("Failed to publish texture cook generation: " + std::string(error.what()));
+		ToolConsole::Error("Texture cook generation failed: " + std::string(error.what()));
 		return TextureCookerConstants::ExitCookFailed;
 	}
+
 	progress.Report("Cooked textures published", totalWork, totalWork);
 
 	ToolConsole::Message(std::cout, ToolConsoleSeverity::Info, "Cooked texture generation", {ToolConsole::Field("textures", std::to_string(requests.size()))});
@@ -113,16 +114,5 @@ void TextureCookRequestBatchProcessor::PublishGeneration(const std::vector<Textu
 	if (!publisher.Publish(publication, fileError))
 	{
 		throw Diagnostics::Error(fileError);
-	}
-}
-
-void TextureCookRequestBatchProcessor::CleanupStagedOutputs(const std::vector<TextureCookBatchItemResult>& results)
-{
-	for (const TextureCookBatchItemResult& result : results)
-	{
-		if (!result.StagedOutputPath.empty())
-		{
-			Files::CleanupTemporaryFile(result.StagedOutputPath);
-		}
 	}
 }

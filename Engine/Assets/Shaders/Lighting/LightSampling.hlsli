@@ -2,6 +2,7 @@
 #define SPARKLE_LIGHT_SAMPLING_HLSLI
 
 #include "/Engine/Common/Math.hlsli"
+#include "/Engine/Common/Color.hlsli"
 #include "/Engine/Common/Random.hlsli"
 
 namespace LightSampling
@@ -109,7 +110,7 @@ namespace LightSampling
 
 	float3 PhotometricRgbToRadiometric(float3 color, float quantity)
 	{
-		const float luminance = dot(color, float3(0.2126f, 0.7152f, 0.0722f));
+		const float luminance = CommonColor::LuminanceRec709(color);
 		return luminance > 0.0f ? quantity * color / (683.0f * luminance) : 0.0f.xxx;
 	}
 

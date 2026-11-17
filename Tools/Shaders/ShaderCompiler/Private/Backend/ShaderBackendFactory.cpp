@@ -1,46 +1,54 @@
 #include "PCH.h"
 
 #include "Backend/ShaderBackendFactory.h"
-
-#include "Backend/BuiltinBackends.h"
-
+#include "Backend/Dxc/DxcShaderBackend.h"
+#include "Backend/Slang/SlangShaderBackend.h"
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <algorithm>
 #include <array>
 #include <cctype>
 
-static constexpr std::string_view kAutoShaderBackendName = "auto";
+struct ShaderBackendEntry final
+{
+	std::string_view Name;
+	std::string_view SourceExtension;
+	ShaderBackendCapabilities Capabilities;
+	std::uint64_t (*QueryVersion)();
+	std::unique_ptr<IShaderBackend> (*Create)();
+};
 
-static constexpr std::array<ShaderBinaryFormatDescriptor, 2> kShaderBinaryFormats = {{
-    {.Name = "Dxil", .bIsAvailable = true},
-    {.Name = "SpirV", .bIsAvailable = true},
+template <typename TBackend> static std::unique_ptr<IShaderBackend> CreateBackend()
+{
+	return std::make_unique<TBackend>();
+}
+
+static const std::array<ShaderBackendEntry, 2> kShaderBackends = {{
+    {"dxc", ".hlsl", DxcShaderBackend::GetStaticCapabilities(), &DxcShaderBackend::QueryBackendVersion, &CreateBackend<DxcShaderBackend>},
+    {"slang", ".slang", SlangShaderBackend::GetStaticCapabilities(), &SlangShaderBackend::QueryBackendVersion, &CreateBackend<SlangShaderBackend>},
 }};
 
-static constexpr std::array<ShaderCodegenTargetDescriptor, 11> kShaderCodegenTargets = {{
-    {.Target = ShaderTarget::DxilSm60, .BinaryFormat = "Dxil", .bIsAvailable = true},
-    {.Target = ShaderTarget::DxilSm61, .BinaryFormat = "Dxil", .bIsAvailable = true},
-    {.Target = ShaderTarget::DxilSm62, .BinaryFormat = "Dxil", .bIsAvailable = true},
-    {.Target = ShaderTarget::DxilSm63, .BinaryFormat = "Dxil", .bIsAvailable = true},
-    {.Target = ShaderTarget::DxilSm64, .BinaryFormat = "Dxil", .bIsAvailable = true},
-    {.Target = ShaderTarget::DxilSm65, .BinaryFormat = "Dxil", .bIsAvailable = true},
-    {.Target = ShaderTarget::DxilSm66, .BinaryFormat = "Dxil", .bIsAvailable = true},
-    {.Target = ShaderTarget::DxilSm67, .BinaryFormat = "Dxil", .bIsAvailable = true},
-    {.Target = ShaderTarget::SpirV14, .BinaryFormat = "SpirV", .bIsAvailable = true},
-    {.Target = ShaderTarget::SpirV15, .BinaryFormat = "SpirV", .bIsAvailable = true},
-    {.Target = ShaderTarget::SpirV16, .BinaryFormat = "SpirV", .bIsAvailable = true},
-}};
+static constexpr std::array<std::string_view, 2> kShaderBinaryFormats = {"Dxil", "SpirV"};
+
+static constexpr std::array<ShaderTarget, 11> kShaderCodegenTargets = {
+    ShaderTarget::DxilSm60,
+    ShaderTarget::DxilSm61,
+    ShaderTarget::DxilSm62,
+    ShaderTarget::DxilSm63,
+    ShaderTarget::DxilSm64,
+    ShaderTarget::DxilSm65,
+    ShaderTarget::DxilSm66,
+    ShaderTarget::DxilSm67,
+    ShaderTarget::SpirV14,
+    ShaderTarget::SpirV15,
+    ShaderTarget::SpirV16,
+};
 
 static std::string NormalizeShaderBackendName(std::string_view name)
 {
 	std::string normalized(name);
-	std::transform(normalized.begin(), normalized.end(), normalized.begin(), [](unsigned char value) { return static_cast<char>(std::tolower(value)); });
+	std::ranges::transform(normalized, normalized.begin(), [](unsigned char value) { return static_cast<char>(std::tolower(value)); });
 	return normalized;
-}
-
-static bool HasSourceExtension(const ShaderBackendStaticDescriptor& descriptor, std::string_view extension) noexcept
-{
-	return std::find(descriptor.SourceExtensions.begin(), descriptor.SourceExtensions.end(), extension) != descriptor.SourceExtensions.end();
 }
 
 static std::string GetVirtualSourceExtension(std::string_view sourcePath)
@@ -51,99 +59,65 @@ static std::string GetVirtualSourceExtension(std::string_view sourcePath)
 	{
 		return {};
 	}
+
 	return NormalizeShaderBackendName(sourcePath.substr(period));
+}
+
+static const ShaderBackendEntry* FindShaderBackend(std::string_view name) noexcept
+{
+	const auto backend = std::ranges::find(kShaderBackends, name, &ShaderBackendEntry::Name);
+	return backend != kShaderBackends.end() ? &*backend : nullptr;
 }
 
 static std::string SelectAutomaticShaderBackendName(std::string_view sourcePath, ShaderTarget target)
 {
 	const std::string extension = GetVirtualSourceExtension(sourcePath);
-	const std::span<const ShaderBackendRegistration> registrations = GetBuiltinShaderBackendRegistrations();
-	for (const ShaderBackendRegistration& registration : registrations)
+	for (const ShaderBackendEntry& backend : kShaderBackends)
 	{
-		if (HasSourceExtension(registration.Descriptor, extension) && registration.Descriptor.Capabilities.SupportsTarget(target))
+		if (backend.SourceExtension == extension && backend.Capabilities.SupportsTarget(target))
 		{
-			return std::string(registration.Descriptor.Name);
+			return std::string(backend.Name);
 		}
 	}
 	return {};
 }
 
-static const ShaderBackendRegistration* FindShaderBackendRegistration(std::string_view name)
-{
-	const std::span<const ShaderBackendRegistration> registrations = GetBuiltinShaderBackendRegistrations();
-	const auto it = std::find_if(registrations.begin(), registrations.end(), [name](const ShaderBackendRegistration& registration) { return registration.Descriptor.Name == name; });
-	return it != registrations.end() ? &(*it) : nullptr;
-}
-
-static bool QueryBackendAvailability(const ShaderBackendStaticDescriptor& descriptor, std::string& outUnavailableReason)
-{
-	if (descriptor.QueryAvailability == nullptr)
-	{
-		outUnavailableReason.clear();
-		return true;
-	}
-	return descriptor.QueryAvailability(outUnavailableReason);
-}
-
 std::vector<ShaderBackendDescriptor> ListShaderBackends()
 {
 	std::vector<ShaderBackendDescriptor> descriptors;
-	const std::span<const ShaderBackendRegistration> registrations = GetBuiltinShaderBackendRegistrations();
-	descriptors.reserve(registrations.size());
-	for (const ShaderBackendRegistration& registration : registrations)
+	descriptors.reserve(kShaderBackends.size());
+	for (const ShaderBackendEntry& backend : kShaderBackends)
 	{
-		ShaderBackendDescriptor descriptor;
-		descriptor.Name = registration.Descriptor.Name;
-		descriptor.SourceExtensions = registration.Descriptor.SourceExtensions;
-		descriptor.CodegenTargets = registration.Descriptor.CodegenTargets;
-		descriptor.BinaryFormats = registration.Descriptor.BinaryFormats;
-		descriptor.Capabilities = registration.Descriptor.Capabilities;
-		descriptor.bIsAvailable = QueryBackendAvailability(registration.Descriptor, descriptor.UnavailableReason);
-		descriptor.Version = registration.Descriptor.QueryVersion != nullptr ? registration.Descriptor.QueryVersion() : 0;
-
-		descriptors.push_back(descriptor);
+		descriptors.push_back({.Name = backend.Name, .SourceExtension = backend.SourceExtension, .Capabilities = backend.Capabilities, .Version = backend.QueryVersion()});
 	}
-
 	return descriptors;
 }
 
-std::span<const ShaderBinaryFormatDescriptor> ListShaderBinaryFormats() noexcept
+std::span<const std::string_view> ListShaderBinaryFormats() noexcept
 {
 	return kShaderBinaryFormats;
 }
 
-std::span<const ShaderCodegenTargetDescriptor> ListShaderCodegenTargets() noexcept
+std::span<const ShaderTarget> ListShaderCodegenTargets() noexcept
 {
 	return kShaderCodegenTargets;
 }
 
 std::unique_ptr<IShaderBackend> CreateShaderBackend(std::string_view name)
 {
-	const ShaderBackendRegistration* registration = FindShaderBackendRegistration(NormalizeShaderBackendName(name));
-	if (registration == nullptr || registration->create == nullptr)
+	const ShaderBackendEntry* backend = FindShaderBackend(NormalizeShaderBackendName(name));
+	if (backend == nullptr)
 	{
 		throw Diagnostics::Error("Unknown shader backend '" + std::string(name) + "'.");
 	}
 
-	std::unique_ptr<IShaderBackend> backend = registration->create();
-	if (!backend)
-	{
-		throw Diagnostics::Error("Failed to construct shader backend '" + std::string(registration->Descriptor.Name) + "'.");
-	}
-
-	return backend;
+	return backend->Create();
 }
 
 std::string ResolveShaderBackendName(std::string_view sourcePath, ShaderTarget target, std::string_view requestedName)
 {
-	std::string normalizedRequestedName = NormalizeShaderBackendName(requestedName);
-	if (normalizedRequestedName.empty())
-	{
-		normalizedRequestedName = std::string(kAutoShaderBackendName);
-	}
-
-	std::string selectedName = normalizedRequestedName;
-	if (selectedName == kAutoShaderBackendName)
+	std::string selectedName = NormalizeShaderBackendName(requestedName);
+	if (selectedName.empty() || selectedName == "auto")
 	{
 		selectedName = SelectAutomaticShaderBackendName(sourcePath, target);
 		if (selectedName.empty())
@@ -152,27 +126,15 @@ std::string ResolveShaderBackendName(std::string_view sourcePath, ShaderTarget t
 		}
 	}
 
-	const ShaderBackendRegistration* registration = FindShaderBackendRegistration(selectedName);
-	if (registration == nullptr)
+	const ShaderBackendEntry* backend = FindShaderBackend(selectedName);
+	if (backend == nullptr)
 	{
 		throw Diagnostics::Error("Unknown shader backend '" + selectedName + "'.");
 	}
-
-	std::string unavailableReason;
-	if (!QueryBackendAvailability(registration->Descriptor, unavailableReason))
-	{
-		std::string diagnostic = "Shader backend '" + selectedName + "' is unavailable";
-		if (!unavailableReason.empty())
-		{
-			diagnostic += ": " + unavailableReason;
-		}
-		throw Diagnostics::Error(diagnostic);
-	}
-
-	if (!registration->Descriptor.Capabilities.SupportsTarget(target))
+	if (!backend->Capabilities.SupportsTarget(target))
 	{
 		throw Diagnostics::Error("Shader backend '" + selectedName + "' does not support target '" + GetShaderTargetName(target) + "'.");
 	}
 
-	return std::string(registration->Descriptor.Name);
+	return std::string(backend->Name);
 }

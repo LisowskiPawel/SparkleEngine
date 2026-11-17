@@ -4,7 +4,6 @@
 
 namespace MaterialTextures
 {
-	static const float ExplicitLod = 0.0f;
 	static const uint AddressRepeat = 0u;
 	static const uint AddressClampToEdge = 1u;
 	static const uint AddressMirroredRepeat = 2u;

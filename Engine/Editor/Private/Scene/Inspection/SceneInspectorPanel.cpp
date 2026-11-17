@@ -6,10 +6,8 @@
 #include "Scene/Inspection/SceneMaterialVariantInspector.h"
 #include "Scene/Inspection/SceneMeshInspector.h"
 #include "Scene/Inspection/SceneSkyInspector.h"
-#include "Scene/SceneObjectSelection.h"
+#include "Scene/EditorSceneSession.h"
 #include "Scene/SceneObjectPresentation.h"
-#include "Scene/Model/EditorSceneModel.h"
-#include "Scene/Transactions/EditorTransactionHistory.h"
 #include "Style/SparkleUiPalette.h"
 #include "Icons/EditorIcon.h"
 #include "Widgets/UiDetailsWidgets.h"
@@ -20,9 +18,8 @@
 
 #include <imgui.h>
 
-SceneInspectorPanel::SceneInspectorPanel(SceneObjectSelection& selection, EditorTransactionHistory& transactionHistory, float widthPixels) noexcept :
-    m_transactionHistory(&transactionHistory),
-    m_selection(&selection),
+SceneInspectorPanel::SceneInspectorPanel(EditorSceneSession& scene, float widthPixels) noexcept :
+    m_scene(scene),
     m_widthPixels(widthPixels)
 {
 }
@@ -60,29 +57,32 @@ void SceneInspectorPanel::SetTopInset(float topInsetPixels) noexcept
 
 void SceneInspectorPanel::BuildSelectionInspector() noexcept
 {
-	SceneObjectPresentation::DrawSelectionHeader(m_model.get(), m_selection);
+	const EditorSceneModel& model = *m_scene.GetModel();
+	const SceneObjectSelection& selection = m_scene.GetSelection();
+	EditorTransactionHistory& history = m_scene.GetHistory();
+	SceneObjectPresentation::DrawSelectionHeader(model, selection);
 	BuildDetailsToolbar();
-	switch (m_selection->type)
+	switch (selection.type)
 	{
 		case SceneObjectType::Camera:
-			if (const WorldCameraReadData* camera = m_model->FindCamera(m_selection->entity))
+			if (const WorldCameraReadData* camera = model.FindCamera(selection.entity))
 			{
-				SceneCameraInspector::Build(*camera, *m_transactionHistory, m_model->GetWorldGeneration(), m_filterText);
+				SceneCameraInspector::Build(*camera, history, model.GetWorldGeneration(), m_filterText);
 			}
 			break;
 		case SceneObjectType::Light:
-			if (const WorldLightReadData* light = m_model->FindLight(m_selection->entity))
+			if (const WorldLightReadData* light = model.FindLight(selection.entity))
 			{
-				SceneLightInspector::Build(light->Description, light->Entity, *m_transactionHistory, m_model->GetWorldGeneration(), m_filterText);
+				SceneLightInspector::Build(light->Description, light->Entity, history, model.GetWorldGeneration(), m_filterText);
 			}
 			break;
 		case SceneObjectType::Sky:
-			SceneSkyInspector::Build(m_model->GetSkyEnvironment(), *m_transactionHistory, m_model->GetWorldGeneration(), m_filterText);
+			SceneSkyInspector::Build(model.GetSkyEnvironment(), history, model.GetWorldGeneration(), m_filterText);
 			break;
 		case SceneObjectType::Mesh:
-			if (const WorldMeshReadData* mesh = m_model->FindMesh(m_selection->entity))
+			if (const WorldMeshReadData* mesh = model.FindMesh(selection.entity))
 			{
-				SceneMeshInspector::Build(*mesh, *m_transactionHistory, m_model->GetWorldGeneration(), m_filterText);
+				SceneMeshInspector::Build(*mesh, history, model.GetWorldGeneration(), m_filterText);
 			}
 			break;
 		case SceneObjectType::None:
@@ -94,7 +94,8 @@ void SceneInspectorPanel::BuildSelectionInspector() noexcept
 
 void SceneInspectorPanel::BuildEditStatus() noexcept
 {
-	const std::optional<WorldEditResult>& result = m_transactionHistory->GetLastResult();
+	EditorTransactionHistory& history = m_scene.GetHistory();
+	const std::optional<WorldEditResult>& result = history.GetLastResult();
 	if (!result || result->IsAccepted())
 	{
 		return;
@@ -103,7 +104,7 @@ void SceneInspectorPanel::BuildEditStatus() noexcept
 	ImGui::TextWrapped("Edit not applied: %s", result->Message.c_str());
 	if (ImGui::SmallButton("Dismiss edit failure"))
 	{
-		m_transactionHistory->DismissLastResult();
+		history.DismissLastResult();
 	}
 	ImGui::Separator();
 }
@@ -140,10 +141,11 @@ void SceneInspectorPanel::BuildInspectorTabs() noexcept
 			ImGui::EndTabItem();
 		}
 
-		if (!m_model->GetMaterialVariants().Names.empty() && ImGui::BeginTabItem("Variants"))
+		const EditorSceneModel& model = *m_scene.GetModel();
+		if (!model.GetMaterialVariants().Names.empty() && ImGui::BeginTabItem("Variants"))
 		{
 			ImGui::Spacing();
-			SceneMaterialVariantInspector::Build(m_model->GetMaterialVariants(), *m_transactionHistory, m_model->GetWorldGeneration());
+			SceneMaterialVariantInspector::Build(model.GetMaterialVariants(), m_scene.GetHistory(), model.GetWorldGeneration());
 			ImGui::EndTabItem();
 		}
 
@@ -155,7 +157,7 @@ void SceneInspectorPanel::BuildUI(bool bDisableInteraction)
 {
 	BeginWindow();
 
-	if (!m_model || !m_transactionHistory || m_selection == nullptr)
+	if (m_scene.GetModel() == nullptr)
 	{
 		ImGui::TextDisabled("Scene inspector unavailable");
 		ImGui::End();

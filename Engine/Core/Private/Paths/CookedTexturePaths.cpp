@@ -1,6 +1,5 @@
 #include "PCH.h"
-
-#include "Core/Public/Paths/FileSystemPaths.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "Core/Public/Paths/PathUtils.h"
 #include "Core/Public/Strings/StringUtils.h"

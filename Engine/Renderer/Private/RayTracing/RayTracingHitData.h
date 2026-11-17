@@ -5,43 +5,15 @@
 #include <DirectXMath.h>
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <type_traits>
 
 namespace RayTracingHitData
 {
-	inline constexpr std::uint32_t AbiVersion = 5u;
-
-	inline constexpr std::uint32_t InstanceFlag_Valid = 1u << 0u;
-	inline constexpr std::uint32_t InstanceFlag_Opaque = 1u << 1u;
-	inline constexpr std::uint32_t InstanceFlag_TwoSided = 1u << 2u;
-	inline constexpr std::uint32_t InstanceFlag_StaticMesh = 1u << 3u;
-
-	inline constexpr std::uint32_t GeometryFlag_StaticMesh = 1u << 0u;
-	inline constexpr std::uint32_t GeometryFlag_SkinnedMesh = 1u << 1u;
-	inline constexpr std::uint32_t GeometryFlag_AlphaTested = 1u << 2u;
-	inline constexpr std::uint32_t GeometryFlag_AlphaBlended = 1u << 3u;
-	inline constexpr std::uint32_t GeometryFlag_TexturedMaterial = 1u << 4u;
-	inline constexpr std::uint32_t GeometryFlag_DoubleSided = 1u << 5u;
-
-	inline constexpr std::uint32_t Reason_None = 0u;
-	inline constexpr std::uint32_t Reason_NoHit = 1u;
-	inline constexpr std::uint32_t Reason_HitDataUnavailable = 2u;
-	inline constexpr std::uint32_t Reason_InstanceOutOfRange = 3u;
-	inline constexpr std::uint32_t Reason_InvalidInstance = 4u;
-	inline constexpr std::uint32_t Reason_InvalidMaterial = 5u;
-	inline constexpr std::uint32_t Reason_MissingMeshHitData = 8u;
-	inline constexpr std::uint32_t Reason_InvalidPrimitive = 9u;
-	inline constexpr std::uint32_t Reason_InvalidVertexIndex = 10u;
-	inline constexpr std::uint32_t Reason_OneSidedBackface = 11u;
-	inline constexpr std::uint32_t Reason_AlphaRejected = 13u;
-
-	inline constexpr std::uint32_t MaterialFlag_DoubleSided = 1u << 0u;
-	inline constexpr std::uint32_t MaterialFlag_Opaque = 1u << 1u;
-	inline constexpr std::uint32_t MaterialFlag_AlphaTested = 1u << 2u;
-	inline constexpr std::uint32_t MaterialFlag_AlphaBlended = 1u << 3u;
-	inline constexpr std::uint32_t MaterialFlag_Textured = 1u << 4u;
-	inline constexpr std::uint32_t MaterialFlag_Emissive = 1u << 5u;
+	inline constexpr std::uint32_t InstanceFlagValid = 1u << 0u;
+	inline constexpr std::uint32_t InstanceFlagTwoSided = 1u << 2u;
+	inline constexpr std::uint32_t MaterialFlagEmissive = 1u << 5u;
 }
 
 struct RayTracingHitVertex
@@ -61,21 +33,21 @@ struct RayTracingHitInstance
 {
 	std::uint32_t FirstVertex = 0u;
 	std::uint32_t FirstIndex = 0u;
-	std::uint32_t VertexCount = 0u;
 	std::uint32_t IndexCount = 0u;
 	std::uint32_t MaterialSlot = 0u;
 	std::uint32_t Flags = 0u;
-	std::uint32_t GeometryFlags = 0u;
-	std::uint32_t RejectionReason = RayTracingHitData::Reason_InvalidInstance;
-	std::uint32_t AlphaMode = 0u;
-	std::uint32_t MaterialTextureFlags = 0u;
-	std::uint32_t AbiVersion = RayTracingHitData::AbiVersion;
 	std::uint32_t MorphTargetDeltaOffset = 0u;
 };
 
 static_assert(std::is_standard_layout_v<RayTracingHitInstance>, "RayTracingHitInstance must be standard-layout");
 static_assert(std::is_trivially_copyable_v<RayTracingHitInstance>, "RayTracingHitInstance must be trivially copyable");
-static_assert(sizeof(RayTracingHitInstance) == 48, "RayTracingHitInstance must match the shader layout");
+static_assert(sizeof(RayTracingHitInstance) == 24, "RayTracingHitInstance must match the shader layout");
+static_assert(offsetof(RayTracingHitInstance, FirstVertex) == 0);
+static_assert(offsetof(RayTracingHitInstance, FirstIndex) == 4);
+static_assert(offsetof(RayTracingHitInstance, IndexCount) == 8);
+static_assert(offsetof(RayTracingHitInstance, MaterialSlot) == 12);
+static_assert(offsetof(RayTracingHitInstance, Flags) == 16);
+static_assert(offsetof(RayTracingHitInstance, MorphTargetDeltaOffset) == 20);
 
 struct RayTracingHitMaterial
 {

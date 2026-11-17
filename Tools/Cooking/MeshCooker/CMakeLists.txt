@@ -34,10 +34,10 @@ sparkle_target_precompile_headers(MeshCooker
 
 target_link_libraries(MeshCooker
     PUBLIC
-        SourceImporters
         SparkleCore
         SparkleGameFramework
     PRIVATE
+        SourceImporters
         ToolSupport
 )
 

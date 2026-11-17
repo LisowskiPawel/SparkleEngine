@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Gltf/Geometry/GltfTangentFrameSetGenerator.h"
+#include "Gltf/Geometry/GltfMeshTangentGenerator.h"
 
 #include <cstddef>
 #include <cstdint>

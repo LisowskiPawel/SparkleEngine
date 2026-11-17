@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Editor/Capture/ViewportCaptureSlot.h"
-#include "EditorOperations/EditorOperationSlot.h"
+#include "Editor/Operations/EditorOperationSlot.h"
 #include "Core/Public/Console/ConsoleOutput.h"
 
 #include <cstdint>
@@ -9,13 +9,14 @@
 #include <optional>
 #include <string>
 
-class EditorOperationRuntime;
+class TaskExecutor;
+class TaskScope;
 class Renderer;
 
 class EditorViewportCaptureCoordinator final
 {
 public:
-	explicit EditorViewportCaptureCoordinator(EditorOperationRuntime& operations) noexcept;
+	EditorViewportCaptureCoordinator(TaskExecutor& executor, TaskScope& scope) noexcept;
 
 	std::optional<ConsoleOutputRecord> Request(Renderer& renderer, std::uint64_t frameId);
 	std::optional<ConsoleOutputRecord> Update(Renderer& renderer);

@@ -1,7 +1,8 @@
-"""Own OBJ index resolution and the shared unnormalized polygon-normal algorithm."""
+"""Own OBJ index resolution and polygon-normal mathematics."""
 
 from __future__ import annotations
 
+import math
 from collections.abc import Iterable
 from itertools import chain
 
@@ -12,6 +13,14 @@ def resolve_obj_index(value: str, count: int, line_number: int) -> int:
     if resolved < 0 or resolved >= count:
         raise ValueError(f"OBJ index {index} is out of range at line {line_number}.")
     return resolved
+
+
+def normalized(value: Iterable[float], context: str) -> tuple[float, float, float]:
+    components = tuple(value)
+    length = math.sqrt(sum(component * component for component in components))
+    if not math.isfinite(length) or length <= 1.0e-8:
+        raise ValueError(f"Normal has no usable direction for {context}.")
+    return tuple(component / length for component in components)
 
 
 def polygon_normal(vertices: Iterable[tuple[float, float, float]]) -> list[float]:

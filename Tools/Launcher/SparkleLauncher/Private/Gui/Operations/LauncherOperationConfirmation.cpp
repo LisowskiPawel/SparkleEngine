@@ -1,8 +1,6 @@
 #include "Gui/Operations/LauncherOperationConfirmation.h"
 #include "Gui/Operations/LauncherOperationRequest.h"
 #include "Gui/Models/LauncherCleanUiModel.h"
-#include "Gui/Operations/LauncherOperationRequestMapping.h"
-#include <QtCore/QRegularExpression>
 #include <QtCore/QStringList>
 #include <QtWidgets/QMessageBox>
 
@@ -10,16 +8,17 @@ namespace SparkleLauncher
 {
 	bool ConfirmLauncherRunRequest(QWidget& parent, LauncherOperationRequest& request)
 	{
-		if (request.OperationId != "workspace.clean" || request.bConfirmClean)
+		auto* clean = std::get_if<MaintenanceOperationRequest>(&request.Inputs);
+		if (clean == nullptr || clean->bDestructiveActionConfirmed)
 		{
 			return true;
 		}
 
-		const bool bCustomCleanRequested = request.bCleanLevelContent || !request.CleanTargets.isEmpty();
+		const bool bCustomCleanRequested = clean->bCleanLevelContent || !clean->RequestedCleanTargets.empty();
 		QStringList scopeNames;
-		if (request.bCleanLevelContent)
+		if (clean->bCleanLevelContent)
 		{
-			const auto plan = PlanMaintenanceOperation("workspace.clean", LauncherOperationRequestMapping::Maintenance(request));
+			const auto plan = PlanMaintenanceOperation("workspace.clean", *clean);
 			if (plan.Operation.Failure.has_value())
 			{
 				QMessageBox::warning(&parent, "Level content could not be resolved", QString::fromStdString(plan.Operation.Failure->Summary));
@@ -32,16 +31,16 @@ namespace SparkleLauncher
 		}
 		else if (bCustomCleanRequested)
 		{
-			for (const LauncherCleanTarget& target : request.CleanTargets)
+			for (const MaintenanceCleanPathSpec& target : clean->RequestedCleanTargets)
 			{
-				scopeNames.push_back(target.DisplayName + "\n" + target.Path);
+				scopeNames.push_back(QString::fromStdString(target.DisplayName) + "\n" + QString::fromStdWString(target.Path.wstring()));
 			}
 		}
 		else
 		{
-			for (const QString& scopeValue : request.CleanScope.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts))
+			for (const CleanScope scope : clean->RequestedCleanScopes)
 			{
-				scopeNames.push_back(CleanScopeDisplayName(scopeValue));
+				scopeNames.push_back(CleanScopeDisplayName(QString::fromUtf8(CleanScopeId(scope))));
 			}
 		}
 
@@ -50,7 +49,7 @@ namespace SparkleLauncher
 		message += bCustomCleanRequested ? "\n\nThis removes only the generated outputs mapped to the selected action. Continue?"
 		                                 : "\n\nThis removes generated files for the selected scope. Continue?";
 
-		if (request.bCleanLevelContent)
+		if (clean->bCleanLevelContent)
 		{
 			message += "\n\nThis also disables catalog selection for all levels except Empty.";
 		}
@@ -67,7 +66,7 @@ namespace SparkleLauncher
 			return false;
 		}
 
-		request.bConfirmClean = true;
+		clean->bDestructiveActionConfirmed = true;
 		return true;
 	}
 }

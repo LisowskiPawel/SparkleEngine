@@ -12,7 +12,7 @@ namespace SparkleLauncher
 		bool bSupported = false;
 		std::string Detail;
 
-		bool Available() const noexcept { return bInstalled && bSupported; }
+		bool Available() const noexcept;
 	};
 
 	ExternalCaptureAvailability InspectExternalCaptureProvider(ExternalCaptureProvider provider, std::string_view graphicsApi, std::string_view productProfile);

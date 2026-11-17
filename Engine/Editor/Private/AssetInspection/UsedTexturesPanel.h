@@ -11,7 +11,7 @@ class UsedTexturesPanel final
 public:
 	using DiagnosticsProvider = std::function<TextureDiagnosticsSnapshot()>;
 
-	void SetOpen(bool bOpen) noexcept { m_bIsOpen = bOpen; }
+	void SetOpen(bool bOpen) noexcept;
 
 	void SetDiagnosticsProvider(DiagnosticsProvider provider);
 	void BuildUI(bool bDisableInteraction);

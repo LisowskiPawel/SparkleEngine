@@ -1,11 +1,11 @@
 #include "PCH.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "Level/Loading/SceneLoadExecutor.h"
 
 #include "Assets/SceneAssetCatalog.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Diagnostics/Verify.h"
-#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Level/Loading/SceneLoadWorkState.h"
 #include "Level/Loading/SceneLoadTaskGraph.h"
 #include "Tasks/Public/TaskExecutor.h"

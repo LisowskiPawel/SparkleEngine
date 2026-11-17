@@ -6,14 +6,13 @@ set(TOOL_SUPPORT_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/ToolOutputPaths.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/ToolWorkProgress.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/ToolWorkProgressEvent.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Public/ToolWorkProgressWriter.h
 )
 
 set(TOOL_SUPPORT_PRIVATE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceAssetPaths.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/ToolConsole.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Projects/ProjectLevelCatalog.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Projects/ProjectLevelSelectionWriter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Projects/ProjectLevelSelectionWriter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Projects/ProjectLevelCatalogReader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Projects/ProjectLevelCatalogReader.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Projects/ProjectLevelCatalogValidator.cpp
@@ -21,6 +20,7 @@ set(TOOL_SUPPORT_PRIVATE_SOURCES
 
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/ToolOutputPaths.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/ToolWorkProgress.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/ToolWorkProgressWriter.cpp
 )
 
 add_library(ToolSupport STATIC

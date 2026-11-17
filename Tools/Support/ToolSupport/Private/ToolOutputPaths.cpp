@@ -47,17 +47,6 @@ namespace SparkleTools
 		    .SymbolsRoot = artifactRoot / "symbols"};
 	}
 
-	ToolTargetOutputPaths ToolOutputPaths::RuntimeSupportTargetOutputs(std::string_view targetName, std::string_view profileName) const
-	{
-		const std::string target(targetName);
-		const std::string profile(profileName);
-
-		return ToolTargetOutputPaths{
-		    .BinaryDirectory = ProductRoot / "Engine" / "Binaries" / target / profile,
-		    .LibraryDirectory = ProductRoot / "libraries" / "runtime-support" / target / profile,
-		    .SymbolDirectory = SymbolsRoot / "runtime-support" / target / profile};
-	}
-
 	ToolTargetOutputPaths ToolOutputPaths::LauncherTargetOutputs(std::string_view profileName) const
 	{
 		const std::string profile(profileName);

@@ -1,6 +1,9 @@
 #include "PCH.h"
 #include "Input/Routing/InputFocusRouter.h"
-#include "Input/InputBackendResult.h"
+
+InputFocusRouter::InputFocusRouter() noexcept = default;
+
+InputFocusRouter::~InputFocusRouter() = default;
 
 void InputFocusRouter::BeginFrame(bool bInteractionDisabled, bool bTextInputActive)
 {
@@ -29,41 +32,56 @@ void InputFocusRouter::RegisterTargetRegion(float left, float top, float right, 
 	}
 }
 
-InputLayer InputFocusRouter::ResolveTargetLayer(const InputBackendResult& result) const noexcept
+InputLayer InputFocusRouter::ResolveTargetLayer(const KeyboardEvent&) const noexcept
+{
+	if (m_bInteractionDisabled)
+	{
+		return InputLayer::UI;
+	}
+	if (m_bTextInputActive && m_activeTargetLayer != InputLayer::Gameplay)
+	{
+		return InputLayer::UI;
+	}
+
+	return m_activeTargetLayer;
+}
+
+InputLayer InputFocusRouter::ResolveTargetLayer(const MouseButtonEvent& event) const noexcept
+{
+	if (!m_bHasRoutingFrame)
+	{
+		return m_activeTargetLayer;
+	}
+	if (m_bInteractionDisabled)
+	{
+		return InputLayer::UI;
+	}
+
+	return event.bPressed ? ResolvePointTarget(event.Position) : m_activeTargetLayer;
+}
+
+InputLayer InputFocusRouter::ResolveTargetLayer(const MouseMoveEvent& event) const noexcept
+{
+	if (!m_bHasRoutingFrame)
+	{
+		return m_activeTargetLayer;
+	}
+	if (m_bInteractionDisabled || m_activeTargetLayer != InputLayer::Gameplay)
+	{
+		return InputLayer::UI;
+	}
+
+	return ResolvePointTarget(event.Position);
+}
+
+InputLayer InputFocusRouter::ResolveTargetLayer(const MouseWheelEvent& event) const noexcept
 {
 	if (!m_bHasRoutingFrame)
 	{
 		return m_activeTargetLayer;
 	}
 
-	if (m_bInteractionDisabled)
-	{
-		return InputLayer::UI;
-	}
-
-	switch (result.Type)
-	{
-		case InputEventType::MouseButton:
-			if (result.MouseButton.bPressed)
-			{
-				return ResolvePointTarget(result.MouseButton.Position);
-			}
-			break;
-		case InputEventType::MouseMove:
-			return ResolveMouseMoveTarget(result.MouseMove.Position);
-		case InputEventType::MouseWheel:
-			return ResolvePointTarget(result.MouseWheel.Position);
-		case InputEventType::Keyboard:
-			if (m_bTextInputActive && m_activeTargetLayer != InputLayer::Gameplay)
-			{
-				return InputLayer::UI;
-			}
-			return GetActiveTargetLayer();
-		default:
-			break;
-	}
-
-	return GetActiveTargetLayer();
+	return m_bInteractionDisabled ? InputLayer::UI : ResolvePointTarget(event.Position);
 }
 
 InputLayer InputFocusRouter::GetActiveTargetLayer() const noexcept
@@ -110,14 +128,4 @@ InputLayer InputFocusRouter::ResolvePointTarget(MousePosition position) const no
 	}
 
 	return InputLayer::UI;
-}
-
-InputLayer InputFocusRouter::ResolveMouseMoveTarget(MousePosition position) const noexcept
-{
-	if (m_activeTargetLayer != InputLayer::Gameplay)
-	{
-		return InputLayer::UI;
-	}
-
-	return ResolvePointTarget(position) == InputLayer::Gameplay ? InputLayer::Gameplay : InputLayer::UI;
 }

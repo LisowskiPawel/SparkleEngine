@@ -1,6 +1,9 @@
 #include "PCH.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "TextureCookRequestBuilder.h"
+#include "MaterialCooker.h"
+#include "SourceImportOutput.h"
 
 #include "SourceAssetPaths.h"
 #include "Core/Public/Diagnostics/Error.h"
@@ -9,46 +12,33 @@
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Paths/PathUtils.h"
 
-#include <optional>
 #include <string>
+#include <string_view>
 
-static std::string BuildTextureSourceKeyForRoot(std::string_view rootName, const TextureCookRequest& request, const std::filesystem::path& relativePath);
-static std::optional<std::filesystem::path> BuildTextureOutputPathForRoot(
-    const std::filesystem::path& sourceTexturePath,
-    const std::filesystem::path& sourceRoot,
-    std::string_view cookedDirectory,
-    std::string_view variantSuffix);
-static TextureColorSpace ResolveColorSpace(TextureGroup textureGroup) noexcept;
-static TextureMipPolicy ResolveMipPolicy(const std::filesystem::path& sourceTexturePath, TextureGroup textureGroup) noexcept;
-static TextureMipFilter ResolveMipFilter(TextureGroup textureGroup) noexcept;
-static TextureColorProcessingPolicy ResolveColorProcessingPolicy(TextureGroup textureGroup) noexcept;
-static TextureDimension ResolveTextureDimension(TextureGroup textureGroup) noexcept;
-static std::filesystem::path NormalizeSourceTexturePath(const std::filesystem::path& sourceTexturePath);
-static std::string BuildTextureSourceKey(const TextureCookRequest& request);
-static std::filesystem::path BuildTextureOutputPath(const TextureCookRequest& request);
-static std::string BuildTextureVariantSuffix(const TextureCookRequest& request);
-
-static std::string BuildTextureSourceKeyForRoot(std::string_view rootName, const TextureCookRequest& request, const std::filesystem::path& relativePath)
+struct TextureSourceLocation final
 {
-	return std::string(rootName) + ":" + GetTextureColorSpaceName(request.policy.colorSpace) + ":" + GetTextureMipPolicyName(request.policy.mipPolicy) + ":"
+	std::string_view rootName;
+	std::string_view cookedDirectory;
+	std::filesystem::path relativePath;
+};
+
+static TextureColorSpace ResolveColorSpace(TextureGroup textureGroup) noexcept;
+static TextureMipPolicy ResolveMipPolicy(const std::filesystem::path& sourceTexturePath);
+static TextureMipFilter ResolveMipFilter(TextureGroup textureGroup) noexcept;
+static std::filesystem::path NormalizeSourceTexturePath(const std::filesystem::path& sourceTexturePath);
+static TextureSourceLocation ResolveSourceLocation(const std::filesystem::path& sourcePath);
+
+static std::string BuildTextureSourceKey(const TextureCookRequest& request, const TextureSourceLocation& location)
+{
+	return std::string(location.rootName) + ":" + GetTextureColorSpaceName(request.policy.colorSpace) + ":" + GetTextureMipPolicyName(request.policy.mipPolicy) + ":"
 	    + GetTextureMipFilterName(request.policy.mipFilter) + ":" + GetTextureColorProcessingPolicyName(request.policy.colorProcessingPolicy) + ":" + GetTextureGroupName(request.policy.textureGroup)
-	    + ":" + GetTextureDimensionName(request.policy.dimension) + ":" + GetTextureChannelMaskName(request.policy.channelMask) + ":" + relativePath.generic_string();
+	    + ":" + GetTextureDimensionName(request.policy.dimension) + ":" + GetTextureChannelMaskName(request.policy.channelMask) + ":" + location.relativePath.generic_string();
 }
 
-static std::optional<std::filesystem::path> BuildTextureOutputPathForRoot(
-    const std::filesystem::path& sourceTexturePath,
-    const std::filesystem::path& sourceRoot,
-    std::string_view cookedDirectory,
-    std::string_view variantSuffix)
+static std::filesystem::path BuildTextureOutputPath(const TextureCookRequest& request, const TextureSourceLocation& location)
 {
-	const auto relativePath = Paths::TryMakeRelativeUnderRoot(sourceTexturePath, sourceRoot);
-	if (!relativePath)
-	{
-		return std::nullopt;
-	}
-
-	std::filesystem::path cookedRelativePath = std::filesystem::path(cookedDirectory) / *relativePath;
-	cookedRelativePath.replace_extension(std::string(variantSuffix) + ".stex");
+	std::filesystem::path cookedRelativePath = std::filesystem::path(location.cookedDirectory) / location.relativePath;
+	cookedRelativePath.replace_extension("." + Formatting::FormatHexUInt64(request.assetId) + ".stex");
 	return Filesystem::GetCookedTextureRootPath() / cookedRelativePath;
 }
 
@@ -57,15 +47,33 @@ TextureCookRequest BuildTextureCookRequest(const std::filesystem::path& sourceTe
 	TextureCookRequest request;
 	request.sourcePath = NormalizeSourceTexturePath(sourceTexturePath);
 	request.policy.colorSpace = ResolveColorSpace(textureGroup);
-	request.policy.mipPolicy = ResolveMipPolicy(request.sourcePath, textureGroup);
+	request.policy.mipPolicy = ResolveMipPolicy(request.sourcePath);
 	request.policy.mipFilter = ResolveMipFilter(textureGroup);
-	request.policy.colorProcessingPolicy = ResolveColorProcessingPolicy(textureGroup);
+	request.policy.colorProcessingPolicy = request.IsSrgb() ? TextureColorProcessingPolicy::SrgbLinearize : TextureColorProcessingPolicy::Linear;
 	request.policy.textureGroup = textureGroup;
-	request.policy.dimension = ResolveTextureDimension(textureGroup);
 	request.policy.channelMask = channelMask;
-	request.assetId = Hash::Fnv1a64(BuildTextureSourceKey(request));
-	request.outputPath = BuildTextureOutputPath(request);
+	const TextureSourceLocation location = ResolveSourceLocation(request.sourcePath);
+	const std::string sourceKey = BuildTextureSourceKey(request, location);
+	request.assetId = Hash::Fnv1a64(sourceKey);
+	request.outputPath = BuildTextureOutputPath(request, location);
 	return request;
+}
+
+void MaterialCooker::AppendTextureCookRequests(const SourceImportOutput& importOutput, TextureCookRequestSet& requests)
+{
+	for (const ImportedMaterial& material : importOutput.scene.materials)
+	{
+		for (const ImportedTextureSource& textureSource : material.textureSources)
+		{
+			if (textureSource.sourcePath.empty())
+			{
+				continue;
+			}
+
+			const TextureCookRequest request = BuildTextureCookRequest(textureSource.sourcePath, textureSource.textureGroup, textureSource.channelMask);
+			requests.Add(request);
+		}
+	}
 }
 
 static TextureColorSpace ResolveColorSpace(TextureGroup textureGroup) noexcept
@@ -89,9 +97,8 @@ static TextureColorSpace ResolveColorSpace(TextureGroup textureGroup) noexcept
 	}
 }
 
-static TextureMipPolicy ResolveMipPolicy(const std::filesystem::path& sourceTexturePath, TextureGroup textureGroup) noexcept
+static TextureMipPolicy ResolveMipPolicy(const std::filesystem::path& sourceTexturePath)
 {
-	(void) textureGroup;
 	if (Paths::GetLowercaseExtension(sourceTexturePath) == L".dds")
 	{
 		return TextureMipPolicy::PreserveExisting;
@@ -122,88 +129,40 @@ static TextureMipFilter ResolveMipFilter(TextureGroup textureGroup) noexcept
 	}
 }
 
-static TextureColorProcessingPolicy ResolveColorProcessingPolicy(TextureGroup textureGroup) noexcept
-{
-	return ResolveColorSpace(textureGroup) == TextureColorSpace::Srgb ? TextureColorProcessingPolicy::SrgbLinearize : TextureColorProcessingPolicy::Linear;
-}
-
-static TextureDimension ResolveTextureDimension(TextureGroup textureGroup) noexcept
-{
-	(void) textureGroup;
-	return TextureDimension::Texture2D;
-}
-
 static std::filesystem::path NormalizeSourceTexturePath(const std::filesystem::path& sourceTexturePath)
 {
-	{
-		const auto resolvedPath = SparkleTools::ResolveSourceAssetPath(sourceTexturePath, SparkleTools::SourceAssetType::Texture);
+	const auto resolvedPath = SparkleTools::ResolveSourceAssetPath(sourceTexturePath, SparkleTools::SourceAssetType::Texture);
 
-		if (resolvedPath)
-		{
-			return *resolvedPath;
-		}
+	if (resolvedPath)
+	{
+		return *resolvedPath;
 	}
 
 	throw Diagnostics::Error("Unable to resolve source texture path '" + sourceTexturePath.string() + "'.");
 }
 
-static std::string BuildTextureSourceKey(const TextureCookRequest& request)
+static TextureSourceLocation ResolveSourceLocation(const std::filesystem::path& sourcePath)
 {
 	const std::filesystem::path& projectRoot = Filesystem::GetProjectPath();
-	if (const auto relativePath = Paths::TryMakeRelativeUnderRoot(request.sourcePath, projectRoot))
+	if (const auto relativePath = Paths::TryMakeRelativeUnderRoot(sourcePath, projectRoot))
 	{
-		return BuildTextureSourceKeyForRoot("project", request, *relativePath);
+		return {"project", "Project", *relativePath};
 	}
 
 	const std::filesystem::path& engineRoot = Filesystem::GetEnginePath();
-	if (const auto relativePath = Paths::TryMakeRelativeUnderRoot(request.sourcePath, engineRoot))
+	if (const auto relativePath = Paths::TryMakeRelativeUnderRoot(sourcePath, engineRoot))
 	{
-		return BuildTextureSourceKeyForRoot("engine", request, *relativePath);
+		return {"engine", "Engine", *relativePath};
 	}
 
 	const std::filesystem::path importedTextureRoot = SparkleTools::ImportedTextureCacheRoot();
-	if (const auto relativePath = Paths::TryMakeRelativeUnderRoot(request.sourcePath, importedTextureRoot))
+	if (const auto relativePath = Paths::TryMakeRelativeUnderRoot(sourcePath, importedTextureRoot))
 	{
-		return BuildTextureSourceKeyForRoot("imported", request, *relativePath);
+		return {"imported", "Imported", *relativePath};
 	}
 
 	throw Diagnostics::Error(
 	    "Source texture path must be under the project, engine, or imported-texture cache root "
-	    "to derive a stable cooked texture id: '"
-	    + request.sourcePath.string() + "'.");
-}
-
-static std::filesystem::path BuildTextureOutputPath(const TextureCookRequest& request)
-{
-	const std::string variantSuffix = BuildTextureVariantSuffix(request);
-	const std::filesystem::path& projectRoot = Filesystem::GetProjectPath();
-	if (const auto outputPath = BuildTextureOutputPathForRoot(request.sourcePath, projectRoot, "Project", variantSuffix))
-	{
-		return *outputPath;
-	}
-
-	const std::filesystem::path& engineRoot = Filesystem::GetEnginePath();
-	if (const auto outputPath = BuildTextureOutputPathForRoot(request.sourcePath, engineRoot, "Engine", variantSuffix))
-	{
-		return *outputPath;
-	}
-
-	{
-		const auto outputPath = BuildTextureOutputPathForRoot(request.sourcePath, SparkleTools::ImportedTextureCacheRoot(), "Imported", variantSuffix);
-
-		if (outputPath)
-		{
-			return *outputPath;
-		}
-	}
-
-	throw Diagnostics::Error(
-	    "Source texture path must be under the project, engine, or imported-texture cache root "
-	    "to derive a cooked texture output path: '"
-	    + request.sourcePath.string() + "'.");
-}
-
-static std::string BuildTextureVariantSuffix(const TextureCookRequest& request)
-{
-	return "." + Formatting::FormatHexUInt64(request.assetId);
+	    "to derive its cooked texture identity and output path: '"
+	    + sourcePath.string() + "'.");
 }

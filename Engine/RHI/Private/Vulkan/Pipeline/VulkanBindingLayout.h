@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Device/RenderHardwareInterface.h"
+#include "Bindings/RenderBindingLayout.h"
 #include "Vulkan/VulkanIncludes.h"
 
 #include <memory>

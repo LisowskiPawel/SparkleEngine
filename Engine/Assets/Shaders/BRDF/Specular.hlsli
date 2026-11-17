@@ -41,12 +41,6 @@ namespace BRDF
 			return float2(-1.04f, 1.04f) * a004 + r.zw;
 		}
 
-		float3 EvaluateIndirectWithLUT(float NoV, float3 F0, float roughness, float3 prefilteredEnv, float2 brdfLUT)
-		{
-			const float3 F = Fresnel::EvaluateIndirect(NoV, F0, roughness);
-			return prefilteredEnv * (F * brdfLUT.x + brdfLUT.y);
-		}
-
 		float3 EvaluateIndirect(float NoV, float3 F0, float roughness, float3 prefilteredEnv)
 		{
 			const float2 brdf = ApproximateBRDFIntegration(NoV, roughness);

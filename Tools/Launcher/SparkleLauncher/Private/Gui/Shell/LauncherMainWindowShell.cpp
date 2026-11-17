@@ -1,6 +1,6 @@
 #include <QtCore/QSignalBlocker>
 #include "Gui/Widgets/LauncherOptionWidgets.h"
-#include "GpuCrash/LauncherGpuCrashPanel.h"
+#include "Gui/GpuCrash/LauncherGpuCrashPanel.h"
 #include "Gui/Shell/LauncherMainWindow.h"
 
 #include "Gui/Widgets/LauncherLayoutWidgets.h"

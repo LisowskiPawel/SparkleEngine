@@ -236,7 +236,7 @@ function(sparkle_boundary_scan_file absolute_path)
 		endif()
 
 		if(_relative_path MATCHES "^Engine/Core/Private/Diagnostics/(Logger|LoggerBootstrap)[.](cpp|h)$" AND
-		   _line MATCHES "FileSystemPathState|Core/Public/Paths/(FileSystemPaths|ProductFilePaths)|GetProductUserStatePaths|Paths::LogFile")
+		   _line MATCHES "FileSystemPathState|Core/Public/Paths/(FileSystemPaths|CookedAssetPaths|ProductUserStatePaths)|GetProductUserStatePaths")
 			sparkle_boundary_append_failure(
 				"LOGGING_BOOTSTRAP_USES_STATELESS_PATH_POLICY"
 				"${_relative_path}"
@@ -266,7 +266,7 @@ function(sparkle_boundary_scan_file absolute_path)
 		endif()
 
 		if(_relative_path MATCHES "^Engine/Core/Private/Paths/(FileSystemDiscovery|UserStatePaths)[.](cpp|h)$" AND
-		   _line MATCHES "Diagnostics/|Logger[.]h|Get(FileSystemPathState|ProductUserStatePaths)|Paths::LogFile")
+		   _line MATCHES "Diagnostics/|Logger[.]h|Get(FileSystemPathState|ProductUserStatePaths)")
 			sparkle_boundary_append_failure(
 				"BOOTSTRAP_PATH_DISCOVERY_REMAINS_STATELESS"
 				"${_relative_path}"
@@ -277,6 +277,7 @@ function(sparkle_boundary_scan_file absolute_path)
 
 		if(_line MATCHES "FormatToolWorkProgress|ParseToolWorkProgress" AND
 		   NOT _relative_path MATCHES "^Tools/Support/ToolSupport/(Private|Public)/ToolWorkProgress[.](cpp|h)$" AND
+		   NOT _relative_path STREQUAL "Tools/Support/ToolSupport/Private/ToolWorkProgressWriter.cpp" AND
 		   NOT _relative_path MATCHES "^Tools/Launcher/SparkleLauncher/Private/(Operations/LauncherOperationProgress|Gui/Operations/LauncherProgressStreamDecoder)[.]cpp$")
 			sparkle_boundary_append_failure(
 				"TOOL_PROGRESS_TRANSPORT_REMAINS_AT_PROCESS_BOUNDARY"

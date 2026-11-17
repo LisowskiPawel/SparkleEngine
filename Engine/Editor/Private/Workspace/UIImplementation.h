@@ -1,9 +1,7 @@
 #pragma once
 
 #include "UI.h"
-#include "Scene/SceneObjectSelection.h"
-
-#include <string>
+#include "Scene/EditorSceneSession.h"
 
 class EditorIconService;
 class EditorImGuiContext;
@@ -14,6 +12,7 @@ class SceneOutlinerPanel;
 class SceneInspectorPanel;
 class ViewportPanel;
 class ViewportToolbar;
+class EditorViewportSession;
 class SettingsPanel;
 class ShaderToolsPanel;
 class UsedMeshesPanel;
@@ -22,6 +21,7 @@ class EngineRenderingSettingsController;
 class InputSystem;
 class LevelSession;
 class Window;
+class ImGuiRenderPacketBuilder;
 
 class UI::Implementation final
 {
@@ -30,7 +30,7 @@ public:
 	~Implementation() noexcept;
 
 	const ViewportRenderRequest& GetViewportRenderRequest() const noexcept;
-	RenderViewCameraData UpdateViewportCamera(const CameraInputIntent& intent, float deltaSeconds) noexcept;
+	RenderViewCameraData UpdateViewportCamera(const CameraInputIntent& intent, float deltaSeconds);
 	void SetViewportOverlay(std::unique_ptr<ViewportOverlay> overlay) noexcept;
 	void SetViewportRenderProducts(const ViewportRenderProducts& products) noexcept;
 	void SetViewportFinalColorTexture(UiTextureHandle texture) noexcept;
@@ -59,10 +59,8 @@ private:
 	void RegisterViewportInputRegion();
 	void BuildSceneInspector(bool bDisableInteraction, float mainMenuBarHeight);
 	void BuildUtilityPanels(bool bDisableInteraction);
-	bool IsReady() const noexcept;
 
 	void InitializeImGuiContext();
-	void InitializeSceneEditing(EditorHostServices& hostServices);
 	void InitializeRenderingSettings(EditorHostServices& hostServices);
 	void InitializeConsole(CVarControlExecutor&& consoleVariables);
 
@@ -71,8 +69,7 @@ private:
 	void InitializeViewport();
 	void InitializeAssetPanels();
 	void InitializeScenePanels();
-	void UpdateSceneModel();
-	void HandleTransactionShortcuts();
+	void HandleTransactionShortcuts(bool bDisableInteraction);
 	void ConfigureMainMenuBarWindowActions();
 
 	void SubscribeToWindowEvents();
@@ -80,28 +77,25 @@ private:
 	std::unique_ptr<EditorImGuiContext> m_imguiContext;
 	CVarControlExecutor m_consoleVariables;
 	std::unique_ptr<EditorIconService> m_icons;
+	EditorSceneSession m_scene;
+	std::unique_ptr<EngineRenderingSettingsController> m_renderingSettings;
+	std::unique_ptr<EditorViewportSession> m_viewportSession;
 	std::unique_ptr<MainMenuBarPanel> m_mainMenuBar;
 	std::unique_ptr<EditorConsoleSystem> m_editorConsoleSystem;
 	std::unique_ptr<SceneOutlinerPanel> m_sceneOutlinerPanel;
 	std::unique_ptr<SceneInspectorPanel> m_sceneInspectorPanel;
 	std::unique_ptr<ViewportToolbar> m_viewportToolbar;
 	std::unique_ptr<ViewportPanel> m_viewportPanel;
-	std::unique_ptr<class EditorViewportSession> m_viewportSession;
 	std::unique_ptr<SettingsPanel> m_settingsPanel;
 	std::unique_ptr<ShaderToolsPanel> m_shaderToolsPanel;
 	std::unique_ptr<UsedMeshesPanel> m_usedMeshesPanel;
 	std::unique_ptr<UsedTexturesPanel> m_usedTexturesPanel;
-	std::unique_ptr<EngineRenderingSettingsController> m_renderingSettings;
-	Timer* m_timer = nullptr;
+	Timer& m_timer;
 	LevelSession* m_levelSession = nullptr;
-	Window* m_window = nullptr;
-	InputSystem* m_inputSystem = nullptr;
-	SceneObjectSelection m_sceneSelection = SceneObjectSelection::None();
+	Window& m_window;
+	InputSystem& m_inputSystem;
 	std::function<RendererMemoryDiagnosticsSnapshot()> m_memoryDiagnosticsProvider;
-	std::unique_ptr<class EditorSceneModelBuilder> m_sceneModelBuilder;
-	std::unique_ptr<class EditorTransactionHistory> m_transactionHistory;
-	std::shared_ptr<const class EditorSceneModel> m_sceneModel;
-	std::unique_ptr<class ImGuiRenderPacketBuilder> m_renderPacketBuilder;
+	std::unique_ptr<ImGuiRenderPacketBuilder> m_renderPacketBuilder;
 	UiRenderPacket m_renderPacket;
 	std::uint64_t m_viewportGeneration = 0;
 	bool m_bShaderReloadRequested = false;

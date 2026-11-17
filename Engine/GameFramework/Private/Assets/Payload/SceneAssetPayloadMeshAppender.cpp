@@ -8,7 +8,7 @@
 #include "Assets/Loaders/CookedAssetFileSet.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Formatting/HexFormat.h"
-#include "Core/Public/Paths/ProductFilePaths.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 #include "Scene/Transform.h"
 
 #include <DirectXMath.h>

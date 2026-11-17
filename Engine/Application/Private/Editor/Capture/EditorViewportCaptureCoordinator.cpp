@@ -12,8 +12,8 @@
 #include <optional>
 #include <utility>
 
-EditorViewportCaptureCoordinator::EditorViewportCaptureCoordinator(EditorOperationRuntime& operations) noexcept :
-    m_writeOperation(operations)
+EditorViewportCaptureCoordinator::EditorViewportCaptureCoordinator(TaskExecutor& executor, TaskScope& scope) noexcept :
+    m_writeOperation(executor, scope)
 {
 }
 

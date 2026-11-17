@@ -37,6 +37,13 @@ DxcShaderBackend::DxcShaderBackend()
 	m_backendVersion = QueryBackendVersion(*m_compiler.Get());
 }
 
+DxcShaderBackend::~DxcShaderBackend() = default;
+
+bool DxcShaderBackend::IsValid() const noexcept
+{
+	return m_compiler != nullptr && m_utils != nullptr;
+}
+
 ShaderBackendCapabilities DxcShaderBackend::GetStaticCapabilities() noexcept
 {
 	ShaderBackendCapabilities capabilities;

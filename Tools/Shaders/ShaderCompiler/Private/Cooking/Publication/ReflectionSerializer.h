@@ -27,4 +27,4 @@ struct ShaderReflectionTables
 
 ShaderReflection DecodeShaderReflection(const GlobalShaderMap& map, const GlobalShaderMapEntry& entry);
 
-void BuildShaderReflectionTables(std::span<const ShaderReflection> reflections, Strings::StringTableBuilder& stringTable, ShaderReflectionTables& outOutput);
+void BuildShaderReflectionTables(std::span<const ShaderReflection* const> reflections, Strings::StringTableBuilder& stringTable, ShaderReflectionTables& outOutput);

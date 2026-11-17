@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Cooking/ShaderCookContext.h"
+#include "Cooking/Planning/ShaderCookPipelinePlan.h"
 #include "Cooking/ShaderCookOutput.h"
 
 #include <filesystem>

@@ -19,7 +19,6 @@
 #include <limits>
 #include <string>
 #include <string_view>
-#include <utility>
 
 class CookedMeshAssetTranslation final
 {
@@ -52,10 +51,7 @@ public:
 	}
 
 private:
-	static Assets::CookedAssetId BuildMeshAssetId(std::string_view sceneAssetId, std::size_t meshIndex) noexcept
-	{
-		return Hash::Fnv1a64(std::string(sceneAssetId) + "#mesh#" + std::to_string(meshIndex));
-	}
+	static Assets::CookedAssetId BuildMeshAssetId(std::string_view sceneAssetId, std::size_t meshIndex) { return Hash::Fnv1a64(std::string(sceneAssetId) + "#mesh#" + std::to_string(meshIndex)); }
 
 	static void ValidateGeometry(const ImportedMeshGeometry& geometry, std::size_t primitiveIndex)
 	{
@@ -123,7 +119,7 @@ private:
 		asset.morphTargets.reserve(geometry.deformation.morphTargets.size());
 		for (const ImportedMorphTarget& morphTarget : geometry.deformation.morphTargets)
 		{
-			if (!morphTarget.IsValidForVertexCount(static_cast<std::uint32_t>(geometry.vertices.size())))
+			if (morphTarget.deltas.size() != geometry.vertices.size())
 			{
 				throw Diagnostics::Error(
 				    std::format("Imported mesh primitive {} has a morph target with {} deltas for {} vertices.", primitiveIndex, morphTarget.deltas.size(), geometry.vertices.size()));
@@ -148,19 +144,16 @@ private:
 	}
 };
 
-MeshCookOutput CookedMeshAssetBuilder::BuildMeshAssets(const SourceImportOutput& importOutput, std::string_view sceneAssetId)
+std::vector<CookedMeshAssetBuild> CookedMeshAssetBuilder::BuildMeshAssets(const SourceImportOutput& importOutput, std::string_view sceneAssetId)
 {
-	MeshCookOutput output;
-	output.assets.reserve(importOutput.scene.meshPrimitives.size());
-	output.assetReferences.reserve(importOutput.scene.meshPrimitives.size());
+	std::vector<CookedMeshAssetBuild> assets;
+	assets.reserve(importOutput.scene.meshPrimitives.size());
 
 	for (std::size_t primitiveIndex = 0; primitiveIndex < importOutput.scene.meshPrimitives.size(); ++primitiveIndex)
 	{
 		const ImportedMeshPrimitive& importedPrimitive = importOutput.scene.meshPrimitives[primitiveIndex];
-		CookedMeshAssetBuild meshAsset = CookedMeshAssetTranslation::BuildAsset(importedPrimitive, primitiveIndex, sceneAssetId, importOutput.GetSourcePath());
-		output.assetReferences.push_back({meshAsset.assetId, meshAsset.assetKind});
-		output.assets.push_back(std::move(meshAsset));
+		assets.push_back(CookedMeshAssetTranslation::BuildAsset(importedPrimitive, primitiveIndex, sceneAssetId, importOutput.GetSourcePath()));
 	}
 
-	return output;
+	return assets;
 }

@@ -24,7 +24,6 @@ class InputEventDispatcher final
 {
 public:
 	static constexpr std::size_t LayerCount = static_cast<std::size_t>(InputLayer::Count);
-	using LayerAvailability = std::array<bool, LayerCount>;
 
 	template <typename TEvent> EventHandle Subscribe(std::function<void(const TEvent&)> callback, InputLayer layer, DispatchMode mode)
 	{
@@ -40,17 +39,14 @@ public:
 
 	void Unsubscribe(EventHandle handle);
 
-	template <typename TEvent> void DispatchImmediate(const TEvent& event, InputLayer targetLayer, const LayerAvailability& layerAvailability)
-	{
-		DispatchToCallbacks(event, DispatchMode::Immediate, targetLayer, layerAvailability);
-	}
+	template <typename TEvent> void DispatchImmediate(const TEvent& event, InputLayer targetLayer) { DispatchToCallbacks(event, DispatchMode::Immediate, targetLayer); }
 
-	template <typename TEvent> void QueueDeferred(const TEvent& event, InputLayer targetLayer, const LayerAvailability& layerAvailability)
+	template <typename TEvent> void QueueDeferred(const TEvent& event, InputLayer targetLayer)
 	{
 		for (const auto& entry : GetCallbacks<TEvent>())
 		{
 			const bool bDeferred = entry.Function && entry.Mode == DispatchMode::Deferred;
-			const bool bEligible = bDeferred && ShouldDispatchToLayer(entry.Layer, targetLayer, layerAvailability);
+			const bool bEligible = bDeferred && ShouldDispatchToLayer(entry.Layer, targetLayer);
 			if (bEligible)
 			{
 				m_deferredEvents.push_back({event, targetLayer});
@@ -59,7 +55,7 @@ public:
 		}
 	}
 
-	// Cancellation reaches both delivery modes on the affected layer, even after disablement.
+	// Cancellation reaches both delivery modes on the affected layer.
 	template <typename TEvent> void DispatchCancellation(const TEvent& event, InputLayer targetLayer)
 	{
 		const auto callbacks = SnapshotCallbacks<TEvent>([targetLayer](const auto& entry) { return entry.Layer == targetLayer; });
@@ -69,7 +65,7 @@ public:
 		}
 	}
 
-	void ProcessDeferredEvents(const LayerAvailability& layerAvailability);
+	void ProcessDeferredEvents();
 	void ClearDeferredEvents();
 	void CancelAllEvents();
 	void CancelLayerEvents(InputLayer layer);
@@ -95,7 +91,7 @@ private:
 	using CallbackTuple = std::
 	    tuple<std::vector<CallbackEntry<KeyboardEvent>>, std::vector<CallbackEntry<MouseButtonEvent>>, std::vector<CallbackEntry<MouseMoveEvent>>, std::vector<CallbackEntry<MouseWheelEvent>>>;
 
-	static bool ShouldDispatchToLayer(InputLayer registeredLayer, InputLayer targetLayer, const LayerAvailability& layerAvailability) noexcept;
+	static bool ShouldDispatchToLayer(InputLayer registeredLayer, InputLayer targetLayer) noexcept;
 
 	template <typename TEvent> std::vector<CallbackEntry<TEvent>>& GetCallbacks() { return std::get<std::vector<CallbackEntry<TEvent>>>(m_callbacks); }
 
@@ -113,11 +109,11 @@ private:
 		return callbacks;
 	}
 
-	template <typename TEvent> void DispatchToCallbacks(const TEvent& event, DispatchMode mode, InputLayer targetLayer, const LayerAvailability& layerAvailability)
+	template <typename TEvent> void DispatchToCallbacks(const TEvent& event, DispatchMode mode, InputLayer targetLayer)
 	{
 		const auto layerEpochs = m_layerEpochs;
 		const auto pointerEpoch = m_pointerEpoch;
-		const auto callbacks = SnapshotCallbacks<TEvent>([&](const auto& entry) { return entry.Mode == mode && ShouldDispatchToLayer(entry.Layer, targetLayer, layerAvailability); });
+		const auto callbacks = SnapshotCallbacks<TEvent>([mode, targetLayer](const auto& entry) { return entry.Mode == mode && ShouldDispatchToLayer(entry.Layer, targetLayer); });
 		for (const auto& [callback, layer] : callbacks)
 		{
 			const auto index = static_cast<std::size_t>(layer);

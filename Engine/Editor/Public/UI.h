@@ -67,7 +67,7 @@ public:
 	UI& operator=(UI&&) = delete;
 
 	const ViewportRenderRequest& GetViewportRenderRequest() const noexcept;
-	RenderViewCameraData UpdateViewportCamera(const CameraInputIntent& intent, float deltaSeconds) noexcept;
+	RenderViewCameraData UpdateViewportCamera(const CameraInputIntent& intent, float deltaSeconds);
 	// Install, replace or clear the viewport overlay after UI construction on the Editor thread.
 	void SetViewportOverlay(std::unique_ptr<ViewportOverlay> overlay) noexcept;
 	void SetViewportRenderProducts(const ViewportRenderProducts& products) noexcept;

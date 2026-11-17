@@ -1,9 +1,9 @@
 #pragma once
 
 #include "RHI/Public/Shaders/ShaderTarget.h"
+#include "RHI/Public/Shaders/ShaderMap.h"
 #include "RHI/Public/Shaders/Authoring/ShaderParameterStruct.h"
 #include "RHI/Public/Shaders/ShaderStage.h"
-#include "ShaderContractCatalog.h"
 
 #include <cstdint>
 #include <functional>
@@ -13,6 +13,8 @@
 
 struct ShaderDescriptorBindingRemap final
 {
+	bool operator==(const ShaderDescriptorBindingRemap&) const;
+
 	std::string Name;
 	std::uint32_t Set = 0;
 	std::uint32_t Binding = 0;
@@ -24,7 +26,7 @@ enum class ShaderCompileUnitKind : std::uint8_t
 	Library,
 };
 
-enum class ShaderCompileFeatureFlags : std::uint32_t
+enum class ShaderCompileFeatureFlags : std::uint8_t
 {
 	None = 0,
 	InlineRayQuery = 1u << 0u,
@@ -33,21 +35,9 @@ enum class ShaderCompileFeatureFlags : std::uint32_t
 	RayTracingPipeline = 1u << 3u,
 };
 
-constexpr ShaderCompileFeatureFlags operator|(ShaderCompileFeatureFlags lhs, ShaderCompileFeatureFlags rhs) noexcept
-{
-	return static_cast<ShaderCompileFeatureFlags>(static_cast<std::uint32_t>(lhs) | static_cast<std::uint32_t>(rhs));
-}
-
-constexpr ShaderCompileFeatureFlags& operator|=(ShaderCompileFeatureFlags& lhs, ShaderCompileFeatureFlags rhs) noexcept
-{
-	lhs = lhs | rhs;
-	return lhs;
-}
-
-constexpr bool HasShaderCompileFeature(ShaderCompileFeatureFlags value, ShaderCompileFeatureFlags flag) noexcept
-{
-	return (static_cast<std::uint32_t>(value) & static_cast<std::uint32_t>(flag)) != 0;
-}
+ShaderCompileFeatureFlags operator|(ShaderCompileFeatureFlags lhs, ShaderCompileFeatureFlags rhs) noexcept;
+ShaderCompileFeatureFlags& operator|=(ShaderCompileFeatureFlags& lhs, ShaderCompileFeatureFlags rhs) noexcept;
+bool HasShaderCompileFeature(ShaderCompileFeatureFlags value, ShaderCompileFeatureFlags flag) noexcept;
 
 class ShaderSourceMountTable;
 

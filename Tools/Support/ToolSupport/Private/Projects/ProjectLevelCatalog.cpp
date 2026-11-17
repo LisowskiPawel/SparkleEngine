@@ -1,10 +1,14 @@
 #include "ProjectLevelCatalog.h"
 
-#include "Projects/ProjectLevelSelectionWriter.h"
-#include "Projects/ProjectLevelCatalogReader.h"
-
+#include <cstdint>
 #include <system_error>
 #include <unordered_set>
+
+enum class AssetPackRequirement : std::uint8_t
+{
+	Payload,
+	GameSource
+};
 
 bool ProjectLevelCatalog::IsAssetPackPayloadPresent(const ProjectAssetPack& pack) const
 {
@@ -18,7 +22,7 @@ bool ProjectLevelCatalog::IsAssetPackPayloadPresent(const ProjectAssetPack& pack
 	return std::filesystem::exists(requiredPath, error) && !error;
 }
 
-bool ProjectLevelCatalog::IsAssetPackSourceReady(std::string_view packId) const
+static bool IsAssetPackChainReady(const ProjectLevelCatalog& catalog, std::string_view packId, AssetPackRequirement requirement)
 {
 	std::unordered_set<std::string_view> visitedPackIds;
 	while (!packId.empty())
@@ -28,54 +32,39 @@ bool ProjectLevelCatalog::IsAssetPackSourceReady(std::string_view packId) const
 			return false;
 		}
 
-		const auto pack = assetPacks.find(packId);
-		if (pack == assetPacks.end() || !IsAssetPackPayloadPresent(pack->second))
+		const auto pack = catalog.assetPacks.find(packId);
+		if (pack == catalog.assetPacks.end() || !catalog.IsAssetPackPayloadPresent(pack->second))
 		{
 			return false;
 		}
+		if (requirement == AssetPackRequirement::GameSource && !pack->second.bGameSupported)
+		{
+			return false;
+		}
+
 		packId = pack->second.parentPackId;
 	}
 
 	return true;
+}
+
+bool ProjectLevelCatalog::IsAssetPackSourceReady(std::string_view packId) const
+{
+	return IsAssetPackChainReady(*this, packId, AssetPackRequirement::Payload);
 }
 
 bool ProjectLevelCatalog::HasLevelSourceInputs(const ProjectLevelCatalogEntry& level) const
 {
-	std::error_code error;
-	const bool bSourceSpecified = !level.id.empty() && !level.sourcePath.empty();
-	const bool bSourcePresentSourcePath = bSourceSpecified && std::filesystem::is_regular_file(level.sourcePath, error);
-	const bool bSourcePresent = bSourcePresentSourcePath && (!error);
-	const bool bSourceReady = bSourcePresent && IsAssetPackSourceReady(level.assetPackId);
-
-	if (!bSourceReady)
+	if (level.id.empty() || level.sourcePath.empty())
 	{
 		return false;
 	}
 
-	std::string_view packId = level.assetPackId;
-	while (!packId.empty())
+	std::error_code error;
+	if (!std::filesystem::is_regular_file(level.sourcePath, error))
 	{
-		const auto pack = assetPacks.find(packId);
-		if (pack == assetPacks.end() || !pack->second.bGameSupported)
-		{
-			return false;
-		}
-		packId = pack->second.parentPackId;
+		return false;
 	}
-	return true;
-}
 
-ProjectLevelCatalog ProjectLevelCatalogFile::Load(const std::filesystem::path& projectRoot)
-{
-	return ProjectLevelCatalogReader::Read(projectRoot);
-}
-
-bool ProjectLevelCatalogFile::SetLevelSelected(const std::filesystem::path& projectRoot, std::string_view levelId, bool bSelected, std::string& outErrorMessage)
-{
-	return ProjectLevelSelectionWriter::SetLevelSelected(projectRoot, levelId, bSelected, outErrorMessage);
-}
-
-bool ProjectLevelCatalogFile::SetLevelsSelected(const std::filesystem::path& projectRoot, const std::vector<std::string>& levelIds, bool bSelected, std::string& outErrorMessage)
-{
-	return ProjectLevelSelectionWriter::SetLevelsSelected(projectRoot, levelIds, bSelected, outErrorMessage);
+	return IsAssetPackChainReady(*this, level.assetPackId, AssetPackRequirement::GameSource);
 }

@@ -8,6 +8,11 @@ namespace SparkleLauncher
 {
 	static constexpr unsigned MaxCaptureInstallationEntries = 64;
 
+	bool ExternalCaptureAvailability::Available() const noexcept
+	{
+		return bInstalled && bSupported;
+	}
+
 	static bool IsInstalledToolFile(const std::filesystem::path& path)
 	{
 		std::error_code error;
@@ -25,7 +30,7 @@ namespace SparkleLauncher
 			const bool bCaptureLibraryInstalled = bToolDirectoryMatches && IsInstalledToolFile(path / library);
 			const bool bCaptureViewerInstalled = bCaptureLibraryInstalled && IsInstalledToolFile(path / viewer);
 
-			if (!bCaptureViewerInstalled)
+			if (bCaptureViewerInstalled)
 			{
 				return path;
 			}

@@ -2,7 +2,7 @@
 
 #include "Fbx/FbxAnimationImporter.h"
 
-#include "Fbx/FbxNodeTransformConverter.h"
+#include "Assimp/AssimpNodeTransformConverter.h"
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <DirectXMath.h>
@@ -41,14 +41,11 @@ public:
 		{
 			const float timeSeconds = static_cast<float>(keys[keyIndex].mTime / ticksPerSecond);
 			const aiVector3D& value = keys[keyIndex].mValue;
-			const bool bTimeFinite = std::isfinite(timeSeconds);
-			const bool bTimeOrderedTimeSeconds = !(timeSeconds < 0.0f || timeSeconds <= previousTime);
-			const bool bTimeOrdered = bTimeFinite && bTimeOrderedTimeSeconds;
-			const bool bValueFiniteX = bTimeOrdered && std::isfinite(value.x);
-			const bool bValueFiniteY = bValueFiniteX && (std::isfinite(value.y));
-			const bool bValueFinite = bValueFiniteY && (std::isfinite(value.z));
-
-			if (!bValueFinite)
+			const bool bTimeInRange = timeSeconds >= 0.0f && timeSeconds > previousTime;
+			const bool bTimeValid = std::isfinite(timeSeconds) && bTimeInRange;
+			const bool bFiniteXy = std::isfinite(value.x) && std::isfinite(value.y);
+			const bool bValueFinite = bFiniteXy && std::isfinite(value.z);
+			if (!bTimeValid || !bValueFinite)
 			{
 				throw Diagnostics::Error(std::format("FBX animation vector key {} is invalid or not strictly time ordered.", keyIndex));
 			}
@@ -85,17 +82,13 @@ public:
 			const aiQuaternion& value = keys[keyIndex].mValue;
 			DirectX::XMVECTOR quaternion = DirectX::XMVectorSet(value.x, value.y, value.z, value.w);
 			const float lengthSquared = DirectX::XMVectorGetX(DirectX::XMVector4LengthSq(quaternion));
-			const bool bTimeFinite = std::isfinite(timeSeconds);
-			const bool bTimeOrderedTimeSeconds = !(timeSeconds < 0.0f || timeSeconds <= previousTime);
-			const bool bTimeOrdered = bTimeFinite && bTimeOrderedTimeSeconds;
-			const bool bValueFiniteX = bTimeOrdered && std::isfinite(value.x);
-			const bool bValueFiniteY = bValueFiniteX && (std::isfinite(value.y));
-			const bool bValueFiniteZ = bValueFiniteY && (std::isfinite(value.z));
-			const bool bValueFinite = bValueFiniteZ && (std::isfinite(value.w));
-			const bool bRotationUsableIsfinite = bValueFinite && std::isfinite(lengthSquared);
-			const bool bRotationUsable = bRotationUsableIsfinite && (!(lengthSquared <= 1.0e-8f));
-
-			if (!bRotationUsable)
+			const bool bTimeInRange = timeSeconds >= 0.0f && timeSeconds > previousTime;
+			const bool bTimeValid = std::isfinite(timeSeconds) && bTimeInRange;
+			const bool bFiniteXy = std::isfinite(value.x) && std::isfinite(value.y);
+			const bool bFiniteZw = std::isfinite(value.z) && std::isfinite(value.w);
+			const bool bValueFinite = bFiniteXy && bFiniteZw;
+			const bool bRotationUsable = std::isfinite(lengthSquared) && lengthSquared > 1.0e-8f;
+			if (!bTimeValid || !bValueFinite || !bRotationUsable)
 			{
 				throw Diagnostics::Error(std::format("FBX animation rotation key {} is invalid or not strictly time ordered.", keyIndex));
 			}
@@ -122,7 +115,7 @@ public:
 		    ImportedAnimationChannel{.targetPath = ImportedAnimationTargetPath::Rotation, .targetNodeIndex = targetNodeIndex, .targetJointIndex = targetJointIndex, .samplerIndex = samplerIndex});
 	}
 
-	static void AppendNodeChannel(const aiScene& scene, const aiNodeAnim& sourceChannel, double ticksPerSecond, ImportedAnimationClip& clip, const SourceImportOutput& output)
+	static void AppendNodeChannel(const aiScene& scene, const aiNodeAnim& sourceChannel, double ticksPerSecond, ImportedAnimationClip& clip, const ImportedScene& importedScene)
 	{
 		if ((sourceChannel.mNumPositionKeys == 0 && sourceChannel.mNumRotationKeys == 0 && sourceChannel.mNumScalingKeys == 0)
 		    || (sourceChannel.mPreState != aiAnimBehaviour_DEFAULT && sourceChannel.mPreState != aiAnimBehaviour_CONSTANT)
@@ -131,19 +124,19 @@ public:
 			throw Diagnostics::Error("FBX animation channel has no keys or uses unsupported boundary behavior.");
 		}
 
-		const aiNode* targetNode = FbxNodeTransformConverter::FindNode(scene, sourceChannel.mNodeName);
+		const aiNode* targetNode = AssimpNodeTransformConverter::FindNode(scene, sourceChannel.mNodeName);
 		if (targetNode == nullptr)
 		{
 			throw Diagnostics::Error("FBX animation channel targets an unknown node.");
 		}
 
-		const std::uint32_t targetNodeIndex = FbxNodeTransformConverter::FindNodeIndex(scene, *targetNode);
+		const std::uint32_t targetNodeIndex = AssimpNodeTransformConverter::FindNodeIndex(scene, *targetNode);
 		if (targetNodeIndex == (std::numeric_limits<std::uint32_t>::max)())
 		{
 			throw Diagnostics::Error("FBX animation channel target has no source-node index.");
 		}
 
-		const auto [targetSkeletonIndex, targetJointIndex] = output.scene.FindSkeletonJointForNode(targetNodeIndex);
+		const auto [targetSkeletonIndex, targetJointIndex] = importedScene.FindSkeletonJointForNode(targetNodeIndex);
 		if (targetSkeletonIndex == (std::numeric_limits<std::uint32_t>::max)() || targetJointIndex == (std::numeric_limits<std::uint32_t>::max)())
 		{
 			throw Diagnostics::Error("FBX animation channel target is not owned by an imported skeleton.");
@@ -161,31 +154,30 @@ public:
 	}
 };
 
-void FbxAnimationImporter::ImportAnimations(const aiScene& scene, SourceImportOutput& output)
+void FbxAnimationImporter::ImportAnimations(const aiScene& scene, ImportedScene& importedScene)
 {
 	// A static FBX may contain an exporter-created transform take even though it has
 	// no skeleton. Sparkle cannot play node-only animation, but rejecting that take
 	// would also reject otherwise complete static scene geometry.
-	if (output.scene.skeletons.empty())
+	if (importedScene.skeletons.empty())
 	{
 		return;
 	}
 
-	output.scene.animations.reserve(scene.mNumAnimations);
+	importedScene.animations.reserve(scene.mNumAnimations);
 	for (unsigned int animationIndex = 0; animationIndex < scene.mNumAnimations; ++animationIndex)
 	{
 		const aiAnimation* sourceAnimation = scene.mAnimations[animationIndex];
-		const bool bAnimationPresent = sourceAnimation != nullptr;
-		const bool bDurationFiniteMDuration = bAnimationPresent && std::isfinite(sourceAnimation->mDuration);
-		const bool bDurationFinite = bDurationFiniteMDuration && (!(sourceAnimation->mDuration < 0.0));
-		const bool bTickRateValidPerSecond = bDurationFinite && std::isfinite(sourceAnimation->mTicksPerSecond);
-		const bool bTickRateValid = bTickRateValidPerSecond && (!(sourceAnimation->mTicksPerSecond <= 0.0));
-		const bool bChannelsPresentNumChannels = bTickRateValid && sourceAnimation->mNumChannels != 0;
-		const bool bChannelsPresent = bChannelsPresentNumChannels && (sourceAnimation->mChannels != nullptr);
-		const bool bChannelKindsSupportedMeshChannels = bChannelsPresent && sourceAnimation->mNumMeshChannels == 0;
-		const bool bChannelKindsSupported = bChannelKindsSupportedMeshChannels && (sourceAnimation->mNumMorphMeshChannels == 0);
+		if (sourceAnimation == nullptr)
+		{
+			throw Diagnostics::Error(std::format("FBX animation {} has incomplete or unsupported channel data.", animationIndex));
+		}
 
-		if (!bChannelKindsSupported)
+		const bool bDurationValid = std::isfinite(sourceAnimation->mDuration) && sourceAnimation->mDuration >= 0.0;
+		const bool bTickRateValid = std::isfinite(sourceAnimation->mTicksPerSecond) && sourceAnimation->mTicksPerSecond > 0.0;
+		const bool bChannelsPresent = sourceAnimation->mNumChannels != 0 && sourceAnimation->mChannels != nullptr;
+		const bool bChannelKindsSupported = sourceAnimation->mNumMeshChannels == 0 && sourceAnimation->mNumMorphMeshChannels == 0;
+		if (!bDurationValid || !bTickRateValid || !bChannelsPresent || !bChannelKindsSupported)
 		{
 			throw Diagnostics::Error(std::format("FBX animation {} has incomplete or unsupported channel data.", animationIndex));
 		}
@@ -203,7 +195,8 @@ void FbxAnimationImporter::ImportAnimations(const aiScene& scene, SourceImportOu
 			{
 				throw Diagnostics::Error(std::format("FBX animation {} has a null channel {}.", animationIndex, channelIndex));
 			}
-			FbxAnimationTranslation::AppendNodeChannel(scene, *sourceAnimation->mChannels[channelIndex], sourceAnimation->mTicksPerSecond, clip, output);
+
+			FbxAnimationTranslation::AppendNodeChannel(scene, *sourceAnimation->mChannels[channelIndex], sourceAnimation->mTicksPerSecond, clip, importedScene);
 		}
 
 		if (!clip.IsValid())
@@ -211,6 +204,6 @@ void FbxAnimationImporter::ImportAnimations(const aiScene& scene, SourceImportOu
 			throw Diagnostics::Error(std::format("FBX animation {} cannot be represented without losing channel data.", animationIndex));
 		}
 
-		output.scene.animations.push_back(std::move(clip));
+		importedScene.animations.push_back(std::move(clip));
 	}
 }

@@ -79,6 +79,7 @@ set(SPARKLE_LAUNCHER_CORE_LEVEL_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelPreparation.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelCleanPaths.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelSelectionCommit.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelSelectionWriter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelOperationExecutor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelOperationProcessRequests.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelOperations.cpp
@@ -92,6 +93,7 @@ set(SPARKLE_LAUNCHER_CORE_LEVEL_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/AssetPackSyncPlanner.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelPreparation.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelSelectionCommit.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelSelectionWriter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelOperationProcessRequests.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Levels/LevelRunOperationProcessRequests.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/ExternalCapture/ExternalCaptureDiscovery.h
@@ -144,12 +146,10 @@ set(SPARKLE_LAUNCHER_GUI_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Workspace/LauncherWorkspaceSetup.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindowPages.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Widgets/LauncherOptionWidgets.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/GpuCrash/LauncherGpuCrashPanel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/GpuCrash/LauncherGpuCrashPanel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/GpuCrash/LauncherGpuCrashPanel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherBackend.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherGuiApp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherSettings.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherOperationRequestMapping.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherOperationExecution.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherOperationService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherProgressStreamDecoder.cpp
@@ -187,11 +187,11 @@ set(SPARKLE_LAUNCHER_GUI_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Scenes/LauncherSceneCatalog.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Workspace/LauncherWorkspaceSetup.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Widgets/LauncherOptionWidgets.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/GpuCrash/LauncherGpuCrashPanel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherBackend.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherGuiApp.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherOperationRequest.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherOperationRequestMapping.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherOperationExecution.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherOperationService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherProgressStreamDecoder.h
@@ -272,7 +272,7 @@ target_compile_definitions(SparkleLauncherCore
 
 target_link_libraries(SparkleLauncherCore
     PUBLIC SparkleCore SparkleRHIContracts
-    PRIVATE ToolSupport
+    PRIVATE ToolSupport nlohmann_json::nlohmann_json
 )
 
 add_executable(SparkleLauncher WIN32

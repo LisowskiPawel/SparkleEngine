@@ -4,7 +4,7 @@
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "SourceTexturePathResolver.h"
-#include "SourceImportOutput.h"
+#include "Types/ImportedScene.h"
 
 #include <assimp/material.h>
 #include <assimp/scene.h>
@@ -313,7 +313,7 @@ void AssimpMaterialImporter::ImportMaterials(
     const aiScene& scene,
     const std::filesystem::path& sourceDirectory,
     std::span<const std::filesystem::path> embeddedTexturePaths,
-    SourceImportOutput& output)
+    ImportedScene& importedScene)
 {
 	const TextureResolutionContext textureContext{scene, sourceDirectory, embeddedTexturePaths};
 	for (unsigned int materialIndex = 0; materialIndex < scene.mNumMaterials; ++materialIndex)
@@ -324,6 +324,6 @@ void AssimpMaterialImporter::ImportMaterials(
 		}
 
 		ImportedMaterial importedMaterial = ExtractMaterial(*scene.mMaterials[materialIndex], materialIndex, textureContext);
-		output.scene.materials.push_back(std::move(importedMaterial));
+		importedScene.materials.push_back(std::move(importedMaterial));
 	}
 }

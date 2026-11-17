@@ -50,6 +50,8 @@ $profiles = '--editor-profile', 'ShippingEditor', '--game-profile', 'ShippingGam
 
 Build and dependency files are under `build/`; binaries and cooked content are under `artifacts/dev/`. [SparkleArtifactContract.cmake](../CMake/SparkleArtifactContract.cmake) defines the paths. Source and extracted products use the same workspace layout.
 
+Cleaning a cooking action removes its selected shader, texture or scene outputs. Scene cleanup includes meshes, materials, skeletons, animations and the scene registry. Clean Cook All and the Cooked Outputs scope remove the complete cooked-content directory.
+
 ## Making a change
 
 1. Check `git status --short` and `git rev-parse HEAD`. Preserve unrelated changes.
@@ -64,13 +66,15 @@ Reuse earlier results when their inputs still match. Changed inputs need the aff
 
 A system owns its algorithms, state, validation, cancellation and lifetime. Callers use focused interfaces; Application and other composition code connect implementations. Core behavior must not depend on an Editor panel or Launcher operation.
 
-Put stable cross-module requests, results, handles and interfaces in `Public`; keep implementation in `Private`. A public API needs two real module consumers or one necessary host/module boundary.
+Put stable cross-module requests, results, handles and interfaces in `Public`; keep implementation in `Private`. New public APIs need two real module consumers or one necessary host/module boundary. When reviewing existing APIs, lack of current callers alone is not a reason to delete a coherent foundation contract, such as flag operations or input-state queries. Check its purpose, semantics and owning abstraction before removal; move implementation out of headers without discarding useful operations.
+
+`Tools/Support/ToolSupport` owns shared catalog parsing, source/output paths and console/progress contracts. Launcher owns selection edits to `Levels.catalog`. Progress readers use the wire-format contract; producers use the synchronized writer or a borrowed progress callback.
 
 Core is the base dependency. GameFramework does not depend on Renderer or RHI; RHI does not depend on Renderer. Native types remain inside the backend or an explicit interop interface. Dependencies follow actual public use, not convenient transitive includes.
 
 For external libraries, use the existing [dependency workflow](ThirdPartyMigration.md#ownership-and-dependency-workflow) for source separation, pinning, Launcher sync and distribution metadata.
 
-Orchestration should show what happens and in what order. Put substantial algorithms and state in their owning capability. Keep cohesive algorithms/state machines together and split independently changing responsibilities. Avoid god classes, numbered fragments, forwarding-only collaborators, helper bags and service locators.
+Orchestration should show what happens and in what order. Put substantial algorithms and state in their owning capability. Keep cohesive algorithms/state machines together and split independently changing responsibilities. Avoid god classes, numbered fragments, forwarding-only collaborators, helper bags and service locators. Review file moves and helper extraction against surrounding style, responsibility and dependency direction; fewer lines or files alone do not establish an improvement.
 
 Keep a feature's state and mechanism in one predictable location. Changes elsewhere need an integration reason and a check. A new cache, queue, layer, flag or API needs a current user and a reason simpler code is insufficient. Prefer direct code or a closed enum switch to speculative extensibility.
 

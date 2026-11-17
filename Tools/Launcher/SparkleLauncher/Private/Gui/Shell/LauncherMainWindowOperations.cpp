@@ -9,11 +9,11 @@
 #include "Gui/Widgets/LauncherActionWidgets.h"
 #include "Gui/App/LauncherBackend.h"
 #include "Gui/Models/LauncherOperationRequestFactory.h"
-#include "Gui/Operations/LauncherOperationRequestMapping.h"
 #include "Gui/Models/LauncherContentModel.h"
 #include "Gui/App/LauncherSettings.h"
 #include "Gui/Models/LauncherWorkflowCatalog.h"
 
+#include "SparkleLauncher/CookOperations.h"
 #include "ToolOutputPaths.h"
 
 #include <QtCore/QCoreApplication>
@@ -96,7 +96,7 @@ namespace SparkleLauncher
 		    std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()),
 		    m_selectedOperationId);
 
-		if (request.CleanTargets.isEmpty())
+		if (std::get<MaintenanceOperationRequest>(request.Inputs).RequestedCleanTargets.empty())
 		{
 			const QString message = OperationNeedsContent(m_selectedOperationId) && m_contentModel.ContentId().isEmpty() ? "Workspace content is unavailable for this workflow's generated outputs."
 			                                                                                                             : "No generated outputs were resolved for this workflow.";
@@ -149,7 +149,7 @@ namespace SparkleLauncher
 		}
 
 		return operationId == LauncherScenesOperationId() || operationId == "levels.sync" || operationId == "levels.run" || operationId.startsWith("workspace.build.")
-		    || operationId.startsWith("cook.");
+		    || FindCookOperationDefinition(operationId.toStdString()).has_value();
 	}
 
 	void LauncherMainWindow::PromptForLauncherRestart()
@@ -192,7 +192,7 @@ namespace SparkleLauncher
 			request.RunId = CreateRunId();
 		}
 		const QString runId = request.RunId;
-		if (LauncherOperationRequestMapping::RequestsLauncherRebuild(request) && !m_pendingRestartRunIds.contains(runId))
+		if (RequestsLauncherRebuild(request) && !m_pendingRestartRunIds.contains(runId))
 		{
 			m_pendingRestartRunIds.push_back(runId);
 		}

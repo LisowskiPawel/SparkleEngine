@@ -197,7 +197,7 @@ namespace SparkleLauncher
 			    else if (actionIntent == QStringLiteral("sync"))
 			    {
 				    LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, QStringLiteral("levels.sync"));
-				    request.RequestedLevelIds = level.Id;
+				    std::get<LevelOperationRequest>(request.Inputs).RequestedLevelIds = {level.Id.toStdString()};
 				    m_startOperation(std::move(request), QStringLiteral("Sync %1").arg(level.DisplayName));
 			    }
 			    else if (actionIntent == QStringLiteral("details"))

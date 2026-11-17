@@ -24,7 +24,7 @@ namespace SparkleLauncher
 	{
 		try
 		{
-			const auto catalog = ProjectLevelCatalogFile::Load(plan.WorkingDirectory);
+			const auto catalog = LoadProjectLevelCatalog(plan.WorkingDirectory);
 			const auto level = std::find_if(catalog.levels.begin(), catalog.levels.end(), [&plan](const ProjectLevelCatalogEntry& entry) { return entry.id == plan.Request.LevelId; });
 			if (level == catalog.levels.end())
 			{

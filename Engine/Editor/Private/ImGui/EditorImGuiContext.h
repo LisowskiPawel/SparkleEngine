@@ -24,7 +24,6 @@ public:
 
 	void Initialize();
 	bool InitializePlatformBackend();
-	bool IsReady() const noexcept;
 	void ApplyDpiScale(float dpiScale) noexcept;
 	void SubscribeToWindowEvents(ShortcutHandler shortcutHandler);
 	void UnsubscribeFromWindowEvents() noexcept;

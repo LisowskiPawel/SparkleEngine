@@ -55,14 +55,10 @@ static std::optional<LRESULT> ClassifyResizeBorder(const POINT& cursorPoint, con
 
 LRESULT Window::HandleNonClientSize(WPARAM wParam, LPARAM lParam) const
 {
-	if (wParam == TRUE)
+	if (wParam == TRUE && IsZoomed(m_hWnd))
 	{
-		if (IsZoomed(m_hWnd))
-		{
-			auto* params = reinterpret_cast<NCCALCSIZE_PARAMS*>(lParam);
-			params->rgrc[0] = GetCurrentMonitorInfo().rcWork;
-		}
-		return 0;
+		auto* params = reinterpret_cast<NCCALCSIZE_PARAMS*>(lParam);
+		params->rgrc[0] = GetCurrentMonitorInfo().rcWork;
 	}
 
 	return 0;
@@ -92,8 +88,9 @@ LRESULT Window::HandleResizeHitTest(WPARAM wParam, LPARAM lParam) const
 	return DefWindowProcW(m_hWnd, WM_NCHITTEST, wParam, lParam);
 }
 
-void Window::ApplyTrackSizeConstraints(MINMAXINFO& minMaxInfo) const
+LRESULT Window::HandleTrackSizeConstraints(LPARAM lParam) const
 {
+	auto& minMaxInfo = *reinterpret_cast<MINMAXINFO*>(lParam);
 	const UINT dpi = GetDpi();
 	minMaxInfo.ptMinTrackSize.x = MulDiv(kMinWindowWidth, static_cast<int>(dpi), USER_DEFAULT_SCREEN_DPI);
 	minMaxInfo.ptMinTrackSize.y = MulDiv(kMinWindowHeight, static_cast<int>(dpi), USER_DEFAULT_SCREEN_DPI);
@@ -103,11 +100,6 @@ void Window::ApplyTrackSizeConstraints(MINMAXINFO& minMaxInfo) const
 	minMaxInfo.ptMaxPosition.y = bounds.top - mi.rcMonitor.top;
 	minMaxInfo.ptMaxSize.x = bounds.right - bounds.left;
 	minMaxInfo.ptMaxSize.y = bounds.bottom - bounds.top;
-}
-
-LRESULT Window::HandleTrackSizeConstraints(LPARAM lParam) const
-{
-	ApplyTrackSizeConstraints(*reinterpret_cast<MINMAXINFO*>(lParam));
 	return 0;
 }
 

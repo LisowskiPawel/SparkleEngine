@@ -4,6 +4,14 @@
 #include "Scene/SceneObjectPresentation.h"
 
 #include <algorithm>
+#include <utility>
+
+EditorSceneModel::EditorSceneModel(WorldReadView readView, WorldMaterialVariantView materialVariants) :
+    m_readView(std::move(readView)),
+    m_materialVariants(std::move(materialVariants))
+{
+	RebuildEntries();
+}
 
 template <typename T> static const T* FindByEntity(std::span<const T> values, EntityId entity) noexcept
 {

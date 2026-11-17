@@ -112,15 +112,14 @@ namespace SparkleLauncher
 	void LauncherSceneCatalog::SyncAllLevels()
 	{
 		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, QStringLiteral("levels.sync"));
-		request.bSelectAvailableLevels = true;
+		std::get<LevelOperationRequest>(request.Inputs).bSelectAvailableLevels = true;
 		m_startOperation(std::move(request), QStringLiteral("Sync Available Levels"));
 	}
 
 	void LauncherSceneCatalog::CleanAllLevels()
 	{
 		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, QStringLiteral("workspace.clean"));
-		request.bCleanLevelContent = true;
-		request.bConfirmClean = false;
+		std::get<MaintenanceOperationRequest>(request.Inputs).bCleanLevelContent = true;
 		if (ConfirmLauncherRunRequest(m_dialogParent, request))
 		{
 			m_startOperation(std::move(request), QStringLiteral("Clean All Levels"));

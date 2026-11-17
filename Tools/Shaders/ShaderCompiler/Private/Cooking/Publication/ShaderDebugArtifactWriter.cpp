@@ -5,10 +5,9 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Formatting/HexFormat.h"
-#include "Core/Public/Json/JsonWriter.h"
 #include "Core/Public/Paths/PathUtils.h"
 #include "Core/Public/Hash/HashUtils.h"
-#include "Cooking/ShaderCookContext.h"
+#include "Cooking/Planning/ShaderCookPipelinePlan.h"
 #include "RHI/Public/Shaders/GlobalShaderMap.h"
 
 #include <Windows.h>
@@ -16,6 +15,7 @@
 #include <format>
 #include <algorithm>
 #include <utility>
+#include <nlohmann/json.hpp>
 
 ShaderDebugArtifactWriter::ShaderDebugArtifactWriter(const std::filesystem::path& rootDirectory)
 {
@@ -62,15 +62,10 @@ std::string ShaderDebugArtifactWriter::WriteBytes(const std::filesystem::path& r
 {
 	const std::string hash = HashBytes(contents);
 	const std::string relativeName = relativePath.generic_string();
-	Json::ObjectWriter file;
-	file.WriteString("path", relativeName);
-	file.WriteString("sha256", hash);
-	file.WriteUInt64("bytes", contents.size());
-	const std::string receipt = file.Finish();
-	const auto [entry, bInserted] = m_files.emplace(relativeName, receipt);
+	const auto [entry, bInserted] = m_files.emplace(relativeName, FileReceipt{hash, contents.size()});
 	if (!bInserted)
 	{
-		if (entry->second != receipt)
+		if (entry->second.Sha256 != hash || entry->second.Bytes != contents.size())
 		{
 			throw Diagnostics::Error("Shader debug export contains conflicting bytes for the same source or artifact.");
 		}
@@ -161,9 +156,8 @@ void ShaderDebugArtifactWriter::Write(const ShaderCompileRequest& request, const
 	WriteCompilerOutputs(bundleDirectory, debugArtifacts, compiledStage);
 	const std::filesystem::path requestPath = bundleDirectory / "compile-request.json";
 	const std::string compileRequestJson = BuildCompileRequestJson(request, compiledStage, codeSha256, debugArtifacts);
-	const std::string definesJson = Json::WriteStringArray(request.Defines);
 	WriteText(requestPath, compileRequestJson);
-	WriteText(bundleDirectory / "defines.json", definesJson);
+	WriteText(bundleDirectory / "defines.json", nlohmann::json(request.Defines).dump());
 	m_jobs.push_back(requestPath.generic_string());
 }
 
@@ -172,14 +166,23 @@ void ShaderDebugArtifactWriter::WriteCompilerOutputs(const std::filesystem::path
 	WriteText(bundleDirectory / "preprocessed-source.hlsl", debugArtifacts.PreprocessedSource);
 	const std::string reflectionJson = BuildReflectionJson(compiledStage.reflection);
 	WriteText(bundleDirectory / "reflection.json", reflectionJson);
-	WriteText(bundleDirectory / "parameter-struct-match.json", debugArtifacts.ParameterMatchReportJson);
+	nlohmann::json parameterReport;
+	if (debugArtifacts.ParameterVerification.has_value())
+	{
+		const auto& result = *debugArtifacts.ParameterVerification;
+		parameterReport = {{"status", result.mismatches.empty() ? "matched" : "mismatch"}, {"diagnostics", result.diagnostics}};
+	}
+	else
+	{
+		parameterReport = {{"status", "skipped"}, {"reason", "no parameter-struct descriptor declared for this shader stage"}};
+	}
+	WriteText(bundleDirectory / "parameter-struct-match.json", parameterReport.dump());
 	if (!debugArtifacts.Disassembly.empty())
 	{
 		WriteText(bundleDirectory / "disassembly.txt", debugArtifacts.Disassembly);
 	}
 	WriteText(bundleDirectory / "compiler-stderr.txt", debugArtifacts.CompilerOutput);
-	const std::string compileArgumentsJson = Json::WriteStringArray(debugArtifacts.CompileArguments);
-	WriteText(bundleDirectory / "compile-args.json", compileArgumentsJson);
+	WriteText(bundleDirectory / "compile-args.json", nlohmann::json(debugArtifacts.CompileArguments).dump());
 
 	if (!debugArtifacts.Symbols.empty())
 	{

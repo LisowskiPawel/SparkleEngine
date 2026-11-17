@@ -38,6 +38,16 @@ ViewportPanel::ViewportPanel(float leftInsetPixels, float rightInsetPixels) noex
 
 ViewportPanel::~ViewportPanel() noexcept = default;
 
+void ViewportPanel::RequestOutputAction(ViewportOutputAction action) noexcept
+{
+	m_outputAction = action;
+}
+
+InputLayer ViewportPanel::GetTargetInputLayer() const noexcept
+{
+	return InputLayer::Gameplay;
+}
+
 void ViewportPanel::SetTopInset(float topInsetPixels) noexcept
 {
 	m_topInsetPixels = topInsetPixels;

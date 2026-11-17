@@ -66,10 +66,11 @@ namespace SparkleLauncher
 			case CleanScope::PristineGeneratedWorkspace:
 				return "Clean All";
 		}
+
 		return scopeValue;
 	}
 
-	static std::optional<std::vector<CleanScope>> ParseCleanScopeSelection(const QString& scopeSelection)
+	std::optional<std::vector<CleanScope>> ParseCleanScopeSelection(const QString& scopeSelection)
 	{
 		const QStringList selectedScopes = scopeSelection.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts);
 		if (selectedScopes.empty())
@@ -107,15 +108,5 @@ namespace SparkleLauncher
 	{
 		const std::optional<std::vector<CleanScope>> scopes = ParseCleanScopeSelection(scopeSelection);
 		return scopes.has_value() && std::any_of(scopes->begin(), scopes->end(), CleanScopeRequiresContent);
-	}
-
-	QVector<LauncherCleanTarget> BuildActionSpecificCleanTargets(const ActionCleanTargetRequest& request)
-	{
-		QVector<LauncherCleanTarget> targets;
-		for (const MaintenanceCleanPathSpec& path : BuildActionCleanPaths(request))
-		{
-			targets.push_back({QString::fromStdString(path.DisplayName), QString::fromStdString(path.Path.string()), QString::fromStdString(path.Detail)});
-		}
-		return targets;
 	}
 }

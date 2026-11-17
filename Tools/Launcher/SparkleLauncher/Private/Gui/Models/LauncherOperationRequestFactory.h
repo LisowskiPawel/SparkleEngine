@@ -1,11 +1,10 @@
 #pragma once
 
-#include "Gui/App/LauncherBackend.h"
+#include "Gui/Operations/LauncherOperationRequest.h"
 
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 
 #include <QtCore/QString>
-#include <QtCore/QStringList>
 
 #include <filesystem>
 
@@ -18,6 +17,7 @@ namespace SparkleLauncher
 	WorkspaceIde ResolveSelectedWorkspaceIde(const LauncherSettings& settings);
 	QString ResolveSelectedWorkspaceIdeName(const LauncherSettings& settings);
 	WorkspaceCompiler ResolveSelectedWorkspaceCompiler(const LauncherSettings& settings);
+	bool RequestsLauncherRebuild(const LauncherOperationRequest& request);
 
 	BuildWorkspaceOperationRequest BuildWorkspacePlanRequest(const std::filesystem::path& workspaceRoot, const LauncherContentModel& contentModel, const LauncherSettings& settings);
 

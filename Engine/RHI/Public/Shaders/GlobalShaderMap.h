@@ -88,9 +88,9 @@ struct ResolvedShader final
 	const GlobalShaderMapEntry* Entry = nullptr;
 	const CookedShaderCodeRecord* Code = nullptr;
 
-	bool IsValid() const noexcept { return Map != nullptr && Library != nullptr && Entry != nullptr && Code != nullptr; }
+	SPARKLE_RHI_API bool IsValid() const noexcept;
 
 	explicit operator bool() const noexcept { return IsValid(); }
 
-	ShaderBytecode GetBytecode() const noexcept { return IsValid() ? Library->GetBytecode(*Code) : ShaderBytecode{}; }
+	SPARKLE_RHI_API ShaderBytecode GetBytecode() const noexcept;
 };

@@ -1,6 +1,7 @@
 #include "PCH.h"
 
 #include "RayTracing/RhiRayTracingPipelineDesc.h"
+#include "Shaders/GlobalShaderMap.h"
 
 RayTracingPipeline::RayTracingPipeline(const RayTracingPipelineDesc& desc) :
     m_generation(desc.Generation)

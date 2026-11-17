@@ -34,7 +34,7 @@ private:
 	static bool CollectSceneIds(const std::filesystem::path& projectRoot, std::vector<std::string>& outSceneIds, AssetCookerDiagnostics& diagnostics);
 	static bool AppendLevelSceneIds(const ProjectLevelCatalog& catalog, const ProjectLevelCatalogEntry& level, std::vector<std::string>& outSceneIds, AssetCookerDiagnostics& diagnostics);
 	static bool ResolveSceneEntry(const std::filesystem::path& projectRoot, std::string_view sceneId, AssetCookerSceneEntry& outEntry, AssetCookerDiagnostics& diagnostics);
-	static bool IsSceneIdSafe(const std::filesystem::path& relativeScenePath) noexcept;
+	static bool IsSceneIdSafe(const std::filesystem::path& relativeScenePath);
 	static bool ResolveSceneSource(
 	    const std::filesystem::path& meshRoot,
 	    const std::filesystem::path& relativeScenePath,

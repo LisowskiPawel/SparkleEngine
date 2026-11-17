@@ -28,8 +28,9 @@ namespace SparkleLauncher
 		}
 
 		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, QStringLiteral("levels.run"));
-		request.ContentId = content.Id;
-		request.RequestedLevelIds = level.Id;
+		auto& inputs = std::get<LevelRunOperationRequest>(request.Inputs);
+		inputs.ContentId = content.Id.toStdString();
+		inputs.LevelId = level.Id.toStdString();
 		const QString action = m_settings.RunMode() == QStringLiteral("game") ? QStringLiteral("Run ") : QStringLiteral("Open ");
 		m_startingLevelId = level.Id;
 		m_startingLevelRunId = m_startOperation(std::move(request), action + level.DisplayName);

@@ -1,5 +1,7 @@
 #include "PCH.h"
 #include "AssetInspection/MeshPreview.h"
+#include "Icons/EditorIcon.h"
+#include "Widgets/UiIconWidgets.h"
 
 #include <imgui.h>
 
@@ -7,11 +9,11 @@
 #include <array>
 #include <cmath>
 #include <limits>
-
-const std::array<const char*, 3> MeshPreview::Modes = {"Wireframe", "Solid", "Wire + Solid"};
-const float MeshPreview::Pi = 3.1415926535f;
+#include <numbers>
+#include <utility>
 
 static constexpr std::size_t MaxPreviewTriangles = 20000;
+static constexpr std::array<const char*, 3> PreviewModes = {"Wireframe", "Solid", "Wire + Solid"};
 
 struct PreviewBounds final
 {
@@ -146,7 +148,62 @@ static void DrawWireTriangles(ImDrawList& drawList, const MeshPreviewGeometry& g
 	    });
 }
 
-void MeshPreview::Draw(const MeshPreviewGeometry& geometry, bool bGpuResident, float yaw, float pitch, int modeIndex)
+void MeshPreview::SetGeometryProvider(GeometryProvider provider)
+{
+	m_geometryProvider = std::move(provider);
+	Invalidate();
+}
+
+void MeshPreview::Invalidate() noexcept
+{
+	m_geometry = {};
+	m_meshRuntimeId = 0;
+}
+
+void MeshPreview::RefreshGeometry(std::uintptr_t meshRuntimeId)
+{
+	if (m_meshRuntimeId == meshRuntimeId)
+	{
+		return;
+	}
+
+	MeshPreviewGeometry geometry = m_geometryProvider ? m_geometryProvider(meshRuntimeId) : MeshPreviewGeometry{};
+	m_geometry = std::move(geometry);
+	m_meshRuntimeId = meshRuntimeId;
+}
+
+void MeshPreview::BuildUI(std::uintptr_t meshRuntimeId, bool bGpuResident, bool bDisableInteraction)
+{
+	RefreshGeometry(meshRuntimeId);
+	DrawControls(bDisableInteraction);
+	DrawGeometry(bGpuResident);
+}
+
+void MeshPreview::DrawControls(bool bDisableInteraction)
+{
+	ImGui::BeginDisabled(bDisableInteraction);
+	ImGui::SetNextItemWidth(150.0f);
+	int modeIndex = static_cast<int>(m_mode);
+	if (ImGui::Combo("Mode", &modeIndex, PreviewModes.data(), static_cast<int>(PreviewModes.size())))
+	{
+		m_mode = static_cast<MeshPreviewMode>(modeIndex);
+	}
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(120.0f);
+	ImGui::SliderFloat("Yaw", &m_yawRadians, -std::numbers::pi_v<float>, std::numbers::pi_v<float>, "%.2f");
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(120.0f);
+	ImGui::SliderFloat("Pitch", &m_pitchRadians, -1.45f, 1.45f, "%.2f");
+	ImGui::SameLine();
+	if (EditorWidgets::DrawEditorIconButton(EditorIcons::EditorIcon::Reset, "##ResetMeshPreview", "Reset preview view"))
+	{
+		m_yawRadians = 0.65f;
+		m_pitchRadians = -0.35f;
+	}
+	ImGui::EndDisabled();
+}
+
+void MeshPreview::DrawGeometry(bool bGpuResident) const
 {
 	ImVec2 availableRegion = ImGui::GetContentRegionAvail();
 	availableRegion.y = (std::max) (128.0f, availableRegion.y - 214.0f);
@@ -158,32 +215,32 @@ void MeshPreview::Draw(const MeshPreviewGeometry& geometry, bool bGpuResident, f
 	const ImVec2 canvasMax(canvasMin.x + canvasSize.x, canvasMin.y + canvasSize.y);
 	drawList.AddRectFilled(canvasMin, canvasMax, IM_COL32(18, 20, 24, 255));
 	drawList.AddRect(canvasMin, canvasMax, IM_COL32(68, 74, 84, 255));
-	if (!geometry.IsValid())
+	if (!m_geometry.IsValid())
 	{
 		drawList.AddText(ImVec2(canvasMin.x + 12.0f, canvasMin.y + 12.0f), IM_COL32(160, 166, 176, 255), "Preview geometry is unavailable.");
 		ImGui::EndChild();
 		return;
 	}
 
-	const PreviewBounds bounds = ComputePreviewBounds(geometry);
+	const PreviewBounds bounds = ComputePreviewBounds(m_geometry);
 	if (!bounds.bIsValid || canvasSize.x <= 1.0f || canvasSize.y <= 1.0f)
 	{
 		ImGui::EndChild();
 		return;
 	}
 
-	const PreviewProjection projection = BuildProjection(geometry, bounds, canvasMin, canvasSize, yaw, pitch);
-	const bool bDrawSolid = modeIndex == 1 || modeIndex == 2;
-	const bool bDrawWire = modeIndex == 0 || modeIndex == 2;
-	const std::size_t triangleCount = geometry.Indices.size() / 3;
+	const PreviewProjection projection = BuildProjection(m_geometry, bounds, canvasMin, canvasSize, m_yawRadians, m_pitchRadians);
+	const bool bDrawSolid = m_mode != MeshPreviewMode::Wireframe;
+	const bool bDrawWire = m_mode != MeshPreviewMode::Solid;
+	const std::size_t triangleCount = m_geometry.Indices.size() / 3;
 	const std::size_t previewTriangleCount = (std::min) (triangleCount, MaxPreviewTriangles);
 	if (bDrawSolid)
 	{
-		DrawSolidTriangles(drawList, geometry, projection, previewTriangleCount, bGpuResident, bDrawWire);
+		DrawSolidTriangles(drawList, m_geometry, projection, previewTriangleCount, bGpuResident, bDrawWire);
 	}
 	if (bDrawWire)
 	{
-		DrawWireTriangles(drawList, geometry, projection, previewTriangleCount, bGpuResident);
+		DrawWireTriangles(drawList, m_geometry, projection, previewTriangleCount, bGpuResident);
 	}
 	if (triangleCount > previewTriangleCount)
 	{

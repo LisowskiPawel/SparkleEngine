@@ -22,6 +22,8 @@ struct EditorSceneEntry final
 class EditorSceneModel final
 {
 public:
+	EditorSceneModel(WorldReadView readView, WorldMaterialVariantView materialVariants);
+
 	std::uint64_t GetWorldGeneration() const noexcept { return m_readView.GetGeneration(); }
 
 	WorldSequence GetWorldSequence() const noexcept { return m_readView.GetSequence(); }
@@ -51,7 +53,6 @@ public:
 	const EditorSceneEntry* FindEntry(const SceneObjectSelection& selection) const noexcept;
 
 private:
-	friend class EditorSceneModelBuilder;
 	void RebuildEntries();
 	WorldReadView m_readView;
 	WorldMaterialVariantView m_materialVariants;

@@ -23,7 +23,6 @@ target_include_directories(SourceImporters
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Private
         ${CMAKE_SOURCE_DIR}/Engine
-        ${CMAKE_SOURCE_DIR}/Engine/Core/Public/Diagnostics
 )
 
 target_compile_features(SourceImporters PUBLIC cxx_std_20)

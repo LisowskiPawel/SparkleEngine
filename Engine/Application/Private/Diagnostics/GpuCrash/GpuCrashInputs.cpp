@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 #include "Diagnostics/GpuCrash/GpuCrashInputs.h"
 
 #include "Diagnostics/GpuCrash/GpuCrashInputVerification.h"

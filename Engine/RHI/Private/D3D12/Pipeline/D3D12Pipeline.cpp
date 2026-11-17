@@ -3,6 +3,7 @@
   #include "D3D12/Diagnostics/GpuCrash/D3D12GpuCrash.h"
 #endif
 #include "D3D12/Pipeline/D3D12Pipeline.h"
+#include "Shaders/GlobalShaderMap.h"
 #include "D3D12/Device/D3D12Rhi.h"
 #include "D3D12/D3D12TypeConversions.h"
 #include "D3D12/Pipeline/D3D12BindingLayout.h"
@@ -180,14 +181,14 @@ static std::vector<D3D12_INPUT_ELEMENT_DESC> BuildVertexInput(const RhiVertexInp
 	return result;
 }
 
-static D3D12_SHADER_BYTECODE ResolveD3D12ShaderStage(const RhiShaderStageDesc& shaderDesc, std::string_view pipelineName)
+static D3D12_SHADER_BYTECODE ResolveD3D12ShaderStage(const ResolvedShader* resolvedShader, std::string_view pipelineName)
 {
-	if (!shaderDesc.IsValid())
+	if (resolvedShader == nullptr || !resolvedShader->IsValid())
 	{
 		return {};
 	}
 
-	const ResolvedShader& shader = *shaderDesc.Shader;
+	const ResolvedShader& shader = *resolvedShader;
 	if (shader.Entry->BinaryFormat != ShaderBinaryFormat::Dxil)
 	{
 		Diagnostics::Fatal(g_pipelineLogger, __FILE__, __LINE__, std::format("Pipeline '{}' received non-DXIL code for shader stage '{}'", pipelineName, GetShaderStagePrefix(shader.Entry->Stage)));

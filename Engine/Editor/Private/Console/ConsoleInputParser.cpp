@@ -3,6 +3,11 @@
 #include "Console/ConsoleInputParser.h"
 #include "Core/Public/Strings/StringUtils.h"
 
+bool ConsoleParsedInput::IsEmpty() const noexcept
+{
+	return bSucceeded && CommandName.empty();
+}
+
 namespace ConsoleInputParser
 {
 	static bool ReadNextToken(std::string_view input, std::size_t& cursor, std::string& token, std::string& error)

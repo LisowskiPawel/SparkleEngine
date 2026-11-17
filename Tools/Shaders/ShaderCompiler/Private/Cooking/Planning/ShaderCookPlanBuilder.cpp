@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "Cooking/Planning/ShaderCookPlanBuilder.h"
 
@@ -9,7 +10,6 @@
 #include "Cooking/Planning/ShaderCookPlanner.h"
 #include "Cooking/ShaderCookSettings.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Paths/FileSystemPaths.h"
 
 #include <algorithm>
 #include <format>

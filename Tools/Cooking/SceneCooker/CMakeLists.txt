@@ -36,10 +36,10 @@ target_link_libraries(SceneCooker
     PUBLIC
         MeshCooker
         MaterialCooker
-        SourceImporters
         SparkleCore
         SparkleGameFramework
     PRIVATE
+        SourceImporters
         ToolSupport
 )
 

@@ -45,11 +45,9 @@ namespace Filesystem
 		ValidatePath(logger, "Working Directory", state.workingDirectory, true);
 		ValidatePath(logger, "Executable Directory", state.executableDirectory, true);
 		ValidatePath(logger, "Workspace", state.workspacePath, true);
-		ValidatePath(logger, "Logs Root", state.productUserStatePaths.LogsRoot, false);
 		ValidatePath(logger, "Engine", state.enginePath, true);
-		ValidatePath(logger, "Engine Assets", state.engineAssetsPath, true);
+		ValidatePath(logger, "Engine Assets", state.enginePath / "Assets", true);
 		ValidatePath(logger, "Project", state.projectPath, false);
-		ValidatePath(logger, "Project Assets", state.projectAssetsPath, false);
+		ValidatePath(logger, "Project Assets", state.projectPath.empty() ? std::filesystem::path{} : state.projectPath / "Assets", false);
 	}
-
 }

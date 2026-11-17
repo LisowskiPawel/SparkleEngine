@@ -3,7 +3,6 @@
 #include "Cooking/TextureCookBatchExecutor.h"
 
 #include "Cooking/TextureAssetCooker.h"
-#include "Cooking/TextureCookMemoryLimiter.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Diagnostics/Logger.h"
 #include "Core/Public/Diagnostics/Verify.h"
@@ -13,15 +12,12 @@
 #include "TaskExecutor.h"
 #include "TaskGraph.h"
 #include "TaskTypes.h"
-#include "TextureCookRequestList.h"
 
 #include <algorithm>
-#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
-#include <functional>
-#include <objbase.h>
+#include <limits>
 #include <optional>
 #include <thread>
 #include <utility>
@@ -29,76 +25,35 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_textureCookBatchExecutorLogger, "TextureCooker.BatchExecutor");
 
-class TextureSourceComApartment final
-{
-public:
-	TextureSourceComApartment() = default;
-
-	~TextureSourceComApartment();
-	TextureSourceComApartment(const TextureSourceComApartment&) = delete;
-	TextureSourceComApartment& operator=(const TextureSourceComApartment&) = delete;
-	TextureSourceComApartment(TextureSourceComApartment&&) = delete;
-	TextureSourceComApartment& operator=(TextureSourceComApartment&&) = delete;
-
-	void Initialize();
-
-private:
-	HRESULT m_result = E_FAIL;
-};
-
-class TextureCookBatchRun final
-{
-public:
-	TextureCookBatchRun(const std::vector<TextureCookRequest>& requests, std::size_t memoryBudgetBytes, std::function<void(std::size_t, std::size_t)> progress);
-
-	std::vector<TextureCookBatchItemResult> Execute();
-
-private:
-	static constexpr std::uint32_t kMaximumBackgroundWorkerCount = 4;
-
-	TaskExecutorConfig BuildExecutorConfig() const;
-	CompiledTaskGraph BuildTaskGraph(std::vector<TaskNodeHandle>& outTaskHandles);
-	TaskResult CookRequest(std::uint32_t index);
-	static std::uint32_t ResolveBackgroundWorkerCount();
-	static std::filesystem::path BuildStagedOutputPath(const std::filesystem::path& outputPath);
-
-	const std::vector<TextureCookRequest>& m_requests;
-	TextureCookMemoryLimiter m_memoryLimiter;
-	std::function<void(std::size_t, std::size_t)> m_progress;
-	std::atomic<std::size_t> m_completedRequests{0};
-	std::vector<TextureCookBatchItemResult> m_items;
-};
-
-TextureSourceComApartment::~TextureSourceComApartment()
-{
-	if (SUCCEEDED(m_result))
-	{
-		CoUninitialize();
-	}
-}
-
-void TextureSourceComApartment::Initialize()
-{
-	m_result = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-	if (FAILED(m_result) && m_result != RPC_E_CHANGED_MODE)
-	{
-		throw Diagnostics::Error("Failed to initialize COM for source texture loading.");
-	}
-}
-
-TextureCookBatchRun::TextureCookBatchRun(const std::vector<TextureCookRequest>& requests, std::size_t memoryBudgetBytes, std::function<void(std::size_t, std::size_t)> progress) :
+TextureCookBatchExecutor::TextureCookBatchExecutor(const std::vector<TextureCookRequest>& requests, std::size_t memoryBudgetBytes, std::function<void(std::size_t, std::size_t)> progress) :
     m_requests(requests),
     m_memoryLimiter(memoryBudgetBytes),
     m_progress(std::move(progress))
 {
 }
 
-std::vector<TextureCookBatchItemResult> TextureCookBatchRun::Execute()
+TextureCookBatchExecutor::~TextureCookBatchExecutor()
 {
+	for (const TextureCookBatchItemResult& item : m_items)
+	{
+		if (!item.StagedOutputPath.empty())
+		{
+			Files::CleanupTemporaryFile(item.StagedOutputPath);
+		}
+	}
+}
+
+const std::vector<TextureCookBatchItemResult>& TextureCookBatchExecutor::Execute()
+{
+	if (m_requests.size() > (std::numeric_limits<std::uint32_t>::max)())
+	{
+		throw Diagnostics::Error("Texture cook request count exceeds task capacity.");
+	}
+
 	m_items.resize(m_requests.size());
 	for (std::size_t index = 0; index < m_requests.size(); ++index)
 	{
-		m_items[index].StagedOutputPath = BuildStagedOutputPath(m_requests[index].outputPath);
+		m_items[index].StagedOutputPath = Files::BuildTemporaryPath(m_requests[index].outputPath, ".cook-generation");
 	}
 
 	TaskExecutor executor(BuildExecutorConfig());
@@ -116,10 +71,10 @@ std::vector<TextureCookBatchItemResult> TextureCookBatchRun::Execute()
 		m_items[index].CookResult = *taskResult;
 	}
 
-	return std::move(m_items);
+	return m_items;
 }
 
-TaskExecutorConfig TextureCookBatchRun::BuildExecutorConfig() const
+TaskExecutorConfig TextureCookBatchExecutor::BuildExecutorConfig() const
 {
 	const std::uint32_t maximumTasks = static_cast<std::uint32_t>(std::max<std::size_t>(m_requests.size(), 1));
 
@@ -131,7 +86,7 @@ TaskExecutorConfig TextureCookBatchRun::BuildExecutorConfig() const
 	    .MaximumActiveExecutions = 1};
 }
 
-CompiledTaskGraph TextureCookBatchRun::BuildTaskGraph(std::vector<TaskNodeHandle>& outTaskHandles)
+CompiledTaskGraph TextureCookBatchExecutor::BuildTaskGraph(std::vector<TaskNodeHandle>& outTaskHandles)
 {
 	const std::uint32_t maximumTasks = static_cast<std::uint32_t>(std::max<std::size_t>(m_requests.size(), 1));
 	TaskGraphBuilder graph(TaskGraphLimits{.MaximumTasks = maximumTasks, .MaximumEdges = 1});
@@ -146,16 +101,14 @@ CompiledTaskGraph TextureCookBatchRun::BuildTaskGraph(std::vector<TaskNodeHandle
 	return graph.Compile();
 }
 
-TaskResult TextureCookBatchRun::CookRequest(std::uint32_t index)
+TaskResult TextureCookBatchExecutor::CookRequest(std::uint32_t index)
 {
 	TextureCookRequest stagedRequest = m_requests[index];
 	stagedRequest.outputPath = m_items[index].StagedOutputPath;
 	Files::CleanupTemporaryFile(stagedRequest.outputPath);
 
-	TextureSourceComApartment comApartment;
-	comApartment.Initialize();
-
 	CookTextureAsset(stagedRequest, m_memoryLimiter);
+
 	if (m_progress)
 	{
 		const std::size_t completed = ++m_completedRequests;
@@ -164,21 +117,8 @@ TaskResult TextureCookBatchRun::CookRequest(std::uint32_t index)
 	return TaskResult::Success();
 }
 
-std::uint32_t TextureCookBatchRun::ResolveBackgroundWorkerCount()
+std::uint32_t TextureCookBatchExecutor::ResolveBackgroundWorkerCount()
 {
 	const std::uint32_t hardwareThreads = std::max(1u, std::thread::hardware_concurrency());
-	return std::clamp(hardwareThreads > 1 ? hardwareThreads - 1 : 1u, 1u, kMaximumBackgroundWorkerCount);
-}
-
-std::filesystem::path TextureCookBatchRun::BuildStagedOutputPath(const std::filesystem::path& outputPath)
-{
-	return Files::BuildTemporaryPath(outputPath, ".cook-generation");
-}
-
-std::vector<TextureCookBatchItemResult> TextureCookBatchExecutor::Execute(
-    const std::vector<TextureCookRequest>& requests,
-    std::size_t memoryBudgetBytes,
-    const std::function<void(std::size_t, std::size_t)>& progress)
-{
-	return TextureCookBatchRun(requests, memoryBudgetBytes, progress).Execute();
+	return std::clamp(hardwareThreads > 1 ? hardwareThreads - 1 : 1u, 1u, 4u);
 }

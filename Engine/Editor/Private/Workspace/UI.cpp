@@ -16,7 +16,7 @@ const ViewportRenderRequest& UI::GetViewportRenderRequest() const noexcept
 	return m_implementation->GetViewportRenderRequest();
 }
 
-RenderViewCameraData UI::UpdateViewportCamera(const CameraInputIntent& intent, float deltaSeconds) noexcept
+RenderViewCameraData UI::UpdateViewportCamera(const CameraInputIntent& intent, float deltaSeconds)
 {
 	return m_implementation->UpdateViewportCamera(intent, deltaSeconds);
 }

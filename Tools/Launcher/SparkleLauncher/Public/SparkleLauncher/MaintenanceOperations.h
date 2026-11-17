@@ -12,6 +12,9 @@
 
 namespace SparkleLauncher
 {
+	enum class BuildWorkspaceScope : std::uint8_t;
+	enum class CookWorkspaceScope : std::uint8_t;
+
 	enum class CleanScope : std::uint8_t
 	{
 		CookedOutputs,
@@ -59,8 +62,8 @@ namespace SparkleLauncher
 		std::string ContentId;
 		std::string EditorProfile;
 		std::string GameProfile;
-		std::vector<std::string> BuildScopes;
-		std::vector<std::string> CookScopes;
+		std::vector<BuildWorkspaceScope> BuildScopes;
+		std::vector<CookWorkspaceScope> CookScopes;
 	};
 
 	bool SupportsActionSpecificClean(std::string_view operationId);

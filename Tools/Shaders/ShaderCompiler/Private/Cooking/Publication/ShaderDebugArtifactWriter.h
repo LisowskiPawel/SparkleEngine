@@ -31,6 +31,12 @@ public:
 	    const std::filesystem::path& libraryPath);
 
 private:
+	struct FileReceipt
+	{
+		std::string Sha256;
+		std::uint64_t Bytes;
+	};
+
 	void WriteCompiledJobs(const ShaderCookPipelinePlan& plan, std::span<const ShaderCompileResult> compileResults, const GlobalShaderMap& map, const CookedShaderLibrary& library);
 	std::string BuildManifestJson(const ShaderCookPipelinePlan& plan, const std::filesystem::path& mapPath, const std::filesystem::path& libraryPath) const;
 	void Write(const ShaderCompileRequest& request, const CookedStageBuild& compiledStage, const ShaderDebugArtifactSet& debugArtifacts);
@@ -53,7 +59,7 @@ private:
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	std::map<std::wstring, std::string> m_sourceFileHashes;
 #endif
-	std::map<std::string, std::string> m_files;
+	std::map<std::string, FileReceipt> m_files;
 	std::map<std::string, std::string> m_compilerModules;
 	std::vector<std::string> m_jobs;
 };

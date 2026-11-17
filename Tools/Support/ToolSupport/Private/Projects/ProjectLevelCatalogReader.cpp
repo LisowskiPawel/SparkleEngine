@@ -35,7 +35,7 @@ namespace ProjectLevelCatalogParsing
 	}
 }
 
-ProjectLevelCatalog ProjectLevelCatalogReader::Read(const std::filesystem::path& projectRoot)
+ProjectLevelCatalog LoadProjectLevelCatalog(const std::filesystem::path& projectRoot)
 {
 	const std::filesystem::path normalizedRoot = Paths::Normalize(projectRoot);
 	const std::filesystem::path catalogPath = normalizedRoot / "Levels.catalog";
@@ -47,14 +47,13 @@ ProjectLevelCatalog ProjectLevelCatalogReader::Read(const std::filesystem::path&
 
 	try
 	{
-		ProjectLevelCatalogReader reader(normalizedRoot);
-		reader.ReadCatalog(input);
+		ProjectLevelCatalog catalog = ProjectLevelCatalogReader::Parse(normalizedRoot, input);
 		if (input.bad())
 		{
 			throw Diagnostics::Error("Project level catalog could not be read.");
 		}
-		ValidateProjectLevelCatalog(reader.m_catalog, reader.m_projectRoot);
-		return std::move(reader.m_catalog);
+
+		return catalog;
 	}
 	catch (const Diagnostics::Error& error)
 	{
@@ -62,13 +61,19 @@ ProjectLevelCatalog ProjectLevelCatalogReader::Read(const std::filesystem::path&
 	}
 }
 
-void ProjectLevelCatalogReader::ValidateText(const std::filesystem::path& projectRoot, std::string_view text)
+ProjectLevelCatalog ParseProjectLevelCatalog(const std::filesystem::path& projectRoot, std::string_view text)
 {
 	const std::filesystem::path normalizedRoot = Paths::Normalize(projectRoot);
 	std::istringstream input{std::string(text)};
-	ProjectLevelCatalogReader reader(normalizedRoot);
+	return ProjectLevelCatalogReader::Parse(normalizedRoot, input);
+}
+
+ProjectLevelCatalog ProjectLevelCatalogReader::Parse(const std::filesystem::path& projectRoot, std::istream& input)
+{
+	ProjectLevelCatalogReader reader(projectRoot);
 	reader.ReadCatalog(input);
 	ValidateProjectLevelCatalog(reader.m_catalog, reader.m_projectRoot);
+	return std::move(reader.m_catalog);
 }
 
 ProjectLevelCatalogReader::ProjectLevelCatalogReader(const std::filesystem::path& projectRoot) noexcept :

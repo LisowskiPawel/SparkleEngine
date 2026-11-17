@@ -1,96 +1,104 @@
 #include "PCH.h"
-#include "InputState.h"
+#include "Core/Public/Input/InputState.h"
 
-bool InputState::IsKeyDown(Key InKey) const noexcept
+InputState::InputState() = default;
+
+InputState::~InputState() = default;
+
+InputState::InputState(InputState&&) noexcept = default;
+
+InputState& InputState::operator=(InputState&&) noexcept = default;
+
+bool InputState::IsKeyDown(Key key) const noexcept
 {
-	const ButtonState state = GetKeyState(InKey);
-	return state == ButtonState::Pressed || state == ButtonState::Held;
+	return IsDown(GetKeyState(key));
 }
 
-bool InputState::IsKeyPressed(Key InKey) const noexcept
+bool InputState::IsKeyPressed(Key key) const noexcept
 {
-	return GetKeyState(InKey) == ButtonState::Pressed;
+	return GetKeyState(key) == ButtonState::Pressed;
 }
 
-bool InputState::IsKeyReleased(Key InKey) const noexcept
+bool InputState::IsKeyReleased(Key key) const noexcept
 {
-	return GetKeyState(InKey) == ButtonState::Released;
+	return GetKeyState(key) == ButtonState::Released;
 }
 
-bool InputState::IsKeyHeld(Key InKey) const noexcept
+bool InputState::IsKeyHeld(Key key) const noexcept
 {
-	return GetKeyState(InKey) == ButtonState::Held;
+	return GetKeyState(key) == ButtonState::Held;
 }
 
-ButtonState InputState::GetKeyState(Key InKey) const noexcept
+ButtonState InputState::GetKeyState(Key key) const noexcept
 {
-	const std::size_t index = static_cast<std::size_t>(InKey);
-	if (index >= KeyCount)
+	const std::size_t index = static_cast<std::size_t>(key);
+	if (index >= kKeyCount)
 	{
 		return ButtonState::Up;
 	}
-	return m_KeyStates[index];
+
+	return m_keyStates[index];
 }
 
-bool InputState::IsMouseButtonDown(MouseButton InButton) const noexcept
+bool InputState::IsMouseButtonDown(MouseButton button) const noexcept
 {
-	const ButtonState state = GetMouseButtonState(InButton);
-	return state == ButtonState::Pressed || state == ButtonState::Held;
+	return IsDown(GetMouseButtonState(button));
 }
 
-bool InputState::IsMouseButtonPressed(MouseButton InButton) const noexcept
+bool InputState::IsMouseButtonPressed(MouseButton button) const noexcept
 {
-	return GetMouseButtonState(InButton) == ButtonState::Pressed;
+	return GetMouseButtonState(button) == ButtonState::Pressed;
 }
 
-bool InputState::IsMouseButtonReleased(MouseButton InButton) const noexcept
+bool InputState::IsMouseButtonReleased(MouseButton button) const noexcept
 {
-	return GetMouseButtonState(InButton) == ButtonState::Released;
+	return GetMouseButtonState(button) == ButtonState::Released;
 }
 
-bool InputState::IsMouseButtonHeld(MouseButton InButton) const noexcept
+bool InputState::IsMouseButtonHeld(MouseButton button) const noexcept
 {
-	return GetMouseButtonState(InButton) == ButtonState::Held;
+	return GetMouseButtonState(button) == ButtonState::Held;
 }
 
-ButtonState InputState::GetMouseButtonState(MouseButton InButton) const noexcept
+ButtonState InputState::GetMouseButtonState(MouseButton button) const noexcept
 {
-	const std::size_t index = static_cast<std::size_t>(InButton);
-	if (index >= MouseButtonCount)
+	const std::size_t index = static_cast<std::size_t>(button);
+	if (index >= kMouseButtonCount)
 	{
 		return ButtonState::Up;
 	}
-	return m_MouseButtonStates[index];
+
+	return m_mouseButtonStates[index];
 }
 
 MousePosition InputState::GetMousePosition() const noexcept
 {
-	return MousePosition{m_MouseX, m_MouseY};
+	return m_mousePosition;
 }
 
-MousePosition InputState::GetMouseDelta() const noexcept
+MouseDelta InputState::GetMouseDelta() const noexcept
 {
-	return MousePosition{m_MouseDeltaX, m_MouseDeltaY};
+	return m_mouseDelta;
 }
 
 float InputState::GetMouseWheelDelta() const noexcept
 {
-	return m_WheelDelta;
+	return m_wheelDelta;
 }
 
 float InputState::GetMouseWheelHorizontalDelta() const noexcept
 {
-	return m_WheelHorizontalDelta;
+	return m_wheelHorizontalDelta;
 }
 
 ModifierFlags InputState::GetModifiers() const noexcept
 {
-	return m_Modifiers;
+	return m_modifiers;
 }
 
-bool InputState::HasModifier(ModifierFlags InModifier) const noexcept
+bool InputState::HasModifier(ModifierFlags modifier) const noexcept
 {
-	return HasAnyFlag(m_Modifiers, InModifier);
+	return HasAnyFlag(m_modifiers, modifier);
 }
 
 bool InputState::IsShiftDown() const noexcept
@@ -118,49 +126,49 @@ bool InputState::IsCursorHidden() const noexcept
 	return m_bCursorHidden;
 }
 
-void InputState::SetKeyState(Key InKey, ButtonState InState) noexcept
+void InputState::SetKeyState(Key key, ButtonState state) noexcept
 {
-	const std::size_t index = static_cast<std::size_t>(InKey);
-	if (index < KeyCount)
+	const std::size_t index = static_cast<std::size_t>(key);
+	if (index < kKeyCount)
 	{
-		m_KeyStates[index] = InState;
+		m_keyStates[index] = state;
 	}
 }
 
-void InputState::SetMouseButtonState(MouseButton InButton, ButtonState InState) noexcept
+void InputState::SetMouseButtonState(MouseButton button, ButtonState state) noexcept
 {
-	const std::size_t index = static_cast<std::size_t>(InButton);
-	if (index < MouseButtonCount)
+	const std::size_t index = static_cast<std::size_t>(button);
+	if (index < kMouseButtonCount)
 	{
-		m_MouseButtonStates[index] = InState;
+		m_mouseButtonStates[index] = state;
 	}
 }
 
-void InputState::SetMousePosition(int32_t X, int32_t Y) noexcept
+void InputState::SetMousePosition(std::int32_t x, std::int32_t y) noexcept
 {
-	m_MouseX = X;
-	m_MouseY = Y;
+	m_mousePosition.X = x;
+	m_mousePosition.Y = y;
 }
 
-void InputState::AccumulateMouseDelta(int32_t DeltaX, int32_t DeltaY) noexcept
+void InputState::AccumulateMouseDelta(std::int32_t deltaX, std::int32_t deltaY) noexcept
 {
-	m_MouseDeltaX += DeltaX;
-	m_MouseDeltaY += DeltaY;
+	m_mouseDelta.X += deltaX;
+	m_mouseDelta.Y += deltaY;
 }
 
-void InputState::AccumulateWheelDelta(float Delta) noexcept
+void InputState::AccumulateWheelDelta(float delta) noexcept
 {
-	m_WheelDelta += Delta;
+	m_wheelDelta += delta;
 }
 
-void InputState::AccumulateWheelHorizontalDelta(float Delta) noexcept
+void InputState::AccumulateWheelHorizontalDelta(float delta) noexcept
 {
-	m_WheelHorizontalDelta += Delta;
+	m_wheelHorizontalDelta += delta;
 }
 
-void InputState::SetModifiers(ModifierFlags InModifiers) noexcept
+void InputState::SetModifiers(ModifierFlags modifiers) noexcept
 {
-	m_Modifiers = InModifiers;
+	m_modifiers = modifiers;
 }
 
 void InputState::SetMouseCaptured(bool bCaptured) noexcept
@@ -175,14 +183,14 @@ void InputState::SetCursorHidden(bool bHidden) noexcept
 
 void InputState::BeginFrame() noexcept
 {
-	AdvanceButtonStates(m_KeyStates);
-	AdvanceButtonStates(m_MouseButtonStates);
+	AdvanceButtonStates(m_keyStates);
+	AdvanceButtonStates(m_mouseButtonStates);
 	ResetFrameDeltas();
 }
 
 void InputState::ResetPointerState() noexcept
 {
-	m_MouseButtonStates.fill(ButtonState::Up);
+	m_mouseButtonStates.fill(ButtonState::Up);
 	ResetFrameDeltas();
 	m_bMouseCaptured = false;
 	m_bCursorHidden = false;
@@ -205,8 +213,8 @@ void InputState::AdvanceButtonStates(std::span<ButtonState> states) noexcept
 
 void InputState::ResetFrameDeltas() noexcept
 {
-	m_MouseDeltaX = 0;
-	m_MouseDeltaY = 0;
-	m_WheelDelta = 0.0f;
-	m_WheelHorizontalDelta = 0.0f;
+	m_mouseDelta.X = 0;
+	m_mouseDelta.Y = 0;
+	m_wheelDelta = 0.0f;
+	m_wheelHorizontalDelta = 0.0f;
 }

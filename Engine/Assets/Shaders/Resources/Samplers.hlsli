@@ -65,5 +65,3 @@ SamplerState SamplerAniso8xMirror;
 SamplerState SamplerAniso16xWrap;
 SamplerState SamplerAniso16xClamp;
 SamplerState SamplerAniso16xMirror;
-
-static const uint kSamplerCount = 33;

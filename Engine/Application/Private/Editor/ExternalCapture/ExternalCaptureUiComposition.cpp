@@ -7,7 +7,6 @@ class RendererCaptureCommands final : public EditorExternalCaptureCommands
 {
 public:
 	explicit RendererCaptureCommands(Renderer& renderer) noexcept :
-
 	    m_renderer(renderer)
 	{
 	}

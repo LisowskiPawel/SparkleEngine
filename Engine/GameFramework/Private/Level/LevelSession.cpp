@@ -5,7 +5,7 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Environment/EnvironmentVariables.h"
-#include "Level/Level.h"
+#include "Level/LevelAsset.h"
 #include "Level/LevelRegistry.h"
 #include "Level/LevelWorldProjection.h"
 #include "Level/Loading/SceneLoadExecutor.h"
@@ -48,6 +48,11 @@ void LevelSession::InitializeStartupLevel() noexcept
 std::vector<std::string> LevelSession::GetRegisteredLevelNames() const
 {
 	return m_levelRegistry->GetLevelNames();
+}
+
+std::string_view LevelSession::GetActiveLevelName() const noexcept
+{
+	return m_activeLevel != nullptr ? m_activeLevel->GetName() : std::string_view{};
 }
 
 void LevelSession::RequestLevelChange(std::string_view requestedLevelName) noexcept
@@ -123,7 +128,7 @@ void LevelSession::StartLevelChange(LevelAsset& requestedLevel) noexcept
 
 	try
 	{
-		m_loadExecutor->Start(requestId, m_gameWorld->GetGeneration(), m_documentGeneration, requestedLevel.BuildDescription());
+		m_loadExecutor->Start(requestId, m_gameWorld->GetGeneration(), m_documentGeneration, requestedLevel.GetDescription());
 	}
 	catch (const Diagnostics::Error& error)
 	{
@@ -239,10 +244,11 @@ bool LevelSession::SaveActiveLevel() noexcept
 	{
 		return false;
 	}
-	m_activeLevel->SetLevelDesc(CaptureLevelWorldState(m_activeLevel->BuildDescription(), m_gameWorld->AcquireReadView()));
+
 	try
 	{
-		m_levelRegistry->SaveLevel(*m_activeLevel);
+		LevelDesc description = CaptureLevelWorldState(m_activeLevel->GetDescription(), m_gameWorld->AcquireReadView());
+		m_activeLevel->Save(std::move(description));
 		m_lastLoadDiagnostic.clear();
 		return true;
 	}

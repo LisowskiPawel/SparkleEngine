@@ -2,17 +2,13 @@
 #define SPARKLE_GBUFFER_PACKING_HLSLI
 
 #include "/Engine/Common/Math.hlsli"
+#include "/Engine/Material/MaterialAlpha.hlsli"
 
 namespace GBufferPacking
 {
-	float PackOutputAlpha(float alpha, uint alphaMode, uint blendedAlphaMode)
+	float4 PackBaseColor(float3 baseColor, float alpha, uint alphaMode)
 	{
-		return alphaMode == blendedAlphaMode ? alpha : 1.0f;
-	}
-
-	float4 PackBaseColor(float3 baseColor, float alpha, uint alphaMode, uint blendedAlphaMode)
-	{
-		return float4(baseColor, PackOutputAlpha(alpha, alphaMode, blendedAlphaMode));
+		return float4(baseColor, alphaMode == MaterialAlpha::Blend ? alpha : 1.0f);
 	}
 
 	float4 PackWorldNormal(float3 normalWorld)

@@ -4,18 +4,13 @@
 #include "../Formats/PixelFormat.h"
 #include "../RHIAPI.h"
 #include "../Resources/RhiResourceDesc.h"
-#include "../ShaderParameters/ShaderParameterSemantics.h"
-#include "../Shaders/ShaderStage.h"
-#include "../Shaders/GlobalShaderMap.h"
 
 #include <array>
 #include <cstddef>
 #include <cstdint>
-#include <string>
-#include <span>
-#include <vector>
 
-class PassParameterLayout;
+class RenderBindingLayout;
+struct ResolvedShader;
 
 enum class ERhiCullMode : std::uint8_t
 {
@@ -76,79 +71,6 @@ enum class RhiVertexSemantic : std::uint8_t
 	Tangent = 3,
 };
 
-enum class CompiledBindingType : std::uint8_t
-{
-	ConstantBuffer,
-	ReadOnlyAddress,
-	ReadWriteAddress,
-	AccelerationStructure,
-	ReadOnlyResourceTable,
-	ReadWriteResourceTable,
-	SamplerTable,
-	PushConstants,
-};
-
-struct RhiBindingPoint
-{
-	// HLSL register space and SPIR-V descriptor set share Set; HLSL register and SPIR-V binding share Binding.
-	std::uint32_t Set = 0;
-	std::uint32_t Binding = 0;
-};
-
-struct RhiBindlessBindingMetadata
-{
-	// Reserved for descriptor-indexing/bindless layout compilation; bindful paths keep these fields disabled.
-	bool bBindlessEligible = false;
-	bool bRuntimeSizedArray = false;
-	std::uint32_t ReservedDescriptorCount = 0;
-};
-
-struct CompiledBinding
-{
-	const char* Name = nullptr;
-	CompiledBindingType Type = CompiledBindingType::ReadOnlyResourceTable;
-	ShaderParameterSemanticKind SemanticKind = ShaderParameterSemanticKind::ReadTexture;
-	std::uint32_t BindingIndex = 0;
-	RhiBindingPoint BindingPoint = {};
-	ShaderStageMask VisibilityMask = ShaderStageMask::None;
-	std::uint32_t DescriptorCount = 0;
-	std::uint32_t PushConstantCount = 0;
-	RhiBindlessBindingMetadata Bindless = {};
-};
-
-struct RenderBindingLayoutCompileDesc
-{
-	const PassParameterLayout* ParameterLayout = nullptr;
-	std::span<const ResolvedShader> Shaders;
-	bool bAllowInputAssemblerInputLayout = false;
-	const wchar_t* DebugName = L"RHI_BindingLayout";
-	bool bInlineUniformDataAsPushConstants = false;
-};
-
-class SPARKLE_RHI_API RenderBindingLayout
-{
-public:
-	virtual ~RenderBindingLayout() noexcept;
-	RenderBindingLayout(const RenderBindingLayout&) = delete;
-	RenderBindingLayout& operator=(const RenderBindingLayout&) = delete;
-	RenderBindingLayout(RenderBindingLayout&&) = delete;
-	RenderBindingLayout& operator=(RenderBindingLayout&&) = delete;
-
-	const PassParameterLayout& GetParameterLayout() const noexcept;
-	const CompiledBinding* GetBindings() const noexcept;
-	std::size_t GetBindingCount() const noexcept;
-	const CompiledBinding* FindBinding(const char* name) const noexcept;
-
-protected:
-	RenderBindingLayout(const PassParameterLayout& parameterLayout, std::vector<CompiledBinding> bindings, std::vector<std::string> bindingNames) noexcept;
-
-private:
-	const PassParameterLayout* m_parameterLayout = nullptr;
-
-	std::vector<CompiledBinding> m_bindings;
-	std::vector<std::string> m_bindingNames;
-};
-
 struct RhiBlendTargetState
 {
 	bool bBlendEnable = false;
@@ -169,22 +91,7 @@ struct RhiBlendState
 	bool bIndependentBlendEnable = false;
 	std::array<RhiBlendTargetState, 8> Targets = {};
 
-	bool operator==(const RhiBlendState& other) const noexcept
-	{
-		if (bAlphaToCoverageEnable != other.bAlphaToCoverageEnable || bIndependentBlendEnable != other.bIndependentBlendEnable)
-		{
-			return false;
-		}
-		const std::size_t targetCount = bIndependentBlendEnable ? Targets.size() : 1;
-		for (std::size_t index = 0; index < targetCount; ++index)
-		{
-			if (Targets[index] != other.Targets[index])
-			{
-				return false;
-			}
-		}
-		return true;
-	}
+	SPARKLE_RHI_API bool operator==(const RhiBlendState& other) const noexcept;
 };
 
 struct RhiRasterizerState
@@ -203,7 +110,7 @@ struct RhiDepthState
 	bool bDepthWriteEnable = true;
 	CompareOp DepthFunc = CompareOp::Less;
 
-	constexpr bool IsValid() const noexcept { return bDepthEnable || !bDepthWriteEnable; }
+	SPARKLE_RHI_API bool IsValid() const noexcept;
 
 	bool operator==(const RhiDepthState&) const noexcept = default;
 };
@@ -222,16 +129,7 @@ struct RhiStencilState
 	RhiStencilOp BackFaceStencilDepthFailOp = RhiStencilOp::Keep;
 	RhiStencilOp BackFaceStencilPassOp = RhiStencilOp::Keep;
 
-	constexpr bool HasWrites() const noexcept
-	{
-		const bool bFrontFailures = FrontFaceStencilFailOp != RhiStencilOp::Keep || FrontFaceStencilDepthFailOp != RhiStencilOp::Keep;
-		const bool bFrontWrites = bFrontFailures || FrontFaceStencilPassOp != RhiStencilOp::Keep;
-		const bool bBackFailures = BackFaceStencilFailOp != RhiStencilOp::Keep || BackFaceStencilDepthFailOp != RhiStencilOp::Keep;
-		const bool bBackWrites = bBackFailures || BackFaceStencilPassOp != RhiStencilOp::Keep;
-		const bool bFacesWrite = bFrontWrites || bBackWrites;
-		const bool bWritesEnabled = bStencilEnable && StencilWriteMask != 0;
-		return bWritesEnabled && bFacesWrite;
-	}
+	SPARKLE_RHI_API bool HasWrites() const noexcept;
 
 	bool operator==(const RhiStencilState&) const noexcept = default;
 };
@@ -264,48 +162,14 @@ struct RhiVertexInputDeclaration
 	std::uint8_t BindingCount = 0;
 	std::uint8_t ElementCount = 0;
 
-	bool operator==(const RhiVertexInputDeclaration& other) const noexcept
-	{
-		if (BindingCount != other.BindingCount || ElementCount != other.ElementCount)
-		{
-			return false;
-		}
-		if (BindingCount > Bindings.size() || ElementCount > Elements.size())
-		{
-			return Bindings == other.Bindings && Elements == other.Elements;
-		}
-		for (std::uint32_t index = 0; index < BindingCount; ++index)
-		{
-			if (Bindings[index] != other.Bindings[index])
-			{
-				return false;
-			}
-		}
-		for (std::uint32_t index = 0; index < ElementCount; ++index)
-		{
-			if (Elements[index] != other.Elements[index])
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-};
-
-struct RhiShaderStageDesc
-{
-	const ResolvedShader* Shader = nullptr;
-
-	bool IsValid() const noexcept { return Shader != nullptr && Shader->IsValid(); }
-
-	explicit operator bool() const noexcept { return IsValid(); }
+	SPARKLE_RHI_API bool operator==(const RhiVertexInputDeclaration& other) const noexcept;
 };
 
 struct GraphicsPipelineDesc
 {
 	const RenderBindingLayout* BindingLayout = nullptr;
-	RhiShaderStageDesc VertexShader = {};
-	RhiShaderStageDesc PixelShader = {};
+	const ResolvedShader* VertexShader = nullptr;
+	const ResolvedShader* PixelShader = nullptr;
 	RhiBlendState Blend = {};
 	RhiRasterizerState Rasterizer = {};
 	RhiDepthState Depth = {};
@@ -318,25 +182,20 @@ struct GraphicsPipelineDesc
 	std::uint8_t SampleCount = 1;
 	const wchar_t* DebugName = L"RHI_GraphicsPipeline";
 
-	static constexpr bool IsValidSampleCount(std::uint8_t sampleCount) noexcept
-	{
-		const bool bSmallCount = sampleCount == 1 || sampleCount == 2;
-		const bool bLargeCount = sampleCount == 4 || sampleCount == 8;
-		return bSmallCount || bLargeCount;
-	}
+	static SPARKLE_RHI_API bool IsValidSampleCount(std::uint8_t sampleCount) noexcept;
 };
 
 struct ComputePipelineDesc
 {
 	const RenderBindingLayout* BindingLayout = nullptr;
-	RhiShaderStageDesc ComputeShader = {};
+	const ResolvedShader* ComputeShader = nullptr;
 	const wchar_t* DebugName = L"RHI_ComputePipeline";
 };
 
 class SPARKLE_RHI_API RenderPipeline
 {
 public:
-	virtual ~RenderPipeline() noexcept = default;
+	virtual ~RenderPipeline() noexcept;
 
 	RenderPipeline(const RenderPipeline&) = delete;
 	RenderPipeline& operator=(const RenderPipeline&) = delete;
@@ -344,5 +203,5 @@ public:
 	RenderPipeline& operator=(RenderPipeline&&) = delete;
 
 protected:
-	RenderPipeline() noexcept = default;
+	RenderPipeline() noexcept;
 };

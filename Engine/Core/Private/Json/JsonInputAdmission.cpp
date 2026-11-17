@@ -1,0 +1,48 @@
+#include "PCH.h"
+
+#include "Core/Public/Json/JsonInputAdmission.h"
+
+#include "Core/Public/Diagnostics/Error.h"
+
+namespace Json
+{
+	InputAdmission::InputAdmission(std::string_view input, std::size_t maximumBytes)
+	{
+		if (input.size() > maximumBytes || input.find('\0') != std::string_view::npos)
+		{
+			throw Diagnostics::Error("JSON input exceeds its byte limit or contains a raw NUL.");
+		}
+		if (input.starts_with("\xef\xbb\xbf"))
+		{
+			throw Diagnostics::Error("JSON input must use UTF-8 without a byte order mark.");
+		}
+	}
+
+	void InputAdmission::CheckDepth(int depth) const
+	{
+		if (depth > 65)
+		{
+			throw Diagnostics::Error("JSON input exceeds its nesting limit.");
+		}
+	}
+
+	void InputAdmission::BeginObject(int depth)
+	{
+		CheckDepth(depth);
+		m_keys.resize(static_cast<std::size_t>(depth) + 1);
+		m_keys.back().clear();
+	}
+
+	void InputAdmission::EndObject(int depth)
+	{
+		m_keys.resize(static_cast<std::size_t>(depth));
+	}
+
+	void InputAdmission::ReadKey(int depth, const std::string& key)
+	{
+		if (!m_keys.at(static_cast<std::size_t>(depth) - 1).insert(key).second)
+		{
+			throw Diagnostics::Error("JSON input repeats a consumed member.");
+		}
+	}
+}

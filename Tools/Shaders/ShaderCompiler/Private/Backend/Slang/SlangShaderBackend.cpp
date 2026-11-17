@@ -33,6 +33,8 @@ SlangShaderBackend::SlangShaderBackend()
 	m_backendVersion = QueryBackendVersion(*m_globalSession.get());
 }
 
+SlangShaderBackend::~SlangShaderBackend() = default;
+
 ShaderBackendCapabilities SlangShaderBackend::GetStaticCapabilities() noexcept
 {
 	return ShaderBackendCapabilities{.bSupportsDxil = true, .bSupportsSpirV = true, .bSupportsSpirVRayTracingLibrary = true, .bSupportsSpirVInlineRayQuery = true};

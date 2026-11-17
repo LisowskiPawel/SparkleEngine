@@ -7,7 +7,7 @@ class SkeletonResourceStore;
 namespace ECS
 {
 	class AnimationClipResourceStore;
-	class AnimationOutputStorage;
+	class AnimationEvaluationStorage;
 	class MorphWeightStorage;
 	class EntityRegistry;
 
@@ -18,7 +18,7 @@ namespace ECS
 		    EntityRegistry& registry,
 		    const AnimationClipResourceStore& clips,
 		    const SkeletonResourceStore& skeletons,
-		    AnimationOutputStorage& output,
+		    AnimationEvaluationStorage& output,
 		    MorphWeightStorage& weights,
 		    float deltaSeconds);
 
@@ -35,7 +35,7 @@ namespace ECS
 		EntityRegistry& m_registry;
 		const AnimationClipResourceStore& m_clips;
 		const SkeletonResourceStore& m_skeletons;
-		AnimationOutputStorage& m_output;
+		AnimationEvaluationStorage& m_evaluation;
 		MorphWeightStorage& m_weights;
 		float m_deltaSeconds = 0.0f;
 	};

@@ -20,11 +20,6 @@ namespace SceneDepthUtils
 		return sceneDepth > 0.0f ? nearZ / sceneDepth : 0.0f;
 	}
 
-	float SkyDepth(float farZ)
-	{
-		return farZ;
-	}
-
 	bool IsSkyDepth(float sceneDepth, float farZ)
 	{
 		return sceneDepth >= farZ - max(1.0e-3f, farZ * 1.0e-6f);

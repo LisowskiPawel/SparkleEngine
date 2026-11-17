@@ -15,7 +15,7 @@ RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult t
 	const float3 normalObject = cross(evaluatedTriangle.V1.Position - evaluatedTriangle.V0.Position, evaluatedTriangle.V2.Position - evaluatedTriangle.V0.Position);
 	const float3 outwardGeometricNormal = RayEndpoints::TransformGeometricNormal(normalObject, mesh);
 
-	const bool bTwoSided = (evaluatedTriangle.Instance.Flags & HitSurface::InstanceFlagTwoSided) != 0u;
+	const bool bTwoSided = (evaluatedTriangle.Instance.Flags & RayTracingHitData::InstanceFlagTwoSided) != 0u;
 
 	RayTracingHitSurfaceData surface = (RayTracingHitSurfaceData)0;
 	if (!trace.bFrontFace && !bTwoSided)

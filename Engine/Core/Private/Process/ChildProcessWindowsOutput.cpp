@@ -29,7 +29,7 @@ namespace Process
 		return true;
 	}
 
-	enum class ChildOutputEvent
+	enum class ChildOutputEvent : std::uint8_t
 	{
 		ProcessExited,
 		OutputReady,

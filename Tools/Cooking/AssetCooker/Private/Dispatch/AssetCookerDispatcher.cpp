@@ -2,7 +2,7 @@
 
 #include "Cooking/AssetCookStages.h"
 #include "Core/Public/Paths/FileSystemPaths.h"
-#include "ToolWorkProgress.h"
+#include "ToolWorkProgressWriter.h"
 
 #include <array>
 #include <iostream>

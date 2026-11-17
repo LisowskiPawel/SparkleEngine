@@ -6,7 +6,7 @@
 #include "BinaryAssetWriter.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Files/FileSetPublication.h"
-#include "Core/Public/Paths/ProductFilePaths.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include <cstring>
 

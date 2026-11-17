@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Bindings/RenderBindingLayout.h"
 #include "../Core/RhiBackendApi.h"
 #include "RhiQueue.h"
 #include "../Descriptors/RhiDescriptorHandles.h"

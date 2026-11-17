@@ -26,6 +26,31 @@ static bool AffectsSameTarget(const WorldEditPayload& left, const WorldEditPaylo
 
 static constexpr std::size_t MaximumTransactions = 256;
 
+EditorTransactionHistory::EditorTransactionHistory(SubmitFunction submit) :
+    m_submit(std::move(submit))
+{
+}
+
+void EditorTransactionHistory::FinishInteraction() noexcept
+{
+	m_bCoalescing = false;
+}
+
+bool EditorTransactionHistory::CanUndo() const noexcept
+{
+	return !m_undo.empty();
+}
+
+bool EditorTransactionHistory::CanRedo() const noexcept
+{
+	return !m_redo.empty();
+}
+
+void EditorTransactionHistory::DismissLastResult() noexcept
+{
+	m_lastResult.reset();
+}
+
 WorldEditResult EditorTransactionHistory::Submit(WorldEditCommand command, std::uint64_t worldGeneration)
 {
 	command.RequestId = m_nextRequestId++;

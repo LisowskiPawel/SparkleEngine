@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "CookedSceneManifestWriter.h"
 #include "CookedSceneBuild.h"
@@ -7,13 +8,41 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Files/FileSetPublication.h"
-#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Paths/PathUtils.h"
 
 #include <optional>
+#include <limits>
+
+static std::uint32_t GetRecordCount(std::size_t count)
+{
+	if (count > (std::numeric_limits<std::uint32_t>::max)())
+	{
+		throw Diagnostics::Error("Cooked scene manifest record count exceeds the cooked format.");
+	}
+
+	return static_cast<std::uint32_t>(count);
+}
+
+static Assets::CookedSceneManifestHeader BuildHeader(const CookedSceneManifestBuildData& manifest)
+{
+	return Assets::CookedSceneManifestHeader{
+	    .meshAssetReferenceCount = GetRecordCount(manifest.meshAssetReferences.size()),
+	    .materialAssetReferenceCount = GetRecordCount(manifest.materialAssetReferences.size()),
+	    .instanceCount = GetRecordCount(manifest.instances.size()),
+	    .instanceGroupCount = GetRecordCount(manifest.instanceGroups.size()),
+	    .cameraCount = GetRecordCount(manifest.cameras.size()),
+	    .lightCount = GetRecordCount(manifest.lights.size()),
+	    .skeletonRefCount = GetRecordCount(manifest.skeletonRefs.size()),
+	    .animationRefCount = GetRecordCount(manifest.animationReferences.size()),
+	    .morphWeightCount = GetRecordCount(manifest.morphWeights.size()),
+	    .materialVariantCount = GetRecordCount(manifest.materialVariants.size()),
+	    .materialVariantMappingCount = GetRecordCount(manifest.materialVariantMappings.size()),
+	    .featureFlags = manifest.featureFlags};
+}
 
 static void StageManifest(const CookedSceneBuild& build, std::vector<Files::FilePublication>& outPublication)
 {
+	const Assets::CookedSceneManifestHeader header = BuildHeader(build.manifest);
 	const std::filesystem::path stagedPath = Files::BuildTemporaryPath(build.identity.manifestPath, ".cook-generation");
 
 	Files::CleanupTemporaryFile(stagedPath);
@@ -21,7 +50,7 @@ static void StageManifest(const CookedSceneBuild& build, std::vector<Files::File
 
 	SparkleTools::WriteBinaryAssetFile(
 	    stagedPath,
-	    build.manifest.header,
+	    header,
 	    build.manifest.meshAssetReferences,
 	    build.manifest.materialAssetReferences,
 	    build.manifest.instances,

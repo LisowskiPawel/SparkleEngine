@@ -9,20 +9,17 @@
 #include <cstring>
 #include <utility>
 
-namespace GltfCoordinateConversionDetail
+DirectX::XMMATRIX GltfCoordinateConverter::LoadSourceMatrix(const float (&values)[16]) noexcept
 {
-	DirectX::XMMATRIX LoadGltfRowMatrix(const float (&values)[16]) noexcept
-	{
-		DirectX::XMFLOAT4X4 matrix;
-		static_assert(sizeof(matrix) == sizeof(values));
-		std::memcpy(&matrix, values, sizeof(values));
-		return DirectX::XMLoadFloat4x4(&matrix);
-	}
+	DirectX::XMFLOAT4X4 matrix;
+	static_assert(sizeof(matrix) == sizeof(values));
+	std::memcpy(&matrix, values, sizeof(values));
+	return DirectX::XMLoadFloat4x4(&matrix);
+}
 
-	DirectX::XMFLOAT3 ReflectSourceX(const DirectX::XMFLOAT3& value) noexcept
-	{
-		return {-value.x, value.y, value.z};
-	}
+DirectX::XMFLOAT3 GltfCoordinateConverter::ReflectSourceX(const DirectX::XMFLOAT3& value) noexcept
+{
+	return {-value.x, value.y, value.z};
 }
 
 DirectX::XMMATRIX GltfCoordinateConverter::ComputeNodeLocalTransform(const cgltf_node* node)
@@ -34,7 +31,7 @@ DirectX::XMMATRIX GltfCoordinateConverter::ComputeNodeLocalTransform(const cgltf
 
 	float sourceMatrix[16];
 	cgltf_node_transform_local(node, sourceMatrix);
-	return ConvertMatrix(GltfCoordinateConversionDetail::LoadGltfRowMatrix(sourceMatrix));
+	return ConvertMatrix(LoadSourceMatrix(sourceMatrix));
 }
 
 DirectX::XMMATRIX GltfCoordinateConverter::ComputeNodeWorldTransform(const cgltf_node* node)
@@ -46,7 +43,7 @@ DirectX::XMMATRIX GltfCoordinateConverter::ComputeNodeWorldTransform(const cgltf
 
 	float sourceMatrix[16];
 	cgltf_node_transform_world(node, sourceMatrix);
-	return ConvertMatrix(GltfCoordinateConversionDetail::LoadGltfRowMatrix(sourceMatrix));
+	return ConvertMatrix(LoadSourceMatrix(sourceMatrix));
 }
 
 DirectX::XMMATRIX GltfCoordinateConverter::ConvertMatrix(DirectX::FXMMATRIX sourceRowMatrix) noexcept
@@ -57,42 +54,42 @@ DirectX::XMMATRIX GltfCoordinateConverter::ConvertMatrix(DirectX::FXMMATRIX sour
 
 DirectX::XMFLOAT3 GltfCoordinateConverter::ConvertPosition(const DirectX::XMFLOAT3& value) noexcept
 {
-	return GltfCoordinateConversionDetail::ReflectSourceX(value);
+	return ReflectSourceX(value);
 }
 
 DirectX::XMFLOAT3 GltfCoordinateConverter::ConvertDirection(const DirectX::XMFLOAT3& value) noexcept
 {
-	return GltfCoordinateConversionDetail::ReflectSourceX(value);
+	return ReflectSourceX(value);
 }
 
 DirectX::XMFLOAT3 GltfCoordinateConverter::ConvertNormal(const DirectX::XMFLOAT3& value) noexcept
 {
-	return GltfCoordinateConversionDetail::ReflectSourceX(value);
+	return ReflectSourceX(value);
 }
 
 DirectX::XMFLOAT3 GltfCoordinateConverter::ConvertTranslation(const DirectX::XMFLOAT3& value) noexcept
 {
-	return GltfCoordinateConversionDetail::ReflectSourceX(value);
+	return ReflectSourceX(value);
 }
 
 DirectX::XMFLOAT3 GltfCoordinateConverter::ConvertTranslationTangent(const DirectX::XMFLOAT3& value) noexcept
 {
-	return GltfCoordinateConversionDetail::ReflectSourceX(value);
+	return ReflectSourceX(value);
 }
 
 DirectX::XMFLOAT3 GltfCoordinateConverter::ConvertMorphPositionDelta(const DirectX::XMFLOAT3& value) noexcept
 {
-	return GltfCoordinateConversionDetail::ReflectSourceX(value);
+	return ReflectSourceX(value);
 }
 
 DirectX::XMFLOAT3 GltfCoordinateConverter::ConvertMorphNormalDelta(const DirectX::XMFLOAT3& value) noexcept
 {
-	return GltfCoordinateConversionDetail::ReflectSourceX(value);
+	return ReflectSourceX(value);
 }
 
 DirectX::XMFLOAT3 GltfCoordinateConverter::ConvertMorphTangentDelta(const DirectX::XMFLOAT3& value) noexcept
 {
-	return GltfCoordinateConversionDetail::ReflectSourceX(value);
+	return ReflectSourceX(value);
 }
 
 DirectX::XMFLOAT4 GltfCoordinateConverter::ConvertTangentFrame(const DirectX::XMFLOAT4& value) noexcept

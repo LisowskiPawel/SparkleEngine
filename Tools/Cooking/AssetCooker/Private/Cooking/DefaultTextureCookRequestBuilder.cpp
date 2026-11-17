@@ -1,4 +1,5 @@
 #include "DefaultTextureCookRequestBuilder.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "Core/Public/Assets/DefaultTexture.h"
 #include "Core/Public/Diagnostics/Error.h"

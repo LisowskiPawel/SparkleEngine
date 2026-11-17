@@ -1,11 +1,11 @@
 #include "PCH.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "Cli/InspectShaderCommand.h"
 
 #include "Constants/ShaderCompilerConstants.h"
 #include "Contracts/ShaderContractCatalogBuilder.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Formatting/HexFormat.h"
 #include "RHI/Public/Shaders/GlobalShaderMap.h"
 
@@ -20,7 +20,7 @@ int InspectShader(std::string_view shaderId)
 		const CookedShaderLibrary library = CookedShaderLibrary::Open(Filesystem::GetCookedShaderLibraryPath());
 		const GlobalShaderMap map = GlobalShaderMap::Open(Filesystem::GetGlobalShaderMapPath(), library);
 		std::cout << shader.shaderName << " type=" << Formatting::FormatPrefixedHexUInt64(shader.shaderTypeId) << " stage=" << GetShaderStagePrefix(shader.stage) << " source=" << shader.sourcePath
-		          << " entry=" << shader.entryPoint << " parameters=" << shader.parameterStruct.Fields.size() << "\n";
+		          << " entry=" << shader.entryPoint << " parameters=" << (shader.parameterStruct ? shader.parameterStruct->Fields.size() : 0) << "\n";
 		for (const ShaderTarget target : {ShaderTarget::DxilSm66, ShaderTarget::SpirV16})
 		{
 			const GlobalShaderMapEntry* const entry = map.Find(shader.shaderTypeId, target);

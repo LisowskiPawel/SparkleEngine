@@ -7,20 +7,20 @@
 #include <string>
 #include <vector>
 
-enum class ImportedAnimationInterpolation : std::uint32_t
+enum class ImportedAnimationInterpolation : std::uint8_t
 {
 	Linear = 0,
 	Step = 1,
 	CubicSpline = 2,
 };
 
-enum class ImportedAnimationTargetPath : std::uint32_t
+enum class ImportedAnimationTargetPath : std::uint8_t
 {
 	Translation = 0,
 	Rotation = 1,
 	Scale = 2,
 	Weights = 3,
-	Unknown = 0xFFFFFFFFu,
+	Unknown = 0xFFu,
 };
 
 struct ImportedAnimationKeyframe
@@ -36,7 +36,7 @@ struct ImportedAnimationSampler
 	ImportedAnimationInterpolation interpolation = ImportedAnimationInterpolation::Linear;
 	std::vector<ImportedAnimationKeyframe> keyframes;
 
-	bool IsValid() const noexcept { return !keyframes.empty(); }
+	bool IsValid() const noexcept;
 };
 
 struct ImportedAnimationChannel
@@ -56,5 +56,5 @@ struct ImportedAnimationClip
 	std::vector<ImportedAnimationSampler> samplers;
 	std::vector<ImportedAnimationChannel> channels;
 
-	bool IsValid() const noexcept { return !samplers.empty() && !channels.empty() && durationSeconds >= 0.0f; }
+	bool IsValid() const noexcept;
 };

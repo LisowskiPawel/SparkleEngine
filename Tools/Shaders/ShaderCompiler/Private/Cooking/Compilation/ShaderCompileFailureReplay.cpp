@@ -5,7 +5,9 @@
 #include "Cooking/Compilation/ShaderCompileJob.h"
 
 #include "Core/Public/Files/FileUtils.h"
-#include "Core/Public/Json/JsonWriter.h"
+#include "Core/Public/Formatting/HexFormat.h"
+
+#include <nlohmann/json.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -35,7 +37,12 @@ namespace ShaderCompileFailureReplay
 		{
 			return std::string(truncationMarker.substr(0, maximumBytes));
 		}
-		std::string bounded(text.substr(0, maximumBytes - truncationMarker.size()));
+		std::size_t retainedBytes = maximumBytes - truncationMarker.size();
+		while (retainedBytes > 0 && (static_cast<unsigned char>(text[retainedBytes]) & 0xc0u) == 0x80u)
+		{
+			--retainedBytes;
+		}
+		std::string bounded(text.substr(0, retainedBytes));
 		bounded += truncationMarker;
 		return bounded;
 	}
@@ -69,34 +76,34 @@ namespace ShaderCompileFailureReplay
 			    std::span(job.Request.DescriptorBindingRemaps),
 			    [](const ShaderDescriptorBindingRemap& remap) { return std::format("{}:{}:{}", remap.Name, remap.Set, remap.Binding); });
 
-			Json::ObjectWriter writer;
-			writer.WriteString("shaderType", job.Request.ShaderTypeName);
-			writer.WriteHexUInt64("shaderTypeId", job.Request.ShaderType);
-			writer.WriteString("virtualSource", job.Request.VirtualSourcePath);
-			writer.WriteString("entryPoint", job.Request.EntryPoint);
-			writer.WriteString("stage", GetShaderStagePrefix(job.Request.Stage));
-			writer.WriteString("target", GetShaderTargetName(job.Request.Target));
-			writer.WriteString("backend", job.BackendName);
-			writer.WriteUInt64("backendVersion", job.BackendVersion);
-			writer.WriteString("profile", job.TargetProfile);
-			writer.WriteUInt64("unitKind", static_cast<std::uint64_t>(job.Request.UnitKind));
-			writer.WriteUInt64("requiredFeatures", static_cast<std::uint64_t>(job.Request.RequiredFeatures));
-			writer.WriteRaw("enableDebugInfo", job.Request.bEnableDebugInfo ? "true" : "false");
-			writer.WriteRaw("enableOptimizations", job.Request.bEnableOptimizations ? "true" : "false");
-			writer.WriteRaw("treatWarningsAsErrors", job.Request.bTreatWarningsAsErrors ? "true" : "false");
-			writer.WriteRaw("stripDebugInfo", job.Request.bStripDebugInfo ? "true" : "false");
-			writer.WriteHexUInt64("sourceContentHash", job.SourceContentHash);
-			writer.WriteHexUInt64("dependencyClosureHash", job.DependencyClosureHash);
-			writer.WriteHexUInt64("requestHash", job.RequestHash);
-			writer.WriteHexUInt64("compileInputHash", job.InputHash);
-			writer.WriteRaw("virtualDependencies", Json::WriteStringArray(replayDependencies));
-			writer.WriteRaw("defines", Json::WriteStringArray(replayDefines));
-			writer.WriteRaw("descriptorBindingRemaps", Json::WriteStringArray(replayRemaps));
-			writer.WriteString("diagnostic", BoundText(diagnostic, kMaximumFailureDiagnosticBytes));
-			writer.WriteString("preprocessedSource", BoundText(job.Request.SourceCode, kMaximumFailureSourceBytes));
+			nlohmann::json document{
+			    {"shaderType", job.Request.ShaderTypeName},
+			    {"shaderTypeId", Formatting::FormatHexUInt64(job.Request.ShaderType)},
+			    {"virtualSource", job.Request.VirtualSourcePath},
+			    {"entryPoint", job.Request.EntryPoint},
+			    {"stage", GetShaderStagePrefix(job.Request.Stage)},
+			    {"target", GetShaderTargetName(job.Request.Target)},
+			    {"backend", job.BackendName},
+			    {"backendVersion", job.BackendVersion},
+			    {"profile", job.TargetProfile},
+			    {"unitKind", static_cast<std::uint64_t>(job.Request.UnitKind)},
+			    {"requiredFeatures", static_cast<std::uint64_t>(job.Request.RequiredFeatures)},
+			    {"enableDebugInfo", job.Request.bEnableDebugInfo},
+			    {"enableOptimizations", job.Request.bEnableOptimizations},
+			    {"treatWarningsAsErrors", job.Request.bTreatWarningsAsErrors},
+			    {"stripDebugInfo", job.Request.bStripDebugInfo},
+			    {"sourceContentHash", Formatting::FormatHexUInt64(job.SourceContentHash)},
+			    {"dependencyClosureHash", Formatting::FormatHexUInt64(job.DependencyClosureHash)},
+			    {"requestHash", Formatting::FormatHexUInt64(job.RequestHash)},
+			    {"compileInputHash", Formatting::FormatHexUInt64(job.InputHash)},
+			    {"virtualDependencies", replayDependencies},
+			    {"defines", replayDefines},
+			    {"descriptorBindingRemaps", replayRemaps},
+			    {"diagnostic", BoundText(diagnostic, kMaximumFailureDiagnosticBytes)},
+			    {"preprocessedSource", BoundText(job.Request.SourceCode, kMaximumFailureSourceBytes)}};
 
 			std::string fileError;
-			Files::TryWriteAllTextAtomic(cookedShaderRoot / "Diagnostics" / "LastShaderCompileFailure.json", writer.Finish(), fileError);
+			Files::TryWriteAllTextAtomic(cookedShaderRoot / "Diagnostics" / "LastShaderCompileFailure.json", document.dump(), fileError);
 		}
 		catch (...)
 		{

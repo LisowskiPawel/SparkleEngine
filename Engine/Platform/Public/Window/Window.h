@@ -39,6 +39,7 @@ public:
 	Event<void()> OnResized;
 	Event<void(float)> OnDpiScaleChanged;
 
+	// bHandled suppresses default processing; native size, DPI and destruction still update owned state.
 	Event<void(WindowMessageEvent&), 16> OnWindowMessage;
 
 	void PollEvents() noexcept;
@@ -61,7 +62,7 @@ public:
 
 	bool IsMinimized() const noexcept { return m_state == State::Minimized; }
 
-	bool IsMaximized() const noexcept { return GetState() == State::Maximized; }
+	bool IsMaximized() const noexcept;
 
 	void SetFullScreen(bool bFullScreen);
 	void ToggleFullScreen();
@@ -91,7 +92,6 @@ private:
 	LRESULT HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT HandleNonClientSize(WPARAM wParam, LPARAM lParam) const;
 	LRESULT HandleResizeHitTest(WPARAM wParam, LPARAM lParam) const;
-	void ApplyTrackSizeConstraints(MINMAXINFO& minMaxInfo) const;
 	LRESULT HandleTrackSizeConstraints(LPARAM lParam) const;
 	void HandleDpiChanged(WPARAM wParam, LPARAM lParam);
 	void OnSizeChanged(WPARAM sizeType, LPARAM dimensions);

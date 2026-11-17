@@ -45,6 +45,8 @@ SourceImportOutput ImportSourceScene(const std::filesystem::path& filePath)
 			{
 				throw Diagnostics::Error(std::format("{} produced incomplete mesh content or no supported scene content.", format.ImporterId));
 			}
+
+			output.provenance.sourcePath = filePath;
 			output.provenance.importerId = format.ImporterId;
 			return output;
 		}

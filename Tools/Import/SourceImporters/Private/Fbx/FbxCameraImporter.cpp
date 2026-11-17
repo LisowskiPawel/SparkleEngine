@@ -2,7 +2,7 @@
 
 #include "Fbx/FbxCameraImporter.h"
 
-#include "Fbx/FbxNodeTransformConverter.h"
+#include "Assimp/AssimpNodeTransformConverter.h"
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <DirectXMath.h>
@@ -16,13 +16,13 @@ float FbxCameraImporter::ResolveFovYRadians(const aiCamera& camera) noexcept
 	return 2.0f * std::atan(std::tan(camera.mHorizontalFOV) / camera.mAspect);
 }
 
-void FbxCameraImporter::ImportCameras(const aiScene& scene, float sourceMetersPerUnit, SourceImportOutput& output)
+void FbxCameraImporter::ImportCameras(const aiScene& scene, float sourceMetersPerUnit, ImportedScene& importedScene)
 {
-	output.scene.cameras.reserve(scene.mNumCameras);
+	importedScene.cameras.reserve(scene.mNumCameras);
 	for (unsigned int cameraIndex = 0; cameraIndex < scene.mNumCameras; ++cameraIndex)
 	{
 		const aiCamera* sourceCamera = scene.mCameras[cameraIndex];
-		const aiNode* node = sourceCamera != nullptr ? FbxNodeTransformConverter::FindNode(scene, sourceCamera->mName) : nullptr;
+		const aiNode* node = sourceCamera != nullptr ? AssimpNodeTransformConverter::FindNode(scene, sourceCamera->mName) : nullptr;
 		if (sourceCamera == nullptr || sourceCamera->mName.length == 0 || node == nullptr || sourceCamera->mOrthographicWidth != 0.0f)
 		{
 			throw Diagnostics::Error(std::format("FBX camera {} has incomplete source data or an unsupported projection.", cameraIndex));
@@ -30,7 +30,7 @@ void FbxCameraImporter::ImportCameras(const aiScene& scene, float sourceMetersPe
 
 		ImportedCamera camera;
 		camera.name = sourceCamera->mName.C_Str();
-		camera.sourceNodeIndex = FbxNodeTransformConverter::FindNodeIndex(scene, *node);
+		camera.sourceNodeIndex = AssimpNodeTransformConverter::FindNodeIndex(scene, *node);
 		camera.projectionKind = ImportedCameraProjectionKind::Perspective;
 		camera.fovYRadians = ResolveFovYRadians(*sourceCamera);
 		camera.nearZ = sourceCamera->mClipPlaneNear * sourceMetersPerUnit;
@@ -47,8 +47,8 @@ void FbxCameraImporter::ImportCameras(const aiScene& scene, float sourceMetersPe
 		const aiVector3D position = aiVector3D(sourceCamera->mPosition.x, sourceCamera->mPosition.y, -sourceCamera->mPosition.z) * sourceMetersPerUnit;
 		const aiVector3D direction(authoredDirection.x, authoredDirection.y, -authoredDirection.z);
 		const aiVector3D up(sourceCamera->mUp.x, sourceCamera->mUp.y, -sourceCamera->mUp.z);
-		camera.worldTransform = FbxNodeTransformConverter::BuildNodeAttachedOrientation(*node, position, direction, up);
+		camera.worldTransform = AssimpNodeTransformConverter::BuildNodeAttachedOrientation(*node, position, direction, up);
 
-		output.scene.cameras.push_back(std::move(camera));
+		importedScene.cameras.push_back(std::move(camera));
 	}
 }

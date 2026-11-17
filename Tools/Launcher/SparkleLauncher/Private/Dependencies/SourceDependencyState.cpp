@@ -39,6 +39,14 @@ namespace SparkleLauncher
 		const WorkspaceFeatureSettings features = GetLauncherWorkspaceFeatureSettings();
 
 		static const std::vector<SourceDependencyEntry> dependencies{
+		    {"nlohmann_json",
+		        "nlohmann/json",
+		        "v3.12.0",
+		        "JSON parsing, typed values and serialization.",
+		        "nlohmann_json-src",
+		        {"CMakeLists.txt", "include/nlohmann/json.hpp", "include/nlohmann/json_fwd.hpp", "LICENSE.MIT"},
+		        true,
+		        true},
 		    {"cli11",
 		        "CLI11",
 		        "v2.7.2",

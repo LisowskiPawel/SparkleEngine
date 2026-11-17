@@ -13,6 +13,8 @@ using ShaderCompileInputHash = std::uint64_t;
 
 struct ShaderCompileJob final
 {
+	bool HasSameCompilerInput(const ShaderCompileJob& other) const noexcept;
+
 	ShaderCompileRequest Request;
 	std::string BackendName;
 	std::string TargetProfile;

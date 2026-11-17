@@ -3,7 +3,7 @@
 #include "Cooking/Publication/ShaderArtifactWriter.h"
 
 #include "Cooking/Publication/ReflectionSerializer.h"
-#include "Cooking/ShaderCookContext.h"
+#include "Cooking/Planning/ShaderCookPipelinePlan.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/BinaryStreamWriter.h"
 #include "Core/Public/Files/FileUtils.h"
@@ -22,6 +22,7 @@
 #include <string_view>
 #include <vector>
 #include <utility>
+#include <tuple>
 
 namespace ShaderArtifactWriter
 {
@@ -54,7 +55,7 @@ namespace ShaderArtifactWriter
 		std::string CodegenTarget;
 		std::vector<ArtifactBinding> Bindings;
 		ShaderReflection Reflection;
-		std::vector<std::uint8_t> Code;
+		std::span<const std::uint8_t> Code;
 	};
 
 	static ShaderStageMask ToStageMask(ShaderStageVisibility visibility) noexcept
@@ -86,7 +87,39 @@ namespace ShaderArtifactWriter
 		{
 			throw Diagnostics::Error(std::format("Compiled shader output is missing descriptor binding '{}'.", name));
 		}
+
 		return found->Binding;
+	}
+
+	static bool MatchesCatalog(const ShaderCookDesc& shader, const ShaderCookProduct& product, ShaderCodeHash codeHash)
+	{
+		if (product.shaderTypeId != shader.shaderTypeId || !IsShaderTarget(product.target))
+		{
+			return false;
+		}
+
+		const auto productMetadata = std::tie(product.features, product.rayTracing, product.compiled.stage);
+		const auto catalogMetadata = std::tie(shader.features, shader.rayTracing, shader.stage);
+		if (productMetadata != catalogMetadata || product.compiled.format != GetShaderBinaryFormat(product.target))
+		{
+			return false;
+		}
+
+		const bool bSourceMatches = product.compiled.sourcePath == shader.sourcePath && product.compiled.entryPoint == shader.entryPoint;
+		if (!bSourceMatches || product.compiled.backendName.empty())
+		{
+			return false;
+		}
+		if (product.compiled.codegenTarget != GetShaderTargetName(product.target) || product.compiled.backendVersion == 0)
+		{
+			return false;
+		}
+		if (product.compiled.compileInputHash == 0 || product.compiled.bytecodeHash != codeHash)
+		{
+			return false;
+		}
+
+		return BuildShaderParameterSignature(product.parameterLayout) == BuildShaderParameterSignature(shader.parameterLayout);
 	}
 
 	static ArtifactEntry BuildEntryFromProduct(const ShaderCookDesc& shader, const ShaderCookProduct& product)
@@ -97,22 +130,8 @@ namespace ShaderArtifactWriter
 		}
 
 		const ShaderCodeHash codeHash = Hash::Fnv1a64(product.compiled.bytecode.data(), product.compiled.bytecode.size());
-		const bool bShaderIdentityMatches = product.shaderTypeId == shader.shaderTypeId;
-		const bool bTargetValid = bShaderIdentityMatches && IsShaderTarget(product.target);
-		const bool bShaderMetadataMatchesFeatures = bTargetValid && product.features == shader.features;
-		const bool bShaderMetadataMatchesRayTracing = bShaderMetadataMatchesFeatures && (product.rayTracing == shader.rayTracing);
-		const bool bShaderMetadataMatches = bShaderMetadataMatchesRayTracing && (product.compiled.stage == shader.stage);
-		const bool bBinaryFormatMatches = bShaderMetadataMatches && product.compiled.format == GetShaderBinaryFormat(product.target);
-		const bool bSourceMatchesSourcePath = bBinaryFormatMatches && product.compiled.sourcePath == shader.sourcePath;
-		const bool bSourceMatchesEntryPoint = bSourceMatchesSourcePath && (product.compiled.entryPoint == shader.entryPoint);
-		const bool bSourceMatches = bSourceMatchesEntryPoint && (!product.compiled.backendName.empty());
-		const bool bCodegenTargetMatches = bSourceMatches && product.compiled.codegenTarget == GetShaderTargetName(product.target);
-		const bool bCompiledIdentityValidCompiled = bCodegenTargetMatches && product.compiled.backendVersion != 0;
-		const bool bInputHashPresent = bCompiledIdentityValidCompiled && (product.compiled.compileInputHash != 0);
-		const bool bCompiledIdentityValid = bInputHashPresent && (product.compiled.bytecodeHash == codeHash);
-		const bool bParameterLayoutMatches = bCompiledIdentityValid && BuildShaderParameterSignature(product.parameterLayout) == BuildShaderParameterSignature(shader.parameterLayout);
-
-		if (!bParameterLayoutMatches)
+		const bool bMatchesCatalog = MatchesCatalog(shader, product, codeHash);
+		if (!bMatchesCatalog)
 		{
 			throw Diagnostics::Error(std::format("Compiled shader product for '{}' does not match its catalog contract.", shader.shaderTypeName));
 		}
@@ -193,7 +212,7 @@ namespace ShaderArtifactWriter
 		}
 
 		const ShaderBytecode bytecode = library.GetBytecode(*code);
-		entry.Code.assign(static_cast<const std::uint8_t*>(bytecode.Data), static_cast<const std::uint8_t*>(bytecode.Data) + bytecode.Size);
+		entry.Code = {static_cast<const std::uint8_t*>(bytecode.Data), bytecode.Size};
 		return entry;
 	}
 
@@ -202,8 +221,8 @@ namespace ShaderArtifactWriter
 		Strings::StringTableBuilder Strings;
 		std::vector<GlobalShaderMapEntry> Entries;
 		std::vector<ShaderMapBindingRecord> Bindings;
-		std::vector<ShaderReflection> Reflections;
-		// The sorted entries own these bytes until map/library encoding finishes.
+		std::vector<const ShaderReflection*> Reflections;
+		// The cook plan and previous library outlive encoding; entries retain their reflections.
 		std::map<ShaderCodeHash, std::span<const std::uint8_t>> UniqueCode;
 	};
 
@@ -256,7 +275,7 @@ namespace ShaderArtifactWriter
 			        .ValueSizeInBytes = sourceBinding.ValueSizeInBytes});
 		}
 		tables.Entries.push_back(entry);
-		tables.Reflections.push_back(source.Reflection);
+		tables.Reflections.push_back(&source.Reflection);
 
 		result.entries.push_back(
 		    ShaderCookedEntry{.shaderType = source.ShaderType, .shaderName = source.ShaderName, .target = source.Target, .codeHash = source.CodeHash, .codeSizeInBytes = source.Code.size()});
@@ -394,21 +413,17 @@ namespace ShaderArtifactWriter
 		return result;
 	}
 
-	static std::vector<ArtifactEntry> BuildEntries(const ShaderCookPipelinePlan& plan, bool bReplaceCompleteCatalog, const std::filesystem::path& mapPath, const std::filesystem::path& libraryPath)
+	static std::vector<ArtifactEntry> BuildEntries(const ShaderCookPipelinePlan& plan, const GlobalShaderMap& existingMap, const CookedShaderLibrary& existingLibrary)
 	{
 		std::map<std::pair<ShaderTypeId, ShaderTarget>, ArtifactEntry> entries;
-		if (!bReplaceCompleteCatalog)
+		for (const GlobalShaderMapEntry& entry : existingMap.GetEntries())
 		{
-			const CookedShaderLibrary existingLibrary = CookedShaderLibrary::Open(libraryPath);
-			const GlobalShaderMap existingMap = GlobalShaderMap::Open(mapPath, existingLibrary);
-			for (const GlobalShaderMapEntry& entry : existingMap.GetEntries())
+			if (!std::ranges::binary_search(plan.registeredShaderTypes, entry.ShaderType))
 			{
-				if (!std::ranges::binary_search(plan.registeredShaderTypes, entry.ShaderType))
-				{
-					continue;
-				}
-				entries.emplace(std::pair{entry.ShaderType, entry.Target}, ReadExistingEntry(existingMap, existingLibrary, entry));
+				continue;
 			}
+
+			entries.emplace(std::pair{entry.ShaderType, entry.Target}, ReadExistingEntry(existingMap, existingLibrary, entry));
 		}
 		for (std::size_t shaderIndex = 0; shaderIndex < plan.shaders.size(); ++shaderIndex)
 		{
@@ -436,8 +451,16 @@ namespace ShaderArtifactWriter
 	    const std::filesystem::path& stagedMapPath,
 	    const std::filesystem::path& stagedLibraryPath)
 	{
-		std::vector<ArtifactEntry> entries = BuildEntries(plan, bReplaceCompleteCatalog, mapPath, libraryPath);
+		// Retained code is borrowed from this library through both map and library encoding.
+		CookedShaderLibrary existingLibrary;
+		GlobalShaderMap existingMap;
+		if (!bReplaceCompleteCatalog)
+		{
+			existingLibrary = CookedShaderLibrary::Open(libraryPath);
+			existingMap = GlobalShaderMap::Open(mapPath, existingLibrary);
+		}
+
+		std::vector<ArtifactEntry> entries = BuildEntries(plan, existingMap, existingLibrary);
 		return WriteArtifacts(std::move(entries), stagedMapPath, stagedLibraryPath);
 	}
-
 }

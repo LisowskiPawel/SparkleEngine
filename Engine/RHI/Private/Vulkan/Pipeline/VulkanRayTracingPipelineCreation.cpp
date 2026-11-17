@@ -1,6 +1,7 @@
 #include "Vulkan/VulkanPCH.h"
 
 #include "Vulkan/Pipeline/VulkanRayTracingPipelineCreation.h"
+#include "Shaders/GlobalShaderMap.h"
 #include "Vulkan/Pipeline/VulkanShaderModule.h"
 #include "Vulkan/Device/VulkanRhi.h"
 #include "Vulkan/Core/VulkanResult.h"
@@ -35,7 +36,7 @@ private:
 		m_stages.reserve(desc.ShaderExports.size());
 		for (const RhiRayTracingShaderExportDesc& shaderExport : desc.ShaderExports)
 		{
-			m_modules.emplace_back(rhi, RhiShaderStageDesc{shaderExport.Shader}, debugName);
+			m_modules.emplace_back(rhi, shaderExport.Shader, debugName);
 			m_stages.push_back(m_modules.back().BuildStageCreateInfo());
 			m_stageIndices.emplace(shaderExport.ExportName, static_cast<std::uint32_t>(m_stages.size() - 1));
 		}

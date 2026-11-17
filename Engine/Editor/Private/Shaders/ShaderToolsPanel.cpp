@@ -9,6 +9,11 @@
 
 #include <utility>
 
+void ShaderToolsPanel::SetOpen(bool bOpen) noexcept
+{
+	m_bIsOpen = bOpen;
+}
+
 void ShaderToolsPanel::SetDiagnosticsProvider(RegisteredShaderListModel::DiagnosticsProvider provider)
 {
 	m_model.SetDiagnosticsProvider(std::move(provider));

@@ -8,50 +8,12 @@
 
 #include <string>
 
-#include <objbase.h>
-
-class ImportedSceneComApartment final
-{
-public:
-	ImportedSceneComApartment();
-	~ImportedSceneComApartment();
-
-	ImportedSceneComApartment(const ImportedSceneComApartment&) = delete;
-	ImportedSceneComApartment& operator=(const ImportedSceneComApartment&) = delete;
-
-private:
-	HRESULT m_result;
-};
-
-ImportedSceneComApartment::ImportedSceneComApartment() :
-    m_result(CoInitializeEx(nullptr, COINIT_MULTITHREADED))
-{
-	if (!SUCCEEDED(m_result) && m_result != RPC_E_CHANGED_MODE)
-	{
-		throw Diagnostics::Error("Failed to initialize COM for source import.");
-	}
-}
-
-ImportedSceneComApartment::~ImportedSceneComApartment()
-{
-	if (SUCCEEDED(m_result))
-	{
-		CoUninitialize();
-	}
-}
-
-SourceImportOutput ImportedSceneCooker::Import(const AssetCookerSceneEntry& sceneEntry)
-{
-	const ImportedSceneComApartment comApartment;
-	return ImportSourceScene(sceneEntry.sourcePath);
-}
-
 CookedSceneBuild ImportedSceneCooker::Build(const AssetCookerSceneEntry& sceneEntry, AssetCookerDiagnostics& diagnostics)
 {
 	SourceImportOutput importOutput;
 	try
 	{
-		importOutput = Import(sceneEntry);
+		importOutput = ImportSourceScene(sceneEntry.sourcePath);
 	}
 	catch (const Diagnostics::Error& error)
 	{
@@ -73,9 +35,10 @@ CookedSceneBuild ImportedSceneCooker::BuildCookedScene(const AssetCookerSceneEnt
 		diagnostics.AddError(AssetCookerCategory::SceneAssets, error.what(), sceneEntry.sourcePath);
 		throw;
 	}
+
 	try
 	{
-		build.ApplyMeshOutput(CookedMeshAssetBuilder::BuildMeshAssets(importOutput, build.identity.assetId));
+		build.outputs.meshAssets = CookedMeshAssetBuilder::BuildMeshAssets(importOutput, build.identity.assetId);
 	}
 	catch (const Diagnostics::Error& error)
 	{
@@ -85,7 +48,7 @@ CookedSceneBuild ImportedSceneCooker::BuildCookedScene(const AssetCookerSceneEnt
 
 	try
 	{
-		build.ApplyMaterialOutput(MaterialCooker::BuildMaterialAssets(importOutput, build.identity.assetId));
+		build.outputs.materialAssets = MaterialCooker::BuildMaterialAssets(importOutput, build.identity.assetId);
 	}
 	catch (const Diagnostics::Error& error)
 	{

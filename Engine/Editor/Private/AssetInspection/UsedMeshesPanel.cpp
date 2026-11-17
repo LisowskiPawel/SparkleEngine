@@ -3,7 +3,6 @@
 #include "AssetInspection/UsedMeshesPanel.h"
 
 #include "AssetInspection/MeshDiagnosticsPresentation.h"
-#include "AssetInspection/MeshPreview.h"
 #include "AssetInspection/PanelDiagnosticsFormatting.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Icons/EditorIcon.h"
@@ -21,6 +20,7 @@ void UsedMeshesPanel::SetOpen(bool bOpen) noexcept
 	if (bOpen != m_bIsOpen)
 	{
 		m_metadata.Clear();
+		m_preview.Invalidate();
 	}
 	m_bIsOpen = bOpen;
 }
@@ -30,13 +30,12 @@ void UsedMeshesPanel::SetDiagnosticsProvider(DiagnosticsProvider provider)
 	m_diagnosticsProvider = std::move(provider);
 	m_snapshot = {};
 	m_metadata.Clear();
+	m_preview.Invalidate();
 }
 
-void UsedMeshesPanel::SetPreviewGeometryProvider(PreviewGeometryProvider provider)
+void UsedMeshesPanel::SetPreviewGeometryProvider(MeshPreview::GeometryProvider provider)
 {
-	m_previewGeometryProvider = std::move(provider);
-	m_previewGeometry = {};
-	m_previewGeometryMeshRuntimeId = 0;
+	m_preview.SetGeometryProvider(std::move(provider));
 }
 
 void UsedMeshesPanel::BuildUI(bool bDisableInteraction)
@@ -91,19 +90,7 @@ void UsedMeshesPanel::RefreshInspection()
 {
 	m_metadata.Clear();
 	m_metadata.Update(m_snapshot.Rows);
-	m_previewGeometry = {};
-	m_previewGeometryMeshRuntimeId = 0;
-}
-
-void UsedMeshesPanel::RefreshPreviewGeometry(const MeshDiagnosticsRow& row)
-{
-	if (m_previewGeometryMeshRuntimeId == row.MeshRuntimeId)
-	{
-		return;
-	}
-
-	m_previewGeometryMeshRuntimeId = row.MeshRuntimeId;
-	m_previewGeometry = m_previewGeometryProvider ? m_previewGeometryProvider(row.MeshRuntimeId) : MeshPreviewGeometry{};
+	m_preview.Invalidate();
 }
 
 void UsedMeshesPanel::DrawToolbar()
@@ -184,8 +171,7 @@ void UsedMeshesPanel::DrawMeshTable(bool bDisableInteraction)
 		if (ImGui::Selectable(displayName.c_str(), bSelected, ImGuiSelectableFlags_SpanAllColumns))
 		{
 			m_selectedMeshRuntimeId = row.MeshRuntimeId;
-			m_previewGeometryMeshRuntimeId = 0;
-			m_previewGeometry = {};
+			m_preview.Invalidate();
 		}
 		ImGui::TableNextColumn();
 		const std::string sourcePath = MeshDiagnosticsPresentation::FormatMeshSourcePath(row, metadata);
@@ -221,39 +207,17 @@ void UsedMeshesPanel::DrawSelectedMeshInspector(bool bDisableInteraction)
 		return;
 	}
 
-	RefreshPreviewGeometry(*selectedRow);
 	const MeshDiagnosticMetadata* metadata = m_metadata.Find(selectedRow->MeshAssetId);
 	const std::string displayName = MeshDiagnosticsPresentation::FormatMeshDisplayName(*selectedRow, metadata);
 	const std::string sourcePath = MeshDiagnosticsPresentation::FormatMeshSourcePath(*selectedRow, metadata);
 	ImGui::TextUnformatted(displayName.c_str());
 	PanelDiagnosticsFormatting::DrawWrappedDisabledText(sourcePath);
 	ImGui::Separator();
-	DrawPreviewControls(bDisableInteraction);
-	MeshPreview::Draw(m_previewGeometry, selectedRow->bGpuResident, m_previewYaw, m_previewPitch, m_previewModeIndex);
+	m_preview.BuildUI(selectedRow->MeshRuntimeId, selectedRow->bGpuResident, bDisableInteraction);
 	ImGui::SeparatorText("Runtime Properties");
 	ImGui::BeginChild("##MeshDetailsPane", ImVec2(0.0f, 0.0f), ImGuiChildFlags_None);
 	DrawSelectedMeshDetails(*selectedRow);
 	ImGui::EndChild();
-}
-
-void UsedMeshesPanel::DrawPreviewControls(bool bDisableInteraction)
-{
-	ImGui::BeginDisabled(bDisableInteraction);
-	ImGui::SetNextItemWidth(150.0f);
-	ImGui::Combo("Mode", &m_previewModeIndex, MeshPreview::Modes.data(), static_cast<int>(MeshPreview::Modes.size()));
-	ImGui::SameLine();
-	ImGui::SetNextItemWidth(120.0f);
-	ImGui::SliderFloat("Yaw", &m_previewYaw, -MeshPreview::Pi, MeshPreview::Pi, "%.2f");
-	ImGui::SameLine();
-	ImGui::SetNextItemWidth(120.0f);
-	ImGui::SliderFloat("Pitch", &m_previewPitch, -1.45f, 1.45f, "%.2f");
-	ImGui::SameLine();
-	if (EditorWidgets::DrawEditorIconButton(EditorIcons::EditorIcon::Reset, "##ResetMeshPreview", "Reset preview view"))
-	{
-		m_previewYaw = 0.65f;
-		m_previewPitch = -0.35f;
-	}
-	ImGui::EndDisabled();
 }
 
 void UsedMeshesPanel::DrawSelectedMeshDetails(const MeshDiagnosticsRow& row) const

@@ -8,9 +8,9 @@
 #include <exception>
 #include <utility>
 
-EditorShaderCompileOperation::EditorShaderCompileOperation(EditorOperationRuntime& operations, const EditorShaderCompileAction& compile) :
+EditorShaderCompileOperation::EditorShaderCompileOperation(TaskExecutor& executor, TaskScope& scope, const EditorShaderCompileAction& compile) :
     m_compile(compile),
-    m_operation(operations)
+    m_operation(executor, scope)
 {
 }
 

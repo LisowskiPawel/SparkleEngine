@@ -11,7 +11,17 @@
 
 void SceneCooker::BuildManifest(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild)
 {
-	outBuild.ResetManifest();
+	outBuild.manifest = {};
+	outBuild.manifest.meshAssetReferences.reserve(outBuild.outputs.meshAssets.size());
+	for (const CookedMeshAssetBuild& meshAsset : outBuild.outputs.meshAssets)
+	{
+		outBuild.manifest.meshAssetReferences.push_back({meshAsset.assetId, meshAsset.assetKind});
+	}
+	outBuild.manifest.materialAssetReferences.reserve(outBuild.outputs.materialAssets.size());
+	for (const CookedMaterialAssetBuild& materialAsset : outBuild.outputs.materialAssets)
+	{
+		outBuild.manifest.materialAssetReferences.push_back(materialAsset.assetId);
+	}
 
 	CookedSceneSkeletonBuilder::BuildSkeletons(importOutput, outBuild.identity.assetId, outBuild);
 	CookedAnimationAssetBuilder::Build(importOutput, outBuild.identity.assetId, outBuild);
@@ -20,6 +30,4 @@ void SceneCooker::BuildManifest(const SourceImportOutput& importOutput, CookedSc
 	CookedSceneCameraBuilder::BuildCameras(importOutput, outBuild);
 	CookedSceneLightBuilder::BuildLights(importOutput, outBuild);
 	CookedSceneMetadataBuilder::BuildMetadata(importOutput, outBuild);
-
-	outBuild.FinalizeManifestHeader();
 }

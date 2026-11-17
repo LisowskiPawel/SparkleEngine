@@ -1,5 +1,6 @@
 #include "Levels/LevelSelectionCommit.h"
 #include "Levels/AssetPackSyncPlanner.h"
+#include "Levels/LevelSelectionWriter.h"
 
 #include "ProjectLevelCatalog.h"
 #include "SparkleLauncher/OperationModel.h"
@@ -25,7 +26,7 @@ namespace SparkleLauncher
 	{
 		try
 		{
-			const ProjectLevelCatalog catalog = ProjectLevelCatalogFile::Load(contentRoot);
+			const ProjectLevelCatalog catalog = LoadProjectLevelCatalog(contentRoot);
 			(void) BuildAssetPackSyncPlan(catalog, levelIds, true);
 			return true;
 		}
@@ -45,13 +46,15 @@ namespace SparkleLauncher
 		{
 			return false;
 		}
+
 		try
 		{
 			std::string error;
-			if (!ProjectLevelCatalogFile::SetLevelsSelected(contentRoot, levelIds, bSelected, error))
+			if (!WriteLevelSelection(contentRoot, levelIds, bSelected, error))
 			{
 				return FailLevelSelection(operation, std::move(error));
 			}
+
 			return true;
 		}
 		catch (const std::exception& error)
@@ -64,7 +67,7 @@ namespace SparkleLauncher
 	{
 		try
 		{
-			const ProjectLevelCatalog catalog = ProjectLevelCatalogFile::Load(contentRoot);
+			const ProjectLevelCatalog catalog = LoadProjectLevelCatalog(contentRoot);
 			std::vector<std::string> levelIds;
 			for (const ProjectLevelCatalogEntry& level : catalog.levels)
 			{

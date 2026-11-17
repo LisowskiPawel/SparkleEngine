@@ -1,9 +1,7 @@
 #include "Gui/Operations/LauncherOperationExecution.h"
 
-#include "Gui/Operations/LauncherOperationRequestMapping.h"
 #include "Tasks/Public/TaskExecutionContext.h"
 
-#include <stdexcept>
 #include <type_traits>
 #include <utility>
 
@@ -30,35 +28,48 @@ namespace SparkleLauncher
 		TaskExecutionContext& m_context;
 	};
 
-	LauncherOperationPlan PlanLauncherOperation(LauncherOperationCategory category, std::string_view operationId, const LauncherOperationRequest& request)
-	{
-		switch (category)
-		{
-			case LauncherOperationCategory::Workspace:
-				return PlanBuildWorkspaceOperation(operationId, LauncherOperationRequestMapping::BuildWorkspace(request));
-			case LauncherOperationCategory::Levels:
-				return PlanLevelOperation(operationId, LauncherOperationRequestMapping::Levels(request));
-			case LauncherOperationCategory::LevelRun:
-				return PlanLevelRunOperation(operationId, LauncherOperationRequestMapping::LevelRun(request));
-			case LauncherOperationCategory::Cooking:
-				return PlanCookOperation(operationId, LauncherOperationRequestMapping::Cook(request));
-			case LauncherOperationCategory::Maintenance:
-				return PlanMaintenanceOperation(operationId, LauncherOperationRequestMapping::Maintenance(request));
-		}
+	using LauncherOperationPlan = std::variant<BuildWorkspaceOperationPlan, LevelOperationPlan, LevelRunOperationPlan, CookOperationPlan, MaintenanceOperationPlan>;
 
-		throw std::logic_error("Unknown launcher operation category.");
+	static LauncherOperationPlan PlanLauncherOperation(const LauncherOperationRequest& request)
+	{
+		const std::string operationId = request.OperationId.toStdString();
+
+		return std::visit(
+		    [&operationId](const auto& inputs) -> LauncherOperationPlan
+		    {
+			    using Request = std::remove_cvref_t<decltype(inputs)>;
+			    if constexpr (std::is_same_v<Request, BuildWorkspaceOperationRequest>)
+			    {
+				    return PlanBuildWorkspaceOperation(operationId, inputs);
+			    }
+			    else if constexpr (std::is_same_v<Request, LevelOperationRequest>)
+			    {
+				    return PlanLevelOperation(operationId, inputs);
+			    }
+			    else if constexpr (std::is_same_v<Request, LevelRunOperationRequest>)
+			    {
+				    return PlanLevelRunOperation(operationId, inputs);
+			    }
+			    else if constexpr (std::is_same_v<Request, CookOperationRequest>)
+			    {
+				    return PlanCookOperation(operationId, inputs);
+			    }
+			    else
+			    {
+				    return PlanMaintenanceOperation(operationId, inputs);
+			    }
+		    },
+		    request.Inputs);
 	}
 
 	OperationRecord ExecuteLauncherOperation(
-	    LauncherOperationCategory category,
-	    std::string_view operationId,
 	    const LauncherOperationRequest& request,
 	    IProcessRunner& processRunner,
 	    TaskExecutionContext& context,
 	    const Process::ChildProcessOutputCallback& outputCallback)
 	{
 		TaskContextProcessRunner taskProcessRunner(processRunner, context);
-		LauncherOperationPlan plan = PlanLauncherOperation(category, operationId, request);
+		LauncherOperationPlan plan = PlanLauncherOperation(request);
 
 		return std::visit(
 		    [&taskProcessRunner, &outputCallback](auto&& typedPlan) -> OperationRecord

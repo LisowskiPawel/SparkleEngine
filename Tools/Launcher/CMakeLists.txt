@@ -19,6 +19,7 @@ include(${SPARKLE_REPOSITORY_ROOT}/CMake/SparkleHostTool.cmake)
 # Launcher at runtime and are not prerequisites of the Launcher product itself.
 set(SPARKLE_SOURCE_DEPENDENCY_ALLOWLIST
     cli11
+    nlohmann_json
     spdlog
     editor-icons
 )

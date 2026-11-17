@@ -6,7 +6,7 @@
 #include "Assets/Loaders/CookedAssetFileSet.h"
 #include "Assets/Loaders/SceneManifestLoader.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Paths/ProductFilePaths.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include <format>
 

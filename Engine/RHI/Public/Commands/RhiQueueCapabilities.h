@@ -12,27 +12,15 @@ struct RhiQueueCapability final
 
 struct RhiQueueCapabilities final
 {
-	constexpr void Set(ERhiQueueType queue, bool bSupported, bool bIndependent) noexcept
-	{
-		if (!IsRhiQueueTypeValid(queue))
-		{
-			return;
-		}
+	SPARKLE_RHI_API void Set(ERhiQueueType queue, bool bSupported, bool bIndependent) noexcept;
 
-		Entries[RhiQueueTypeToIndex(queue)] = RhiQueueCapability{.bSupported = bSupported, .bIndependent = bSupported && bIndependent};
-	}
+	SPARKLE_RHI_API RhiQueueCapability Get(ERhiQueueType queue) const noexcept;
 
-	constexpr RhiQueueCapability Get(ERhiQueueType queue) const noexcept { return IsRhiQueueTypeValid(queue) ? Entries[RhiQueueTypeToIndex(queue)] : RhiQueueCapability{}; }
+	SPARKLE_RHI_API bool Supports(ERhiQueueType queue) const noexcept;
 
-	constexpr bool Supports(ERhiQueueType queue) const noexcept { return Get(queue).bSupported; }
+	SPARKLE_RHI_API bool IsIndependent(ERhiQueueType queue) const noexcept;
 
-	constexpr bool IsIndependent(ERhiQueueType queue) const noexcept { return Get(queue).bIndependent; }
-
-	constexpr bool SupportsIndependent(ERhiQueueType queue) const noexcept
-	{
-		const RhiQueueCapability capability = Get(queue);
-		return capability.bSupported && capability.bIndependent;
-	}
+	SPARKLE_RHI_API bool SupportsIndependent(ERhiQueueType queue) const noexcept;
 
 	std::array<RhiQueueCapability, RhiQueueTypeCount> Entries{};
 };

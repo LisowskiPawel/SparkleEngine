@@ -36,10 +36,11 @@ int ListShaders(bool bValidateOnly)
 		std::cout << "ShaderCompiler: " << catalog.size() << " typed shader registration(s) valid\n";
 		return kExitCodeSuccess;
 	}
+
 	for (const ShaderContract& shader : catalog)
 	{
 		std::cout << shader.shaderName << " type=" << Formatting::FormatPrefixedHexUInt64(shader.shaderTypeId) << " stage=" << GetShaderStagePrefix(shader.stage) << " source=" << shader.sourcePath
-		          << " entry=" << shader.entryPoint << " parameters=" << shader.parameterStruct.Fields.size() << "\n";
+		          << " entry=" << shader.entryPoint << " parameters=" << (shader.parameterStruct ? shader.parameterStruct->Fields.size() : 0) << "\n";
 	}
 	return kExitCodeSuccess;
 }

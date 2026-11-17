@@ -1,6 +1,6 @@
 #include "PCH.h"
 #include "Startup/ApplicationGpuCrashStartup.h"
-#include "GameApplication.h"
+#include "Game/GameApplication.h"
 #include "Core/Public/Process/ProcessReadiness.h"
 #include "Renderer/Public/ExternalCapture/RendererGraphicsLaunch.h"
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING

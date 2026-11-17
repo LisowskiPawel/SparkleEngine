@@ -18,23 +18,11 @@
 #include "Viewport/ViewportToolbar.h"
 #include "Settings/EngineRenderingSettingsController.h"
 #include "Renderer/Public/UI/ImGuiRenderPacketBuilder.h"
-#include "Scene/Model/EditorSceneModel.h"
-#include "Scene/Model/EditorSceneModelBuilder.h"
-#include "Scene/Transactions/EditorTransactionHistory.h"
 #include "Style/SparkleUiTheme.h"
 #include "Viewport/EditorViewportSession.h"
 
 #include <memory>
-#include <string>
 #include <utility>
-
-void UI::Implementation::InitializeSceneEditing(EditorHostServices& hostServices)
-{
-	m_sceneModelBuilder = std::make_unique<EditorSceneModelBuilder>(
-	    EditorSceneSource{.AcquireReadView = std::move(hostServices.AcquireWorldReadView), .MaterialVariants = std::move(hostServices.MaterialVariants)});
-
-	m_transactionHistory = std::make_unique<EditorTransactionHistory>(std::move(hostServices.SubmitWorldEdit));
-}
 
 void UI::Implementation::InitializeRenderingSettings(EditorHostServices& hostServices)
 {
@@ -63,12 +51,12 @@ void UI::Implementation::InitializeWorkspace(std::function<void()> requestRestar
 	InitializeViewport();
 	InitializeAssetPanels();
 	InitializeScenePanels();
+	ConfigureMainMenuBarWindowActions();
 }
 
 void UI::Implementation::InitializeCorePanels(std::function<void()> requestRestart)
 {
-	m_mainMenuBar = std::make_unique<MainMenuBarPanel>(m_levelSession, m_window);
-	ConfigureMainMenuBarWindowActions();
+	m_mainMenuBar = std::make_unique<MainMenuBarPanel>(m_levelSession, &m_window);
 	m_settingsPanel = std::make_unique<SettingsPanel>();
 	m_settingsPanel->SetRenderingSettings(m_renderingSettings.get());
 
@@ -93,81 +81,23 @@ void UI::Implementation::InitializeAssetPanels()
 
 void UI::Implementation::InitializeScenePanels()
 {
-	m_sceneModel = m_sceneModelBuilder->Update();
-	if (m_sceneModel && !m_sceneModel->GetCameras().empty())
-	{
-		m_sceneSelection = SceneObjectSelection::Camera(m_sceneModel->GetCameras().front().Entity);
-	}
-
-	m_sceneOutlinerPanel = std::make_unique<SceneOutlinerPanel>(m_sceneSelection, *m_transactionHistory, EditorWorkspaceLayout::SceneOutlinerWidth);
-	m_sceneInspectorPanel = std::make_unique<SceneInspectorPanel>(m_sceneSelection, *m_transactionHistory, EditorWorkspaceLayout::SceneInspectorWidth);
+	m_sceneOutlinerPanel = std::make_unique<SceneOutlinerPanel>(m_scene, EditorWorkspaceLayout::SceneOutlinerWidth);
+	m_sceneInspectorPanel = std::make_unique<SceneInspectorPanel>(m_scene, EditorWorkspaceLayout::SceneInspectorWidth);
 }
 
 void UI::Implementation::ConfigureMainMenuBarWindowActions()
 {
-	if (!m_mainMenuBar)
-	{
-		return;
-	}
-
-	m_mainMenuBar->SetShaderToolsOpenHandler(
-	    [this]()
-	    {
-		    if (m_shaderToolsPanel)
-		    {
-			    m_shaderToolsPanel->SetOpen(true);
-		    }
-	    });
-
-	m_mainMenuBar->SetTextureToolsOpenHandler(
-	    [this]()
-	    {
-		    if (m_usedTexturesPanel)
-		    {
-			    m_usedTexturesPanel->SetOpen(true);
-		    }
-	    });
-
-	m_mainMenuBar->SetMeshToolsOpenHandler(
-	    [this]()
-	    {
-		    if (m_usedMeshesPanel)
-		    {
-			    m_usedMeshesPanel->SetOpen(true);
-		    }
-	    });
-
-	m_mainMenuBar->SetSettingsOpenHandler(
-	    [this]()
-	    {
-		    if (m_settingsPanel)
-		    {
-			    m_settingsPanel->SetOpen(true);
-		    }
-	    });
-
-	m_mainMenuBar->SetViewportCaptureHandler(
-	    [this]()
-	    {
-		    if (m_viewportPanel)
-		    {
-			    m_viewportPanel->RequestOutputAction(ViewportOutputAction::CapturePresentation);
-		    }
-	    });
-
-	m_mainMenuBar->SetConsoleOpenHandler(
-	    [this]()
-	    {
-		    if (m_editorConsoleSystem)
-		    {
-			    m_editorConsoleSystem->OpenConsole();
-		    }
-	    });
+	m_mainMenuBar->SetShaderToolsOpenHandler([this]() { m_shaderToolsPanel->SetOpen(true); });
+	m_mainMenuBar->SetTextureToolsOpenHandler([this]() { m_usedTexturesPanel->SetOpen(true); });
+	m_mainMenuBar->SetMeshToolsOpenHandler([this]() { m_usedMeshesPanel->SetOpen(true); });
+	m_mainMenuBar->SetSettingsOpenHandler([this]() { m_settingsPanel->SetOpen(true); });
+	m_mainMenuBar->SetViewportCaptureHandler([this]() { m_viewportPanel->RequestOutputAction(ViewportOutputAction::CapturePresentation); });
+	m_mainMenuBar->SetConsoleOpenHandler([this]() { m_editorConsoleSystem->OpenConsole(); });
 }
 
 void UI::Implementation::InitializeImGuiContext()
 {
-	m_imguiContext = std::make_unique<EditorImGuiContext>(*m_window);
+	m_imguiContext = std::make_unique<EditorImGuiContext>(m_window);
 	m_imguiContext->Initialize();
 	ImGuiRenderPacketBuilder::ConfigureProducerContext();
 	SparkleUiTheme::ConfigureTypography();
@@ -176,5 +106,5 @@ void UI::Implementation::InitializeImGuiContext()
 
 void UI::Implementation::SubscribeToWindowEvents()
 {
-	m_imguiContext->SubscribeToWindowEvents([this](Key key) { return m_editorConsoleSystem != nullptr && m_editorConsoleSystem->HandleShortcut(key); });
+	m_imguiContext->SubscribeToWindowEvents([this](Key key) { return m_editorConsoleSystem->HandleShortcut(key); });
 }

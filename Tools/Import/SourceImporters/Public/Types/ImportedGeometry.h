@@ -12,7 +12,7 @@
 #include <type_traits>
 #include <vector>
 
-enum class ImportedMeshInstanceGroupKind : std::uint32_t
+enum class ImportedMeshInstanceGroupKind : std::uint8_t
 {
 	None = 0,
 	SharedMeshReference = 1,
@@ -36,17 +36,11 @@ struct ImportedMeshGeometry
 	std::vector<std::uint32_t> indices;
 	ImportedMeshDeformation deformation;
 
-	bool IsValid() const noexcept { return !vertices.empty() && !indices.empty(); }
+	bool IsValid() const noexcept;
 
 	bool HasSkinInfluences() const noexcept { return deformation.HasSkinInfluences(); }
 
 	bool HasMorphTargets() const noexcept { return deformation.HasMorphTargets(); }
-
-	void Reserve(std::uint32_t vertexCount, std::uint32_t indexCount)
-	{
-		vertices.reserve(vertexCount);
-		indices.reserve(indexCount);
-	}
 };
 
 struct ImportedMeshPrimitive
@@ -88,5 +82,5 @@ struct ImportedMeshInstanceGroup
 
 	bool HasMaterialBinding() const noexcept { return materialIndex != kInvalidImportedMaterialIndex; }
 
-	bool HasInstanceRange() const noexcept { return firstInstanceIndex != kInvalidImportedMeshInstanceIndex && instanceCount > 0; }
+	bool HasInstanceRange() const noexcept;
 };

@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "GameFramework/Public/Assets/Cooked/CookedMeshAsset.h"
-#include "GameFramework/Public/Assets/Cooked/CookedSceneManifest.h"
 
 #include <cstdint>
 #include <filesystem>
@@ -25,10 +24,4 @@ struct CookedMeshAssetBuild
 	bool HasMorphTargets() const noexcept { return !morphTargets.empty(); }
 
 	bool IsSkeletal() const noexcept { return assetKind == Assets::CookedMeshAssetKind::Skeletal; }
-};
-
-struct MeshCookOutput final
-{
-	std::vector<CookedMeshAssetBuild> assets;
-	std::vector<Assets::CookedSceneMeshAssetRef> assetReferences;
 };

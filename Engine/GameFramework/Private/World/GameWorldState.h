@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Animation/AnimationOutputStorage.h"
+#include "Animation/AnimationEvaluationStorage.h"
 #include "Animation/AnimationClipResource.h"
 #include "GameFramework/Public/Scene/Camera/CameraDesc.h"
 #include "GameFramework/Public/Scene/Camera/SceneCameraEntry.h"
@@ -118,7 +118,7 @@ namespace ECS
 
 		EntityRegistry m_registry;
 		MeshResourceStore m_meshResources;
-		AnimationOutputStorage m_animationOutput;
+		AnimationEvaluationStorage m_animationEvaluation;
 		MorphWeightStorage m_morphWeights;
 		WorldExtractionStorage m_extraction;
 		std::vector<EntityId> m_transformWork;

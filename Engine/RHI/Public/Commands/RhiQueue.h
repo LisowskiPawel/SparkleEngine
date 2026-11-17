@@ -17,40 +17,20 @@ enum class ERhiQueueType : std::uint8_t
 
 constexpr std::size_t RhiQueueTypeCount = static_cast<std::size_t>(ERhiQueueType::Count);
 
-constexpr bool IsRhiQueueTypeValid(ERhiQueueType queue) noexcept
-{
-	return static_cast<std::size_t>(queue) < RhiQueueTypeCount;
-}
+SPARKLE_RHI_API bool IsRhiQueueTypeValid(ERhiQueueType queue) noexcept;
 
-constexpr std::size_t RhiQueueTypeToIndex(ERhiQueueType queue) noexcept
-{
-	return static_cast<std::size_t>(queue);
-}
+SPARKLE_RHI_API std::size_t RhiQueueTypeToIndex(ERhiQueueType queue) noexcept;
 
-constexpr const char* RhiQueueTypeToString(ERhiQueueType queue) noexcept
-{
-	switch (queue)
-	{
-		case ERhiQueueType::Graphics:
-			return "Graphics";
-		case ERhiQueueType::Compute:
-			return "Compute";
-		case ERhiQueueType::Copy:
-			return "Copy";
-		case ERhiQueueType::Count:
-		default:
-			return "Unknown";
-	}
-}
+SPARKLE_RHI_API const char* RhiQueueTypeToString(ERhiQueueType queue) noexcept;
 
 struct RhiSubmissionToken final
 {
 	ERhiQueueType Queue = ERhiQueueType::Graphics;
 	std::uint64_t Value = 0;
 
-	constexpr bool IsValid() const noexcept { return IsRhiQueueTypeValid(Queue) && Value != 0; }
+	SPARKLE_RHI_API bool IsValid() const noexcept;
 
-	constexpr explicit operator bool() const noexcept { return IsValid(); }
+	explicit operator bool() const noexcept { return IsValid(); }
 
 	constexpr bool operator==(const RhiSubmissionToken&) const noexcept = default;
 };
@@ -59,45 +39,13 @@ struct RhiSubmissionState final
 {
 	std::array<std::uint64_t, RhiQueueTypeCount> Values{};
 
-	constexpr void Clear() noexcept { Values.fill(0); }
+	SPARKLE_RHI_API void Clear() noexcept;
 
-	constexpr void MarkUsed(RhiSubmissionToken token) noexcept
-	{
-		if (token.IsValid())
-		{
-			std::uint64_t& value = Values[RhiQueueTypeToIndex(token.Queue)];
-			value = value < token.Value ? token.Value : value;
-		}
-	}
+	SPARKLE_RHI_API void MarkUsed(RhiSubmissionToken token) noexcept;
 
-	constexpr RhiSubmissionToken GetToken(ERhiQueueType queue) const noexcept
-	{
-		return IsRhiQueueTypeValid(queue) ? RhiSubmissionToken{.Queue = queue, .Value = Values[RhiQueueTypeToIndex(queue)]} : RhiSubmissionToken{};
-	}
+	SPARKLE_RHI_API RhiSubmissionToken GetToken(ERhiQueueType queue) const noexcept;
 
-	constexpr std::size_t CopyTokens(std::span<RhiSubmissionToken> destination) const noexcept
-	{
-		std::size_t count = 0;
-		for (std::size_t queueIndex = 0; queueIndex < RhiQueueTypeCount && count < destination.size(); ++queueIndex)
-		{
-			const std::uint64_t value = Values[queueIndex];
-			if (value != 0)
-			{
-				destination[count++] = RhiSubmissionToken{.Queue = static_cast<ERhiQueueType>(queueIndex), .Value = value};
-			}
-		}
-		return count;
-	}
+	SPARKLE_RHI_API std::size_t CopyTokens(std::span<RhiSubmissionToken> destination) const noexcept;
 
-	constexpr bool IsComplete(const std::array<std::uint64_t, RhiQueueTypeCount>& completedValues) const noexcept
-	{
-		for (std::size_t queueIndex = 0; queueIndex < RhiQueueTypeCount; ++queueIndex)
-		{
-			if (completedValues[queueIndex] < Values[queueIndex])
-			{
-				return false;
-			}
-		}
-		return true;
-	}
+	SPARKLE_RHI_API bool IsComplete(const std::array<std::uint64_t, RhiQueueTypeCount>& completedValues) const noexcept;
 };

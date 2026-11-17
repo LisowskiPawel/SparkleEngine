@@ -7,7 +7,7 @@
 #include "Assets/Loaders/MaterialAssetLoader.h"
 #include "Assets/Loaders/CookedAssetFileSet.h"
 #include "Core/Public/Formatting/HexFormat.h"
-#include "Core/Public/Paths/ProductFilePaths.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include <filesystem>
 #include <format>

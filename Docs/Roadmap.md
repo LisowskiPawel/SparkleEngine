@@ -78,6 +78,8 @@ Build the [three portfolio cases](Goals.md#the-three-cases) from the completed t
 
 These changes support rendering and add no first-release prerequisites. Start with [JSON](ThirdPartyMigration.md#candidates-and-expected-benefit). Investigate task execution and cooked metadata next, followed by texture cooking and native window/input. The migration guide records candidate benefits and requirements; other candidates remain deferred.
 
+Texture cooking stages 1–2 are complete for baseline capture and a **NO-GO evaluation on 2026-11-17**. No replacement processor qualified; the migration is blocked and stages 3–6 remain unstarted. The [final disposition](Implementation/TextureCooking.md#stage-2-final-disposition--2026-11-17) records the evidence and the SDK/capability changes required to reopen selection. Keep the working cooker until a candidate qualifies.
+
 ## Choosing the next task
 
 Prefer an unmet dependency, a useful rendering improvement or a focused simplification. Reuse earlier results when their inputs still match.

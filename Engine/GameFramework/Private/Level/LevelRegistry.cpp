@@ -3,7 +3,7 @@
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Diagnostics/Verify.h"
-#include "Level/Level.h"
+#include "Level/LevelAsset.h"
 #include "Level/Parsing/LevelParser.h"
 
 #include <format>
@@ -110,16 +110,6 @@ std::vector<std::string> LevelRegistry::GetLevelNames() const
 	}
 	std::sort(levelNames.begin(), levelNames.end());
 	return levelNames;
-}
-
-void LevelRegistry::SaveLevel(const LevelAsset& level) const
-{
-	if (FindLevel(level.GetName()) == nullptr)
-	{
-		throw Diagnostics::Error("Level not found.");
-	}
-
-	LevelParser::SaveToFile(level);
 }
 
 std::string_view LevelRegistry::GetDefaultLevelName() const noexcept

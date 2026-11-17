@@ -1,10 +1,10 @@
 #include "../PCH.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "RenderPassRuntimeCache.h"
 
 #include "Core/Public/Diagnostics/Logger.h"
 #include "Core/Public/Files/FileSetPublication.h"
-#include "Core/Public/Paths/FileSystemPaths.h"
 #include "RHI/Public/Device/RenderDeviceServices.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 #include "RHI/Public/Shaders/ShaderParameterLayoutBuilder.h"

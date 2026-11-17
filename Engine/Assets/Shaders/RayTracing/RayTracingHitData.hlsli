@@ -1,8 +1,14 @@
 #ifndef SPARKLE_RAY_TRACING_HIT_DATA_HLSLI
 #define SPARKLE_RAY_TRACING_HIT_DATA_HLSLI
 
-#include "/Engine/RayTracing/RayTracingHitSurface.hlsli"
 #include "/Engine/Resources/MaterialTextureMappingData.hlsli"
+
+namespace RayTracingHitData
+{
+	static const uint InstanceFlagValid = 1u << 0u;
+	static const uint InstanceFlagTwoSided = 1u << 2u;
+	static const uint MaterialFlagEmissive = 1u << 5u;
+}
 
 struct RayTracingHitVertex
 {
@@ -17,15 +23,9 @@ struct RayTracingHitInstance
 {
 	uint FirstVertex;
 	uint FirstIndex;
-	uint VertexCount;
 	uint IndexCount;
 	uint MaterialSlot;
 	uint Flags;
-	uint GeometryFlags;
-	uint RejectionReason;
-	uint AlphaMode;
-	uint MaterialTextureFlags;
-	uint AbiVersion;
 	uint MorphTargetDeltaOffset;
 };
 

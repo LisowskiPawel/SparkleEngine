@@ -1,7 +1,7 @@
 #include "Cooking/AssetCookStages.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Dispatch/AssetCookerToolProcess.h"
-#include "Core/Public/Paths/FileSystemPaths.h"
 
 bool ValidateShaderCookStage(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics& diagnostics)
 {

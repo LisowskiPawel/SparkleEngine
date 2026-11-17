@@ -1,11 +1,11 @@
 #include "PCH.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "Textures/CookedTextureLoader.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/BinarySpanReader.h"
 #include "Core/Public/Files/FileUtils.h"
-#include "Core/Public/Paths/FileSystemPaths.h"
 #include "RHI/Public/Textures/CookedTextureAsset.h"
 
 #include <format>

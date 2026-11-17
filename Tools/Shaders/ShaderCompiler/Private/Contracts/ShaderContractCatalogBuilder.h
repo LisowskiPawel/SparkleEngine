@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ShaderContractCatalog.h"
+#include "Contracts/ShaderContractCatalog.h"
 
 #include <cstdint>
 #include <string>

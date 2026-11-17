@@ -3,11 +3,9 @@
 #include "Verification/ShaderParameterStructVerifier.h"
 
 #include "Core/Public/Diagnostics/Verify.h"
-#include "Core/Public/Json/JsonWriter.h"
 
 #include <algorithm>
 #include <format>
-#include <sstream>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_shaderParameterStructVerifierLogger, "ShaderCompiler.ParameterStructVerifier");
 
@@ -88,26 +86,6 @@ namespace ShaderParameterVerification
 		const auto field = std::ranges::find_if(descriptor.Fields, [name](const auto& candidate) { return candidate.bReflected && candidate.Name == name; });
 		return field != descriptor.Fields.end() ? &*field : nullptr;
 	}
-}
-
-std::string ShaderParameterStructVerificationResult::BuildJsonReport() const
-{
-	std::ostringstream stream;
-	stream << "{\n";
-	stream << "  \"status\": \"" << (mismatches.empty() ? "matched" : "mismatch") << "\",\n";
-	stream << "  \"diagnostics\": [\n";
-	for (std::size_t index = 0; index < diagnostics.size(); ++index)
-	{
-		stream << "    " << Json::QuoteString(diagnostics[index]);
-		if (index + 1 < diagnostics.size())
-		{
-			stream << ',';
-		}
-		stream << "\n";
-	}
-	stream << "  ]\n";
-	stream << "}\n";
-	return stream.str();
 }
 
 namespace ShaderParameterVerification

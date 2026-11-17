@@ -3,6 +3,7 @@
 #include "Vulkan/Pipeline/VulkanShaderModule.h"
 
 #include "Vulkan/VulkanTypeConversions.h"
+#include "Shaders/GlobalShaderMap.h"
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "Vulkan/Diagnostics/GpuCrash/VulkanGpuCrash.h"
 #endif
@@ -16,15 +17,15 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanShaderModuleLogger, "RHI.Vulkan.ShaderModule");
 
-VulkanShaderModule::VulkanShaderModule(VulkanRhi& rhi, const RhiShaderStageDesc& desc, std::string_view pipelineName) :
+VulkanShaderModule::VulkanShaderModule(VulkanRhi& rhi, const ResolvedShader* resolvedShader, std::string_view pipelineName) :
     m_device(rhi.GetDevice())
 {
-	if (!desc.IsValid())
+	if (resolvedShader == nullptr || !resolvedShader->IsValid())
 	{
 		return;
 	}
 
-	const ResolvedShader& shader = *desc.Shader;
+	const ResolvedShader& shader = *resolvedShader;
 	if (shader.Entry->BinaryFormat != ShaderBinaryFormat::SpirV)
 	{
 		Diagnostics::Fatal(

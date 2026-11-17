@@ -1,8 +1,9 @@
 #include "Vulkan/VulkanPCH.h"
 
 #include "Vulkan/Pipeline/VulkanBindingLayout.h"
+#include "Shaders/GlobalShaderMap.h"
 
-#include "Pipeline/RhiShaderBindingReflection.h"
+#include "Bindings/RhiShaderBindingReflection.h"
 #include "ShaderParameters/PassParameterLayout.h"
 #include "Vulkan/Core/VulkanResult.h"
 #include "Vulkan/VulkanTypeConversions.h"
@@ -208,8 +209,6 @@ static void CompileParameterBindings(
 		compiledBinding.VisibilityMask = reflectedLocations.front().VisibilityMask;
 		compiledBinding.DescriptorCount = std::max(1u, bindingRecord.ArrayCount);
 		compiledBinding.PushConstantCount = bindingRecord.ValueSizeInBytes / sizeof(std::uint32_t);
-		compiledBinding.Bindless.bBindlessEligible = bindingRecord.ArrayCount > 1u;
-		compiledBinding.Bindless.ReservedDescriptorCount = compiledBinding.Bindless.bBindlessEligible ? compiledBinding.DescriptorCount : 0u;
 		bindings.push_back(compiledBinding);
 
 		if (compiledBinding.Type == CompiledBindingType::PushConstants)
@@ -225,7 +224,9 @@ static void CompileParameterBindings(
 		{
 			continue;
 		}
-		if (compiledBinding.Bindless.bBindlessEligible && !rhi.GetFeatureStatus().bEnabledPartiallyBoundDescriptorArrays)
+
+		const bool bPartiallyBound = compiledBinding.DescriptorCount > 1u;
+		if (bPartiallyBound && !rhi.GetFeatureStatus().bEnabledPartiallyBoundDescriptorArrays)
 		{
 			Diagnostics::Fatal(g_vulkanBindingLayoutLogger, __FILE__, __LINE__, std::format("Vulkan shader descriptor array '{}' cannot be partially bound on this device.", bindingName));
 		}
@@ -239,7 +240,7 @@ static void CompileParameterBindings(
 		        .descriptorCount = std::max(1u, bindingRecord.ArrayCount),
 		        .stageFlags = VulkanTypeConversions::ToVkShaderStages(compiledBinding.VisibilityMask),
 		        .pImmutableSamplers = nullptr},
-		    compiledBinding.Bindless.bBindlessEligible ? VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT : 0u);
+		    bPartiallyBound ? VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT : 0u);
 	}
 }
 

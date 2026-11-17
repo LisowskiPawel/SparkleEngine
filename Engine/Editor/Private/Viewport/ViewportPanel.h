@@ -31,11 +31,11 @@ public:
 	void SetFinalColorTexture(UiTextureHandle texture) noexcept;
 	const ViewportRenderRequest& GetRenderRequest() const noexcept;
 
-	void RequestOutputAction(ViewportOutputAction action) noexcept { m_outputAction = action; }
+	void RequestOutputAction(ViewportOutputAction action) noexcept;
 
 	ViewportOutputAction ConsumeOutputAction() noexcept;
 
-	InputLayer GetTargetInputLayer() const noexcept { return InputLayer::Gameplay; }
+	InputLayer GetTargetInputLayer() const noexcept;
 
 	bool GetInputBounds(float& left, float& top, float& right, float& bottom) const noexcept;
 	void SetOverlay(std::unique_ptr<ViewportOverlay> overlay) noexcept;

@@ -7,7 +7,7 @@ namespace ECS
 {
 	bool GameWorldState::PrepareSystemExecution(GameWorldResourceStores& resources)
 	{
-		const bool bAnimationPrepared = m_animationOutput.Prepare(m_registry, resources.AnimationClips, resources.Skeletons, m_morphWeights, resources.Generation);
+		const bool bAnimationPrepared = m_animationEvaluation.Prepare(m_registry, resources.AnimationClips, resources.Skeletons, m_morphWeights, resources.Generation);
 		if (!bAnimationPrepared)
 		{
 			return false;

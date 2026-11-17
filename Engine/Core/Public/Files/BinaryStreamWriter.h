@@ -4,43 +4,31 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <fstream>
+#include <ostream>
+#include <limits>
 #include <string>
 #include <type_traits>
 #include <vector>
 
 namespace Files::BinaryStreamWriter
 {
-	SPARKLE_CORE_API bool WriteBytes(std::ofstream& output, const void* bytes, std::size_t byteCount, std::string& outErrorMessage);
+	SPARKLE_CORE_API bool WriteBytes(std::ostream& output, const void* bytes, std::size_t byteCount, std::string& outErrorMessage);
 
-	template <typename T> bool WriteValue(std::ofstream& output, const T& value, std::string& outErrorMessage)
+	template <typename T> bool WriteValue(std::ostream& output, const T& value, std::string& outErrorMessage)
 	{
 		static_assert(std::is_trivially_copyable_v<T>, "BinaryStreamWriter requires trivially-copyable values");
-		output.write(reinterpret_cast<const char*>(&value), sizeof(T));
-		if (output.good())
-		{
-			return true;
-		}
-
-		outErrorMessage = "Failed to write binary value to output stream";
-		return false;
+		return WriteBytes(output, &value, sizeof(T), outErrorMessage);
 	}
 
-	template <typename T> bool WriteArray(std::ofstream& output, const std::vector<T>& values, std::string& outErrorMessage)
+	template <typename T> bool WriteArray(std::ostream& output, const std::vector<T>& values, std::string& outErrorMessage)
 	{
 		static_assert(std::is_trivially_copyable_v<T>, "BinaryStreamWriter requires trivially-copyable values");
-		if (values.empty())
+		if (values.size() > (std::numeric_limits<std::size_t>::max)() / sizeof(T))
 		{
-			return true;
+			outErrorMessage = "Binary array size overflow";
+			return false;
 		}
 
-		output.write(reinterpret_cast<const char*>(values.data()), static_cast<std::streamsize>(sizeof(T) * values.size()));
-		if (output.good())
-		{
-			return true;
-		}
-
-		outErrorMessage = "Failed to write binary array to output stream";
-		return false;
+		return WriteBytes(output, values.data(), sizeof(T) * values.size(), outErrorMessage);
 	}
 }

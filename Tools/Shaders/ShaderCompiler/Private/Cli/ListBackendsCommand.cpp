@@ -88,33 +88,29 @@ int ListBackends()
 	for (const ShaderBackendDescriptor& backend : backends)
 	{
 		std::cout << "  name='" << backend.Name << "'"
-		          << " available=" << (backend.bIsAvailable ? "true" : "false") << " sourceExtensions='" << BuildStringList(backend.SourceExtensions) << "'"
-		          << " codegenTargets='" << BuildTargetList(backend.CodegenTargets) << "'"
-		          << " binaryFormats='" << BuildStringList(backend.BinaryFormats) << "'"
+		          << " available=true sourceExtensions='" << backend.SourceExtension << "'"
+		          << " codegenTargets='" << BuildTargetList(ListShaderCodegenTargets()) << "'"
+		          << " binaryFormats='" << BuildStringList(ListShaderBinaryFormats()) << "'"
 		          << " rt='" << BuildRayTracingFeatureList(backend.Capabilities) << "'"
 		          << " version=" << backend.Version;
-		if (!backend.UnavailableReason.empty())
-		{
-			std::cout << " unavailableReason='" << backend.UnavailableReason << "'";
-		}
 		std::cout << "\n";
 	}
 
-	const std::span<const ShaderBinaryFormatDescriptor> binaryFormats = ListShaderBinaryFormats();
+	const std::span<const std::string_view> binaryFormats = ListShaderBinaryFormats();
 	std::cout << "ShaderCompiler: " << binaryFormats.size() << " binary format(s) registered\n";
-	for (const ShaderBinaryFormatDescriptor& binaryFormat : binaryFormats)
+	for (const std::string_view binaryFormat : binaryFormats)
 	{
-		std::cout << "  name='" << binaryFormat.Name << "'"
-		          << " available=" << (binaryFormat.bIsAvailable ? "true" : "false") << "\n";
+		std::cout << "  name='" << binaryFormat << "'"
+		          << " available=true\n";
 	}
 
-	const std::span<const ShaderCodegenTargetDescriptor> codegenTargets = ListShaderCodegenTargets();
+	const std::span<const ShaderTarget> codegenTargets = ListShaderCodegenTargets();
 	std::cout << "ShaderCompiler: " << codegenTargets.size() << " codegen target(s) registered\n";
-	for (const ShaderCodegenTargetDescriptor& codegenTarget : codegenTargets)
+	for (const ShaderTarget codegenTarget : codegenTargets)
 	{
-		std::cout << "  name='" << GetShaderTargetName(codegenTarget.Target) << "'"
-		          << " binaryFormat='" << codegenTarget.BinaryFormat << "'"
-		          << " available=" << (codegenTarget.bIsAvailable ? "true" : "false") << "\n";
+		std::cout << "  name='" << GetShaderTargetName(codegenTarget) << "'"
+		          << " binaryFormat='" << (IsDxilTarget(codegenTarget) ? "Dxil" : "SpirV") << "'"
+		          << " available=true\n";
 	}
 
 	return kExitCodeSuccess;

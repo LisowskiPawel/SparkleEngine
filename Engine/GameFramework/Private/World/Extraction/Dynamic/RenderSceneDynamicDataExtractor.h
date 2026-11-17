@@ -15,7 +15,7 @@ class WorldReadView;
 
 namespace ECS
 {
-	class AnimationOutputStorage;
+	class AnimationEvaluationStorage;
 	class MorphWeightStorage;
 	class RenderObjectDeltaExtractor;
 	class RenderObjectIdentityMap;
@@ -28,7 +28,7 @@ namespace ECS
 		static void ExtractSkinning(
 		    const ComponentStorage<SkinningState>& skinningStates,
 		    const ComponentStorage<AnimationState>& animationStates,
-		    const AnimationOutputStorage& animation,
+		    const AnimationEvaluationStorage& animation,
 		    const SkeletonResourceStore& skeletons,
 		    std::span<const WorldExtractionStorage::MeshSlot> meshes,
 		    const RenderObjectDeltaExtractor& objects,
@@ -36,7 +36,7 @@ namespace ECS
 		void ExtractMorphWeights(
 		    const ComponentStorage<MorphState>& morphStates,
 		    const ComponentStorage<AnimationState>& animationStates,
-		    const AnimationOutputStorage& animation,
+		    const AnimationEvaluationStorage& animation,
 		    const MorphWeightStorage& weights,
 		    const RenderObjectDeltaExtractor& objects,
 		    RenderSceneDynamicData& dynamic);
@@ -51,7 +51,7 @@ namespace ECS
 		};
 
 		static bool HasSameObjectData(const RenderObjectDynamicData& left, const RenderObjectDynamicData& right) noexcept;
-		void BuildMorphMetadata(const AnimationOutputStorage& animation, const ComponentStorage<AnimationState>& animationStates);
+		void BuildMorphMetadata(const AnimationEvaluationStorage& animation, const ComponentStorage<AnimationState>& animationStates);
 		void ExtractMorphWeightRanges(const ComponentStorage<MorphState>& morphStates, const MorphWeightStorage& weights, const RenderObjectDeltaExtractor& objects, RenderSceneDynamicData& dynamic);
 
 		std::vector<RenderObjectDynamicData> m_publishedObjects;

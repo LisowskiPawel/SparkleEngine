@@ -25,14 +25,14 @@ class DxcShaderBackend final : public IShaderBackend
 {
 public:
 	DxcShaderBackend();
-	~DxcShaderBackend() override = default;
+	~DxcShaderBackend() override;
 
 	DxcShaderBackend(const DxcShaderBackend&) = delete;
 	DxcShaderBackend& operator=(const DxcShaderBackend&) = delete;
 	DxcShaderBackend(DxcShaderBackend&&) = delete;
 	DxcShaderBackend& operator=(DxcShaderBackend&&) = delete;
 
-	bool IsValid() const noexcept { return m_compiler != nullptr && m_utils != nullptr; }
+	bool IsValid() const noexcept;
 
 	static ShaderBackendCapabilities GetStaticCapabilities() noexcept;
 	static std::uint64_t QueryBackendVersion();

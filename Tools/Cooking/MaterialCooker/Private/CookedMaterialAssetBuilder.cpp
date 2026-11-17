@@ -1,19 +1,17 @@
 #include "PCH.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "MaterialCooker.h"
 #include "CookedMaterialAssetBuild.h"
 #include "SourceImportOutput.h"
 #include "TextureCookRequestBuilder.h"
-#include "TextureCookRequestList.h"
 #include "Types/ImportedMaterial.h"
 #include "Types/ImportedTextureSource.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Hash/HashUtils.h"
-#include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Paths/PathUtils.h"
 
 #include <optional>
-#include <utility>
 
 static std::string BuildCookedTextureReferencePath(const TextureCookRequest& request)
 {
@@ -26,7 +24,7 @@ static std::string BuildCookedTextureReferencePath(const TextureCookRequest& req
 	return relativePath->generic_string();
 }
 
-static Assets::CookedAssetId BuildMaterialAssetId(std::string_view sceneAssetId, std::size_t materialIndex) noexcept
+static Assets::CookedAssetId BuildMaterialAssetId(std::string_view sceneAssetId, std::size_t materialIndex)
 {
 	return Hash::Fnv1a64(std::string(sceneAssetId) + "#material#" + std::to_string(materialIndex));
 }
@@ -63,7 +61,6 @@ static CookedMaterialAssetBuild BuildMaterialAsset(const ImportedMaterial& impor
 	CookedMaterialAssetBuild materialAsset;
 	materialAsset.assetId = BuildMaterialAssetId(sceneAssetId, materialIndex);
 	materialAsset.name = importedMaterial.name;
-	materialAsset.header.nameByteCount = static_cast<std::uint32_t>(materialAsset.name.size());
 	materialAsset.header.alphaMode = TranslateAlphaMode(importedMaterial.alphaMode);
 	materialAsset.header.baseColor = importedMaterial.baseColor;
 	materialAsset.header.metallic = importedMaterial.metallic;
@@ -80,48 +77,18 @@ static CookedMaterialAssetBuild BuildMaterialAsset(const ImportedMaterial& impor
 		AppendTextureReference(textureSource, materialAsset);
 	}
 
-	materialAsset.header.textureReferenceCount = static_cast<std::uint32_t>(materialAsset.textureReferences.size());
 	return materialAsset;
 }
 
-static void AppendTextureRequest(const ImportedTextureSource& textureSource, TextureCookRequestSet& requestSet)
+std::vector<CookedMaterialAssetBuild> MaterialCooker::BuildMaterialAssets(const SourceImportOutput& importOutput, std::string_view sceneAssetId)
 {
-	if (textureSource.sourcePath.empty())
-	{
-		return;
-	}
-
-	const TextureCookRequest request = BuildTextureCookRequest(textureSource.sourcePath, textureSource.textureGroup, textureSource.channelMask);
-	requestSet.Add(request);
-}
-
-MaterialCookOutput MaterialCooker::BuildMaterialAssets(const SourceImportOutput& importOutput, std::string_view sceneAssetId)
-{
-	MaterialCookOutput output;
-	output.assets.reserve(importOutput.scene.materials.size());
-	output.assetReferences.reserve(importOutput.scene.materials.size());
+	std::vector<CookedMaterialAssetBuild> assets;
+	assets.reserve(importOutput.scene.materials.size());
 
 	for (std::size_t materialIndex = 0; materialIndex < importOutput.scene.materials.size(); ++materialIndex)
 	{
-		CookedMaterialAssetBuild materialAsset = BuildMaterialAsset(importOutput.scene.materials[materialIndex], sceneAssetId, materialIndex);
-		output.assetReferences.push_back({materialAsset.assetId});
-		output.assets.push_back(std::move(materialAsset));
+		assets.push_back(BuildMaterialAsset(importOutput.scene.materials[materialIndex], sceneAssetId, materialIndex));
 	}
 
-	return output;
-}
-
-std::vector<TextureCookRequest> MaterialCooker::CollectTextureCookRequests(const SourceImportOutput& importOutput)
-{
-	TextureCookRequestSet requestSet;
-
-	for (const ImportedMaterial& importedMaterial : importOutput.scene.materials)
-	{
-		for (const ImportedTextureSource& textureSource : importedMaterial.textureSources)
-		{
-			AppendTextureRequest(textureSource, requestSet);
-		}
-	}
-
-	return requestSet.ReleaseRequests();
+	return assets;
 }

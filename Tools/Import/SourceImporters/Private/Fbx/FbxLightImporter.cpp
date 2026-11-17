@@ -2,7 +2,7 @@
 
 #include "Fbx/FbxLightImporter.h"
 
-#include "Fbx/FbxNodeTransformConverter.h"
+#include "Assimp/AssimpNodeTransformConverter.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Math/WorldCoordinateSystem.h"
 
@@ -85,8 +85,8 @@ public:
 		const aiVector3D up(source.mUp.x, source.mUp.y, -source.mUp.z);
 		WorldPose pose;
 
-		pose.Transform = kind == ImportedLightKind::Point ? FbxNodeTransformConverter::BuildNodeAttachedTranslation(node, position)
-		                                                  : FbxNodeTransformConverter::BuildNodeAttachedOrientation(node, position, localDirection, up);
+		pose.Transform = kind == ImportedLightKind::Point ? AssimpNodeTransformConverter::BuildNodeAttachedTranslation(node, position)
+		                                                  : AssimpNodeTransformConverter::BuildNodeAttachedOrientation(node, position, localDirection, up);
 
 		const DirectX::XMMATRIX lightWorld = DirectX::XMLoadFloat4x4(&pose.Transform);
 
@@ -101,13 +101,13 @@ public:
 	}
 };
 
-void FbxLightImporter::ImportLights(const aiScene& scene, float sourceMetersPerUnit, SourceImportOutput& output)
+void FbxLightImporter::ImportLights(const aiScene& scene, float sourceMetersPerUnit, ImportedScene& importedScene)
 {
-	output.scene.lights.reserve(scene.mNumLights);
+	importedScene.lights.reserve(scene.mNumLights);
 	for (unsigned int lightIndex = 0; lightIndex < scene.mNumLights; ++lightIndex)
 	{
 		const aiLight* sourceLight = scene.mLights[lightIndex];
-		const aiNode* node = sourceLight != nullptr ? FbxNodeTransformConverter::FindNode(scene, sourceLight->mName) : nullptr;
+		const aiNode* node = sourceLight != nullptr ? AssimpNodeTransformConverter::FindNode(scene, sourceLight->mName) : nullptr;
 		const ImportedLightKind kind = sourceLight != nullptr ? FbxLightTranslation::ToImportedLightKind(sourceLight->mType) : ImportedLightKind::Unknown;
 		if (sourceLight == nullptr || sourceLight->mName.length == 0 || node == nullptr || kind == ImportedLightKind::Unknown)
 		{
@@ -117,7 +117,7 @@ void FbxLightImporter::ImportLights(const aiScene& scene, float sourceMetersPerU
 		ImportedLight light;
 		light.name = sourceLight->mName.C_Str();
 		light.kind = kind;
-		light.sourceNodeIndex = FbxNodeTransformConverter::FindNodeIndex(scene, *node);
+		light.sourceNodeIndex = AssimpNodeTransformConverter::FindNodeIndex(scene, *node);
 		light.innerAngleRadians = sourceLight->mAngleInnerCone;
 		light.outerAngleRadians = sourceLight->mAngleOuterCone;
 		light.width = sourceLight->mSize.x * sourceMetersPerUnit;
@@ -139,6 +139,6 @@ void FbxLightImporter::ImportLights(const aiScene& scene, float sourceMetersPerU
 		light.worldTransform = worldPose.Transform;
 		light.direction = worldPose.Direction;
 		light.tangent = worldPose.Tangent;
-		output.scene.lights.push_back(std::move(light));
+		importedScene.lights.push_back(std::move(light));
 	}
 }

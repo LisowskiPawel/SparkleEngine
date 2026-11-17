@@ -66,6 +66,7 @@ target_link_libraries(SparkleEditor
         SparkleRenderer
         SparkleGameFramework
     PRIVATE
+        nlohmann_json::nlohmann_json
         SparklePlatform
         imgui
 )

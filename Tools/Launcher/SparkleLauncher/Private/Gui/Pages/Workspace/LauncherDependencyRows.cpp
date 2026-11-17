@@ -126,7 +126,7 @@ namespace SparkleLauncher
 	void LauncherWorkspaceSetup::SyncSourceDependency(const ThirdPartyDependencyUiEntry& dependency)
 	{
 		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, "workspace.sync-code");
-		request.SourceDependencyId = dependency.Id;
+		std::get<BuildWorkspaceOperationRequest>(request.Inputs).SourceDependencyId = dependency.Id.toStdString();
 		m_startOperation(std::move(request), "Sync " + dependency.Label);
 	}
 
@@ -139,6 +139,7 @@ namespace SparkleLauncher
 		}
 
 		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, "workspace.clean");
+		auto& inputs = std::get<MaintenanceOperationRequest>(request.Inputs);
 		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(m_workspaceRoot);
 		const std::filesystem::path dependencyCachePath = workspaceOutputs.DependencyCacheRoot;
 		for (const std::filesystem::path& path : GetSourceDependencyCachePaths(*sourceDependency, dependencyCachePath))
@@ -148,9 +149,14 @@ namespace SparkleLauncher
 			{
 				continue;
 			}
-			request.CleanTargets.push_back({dependency.Label + " cache", QString::fromStdString(path.string()), "Generated source dependency cache."});
+
+			inputs.RequestedCleanTargets.push_back({dependency.Label.toStdString() + " cache", path, "Generated source dependency cache."});
 		}
-		if (request.CleanTargets.empty() || !ConfirmLauncherRunRequest(m_dialogParent, request))
+		if (inputs.RequestedCleanTargets.empty())
+		{
+			return;
+		}
+		if (!ConfirmLauncherRunRequest(m_dialogParent, request))
 		{
 			return;
 		}
@@ -168,9 +174,10 @@ namespace SparkleLauncher
 			return;
 		}
 
-		if (!request.SourceDependencyId.isEmpty())
+		const auto& inputs = std::get<BuildWorkspaceOperationRequest>(request.Inputs);
+		if (!inputs.SourceDependencyId.empty())
 		{
-			m_sourceDependencyRunIds.insert(request.SourceDependencyId, runId);
+			m_sourceDependencyRunIds.insert(QString::fromStdString(inputs.SourceDependencyId), runId);
 			RefreshSourceDependencyRows();
 			return;
 		}

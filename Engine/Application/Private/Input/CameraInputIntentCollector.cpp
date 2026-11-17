@@ -104,9 +104,10 @@ void CameraInputIntentCollector::OnMouseMove(const MouseMoveEvent& event) noexce
 	{
 		return;
 	}
+
 	m_lookDeltaX += static_cast<float>(event.Delta.X);
 	m_lookDeltaY += static_cast<float>(event.Delta.Y);
-	m_inputSystem.CenterCursor(m_window.GetHWND());
+	m_inputSystem.CenterCursor();
 }
 
 void CameraInputIntentCollector::OnMouseWheel(const MouseWheelEvent& event) noexcept

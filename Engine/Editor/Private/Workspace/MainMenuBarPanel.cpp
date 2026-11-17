@@ -1,7 +1,6 @@
 #include "PCH.h"
 #include "Workspace/MainMenuBarPanel.h"
 
-#include "Level/Level.h"
 #include "Level/LevelSession.h"
 #include "Workspace/TitleBarWindowControls.h"
 #include "Icons/EditorIcon.h"
@@ -10,6 +9,7 @@
 #include <imgui.h>
 #include <algorithm>
 #include <utility>
+#include <string_view>
 
 MainMenuBarPanel::MainMenuBarPanel(LevelSession* levelSession, Window* window) noexcept
 {
@@ -72,8 +72,7 @@ void MainMenuBarPanel::BuildOpenLevelMenu() noexcept
 		return;
 	}
 
-	const LevelAsset* activeLevel = m_levelSession->GetActiveLevel();
-	const std::string activeLevelName = activeLevel != nullptr ? std::string(activeLevel->GetName()) : std::string();
+	const std::string_view activeLevelName = m_levelSession->GetActiveLevelName();
 
 	for (const std::string& levelName : levelNames)
 	{

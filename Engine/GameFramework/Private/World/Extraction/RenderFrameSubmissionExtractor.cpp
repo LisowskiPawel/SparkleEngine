@@ -25,7 +25,7 @@ namespace ECS
 		m_dynamicExtractor.ExtractSkinning(
 		    state.m_registry.GetStorage<SkinningState>(),
 		    state.m_registry.GetStorage<AnimationState>(),
-		    state.m_animationOutput,
+		    state.m_animationEvaluation,
 		    resources.Skeletons,
 		    meshes,
 		    m_objectExtractor,
@@ -34,7 +34,7 @@ namespace ECS
 		m_dynamicExtractor.ExtractMorphWeights(
 		    state.m_registry.GetStorage<MorphState>(),
 		    state.m_registry.GetStorage<AnimationState>(),
-		    state.m_animationOutput,
+		    state.m_animationEvaluation,
 		    state.m_morphWeights,
 		    m_objectExtractor,
 		    submission.Scene.Dynamic);

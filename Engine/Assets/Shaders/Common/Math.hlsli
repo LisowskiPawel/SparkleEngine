@@ -19,8 +19,3 @@ float3 SafeNormalize(float3 v, float3 fallback)
 	const float lengthSquared = dot(v, v);
 	return lengthSquared > 1.0e-8f ? v * rsqrt(lengthSquared) : fallback;
 }
-
-float Remap(float value, float inMin, float inMax, float outMin, float outMax)
-{
-	return outMin + (value - inMin) * (outMax - outMin) / (inMax - inMin);
-}

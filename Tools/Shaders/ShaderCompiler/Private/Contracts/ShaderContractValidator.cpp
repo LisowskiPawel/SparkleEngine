@@ -40,15 +40,16 @@ std::vector<ShaderContractVerificationFailure> ValidateShaderContracts(const Sha
 		{
 			failures.push_back(ShaderContractValidation::Failure(shader, "unsupported-stage"));
 		}
-		if (!shader.bHasParameterStruct && !IsRayTracingShaderStage(shader.stage))
+		const bool bHasParameterStruct = shader.parameterStruct.has_value();
+		if (!bHasParameterStruct && !IsRayTracingShaderStage(shader.stage))
 		{
 			failures.push_back(ShaderContractValidation::Failure(shader, "missing-parameter-descriptor-builder"));
 		}
-		if (!shader.bHasParameterStruct && shader.stage == ShaderStage::RayGeneration)
+		if (!bHasParameterStruct && shader.stage == ShaderStage::RayGeneration)
 		{
 			failures.push_back(ShaderContractValidation::Failure(shader, "ray-generation-missing-root-parameter-struct"));
 		}
-		if (shader.bHasParameterStruct && IsRayTracingShaderStage(shader.stage) && shader.stage != ShaderStage::RayGeneration)
+		if (bHasParameterStruct && IsRayTracingShaderStage(shader.stage) && shader.stage != ShaderStage::RayGeneration)
 		{
 			failures.push_back(ShaderContractValidation::Failure(shader, "non-ray-generation-root-parameter-struct"));
 		}

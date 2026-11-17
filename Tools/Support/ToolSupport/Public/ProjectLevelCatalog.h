@@ -56,10 +56,5 @@ struct ProjectLevelCatalog final
 	bool HasLevelSourceInputs(const ProjectLevelCatalogEntry& level) const;
 };
 
-class ProjectLevelCatalogFile final
-{
-public:
-	static ProjectLevelCatalog Load(const std::filesystem::path& projectRoot);
-	static bool SetLevelSelected(const std::filesystem::path& projectRoot, std::string_view levelId, bool bSelected, std::string& outErrorMessage);
-	static bool SetLevelsSelected(const std::filesystem::path& projectRoot, const std::vector<std::string>& levelIds, bool bSelected, std::string& outErrorMessage);
-};
+ProjectLevelCatalog LoadProjectLevelCatalog(const std::filesystem::path& projectRoot);
+ProjectLevelCatalog ParseProjectLevelCatalog(const std::filesystem::path& projectRoot, std::string_view text);

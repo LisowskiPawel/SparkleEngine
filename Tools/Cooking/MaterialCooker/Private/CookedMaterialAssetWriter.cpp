@@ -6,10 +6,26 @@
 #include "Core/Public/Files/BinaryStreamWriter.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Files/FileSetPublication.h"
-#include "Core/Public/Paths/ProductFilePaths.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include <fstream>
 #include <limits>
+#include <cstring>
+
+static Assets::CookedMaterialAssetHeader BuildHeader(const CookedMaterialAssetBuild& materialAsset)
+{
+	const bool bNameTooLarge = materialAsset.name.size() > (std::numeric_limits<std::uint32_t>::max)();
+	const bool bReferencesTooLarge = materialAsset.textureReferences.size() > (std::numeric_limits<std::uint32_t>::max)();
+	if (bNameTooLarge || bReferencesTooLarge)
+	{
+		throw Diagnostics::Error("Cooked material payload exceeds the cooked format.");
+	}
+
+	Assets::CookedMaterialAssetHeader header = materialAsset.header;
+	header.nameByteCount = static_cast<std::uint32_t>(materialAsset.name.size());
+	header.textureReferenceCount = static_cast<std::uint32_t>(materialAsset.textureReferences.size());
+	return header;
+}
 
 static void WriteMaterialName(std::ofstream& output, const CookedMaterialAssetBuild& materialAsset)
 {
@@ -36,7 +52,13 @@ static std::vector<Assets::CookedTextureReferenceRecord> BuildTextureReferenceRe
 			throw Diagnostics::Error("Cooked material texture reference path is too large to serialize.");
 		}
 
-		records.push_back({.texturePathByteCount = static_cast<std::uint32_t>(reference.texturePath.size()), .textureGroup = reference.textureGroup, .mapping = reference.mapping});
+		records.emplace_back();
+		Assets::CookedTextureReferenceRecord& record = records.back();
+		// The binary record includes alignment bytes that must be deterministic too.
+		std::memset(&record, 0, sizeof(record));
+		record.texturePathByteCount = static_cast<std::uint32_t>(reference.texturePath.size());
+		record.textureGroup = reference.textureGroup;
+		record.mapping = reference.mapping;
 	}
 
 	return records;
@@ -56,19 +78,20 @@ static void WriteTextureReferencePaths(std::ofstream& output, const CookedMateri
 
 static void WriteMaterialAsset(const CookedMaterialAssetBuild& materialAsset, const std::filesystem::path& stagedOutputPath)
 {
+	const Assets::CookedMaterialAssetHeader header = BuildHeader(materialAsset);
+	const std::vector<Assets::CookedTextureReferenceRecord> records = BuildTextureReferenceRecords(materialAsset);
 	std::string errorMessage;
 	std::ofstream output;
 	if (!Files::TryOpenBinaryOutput(stagedOutputPath, output, errorMessage))
 	{
 		throw Diagnostics::Error(errorMessage);
 	}
-	if (!Files::BinaryStreamWriter::WriteValue(output, materialAsset.header, errorMessage))
+	if (!Files::BinaryStreamWriter::WriteValue(output, header, errorMessage))
 	{
 		throw Diagnostics::Error(errorMessage);
 	}
 
 	WriteMaterialName(output, materialAsset);
-	const std::vector<Assets::CookedTextureReferenceRecord> records = BuildTextureReferenceRecords(materialAsset);
 	if (!Files::BinaryStreamWriter::WriteArray(output, records, errorMessage))
 	{
 		throw Diagnostics::Error(errorMessage);

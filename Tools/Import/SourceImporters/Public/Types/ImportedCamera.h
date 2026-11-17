@@ -8,7 +8,7 @@
 #include <limits>
 #include <string>
 
-enum class ImportedCameraProjectionKind : std::uint32_t
+enum class ImportedCameraProjectionKind : std::uint8_t
 {
 	Perspective = 0,
 	Orthographic = 1,

@@ -1,6 +1,6 @@
 #include "Gui/Pages/Scenes/LauncherSceneCatalog.h"
 #include "Gui/Pages/Workspace/LauncherWorkspaceSetup.h"
-#include "GpuCrash/LauncherGpuCrashPanel.h"
+#include "Gui/GpuCrash/LauncherGpuCrashPanel.h"
 #include "Gui/Shell/LauncherMainWindow.h"
 
 #include "Gui/Shell/LauncherActivityPanel.h"
@@ -28,7 +28,7 @@ namespace SparkleLauncher
 
 	void LauncherMainWindow::DisplayOperationFinished(const QString& runId, const QString& operationId, const QString& title, const LauncherOperationResult& result)
 	{
-		const bool bSucceeded = result.bSucceeded;
+		const bool bSucceeded = result.Status == OperationStatus::Succeeded;
 		if (result.GpuCrash)
 		{
 			m_gpuCrashPanel->SetIncident(*result.GpuCrash);

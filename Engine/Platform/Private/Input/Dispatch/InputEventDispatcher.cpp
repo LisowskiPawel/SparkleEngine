@@ -18,7 +18,7 @@ void InputEventDispatcher::Unsubscribe(EventHandle handle)
 	std::apply([&removeByHandle](auto&... callbacks) { (removeByHandle(callbacks), ...); }, m_callbacks);
 }
 
-void InputEventDispatcher::ProcessDeferredEvents(const LayerAvailability& layerAvailability)
+void InputEventDispatcher::ProcessDeferredEvents()
 {
 	if (m_bIsProcessingDeferredEvents)
 	{
@@ -33,7 +33,7 @@ void InputEventDispatcher::ProcessDeferredEvents(const LayerAvailability& layerA
 			// Remove before invoking user code, which can clear, append or recursively process the queue.
 			const RoutedInputEvent routedEvent = std::move(m_deferredEvents.front());
 			m_deferredEvents.pop_front();
-			std::visit([&](const auto& event) { DispatchToCallbacks(event, DispatchMode::Deferred, routedEvent.TargetLayer, layerAvailability); }, routedEvent.Event);
+			std::visit([&](const auto& event) { DispatchToCallbacks(event, DispatchMode::Deferred, routedEvent.TargetLayer); }, routedEvent.Event);
 		}
 	}
 	catch (...)
@@ -83,17 +83,7 @@ void InputEventDispatcher::CancelPointerEvents()
 	std::erase_if(m_deferredEvents, [](const RoutedInputEvent& event) { return !std::holds_alternative<KeyboardEvent>(event.Event); });
 }
 
-bool InputEventDispatcher::ShouldDispatchToLayer(InputLayer registeredLayer, InputLayer targetLayer, const LayerAvailability& layerAvailability) noexcept
+bool InputEventDispatcher::ShouldDispatchToLayer(InputLayer registeredLayer, InputLayer targetLayer) noexcept
 {
-	if (registeredLayer == InputLayer::System)
-	{
-		return true;
-	}
-	if (registeredLayer != targetLayer)
-	{
-		return false;
-	}
-
-	const auto index = static_cast<std::size_t>(registeredLayer);
-	return index < layerAvailability.size() && layerAvailability[index];
+	return registeredLayer == InputLayer::System || registeredLayer == targetLayer;
 }

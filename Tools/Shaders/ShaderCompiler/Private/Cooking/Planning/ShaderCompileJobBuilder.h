@@ -2,7 +2,7 @@
 
 #include "Cooking/Compilation/ShaderCompileJob.h"
 #include "Cooking/ShaderCookTypes.h"
-#include "ShaderContractCatalog.h"
+#include "Contracts/ShaderContractCatalog.h"
 
 #include <cstdint>
 #include <string_view>

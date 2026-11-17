@@ -99,13 +99,13 @@ public:
 	}
 };
 
-void GltfMaterialImporter::ImportMaterials(const cgltf_data* data, const std::filesystem::path& sourceDirectory, SourceImportOutput& output)
+void GltfMaterialImporter::ImportMaterials(const cgltf_data& data, const std::filesystem::path& sourceDirectory, ImportedScene& importedScene)
 {
-	GltfMaterialFeatureReporting::ValidateRequiredExtensions(*data);
-	for (cgltf_size materialIndex = 0; materialIndex < data->materials_count; ++materialIndex)
+	GltfMaterialFeatureReporting::ValidateRequiredExtensions(data);
+	for (cgltf_size materialIndex = 0; materialIndex < data.materials_count; ++materialIndex)
 	{
-		output.scene.materials.push_back(ExtractMaterial(data->materials[materialIndex], static_cast<ImportedMaterialIndex>(materialIndex), sourceDirectory));
-		GltfMaterialFeatureReporting::ReportGenericShading(data->materials[materialIndex], static_cast<ImportedMaterialIndex>(materialIndex));
+		importedScene.materials.push_back(ExtractMaterial(data.materials[materialIndex], static_cast<ImportedMaterialIndex>(materialIndex), sourceDirectory));
+		GltfMaterialFeatureReporting::ReportGenericShading(data.materials[materialIndex], static_cast<ImportedMaterialIndex>(materialIndex));
 	}
 }
 

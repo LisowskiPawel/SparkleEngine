@@ -33,6 +33,5 @@ namespace SparkleLauncher
 
 	private:
 		LauncherContentSummary m_content;
-		bool m_bHasContent = false;
 	};
 }

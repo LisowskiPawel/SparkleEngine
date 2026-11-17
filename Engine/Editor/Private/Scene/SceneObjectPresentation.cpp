@@ -11,9 +11,9 @@
 
 namespace SceneObjectPresentation
 {
-	void DrawSelectionHeader(const EditorSceneModel* model, const SceneObjectSelection* selection) noexcept
+	void DrawSelectionHeader(const EditorSceneModel& model, const SceneObjectSelection& selection) noexcept
 	{
-		const EditorSceneEntry* entry = model && selection ? model->FindEntry(*selection) : nullptr;
+		const EditorSceneEntry* entry = model.FindEntry(selection);
 		const char* title = entry != nullptr ? entry->Label.c_str() : "No Selection";
 		const char* subtitle = entry != nullptr ? entry->TypeLabel.c_str() : "Object";
 		const EditorIcons::EditorIcon icon = SceneObjectPresentation::BuildSelectionIcon(selection, entry ? entry->LightKind : SceneLightKind::Unknown);
@@ -104,10 +104,5 @@ namespace SceneObjectPresentation
 			default:
 				return EditorIcons::EditorIcon::None;
 		}
-	}
-
-	EditorIcons::EditorIcon BuildSelectionIcon(const SceneObjectSelection* selection, SceneLightKind lightKind) noexcept
-	{
-		return selection != nullptr ? BuildSelectionIcon(*selection, lightKind) : EditorIcons::EditorIcon::None;
 	}
 }

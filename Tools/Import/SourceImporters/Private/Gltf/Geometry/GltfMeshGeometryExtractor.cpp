@@ -74,6 +74,25 @@ namespace GltfMeshGeometryExtractor
 		}
 	}
 
+	static bool SupportsAttribute(const cgltf_attribute& attribute) noexcept
+	{
+		switch (attribute.type)
+		{
+			case cgltf_attribute_type_position:
+			case cgltf_attribute_type_normal:
+			case cgltf_attribute_type_tangent:
+				return attribute.index == 0;
+			case cgltf_attribute_type_texcoord:
+			case cgltf_attribute_type_color:
+				return true;
+			case cgltf_attribute_type_joints:
+			case cgltf_attribute_type_weights:
+				return attribute.index == 0 || attribute.index == 1;
+			default:
+				return false;
+		}
+	}
+
 	static void ValidateAttributes(const cgltf_primitive& primitive, const Attributes& attributes)
 	{
 		const bool bRequiredAccessors = attributes.Positions != nullptr && attributes.Normals != nullptr;
@@ -92,15 +111,7 @@ namespace GltfMeshGeometryExtractor
 		{
 			const cgltf_attribute& attribute = primitive.attributes[attributeIndex];
 
-			const bool bSupportedType = attribute.type == cgltf_attribute_type_position || attribute.type == cgltf_attribute_type_normal;
-			const bool bGeometryAttribute = bSupportedType || (attribute.type == cgltf_attribute_type_tangent);
-			const bool bSupportedIndex = bGeometryAttribute && (attribute.index == 0);
-			const bool bCoordinateAttribute = bSupportedIndex || (attribute.type == cgltf_attribute_type_texcoord);
-			const bool bColorAttribute = bCoordinateAttribute || (attribute.type == cgltf_attribute_type_color);
-			const bool bSkinAttribute = attribute.type == cgltf_attribute_type_joints || attribute.type == cgltf_attribute_type_weights;
-			const bool bSupportedSkinSet = attribute.index == 0 || attribute.index == 1;
-			const bool bSkinSetAccepted = bSkinAttribute && bSupportedSkinSet;
-			const bool bSupported = bColorAttribute || bSkinSetAccepted;
+			const bool bSupported = SupportsAttribute(attribute);
 
 			const bool bSupportedAccessor = bSupported && attribute.data != nullptr;
 			const bool bCountMatches = bSupportedAccessor && attribute.data->count == attributes.Positions->count;
@@ -217,7 +228,6 @@ namespace GltfMeshGeometryExtractor
 
 		const std::uint32_t vertexCount = static_cast<std::uint32_t>(attributes.Positions->count);
 		ImportedMeshGeometry geometry;
-		geometry.Reserve(vertexCount, primitive.indices ? static_cast<std::uint32_t>(primitive.indices->count) : 0u);
 		geometry.vertices.resize(vertexCount);
 		if (attributes.HasSkinInfluences())
 		{

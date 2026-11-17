@@ -1,27 +1,31 @@
 #include "Gui/Models/LauncherOperationRequestFactory.h"
 
 #include "Gui/Models/LauncherCleanUiModel.h"
-#include "Gui/Models/LauncherDependencyUiModel.h"
 #include "Gui/Models/LauncherContentModel.h"
 #include "Gui/App/LauncherSettings.h"
 
 #include <QtCore/QRegularExpression>
+#include <QtCore/QStringList>
 
 #include <algorithm>
+#include <stdexcept>
+#include <utility>
 
 namespace SparkleLauncher
 {
-	static std::vector<BuildWorkspaceScope> ResolveSelectedBuildScopes(const LauncherSettings& settings)
+	template <typename Scope> static std::vector<Scope> ParseSelectedScopes(const QString& selection, bool (*parseScope)(std::string_view, Scope&))
 	{
-		std::vector<BuildWorkspaceScope> scopes;
-		for (const QString& part : settings.BuildScopes().split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts))
+		std::vector<Scope> scopes;
+		const QStringList values = selection.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts);
+		for (const QString& value : values)
 		{
-			BuildWorkspaceScope scope = BuildWorkspaceScope::Editor;
-			const std::string scopeText = part.trimmed().toStdString();
-			const bool bScopeParsed = TryParseBuildWorkspaceScope(scopeText, scope);
-			const bool bScopeMissing = bScopeParsed && std::find(scopes.begin(), scopes.end(), scope) == scopes.end();
-
-			if (bScopeMissing)
+			Scope scope{};
+			const std::string text = value.trimmed().toStdString();
+			if (!parseScope(text, scope))
+			{
+				continue;
+			}
+			if (std::find(scopes.begin(), scopes.end(), scope) == scopes.end())
 			{
 				scopes.push_back(scope);
 			}
@@ -57,8 +61,24 @@ namespace SparkleLauncher
 		request.GameProfile = settings.GameProfile().toStdString();
 		request.PreferredIde = ResolveSelectedWorkspaceIde(settings);
 		request.Compiler = ResolveSelectedWorkspaceCompiler(settings);
-		request.SelectedScopes = ResolveSelectedBuildScopes(settings);
+		request.SelectedScopes = ParseSelectedScopes(settings.BuildScopes(), TryParseBuildWorkspaceScope);
 		return request;
+	}
+
+	bool RequestsLauncherRebuild(const LauncherOperationRequest& request)
+	{
+		if (request.OperationId == "launcher.build.self")
+		{
+			return true;
+		}
+
+		const auto* build = std::get_if<BuildWorkspaceOperationRequest>(&request.Inputs);
+		if (request.OperationId != "workspace.build" || build == nullptr)
+		{
+			return false;
+		}
+
+		return HasSelectedBuildScope(*build, BuildWorkspaceScope::Launcher);
 	}
 
 	LauncherOperationRequest BuildLauncherOperationRequest(
@@ -67,36 +87,53 @@ namespace SparkleLauncher
 	    const LauncherSettings& settings,
 	    const QString& operationId)
 	{
-		LauncherOperationRequest request;
-		request.WorkspaceRoot = workspaceRoot;
-		request.OperationId = operationId;
-		request.ContentId = contentModel.ContentId();
-		request.RunMode = settings.RunMode();
-		request.EditorProfile = settings.EditorProfile();
-		request.GameProfile = settings.GameProfile();
-		request.WorkspaceIde = settings.WorkspaceIde();
-		request.WorkspaceCompiler = settings.WorkspaceCompiler();
-		request.BuildScopes = settings.BuildScopes();
-		request.CookScopes = settings.CookScopes();
-		request.ShaderBackend = settings.ShaderBackend();
-		request.bShaderSymbols = settings.ShaderSymbols();
-		request.GraphicsApi = settings.GraphicsApi();
-		request.CaptureProvider = settings.CaptureProvider();
-		request.GpuCrashMode = settings.GpuCrashMode();
-		request.ShaderExportPath = request.GpuCrashMode == RhiGpuCrashMode::Off ? QString{} : settings.ShaderExportPath();
-		request.CleanScope = settings.CleanScope();
-
-		return request;
-	}
-
-	static std::vector<std::string> CaptureCleanScopeNames(const QString& selection)
-	{
-		std::vector<std::string> names;
-		for (const QString& name : selection.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts))
+		const std::string id = operationId.toStdString();
+		const std::string contentId = contentModel.ContentId().toStdString();
+		if (FindBuildWorkspaceOperationDefinition(id).has_value())
 		{
-			names.push_back(name.toStdString());
+			return {.OperationId = operationId, .Inputs = BuildWorkspacePlanRequest(workspaceRoot, contentModel, settings)};
 		}
-		return names;
+		if (FindCookOperationDefinition(id).has_value())
+		{
+			CookOperationRequest inputs;
+			inputs.WorkspaceRoot = workspaceRoot;
+			inputs.ContentId = contentId;
+			inputs.GameProfile = settings.GameProfile().toStdString();
+			inputs.SelectedScopes = ParseSelectedScopes(settings.CookScopes(), TryParseCookWorkspaceScope);
+			inputs.ShaderBackend = settings.ShaderBackend().toStdString();
+			inputs.bShaderEnableDebugInfo = settings.ShaderSymbols();
+			return {.OperationId = operationId, .Inputs = std::move(inputs)};
+		}
+		if (FindLevelOperationDefinition(id).has_value())
+		{
+			return {.OperationId = operationId, .Inputs = LevelOperationRequest{.WorkspaceRoot = workspaceRoot, .ContentId = contentId}};
+		}
+		if (FindLevelRunOperationDefinition(id).has_value())
+		{
+			LevelRunOperationRequest inputs;
+			inputs.WorkspaceRoot = workspaceRoot;
+			inputs.ContentId = contentId;
+			inputs.RunMode = settings.RunMode() == "game" ? LevelRunMode::Game : LevelRunMode::Editor;
+			inputs.ProductProfile = inputs.RunMode == LevelRunMode::Game ? settings.GameProfile().toStdString() : settings.EditorProfile().toStdString();
+			inputs.GraphicsApi = settings.GraphicsApi().toStdString();
+			inputs.CaptureProvider = settings.CaptureProvider();
+			inputs.GpuCrashMode = settings.GpuCrashMode();
+			if (inputs.GpuCrashMode != RhiGpuCrashMode::Off)
+			{
+				inputs.ShaderExportPath = settings.ShaderExportPath().toStdWString();
+			}
+			return {.OperationId = operationId, .Inputs = std::move(inputs)};
+		}
+		if (FindMaintenanceOperationDefinition(id).has_value())
+		{
+			MaintenanceOperationRequest inputs;
+			inputs.WorkspaceRoot = workspaceRoot;
+			inputs.ContentId = contentId;
+			inputs.EditorProfile = settings.EditorProfile().toStdString();
+			return {.OperationId = operationId, .Inputs = std::move(inputs)};
+		}
+
+		throw std::invalid_argument("Unknown Launcher operation: " + id);
 	}
 
 	ActionCleanTargetRequest BuildActionCleanTargetRequest(
@@ -113,8 +150,8 @@ namespace SparkleLauncher
 		    contentModel.ContentId().toStdString(),
 		    settings.EditorProfile().toStdString(),
 		    settings.GameProfile().toStdString(),
-		    CaptureCleanScopeNames(settings.BuildScopes()),
-		    CaptureCleanScopeNames(settings.CookScopes())};
+		    ParseSelectedScopes(settings.BuildScopes(), TryParseBuildWorkspaceScope),
+		    ParseSelectedScopes(settings.CookScopes(), TryParseCookWorkspaceScope)};
 	}
 
 	LauncherOperationRequest BuildActionCleanOperationRequest(
@@ -125,8 +162,8 @@ namespace SparkleLauncher
 	    const QString& operationId)
 	{
 		LauncherOperationRequest request = BuildLauncherOperationRequest(workspaceRoot, contentModel, settings, "workspace.clean");
-		request.CleanTargets = BuildActionSpecificCleanTargets(BuildActionCleanTargetRequest(workspaceRoot, contentModel, settings, runningLauncherPath, operationId));
-		request.bConfirmClean = false;
+		const ActionCleanTargetRequest cleanRequest = BuildActionCleanTargetRequest(workspaceRoot, contentModel, settings, runningLauncherPath, operationId);
+		std::get<MaintenanceOperationRequest>(request.Inputs).RequestedCleanTargets = BuildActionCleanPaths(cleanRequest);
 		return request;
 	}
 
@@ -138,11 +175,18 @@ namespace SparkleLauncher
 	    const std::filesystem::path& runningLauncherPath)
 	{
 		LauncherOperationRequest request = BuildLauncherOperationRequest(workspaceRoot, contentModel, settings, "workspace.clean");
-		request.CleanScope = cleanScope;
-		request.CleanTargets.clear();
-		request.PreservedPaths.clear();
-		const QStringList selectedScopes = cleanScope.split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts);
-		if ((selectedScopes.contains("artifacts") || selectedScopes.contains("clean-all")) && !runningLauncherPath.empty())
+		const auto scopes = ParseCleanScopeSelection(cleanScope);
+		if (!scopes.has_value())
+		{
+			throw std::invalid_argument("Invalid Launcher clean scope selection.");
+		}
+
+		auto& inputs = std::get<MaintenanceOperationRequest>(request.Inputs);
+		inputs.RequestedCleanScopes = *scopes;
+		const bool bCleansArtifacts = std::find(scopes->begin(), scopes->end(), CleanScope::ArtifactOutputs) != scopes->end();
+		const bool bCleansAll = std::find(scopes->begin(), scopes->end(), CleanScope::PristineGeneratedWorkspace) != scopes->end();
+		const bool bPreserveLauncher = bCleansArtifacts || bCleansAll;
+		if (bPreserveLauncher && !runningLauncherPath.empty())
 		{
 			std::error_code errorCode;
 			const std::filesystem::path absoluteRunningPath = std::filesystem::absolute(runningLauncherPath, errorCode);
@@ -150,11 +194,9 @@ namespace SparkleLauncher
 			const std::filesystem::path launcherDirectory = candidatePath.parent_path();
 			if (!launcherDirectory.empty())
 			{
-				request.PreservedPaths.push_back(QString::fromStdString(launcherDirectory.string()));
+				inputs.PreservedPaths.push_back(launcherDirectory);
 			}
 		}
-		request.bConfirmClean = false;
 		return request;
 	}
-
 }

@@ -13,8 +13,6 @@ class ShaderBackendPool final
 public:
 	IShaderBackend& ResolveAndAcquire(std::string_view sourcePath, ShaderTarget target, std::string_view requestedName);
 
-	IShaderBackend* Find(std::string_view backendName) const noexcept;
-
 private:
 	IShaderBackend& Acquire(std::string_view backendName, ShaderTarget target);
 

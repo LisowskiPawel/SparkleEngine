@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "Core/Public/Json/JsonWriter.h"
+#include <nlohmann/json.hpp>
 #include "Core/Public/Strings/StringUtils.h"
 
 #include "Cli/CookShadersCommand.h"
@@ -10,7 +10,7 @@
 #include "Cooking/GlobalShaderCooker.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "ToolConsole.h"
-#include "ToolWorkProgress.h"
+#include "ToolWorkProgressWriter.h"
 
 #include <iostream>
 #include <ostream>
@@ -58,7 +58,7 @@ static void PrintSummary(const ShaderCookResult& result, const ShaderCookSetting
 	if (!result.output.debugManifestPath.empty())
 	{
 		const auto manifestPath = Strings::ToNarrow(result.output.debugManifestPath.wstring());
-		const auto quotedManifest = Json::QuoteString(manifestPath);
+		const auto quotedManifest = nlohmann::json(manifestPath).dump();
 		std::cout << "SPARKLE_SHADER_EXPORT " << quotedManifest << std::endl;
 	}
 }

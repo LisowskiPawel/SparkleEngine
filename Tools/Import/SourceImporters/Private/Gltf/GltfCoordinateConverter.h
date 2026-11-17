@@ -27,4 +27,8 @@ public:
 	static DirectX::XMMATRIX ConvertCameraOrLightWorldTransform(DirectX::FXMMATRIX nodeWorldTransform) noexcept;
 	static void ConvertTriangleWinding(std::vector<std::uint32_t>& indices) noexcept;
 	static DirectX::XMFLOAT3 TransformDirection(DirectX::FXMMATRIX transform, const DirectX::XMFLOAT3& localDirection) noexcept;
+
+private:
+	static DirectX::XMMATRIX LoadSourceMatrix(const float (&values)[16]) noexcept;
+	static DirectX::XMFLOAT3 ReflectSourceX(const DirectX::XMFLOAT3& value) noexcept;
 };

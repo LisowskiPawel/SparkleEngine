@@ -189,6 +189,8 @@ Application hosts the world and renderer. GameFramework publishes immutable inpu
 | [Application](../Engine/Application), [Editor](../Engine/Editor) | Hosting, settings, inspection and typed edits |
 | [Tools](../Tools) | Source import, cooking, compilation and Launcher |
 
+Shader [passes](../Engine/Assets/Shaders/Passes) own their entry points and pass-specific resources, including [raster material sampling](../Engine/Assets/Shaders/Passes/GBuffer/Raster/RasterMaterial.hlsli). Shared [material rules](../Engine/Assets/Shaders/Material) and [color mathematics](../Engine/Assets/Shaders/Common/Color.hlsli) stay independent of passes. Ray-tracing buffer records and flags live in [RayTracingHitData.hlsli](../Engine/Assets/Shaders/RayTracing/RayTracingHitData.hlsli), matched by the [Renderer upload layout](../Engine/Renderer/Private/RayTracing/RayTracingHitData.h); reconstructed surfaces carry evaluated shading results.
+
 The showcase runs typed camera, animation, transform and extraction work through Tasks. ECS uses generational entity IDs and fixed typed component storage. Structural edits wait for workers; updates and extraction finish before immutable publication. Animation-only updates preserve the Editor snapshot, and read views distinguish scene changes from new publications so normal updates preserve edit history and viewport navigation.
 
 Shader compilation uses Launcher Cook or Editor **Recompile Shaders** / `CompileShaders [symbols]`. `ReloadShaders` reloads existing output. Dependency-directed Apply Changed is unfinished. See [References](References.md) for papers and SDK guides.

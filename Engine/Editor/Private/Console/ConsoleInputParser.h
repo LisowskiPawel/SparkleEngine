@@ -11,7 +11,7 @@ struct ConsoleParsedInput final
 	std::vector<std::string> Arguments;
 	std::string ErrorMessage;
 
-	bool IsEmpty() const noexcept { return bSucceeded && CommandName.empty(); }
+	bool IsEmpty() const noexcept;
 };
 
 namespace ConsoleInputParser

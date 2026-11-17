@@ -1,17 +1,19 @@
 #pragma once
 
-#include <cstdint>
-#include <memory>
+#include "Editor/Capture/EditorViewportCaptureCoordinator.h"
+#include "Editor/ReferencePathTracer/ReferencePathTracerArtifactCoordinator.h"
 
-class EditorOperationRuntime;
+#include <cstdint>
+
+class TaskExecutor;
+class TaskScope;
 class Renderer;
 class UI;
 
 class EditorViewportOutputCoordinator final
 {
 public:
-	explicit EditorViewportOutputCoordinator(EditorOperationRuntime& operations) noexcept;
-	~EditorViewportOutputCoordinator() noexcept;
+	EditorViewportOutputCoordinator(TaskExecutor& executor, TaskScope& scope) noexcept;
 
 	EditorViewportOutputCoordinator(const EditorViewportOutputCoordinator&) = delete;
 	EditorViewportOutputCoordinator& operator=(const EditorViewportOutputCoordinator&) = delete;
@@ -20,6 +22,6 @@ public:
 	void HandleAction(UI& ui, Renderer& renderer, std::uint64_t frameId);
 
 private:
-	struct State;
-	std::unique_ptr<State> m_state;
+	EditorViewportCaptureCoordinator m_presentationCapture;
+	ReferencePathTracerArtifactCoordinator m_referenceArtifacts;
 };

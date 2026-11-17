@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Core/RhiGenerationalHandle.h"
+#include "../RHIAPI.h"
 #include "../Formats/PixelFormat.h"
 #include "RhiResourceDesc.h"
 #include "RhiResourceHandles.h"
@@ -45,43 +46,16 @@ struct RhiResourceViewDesc
 	TextureResourceDimension TextureDimension = TextureResourceDimension::Texture2D;
 	RhiBufferViewRange Buffer = {};
 
-	static constexpr RhiResourceViewDesc TextureShaderResource(
-	    RhiResourceHandle resource,
-	    PixelFormat format,
-	    RhiTextureViewRange range = {},
-	    TextureResourceDimension dimension = TextureResourceDimension::Texture2D) noexcept
-	{
-		return RhiResourceViewDesc{.Kind = ERhiResourceViewKind::TextureShaderResource, .Resource = resource, .Format = format, .Texture = range, .TextureDimension = dimension};
-	}
+	static SPARKLE_RHI_API RhiResourceViewDesc
+	TextureShaderResource(RhiResourceHandle resource, PixelFormat format, RhiTextureViewRange range = {}, TextureResourceDimension dimension = TextureResourceDimension::Texture2D) noexcept;
 
-	static constexpr RhiResourceViewDesc TextureUnorderedAccess(RhiResourceHandle resource, PixelFormat format) noexcept
-	{
-		return RhiResourceViewDesc{.Kind = ERhiResourceViewKind::TextureUnorderedAccess, .Resource = resource, .Format = format};
-	}
+	static SPARKLE_RHI_API RhiResourceViewDesc TextureUnorderedAccess(RhiResourceHandle resource, PixelFormat format) noexcept;
 
-	static constexpr RhiResourceViewDesc RenderTarget(RhiResourceHandle resource, PixelFormat format) noexcept
-	{
-		return RhiResourceViewDesc{.Kind = ERhiResourceViewKind::RenderTarget, .Resource = resource, .Format = format};
-	}
+	static SPARKLE_RHI_API RhiResourceViewDesc RenderTarget(RhiResourceHandle resource, PixelFormat format) noexcept;
 
-	static constexpr RhiResourceViewDesc DepthStencil(RhiResourceHandle resource, PixelFormat format) noexcept
-	{
-		return RhiResourceViewDesc{.Kind = ERhiResourceViewKind::DepthStencil, .Resource = resource, .Format = format};
-	}
+	static SPARKLE_RHI_API RhiResourceViewDesc DepthStencil(RhiResourceHandle resource, PixelFormat format) noexcept;
 
-	static constexpr RhiResourceViewDesc BufferShaderResource(RhiResourceHandle resource, std::uint64_t sizeInBytes, std::uint32_t strideInBytes = 0, std::uint64_t offsetInBytes = 0) noexcept
-	{
-		return RhiResourceViewDesc{
-		    .Kind = ERhiResourceViewKind::BufferShaderResource,
-		    .Resource = resource,
-		    .Buffer = RhiBufferViewRange{.OffsetInBytes = offsetInBytes, .SizeInBytes = sizeInBytes, .StrideInBytes = strideInBytes}};
-	}
+	static SPARKLE_RHI_API RhiResourceViewDesc BufferShaderResource(RhiResourceHandle resource, std::uint64_t sizeInBytes, std::uint32_t strideInBytes = 0, std::uint64_t offsetInBytes = 0) noexcept;
 
-	static constexpr RhiResourceViewDesc BufferUnorderedAccess(RhiResourceHandle resource, std::uint64_t sizeInBytes, std::uint32_t strideInBytes = 0, std::uint64_t offsetInBytes = 0) noexcept
-	{
-		return RhiResourceViewDesc{
-		    .Kind = ERhiResourceViewKind::BufferUnorderedAccess,
-		    .Resource = resource,
-		    .Buffer = RhiBufferViewRange{.OffsetInBytes = offsetInBytes, .SizeInBytes = sizeInBytes, .StrideInBytes = strideInBytes}};
-	}
+	static SPARKLE_RHI_API RhiResourceViewDesc BufferUnorderedAccess(RhiResourceHandle resource, std::uint64_t sizeInBytes, std::uint32_t strideInBytes = 0, std::uint64_t offsetInBytes = 0) noexcept;
 };
