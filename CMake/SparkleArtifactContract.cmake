@@ -306,6 +306,8 @@ function(sparkle_declare_runtime_dll_owner product_target)
 
     foreach(runtime_target IN LISTS ARGN)
         if(TARGET ${runtime_target})
+            set_property(TARGET ${product_target} APPEND PROPERTY SPARKLE_RUNTIME_SUPPORT_FILES
+                "$<TARGET_FILE_NAME:${runtime_target}>")
             add_custom_command(TARGET ${product_target} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "$<TARGET_FILE:${runtime_target}>"

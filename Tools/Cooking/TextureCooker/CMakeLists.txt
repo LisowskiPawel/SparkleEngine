@@ -98,7 +98,7 @@ target_link_libraries(TextureCooker
         ktx_read
 )
 
-sparkle_declare_runtime_dll_owner(TextureCooker SparkleCore)
+sparkle_declare_runtime_dll_owner(TextureCooker SparkleCore SparkleTasks)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${TEXTURE_COOK_SHARED_PUBLIC_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${TEXTURE_COOK_SHARED_PRIVATE_SOURCES} ${TEXTURE_COOK_SHARED_PRIVATE_HEADERS} ${TEXTURE_COOKER_PRIVATE_SOURCES} ${TEXTURE_COOKER_PRIVATE_HEADERS})

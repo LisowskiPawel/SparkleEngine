@@ -98,7 +98,7 @@ target_link_libraries(AssetCooker
         AssetCookerCore
         ${ASSET_COOKER_COOKING_LINK_LIBRARIES}
 )
-sparkle_declare_runtime_dll_owner(AssetCooker SparkleCore SparkleGameFramework SparkleRHI)
+sparkle_declare_runtime_dll_owner(AssetCooker SparkleCore SparkleTasks SparkleGameFramework SparkleRHI SparklePlatform)
 
 if(TARGET assimp)
     add_custom_command(TARGET AssetCooker POST_BUILD
