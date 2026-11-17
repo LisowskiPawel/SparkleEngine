@@ -13,14 +13,14 @@ class RenderHardwareInterface;
 class MaterialTextureTable final
 {
 public:
-	MaterialTextureTable() noexcept = default;
+	MaterialTextureTable() noexcept;
 
-	~MaterialTextureTable() noexcept = default;
+	~MaterialTextureTable() noexcept;
 
 	MaterialTextureTable(const MaterialTextureTable&) = delete;
 	MaterialTextureTable& operator=(const MaterialTextureTable&) = delete;
-	MaterialTextureTable(MaterialTextureTable&&) noexcept = default;
-	MaterialTextureTable& operator=(MaterialTextureTable&&) noexcept = default;
+	MaterialTextureTable(MaterialTextureTable&&) noexcept;
+	MaterialTextureTable& operator=(MaterialTextureTable&&) noexcept;
 
 	void Reset() noexcept;
 	std::uint32_t GetOrAddTextureIndex(RhiResourceViewHandle textureView);

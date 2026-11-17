@@ -3,11 +3,11 @@
 # Explicit editor and game launch targets keep the host split visible at the
 # project boundary instead of hiding it behind a single mixed executable.
 add_executable(ShowcaseEditor
-    Src/EditorMain.cpp
+    Private/EditorMain.cpp
 )
 
 add_executable(ShowcaseGame
-    Src/GameMain.cpp
+    Private/GameMain.cpp
 )
 
 target_compile_features(ShowcaseEditor PRIVATE cxx_std_20)
@@ -32,26 +32,8 @@ target_link_libraries(ShowcaseGame PRIVATE
 
 sparkle_configure_project_product(ShowcaseEditor Showcase editor)
 sparkle_configure_project_product(ShowcaseGame Showcase game)
-sparkle_declare_runtime_dll_owner(
-    ShowcaseEditor
-    SparkleApplicationEditor
-    SparkleApplication
-    SparkleEditor
-    SparkleRenderer
-    SparkleRHI
-    SparkleGameFramework
-    SparklePlatform
-    SparkleCore
-)
-sparkle_declare_runtime_dll_owner(
-    ShowcaseGame
-    SparkleApplication
-    SparkleRenderer
-    SparkleRHI
-    SparkleGameFramework
-    SparklePlatform
-    SparkleCore
-)
+sparkle_stage_linked_runtime(ShowcaseEditor)
+sparkle_stage_linked_runtime(ShowcaseGame)
 
 sparkle_stage_nvidia_streamline_runtime(ShowcaseEditor)
 sparkle_stage_nvidia_streamline_runtime(ShowcaseGame)

@@ -136,8 +136,7 @@ namespace SparkleLauncher
 		connect(open, &QPushButton::clicked, this, [this, open]() { OpenGpuCrashInspector(*open); });
 
 		auto* privacy = new QLabel(
-		    "Private local files only. ExportDiagnostics.ps1 previews sanitized metadata; raw dump, NVIDIA debug data, source and symbols require explicit category switches and preview consent. No "
-		    "upload or support service.",
+		    "Incident files stay local. Crash dumps, NVIDIA debug data, source and symbols may contain private content and paths. Inspect them before sharing. No upload or support service.",
 		    &dialog);
 
 		privacy->setWordWrap(true);

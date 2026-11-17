@@ -40,11 +40,16 @@ function Resolve-LocalArtifactPath
     $current = $resolved
     while ($current)
     {
-        if ((Test-Path -LiteralPath $current) -and
-            ((Get-Item -LiteralPath $current -Force -ErrorAction Stop).Attributes -band [IO.FileAttributes]::ReparsePoint))
+        try
         {
-            throw 'Artifact input/output uses a reparse point.'
+            $attributes = [IO.File]::GetAttributes($current)
+            if (($attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)
+            {
+                throw 'Artifact input/output uses a reparse point.'
+            }
         }
+        catch [IO.FileNotFoundException] {}
+        catch [IO.DirectoryNotFoundException] {}
         $current = [IO.Path]::GetDirectoryName($current)
     }
     return $resolved

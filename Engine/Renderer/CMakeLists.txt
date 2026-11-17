@@ -66,8 +66,6 @@ else()
     target_link_libraries(SparkleRenderer PUBLIC SparkleRendererShaderRegistrationObjects)
 endif()
 
-sparkle_configure_runtime_support_artifacts(SparkleRenderer)
-
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${SPARKLE_RENDERER_PUBLIC_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${SPARKLE_RENDERER_PRIVATE_SOURCES} ${SPARKLE_RENDERER_PRIVATE_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private/Upscaling/NvidiaDlss PREFIX "Private\\Upscaling\\NvidiaDlss" FILES ${SPARKLE_RENDERER_UPSCALING_NVIDIA_DLSS_SOURCES} ${SPARKLE_RENDERER_UPSCALING_NVIDIA_DLSS_HEADERS})

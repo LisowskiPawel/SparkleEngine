@@ -2,7 +2,7 @@
 
 #include "RHI/Public/Shaders/ShaderTarget.h"
 #include "RHI/Public/Shaders/ShaderStage.h"
-#include "ShaderReflection.h"
+#include "Compiler/Output/ShaderReflection.h"
 
 #include <cstdint>
 #include <string>

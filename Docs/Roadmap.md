@@ -78,7 +78,7 @@ Build the [three portfolio cases](Goals.md#the-three-cases) from the completed t
 
 These changes support rendering and add no first-release prerequisites. Start with [JSON](ThirdPartyMigration.md#candidates-and-expected-benefit). Investigate task execution and cooked metadata next, followed by texture cooking and native window/input. The migration guide records candidate benefits and requirements; other candidates remain deferred.
 
-Texture cooking selected Microsoft DirectXTex after the user relaxed exact legacy filter equivalence on 2026-11-17. The combined dependency and consumer migration is under qualification; the [implementation plan](Implementation/TextureCooking.md#progress-and-evidence) records results and remaining fault, native upload, visual and delivery acceptance.
+Texture cooking selected Microsoft DirectXTex after the user relaxed exact legacy filter equivalence on 2026-11-17. Combined dependency/consumer stages 3–4 are complete, including Debug/Shipping static/shared builds and relocated real cooking workflows. Stage 5 is next; the [implementation plan](Implementation/TextureCooking.md#progress-and-evidence) records evidence and the remaining memory/fault, native upload, visual and delivery acceptance.
 
 ## Choosing the next task
 

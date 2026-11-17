@@ -4,7 +4,7 @@
 
 #include "Cooking/ShaderCookDiagnostics.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "ShaderDebugArtifactSet.h"
+#include "Compiler/Output/ShaderDebugArtifactSet.h"
 #include "Verification/ShaderParameterStructVerifier.h"
 
 #include <format>

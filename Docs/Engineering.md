@@ -20,6 +20,8 @@ The recorded Windows toolchain is:
 
 Other combinations need separate testing. These versions describe the recorded setup, not the latest available releases.
 
+Source builds require CMake 3.27 or newer for runtime dependency and path generator expressions.
+
 ### Compilation
 
 Launcher requests four parallel build jobs. Visual Studio builds compile up to two C++ sources per project, while PCH creation stays serial. Direct CMake builds can set the project/job count with `--parallel`.
@@ -57,6 +59,8 @@ $profiles = '--editor-profile', 'ShippingEditor', '--game-profile', 'ShippingGam
 Build and dependency files are under `build/`; binaries and cooked content are under `artifacts/dev/`. [SparkleArtifactContract.cmake](../CMake/SparkleArtifactContract.cmake) defines the paths. Source and extracted products use the same workspace layout.
 
 The root [CMakeLists.txt](../CMakeLists.txt) composes dependencies, Engine, Tools and marked projects. Shared CMake logic lives under `CMake/`: `Artifacts` owns layout and runtime deployment, `Build` owns compiler instrumentation, `Workspace` owns project discovery and checks, `Architecture` owns boundary policies, and `Dependencies/Targets` owns each library's pin and native targets. Module-local `CMake` folders keep backend, SDK and deployment details beside their consuming targets. Engine modules share the linkage/export rule in [EngineModule.cmake](../Engine/CMake/EngineModule.cmake); each module still declares its sources and dependencies.
+
+Linked targets own their runtime dependencies. Product staging and the release inventory derive DLL membership from that graph, including private transitive dependencies and imported SDK targets. Keep dynamically loaded plugins and data files in their owning deployment rules; do not maintain a second list of linked engine DLLs. Every engine module uses the shared artifact layout, including Tasks.
 
 Cleaning a cooking action removes its selected shader, texture or scene outputs. Scene cleanup includes meshes, materials, skeletons, animations and the scene registry. Clean Cook All and the Cooked Outputs scope remove the complete cooked-content directory.
 
@@ -150,6 +154,8 @@ External versions, build provenance and counters for stale-handle/lifetime check
 
 Start with the diff and static checks, then build the smallest affected target. Use focused runtime, failure, numerical or native-API checks for the behavior in question. Run broad builds, cooks and clean-machine tests when the change requires that coverage.
 
+Run the existing check owners directly: `code_style_check` and `ShaderCompilerCliValidation` through `cmake --build build --config <Profile> --target <Target>`, and the architecture check below. Keep the command, source identity, logs and result with the work being validated.
+
 Renderer/RHI boundary changes require:
 
 ```powershell
@@ -164,11 +170,13 @@ Permanent test-only additions require explicit project approval. Keep temporary 
 
 ### Script ownership
 
-PowerShell command scripts validate arguments and compose named operations with explicit inputs. Keep implementation beside its capability: `CMake/CodeStyle/` owns source selection, tool discovery, formatting and policy checks; `CMake/Validation/` owns baseline check execution. Under `CMake/Packaging/`, `Payload/` owns admission and identity checks, and `Publication/` owns staging, archives and reversible product replacement. `CMake/Diagnostics/` owns GPU crash receipts, inspection and [diagnostic export](../CMake/Diagnostics/ExportDiagnostics.ps1). Shared local artifact paths, file/symbol identity and shader-export membership belong in `CMake/Artifacts/`; source provenance belongs in `CMake/SourceIdentity.ps1`.
+Keep a script when it serves a named build, cook, content-conversion, rendering comparison, packaging, debugging or code-style workflow. Identify its build/CI caller or documented user command and the result it produces. Prefer existing CMake, compiler, formatter and GPU tools over another runner, parser or reporting layer. Keep the project-specific style checks that enforce our conventions, and update them with the guide when refining a rule. Remove an unused workflow with its helpers and advertised controls. A script's presence or absence in another repository is precedent; its local consumer and maintenance cost decide whether it belongs here.
+
+PowerShell command scripts validate arguments and compose named operations with explicit inputs. `CMake/CodeStyle/` owns source selection, Clang tool discovery, formatting and project-specific policy checks, including the adapter for HLSL attributes unsupported by the formatter. Under `CMake/Packaging/`, `Payload/` owns admission and identity checks, and `Publication/` owns staging, archives and reversible product replacement. `CMake/Diagnostics/` owns GPU crash receipts and verified inspector handoff. Shared local artifact paths, file/symbol identity and shader-export membership belong in `CMake/Artifacts/`; source provenance belongs in `CMake/SourceIdentity.ps1`.
 
 Dot-source the required capability from `$PSScriptRoot` and pass its inputs as parameters. Keep subprocess settlement and rollback state with the operation that owns their lifetime. Batch and command files stay small Windows entry points. Update script callers and package paths when moving an implementation; remove replaced paths instead of adding forwarding scripts. Check PowerShell syntax and exercise the affected success and failure paths with local fixtures.
 
-Qualification fixes the bytes admitted to later steps. Freezing or staging must reject changed qualified products rather than re-hash them as new accepted inputs. One transaction owns publication: complete private files first, then publish their containing directory. Baseline checks report launch failures and use a bounded wait after terminating their owned process tree.
+Qualification fixes the bytes admitted to later steps. Freezing or staging must reject changed qualified products rather than re-hash them as new accepted inputs. One transaction owns publication: complete private files first, then publish their containing directory. GPU incident files stay local; inspect dumps, debug data, source and symbols before sharing them.
 
 ### Performance and images
 

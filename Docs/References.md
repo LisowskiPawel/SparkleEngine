@@ -84,6 +84,12 @@ Studies that connect the professional goals to concrete engineering work. Publis
 - [Peak-performance analysis](https://developer.nvidia.com/blog/the-peak-performance-analysis-method-for-optimizing-any-gpu-workload/): isolate a limiting mechanism before optimization. Its historical tool table and queue assumptions are not current compatibility evidence or local acceptance thresholds.
 - [DXR specification](https://microsoft.github.io/DirectX-Specs/d3d/Raytracing.html), [Vulkan synchronization](https://docs.vulkan.org/samples/latest/samples/extensions/synchronization_2/README.html) and [PTLAS proposal](https://docs.vulkan.org/features/latest/features/proposals/VK_NV_partitioned_acceleration_structure.html).
 
+## Pipeline automation
+
+Use concrete consumers when judging script value. [NRD's CI](https://github.com/NVIDIA-RTX/NRD/blob/90dea8bd91ec6b58d0f90cb6adf53c7da613b82c/.github/workflows/build.yml) runs short deploy, build and SDK-preparation scripts. [RTXPT's scene runner](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/Testing/RegressionTesting-RUN.bat) and [image tests](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/Support/tests/run_tests.ps1) render identified scenes and compare results. [Falcor's CI](https://github.com/NVIDIAGameWorks/Falcor/blob/759aad033ff610fb0d82c74f7e0a508d0096d5f2/.github/workflows/build.yml) invokes setup and native build commands directly.
+
+These examples favor automation that produces a build, usable artifact or rendering result. They do not establish usage frequency or require Sparkle to copy their script inventories. Follow the local [script ownership rule](Engineering.md#script-ownership): keep useful pipeline consumers, use standard tools, and remove bespoke machinery whose maintenance exceeds its result.
+
 ## Code style
 
 Examples behind the project [coding conventions](CodeStyle.md):

@@ -2,7 +2,7 @@
 
 #include "Compiler/ShaderCompileRequest.h"
 #include "Cooking/CookedStageBuild.h"
-#include "ShaderDebugArtifactSet.h"
+#include "Compiler/Output/ShaderDebugArtifactSet.h"
 
 #include <cstddef>
 #include <cstdint>

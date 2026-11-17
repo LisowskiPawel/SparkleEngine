@@ -6,7 +6,7 @@ Temporary implementation plan. Delete it after final acceptance and fold lasting
 
 ## Current decision
 
-**DirectXTex is selected under the user's revised contract of 2026-11-17. Stages 3 and 4 are implemented together and undergoing final qualification; stages 5 and 6 remain open.** The user explicitly removed exact Kaiser equivalence as an adoption condition and directed integration using suitable supported processing. The previous stage 2 no-go applied to the original filter requirement and is superseded. No NVTT installation or personal terms acceptance is needed for the selected Microsoft source library.
+**DirectXTex is selected under the user's revised contract of 2026-11-17. Stages 3 and 4 are complete as one working change; stages 5 and 6 remain open.** The user explicitly removed exact Kaiser equivalence as an adoption condition and directed integration using suitable supported processing. The previous stage 2 no-go applied to the original filter requirement and is superseded. No NVTT installation or personal terms acceptance is needed for the selected Microsoft source library.
 
 Preserve texture meaning, color/alpha/channel intent, meaningful normal filtering, HDR validity, bounded ownership, cancellation and accepted-output publication. Exact legacy kernels are retired. Color groups use native cubic filtering; data and decoded normals use native linear filtering. Generated normal levels use DirectXMath normalization through DirectXTex's row-transform API. NoMips and supplied levels retain their authored normal values. There is no public filter selector or fallback processor.
 
@@ -18,14 +18,14 @@ The allowed processor set remains AMD Compressonator Framework, NVIDIA Texture T
 | --- | --- |
 | 1. Capture | Complete for baseline capture, including recorded failures and gaps. Original executable revision `6e44a2d4ec11ad66d00b2f7b92a8be73a1679360`; frozen artifacts remain unchanged. |
 | 2. Select | Reopened and selected DirectXTex after the explicit requirement revision. CPU NPOT linear/cubic, BC1/4/5/6H callbacks/abort and Microsoft vector transformation passed. Original Kaiser/no-go results remain historical. |
-| 3. Dependency/delivery integration | Implemented with stage 4. Official pinned acquisition, source readiness/identity, private static linkage, notices and package provenance are in place. Final host matrix and Launcher checks are in progress. |
-| 4. Replace processing | Implemented. Native buffers reach the staged writer; old pipeline, DDS parser, block packing and filter/format scaffolding are removed. Final consumer, resource, numerical and footprint checks are in progress. |
+| 3. Dependency/delivery integration | Complete with stage 4. Pinned acquisition/readiness, Launcher Sync/Clean, enabled host builds/runs, relocation, native ABI/import/link closure and package/notices inventory pass. See the recorded acceptance below. |
+| 4. Replace processing | Complete. Native buffers reach the staged writer; old pipeline, DDS parser, block packing and filter/format scaffolding are removed. Real consumers, focused numerical/preservation checks and the net retirement floor pass. |
 | 5. Fault qualification | Open. Focused cancellation/admission probes pass; comprehensive allocator/I/O/publication fault injection and measured resource limits remain. |
 | 6. Native/delivery acceptance | Open. Final D3D12/Vulkan upload and visual results, clean-machine package/source reconstruction and release acceptance remain. |
 
 Raw evidence lives in ignored `build/validation/texture-cooking/`: `20261112-stage1`, `20261116-prerequisites`, `20261116-stage2`, `20261117-stage2-closure` and `20261117-directxtex-migration`. The latest root contains the explicit requirement revision, copied integration baseline, commands, exit codes, executable/input hashes and isolated candidate results. Earlier baselines and failures are not rewritten into passes. Original `budgets.json` SHA-256 is `c1b56b60c13d735029470a18d6c3b8506be6f8d428ac0a98f045f130aa33609b`.
 
-Production work is isolated in `C:/s/texture-cook-20261117`. Merge only its migration delta against `integration-base.zip`; preserve concurrent changes to Application, Core, RHI, importing, cooking and Launcher. Bind final evidence to file/executable hashes because HEAD alone does not identify this dirty checkout. Temporary probes/targets must be archived and removed before handoff.
+The migration was prepared in `C:/s/texture-cook-20261117` against `integration-base.zip`, then merged into the main checkout while preserving concurrent ownership changes. Final host builds use the integrated checkout and isolated artifact variants. File/executable hashes identify the evidence across concurrent commits. Archive and remove temporary probes/targets before handoff.
 
 ## Final ownership
 
@@ -53,11 +53,15 @@ KTX admits RGBA8 linear/sRGB, RGBA32F, BC1/2/3 linear/sRGB, BC4/5 UNORM/SNORM, B
 
 Byte sources use the requested input color policy, with alpha independent of RGB transfer. Float sources remain linear. Inspect all effective subresources before choosing BC1, BC4, BC5, BC6H or an uncompressed format. Preserve meaningful HDR alpha in RGBA32F. Reject non-finite HDR data and positive overflow before BC6H unsigned encoding; negative values follow the unsigned codec's clamp policy. Supplied compressed blocks can pass unchanged when channels and mip policy allow it.
 
+BC5 normal processing reconstructs positive Z from XY before generated-level normalization. Signed BC5 normals convert to the engine's unsigned normal convention; they cannot pass through as signed blocks. Signed BC4/5 data that needs processing retains its signed range in float working/output storage. Output intent must be representable by the selected encoding; an sRGB request for a linear-only format fails explicitly.
+
 The default processing reservation pool remains 1 GiB. Each source file is capped at 64 MiB. Encoded-file/probe reservations are separate from decoded processing reservations so waiting upgrades cannot deadlock each other. The metadata estimate includes overlapping native float chains, provider decode, filter rows, descriptors and encoded staging. Cancellation interrupts admission waits and BC encoding, is checked between native operations and before/during staged writing, and settles owned buffers before release. Stage 5 must challenge the estimate and the uninterruptible native call bounds; reservations are estimates, not an intercepting third-party allocator.
 
 ## 3–4. Combined implementation acceptance
 
 Use the current CMake/Launcher cache, explicit Sync/Clean, immutable Git revisions, required-file checks and existing package/notices metadata. Keep source/generated inputs in ignored dependency storage and preserve the user's active cache. Only the selected processor and required providers belong to TextureCooker's closure.
+
+Source checkouts remain in the shared owned dependency cache. Generated dependency projects live in each build tree's `_deps/<name>-build`, so static/shared artifact variants cannot overwrite one another's libraries. Explicit dependency Clean removes the source cache; subsequent Sync and configure rebuild its generated consumers through the existing workflow.
 
 | Input | Identity and composition |
 | --- | --- |
@@ -65,7 +69,7 @@ Use the current CMake/Launcher cache, explicit Sync/Clean, immutable Git revisio
 | KTX-Software | `v4.3.2`, commit `91ace88675ac59a97e55d0378a6602a9ae6b98bd`, official sparse Git checkout, upstream static `ktx_read`. Writer/encoder/tools/tests/GPU upload/bindings are outside the built tool closure. Its bundled reader components still count and carry notices. |
 | Other provider inputs | Existing pinned stb and TinyEXR source headers, existing zlibstatic for TinyEXR. No separately acquired processor binary, plugin or runtime. |
 
-Processor/provider static libraries are `DirectXTex.lib`, `ktx_read.lib` and `zlibstatic.lib`; stb/TinyEXR compile into the executable. Sparkle Core/Tasks/ToolSupport/TextureCookShared are the existing integration closure. TextureCooker consumes RHI contracts without linking rendering backends. DirectXTex/KTX types remain private; TextureCookShared, public requests, Core, Renderer, RHI, Game and Editor acquire no SDK processing edge.
+Processor/provider static libraries are `DirectXTex.lib`, `ktx_read.lib` and `zlibstatic.lib`; stb/TinyEXR compile into the executable. Existing integration inputs are `ToolSupport.lib`, `TextureCookShared.lib`, `SparkleTasks.lib`, `SparkleCore.lib` and `spdlog.lib`; Core/Tasks use import libraries in the shared configuration. The recorded link lists also identify Windows import libraries. TextureCooker consumes RHI contracts without linking rendering backends. DirectXTex/KTX types remain private; TextureCookShared, public requests, Core, Renderer, RHI, Game and Editor acquire no SDK processing edge.
 
 Shipping delivery uses the existing Microsoft CRT bundle: `msvcp140.dll`, `msvcp140_1.dll`, `msvcp140_2.dll`, `msvcp140_atomic_wait.dll`, `msvcp140_codecvt_ids.dll`, `vcruntime140.dll`, `vcruntime140_1.dll` and `concrt140.dll`. The bundle is the permitted runtime inventory; import inspection records the subset used by the tool. Shared TextureCooker additionally stages `SparkleCore.dll` and `SparkleTasks.dll`. The AssetCooker consumer also needs `SparkleGameFramework.dll`, `SparkleRHI.dll`, `SparklePlatform.dll` and its existing `assimp-vc145-mt.dll`. The existing runtime-owner declarations also produce package membership; import inspection verifies the actual closure. There are no DirectXTex, AMD, NVTT, KTX or processing plugin DLLs. Inspect the actual imports and transitive build/link graph for each enabled configuration; a private edge or successful upstream sample alone is insufficient. Debug runtimes are development prerequisites, not redistributable Shipping files.
 
@@ -76,6 +80,23 @@ Complete stages 3–4 only after real TextureCooker and AssetCooker builds/runs 
 The retirement floor remains at least **35% net bytes and physical lines** against the original 107355-byte/3346-line source boundary, charging added native adapters, caller changes and build/Launcher wiring. Each retained mechanism needs its current semantic, trust-boundary or lifetime purpose. A numerical floor does not justify leftover generic algorithms or mirrors.
 
 Failure checks: missing headers/licenses/runtime, wrong or dirty cache, interrupted sync, unexpected network, GPU/full-framework targets, leaked compiler/output settings, stale Compressonator targets and processing imports in Game/Editor. Use disposable fixtures. Failure preserves cache evidence and accepted output; no automatic reset or fallback processor.
+
+### Recorded combined acceptance, 2026-11-17
+
+Evidence paths below are relative to `build/validation/texture-cooking/20261117-directxtex-migration`. The file ledger, commands and binary hashes bind these results across concurrent checkout changes; unrelated edits and the active dependency cache were preserved.
+
+| Check | Observed result and receipt |
+| --- | --- |
+| Actual host consumers | TextureCooker and AssetCooker build in x64 `ShippingEditor` and `DebugEditor`, with `SPARKLE_BUILD_SHARED` both ON and OFF. Root variants are `texture-cooking` and `texture-cooking-static`. `logs/accepted-*-build.json` records successful aggregate exits. |
+| Enabled paths and relocation | All four TextureCooker configurations cook nine selected raster/HDR/EXR/DDS/KTX/normal/scalar paths. All four relocated AssetCooker configurations execute both `cook-textures` and `cook-assets` through real default/material producers with a system-only PATH. `matrix-runs.json`, `caller-matrix.json`. Debug uses the prepared development CRT; Shipping uses the recorded app-local bundle. |
+| SDK and isolation | Actual x64 object/binary inspection agrees with MSVC 14.51.36231, `/MDd` in Debug and `/MD` in Shipping; DirectXTex header version 211 agrees with its clean pinned source. Native library/tool hashes, complete project/link closures, DLL imports and generated delivery inventories agree in `binary-inventory.json`. TextureCookShared has no processor/provider include or link edge; TextureCooker has no RHI implementation or alternate processor edge. |
+| Dependency workflow | Official cold acquisition, warm reuse and protocol-disabled offline reuse pass for both DirectXTex and KTX. Dirty/wrong-revision/missing-license/missing-header/interrupted-cache fixtures fail and remain intact; restoration passes offline. `cache-failures.json`, `cache-final.json`, `logs/cold-*.json`. Workspace individual Clean/Sync and full Sync Code pass; standalone Launcher agrees on identity/readiness in the isolated integration checkout. `logs/workspace-dependency-clean-sync.*`, `logs/workspace-final-full-sync.*`, `logs/standalone-launcher-readiness.*`. |
+| Sources and semantics | Final shared Shipping replay: 212 cases, 182 successes and 30 expected rejections. Native KTX fixtures cover 36 containers/144 subresources. Twelve additional checks cover 4K admission, independent gray/alpha/16-bit pixels, sRGB round trips, Unicode, mixed-batch/output preservation, obsolete request rejection, 513 deterministic tiny requests and relocation. Independent BC5 checks preserve tilted normals and signed-data handling. `replay.json`, `extra-results.json`, `normal-final.json`. Historical kernel names in corpus IDs do not assert legacy kernel equivalence. |
+| Lifetime and Windows inputs | Focused native probes pass later-mip alpha/grayscale inspection, pre-cancellation, blocked admission cancellation and active BC6H cancellation under two seconds. Built-in Windows raster decoder identities resolve to `System32/windowscodecs.dll`. `logs/probe-run.stdout`, `logs/wic-builtins.stdout`. This does not measure the full memory/cancellation envelope or prove a physical clean OS. |
+| Retirement and checks | TextureCooker C++ files: 56 to 29; 33 old paths retired including the obsolete dependency composition. Net owned delta is −38338 bytes / −1424 lines: **35.71% / 42.56%** against the frozen denominator, charging added adapters/callers/build/Launcher/runtime wiring and excluding unrelated concurrent refactors. `retirement-final.json`. All 27 affected C++ style checks and the architecture boundary check pass; stale processing references are absent. |
+| Notices and evidence cleanup | Selected upstream license contents and source hashes are present once in the combined notices; generated product membership matches the observed runtime inventory. `notices-final.json`, `binary-inventory.json`. Temporary probe sources/targets/binaries and disposable fixtures are archived and removed; `temporary-validation-cleanup.json` records the archive and removed paths. |
+
+The observed setup failures exposed missing shared Tasks/Platform runtime staging, a Debug-only RHI member typo and cross-variant dependency binary directories; their owning declarations/code were corrected and the final matrix rerun. Earlier failed logs remain evidence of those failures. Independent normal checks also exposed and fixed BC5 positive-Z reconstruction and signed-range loss. No permanent test executable or compatibility pipeline is retained.
 
 ## 5. Qualify memory, cancellation and publication
 
@@ -104,4 +125,4 @@ At closure fold lasting guidance into the owning guide, delete this temporary pl
 
 Use independent decoders for lossy quality, not the selected encoder's decoder alone. Keep filter differences permitted by the user distinct from color, alpha, normal, HDR, layout and publication defects. The recorded Vulkan row-pitch and D3D12 unaligned-BC admission failures remain native acceptance work until rerun successfully. Do not promote CPU artifact results to GPU/visual or release claims.
 
-**Next action:** finish combined stage 3–4 host/dependency/consumer qualification, merge only the owned migration delta, bind results to the final files, and then execute stage 5.
+**Next action:** execute stage 5 against the delivered DirectXTex path. Keep stage 6's GPU upload, visual, physical clean-machine, performance and final release/source-reconstruction acceptance open.

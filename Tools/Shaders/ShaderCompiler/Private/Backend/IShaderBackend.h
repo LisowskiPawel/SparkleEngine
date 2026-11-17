@@ -2,7 +2,7 @@
 
 #include "Backend/ShaderBackendCapabilities.h"
 #include "Compiler/ShaderCompileRequest.h"
-#include "CompiledShader.h"
+#include "Compiler/Output/CompiledShader.h"
 
 #include <cstdint>
 #include <string_view>

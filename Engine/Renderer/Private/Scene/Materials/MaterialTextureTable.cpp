@@ -12,6 +12,14 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_materialTextureTableLogger, "Renderer.MaterialTextureTable");
 
+MaterialTextureTable::MaterialTextureTable() noexcept = default;
+
+MaterialTextureTable::~MaterialTextureTable() noexcept = default;
+
+MaterialTextureTable::MaterialTextureTable(MaterialTextureTable&&) noexcept = default;
+
+MaterialTextureTable& MaterialTextureTable::operator=(MaterialTextureTable&&) noexcept = default;
+
 void MaterialTextureTable::Reset() noexcept
 {
 	m_bindingSet.reset();

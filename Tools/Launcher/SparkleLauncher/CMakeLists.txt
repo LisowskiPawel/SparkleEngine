@@ -107,7 +107,7 @@ set(SPARKLE_LAUNCHER_PRIVATE_HEADERS
 )
 
 add_executable(SparkleLauncher WIN32
-    ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/main.cpp
     ${SPARKLE_LAUNCHER_PRIVATE_SOURCES}
     ${SPARKLE_LAUNCHER_PRIVATE_HEADERS}
 )
@@ -176,11 +176,11 @@ set_target_properties(SparkleLauncher PROPERTIES
 )
 sparkle_configure_launcher_artifacts(SparkleLauncher)
 sparkle_configure_product_identity(SparkleLauncher "Sparkle Launcher")
-sparkle_declare_runtime_dll_owner(SparkleLauncher SparkleCore SparkleTasks)
+sparkle_stage_linked_runtime(SparkleLauncher)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/LauncherDeployment.cmake")
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES
     ${SPARKLE_LAUNCHER_PRIVATE_SOURCES} ${SPARKLE_LAUNCHER_PRIVATE_HEADERS})
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "Source" FILES ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${CMAKE_CURRENT_SOURCE_DIR}/Private/main.cpp)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${CMAKE_CURRENT_SOURCE_DIR}/Private/Startup/LauncherArguments.cpp)

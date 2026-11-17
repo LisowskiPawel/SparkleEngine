@@ -10,7 +10,7 @@
 #include "Compiler/ShaderCompileRequest.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Hash/HashUtils.h"
-#include "ShaderDebugArtifactSet.h"
+#include "Compiler/Output/ShaderDebugArtifactSet.h"
 
 #include <format>
 #include <memory>

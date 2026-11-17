@@ -3,7 +3,7 @@
 #include "Process/ChildProcess.h"
 
 #if defined(_WIN32)
-  #include "Process/ChildProcessWindows.h"
+  #include "Process/Windows/ChildProcessWindows.h"
 #endif
 
 bool Process::ChildProcessResult::Succeeded() const noexcept

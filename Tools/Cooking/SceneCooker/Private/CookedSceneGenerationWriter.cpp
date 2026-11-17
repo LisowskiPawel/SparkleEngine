@@ -4,9 +4,9 @@
 #include "CookedSceneGenerationWriter.h"
 
 #include "CookedSceneBuild.h"
-#include "Features/Animations/CookedAnimationAssetWriter.h"
+#include "Animations/CookedAnimationAssetWriter.h"
 #include "CookedMeshAssetWriter.h"
-#include "Features/Skeletons/CookedSkeletonAssetWriter.h"
+#include "Skeletons/CookedSkeletonAssetWriter.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Files/FileSetPublication.h"

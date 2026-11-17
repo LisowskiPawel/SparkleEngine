@@ -35,7 +35,7 @@ target_include_directories(SparkleEditor
 
 target_compile_features(SparkleEditor PUBLIC cxx_std_20)
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/EditorIconAssets.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/EditorIconAssets.cmake")
 
 set(SPARKLE_EDITOR_CAPTURE_UI_CONFIG "$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>")
 foreach(_source IN LISTS _sparkle_editor_capture_sources)
@@ -60,8 +60,6 @@ target_link_libraries(SparkleEditor
         SparklePlatform
         imgui
 )
-
-sparkle_configure_runtime_support_artifacts(SparkleEditor)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${SPARKLE_EDITOR_PUBLIC_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${SPARKLE_EDITOR_PRIVATE_SOURCES} ${SPARKLE_EDITOR_PRIVATE_HEADERS})

@@ -1,13 +1,13 @@
 #include "PCH.h"
 #include "SceneCooker.h"
 #include "CookedSceneBuild.h"
-#include "Features/Animations/CookedAnimationAssetBuilder.h"
-#include "Features/Cameras/CookedSceneCameraBuilder.h"
-#include "Features/Instances/CookedSceneInstanceBuilder.h"
-#include "Features/Lights/CookedSceneLightBuilder.h"
-#include "Features/MaterialVariants/CookedSceneMaterialVariantBuilder.h"
-#include "Features/Metadata/CookedSceneMetadataBuilder.h"
-#include "Features/Skeletons/CookedSceneSkeletonBuilder.h"
+#include "Animations/CookedAnimationAssetBuilder.h"
+#include "Cameras/CookedSceneCameraBuilder.h"
+#include "Instances/CookedSceneInstanceBuilder.h"
+#include "Lights/CookedSceneLightBuilder.h"
+#include "MaterialVariants/CookedSceneMaterialVariantBuilder.h"
+#include "Metadata/CookedSceneMetadataBuilder.h"
+#include "Skeletons/CookedSceneSkeletonBuilder.h"
 
 void SceneCooker::BuildManifest(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild)
 {

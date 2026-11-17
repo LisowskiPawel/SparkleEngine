@@ -58,28 +58,20 @@ function(sparkle_stage_d3d12_pix_event_runtime product_target)
     )
 endfunction()
 
-function(sparkle_declare_runtime_dll_owner product_target)
+function(sparkle_stage_linked_runtime product_target)
     if(NOT TARGET ${product_target})
         message(FATAL_ERROR "Unknown Sparkle product target '${product_target}'")
     endif()
 
-    if(NOT SPARKLE_BUILD_SHARED)
-        return()
-    endif()
-
-    foreach(runtime_target IN LISTS ARGN)
-        if(TARGET ${runtime_target})
-            set_property(TARGET ${product_target} APPEND PROPERTY SPARKLE_RUNTIME_SUPPORT_FILES
-                "$<TARGET_FILE_NAME:${runtime_target}>")
-            add_custom_command(TARGET ${product_target} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "$<TARGET_FILE:${runtime_target}>"
-                    "$<TARGET_FILE_DIR:${product_target}>"
-                COMMENT "Copying ${runtime_target} runtime DLL for ${product_target}"
-                VERBATIM
-            )
-        endif()
-    endforeach()
+    set_property(TARGET ${product_target} APPEND PROPERTY SPARKLE_RUNTIME_SUPPORT_FILES
+        "$<PATH:GET_FILENAME,$<TARGET_RUNTIME_DLLS:${product_target}>>")
+    add_custom_command(TARGET ${product_target} POST_BUILD
+        COMMAND ${CMAKE_COMMAND}
+            "-DSPARKLE_RUNTIME_DLLS=$<TARGET_RUNTIME_DLLS:${product_target}>"
+            "-DSPARKLE_RUNTIME_DIRECTORY=$<TARGET_FILE_DIR:${product_target}>"
+            -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/StageRuntimeDlls.cmake"
+        COMMENT "Staging linked runtime DLLs for ${product_target}"
+        VERBATIM)
 endfunction()
 
 function(sparkle_stage_nvidia_streamline_runtime product_target)

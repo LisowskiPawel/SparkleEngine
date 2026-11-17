@@ -61,15 +61,11 @@ foreach(_product IN ITEMS
                 list(APPEND _runtime_json "\"${_runtime}\"")
             endforeach()
         endif()
-        get_target_property(_support_files ${_target} SPARKLE_RUNTIME_SUPPORT_FILES)
-        if(_support_files)
-            foreach(_support IN LISTS _support_files)
-                list(APPEND _support_json "\"${_support}\"")
-            endforeach()
-        endif()
+        set(_support_files "$<REMOVE_DUPLICATES:$<TARGET_GENEX_EVAL:${_target},$<TARGET_PROPERTY:${_target},SPARKLE_RUNTIME_SUPPORT_FILES>>>")
+        set(_support_json "$<$<BOOL:${_support_files}>:\"$<JOIN:${_support_files},\",\">\">")
+
     endif()
     list(JOIN _runtime_json "," _runtime_json)
-    list(JOIN _support_json "," _support_json)
     list(JOIN _source_packages "," _source_packages)
     list(APPEND _sparkle_release_products_${_profile}
         "{\"Component\":\"${_component}\",\"Target\":\"${_target}\",\"Configuration\":\"${_profile}\",\"Source\":\"${_source}\",\"Symbols\":\"${_symbols}\",\"MSVCRuntime\":[${_runtime_json}],\"RuntimeSupport\":[${_support_json}],\"SourcePackages\":[${_source_packages}],\"Path\":\"${_directory}/${_target}.exe\"}")

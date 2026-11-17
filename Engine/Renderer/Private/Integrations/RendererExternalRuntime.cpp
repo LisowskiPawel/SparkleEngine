@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "RHI/Public/Diagnostics/RhiExternalCapture.h"
 #include "Integrations/RendererExternalRuntime.h"
 
 #include "Streamline/StreamlineRuntimeSupport.h"

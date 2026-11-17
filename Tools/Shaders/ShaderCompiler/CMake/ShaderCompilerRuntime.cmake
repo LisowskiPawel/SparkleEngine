@@ -10,19 +10,7 @@ foreach(_module IN LISTS SLANG_STANDARD_MODULE_DIRECTORIES)
     endif()
     list(APPEND _shader_runtime_support ${_module_files})
 endforeach()
-set_property(TARGET ShaderCompiler PROPERTY SPARKLE_RUNTIME_SUPPORT_FILES ${_shader_runtime_support})
-
-add_custom_command(TARGET ShaderCompiler POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${DXC_RUNTIME_LIBRARY}"
-        "$<TARGET_FILE_DIR:ShaderCompiler>/dxcompiler.dll"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${SLANG_RUNTIME_LIBRARY}"
-        "$<TARGET_FILE_DIR:ShaderCompiler>/slang.dll"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${SPIRV_TOOLS_RUNTIME_LIBRARY}"
-        "$<TARGET_FILE_DIR:ShaderCompiler>/SPIRV-Tools-shared.dll"
-)
+set_property(TARGET ShaderCompiler APPEND PROPERTY SPARKLE_RUNTIME_SUPPORT_FILES ${_shader_runtime_support})
 
 foreach(slang_runtime_support_file IN LISTS SLANG_RUNTIME_SUPPORT_FILES)
     get_filename_component(slang_runtime_support_name "${slang_runtime_support_file}" NAME)

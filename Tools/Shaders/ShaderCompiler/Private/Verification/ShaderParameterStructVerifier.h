@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ShaderReflection.h"
+#include "Compiler/Output/ShaderReflection.h"
 #include "Shaders/Authoring/ShaderParameterStruct.h"
 
 #include <string>

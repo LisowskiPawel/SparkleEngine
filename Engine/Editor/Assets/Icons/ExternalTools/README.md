@@ -4,7 +4,7 @@ Editor icon catalog artwork, not tool runtime dependencies. Each file is an unch
 32x32 top-down, unpremultiplied RGBA8 application icon (4096 bytes), extracted on
 2026-10-10 using Windows ExtractIconEx index 0/large icon and Icon.ToBitmap.
 No crop, recoloring or generated substitute logo is used. Icons.json declares
-names, extents and eligible profiles. Generic EditorIconAssets.cmake embeds
+names, extents and eligible profiles. [EditorIconAssets.cmake](../../../CMake/EditorIconAssets.cmake) embeds
 these pixels in the private per-configuration catalog; EditorIconService owns
 their shared atlas resources. Runtime never reads installed tool executables. Application icons/trademarks remain the property of
 their respective owners and identify the external tool without endorsement.

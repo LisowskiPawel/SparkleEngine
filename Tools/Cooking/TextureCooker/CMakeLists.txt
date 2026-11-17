@@ -62,7 +62,7 @@ target_link_libraries(TextureCookShared
 )
 
 add_executable(TextureCooker
-    ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/main.cpp
     ${TEXTURE_COOKER_PRIVATE_SOURCES}
     ${TEXTURE_COOKER_PRIVATE_HEADERS}
 )
@@ -96,8 +96,8 @@ target_link_libraries(TextureCooker
         ktx_read
 )
 
-sparkle_declare_runtime_dll_owner(TextureCooker SparkleCore SparkleTasks)
+sparkle_stage_linked_runtime(TextureCooker)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${TEXTURE_COOK_SHARED_PUBLIC_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${TEXTURE_COOK_SHARED_PRIVATE_SOURCES} ${TEXTURE_COOK_SHARED_PRIVATE_HEADERS} ${TEXTURE_COOKER_PRIVATE_SOURCES} ${TEXTURE_COOKER_PRIVATE_HEADERS})
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "Source" FILES ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${CMAKE_CURRENT_SOURCE_DIR}/Private/main.cpp)

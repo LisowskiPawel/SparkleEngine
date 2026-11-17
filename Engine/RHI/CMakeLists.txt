@@ -5,7 +5,7 @@
 
 include(FetchContent)
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/Contracts.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/CMake/Contracts.cmake)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/BackendOptions.cmake")
 
@@ -186,8 +186,6 @@ if(TARGET SparkleRHI_Vulkan)
     sparkle_assert_rhi_target_excludes_backend_sources(SparkleRHI_Vulkan D3D12)
 endif()
 
-sparkle_configure_runtime_support_artifacts(SparkleRHI)
-
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${SPARKLE_RHI_PUBLIC_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private\\Common" FILES ${SPARKLE_RHI_COMMON_PRIVATE_SOURCES} ${SPARKLE_RHI_COMMON_PRIVATE_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private/Diagnostics PREFIX "Private\\Diagnostics" FILES ${SPARKLE_RHI_DIAGNOSTICS_SOURCES} ${SPARKLE_RHI_DIAGNOSTICS_HEADERS})
@@ -203,4 +201,4 @@ if(SPARKLE_RHI_WITH_VULKAN)
     source_group("ThirdParty\\ImGui\\Vulkan" FILES ${SPARKLE_RHI_VULKAN_THIRD_PARTY_SOURCES})
 endif()
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/ExternalCapture.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/ExternalCapture.cmake")

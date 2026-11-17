@@ -121,9 +121,6 @@ target_link_libraries(SparkleApplicationEditor
         ZLIB::ZLIB
 )
 
-sparkle_configure_runtime_support_artifacts(SparkleApplication)
-sparkle_configure_runtime_support_artifacts(SparkleApplicationEditor)
-
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${SPARKLE_APPLICATION_PUBLIC_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${SPARKLE_APPLICATION_EDITOR_PUBLIC_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${SPARKLE_APPLICATION_PRIVATE_SOURCES} ${SPARKLE_APPLICATION_PRIVATE_HEADERS})

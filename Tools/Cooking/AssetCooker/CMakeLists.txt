@@ -70,7 +70,7 @@ target_link_libraries(AssetCookerCore
 )
 
 add_executable(AssetCooker
-    ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/main.cpp
     ${ASSET_COOKER_CLI_SOURCES}
     ${ASSET_COOKER_CLI_HEADERS}
 )
@@ -98,21 +98,10 @@ target_link_libraries(AssetCooker
         AssetCookerCore
         ${ASSET_COOKER_COOKING_LINK_LIBRARIES}
 )
-sparkle_declare_runtime_dll_owner(AssetCooker SparkleCore SparkleTasks SparkleGameFramework SparkleRHI SparklePlatform)
-
-if(TARGET assimp)
-    set_property(TARGET AssetCooker APPEND PROPERTY SPARKLE_RUNTIME_SUPPORT_FILES "$<TARGET_FILE_NAME:assimp>")
-    add_custom_command(TARGET AssetCooker POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "$<TARGET_FILE:assimp>"
-            "$<TARGET_FILE_DIR:AssetCooker>"
-        COMMENT "Copying Assimp runtime DLL for AssetCooker"
-        VERBATIM
-    )
-endif()
+sparkle_stage_linked_runtime(AssetCooker)
 
 source_group(
     TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private
     PREFIX "Private"
     FILES ${ASSET_COOKER_CORE_SOURCES} ${ASSET_COOKER_CORE_HEADERS} ${ASSET_COOKER_CLI_SOURCES} ${ASSET_COOKER_CLI_HEADERS})
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "Source" FILES ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${CMAKE_CURRENT_SOURCE_DIR}/Private/main.cpp)

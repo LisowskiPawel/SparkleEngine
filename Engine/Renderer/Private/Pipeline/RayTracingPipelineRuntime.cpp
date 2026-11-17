@@ -5,6 +5,7 @@
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
+#include "RHI/Public/Bindings/RenderBindingLayout.h"
 
 std::unique_ptr<RayTracingPipelineRuntime> RayTracingPipelineRuntime::Create(
     RenderHardwareInterface& renderHardwareInterface,

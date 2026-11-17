@@ -2,7 +2,7 @@
 
 #include "Core/Public/Strings/StringTableBuilder.h"
 #include "RHI/Public/Shaders/ShaderReflection.h"
-#include "ShaderReflection.h"
+#include "Compiler/Output/ShaderReflection.h"
 
 #include <span>
 #include <vector>

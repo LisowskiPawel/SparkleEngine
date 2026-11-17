@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.27)
 include(${CMAKE_CURRENT_LIST_DIR}/CMake/SparkleArtifactContract.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/CMake/SparkleProductIdentity.cmake)
 project(Sparkle VERSION ${SPARKLE_VERSION} LANGUAGES C CXX)

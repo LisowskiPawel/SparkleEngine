@@ -16,7 +16,6 @@ set(SHADER_COMPILER_CLI_SOURCES
 list(REMOVE_ITEM SHADER_COMPILER_PRIVATE_SOURCES ${SHADER_COMPILER_CLI_SOURCES})
 
 add_executable(ShaderCompiler
-    ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp
     ${SHADER_COMPILER_PRIVATE_SOURCES}
     ${SHADER_COMPILER_PRIVATE_HEADERS}
 )
@@ -27,16 +26,8 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/ShaderCompilerSdks.cmake")
 target_include_directories(ShaderCompiler
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Private
-        ${DXC_INCLUDE_DIR}
-        ${SLANG_INCLUDE_DIR}
-        ${SPIRV_TOOLS_INCLUDE_DIR}
         ${CMAKE_SOURCE_DIR}/Engine
         ${CMAKE_SOURCE_DIR}/Engine/Core/Public/Diagnostics
-)
-
-target_compile_definitions(ShaderCompiler
-    PRIVATE
-        SPIRV_TOOLS_SHAREDLIB
 )
 
 target_compile_features(ShaderCompiler PRIVATE cxx_std_20)
@@ -71,16 +62,16 @@ target_link_libraries(ShaderCompiler
         SparkleTasks
         SparkleRHI
         SparkleRendererShaderCookRegistrationObjects
-        ${DXC_IMPORT_LIBRARY}
+        Dxc::Dxc
         spirv_reflect
-        ${SPIRV_TOOLS_IMPORT_LIBRARY}
+        SPIRVTools::SPIRVTools
         slang::slang
 )
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/ShaderCompilerRuntime.cmake")
 
 sparkle_configure_development_tool_artifacts(ShaderCompiler)
-sparkle_declare_runtime_dll_owner(ShaderCompiler SparkleCore)
+sparkle_stage_linked_runtime(ShaderCompiler)
 sparkle_get_project_cooked_directory(SHADER_COMPILER_VALIDATION_COOKED_DIRECTORY Shared)
 
 add_custom_target(ShaderCompilerCliValidation
@@ -96,7 +87,6 @@ add_custom_target(ShaderCompilerCliValidation
     USES_TERMINAL
 )
 
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Source PREFIX "Source" FILES ${CMAKE_CURRENT_SOURCE_DIR}/Source/main.cpp)
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "" FILES ${SHADER_COMPILER_PRIVATE_SOURCES} ${SHADER_COMPILER_PRIVATE_HEADERS} ${SHADER_COMPILER_CLI_SOURCES})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${SHADER_COMPILER_PRIVATE_SOURCES} ${SHADER_COMPILER_PRIVATE_HEADERS} ${SHADER_COMPILER_CLI_SOURCES})
 
 sparkle_configure_gpu_crash_artifacts(ShaderCompiler)
