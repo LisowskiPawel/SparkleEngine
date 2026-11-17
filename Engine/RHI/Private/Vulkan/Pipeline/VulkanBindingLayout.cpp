@@ -1,7 +1,6 @@
 #include "Vulkan/VulkanPCH.h"
 
 #include "Vulkan/Pipeline/VulkanBindingLayout.h"
-#include "Shaders/GlobalShaderMap.h"
 
 #include "Bindings/RhiShaderBindingReflection.h"
 #include "ShaderParameters/PassParameterLayout.h"

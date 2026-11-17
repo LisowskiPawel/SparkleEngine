@@ -1,17 +1,8 @@
-function(sparkle_boundary_relative_path out_var absolute_path)
-    file(RELATIVE_PATH _relative "${SPARKLE_REPO_ROOT}" "${absolute_path}")
-    file(TO_CMAKE_PATH "${_relative}" _relative)
-    set(${out_var} "${_relative}" PARENT_SCOPE)
-endfunction()
-
-function(sparkle_boundary_append_failure_text message_text)
-    set_property(GLOBAL APPEND PROPERTY SPARKLE_BOUNDARY_FAILURES "${message_text}")
-endfunction()
-
 function(sparkle_boundary_append_failure rule relative_path line_number reason line_text)
     string(STRIP "${line_text}" _line_text)
     string(REPLACE ";" "," _line_text "${_line_text}")
-    sparkle_boundary_append_failure_text("${relative_path}:${line_number}: [${rule}] ${reason} | ${_line_text}")
+    set_property(GLOBAL APPEND PROPERTY SPARKLE_BOUNDARY_FAILURES
+        "${relative_path}:${line_number}: [${rule}] ${reason} | ${_line_text}")
 endfunction()
 
 function(sparkle_boundary_collect_source_files out_var)
@@ -31,7 +22,8 @@ function(sparkle_boundary_collect_source_files out_var)
 endfunction()
 
 function(sparkle_boundary_scan_file absolute_path)
-    sparkle_boundary_relative_path(_relative_path "${absolute_path}")
+    file(RELATIVE_PATH _relative_path "${SPARKLE_REPO_ROOT}" "${absolute_path}")
+    file(TO_CMAKE_PATH "${_relative_path}" _relative_path)
     # Policy definitions contain the identifiers that they reject in product source.
     if(_relative_path MATCHES "^CMake/(ArchitectureBoundaryCheck[.]cmake|Architecture/.*[.]cmake)$")
         return()

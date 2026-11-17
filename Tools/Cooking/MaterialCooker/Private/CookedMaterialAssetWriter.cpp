@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "GameFramework/Public/Assets/Cooked/CookedTextureReference.h"
 
 #include "MaterialCooker.h"
 #include "CookedMaterialAssetBuild.h"

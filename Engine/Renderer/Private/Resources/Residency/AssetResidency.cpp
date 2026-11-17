@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <array>
-#include <limits>
 
 AssetResidency::AssetResidency(AssetResidencyBudget budget) noexcept :
     m_budget(budget)

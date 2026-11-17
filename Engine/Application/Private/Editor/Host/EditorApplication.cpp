@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Editor/Host/EditorApplication.h"
+#include "Renderer/Public/Viewport/ViewportPresentationSnapshot.h"
 
 #if SPARKLE_APPLICATION_WITH_EXTERNAL_CAPTURE_UI
   #include "Editor/ExternalCapture/ExternalCaptureUiComposition.h"

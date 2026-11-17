@@ -3,7 +3,6 @@
 
 #include "Core/Public/Hash/HashUtils.h"
 #include "Passes/Lighting/LightingStateHash.h"
-#include "Meshes/GpuMesh.h"
 #include "Textures/RendererTexture.h"
 #include "Scene/Preparation/PreparedRenderScene.h"
 #include "Scene/Materials/MaterialEmissionControls.h"

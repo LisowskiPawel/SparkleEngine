@@ -5,7 +5,6 @@
 #include "Frame/Graph/RenderFrameGraphResources.h"
 #include "FrameGraph/Builder/FrameGraphBuilder.h"
 #include "FrameGraph/Execution/PassCommandContext.h"
-#include "Scene/Preparation/PreparedRenderScene.h"
 #include "Scene/RayTracing/RenderRayTracingScene.h"
 #include "View/RenderView.h"
 

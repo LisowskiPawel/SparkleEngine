@@ -8,7 +8,6 @@
   #include "Vulkan/Diagnostics/GpuCrash/VulkanGpuCrash.h"
 #endif
 
-#include "Strings/StringUtils.h"
 #include "Vulkan/Core/VulkanResult.h"
 #include "Vulkan/Device/VulkanRhi.h"
 #include "Vulkan/Diagnostics/VulkanDebugNames.h"

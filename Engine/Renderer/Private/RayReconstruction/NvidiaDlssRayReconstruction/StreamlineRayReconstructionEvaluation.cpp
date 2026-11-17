@@ -1,6 +1,5 @@
 #include "../../PCH.h"
 #include "RayReconstruction/NvidiaDlssRayReconstruction/StreamlineRayReconstructionEvaluation.h"
-#include "Upscaling/UpscalerSettings.h"
 
 #if SPARKLE_WITH_NVIDIA_STREAMLINE
   #include "RayReconstruction/NvidiaDlssRayReconstruction/StreamlineRayReconstructionResourceTags.h"

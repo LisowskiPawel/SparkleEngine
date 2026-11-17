@@ -9,7 +9,6 @@
 #include "Passes/GBuffer/Raster/GBufferShaders.h"
 #include "Pipeline/RasterPassRenderState.h"
 #include "RHI/Public/Samplers/RhiSamplerDesc.h"
-#include "Scene/Preparation/PreparedRenderScene.h"
 #include "Scene/Materials/MaterialEmissionControls.h"
 #include "View/RenderView.h"
 #include "Passes/Visualization/GpuSceneVisualization.h"

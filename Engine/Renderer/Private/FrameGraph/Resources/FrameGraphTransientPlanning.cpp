@@ -8,7 +8,6 @@
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 
 #include <cassert>
-#include <string>
 
 static bool RequiresUnorderedAccess(const FrameGraphPlan& plan, FrameGraphResourceHandle handle) noexcept
 {

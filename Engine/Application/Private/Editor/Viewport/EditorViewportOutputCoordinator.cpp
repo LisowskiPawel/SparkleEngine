@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "Renderer/Public/Viewport/ViewportPresentationSnapshot.h"
 
 #include "Editor/Viewport/EditorViewportOutputCoordinator.h"
 

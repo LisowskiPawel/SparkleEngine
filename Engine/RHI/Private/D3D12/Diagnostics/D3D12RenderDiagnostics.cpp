@@ -9,7 +9,6 @@
 #include "Diagnostics/RhiDiagnosticsComposition.h"
 #include "Diagnostics/RhiTimestampQueryAllocator.h"
 
-#include "Frame/RhiFrameConstants.h"
 #include "D3D12/Device/D3D12Rhi.h"
 #include "D3D12/D3D12TypeConversions.h"
 #include "D3D12/Memory/D3D12GpuAllocation.h"
@@ -18,7 +17,6 @@
 
 #include "Core/Public/Strings/StringUtils.h"
 
-#include <array>
 #include <cstring>
 #include <memory>
 #include <string>

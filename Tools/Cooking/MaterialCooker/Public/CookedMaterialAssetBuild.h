@@ -1,6 +1,7 @@
-﻿#pragma once
+#pragma once
 
 #include "GameFramework/Public/Assets/Cooked/CookedMaterialAsset.h"
+#include "GameFramework/Public/Assets/Cooked/CookedTextureReference.h"
 
 #include <string>
 #include <vector>

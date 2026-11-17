@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "GameFramework/Public/Assets/Cooked/CookedSceneLightRecord.h"
 
 #include "CookedSceneLightBuilder.h"
 

@@ -49,7 +49,7 @@ sparkle_target_precompile_headers(SparkleEditor
 
 # Editor exposes Core, Renderer/world contracts and the RHI capture contract.
 # Platform and ImGui stay implementation dependencies.
-target_link_libraries(SparkleEditor 
+target_link_libraries(SparkleEditor
     PUBLIC
         SparkleCore
         SparkleRHI

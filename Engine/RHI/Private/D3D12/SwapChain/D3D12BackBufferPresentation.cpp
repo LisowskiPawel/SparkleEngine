@@ -6,7 +6,6 @@
 #include "D3D12/Descriptors/D3D12DescriptorService.h"
 #include "D3D12/Resources/D3D12ResourceService.h"
 #include "D3D12/Commands/D3D12CommandRecordingContext.h"
-#include "D3D12/Commands/D3D12RenderCommandList.h"
 
 D3D12BackBufferPresentation::D3D12BackBufferPresentation(D3D12Rhi& rhi, D3D12SwapChain& swapChain, D3D12DescriptorService& descriptors, D3D12ResourceService& resources) noexcept :
     m_rhi(&rhi),

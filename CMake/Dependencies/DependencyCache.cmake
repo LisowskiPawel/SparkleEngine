@@ -111,6 +111,7 @@ endfunction()
 
 function(sparkle_declare_git_dependency dependency_name repository revision)
     FetchContent_Declare(${dependency_name}
+        BINARY_DIR "${CMAKE_BINARY_DIR}/_deps/${dependency_name}-build"
         GIT_REPOSITORY "${repository}"
         GIT_TAG "${revision}"
         GIT_SHALLOW FALSE

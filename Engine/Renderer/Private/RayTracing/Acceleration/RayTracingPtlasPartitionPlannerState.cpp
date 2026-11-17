@@ -4,7 +4,6 @@
 
 #include "Scene/Geometry/MeshDraw.h"
 
-#include <algorithm>
 #include <cmath>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_rayTracingPtlasPartitionPlannerStateLogger, "Renderer.RayTracing.PtlasPartitionPlannerState");

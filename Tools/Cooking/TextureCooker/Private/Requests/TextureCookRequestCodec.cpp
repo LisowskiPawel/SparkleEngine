@@ -1,6 +1,7 @@
 #include "TextureCookRequestCodec.h"
 
 #include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Diagnostics/Logger.h"
 #include "Core/Public/Formatting/HexFormat.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Core/Public/Diagnostics/Verify.h"

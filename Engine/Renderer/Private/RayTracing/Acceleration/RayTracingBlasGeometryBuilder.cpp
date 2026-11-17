@@ -5,7 +5,6 @@
 #include "Core/Public/Math/MathUtils.h"
 #include "Meshes/GpuMesh.h"
 #include "Scene/Preparation/PreparedRenderScene.h"
-#include "ShaderData/MeshInstanceShaderData.h"
 
 #include <span>
 

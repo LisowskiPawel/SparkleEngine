@@ -2,7 +2,6 @@
 
 #include "RayTracing/Acceleration/RayTracingPtlasPartitionPlanner.h"
 
-#include "Meshes/GpuMesh.h"
 #include "Scene/Geometry/MeshDraw.h"
 #include "Scene/Preparation/PreparedRenderScene.h"
 

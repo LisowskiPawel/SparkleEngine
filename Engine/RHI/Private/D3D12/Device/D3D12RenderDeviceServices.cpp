@@ -16,7 +16,6 @@
 
 #include "Window/Window.h"
 
-#include <array>
 #include <span>
 
 class D3D12RenderDeviceServices final : public RenderDeviceBackendServices

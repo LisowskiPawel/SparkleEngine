@@ -27,7 +27,7 @@ sparkle_prepare_git_fetchcontent_source(ktx EXPECTED_REVISION "${SPARKLE_KTX_REV
     lib/basisu/zstd/zstd.c cmake/version.cmake include/KHR/khr_df.h
     LICENSE.md NOTICE.md LICENSES/Apache-2.0.txt LICENSES/BSD-1-Clause.txt LICENSES/LicenseRef-ETCSLA.txt lib/basisu/zstd/LICENSE)
 set(ktx_SOURCE_DIR "${_ktx_source}")
-set(ktx_BINARY_DIR "${FETCHCONTENT_BASE_DIR}/ktx-build")
+set(ktx_BINARY_DIR "${CMAKE_BINARY_DIR}/_deps/ktx-build")
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
     sparkle_log_dependency_ready("KTX-Software" "${ktx_SOURCE_DIR}" "sparse source checkout")
     return()

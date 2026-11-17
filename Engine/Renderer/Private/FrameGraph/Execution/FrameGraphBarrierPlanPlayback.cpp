@@ -7,7 +7,6 @@
 
 #include <cassert>
 #include <format>
-#include <memory>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogFrameGraphBarrierPlayback, "Renderer.FrameGraph");
 

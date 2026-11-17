@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Game/GameApplication.h"
+#include "Renderer/Public/Viewport/ViewportContracts.h"
 
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "Diagnostics/GpuCrash/GpuCrashIncidentSink.h"

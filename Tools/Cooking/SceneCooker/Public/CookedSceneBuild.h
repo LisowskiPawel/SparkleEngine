@@ -1,10 +1,13 @@
-﻿#pragma once
+#pragma once
 
 #include "CookedMaterialAssetBuild.h"
 #include "CookedMeshAssetBuild.h"
 #include "GameFramework/Public/Assets/Cooked/CookedSceneManifest.h"
 #include "GameFramework/Public/Assets/Cooked/CookedAnimationAsset.h"
 #include "GameFramework/Public/Assets/Cooked/CookedSkeletonAsset.h"
+#include "GameFramework/Public/Assets/Cooked/CookedSceneCameraRecord.h"
+#include "GameFramework/Public/Assets/Cooked/CookedSceneLightRecord.h"
+#include "GameFramework/Public/Assets/Cooked/CookedSceneMetadataRecords.h"
 
 #include <cstdint>
 #include <filesystem>

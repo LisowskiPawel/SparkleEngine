@@ -5,12 +5,10 @@
 #include "Meshes/GpuMeshPreparation.h"
 #include "RHI/Public/Commands/RhiCommandSubmissionService.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
-#include "Scene/Meshes/Mesh.h"
 #include "Tasks/Public/TaskExecutor.h"
 #include "Tasks/Public/TaskScope.h"
 
 #include <algorithm>
-#include <array>
 #include <chrono>
 #include <utility>
 
