@@ -32,7 +32,7 @@ public:
 	{
 		bool bRequiresScopes = false;
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
-		requiresScopes = GpuCrashSession::Current() != nullptr;
+		bRequiresScopes = GpuCrashSession::Current() != nullptr;
 #endif
 		return RhiDiagnosticsCapabilities{
 		    .bSupportsObjectNames = m_objectDiagnostics->SupportsObjectNames(),

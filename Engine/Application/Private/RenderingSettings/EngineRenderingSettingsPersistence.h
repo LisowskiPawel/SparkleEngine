@@ -1,9 +1,11 @@
 #pragma once
 
+#include "ApplicationAPI.h"
+
 struct EngineRenderingSettingsState;
 
 namespace EngineRenderingSettingsPersistence
 {
 	void Apply();
-	void Write(const EngineRenderingSettingsState& state);
+	SPARKLE_APPLICATION_API void Write(const EngineRenderingSettingsState& state);
 }

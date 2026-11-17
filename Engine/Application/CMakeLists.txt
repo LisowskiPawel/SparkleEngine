@@ -108,7 +108,7 @@ if(SPARKLE_BUILD_SHARED)
         ${SPARKLE_APPLICATION_EDITOR_PRIVATE_SOURCES}
         ${SPARKLE_APPLICATION_EDITOR_PRIVATE_HEADERS}
     )
-    target_compile_definitions(SparkleApplicationEditor PRIVATE SPARKLE_APPLICATION_EXPORTS)
+    target_compile_definitions(SparkleApplicationEditor PRIVATE SPARKLE_APPLICATION_EDITOR_EXPORTS)
 else()
     add_library(SparkleApplicationEditor STATIC
         ${SPARKLE_APPLICATION_EDITOR_PRIVATE_SOURCES}

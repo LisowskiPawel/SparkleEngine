@@ -8,7 +8,7 @@
 
 class Renderer;
 
-class SPARKLE_APPLICATION_API EditorApplication final : public Application
+class SPARKLE_APPLICATION_EDITOR_API EditorApplication final : public Application
 {
 public:
 	EditorApplication();

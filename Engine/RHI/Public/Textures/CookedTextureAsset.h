@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Resources/TextureTypes.h"
-#include "../RHIAPI.h"
 
 #include <cstdint>
 #include <string_view>
@@ -33,7 +32,7 @@ constexpr TextureResourceDimension UnpackCookedTextureDimension(std::uint32_t pa
 	return static_cast<TextureResourceDimension>((packedLayout >> 16u) & 0xffu);
 }
 
-struct SPARKLE_RHI_API CookedTextureAssetHeader
+struct CookedTextureAssetHeader
 {
 	std::uint32_t magic = kCookedTextureAssetMagic;
 	std::uint32_t width = 0;
@@ -50,7 +49,7 @@ struct SPARKLE_RHI_API CookedTextureAssetHeader
 	constexpr TextureResourceDimension GetDimension() const noexcept { return UnpackCookedTextureDimension(packedLayout); }
 };
 
-struct SPARKLE_RHI_API CookedTextureMipHeader
+struct CookedTextureMipHeader
 {
 	std::uint32_t width = 1;
 	std::uint32_t height = 1;

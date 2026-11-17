@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Diagnostics/ExternalCapture/ExternalCaptureAdapter.h"
+#include "Diagnostics/RhiExternalCapture.h"
 
 bool HasInstalledExternalCaptureProvider() noexcept
 {

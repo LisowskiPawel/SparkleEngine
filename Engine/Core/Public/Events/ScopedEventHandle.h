@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/Public/CoreAPI.h"
 #include "EventHandle.h"
 
 #include <cstddef>
@@ -9,7 +8,7 @@
 
 template <typename Signature, std::size_t Capacity> class Event;
 
-class SPARKLE_CORE_API ScopedEventHandle
+class ScopedEventHandle
 {
 public:
 	ScopedEventHandle() noexcept = default;

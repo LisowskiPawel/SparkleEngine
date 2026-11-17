@@ -22,7 +22,7 @@ struct RhiCaptureTicket final
 {
 	std::uint64_t Value = 0;
 
-	explicit operator bool() const noexcept;
+	explicit operator bool() const noexcept { return Value != 0; }
 };
 
 struct RhiTextureCaptureRequest final

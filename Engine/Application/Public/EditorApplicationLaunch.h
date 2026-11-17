@@ -3,4 +3,4 @@
 #include "ApplicationAPI.h"
 #include "EditorShaderCompileAction.h"
 
-SPARKLE_APPLICATION_API int RunEditorApplication(EditorShaderCompileAction compileShaders = {});
+SPARKLE_APPLICATION_EDITOR_API int RunEditorApplication(EditorShaderCompileAction compileShaders = {});
