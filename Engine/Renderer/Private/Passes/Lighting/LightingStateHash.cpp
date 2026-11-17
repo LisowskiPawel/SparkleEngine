@@ -1,6 +1,7 @@
 #include "PCH.h"
 
 #include "Passes/Lighting/LightingStateHash.h"
+#include "Core/Public/Hash/HashUtils.h"
 
 namespace LightingStateHash
 {

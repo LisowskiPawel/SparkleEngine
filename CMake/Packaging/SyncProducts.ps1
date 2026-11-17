@@ -21,7 +21,7 @@ if ($Products.Count -eq 0) { throw 'Select at least one product to sync.' }
 if ((Get-FileHash -LiteralPath $Archive).Hash.ToLowerInvariant() -cne $Sha256) { throw 'Product sync archive hash mismatch.' }
 $revision = & git -C $root rev-parse HEAD
 if ($LASTEXITCODE -ne 0) { throw 'Cannot identify the source checkout revision.' }
-$transactionRoot = [IO.Path]::GetFullPath((Join-Path $root 'build/private/product-sync'))
+$transactionRoot = Resolve-LocalArtifactPath (Join-Path $root 'build/private/product-sync')
 $transaction = Join-Path $transactionRoot ([Guid]::NewGuid().ToString('N'))
 $stage = Join-Path $transaction 'archive'
 $replacements = @()
@@ -69,7 +69,7 @@ finally
     if ($lock) { $lock.Dispose() }
     if (!$preserveTransaction -and (Test-Path -LiteralPath $transaction))
     {
-        $resolvedTransaction = (Get-Item -LiteralPath $transaction -Force).FullName
+        $resolvedTransaction = Resolve-LocalArtifactPath $transaction
         if (!$resolvedTransaction.StartsWith($transactionRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase))
         {
             throw 'Product sync cleanup escapes its transaction root.'

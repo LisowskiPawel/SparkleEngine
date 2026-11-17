@@ -19,7 +19,8 @@ $ErrorActionPreference = 'Stop'
 function Write-Receipt
 {
     param([string] $Path, $Record)
-    $parent = [IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($Path))
+    $Path = Resolve-LocalArtifactPath $Path
+    $parent = [IO.Path]::GetDirectoryName($Path)
     [void] [IO.Directory]::CreateDirectory($parent)
     $temporary = $Path + '.' + [Guid]::NewGuid().ToString('N') + '.pending'
     try
@@ -77,7 +78,7 @@ try
     if ([IO.Path]::GetFullPath($SymbolRoot).TrimEnd('\','/') -ine $expectedSymbols.Replace('/','\')) { throw 'Symbol retention escapes the artifact owner.' }
     $runtimeJson = ConvertTo-Json -InputObject $runtime -Depth 6 -Compress
     $symbolId = Get-TextSha256 ($candidate.sourceInputsSha256 + "`n" + $executableHash + "`n" + $pdbHash + "`n" + $Profile + "`n" + $runtimeJson)
-    $retained = Join-Path $SymbolRoot $symbolId
+    $retained = Resolve-LocalArtifactPath (Join-Path $SymbolRoot $symbolId)
     [void] [IO.Directory]::CreateDirectory($retained)
     $retainedPdb = Join-Path $retained $symbols.Name
     if (![IO.File]::Exists($retainedPdb)) { [IO.File]::Copy($symbols.FullName, $retainedPdb, $false) }

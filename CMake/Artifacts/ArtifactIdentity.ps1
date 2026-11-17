@@ -22,39 +22,40 @@ function Assert-ArtifactFile
 {
     param([string] $Root, [string] $Path, [long] $Size, [string] $Sha256)
     Assert-ArtifactPath $Path
-    $current = Get-Item -LiteralPath $Root -Force
-    foreach ($part in $Path.Split('/'))
-    {
-        if (($current.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)
-        {
-            throw "Reparse point is not an artifact input: '$($current.FullName)'."
-        }
-        $current = Get-Item -LiteralPath (Join-Path $current.FullName $part) -Force
-    }
-    if ($current.PSIsContainer -or ($current.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)
-    {
-        throw "Expected a regular artifact file: '$Path'."
-    }
-    if ($Sha256 -notmatch '^[0-9a-f]{64}$' -or $current.Length -ne $Size -or
-        (Get-FileHash -LiteralPath $current.FullName -Algorithm SHA256).Hash.ToLowerInvariant() -cne $Sha256)
+    $file = Get-LocalArtifactFile (Join-Path $Root $Path) ([long]::MaxValue)
+    if ($Sha256 -notmatch '^[0-9a-f]{64}$' -or $file.Length -ne $Size -or
+        (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant() -cne $Sha256)
     {
         throw "Artifact input size/hash mismatch: '$Path'."
     }
-    return $current.FullName
+    return $file.FullName
+}
+
+function Resolve-LocalArtifactPath
+{
+    param([string] $Path)
+    $resolved = [IO.Path]::GetFullPath($Path)
+    if ($resolved.StartsWith('\\')) { throw 'Choose a local artifact path, not a network/device path.' }
+    # Missing tail components are allowed for new publication destinations.
+    $current = $resolved
+    while ($current)
+    {
+        if ((Test-Path -LiteralPath $current) -and
+            ((Get-Item -LiteralPath $current -Force -ErrorAction Stop).Attributes -band [IO.FileAttributes]::ReparsePoint))
+        {
+            throw 'Artifact input/output uses a reparse point.'
+        }
+        $current = [IO.Path]::GetDirectoryName($current)
+    }
+    return $resolved
 }
 
 function Get-LocalArtifactFile
 {
     param([string] $Path, [long] $MaximumBytes)
-    if ([IO.Path]::GetFullPath($Path).StartsWith('\\')) { throw 'Choose a local file, not a network/device path.' }
-    $item = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+    $resolved = Resolve-LocalArtifactPath $Path
+    $item = Get-Item -LiteralPath $resolved -Force -ErrorAction Stop
     if ($item.PSIsContainer -or $item.Length -gt $MaximumBytes) { throw 'Artifact input is absent, not a file, or exceeds its byte limit.' }
-    $current = $item
-    while ($null -ne $current)
-    {
-        if (($current.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'Artifact input/output uses a reparse point.' }
-        $current = if ($current -is [IO.DirectoryInfo]) { $current.Parent } else { $current.Directory }
-    }
     return $item
 }
 

@@ -155,6 +155,15 @@ target_include_directories(SparkleLauncherCore
 )
 
 target_compile_features(SparkleLauncherCore PUBLIC cxx_std_20)
+sparkle_target_precompile_headers(SparkleLauncherCore
+    <algorithm>
+    <filesystem>
+    <memory>
+    <optional>
+    <string>
+    <string_view>
+    <vector>
+)
 
 target_compile_definitions(SparkleLauncherCore
     PRIVATE

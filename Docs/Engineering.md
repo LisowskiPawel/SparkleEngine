@@ -20,6 +20,12 @@ The recorded Windows toolchain is:
 
 Other combinations need separate testing. These versions describe the recorded setup, not the latest available releases.
 
+### Compilation
+
+Launcher requests four parallel build jobs. Visual Studio builds compile up to two C++ sources per project, while PCH creation stays serial. Direct CMake builds can set the project/job count with `--parallel`.
+
+Modules and busy tool targets cache common headers in private PCHs. Core links the compiled static spdlog library, so logging consumers reuse its implementation. Keep source/header dependencies explicit; PCHs must not replace required includes.
+
 ### Build Launcher
 
 Use a short checkout path. Run these commands from the repository root with your Qt path. Stop if a command fails.

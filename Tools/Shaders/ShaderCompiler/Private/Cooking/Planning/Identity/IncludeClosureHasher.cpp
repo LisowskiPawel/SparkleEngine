@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include <unordered_set>
 
 #include "Cooking/Planning/Identity/IncludeClosureHasher.h"
 

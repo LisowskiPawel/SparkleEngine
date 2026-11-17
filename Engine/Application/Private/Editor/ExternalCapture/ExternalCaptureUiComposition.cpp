@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "Renderer/Public/Viewport/ViewportPresentationSnapshot.h"
 #include "Editor/ExternalCapture/ExternalCaptureUiComposition.h"
 #include "Editor/Public/ExternalCapture/ExternalCaptureOverlay.h"
 #include "Renderer.h"

@@ -1,6 +1,7 @@
 Set-StrictMode -Version Latest
 
 . (Join-Path $PSScriptRoot 'PreparedProducts.ps1')
+. (Join-Path $PSScriptRoot '../../Artifacts/ShaderExport.ps1')
 
 function Get-PackageShaderExport
 {
@@ -12,32 +13,21 @@ function Get-PackageShaderExport
     {
         throw 'Shader export escapes the configured symbol owner.'
     }
-    $export = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
-    if ($export.scope -cne 'registered-catalog' -or !@($export.jobs).Count -or !@($export.files).Count)
-    {
-        throw 'The final cook did not export a complete shader catalog.'
-    }
-    $paths = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
-    foreach ($entry in $export.files)
-    {
-        if (!$paths.Add($entry.path)) { throw 'Duplicate shader export member.' }
-        [void] (Assert-ArtifactFile $file.DirectoryName $entry.path $entry.bytes $entry.sha256)
-    }
-    foreach ($job in $export.jobs)
-    {
-        if (!$paths.Contains($job)) { throw 'Shader job is absent from its export receipt.' }
-    }
+    $export = Get-ShaderExport $file.FullName
     $cooked = Join-Path $RepositoryRoot 'artifacts/dev/Projects/Showcase/Cooked/Shaders'
-    foreach ($binding in @(@('GlobalShaderMap.smap','globalShaderMapSha256'), @('CookedShaderLibrary.slib','cookedShaderLibrarySha256')))
+    $cookedFiles = @(foreach ($binding in @(@('GlobalShaderMap.smap','globalShaderMapSha256'), @('CookedShaderLibrary.slib','cookedShaderLibrarySha256')))
     {
-        if ((Get-FileHash -LiteralPath (Join-Path $cooked $binding[0])).Hash.ToLowerInvariant() -cne $export.($binding[1]))
+        $product = Get-LocalArtifactFile (Join-Path $cooked $binding[0]) ([long]::MaxValue)
+        if ((Get-FileHash -LiteralPath $product.FullName).Hash.ToLowerInvariant() -cne $export.($binding[1]))
         {
             throw 'Shader export does not match the final cooked products.'
         }
-    }
+        @{ Source = $product.FullName.Substring($RepositoryRoot.Length + 1).Replace('\','/')
+            Size = $product.Length; Sha256 = $export.($binding[1]) }
+    })
     return @{ Path = $file.FullName.Substring($RepositoryRoot.Length + 1).Replace('\','/')
         Size = $file.Length; Sha256 = (Get-FileHash -LiteralPath $file.FullName).Hash.ToLowerInvariant()
-        CompilerSha256 = $export.shaderCompilerExecutableSha256 }
+        CompilerSha256 = $export.shaderCompilerExecutableSha256; CookedFiles = $cookedFiles }
 }
 
 function Update-PackageSbom
@@ -77,14 +67,23 @@ function Freeze-PackageOutputs
         throw 'Shader export belongs to a different compiler executable.'
     }
 
-    $generated = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
-    foreach ($product in $Products) { [void] $generated.Add([IO.Path]::GetFullPath($product.Source)) }
+    $qualified = @{}
+    foreach ($product in $prepared) { $qualified[$product.Binary.Source] = $product.Binary }
+    foreach ($file in $shader.CookedFiles) { $qualified[$file.Source] = $file }
     foreach ($file in $Inputs.Files)
     {
+        Assert-ArtifactPath $file.Source
         $path = [IO.Path]::GetFullPath((Join-Path $RepositoryRoot $file.Source))
         $cooked = $file.Path.StartsWith('artifacts/dev/Projects/Showcase/Cooked/', [StringComparison]::Ordinal) -and $file.Role -ceq 'EngineContent' -and
             $file.Source.StartsWith('artifacts/dev/Projects/Showcase/Cooked/', [StringComparison]::Ordinal)
-        if ($generated.Contains($path) -or $cooked)
+        if ($qualified.ContainsKey($file.Source))
+        {
+            $identity = $qualified[$file.Source]
+            [void] (Assert-ArtifactFile $RepositoryRoot $file.Source $identity.Size $identity.Sha256)
+            $file.Size = $identity.Size
+            $file.Sha256 = $identity.Sha256
+        }
+        elseif ($cooked)
         {
             # Freeze prepared build/cook outputs once. External inputs stay pinned.
             $output = Get-LocalArtifactFile $path ([long]::MaxValue)

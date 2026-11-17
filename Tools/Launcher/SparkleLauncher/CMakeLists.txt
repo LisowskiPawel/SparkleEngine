@@ -146,6 +146,14 @@ target_link_libraries(SparkleLauncher
 )
 
 target_compile_features(SparkleLauncher PRIVATE cxx_std_20)
+sparkle_target_precompile_headers(SparkleLauncher
+    <filesystem>
+    <memory>
+    <string>
+    <vector>
+    <QString>
+    <QWidget>
+)
 
 # Cache the header-only parser only for its owning compilation unit.
 add_library(SparkleLauncherCli OBJECT Private/Startup/LauncherArguments.cpp)

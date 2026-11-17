@@ -54,7 +54,7 @@ sparkle_target_precompile_headers(SparkleCore
 # SparkleCore owns spdlog bootstrap, sink policy, and named logger lifetime.
 target_link_libraries(SparkleCore
     PUBLIC
-        spdlog::spdlog_header_only
+        spdlog::spdlog
 )
 
 if(WIN32)

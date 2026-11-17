@@ -1,6 +1,7 @@
 Set-StrictMode -Version Latest
 
 . (Join-Path $PSScriptRoot '../Artifacts/NativeSymbols.ps1')
+. (Join-Path $PSScriptRoot '../Artifacts/ShaderExport.ps1')
 
 function Get-GpuCrashIncident
 {
@@ -47,19 +48,9 @@ function Get-GpuCrashBundle
         if ((Get-FileHash -LiteralPath $candidate.($pair[0])).Hash.ToLowerInvariant() -cne $candidate.($pair[1])) { throw 'Candidate input changed.' }
     }
     $product = Get-Content -LiteralPath $candidate.productReceiptPath -Raw -Encoding UTF8 | ConvertFrom-Json
-    $bundle = Get-Content -LiteralPath $candidate.shaderExportPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $bundle = Get-ShaderExport $candidate.shaderExportPath
     $root = [IO.Path]::GetDirectoryName($candidate.shaderExportPath)
-    if ($bundle.scope -cne 'registered-catalog' -or @($bundle.files).Count -eq 0 -or @($bundle.files).Count -gt 65536) { throw 'Shader export membership is incomplete.' }
-    $names = @{}
-    foreach ($entry in $bundle.files)
-    {
-        Assert-ArtifactPath $entry.path
-        if ($names.ContainsKey($entry.path) -or $entry.sha256 -cnotmatch '^[a-f0-9]{64}$') { throw 'Invalid shader receipt.' }
-        $names[$entry.path] = $true
-        $file = Get-LocalArtifactFile (Join-Path $root $entry.path) 1073741824
-        if ($file.Length -ne $entry.bytes -or (Get-FileHash -LiteralPath $file.FullName).Hash.ToLowerInvariant() -cne $entry.sha256) { throw 'Shader bundle changed.' }
-    }
-    if (!$names.ContainsKey('product-receipt.json')) { throw 'Compiler source identity is absent.' }
+    if (@($bundle.files | Where-Object path -ceq 'product-receipt.json').Count -ne 1) { throw 'Compiler source identity is absent.' }
     $compiler = Get-Content -LiteralPath (Join-Path $root 'product-receipt.json') -Raw -Encoding UTF8 | ConvertFrom-Json
     foreach ($key in @('revision','sourceInputsSha256','dirtyPatchSha256'))
     {

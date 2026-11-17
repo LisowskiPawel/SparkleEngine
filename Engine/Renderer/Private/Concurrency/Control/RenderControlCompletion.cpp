@@ -1,4 +1,5 @@
 #include "Concurrency/Control/RenderControlCompletion.h"
+#include "Core/Public/Diagnostics/Logger.h"
 
 #include "Core/Public/Diagnostics/Verify.h"
 

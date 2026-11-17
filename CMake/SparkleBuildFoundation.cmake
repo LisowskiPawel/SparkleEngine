@@ -7,6 +7,24 @@ if(MSVC)
     add_link_options("$<$<CONFIG:ShippingEditor,ShippingGame>:/PDBALTPATH:$<TARGET_PDB_FILE_NAME:$<TARGET_PROPERTY:NAME>>>")
 endif()
 
+function(sparkle_enable_parallel_compilation target_name)
+    if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" OR NOT CMAKE_GENERATOR MATCHES "^Visual Studio ")
+        return()
+    endif()
+
+    # Keep the generated /Yc source serial; /MP is incompatible with PCH creation.
+    # Two compiler workers per project stay bounded with Launcher's four build workers.
+    get_target_property(_sources ${target_name} SOURCES)
+    foreach(_source IN LISTS _sources)
+        if(_source MATCHES "[.](cpp|cxx|cc)$")
+            get_source_file_property(_options "${_source}" TARGET_DIRECTORY ${target_name} COMPILE_OPTIONS)
+            if(NOT "/MP2" IN_LIST _options)
+                set_property(SOURCE "${_source}" TARGET_DIRECTORY ${target_name} APPEND PROPERTY COMPILE_OPTIONS /MP2)
+            endif()
+        endif()
+    endforeach()
+endfunction()
+
 function(sparkle_target_precompile_headers target_name)
     target_precompile_headers(${target_name} PRIVATE ${ARGN})
 

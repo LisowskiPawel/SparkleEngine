@@ -49,14 +49,25 @@ function Invoke-BaselineCheck
             $check.Reason = 'Owner exit code'
         }
     }
+    catch
+    {
+        $check.Status = 'FAILED'
+        $check.Reason = $_.Exception.Message
+    }
     finally
     {
         if ($null -ne $process)
         {
             if (!$process.HasExited)
             {
-                & "$env:SystemRoot/System32/taskkill.exe" /PID $process.Id /T /F | Out-Null
-                $process.WaitForExit()
+                & "$env:SystemRoot/System32/taskkill.exe" /PID $process.Id /T /F 2>$null | Out-Null
+                if (!$process.WaitForExit(5000))
+                {
+                    $check.Status = 'FAILED'
+                    $check.Reason = 'The owned process tree did not settle after termination.'
+                    $process.Dispose()
+                    throw $check.Reason
+                }
                 $check.ExitCode = $process.ExitCode
             }
             $process.Dispose()

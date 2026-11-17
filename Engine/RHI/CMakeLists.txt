@@ -48,6 +48,8 @@ add_library(SparkleRHICommon OBJECT
 )
 
 function(sparkle_configure_rhi_implementation_target target_name)
+    sparkle_enable_parallel_compilation(${target_name})
+
     target_include_directories(${target_name}
         PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/Public

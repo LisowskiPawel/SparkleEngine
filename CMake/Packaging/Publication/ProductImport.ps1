@@ -1,5 +1,7 @@
 Set-StrictMode -Version Latest
 
+. (Join-Path $PSScriptRoot '../../Artifacts/ArtifactIdentity.ps1')
+
 function Get-ProductReplacements
 {
     param([string] $RepositoryRoot, [string] $Transaction, [string] $Stage, $Manifest, [string[]] $Products)
@@ -27,17 +29,7 @@ function Get-ProductReplacements
     }
     foreach ($directory in @($directories | Select-Object -Unique))
     {
-        $destination = Join-Path $RepositoryRoot $directory
-        # Reject links before replacing an owned binary directory.
-        $current = [IO.Path]::GetFullPath($destination)
-        while ($current)
-        {
-            if ((Test-Path -LiteralPath $current) -and ((Get-Item -LiteralPath $current -Force).Attributes -band [IO.FileAttributes]::ReparsePoint))
-            {
-                throw 'Product sync output path contains a reparse point.'
-            }
-            $current = [IO.Path]::GetDirectoryName($current)
-        }
+        $destination = Resolve-LocalArtifactPath (Join-Path $RepositoryRoot $directory)
         $incoming = Join-Path $stage $directory
         if (!(Test-Path -LiteralPath $incoming -PathType Container)) { throw "Missing product output directory: '$directory'." }
         foreach ($file in Get-ChildItem -LiteralPath $incoming -Recurse -File -Force) { $file.IsReadOnly = $false }

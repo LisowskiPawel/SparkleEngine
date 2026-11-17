@@ -9,7 +9,7 @@ namespace SparkleLauncher
 {
 	static std::vector<std::string> GetDefaultBuildToolArguments()
 	{
-		return {"/nologo", "/v:minimal", "/m:1", "/p:UseMultiToolTask=false", "/nodeReuse:false"};
+		return {"/nologo", "/v:minimal", "/p:UseMultiToolTask=false", "/nodeReuse:false"};
 	}
 
 	static std::string ToCMakeBool(bool bValue)
@@ -83,6 +83,7 @@ namespace SparkleLauncher
 		process.LogPath = ResolveLauncherOperationLogPath(workspaceRoot, operationId, logFileName);
 		process.Arguments = {"--build", Strings::ToNarrow(outputs.BuildRoot.wstring()), "--config", std::string(profileName), "--target"};
 		process.Arguments.insert(process.Arguments.end(), targets.begin(), targets.end());
+		process.Arguments.insert(process.Arguments.end(), {"--parallel", "4"});
 		if (CMakeGeneratorUsesMsBuildArguments(toolchain.Generator))
 		{
 			process.Arguments.push_back("--");
@@ -125,6 +126,7 @@ namespace SparkleLauncher
 		process.WorkingDirectory = workspaceRoot;
 		process.LogPath = ResolveLauncherOperationLogPath(workspaceRoot, operationId, logFileName);
 		process.Arguments = {"--build", Strings::ToNarrow(outputs.LauncherBuildDirectory().wstring()), "--config", std::string(profileName), "--target", "SparkleLauncher"};
+		process.Arguments.insert(process.Arguments.end(), {"--parallel", "4"});
 		if (CMakeGeneratorUsesMsBuildArguments(toolchain.Generator))
 		{
 			process.Arguments.push_back("--");

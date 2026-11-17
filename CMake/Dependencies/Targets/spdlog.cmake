@@ -19,7 +19,11 @@ set(SPDLOG_BUILD_BENCH OFF CACHE BOOL "" FORCE)
 set(SPDLOG_BUILD_BENCH_HO OFF CACHE BOOL "" FORCE)
 set(SPDLOG_FMT_EXTERNAL OFF CACHE BOOL "" FORCE)
 
-sparkle_add_dependency_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
+function(sparkle_add_spdlog)
+    set(BUILD_SHARED_LIBS OFF)
+    sparkle_add_dependency_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
+endfunction()
+sparkle_add_spdlog()
 
 if(TARGET spdlog_header_only AND NOT TARGET spdlog::spdlog_header_only)
     add_library(spdlog::spdlog_header_only ALIAS spdlog_header_only)

@@ -38,6 +38,12 @@ target_include_directories(ToolSupport
 
 target_compile_features(ToolSupport PUBLIC cxx_std_20)
 target_link_libraries(ToolSupport PUBLIC SparkleCore)
+sparkle_target_precompile_headers(ToolSupport
+    <filesystem>
+    <string>
+    <string_view>
+    <vector>
+)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${TOOL_SUPPORT_PUBLIC_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${TOOL_SUPPORT_PRIVATE_SOURCES})

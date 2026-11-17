@@ -61,15 +61,8 @@ try
 {
     # This entry owns only the canonical workspace; it never deletes an earlier stage/archive.
     if ($BuildDirectory -ne (Join-Path $repositoryRoot 'build')) { throw 'Release packaging requires the canonical build directory.' }
-    $current = Get-Item -LiteralPath $repositoryRoot -Force
-    foreach ($part in @('artifacts','releases',$version))
-    {
-        if (($current.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'Reparse release output root.' }
-        $path = Join-Path $current.FullName $part
-        if (!(Test-Path -LiteralPath $path)) { [void] (New-Item -ItemType Directory -Path $path) }
-        $current = Get-Item -LiteralPath $path -Force
-    }
-    if (($current.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'Reparse release output root.' }
+    $outputRoot = Resolve-LocalArtifactPath $outputRoot
+    [void] [IO.Directory]::CreateDirectory($outputRoot)
     $lock = [IO.File]::Open((Join-Path $outputRoot 'package.lock'), [IO.FileMode]::OpenOrCreate, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
     [void] (New-Item -ItemType Directory -Path $transactionRoot)
     $revision = & git -C $repositoryRoot rev-parse HEAD

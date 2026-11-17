@@ -13,6 +13,7 @@
 #include "ToolWorkProgressWriter.h"
 
 #include <iostream>
+#include <exception>
 #include <ostream>
 #include <span>
 #include <string>
@@ -29,14 +30,14 @@ int CookShaders(const ShaderCookSettings& settings)
 	try
 	{
 		cookResult = CookGlobalShaders(settings, [&progressOutput](const ToolWorkProgressEvent& progress) { progressOutput.Report(progress); });
+		PrintSummary(cookResult, settings);
 	}
-	catch (const Diagnostics::Error& error)
+	catch (const std::exception& error)
 	{
 		ToolConsole::Message(std::cerr, ToolConsoleSeverity::Error, "Shader cook failed", {ToolConsole::QuotedField("reason", error.what())});
 		return kExitCodeCookFailure;
 	}
 
-	PrintSummary(cookResult, settings);
 	if (cookResult.output.entries.empty())
 	{
 		return kExitCodeNoWork;

@@ -18,6 +18,15 @@ target_include_directories(SparkleTasks
         ${CMAKE_CURRENT_SOURCE_DIR}/Private)
 target_compile_features(SparkleTasks PUBLIC cxx_std_20)
 target_link_libraries(SparkleTasks PRIVATE SparkleCore)
+sparkle_target_precompile_headers(SparkleTasks
+    <atomic>
+    <memory>
+    <mutex>
+    <stop_token>
+    <string>
+    <thread>
+    <vector>
+)
 if(WIN32)
     target_link_libraries(SparkleTasks PRIVATE advapi32)
 endif()
