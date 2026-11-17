@@ -7,8 +7,10 @@ function Get-ShaderExport
     param([string] $Path)
     $file = Get-LocalArtifactFile $Path 33554432
     $export = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
-    if ($export.scope -cne 'registered-catalog' -or !@($export.jobs).Count -or
-        !@($export.files).Count -or @($export.files).Count -gt 65536)
+    $fileCount = @($export.files).Count
+    $jobCount = @($export.jobs).Count
+    if ($export.scope -cne 'registered-catalog' -or $jobCount -eq 0 -or $jobCount -gt $fileCount -or
+        $fileCount -eq 0 -or $fileCount -gt 65536)
     {
         throw 'Shader export membership is incomplete.'
     }

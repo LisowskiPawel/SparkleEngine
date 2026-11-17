@@ -80,7 +80,7 @@ namespace FrameGraphTextureRegistration
 FrameGraphTextureHandle FrameGraph::ImportBackBuffer(const FrameGraphTextureDesc& desc, ResourceState initialState) noexcept
 {
 	const FrameGraphTextureDesc resolvedDesc = FrameGraphTextureRegistration::ResolveTextureDesc(desc, *m_window, "BackBuffer");
-	const auto existing = FindResource(resolvedDesc.name, FrameGraphResourceKind::BackBuffer, FrameGraphResourceOwnership::Imported);
+	const auto existing = FindResourceByName(resolvedDesc.name, FrameGraphResourceKind::BackBuffer, FrameGraphResourceOwnership::Imported);
 	if (existing.IsValid())
 	{
 		return FrameGraphTextureHandle{existing};
@@ -96,7 +96,7 @@ FrameGraphTextureHandle FrameGraph::ImportBackBuffer(const FrameGraphTextureDesc
 FrameGraphTextureHandle FrameGraph::ReservePersistentTexture(const FrameGraphTextureDesc& desc, ResourceState initialState) noexcept
 {
 	const FrameGraphTextureDesc resolvedDesc = FrameGraphTextureRegistration::ResolveTextureDesc(desc, *m_window, "PersistentTexture");
-	const auto existing = FindResource(resolvedDesc.name, FrameGraphTextureRegistration::ResolveTextureResourceKind(desc.kind), FrameGraphResourceOwnership::ExternalPersistent);
+	const auto existing = FindResourceByName(resolvedDesc.name, FrameGraphTextureRegistration::ResolveTextureResourceKind(desc.kind), FrameGraphResourceOwnership::ExternalPersistent);
 	if (existing.IsValid())
 	{
 		return FrameGraphTextureHandle{existing};
@@ -113,7 +113,7 @@ FrameGraphTextureHandle FrameGraph::CreateTexture(const FrameGraphTextureDesc& d
 {
 	const FrameGraphTextureDesc resolvedDesc = FrameGraphTextureRegistration::ResolveTextureDesc(desc, *m_window, "Texture");
 	const FrameGraphResourceKind kind = FrameGraphTextureRegistration::ResolveTextureResourceKind(desc.kind);
-	const auto existing = FindResource(resolvedDesc.name, kind, FrameGraphResourceOwnership::Transient);
+	const auto existing = FindResourceByName(resolvedDesc.name, kind, FrameGraphResourceOwnership::Transient);
 	if (existing.IsValid())
 	{
 		const auto& stored = m_resourceRegistry.GetMetadata(existing).textureDesc;
@@ -135,7 +135,7 @@ FrameGraphTextureHandle FrameGraph::CreateTexture(const FrameGraphTextureDesc& d
 FrameGraphBufferHandle FrameGraph::CreateBuffer(const FrameGraphBufferDesc& desc) noexcept
 {
 	const FrameGraphBufferDesc resolvedDesc = FrameGraphTextureRegistration::ResolveBufferDesc(desc, "Buffer");
-	const auto existing = FindResource(resolvedDesc.name, FrameGraphResourceKind::Buffer, FrameGraphResourceOwnership::Transient);
+	const auto existing = FindResourceByName(resolvedDesc.name, FrameGraphResourceKind::Buffer, FrameGraphResourceOwnership::Transient);
 	if (existing.IsValid())
 	{
 		const auto& stored = m_resourceRegistry.GetMetadata(existing).bufferDesc;
@@ -153,7 +153,7 @@ FrameGraphBufferHandle FrameGraph::CreateBuffer(const FrameGraphBufferDesc& desc
 FrameGraphBufferHandle FrameGraph::ReservePersistentBuffer(const FrameGraphBufferDesc& desc, ResourceState initialState) noexcept
 {
 	const FrameGraphBufferDesc resolvedDesc = FrameGraphTextureRegistration::ResolveBufferDesc(desc, "PersistentBuffer");
-	const auto existing = FindResource(resolvedDesc.name, FrameGraphResourceKind::Buffer, FrameGraphResourceOwnership::ExternalPersistent);
+	const auto existing = FindResourceByName(resolvedDesc.name, FrameGraphResourceKind::Buffer, FrameGraphResourceOwnership::ExternalPersistent);
 	if (existing.IsValid())
 	{
 		return FrameGraphBufferHandle{existing};

@@ -39,7 +39,7 @@ static void FailInvalidAccelerationStructureBinding(std::string_view operation, 
 FrameGraphAccelerationStructureHandle FrameGraph::ReservePersistentAccelerationStructure(std::string_view name, ResourceState initialState) noexcept
 {
 	const std::string resolvedName = ResolveName(name, "PersistentAccelerationStructure");
-	const auto existing = FindResource(resolvedName, FrameGraphResourceKind::AccelerationStructure, FrameGraphResourceOwnership::ExternalPersistent);
+	const auto existing = FindResourceByName(resolvedName, FrameGraphResourceKind::AccelerationStructure, FrameGraphResourceOwnership::ExternalPersistent);
 	if (existing.IsValid())
 	{
 		return FrameGraphAccelerationStructureHandle{existing};

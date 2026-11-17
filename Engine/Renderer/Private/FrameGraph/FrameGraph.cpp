@@ -102,7 +102,7 @@ void FrameGraph::UpdateTrackedResourceState(FrameGraphResourceHandle handle, Res
 	m_resourceStateTracker.UpdateCurrentState(handle, currentState);
 }
 
-FrameGraphResourceHandle FrameGraph::FindResource(std::string_view name, FrameGraphResourceKind kind, FrameGraphResourceOwnership ownership) const noexcept
+FrameGraphResourceHandle FrameGraph::FindResourceByName(std::string_view name, FrameGraphResourceKind kind, FrameGraphResourceOwnership ownership) const noexcept
 {
 	for (FrameGraphResourceHandle handle : m_resourceRegistry.GetRegisteredHandles())
 	{

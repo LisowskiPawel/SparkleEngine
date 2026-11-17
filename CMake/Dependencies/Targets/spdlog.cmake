@@ -22,21 +22,9 @@ set(SPDLOG_FMT_EXTERNAL OFF CACHE BOOL "" FORCE)
 function(sparkle_add_spdlog)
     set(BUILD_SHARED_LIBS OFF)
     sparkle_add_dependency_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
-endfunction()
-sparkle_add_spdlog()
-
-if(TARGET spdlog_header_only AND NOT TARGET spdlog::spdlog_header_only)
-    add_library(spdlog::spdlog_header_only ALIAS spdlog_header_only)
-endif()
-
-if(TARGET spdlog)
     set_target_properties(spdlog PROPERTIES FOLDER "ThirdParty")
     target_compile_definitions(spdlog PUBLIC FMT_CONSTEVAL=constexpr)
-endif()
-
-if(TARGET spdlog_header_only)
-    set_target_properties(spdlog_header_only PROPERTIES FOLDER "ThirdParty")
-    target_compile_definitions(spdlog_header_only INTERFACE FMT_CONSTEVAL=constexpr)
-endif()
+endfunction()
+sparkle_add_spdlog()
 
 sparkle_log_dependency_ready("spdlog" "${spdlog_SOURCE_DIR}" "~3 MB")

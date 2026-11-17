@@ -3,6 +3,7 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Pipeline/PipelineMaterialization.h"
+#include "RHI/Public/Bindings/RenderBindingLayout.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 #include "RHI/Public/ShaderParameters/PassParameterLayout.h"
 #include "RHI/Public/Shaders/ShaderParameterLayoutBuilder.h"

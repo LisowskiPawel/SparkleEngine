@@ -33,7 +33,7 @@ private:
 	struct ReadView;
 
 	static std::shared_ptr<ReadView> BuildReadView(std::span<D3D12GpuAllocationRecord* const> records);
-	static const ResourceEntry* FindResource(const ReadView& readView, RhiResourceHandle resource) noexcept;
+	static const ResourceEntry* FindResourceEntry(const ReadView& readView, RhiResourceHandle resource) noexcept;
 	static void RetainReference(D3D12GpuAllocationRecord& record) noexcept;
 	static void ReleaseReference(D3D12GpuAllocationRecord& record) noexcept;
 	static void ReleaseReference(D3D12GpuAllocationRecord& record, RhiSubmissionToken submissionToken) noexcept;

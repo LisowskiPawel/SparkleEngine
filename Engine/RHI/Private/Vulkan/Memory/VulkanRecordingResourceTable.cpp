@@ -60,7 +60,7 @@ bool VulkanRecordingResourceTable::Resolve(RhiResourceHandle resource, VulkanRec
 		return false;
 	}
 
-	const ResourceEntry* const entry = FindResource(*readView, resource);
+	const ResourceEntry* const entry = FindResourceEntry(*readView, resource);
 	if (entry == nullptr)
 	{
 		return false;
@@ -109,7 +109,7 @@ VulkanRecordingResourceUseToken VulkanRecordingResourceTable::Retain(RhiResource
 		return {};
 	}
 
-	const ResourceEntry* const entry = FindResource(*readView, resource);
+	const ResourceEntry* const entry = FindResourceEntry(*readView, resource);
 	return entry != nullptr && entry->Record != nullptr ? Retain(*entry->Record) : VulkanRecordingResourceUseToken{};
 }
 
@@ -182,7 +182,7 @@ void VulkanRecordingResourceTable::BuildAddressProjections(ReadView& readView)
 	}
 }
 
-const VulkanRecordingResourceTable::ResourceEntry* VulkanRecordingResourceTable::FindResource(const ReadView& readView, RhiResourceHandle resource) noexcept
+const VulkanRecordingResourceTable::ResourceEntry* VulkanRecordingResourceTable::FindResourceEntry(const ReadView& readView, RhiResourceHandle resource) noexcept
 {
 	if (!resource)
 	{

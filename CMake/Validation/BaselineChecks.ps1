@@ -60,6 +60,7 @@ function Invoke-BaselineCheck
         {
             if ($null -ne $process -and !$process.HasExited)
             {
+                # A process can exit before taskkill reaches it; confirm settlement below.
                 & {
                     $ErrorActionPreference = 'Continue'
                     & "$env:SystemRoot/System32/taskkill.exe" /PID $process.Id /T /F 2>&1 | Out-Null

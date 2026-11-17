@@ -49,7 +49,7 @@ D3D12RecordingResourceUseToken D3D12RecordingResourceTable::Retain(RhiResourceHa
 		return {};
 	}
 
-	const ResourceEntry* const entry = FindResource(*readView, resource);
+	const ResourceEntry* const entry = FindResourceEntry(*readView, resource);
 	return entry != nullptr && entry->Record != nullptr ? Retain(*entry->Record) : D3D12RecordingResourceUseToken{};
 }
 
@@ -93,7 +93,7 @@ std::shared_ptr<D3D12RecordingResourceTable::ReadView> D3D12RecordingResourceTab
 	return readView;
 }
 
-const D3D12RecordingResourceTable::ResourceEntry* D3D12RecordingResourceTable::FindResource(const ReadView& readView, RhiResourceHandle resource) noexcept
+const D3D12RecordingResourceTable::ResourceEntry* D3D12RecordingResourceTable::FindResourceEntry(const ReadView& readView, RhiResourceHandle resource) noexcept
 {
 	if (!resource)
 	{

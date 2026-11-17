@@ -304,7 +304,7 @@ private:
 	void CommitTextureHistories() const noexcept;
 	void ReleaseTextureHistories() noexcept;
 	FrameGraphResourceHandle AllocateDynamicResourceHandle() noexcept;
-	FrameGraphResourceHandle FindResource(std::string_view name, FrameGraphResourceKind kind, FrameGraphResourceOwnership ownership) const noexcept;
+	FrameGraphResourceHandle FindResourceByName(std::string_view name, FrameGraphResourceKind kind, FrameGraphResourceOwnership ownership) const noexcept;
 
 	struct TextureHistoryRecord
 	{
