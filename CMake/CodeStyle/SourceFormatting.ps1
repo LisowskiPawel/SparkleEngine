@@ -47,9 +47,9 @@ function ConvertTo-CanonicalShaderText
     return $canonicalText
 }
 
-function Test-ClangFormatChanges
+function Test-ClangFormatReplacements
 {
-    param([string] $RepositoryRoot, [string[]] $Paths, [string] $ReplacementXml)
+    param([string] $RepositoryRoot, [string[]] $Paths, [string] $ReplacementXml, [switch] $BracesOnly)
 
     $documents = @([regex]::Split($ReplacementXml, '(?=<\?xml)') | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
     if ($documents.Count -ne $Paths.Count)
@@ -71,66 +71,33 @@ function Test-ClangFormatChanges
 
         foreach ($replacement in $document.SelectNodes('/replacements/replacement'))
         {
+            if ($BracesOnly -and $replacement.InnerText -notmatch '[{}]') { continue }
             $offset = [int] $replacement.offset
             $length = [int] $replacement.length
             $existing = [Text.Encoding]::UTF8.GetString($bytes, $offset, $length)
-            if ($existing -ceq $replacement.InnerText)
+            $proposed = $replacement.InnerText
+            if ($BracesOnly)
+            {
+                $existing = [regex]::Replace($existing, '\s', '')
+                $proposed = [regex]::Replace($proposed, '\s', '')
+            }
+            if ($existing -ceq $proposed)
             {
                 continue
             }
 
-            [Console]::Error.WriteLine("${relativePath}: code should be clang-formatted")
+            if ($BracesOnly)
+            {
+                $lineNumber = [Text.Encoding]::UTF8.GetString($bytes, 0, $offset).Split("`n").Length
+                [Console]::Error.WriteLine("${relativePath}:${lineNumber}: control-flow bodies require explicit braces; repair the source before formatting")
+            }
+            else { [Console]::Error.WriteLine("${relativePath}: code should be clang-formatted") }
             $changed = $true
             break
         }
     }
 
     return $changed
-}
-
-function Test-ControlFlowBraces
-{
-    param([string] $RepositoryRoot, [string[]] $Paths, [string] $ReplacementXml)
-
-    $documents = @([regex]::Split($ReplacementXml, '(?=<\?xml)') | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-    if ($documents.Count -ne $Paths.Count)
-    {
-        throw "clang-format returned an unexpected brace-check document count."
-    }
-
-    $missingBraces = $false
-    for ($fileIndex = 0; $fileIndex -lt $Paths.Count; ++$fileIndex)
-    {
-        $relativePath = $Paths[$fileIndex]
-        $document = [xml] $documents[$fileIndex]
-        if ($document.replacements.incomplete_format -eq "true")
-        {
-            throw "${relativePath}: clang-format could not complete the brace check."
-        }
-
-        foreach ($replacement in $document.SelectNodes('/replacements/replacement'))
-        {
-            if ($replacement.InnerText -notmatch '[{}]')
-            {
-                continue
-            }
-
-            $bytes = [IO.File]::ReadAllBytes((Join-Path $repositoryRoot $relativePath))
-            $offset = [int] $replacement.offset
-            $existing = [Text.Encoding]::UTF8.GetString($bytes, $offset, [int] $replacement.length)
-            if ([regex]::Replace($existing, '\s', '') -ceq [regex]::Replace($replacement.InnerText, '\s', ''))
-            {
-                continue
-            }
-
-            $lineNumber = [Text.Encoding]::UTF8.GetString($bytes, 0, $offset).Split("`n").Length
-            [Console]::Error.WriteLine("${relativePath}:${lineNumber}: control-flow bodies require explicit braces; repair the source before formatting")
-            $missingBraces = $true
-            break
-        }
-    }
-
-    return $missingBraces
 }
 
 function Invoke-CppFormatting
@@ -175,7 +142,7 @@ function Invoke-CppFormatting
                 {
                     $formatFailed = $true
                 }
-                elseif (Test-ClangFormatChanges -RepositoryRoot $RepositoryRoot -Paths $batch -ReplacementXml ($replacementLines -join "`n"))
+                elseif (Test-ClangFormatReplacements -RepositoryRoot $RepositoryRoot -Paths $batch -ReplacementXml ($replacementLines -join "`n"))
                 {
                     $formatFailed = $true
                 }
@@ -185,7 +152,7 @@ function Invoke-CppFormatting
                 {
                     $formatFailed = $true
                 }
-                elseif (Test-ControlFlowBraces -RepositoryRoot $RepositoryRoot -Paths $batch -ReplacementXml ($braceLines -join "`n"))
+                elseif (Test-ClangFormatReplacements -RepositoryRoot $RepositoryRoot -Paths $batch -ReplacementXml ($braceLines -join "`n") -BracesOnly)
                 {
                     $formatFailed = $true
                 }

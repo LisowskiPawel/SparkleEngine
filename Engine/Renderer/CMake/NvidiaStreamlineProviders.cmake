@@ -56,6 +56,7 @@ target_include_directories(SparkleRendererNvidiaStreamlineProviders
 )
 
 target_compile_features(SparkleRendererNvidiaStreamlineProviders PUBLIC cxx_std_20)
+sparkle_enable_parallel_compilation(SparkleRendererNvidiaStreamlineProviders)
 
 target_link_libraries(SparkleRendererNvidiaStreamlineProviders
     PUBLIC
