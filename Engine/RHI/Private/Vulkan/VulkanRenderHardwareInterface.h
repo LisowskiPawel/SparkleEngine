@@ -2,6 +2,14 @@
 
 #include "Device/RenderHardwareInterface.h"
 #include "Vulkan/VulkanIncludes.h"
+#include "RHI/Public/Commands/RenderCommandList.h"
+#include "RHI/Public/Commands/RhiQueue.h"
+#include "RHI/Public/Core/RhiCapabilities.h"
+#include "RHI/Public/Interop/RhiNativeHandles.h"
+#include "RHI/Public/RayTracing/RhiAccelerationStructureDesc.h"
+#include "RHI/Public/RayTracing/RhiRayTracingDesc.h"
+#include "RHI/Public/RayTracing/RhiTlasDesc.h"
+#include "RHI/Public/Resources/RhiResourceHandles.h"
 
 #include <cstdint>
 #include <memory>

@@ -2,7 +2,6 @@
 
 #include "../Memory/RhiMemoryTypes.h"
 #include "../Resources/RhiResourceDesc.h"
-#include "../Resources/RhiResourceView.h"
 #include "../RHIAPI.h"
 #include "RhiResourceHandles.h"
 

@@ -2,6 +2,7 @@
 
 #include "Device/RenderHardwareInterface.h"
 #include "D3D12RootSignature.h"
+#include "RHI/Public/Pipeline/RhiPipelineDesc.h"
 
 #include <cstdint>
 #include <span>

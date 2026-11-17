@@ -609,7 +609,7 @@ function(sparkle_boundary_scan_file absolute_path)
 
         if(_relative_path MATCHES "^Engine/" AND
            (_line MATCHES "^[ \t]*#[ \t]*include[ \t]*[<\"].*(Tools/|SparkleLauncher/|ToolConsole[.]h|ToolWorkProgress|ShaderCompiler/)" OR
-            (_relative_path MATCHES "/CMakeLists[.]txt$" AND
+            (_relative_path MATCHES "(/CMakeLists[.]txt|[.]cmake)$" AND
              _line MATCHES "(^|[ \t;(])(ToolSupport|SparkleLauncher(Core)?|ShaderCompiler|AssetCooker|TextureCooker|SceneCooker|MaterialCooker|MeshCooker|SourceImporters)([ \t;)]|$)")))
             sparkle_boundary_append_failure(
                 "ENGINE_NO_HOST_TOOL_DEPENDENCY"

@@ -5,6 +5,8 @@
 #include "Formats/PixelFormat.h"
 #include "Presentation/RhiPresentationDefaults.h"
 #include "Vulkan/VulkanIncludes.h"
+#include "RHI/Public/Resources/RhiResourceDesc.h"
+#include "RHI/Public/Resources/RhiResourceHandles.h"
 
 #include <cstdint>
 #include <vector>

@@ -5,6 +5,7 @@
 #include "Vulkan/Diagnostics/VulkanDebugEvents.h"
 #include "Vulkan/Memory/VulkanRecordingResource.h"
 #include "Vulkan/VulkanIncludes.h"
+#include "RHI/Public/Bindings/RenderBindingLayout.h"
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "Diagnostics/GpuCrash/GpuCrashSession.h"
 #endif

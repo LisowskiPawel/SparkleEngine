@@ -3,6 +3,7 @@
 #include "../RHIAPI.h"
 #include "ShaderBytecode.h"
 #include "ShaderMap.h"
+#include "ShaderReflection.h"
 
 #include <cstdint>
 #include <filesystem>

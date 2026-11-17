@@ -21,7 +21,6 @@ function(sparkle_stage_msvc_runtime target_name)
         set_property(TARGET ${target_name} PROPERTY
             SPARKLE_MSVC_RUNTIME_FILES "${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}")
     endif()
-
 endfunction()
 
 function(sparkle_stage_d3d12_pix_event_runtime product_target)

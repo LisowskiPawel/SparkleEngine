@@ -3,6 +3,11 @@
 #include "Formats/CompareOp.h"
 #include "Formats/PixelFormat.h"
 #include "Device/RenderHardwareInterface.h"
+#include "RHI/Public/Descriptors/RhiDescriptorHandles.h"
+#include "RHI/Public/Interop/ResourceState.h"
+#include "RHI/Public/Interop/RhiNativeHandles.h"
+#include "RHI/Public/Resources/RhiResourceDesc.h"
+#include "RHI/Public/Resources/RhiResourceHandles.h"
 
 #include <d3d12.h>
 #include <dxgi1_6.h>

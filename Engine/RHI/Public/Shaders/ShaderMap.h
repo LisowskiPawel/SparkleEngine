@@ -2,7 +2,6 @@
 
 #include "../RHIAPI.h"
 #include "../ShaderParameters/ShaderParameterSemantics.h"
-#include "ShaderReflection.h"
 #include "ShaderStage.h"
 #include "ShaderTarget.h"
 

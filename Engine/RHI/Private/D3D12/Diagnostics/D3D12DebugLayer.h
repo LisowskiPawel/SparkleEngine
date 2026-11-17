@@ -1,4 +1,5 @@
 #pragma once
+#include "RHI/Public/Diagnostics/RhiDiagnostics.h"
 
 #if ENGINE_GPU_VALIDATION || SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "Device/RenderHardwareInterface.h"

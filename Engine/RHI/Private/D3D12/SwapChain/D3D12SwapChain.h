@@ -10,6 +10,7 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <wrl/client.h>
+#include "RHI/Public/Resources/RhiResourceDesc.h"
 
 #include "Frame/RhiFrameConstants.h"
 #include "D3D12/Descriptors/D3D12DescriptorHandle.h"

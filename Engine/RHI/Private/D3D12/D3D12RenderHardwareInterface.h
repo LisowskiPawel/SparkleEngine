@@ -3,6 +3,14 @@
 #include "D3D12/Descriptors/D3D12DescriptorHandle.h"
 #include "D3D12/Memory/D3D12RecordingResourceUseToken.h"
 #include "Device/RenderHardwareInterface.h"
+#include "RHI/Public/Commands/RenderCommandList.h"
+#include "RHI/Public/Commands/RhiQueue.h"
+#include "RHI/Public/Descriptors/RhiDescriptorHandles.h"
+#include "RHI/Public/Interop/RhiNativeHandles.h"
+#include "RHI/Public/RayTracing/RhiAccelerationStructureDesc.h"
+#include "RHI/Public/RayTracing/RhiRayTracingDesc.h"
+#include "RHI/Public/RayTracing/RhiTlasDesc.h"
+#include "RHI/Public/Resources/RhiResourceHandles.h"
 
 #include <cstdint>
 #include <memory>

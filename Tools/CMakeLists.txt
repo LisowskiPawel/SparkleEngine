@@ -23,10 +23,6 @@ if(SPARKLE_ENABLE_SHADER_COMPILER)
 	list(APPEND SPARKLE_COOK_TOOL_TARGETS ShaderCompiler)
 endif()
 
-if(SPARKLE_COOK_TOOL_TARGETS)
-	add_custom_target(SparkleCookTools DEPENDS ${SPARKLE_COOK_TOOL_TARGETS})
-else()
-	add_custom_target(SparkleCookTools)
-endif()
+add_custom_target(SparkleCookTools DEPENDS ${SPARKLE_COOK_TOOL_TARGETS})
 
 sparkle_configure_host_tool_target(SparkleCookTools)

@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <memory>
 #include <span>
+#include "RHI/Public/RayTracing/RhiRayTracingDesc.h"
 
 #include "Commands/RhiQueue.h"
 #include "D3D12/RayTracing/D3D12NvapiRayTracingProvider.h"

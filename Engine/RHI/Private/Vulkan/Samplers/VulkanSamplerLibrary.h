@@ -2,6 +2,8 @@
 
 #include "Device/RenderHardwareInterface.h"
 #include "Vulkan/VulkanIncludes.h"
+#include "RHI/Public/Descriptors/RhiDescriptorHandles.h"
+#include "RHI/Public/Samplers/RhiSamplerDesc.h"
 
 #include <vector>
 

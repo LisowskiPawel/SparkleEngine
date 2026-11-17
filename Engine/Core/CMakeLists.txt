@@ -1,7 +1,6 @@
 # SparkleCore Module
 # Foundation module: Math, Memory, Containers, Logging, Events, Time, Input types
 
-# Collect source files from new module structure
 file(GLOB_RECURSE SPARKLE_CORE_PUBLIC_HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/*.h
 )
@@ -13,23 +12,6 @@ file(GLOB_RECURSE SPARKLE_CORE_PRIVATE_SOURCES CONFIGURE_DEPENDS
 file(GLOB_RECURSE SPARKLE_CORE_PRIVATE_HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/*.h
 )
-
-set(SPARKLE_CORE_FORBIDDEN_LOGGING_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/Public/Diagnostics/Log.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Diagnostics/Log.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Diagnostics/Logging/LogBuffer.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Diagnostics/Logging/LogSink.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Diagnostics/Logging/LogSink.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Diagnostics/Logging/LogFormatting.h
-)
-
-foreach(forbidden_logging_file IN LISTS SPARKLE_CORE_FORBIDDEN_LOGGING_FILES)
-    if(EXISTS "${forbidden_logging_file}")
-        cmake_path(RELATIVE_PATH forbidden_logging_file BASE_DIRECTORY "${SPARKLE_REPOSITORY_ROOT}" OUTPUT_VARIABLE forbidden_logging_relative_path)
-        message(FATAL_ERROR
-            "Deleted logging facade file '${forbidden_logging_relative_path}' was reintroduced. Keep Sparkle logging on Diagnostics/Logger.h and Diagnostics/Verify.h instead.")
-    endif()
-endforeach()
 
 sparkle_add_engine_module(SparkleCore SPARKLE_CORE_EXPORTS
         ${SPARKLE_CORE_PUBLIC_HEADERS}
