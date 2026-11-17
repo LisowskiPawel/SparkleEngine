@@ -4,6 +4,7 @@
 #include "RayTracing/RayTracingPipelineComposition.h"
 #include "RHI/Public/RayTracing/RhiRayTracingPipelineDesc.h"
 #include "RHI/Public/ShaderParameters/PassParameterLayout.h"
+#include "RHI/Public/Shaders/ResolvedShader.h"
 
 #include <cstdint>
 #include <memory>

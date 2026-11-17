@@ -1,6 +1,10 @@
 #pragma once
 
-#include "ShaderParameterStructBuilder.h"
+#if defined(SPARKLE_SHADER_CONTRACTS_ONLY)
+  #include "ShaderParameterFields.h"
+#else
+  #include "ShaderParameterStructBuilder.h"
+#endif
 #include "RHI/Public/Shaders/Authoring/ShaderParameterStruct.h"
 
 #include <cstddef>

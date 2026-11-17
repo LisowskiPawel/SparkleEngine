@@ -4,6 +4,7 @@
 #include "Cooking/CookedTextureAssetWriter.h"
 #include "Cooking/TextureCookMemoryLimiter.h"
 #include "Processing/TextureProcessor.h"
+#include "SourceLoading/TextureSource.h"
 
 void CookTextureAsset(const TextureCookRequest& request, TextureCookMemoryLimiter& memoryLimiter, TextureCookMemoryLimiter& sourceMemory, std::stop_token cancellation)
 {

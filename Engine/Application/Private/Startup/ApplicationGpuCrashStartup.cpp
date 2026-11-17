@@ -59,7 +59,7 @@ GpuCrashStartup ResolveGpuCrashStartup()
 	}
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	GpuCrashStartup startup;
-	startup.ShaderExport = Strings::ToWide(std::string_view{options.at("--shader-export")});
+	startup.ShaderExport = Strings::ToWide(options.at("--shader-export"));
 	startup.SessionId = options.contains("--gpu-crash-session") ? options.at("--gpu-crash-session") : Identifiers::CreateUuidV4String();
 	const bool bInvalidCrashStartupShaderExport = !startup.ShaderExport.is_absolute() || startup.ShaderExport.filename() != "shader-export.json";
 	const bool bInvalidGpuCrashStartup = bInvalidCrashStartupShaderExport || (!Identifiers::IsUuidV4String(startup.SessionId));

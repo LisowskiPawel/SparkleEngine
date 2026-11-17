@@ -2,10 +2,7 @@
 
 #include <cstddef>
 
-// Lightweight non-owning view of cooked shader bytecode. Lives in RHI public
-// because the cooked code library returns it; the offline compile result
-// type that previously co-located here moved out of RHI public into the
-// offline shader-cooking tool's public surface.
+// Non-owning view of cooked shader bytes. The owning library must outlive the view.
 struct ShaderBytecode
 {
 	const void* Data = nullptr;

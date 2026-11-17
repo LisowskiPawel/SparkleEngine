@@ -115,8 +115,8 @@ These extensions follow release and their required inputs; [Roadmap](Roadmap.md#
 
 - **Reconstruction:** one RELAX diffuse/specular temporal path, with quality, time, memory, motion, native-API and delivery results. The owned CNN is independent of this work.
 - **SHaRC:** bounded diffuse update/resolve/query with cold starts, resets, moving scenes, capacity and cache misses. Continue uncached paths on misses and measure benefit, GPU safety, package behavior and reproduction. Media/sharp-specular caching and streaming are outside scope.
-- **NRC:** actual online learning/coupling, adaptation and bias measurements, compared with SHaRC and uncached transport on the same domain. Complete SHaRC, including reproduction, before NRC production.
-- **Neural texture compression:** cooked latent materials and on-sample decode, filtering/LOD/material fidelity, BCn comparison and memory/compute tradeoffs, followed by native-API and delivery checks. It requires the classical-study results, not NRC completion.
+- **NRC:** actual online learning/coupling, adaptation and bias measurements, compared with SHaRC and uncached transport on the same domain.
+- **Neural texture compression:** cooked latent materials and on-sample decode, filtering/LOD/material fidelity, BCn comparison and memory/compute tradeoffs, followed by native-API and delivery checks.
 
 ### Acceleration structures and volumes
 
@@ -178,19 +178,10 @@ A warmed Bistro scene switch aims to avoid hitches above 50 ms; report cold load
 
 ## Source map
 
-Application hosts the world and renderer. GameFramework publishes immutable input; Renderer prepares scene/view/frame work; RHI implements neutral GPU operations through D3D12/Vulkan.
+Application hosts the world and renderer. GameFramework publishes immutable input; [Renderer](../Engine/Renderer) prepares scene/view/frame work; [RHI](../Engine/RHI) implements GPU operations through D3D12/Vulkan. [Module ownership and placement](Engineering.md#file-placement) describes the supporting systems.
 
-| Source | Responsibility |
-| --- | --- |
-| [Renderer](../Engine/Renderer), [shader sources](../Engine/Assets/Shaders) | Rendering policy, passes and shader implementation |
-| [RHI](../Engine/RHI) | GPU resources, pipelines, recording, synchronization and native backends |
-| [GameFramework](../Engine/GameFramework), [Tasks](../Engine/Tasks) | World updates, immutable publication and shared execution |
-| [Core](../Engine/Core) | Low-level utilities and contracts |
-| [Application](../Engine/Application), [Editor](../Engine/Editor) | Hosting, settings, inspection and typed edits |
-| [Tools](../Tools) | Source import, cooking, compilation and Launcher |
+Shader [passes](../Engine/Assets/Shaders/Passes) own entry points and pass-specific resources. Shared [material rules](../Engine/Assets/Shaders/Material) and [color mathematics](../Engine/Assets/Shaders/Common/Color.hlsli) stay independent of passes. Match CPU upload records and shader layouts at their shared boundary.
 
-Shader [passes](../Engine/Assets/Shaders/Passes) own their entry points and pass-specific resources, including [raster material sampling](../Engine/Assets/Shaders/Passes/GBuffer/Raster/RasterMaterial.hlsli). Shared [material rules](../Engine/Assets/Shaders/Material) and [color mathematics](../Engine/Assets/Shaders/Common/Color.hlsli) stay independent of passes. Ray-tracing buffer records and flags live in [RayTracingHitData.hlsli](../Engine/Assets/Shaders/RayTracing/RayTracingHitData.hlsli), matched by the [Renderer upload layout](../Engine/Renderer/Private/RayTracing/RayTracingHitData.h); reconstructed surfaces carry evaluated shading results.
-
-The showcase runs typed camera, animation, transform and extraction work through Tasks. ECS uses generational entity IDs and fixed typed component storage. Structural edits wait for workers; updates and extraction finish before immutable publication. Animation-only updates preserve the Editor snapshot, and read views distinguish scene changes from new publications so normal updates preserve edit history and viewport navigation.
+World updates and extraction finish before immutable publication; structural edits wait for workers. Animation-only publication preserves edit history and viewport navigation.
 
 Shader compilation uses Launcher Cook or Editor **Recompile Shaders** / `CompileShaders [symbols]`. `ReloadShaders` reloads existing output. Dependency-directed Apply Changed is unfinished. See [References](References.md) for papers and SDK guides.

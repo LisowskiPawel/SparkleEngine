@@ -141,11 +141,6 @@ namespace Strings
 #endif
 	}
 
-	std::wstring ToWide(const std::filesystem::path& path)
-	{
-		return path.wstring();
-	}
-
 	std::string ToNarrow(std::wstring_view str)
 	{
 		if (str.empty())

@@ -41,7 +41,7 @@ static void AppendDefines(const std::vector<std::string>& defines, std::vector<s
 	wDefines.clear();
 	for (const auto& def : defines)
 	{
-		wDefines.push_back(Strings::ToWide(std::string_view{def}));
+		wDefines.push_back(Strings::ToWide(def));
 	}
 	for (const auto& def : wDefines)
 	{

@@ -211,7 +211,7 @@ namespace SparkleLauncher
 			return {};
 		}
 		const std::string value = root->as<std::string>();
-		return Strings::ToWide(std::string_view(value));
+		return Strings::ToWide(value);
 	}
 
 	static std::vector<std::string> PrepareLauncherArguments(const CLI::App& app, int argc, char** argv)

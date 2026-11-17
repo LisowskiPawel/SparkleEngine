@@ -5,8 +5,6 @@
 #include <cstddef>
 #include <charconv>
 #include <cstdint>
-#include <filesystem>
-#include <memory>
 #include <span>
 #include <string>
 #include <string_view>
@@ -46,14 +44,13 @@ namespace Strings
 			return false;
 		}
 
-		const char* begin = std::to_address(trimmed.begin());
-		const char* end = std::to_address(trimmed.end());
+		const char* begin = trimmed.data();
+		const char* end = begin + trimmed.size();
 		const std::from_chars_result result = std::from_chars(begin, end, outValue);
 		return result.ec == std::errc{} && result.ptr == end;
 	}
 
 	// UTF-8 <-> native wide text; invalid encoding throws std::invalid_argument.
 	SPARKLE_CORE_API std::wstring ToWide(std::string_view str);
-	SPARKLE_CORE_API std::wstring ToWide(const std::filesystem::path& path);
 	SPARKLE_CORE_API std::string ToNarrow(std::wstring_view str);
 }

@@ -69,7 +69,7 @@ namespace SparkleLauncher
 					{
 						return {};
 					}
-					manifest = Strings::ToWide(std::string_view{path});
+					manifest = Strings::ToWide(path);
 				}
 				catch (const std::exception&)
 				{

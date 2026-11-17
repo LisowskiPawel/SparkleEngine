@@ -33,6 +33,7 @@ set(FETCHCONTENT_BASE_DIR "${_sparkle_canonical_build_root}/_deps" CACHE PATH
 
 set(_sparkle_legacy_generated_paths
     "${SPARKLE_REPOSITORY_ROOT}/Saved"
+    "${SPARKLE_REPOSITORY_ROOT}/logs"
     "${SPARKLE_REPOSITORY_ROOT}/imgui.ini"
     "${SPARKLE_REPOSITORY_ROOT}/CMakeCache.txt"
     "${SPARKLE_REPOSITORY_ROOT}/CMakeFiles"
@@ -84,15 +85,6 @@ if(_sparkle_existing_legacy_generated_paths)
         "Legacy generated paths exist outside Sparkle's owned output roots:\n  - ${_sparkle_legacy_path_list}\n"
         "Use SparkleLauncher cleanup after preserving any wanted captures. New builds must write only to build/, artifacts/, "
         "or the documented per-user state root.")
-endif()
-
-# A launcher built before the per-user logging cutover creates repository-root
-# logs while bootstrapping its replacement. Keep this path visible and warn, but
-# do not strand that one-way self-update route with a configure failure.
-if(EXISTS "${SPARKLE_REPOSITORY_ROOT}/logs")
-    message(WARNING
-        "Legacy repository logs exist at '${SPARKLE_REPOSITORY_ROOT}/logs'. The current launcher can finish its self-update, then "
-        "the Launcher Logs cleanup removes this transition output. Newly built processes write logs beneath the per-user state root.")
 endif()
 
 if(SPARKLE_ARTIFACT_VARIANT AND NOT SPARKLE_ARTIFACT_VARIANT MATCHES "^[A-Za-z0-9._-]+$")

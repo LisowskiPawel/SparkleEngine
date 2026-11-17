@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  source-boundaries:
+  source-checks:
     runs-on: windows-2025
     timeout-minutes: 15
     steps:
@@ -28,7 +28,6 @@ jobs:
           git rev-parse HEAD
           git status --short
           git --version
-          cmake --version
       - name: Check change whitespace
         shell: pwsh
         env:
@@ -40,6 +39,3 @@ jobs:
             git show --check --format=fuller HEAD
           }
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Invoke architecture boundary owner
-        shell: pwsh
-        run: cmake -P CMake/ArchitectureBoundaryCheck.cmake

@@ -221,7 +221,7 @@ private:
 		    .bAllowUnorderedAccess = false};
 
 		const D3D12_RESOURCE_DESC nativeReadbackDesc = D3D12TypeConversions::BuildBufferResourceDesc(readbackBufferDesc);
-		const std::wstring queueName = Strings::ToWide(std::string_view(RhiQueueTypeToString(queueType)));
+		const std::wstring queueName = Strings::ToWide(RhiQueueTypeToString(queueType));
 		const std::wstring readbackName = std::wstring(L"D3D12TimestampReadback_") + queueName + L"_Frame" + std::to_wstring(frameIndex);
 
 		auto readbackAllocation = m_rhi.GetMemoryAllocator()

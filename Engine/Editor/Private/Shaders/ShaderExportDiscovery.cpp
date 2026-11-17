@@ -116,7 +116,7 @@ static bool ReadExportShader(std::string_view text, ShaderTarget target, ShaderD
 
 static bool ResolveExportRequest(const std::filesystem::path& cookDirectory, const std::string& name, std::filesystem::path& request)
 {
-	const std::filesystem::path relative(Strings::ToWide(std::string_view{name}));
+	const std::filesystem::path relative(Strings::ToWide(name));
 	const bool bInvalidRoot = relative.has_root_path() || relative.filename() != "compile-request.json";
 	const bool bInvalidName = name.find(':') != std::string::npos || name.find('\0') != std::string::npos;
 	const bool bTraversal = std::any_of(relative.begin(), relative.end(), [](const auto& component) { return component == ".."; });

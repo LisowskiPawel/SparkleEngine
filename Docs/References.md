@@ -2,12 +2,12 @@
 
 [Documentation](README.md) | [Rendering](Rendering.md)
 
-Papers, SDK guides and examples used in the project. Pinned links identify the studied revision; check current prerequisites, licenses and fixes before using the code.
+Sources behind the project guides, including dated role and professional studies. Pinned links identify the studied revision; check current prerequisites, licenses and fixes before reuse. Project rules and decisions remain in their owning guides.
 
 ## Contents
 
 - [Rendering research](#rendering-research), [scene sources](#scene-sources) and [production studies](#nvidia-production-studies)
-- [Tools and APIs](#tools-and-apis) and [code style](#code-style)
+- [Tools and APIs](#tools-and-apis), [pipeline automation](#pipeline-automation) and [code style](#code-style)
 - [Role sources](#role-sources), [employer study](#employer-role-study), [professional baseline](#professional-baseline) and [public work](#persona-and-portfolio)
 - [Documentation examples](#documentation-examples)
 
@@ -81,14 +81,17 @@ Studies that connect the professional goals to concrete engineering work. Publis
 - [PIX capture](https://devblogs.microsoft.com/pix/taking-a-capture/) and [programmatic capture](https://devblogs.microsoft.com/pix/programmatic-capture/).
 - [RenderDoc application API at v1.46](https://github.com/baldurk/renderdoc/blob/v1.46/docs/in_application_api.rst).
 - [Nsight Graphics](https://developer.nvidia.com/nsight-graphics-features) and [Aftermath](https://developer.nvidia.com/nsight-aftermath).
+- [Radeon Developer Tool Suite](https://gpuopen.com/rgp/), [Windows Performance Toolkit](https://learn.microsoft.com/en-us/windows-hardware/test/wpt/) and [PresentMon](https://github.com/GameTechDev/PresentMon): hardware-specific GPU analysis, ETW scheduling/I/O traces and presentation measurements. Check each tool's supported hardware/API and collection overhead; presentation events alone do not measure input-to-photon latency.
 - [Peak-performance analysis](https://developer.nvidia.com/blog/the-peak-performance-analysis-method-for-optimizing-any-gpu-workload/): isolate a limiting mechanism before optimization. Its historical tool table and queue assumptions are not current compatibility evidence or local acceptance thresholds.
 - [DXR specification](https://microsoft.github.io/DirectX-Specs/d3d/Raytracing.html), [Vulkan synchronization](https://docs.vulkan.org/samples/latest/samples/extensions/synchronization_2/README.html) and [PTLAS proposal](https://docs.vulkan.org/features/latest/features/proposals/VK_NV_partitioned_acceleration_structure.html).
 
 ## Pipeline automation
 
-Use concrete consumers when judging script value. [NRD's CI](https://github.com/NVIDIA-RTX/NRD/blob/90dea8bd91ec6b58d0f90cb6adf53c7da613b82c/.github/workflows/build.yml) runs short deploy, build and SDK-preparation scripts. [RTXPT's scene runner](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/Testing/RegressionTesting-RUN.bat) and [image tests](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/Support/tests/run_tests.ps1) render identified scenes and compare results. [Falcor's CI](https://github.com/NVIDIAGameWorks/Falcor/blob/759aad033ff610fb0d82c74f7e0a508d0096d5f2/.github/workflows/build.yml) invokes setup and native build commands directly.
+For CMake scope, compare [Donut's module and shader composition](https://github.com/NVIDIA-RTX/Donut/blob/52efbe37d7f550ea1c5c7ee02b75404ec7c72c09/CMakeLists.txt), [NVRHI's backend and SDK targets](https://github.com/NVIDIA-RTX/NVRHI/blob/bf0bbd9b666a7297492beb1999a4ddc0dfded143/CMakeLists.txt), and [RTXPT's shader/runtime setup and CPU test registration](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/CMakeLists.txt). These are concrete build consumers. Sparkle keeps backend membership checks, shader compilation/inspection, runtime deployment and capture qualification; source ownership conventions belong in review and the existing style tools.
 
-These examples favor automation that produces a build, usable artifact or rendering result. They do not establish usage frequency or require Sparkle to copy their script inventories. Follow the local [script ownership rule](Engineering.md#script-ownership): keep useful pipeline consumers, use standard tools, and remove bespoke machinery whose maintenance exceeds its result.
+[NRD's CI](https://github.com/NVIDIA-RTX/NRD/blob/90dea8bd91ec6b58d0f90cb6adf53c7da613b82c/.github/workflows/build.yml) runs deploy, build and SDK-preparation scripts. [RTXPT's scene runner](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/Testing/RegressionTesting-RUN.bat) and [image tests](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/Support/tests/run_tests.ps1) render identified scenes and compare results. [Falcor's CI](https://github.com/NVIDIAGameWorks/Falcor/blob/759aad033ff610fb0d82c74f7e0a508d0096d5f2/.github/workflows/build.yml) invokes setup and native build commands directly.
+
+These are examples of concrete pipeline consumers, not a required script inventory. Sparkle's [script ownership rule](Engineering.md#script-ownership) governs local use.
 
 ## Code style
 
@@ -350,7 +353,7 @@ The [Ubisoft 3D Graphics Engineer](https://jobs.smartrecruiters.com/Ubisoft2/744
 
 </details>
 
-The shared direction is research-to-product ownership, causal measurement, usable tools and transfer. Senior ownership means delivering a substantial feature or fix; expert depth means testing its difficult assumptions. Principal scope adds problem selection, direction, repeated adoption and development of other engineers. Titles vary by employer. [Goals](Goals.md#professional-qualifications) distinguishes the selected scope from specialist requirements: using an API, shader cooker or vendor model does not establish driver, compiler or model authorship.
+The study informs [Goals](Goals.md#professional-qualifications); titles and specialist requirements vary by employer.
 
 ## Professional baseline
 
@@ -404,7 +407,7 @@ The study did not establish NVIDIA affiliation for [Will Usher / Twinklebear](ht
 
 Related application-integration writing: [Alan Gray](https://developer.nvidia.com/blog/author/alan-gray/) on application optimization; [Ingo Esser](https://developer.nvidia.com/blog/author/iesser/) and [Evan Hart](https://developer.nvidia.com/blog/author/ehart/) on partner/engine work. The [neural shading course](https://research.nvidia.com/labs/rtr/publication/duca2025neural/) connects model, operator and renderer integration.
 
-The recurring lessons are research carried into a product, API/hardware reasoning that solves a user's problem, small useful tools and explanations tested through feedback. Public projects do not establish why someone was hired.
+Public projects illustrate work and communication; they do not establish why someone was hired.
 
 ## Documentation examples
 

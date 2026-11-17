@@ -21,7 +21,7 @@ static std::string UnescapeArgument(std::string value)
 
 static void ParseWorkspaceRoot(AssetCookerRequest& request, const std::string& value)
 {
-	request.workspaceRoot = Strings::ToWide(std::string_view(value));
+	request.workspaceRoot = Strings::ToWide(value);
 }
 
 static void ConfigureCookOptions(CLI::App& command, AssetCookerRequest& request, bool bRequiresProject)

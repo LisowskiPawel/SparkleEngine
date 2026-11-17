@@ -81,17 +81,3 @@ private:
 	std::vector<CookedShaderSpecializationConstantRecord> m_specializationConstants;
 	std::vector<std::uint8_t> m_stringTable;
 };
-
-struct ResolvedShader final
-{
-	const GlobalShaderMap* Map = nullptr;
-	const CookedShaderLibrary* Library = nullptr;
-	const GlobalShaderMapEntry* Entry = nullptr;
-	const CookedShaderCodeRecord* Code = nullptr;
-
-	SPARKLE_RHI_API bool IsValid() const noexcept;
-
-	explicit operator bool() const noexcept { return IsValid(); }
-
-	SPARKLE_RHI_API ShaderBytecode GetBytecode() const noexcept;
-};

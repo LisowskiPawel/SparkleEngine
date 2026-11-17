@@ -1,7 +1,7 @@
 #include "Vulkan/VulkanPCH.h"
 
 #include "Vulkan/Pipeline/VulkanRayTracingPipelineCreation.h"
-#include "Shaders/GlobalShaderMap.h"
+#include "Shaders/ResolvedShader.h"
 #include "Vulkan/Pipeline/VulkanShaderModule.h"
 #include "Vulkan/Device/VulkanRhi.h"
 #include "Vulkan/Core/VulkanResult.h"

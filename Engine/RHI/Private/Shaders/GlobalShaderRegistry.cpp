@@ -2,36 +2,8 @@
 
 #include "Shaders/Authoring/GlobalShader.h"
 
-#include "Core/Public/Hash/HashUtils.h"
-#include "ShaderParameters/PassParameterLayout.h"
-
 #include <algorithm>
 #include <vector>
-
-ShaderTypeId BuildShaderTypeId(std::string_view shaderName) noexcept
-{
-	constexpr std::string_view shaderTypeDomain = "Sparkle.ShaderType|";
-	std::uint64_t hash = Hash::ContinueFnv1a64(Hash::kFnv64OffsetBasis, shaderTypeDomain.data(), shaderTypeDomain.size());
-	hash = Hash::ContinueFnv1a64(hash, shaderName.data(), shaderName.size());
-	return Hash::FinalizeFnv1a64(hash);
-}
-
-ShaderParameterSignature BuildShaderParameterSignature(const PassParameterLayout& layout) noexcept
-{
-	std::uint64_t hash = Hash::kFnv64OffsetBasis;
-	for (const PassParameterDesc& parameter : layout.GetParameters())
-	{
-		hash = Hash::ContinueFnv1a64(hash, parameter.Name.data(), parameter.Name.size());
-		hash = Hash::ContinueFnv1a64Value(hash, parameter.Kind);
-		hash = Hash::ContinueFnv1a64Value(hash, parameter.ResourceDomain);
-		hash = Hash::ContinueFnv1a64Value(hash, parameter.Access);
-		hash = Hash::ContinueFnv1a64Value(hash, parameter.Visibility);
-		hash = Hash::ContinueFnv1a64Value(hash, parameter.ArrayCount);
-		hash = Hash::ContinueFnv1a64Value(hash, parameter.ValueSizeInBytes);
-		hash = Hash::ContinueFnv1a64Value(hash, parameter.ValueLayoutHash);
-	}
-	return Hash::FinalizeFnv1a64(hash);
-}
 
 static std::vector<ShaderRegistrationDesc>& MutableGlobalShaderRegistrations()
 {

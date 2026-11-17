@@ -1,13 +1,34 @@
 #include "PCH.h"
 
-#include "Shaders/GlobalShaderMap.h"
-#include "Shaders/ShaderMapRanges.h"
+#include "Shaders/ShaderMap.h"
 
-#include <algorithm>
-#include <utility>
+#include "Core/Public/Hash/HashUtils.h"
+#include "ShaderParameters/PassParameterLayout.h"
 
-using ShaderMapRanges::ContainsRange;
-using ShaderMapRanges::ContainsString;
+ShaderTypeId BuildShaderTypeId(std::string_view shaderName) noexcept
+{
+	constexpr std::string_view shaderTypeDomain = "Sparkle.ShaderType|";
+	std::uint64_t hash = Hash::ContinueFnv1a64(Hash::kFnv64OffsetBasis, shaderTypeDomain.data(), shaderTypeDomain.size());
+	hash = Hash::ContinueFnv1a64(hash, shaderName.data(), shaderName.size());
+	return Hash::FinalizeFnv1a64(hash);
+}
+
+ShaderParameterSignature BuildShaderParameterSignature(const PassParameterLayout& layout) noexcept
+{
+	std::uint64_t hash = Hash::kFnv64OffsetBasis;
+	for (const PassParameterDesc& parameter : layout.GetParameters())
+	{
+		hash = Hash::ContinueFnv1a64(hash, parameter.Name.data(), parameter.Name.size());
+		hash = Hash::ContinueFnv1a64Value(hash, parameter.Kind);
+		hash = Hash::ContinueFnv1a64Value(hash, parameter.ResourceDomain);
+		hash = Hash::ContinueFnv1a64Value(hash, parameter.Access);
+		hash = Hash::ContinueFnv1a64Value(hash, parameter.Visibility);
+		hash = Hash::ContinueFnv1a64Value(hash, parameter.ArrayCount);
+		hash = Hash::ContinueFnv1a64Value(hash, parameter.ValueSizeInBytes);
+		hash = Hash::ContinueFnv1a64Value(hash, parameter.ValueLayoutHash);
+	}
+	return Hash::FinalizeFnv1a64(hash);
+}
 
 ShaderFeatureFlags operator|(ShaderFeatureFlags lhs, ShaderFeatureFlags rhs) noexcept
 {
@@ -23,38 +44,4 @@ ShaderFeatureFlags& operator|=(ShaderFeatureFlags& lhs, ShaderFeatureFlags rhs) 
 bool HasShaderFeature(ShaderFeatureFlags value, ShaderFeatureFlags flag) noexcept
 {
 	return (static_cast<std::uint32_t>(value) & static_cast<std::uint32_t>(flag)) == static_cast<std::uint32_t>(flag);
-}
-
-const GlobalShaderMapEntry* GlobalShaderMap::Find(ShaderTypeId shaderType, ShaderTarget target) const noexcept
-{
-	const auto found = std::lower_bound(
-	    m_entries.begin(),
-	    m_entries.end(),
-	    std::pair{shaderType, target},
-	    [](const GlobalShaderMapEntry& entry, const std::pair<ShaderTypeId, ShaderTarget>& key)
-	    { return entry.ShaderType < key.first || (entry.ShaderType == key.first && entry.Target < key.second); });
-	return found != m_entries.end() && found->ShaderType == shaderType && found->Target == target ? &*found : nullptr;
-}
-
-std::string_view GlobalShaderMap::ResolveString(ShaderMapStringRef ref) const noexcept
-{
-	if (!ContainsString(m_stringTable, ref))
-	{
-		return {};
-	}
-	return {reinterpret_cast<const char*>(m_stringTable.data() + ref.OffsetInBytes), ref.SizeInBytes};
-}
-
-std::span<const ShaderMapBindingRecord> GlobalShaderMap::GetBindings(const GlobalShaderMapEntry& entry) const noexcept
-{
-	if (!ContainsRange(m_bindingRecords.size(), entry.BindingRecordOffset, entry.BindingRecordCount))
-	{
-		return {};
-	}
-	return std::span<const ShaderMapBindingRecord>(m_bindingRecords).subspan(entry.BindingRecordOffset, entry.BindingRecordCount);
-}
-
-const CookedShaderReflectionRecord& GlobalShaderMap::GetReflection(const GlobalShaderMapEntry& entry) const noexcept
-{
-	return m_reflectionRecords[entry.ReflectionRecordIndex];
 }

@@ -4,6 +4,7 @@
 
 #include "Vulkan/VulkanTypeConversions.h"
 #include "Shaders/GlobalShaderMap.h"
+#include "Shaders/ResolvedShader.h"
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "Vulkan/Diagnostics/GpuCrash/VulkanGpuCrash.h"
 #endif

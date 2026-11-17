@@ -2,7 +2,7 @@
 
 #include "Pipeline/RasterPassRenderState.h"
 
-#include "RHI/Public/Shaders/GlobalShaderMap.h"
+#include "RHI/Public/Shaders/ShaderMap.h"
 
 #include <array>
 #include <cstddef>

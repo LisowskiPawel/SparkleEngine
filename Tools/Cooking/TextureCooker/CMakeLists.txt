@@ -14,6 +14,9 @@ set(TEXTURE_COOK_SHARED_PRIVATE_HEADERS
 
 set(TEXTURE_COOKER_PRIVATE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Processing/TextureProcessor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/ExrTextureSource.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/RasterTextureSource.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/TextureSourceMetadata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/TextureSource.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/KtxTextureSource.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/App/TextureCookerApplication.cpp

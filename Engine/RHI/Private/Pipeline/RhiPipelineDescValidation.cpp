@@ -1,7 +1,7 @@
 #include "PCH.h"
 
 #include "Pipeline/RhiPipelineDesc.h"
-#include "Shaders/GlobalShaderMap.h"
+#include "Shaders/ResolvedShader.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Validation/RhiContract.h"

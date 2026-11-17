@@ -1,11 +1,12 @@
 #pragma once
 
 #include "../RHIAPI.h"
-#include "Authoring/GlobalShader.h"
+#include "../ShaderParameters/PassParameterLayout.h"
+#include "ShaderStage.h"
 
 #include <span>
 
-class PassParameterLayout;
+struct ShaderRegistrationDesc;
 
 SPARKLE_RHI_API ShaderStageVisibility GetDefaultShaderVisibility(ShaderStage stage) noexcept;
 

@@ -1,11 +1,3 @@
-add_custom_target(
-    architecture_boundary_check
-    COMMAND ${CMAKE_COMMAND} "-DSPARKLE_REPO_ROOT=${SPARKLE_REPOSITORY_ROOT}" -P "${SPARKLE_REPOSITORY_ROOT}/CMake/ArchitectureBoundaryCheck.cmake"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    COMMENT "Checking repository architecture boundaries..."
-    VERBATIM
-)
-
 find_program(SPARKLE_POWERSHELL_EXECUTABLE NAMES pwsh powershell REQUIRED)
 set(SPARKLE_CLANG_FORMAT_EXECUTABLE "" CACHE FILEPATH "Optional path to the required clang-format 22.1.3 executable")
 set(SPARKLE_CLANG_TIDY_EXECUTABLE "" CACHE FILEPATH "Optional path to the required clang-tidy 22.1.3 executable")

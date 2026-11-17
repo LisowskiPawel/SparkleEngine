@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../RHIAPI.h"
-#include "../GlobalShaderMap.h"
+#include "../ResolvedShader.h"
 #include "ShaderParameterStruct.h"
 
 #include <cassert>
@@ -122,10 +122,8 @@ public:
 	static ShaderRef Resolve(const GlobalShaderMap& map, const CookedShaderLibrary& library, ShaderTarget target) noexcept
 	{
 		const ShaderRegistrationDesc& registration = GlobalShader<TShader>::GetRegistration();
-		const GlobalShaderMapEntry* const entry = map.GetPublicationHash() == library.GetPublicationHash() ? map.Find(registration.TypeId, target) : nullptr;
-		const CookedShaderCodeRecord* const code = entry != nullptr ? library.Find(entry->CodeHash) : nullptr;
 		ShaderRef ref;
-		ref.m_shader = ResolvedShader{.Map = &map, .Library = &library, .Entry = entry, .Code = code};
+		ref.m_shader = ResolvedShader::Resolve(map, library, registration.TypeId, target);
 		return ref;
 	}
 

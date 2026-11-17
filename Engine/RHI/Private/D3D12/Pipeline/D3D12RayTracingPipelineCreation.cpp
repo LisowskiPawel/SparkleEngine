@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "Shaders/GlobalShaderMap.h"
+#include "Shaders/ResolvedShader.h"
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "D3D12/Diagnostics/GpuCrash/D3D12GpuCrash.h"
 #endif

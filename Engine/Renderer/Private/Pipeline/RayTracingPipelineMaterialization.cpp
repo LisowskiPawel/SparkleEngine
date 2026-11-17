@@ -8,6 +8,7 @@
 #include "Pipeline/PipelineMaterialization.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 #include "RHI/Public/Shaders/ShaderParameterLayoutBuilder.h"
+#include "RHI/Public/Shaders/ResolvedShader.h"
 
 #include <string_view>
 #include <unordered_set>
@@ -75,9 +76,7 @@ std::vector<RhiRayTracingShaderExportDesc> RayTracingPipelineRuntime::ResolveSha
 	for (ShaderTypeId selection : selections)
 	{
 		const ShaderRegistrationDesc& registration = GetRegistration(selection);
-		const GlobalShaderMapEntry* entry = map.Find(selection, target);
-		const CookedShaderCodeRecord* code = entry != nullptr ? library.Find(entry->CodeHash) : nullptr;
-		m_shaders.push_back(ResolvedShader{.Map = &map, .Library = &library, .Entry = entry, .Code = code});
+		m_shaders.push_back(ResolvedShader::Resolve(map, library, selection, target));
 		exports.push_back(RhiRayTracingShaderExportDesc{.Shader = &m_shaders.back(), .ExportName = registration.EntryPoint});
 		PipelineMaterialization::ValidateShaderCapabilities(renderHardwareInterface, registration.ShaderName, m_shaders.back());
 	}

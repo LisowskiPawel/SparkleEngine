@@ -4,7 +4,7 @@
   #include "D3D12/Diagnostics/GpuCrash/D3D12GpuCrash.h"
 #endif
 #include "D3D12/Pipeline/D3D12Pipeline.h"
-#include "Shaders/GlobalShaderMap.h"
+#include "Shaders/ResolvedShader.h"
 #include "D3D12/Device/D3D12Rhi.h"
 #include "D3D12/D3D12TypeConversions.h"
 #include "D3D12/Pipeline/D3D12BindingLayout.h"

@@ -144,7 +144,7 @@ void ShaderDebugArtifactWriter::RecordSourceCandidate()
 			auto file = sourceFiles.extract(sourceFiles.begin());
 			const auto& relative = file.key();
 			const auto& expected = file.mapped();
-			const std::filesystem::path relativePath = Strings::ToWide(std::string_view{relative});
+			const std::filesystem::path relativePath = Strings::ToWide(relative);
 			const auto source = root / relativePath;
 			const bool bInvalidRoot = relativePath.has_root_path() || relative.empty();
 			const bool bInvalidName = relative.find(':') != std::string::npos || relative.find('\0') != std::string::npos;

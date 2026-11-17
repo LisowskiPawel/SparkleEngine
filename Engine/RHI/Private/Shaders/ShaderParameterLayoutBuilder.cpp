@@ -1,6 +1,7 @@
 #include "PCH.h"
 
 #include "Shaders/ShaderParameterLayoutBuilder.h"
+#include "Shaders/Authoring/GlobalShader.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "ShaderParameters/PassParameterLayout.h"

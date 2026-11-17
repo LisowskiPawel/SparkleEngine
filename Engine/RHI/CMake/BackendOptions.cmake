@@ -1,6 +1,6 @@
 option(SPARKLE_RHI_WITH_D3D12 "Enable the D3D12 RHI backend" ON)
 option(SPARKLE_RHI_WITH_D3D12_NVAPI "Enable NVIDIA NVAPI integration inside the D3D12 RHI backend" ON)
-option(SPARKLE_RHI_D3D12_NVAPI_FETCH_FROM_GITHUB "Fetch the official NVIDIA NVAPI SDK when D3D12 NVAPI is enabled and no local SDK paths are provided" ON)
+option(SPARKLE_RHI_D3D12_NVAPI_FETCH_FROM_GITHUB "Use the pinned NVIDIA NVAPI source cache for the D3D12 backend" ON)
 set(SPARKLE_RHI_D3D12_NVAPI_INCLUDE_DIR "" CACHE PATH "Directory containing NVIDIA NVAPI headers, used only by SparkleRHI_D3D12")
 set(SPARKLE_RHI_D3D12_NVAPI_LIBRARY "" CACHE FILEPATH "NVIDIA NVAPI import library, used only by SparkleRHI_D3D12")
 if(SPARKLE_RHI_WITH_D3D12_PIX_EVENTS AND NOT SPARKLE_RHI_WITH_D3D12)

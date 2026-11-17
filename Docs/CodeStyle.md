@@ -51,9 +51,7 @@ Separate substantial I/O, decoding, allocation, setup, submission and UI work in
 
 Use `nullptr`, scoped enums, explicit constructors, domain values and designated initialization where clear. Use `final` for concrete classes and `noexcept` only for a real no-throw contract. Prefer direct typed code over unnecessary macros, reflection, type erasure or metaprogramming. Use a domain enum/value instead of boolean mode combinations. Classes/structs have at most one direct base.
 
-Prefer direct value bindings and named functions when they make callbacks easier to read. Use a lambda for a short local operation when it is clearer; give substantial validation, conversion and control flow a name.
-
-Keep cohesive initialization in its existing owner. Do not add a factory/getter pair or forwarding function merely to relocate the same code.
+Use a short local lambda when clearer; name substantial validation, conversion or control flow. Prefer direct value bindings; keep cohesive initialization with its owner instead of adding factory/getter pairs or forwarding functions.
 
 ### Enums
 
@@ -112,7 +110,7 @@ Distinguish persistent authoring GUIDs, source/reimport keys, runtime `EntityId`
 
 Keep `RenderFrame` for frame-slot scene/view data and `RenderFrameGraph*` for topology/resources. `PassCommandContext` is narrower than `RenderCommandContext`; native recording contexts stay backend-private. Name queues for their payload. Avoid general context/service/resource bags.
 
-Neutral APIs use `RenderPipeline`, `GraphicsPipelineDesc/ComputePipelineDesc`, `Create*Pipeline`, `SetPipeline`, `renderTarget(s)` and `depthStencil`; PSO/RTV/DSV stay native. Use `GpuMesh/GpuMeshCache` and `commandContext`, not `GPU*/cmd`. `WorkspaceRoot` includes extracted products; `RepositoryRoot` refers to source/provenance. Finding/resolving, loading and compiling have distinct meanings.
+Neutral APIs use `RenderPipeline`, `GraphicsPipelineDesc/ComputePipelineDesc`, `Create*Pipeline`, `SetPipeline`, `renderTarget(s)` and `depthStencil`; PSO/RTV/DSV stay native. Use `GpuMesh/GpuMeshCache` and `commandContext`, not `GPU*/cmd`. `WorkspaceRoot` includes extracted products; `RepositoryRoot` refers to source/provenance.
 
 Keep physical units and CPU/shader names explicit: illuminance/intensity/luminance, radians, `DeltaTimeSeconds`, `FovY/NearZ/FarZ`, `WorldMatrix/PreviousWorldMatrix/WorldInverseTranspose`, directional temporal matrices, `CurrentJitterNdc/PreviousJitterNdc`, `ViewportSizeInv`, `JointMatrix/Skinning/SkinInfluence`, `MorphTarget/MorphWeight` and `GpuSceneSlot`. A GPU slot is not identity. Rename mirrors together and check layout and target compilation.
 
@@ -155,4 +153,4 @@ Repeat per file. Use `-Staged` only when it covers the whole change; it checks w
 
 Record the tool, coverage, mechanical result and manual layout review. Repeat affected checks after edits and identify unchecked files. Documentation changes use documentation checks.
 
-Review ownership, public surface, integration points, repeated switches, dependencies and removal of the old path. Formatting/build success is not a design review. External examples and proposed rules do not override these conventions; update the guide and executable checks together when accepting a change.
+Follow the [responsibility review](Engineering.md#module-boundaries) as well as mechanical checks. External examples do not override these conventions; update the guide and executable checks together when accepting a rule.

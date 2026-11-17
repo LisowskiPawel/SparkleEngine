@@ -127,9 +127,9 @@ CompiledShader DxcShaderBackend::Compile(const ShaderCompileRequest& request)
 	sourceBuffer.Size = sourceText.size();
 	sourceBuffer.Encoding = DXC_CP_UTF8;
 
-	std::wstring wSourcePath = Strings::ToWide(std::string_view{request.VirtualSourcePath});
-	std::wstring wEntryPoint = Strings::ToWide(std::string_view{request.EntryPoint});
-	std::wstring wTargetProfile = Strings::ToWide(std::string_view{BuildShaderTargetProfile(request)});
+	std::wstring wSourcePath = Strings::ToWide(request.VirtualSourcePath);
+	std::wstring wEntryPoint = Strings::ToWide(request.EntryPoint);
+	std::wstring wTargetProfile = Strings::ToWide(BuildShaderTargetProfile(request));
 	std::vector<std::wstring> wDefines;
 	std::vector<LPCWSTR> args;
 

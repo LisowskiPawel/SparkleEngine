@@ -2,7 +2,7 @@
 #include "D3D12/Pipeline/D3D12BindingLayout.h"
 
 #include "D3D12/Pipeline/D3D12RootSignatureBuilder.h"
-#include "Shaders/GlobalShaderMap.h"
+#include "Shaders/ResolvedShader.h"
 
 #include "Bindings/RhiShaderBindingReflection.h"
 #include "ShaderParameters/PassParameterLayout.h"

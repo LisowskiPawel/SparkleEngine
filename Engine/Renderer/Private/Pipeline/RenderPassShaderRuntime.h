@@ -7,6 +7,7 @@
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 #include "RHI/Public/ShaderParameters/PassParameterLayout.h"
 #include "RHI/Public/Shaders/ShaderParameterLayoutBuilder.h"
+#include "RHI/Public/Shaders/Authoring/GlobalShader.h"
 
 #include <format>
 #include <memory>

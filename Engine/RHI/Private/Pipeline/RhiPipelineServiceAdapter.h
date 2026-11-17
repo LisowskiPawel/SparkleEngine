@@ -2,7 +2,7 @@
 
 #include "Pipeline/RhiPipelineService.h"
 
-#include "Shaders/GlobalShaderMap.h"
+#include "Shaders/ResolvedShader.h"
 #include "Core/Public/Diagnostics/Logger.h"
 #include "Core/Public/Diagnostics/Verify.h"
 

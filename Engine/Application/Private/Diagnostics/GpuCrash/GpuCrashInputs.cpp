@@ -42,13 +42,13 @@ namespace GpuCrashInputVerification
 			throw Diagnostics::Error("GPU crash product/profile receipt does not match this executable.");
 		}
 
-		const std::filesystem::path retainedReceipt = Strings::ToWide(std::string_view{ReadRequiredString(product, "retainedReceiptPath")});
+		const std::filesystem::path retainedReceipt = Strings::ToWide(ReadRequiredString(product, "retainedReceiptPath"));
 		if (ReadReceipt(retainedReceipt) != product)
 		{
 			throw Diagnostics::Error("Retained product receipt differs from this build's startup receipt.");
 		}
 		VerifyReceiptFiles(executable.parent_path(), product, "runtimeFiles");
-		const std::filesystem::path pdb = Strings::ToWide(std::string_view{ReadRequiredString(product, "cpuPdbPath")});
+		const std::filesystem::path pdb = Strings::ToWide(ReadRequiredString(product, "cpuPdbPath"));
 		if (HashFile(pdb) != ReadRequiredString(product, "cpuPdbSha256"))
 		{
 			throw Diagnostics::Error("Matching CPU symbols are missing or changed.");
@@ -63,9 +63,9 @@ static std::string VerifyGpuCrashInputs(const GpuCrashStartup& startup, ERhiBack
 	using namespace GpuCrashInputVerification;
 	const auto executable = Filesystem::GetExecutablePath();
 	const auto product = VerifyProductReceipt(executable);
-	const std::filesystem::path productPath = Strings::ToWide(std::string_view{ReadRequiredString(product, "retainedReceiptPath")});
+	const std::filesystem::path productPath = Strings::ToWide(ReadRequiredString(product, "retainedReceiptPath"));
 	const auto bundle = VerifyShaderBundle(startup.ShaderExport, product, api);
-	const std::filesystem::path pdb = Strings::ToWide(std::string_view{ReadRequiredString(product, "cpuPdbPath")});
+	const std::filesystem::path pdb = Strings::ToWide(ReadRequiredString(product, "cpuPdbPath"));
 	Json::ObjectWriter identity;
 	for (const auto key : {"product", "profile", "revision", "sourceInputsSha256", "dirtyPatchSha256", "cpuPdbGuid", "cpuPdbSha256"})
 	{
