@@ -2,12 +2,14 @@
 
 #include "Verification/ShaderParameterStructVerifier.h"
 
-#include "Core/Public/Diagnostics/Verify.h"
+#include "Cooking/ShaderCookDiagnostics.h"
+#include "Cooking/CookedStageBuild.h"
+#include "Core/Public/Diagnostics/Error.h"
 
 #include <algorithm>
 #include <format>
-
-SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_shaderParameterStructVerifierLogger, "ShaderCompiler.ParameterStructVerifier");
+#include <optional>
+#include <string>
 
 namespace ShaderParameterVerification
 {
@@ -42,7 +44,7 @@ namespace ShaderParameterVerification
 			case CookedShaderResourceKind::PushConstantBlock:
 				return "PushConstantBlock";
 		}
-		Diagnostics::Fatal(g_shaderParameterStructVerifierLogger, __FILE__, __LINE__, "Unknown cooked shader resource kind.");
+		return "Unknown";
 	}
 
 	static const char* GetResourceDimensionName(CookedShaderResourceDimension dimension) noexcept
@@ -72,7 +74,7 @@ namespace ShaderParameterVerification
 			case CookedShaderResourceDimension::TextureCubeArray:
 				return "TextureCubeArray";
 		}
-		Diagnostics::Fatal(g_shaderParameterStructVerifierLogger, __FILE__, __LINE__, "Unknown cooked shader resource dimension.");
+		return "Unknown";
 	}
 
 	static const ShaderReflectionResourceBinding* FindReflectionBinding(const ShaderReflection& reflection, std::string_view name) noexcept
@@ -81,16 +83,7 @@ namespace ShaderParameterVerification
 		return binding != reflection.Bindings.end() ? &*binding : nullptr;
 	}
 
-	static const ShaderParameterStructFieldDescriptor* FindDescriptorField(const ShaderParameterStructDescriptor& descriptor, std::string_view name) noexcept
-	{
-		const auto field = std::ranges::find_if(descriptor.Fields, [name](const auto& candidate) { return candidate.bReflected && candidate.Name == name; });
-		return field != descriptor.Fields.end() ? &*field : nullptr;
-	}
-}
-
-namespace ShaderParameterVerification
-{
-	static void VerifyAutomaticValues(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, bool bAllowUnreflectedDeclarations, std::vector<std::string>& mismatches)
+	static std::optional<std::string> FindAutomaticValueMismatch(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, bool bAllowUnreflectedDeclarations)
 	{
 		if (!descriptor.Values.empty())
 		{
@@ -105,28 +98,24 @@ namespace ShaderParameterVerification
 
 					if (bReflectedMemberMismatch)
 					{
-						mismatches.push_back(
-						    std::format(
-						        "SC2007 automatic parameter layout mismatch: block='{}' value='{}' expectedOffset={} expectedSize={}",
-						        descriptor.AutoParametersName,
-						        value.Name,
-						        value.OffsetInBytes,
-						        value.SizeInBytes));
+						return std::format(
+						    "SC2007 automatic parameter layout mismatch: block='{}' value='{}' expectedOffset={} expectedSize={}",
+						    descriptor.AutoParametersName,
+						    value.Name,
+						    value.OffsetInBytes,
+						    value.SizeInBytes);
 					}
 				}
 			}
 			else if (!bAllowUnreflectedDeclarations)
 			{
-				mismatches.push_back(std::format("SC2007 automatic parameter block '{}' has no reflected members.", descriptor.AutoParametersName));
+				return std::format("SC2007 automatic parameter block '{}' has no reflected members.", descriptor.AutoParametersName);
 			}
 		}
+		return std::nullopt;
 	}
 
-	static void VerifyDeclaredBindings(
-	    const ShaderParameterStructDescriptor& descriptor,
-	    const ShaderReflection& reflection,
-	    bool bAllowUnreflectedDeclarations,
-	    ShaderParameterStructVerificationResult& result)
+	static std::optional<std::string> FindDeclaredBindingMismatch(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, bool bAllowUnreflectedDeclarations)
 	{
 		for (const ShaderParameterStructFieldDescriptor& field : descriptor.Fields)
 		{
@@ -140,97 +129,74 @@ namespace ShaderParameterVerification
 			{
 				if (bAllowUnreflectedDeclarations)
 				{
-					result.diagnostics.push_back(
-					    std::format(
-					        "SC2006 declared binding is not referenced by this library export: name='{}' declaredKind='{}' "
-					        "declaredDimension='{}'",
-					        field.Name,
-					        GetResourceKindName(field.Kind),
-					        GetResourceDimensionName(field.Dimension)));
-
 					continue;
 				}
 
-				result.mismatches.push_back(
-				    std::format(
-				        "SC2001 missing reflected binding: name='{}' declaredKind='{}' declaredDimension='{}'",
-				        field.Name,
-				        GetResourceKindName(field.Kind),
-				        GetResourceDimensionName(field.Dimension)));
-
-				continue;
+				return std::format(
+				    "SC2001 missing reflected binding: name='{}' declaredKind='{}' declaredDimension='{}'",
+				    field.Name,
+				    GetResourceKindName(field.Kind),
+				    GetResourceDimensionName(field.Dimension));
 			}
 
 			if (binding->Kind != field.Kind)
 			{
-				result.mismatches.push_back(
-				    std::format(
-				        "SC2002 reflected kind mismatch: name='{}' reflectedBinding='{}' declaredKind='{}' reflectedKind='{}'",
-				        field.Name,
-				        binding->Name,
-				        GetResourceKindName(field.Kind),
-				        GetResourceKindName(binding->Kind)));
+				return std::format(
+				    "SC2002 reflected kind mismatch: name='{}' reflectedBinding='{}' declaredKind='{}' reflectedKind='{}'",
+				    field.Name,
+				    binding->Name,
+				    GetResourceKindName(field.Kind),
+				    GetResourceKindName(binding->Kind));
 			}
 
 			if (field.Dimension != CookedShaderResourceDimension::Unknown && binding->Dimension != CookedShaderResourceDimension::Unknown && binding->Dimension != field.Dimension)
 			{
-				result.mismatches.push_back(
-				    std::format(
-				        "SC2003 reflected dimension mismatch: name='{}' reflectedBinding='{}' declaredDimension='{}' reflectedDimension='{}'",
-				        field.Name,
-				        binding->Name,
-				        GetResourceDimensionName(field.Dimension),
-				        GetResourceDimensionName(binding->Dimension)));
+				return std::format(
+				    "SC2003 reflected dimension mismatch: name='{}' reflectedBinding='{}' declaredDimension='{}' reflectedDimension='{}'",
+				    field.Name,
+				    binding->Name,
+				    GetResourceDimensionName(field.Dimension),
+				    GetResourceDimensionName(binding->Dimension));
 			}
 
 			if (binding->ArrayCount != field.ArrayCount)
 			{
-				result.mismatches.push_back(
-				    std::format(
-				        "SC2004 reflected array-count mismatch: name='{}' reflectedBinding='{}' declaredCount={} reflectedCount={}",
-				        field.Name,
-				        binding->Name,
-				        field.ArrayCount,
-				        binding->ArrayCount));
+				return std::format(
+				    "SC2004 reflected array-count mismatch: name='{}' reflectedBinding='{}' declaredCount={} reflectedCount={}",
+				    field.Name,
+				    binding->Name,
+				    field.ArrayCount,
+				    binding->ArrayCount);
 			}
 		}
+		return std::nullopt;
 	}
-
-	static void ReportUndeclaredBindings(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, std::vector<std::string>& diagnostics)
-	{
-		for (const ShaderReflectionResourceBinding& binding : reflection.Bindings)
-		{
-			if (FindDescriptorField(descriptor, binding.Name) == nullptr)
-			{
-				diagnostics.push_back(
-				    std::format(
-				        "SC2005 extra reflected binding: reflectedBinding='{}' reflectedKind='{}' reflectedDimension='{}' is not declared in "
-				        "parameter struct '{}'",
-				        binding.Name,
-				        GetResourceKindName(binding.Kind),
-				        GetResourceDimensionName(binding.Dimension),
-				        descriptor.Name));
-			}
-		}
-	}
-
-	static void PublishDiagnostics(std::string_view descriptorName, ShaderParameterStructVerificationResult& result)
-	{
-		result.diagnostics.insert(result.diagnostics.begin(), result.mismatches.begin(), result.mismatches.end());
-		if (result.mismatches.empty())
-		{
-			result.diagnostics.push_back(std::format("SC2000 parameter struct '{}' matches reflected resource bindings", descriptorName));
-		}
-	}
-
 }
 
-ShaderParameterStructVerificationResult VerifyShaderParameterStruct(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, bool bAllowUnreflectedDeclarations)
+static std::optional<std::string> FindShaderParameterMismatch(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, bool bAllowUnreflectedDeclarations)
 {
-	ShaderParameterStructVerificationResult result;
-	ShaderParameterVerification::VerifyAutomaticValues(descriptor, reflection, bAllowUnreflectedDeclarations, result.mismatches);
-	ShaderParameterVerification::VerifyDeclaredBindings(descriptor, reflection, bAllowUnreflectedDeclarations, result);
-	ShaderParameterVerification::ReportUndeclaredBindings(descriptor, reflection, result.diagnostics);
-	ShaderParameterVerification::PublishDiagnostics(descriptor.Name, result);
-	return result;
+	if (auto mismatch = ShaderParameterVerification::FindAutomaticValueMismatch(descriptor, reflection, bAllowUnreflectedDeclarations))
+	{
+		return mismatch;
+	}
+	return ShaderParameterVerification::FindDeclaredBindingMismatch(descriptor, reflection, bAllowUnreflectedDeclarations);
+}
+
+void VerifyCookedShaderParameters(const ShaderCompileJob& job, const CookedStageBuild& compiledStage)
+{
+	if (!job.Request.ParameterStruct.has_value())
+	{
+		return;
+	}
+
+	const auto mismatch = FindShaderParameterMismatch(*job.Request.ParameterStruct, compiledStage.reflection, job.Request.UnitKind == ShaderCompileUnitKind::Library);
+	if (mismatch)
+	{
+		throw Diagnostics::Error(
+		    std::format(
+		        "SC2001 {} parameter-struct '{}' verification failed: {}",
+		        FormatShaderCompileJob(job, compiledStage.backendName, job.Request.Target),
+		        job.Request.ParameterStruct->Name,
+		        *mismatch));
+	}
 }

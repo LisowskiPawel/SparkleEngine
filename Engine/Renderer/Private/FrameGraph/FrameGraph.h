@@ -36,7 +36,6 @@ class RayTracingShaderTable;
 class RenderCommandContext;
 class RenderCommandList;
 class RhiCommandSubmissionService;
-class FrameExecutionDiagnostics;
 class FrameGraphTransientAllocator;
 class FrameGraphRecordingChunkRecorder;
 class FrameGraphBuilder;
@@ -80,7 +79,7 @@ private:
 	};
 
 public:
-	FrameGraph(RenderHardwareInterface* renderHardwareInterface, Window* window);
+	FrameGraph(RenderHardwareInterface& renderHardwareInterface, Window& window);
 	~FrameGraph();
 
 	FrameGraph(const FrameGraph&) = delete;
@@ -121,7 +120,7 @@ public:
 		    EFrameGraphPassKind::Raster,
 		    EFrameGraphQueuePreference::Graphics,
 		    parameters,
-		    [](PassResourceBuilder& builder, const TParameterBindings& typedParameters, const char* passName) { return SetupShaderParameters(builder, typedParameters, passName); },
+		    [](PassResourceBuilder& builder, const TParameterBindings& typedParameters) { SetupShaderParameters(builder, typedParameters); },
 		    std::forward<ExecuteFn>(executeFn));
 	}
 
@@ -133,7 +132,7 @@ public:
 		    EFrameGraphPassKind::Compute,
 		    queuePreference,
 		    parameters,
-		    [](PassResourceBuilder& builder, const TParameterBindings& typedParameters, const char* passName) { return SetupShaderParameters(builder, typedParameters, passName); },
+		    [](PassResourceBuilder& builder, const TParameterBindings& typedParameters) { SetupShaderParameters(builder, typedParameters); },
 		    std::forward<ExecuteFn>(executeFn));
 	}
 
@@ -145,11 +144,10 @@ public:
 		    EFrameGraphPassKind::RayTracing,
 		    EFrameGraphQueuePreference::Graphics,
 		    parameters,
-		    [shaderTable](PassResourceBuilder& builder, const TParameterBindings& typedParameters, const char* passName)
+		    [shaderTable](PassResourceBuilder& builder, const TParameterBindings& typedParameters)
 		    {
-			    const bool bParametersValid = SetupShaderParameters(builder, typedParameters, passName);
+			    SetupShaderParameters(builder, typedParameters);
 			    builder.Read(shaderTable, ResourceUsage::RayTracingShaderTableRead, "ShaderTable");
-			    return bParametersValid;
 		    },
 		    std::forward<ExecuteFn>(executeFn));
 	}
@@ -161,7 +159,7 @@ public:
 
 	const FrameGraphPlan& Compile();
 
-	void Execute(const FrameGraphPlan& plan, RhiCommandSubmissionService& submissionService, FrameExecutionDiagnostics& frameDiagnostics, TaskExecutor& taskExecutor) const;
+	void Execute(const FrameGraphPlan& plan, RhiCommandSubmissionService& submissionService, TaskExecutor& taskExecutor) const;
 
 	template <typename TParameters> TypedPassParameterInstance<TParameters>& AllocParameters(const char* debugName, ShaderStageVisibility visibility = ShaderStageVisibility::None)
 	{
@@ -261,7 +259,6 @@ private:
 	void AddTypedShaderPass(std::string_view name, EFrameGraphPassKind kind, EFrameGraphQueuePreference queuePreference, TParameterBindings& parameters, SetupFn&& setupFn, ExecuteFn&& executeFn)
 	{
 		auto* parameterBindings = &parameters;
-		std::string passName(name);
 
 		m_passes.push_back(
 		    RegisteredPass{
@@ -269,8 +266,12 @@ private:
 		        .kind = kind,
 		        .queuePreference = queuePreference,
 		        .executionModel = FrameGraphPassExecutionModel::TypedShader,
-		        .setupCallback = [parameterBindings, passName, setupFn = std::forward<SetupFn>(setupFn)](PassResourceBuilder& builder) mutable
-		        { return setupFn(builder, *parameterBindings, passName.c_str()); },
+		        .setupCallback =
+		            [parameterBindings, setupFn = std::forward<SetupFn>(setupFn)](PassResourceBuilder& builder) mutable
+		        {
+			        setupFn(builder, *parameterBindings);
+			        return true;
+		        },
 		        .executeCallback = MakeParameterizedExecuteCallback(
 		            parameterBindings,
 		            [executeFn = std::forward<ExecuteFn>(executeFn)](PassCommandContext& context, TParameterBindings& typedParameters) mutable { executeFn(context, typedParameters); })});
@@ -294,12 +295,10 @@ private:
 	void SyncImportedBufferViews(FrameGraphResourceHandle handle, const FrameGraphResourceMetadata& metadata, FrameGraphResourceAccess& access) const noexcept;
 	void ReleaseExternalResourceViews() noexcept;
 	void ReleaseExternalResourceViews(FrameGraphResourceHandle handle) noexcept;
-	void EmitTransientAliasingBarriers(RenderCommandContext& commandContext, const std::vector<FrameGraphAliasingBarrier>& barriers) const noexcept;
 	void EmitTransientAliasingBarriers(RenderCommandContext& commandContext, std::string_view passName, const std::vector<FrameGraphAliasingBarrier>& barriers) const noexcept;
-	void EmitCompiledBarriers(RenderCommandContext& commandContext, const std::vector<FrameGraphBarrier>& barriers) const noexcept;
 	void EmitCompiledBarriers(RenderCommandContext& commandContext, std::string_view passName, const std::vector<FrameGraphBarrier>& barriers) const noexcept;
-	void RecordFrameBeginBarriers(const FrameGraphPlan& plan, RenderCommandList& commandList, FrameExecutionDiagnostics& frameDiagnostics) const;
-	void RecordFrameEndBarriers(const FrameGraphPlan& plan, RenderCommandList& commandList, FrameExecutionDiagnostics& frameDiagnostics) const;
+	void RecordFrameBeginBarriers(const FrameGraphPlan& plan, RenderCommandList& commandList) const;
+	void RecordFrameEndBarriers(const FrameGraphPlan& plan, RenderCommandList& commandList) const;
 	void PrepareTextureHistories(const FrameGraphPlan& plan);
 	void CommitTextureHistories() const noexcept;
 	void ReleaseTextureHistories() noexcept;
@@ -352,8 +351,8 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<RayTracingShaderTable>> m_rayTracingShaderTables;
 	std::vector<RegisteredPass> m_passes;
 	std::vector<PassPreparation> m_passPreparations;
-	RenderHardwareInterface* m_renderHardwareInterface = nullptr;
-	Window* m_window = nullptr;
+	RenderHardwareInterface& m_renderHardwareInterface;
+	Window& m_window;
 	FrameGraphResourceRegistry m_resourceRegistry;
 	mutable FrameGraphResourceStateTracker m_resourceStateTracker;
 	mutable FrameGraphResourceResolver m_resourceResolver;

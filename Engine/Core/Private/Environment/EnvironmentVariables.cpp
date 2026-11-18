@@ -20,10 +20,7 @@ namespace Environment
 		size_t requiredLength = 0;
 		if (_dupenv_s(&rawValue, &requiredLength, name) != 0 || rawValue == nullptr || requiredLength <= 1)
 		{
-			if (rawValue != nullptr)
-			{
-				std::free(rawValue);
-			}
+			std::free(rawValue);
 			return false;
 		}
 
@@ -35,7 +32,7 @@ namespace Environment
 	bool GetFlag(const char* name) noexcept
 	{
 		std::string value;
-		return TryGetVariable(name, value) && !value.empty() && value[0] != '0';
+		return TryGetVariable(name, value) && value[0] != '0';
 	}
 
 	std::uint32_t GetUInt32(const char* name, std::uint32_t fallbackValue) noexcept

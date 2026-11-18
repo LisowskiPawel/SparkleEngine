@@ -31,6 +31,7 @@ namespace SparkleLauncher
 			ReportOperationProgress(outputCallback, step.DisplayName);
 			Process::ChildProcessRequest request = step.Request;
 			AppendProcessOutputCallback(request, outputCallback);
+			operation.LogPath = request.LogPath;
 
 			const Process::ChildProcessResult result = processRunner.Run(request);
 			if (plan.Request.GpuCrashMode == RhiGpuCrashMode::Aftermath)

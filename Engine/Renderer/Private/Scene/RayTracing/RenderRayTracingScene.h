@@ -1,6 +1,5 @@
 #pragma once
 
-#include "RayTracing/Diagnostics/RayTracingPerformanceMetrics.h"
 #include "RayTracing/RayTracingExecutionFrontend.h"
 #include "Scene/RayTracing/RenderRayTracingFrameBindings.h"
 #include "Scene/RayTracing/RayTracingShaderTablePlan.h"
@@ -39,18 +38,12 @@ public:
 
 	RayTracingExecutionFrontend GetExecutionFrontend() const noexcept { return m_executionFrontend; }
 
-	void BeginGraphBuild() noexcept;
 	std::uint64_t GetGraphGeneration() const noexcept;
-
-	const RayTracingPerformanceMetrics& GetPerformanceMetrics() const noexcept { return m_performanceMetrics; }
-
-	const RayTracingShaderTableMetrics& GetShaderTableMetrics() const noexcept { return m_shaderTablePlan.GetMetrics(); }
 
 	RayTracingShaderTablePlan& GetShaderTablePlan() noexcept { return m_shaderTablePlan; }
 
 private:
 	RayTracingExecutionFrontend m_executionFrontend = RayTracingExecutionFrontend::None;
-	RayTracingPerformanceMetrics m_performanceMetrics = {};
 	RayTracingShaderTablePlan m_shaderTablePlan;
 	std::unique_ptr<RayTracingBlasCache> m_blasCache;
 	std::unique_ptr<RayTracingAccelerationStrategy> m_accelerationStrategy;

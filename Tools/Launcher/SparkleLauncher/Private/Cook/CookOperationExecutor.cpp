@@ -127,6 +127,7 @@ namespace SparkleLauncher
 			}
 
 			AppendProcessOutputCallback(request, outputCallback);
+			operation.LogPath = request.LogPath;
 
 			const Process::ChildProcessResult result = processRunner.Run(request);
 			if (!result.Succeeded())

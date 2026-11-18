@@ -50,7 +50,7 @@ namespace Assets
 		try
 		{
 			files.Read(manifestPath);
-			manifest = SceneManifestLoader::Decode(manifestPath, files.Get(manifestPath), files.GetAllocationBudget());
+			manifest = SceneManifestLoader::Decode(files.Get(manifestPath), files.GetAllocationBudget());
 			files.Release(manifestPath);
 
 			ReadMeshFiles(manifest, files);

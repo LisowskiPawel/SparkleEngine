@@ -1,6 +1,5 @@
 #pragma once
 
-#include <filesystem>
 #include <span>
 #include <cstdint>
 
@@ -11,6 +10,6 @@ namespace Assets
 
 	namespace MaterialAssetLoader
 	{
-		LoadedMaterialAsset Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget);
+		LoadedMaterialAsset Decode(std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget);
 	}
 }

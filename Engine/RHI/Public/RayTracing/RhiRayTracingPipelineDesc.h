@@ -99,7 +99,8 @@ struct RhiRayTracingShaderTableRegion;
 class SPARKLE_RHI_API RayTracingShaderTable
 {
 public:
-	RayTracingShaderTable(std::uint64_t generation, std::uint64_t pipelineGeneration) noexcept;
+	// The pipeline must outlive its shader tables and pending dispatches.
+	explicit RayTracingShaderTable(const RayTracingShaderTableDesc& desc);
 	virtual ~RayTracingShaderTable() noexcept;
 	RayTracingShaderTable(const RayTracingShaderTable&) = delete;
 	RayTracingShaderTable& operator=(const RayTracingShaderTable&) = delete;
@@ -108,7 +109,7 @@ public:
 
 	std::uint64_t GetGeneration() const noexcept { return m_generation; }
 
-	std::uint64_t GetPipelineGeneration() const noexcept { return m_pipelineGeneration; }
+	bool MatchesPipeline(const RayTracingPipeline& pipeline) const noexcept;
 
 	virtual RhiResourceHandle GetResource() const noexcept = 0;
 	virtual RhiRayTracingShaderTableRegion GetRayGenerationRegion() const noexcept = 0;
@@ -119,7 +120,7 @@ public:
 private:
 	std::uint64_t m_generation = 0;
 
-	std::uint64_t m_pipelineGeneration = 0;
+	const RayTracingPipeline* m_pipeline = nullptr;
 };
 
 struct RhiRayTracingShaderTableRegion final

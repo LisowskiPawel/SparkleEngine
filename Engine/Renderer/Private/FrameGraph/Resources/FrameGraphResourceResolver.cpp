@@ -28,14 +28,12 @@ void FrameGraphResourceResolver::SetResolvedAccess(FrameGraphResourceHandle hand
 
 FrameGraphResourceAccess& FrameGraphResourceResolver::GetResolvedAccess(FrameGraphResourceHandle handle) noexcept
 {
-	assert(handle.IsValid());
 	assert(handle.index < m_resolvedAccessEntries.size() && "FrameGraph resource access is not resolved.");
 	return m_resolvedAccessEntries[handle.index];
 }
 
 const FrameGraphResourceAccess& FrameGraphResourceResolver::GetResolvedAccess(FrameGraphResourceHandle handle) const noexcept
 {
-	assert(handle.IsValid());
 	assert(handle.index < m_resolvedAccessEntries.size() && "FrameGraph resource access is not resolved.");
 	return m_resolvedAccessEntries[handle.index];
 }

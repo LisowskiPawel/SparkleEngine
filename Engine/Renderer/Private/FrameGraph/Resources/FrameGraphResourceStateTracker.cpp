@@ -21,16 +21,12 @@ void FrameGraphResourceStateTracker::RegisterResource(FrameGraphResourceHandle h
 
 void FrameGraphResourceStateTracker::UpdateCurrentState(FrameGraphResourceHandle handle, ResourceState currentState) noexcept
 {
-	assert(handle.IsValid());
-	assert(handle.index < m_runtimeStates.size() && "FrameGraph resource state is not tracked.");
 	assert(handle.index < m_trackedResources.size() && m_trackedResources[handle.index] && "FrameGraph resource state is not tracked.");
 	m_runtimeStates[handle.index] = currentState;
 }
 
 ResourceState FrameGraphResourceStateTracker::GetRuntimeState(FrameGraphResourceHandle handle) const noexcept
 {
-	assert(handle.IsValid());
-	assert(handle.index < m_runtimeStates.size() && "FrameGraph resource state is not tracked.");
 	assert(handle.index < m_trackedResources.size() && m_trackedResources[handle.index] && "FrameGraph resource state is not tracked.");
 	return m_runtimeStates[handle.index];
 }

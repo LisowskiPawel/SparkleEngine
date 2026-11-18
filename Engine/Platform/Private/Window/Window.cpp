@@ -62,7 +62,7 @@ void Window::ToggleFullScreen()
 
 void Window::ToggleMaximizeRestore() noexcept
 {
-	if (m_hWnd == nullptr || IsFullScreen())
+	if (IsFullScreen())
 	{
 		return;
 	}

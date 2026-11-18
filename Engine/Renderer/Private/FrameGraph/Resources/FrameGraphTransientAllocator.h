@@ -65,7 +65,7 @@ private:
 	AllocationRecord CreateAllocationRecord(const FrameGraphTransientResourcePlan& transientPlan);
 	RhiOwnedMemoryBlockHandle GetOrCreateMemoryBlock(const FrameGraphTransientResourcePlan& transientPlan);
 
-	RenderHardwareInterface* m_renderHardwareInterface = nullptr;
+	RenderHardwareInterface& m_renderHardwareInterface;
 	std::vector<PlanEntry> m_planEntries;
 	std::vector<MemoryBlockRecord> m_memoryBlocks;
 	std::vector<AllocationRecord> m_allocations;

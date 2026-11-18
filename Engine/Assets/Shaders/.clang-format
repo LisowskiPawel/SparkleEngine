@@ -8,5 +8,5 @@ SpaceAfterCStyleCast: false
 
 # This expresses the authored shader convention, but clang-format 22.1.3 does
 # not recognize single-bracket HLSL attributes such as [numthreads] and
-# [unroll]. A separate source check must enforce their own-line placement.
+# [unroll]. The formatter wrapper restores their own-line placement.
 BreakAfterAttributes: Always

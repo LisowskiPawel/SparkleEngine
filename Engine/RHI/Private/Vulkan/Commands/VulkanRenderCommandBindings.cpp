@@ -221,7 +221,7 @@ VkDescriptorSet VulkanRenderCommandList::EnsureDescriptorSet(
 
 void VulkanRenderCommandList::BindDescriptorSet(VkPipelineBindPoint bindPoint, VkPipelineLayout pipelineLayout, std::uint32_t setIndex, VkDescriptorSet descriptorSet) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE || pipelineLayout == VK_NULL_HANDLE || descriptorSet == VK_NULL_HANDLE)
+	if (pipelineLayout == VK_NULL_HANDLE || descriptorSet == VK_NULL_HANDLE)
 	{
 		return;
 	}
@@ -372,7 +372,7 @@ void VulkanRenderCommandList::SetShaderPushConstants(
     std::uint32_t destOffsetIn32BitValues) noexcept
 {
 	const CompiledBinding* const binding = FindBindingByIndex(state.Layout, bindingIndex);
-	if (m_commandBuffer == VK_NULL_HANDLE || state.PipelineLayout == VK_NULL_HANDLE || binding == nullptr || data == nullptr || num32BitValues == 0)
+	if (state.PipelineLayout == VK_NULL_HANDLE || binding == nullptr || data == nullptr || num32BitValues == 0)
 	{
 		return;
 	}

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <filesystem>
 #include <span>
 
 namespace Assets
@@ -11,6 +10,6 @@ namespace Assets
 
 	namespace AnimationAssetLoader
 	{
-		LoadedAnimationAsset Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget);
+		LoadedAnimationAsset Decode(std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget);
 	}
 }

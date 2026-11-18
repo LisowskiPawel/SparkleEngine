@@ -21,9 +21,6 @@ namespace Filesystem
 
 	void DiscoverFileSystemPathRoots(FileSystemPathState& state)
 	{
-		state.workingDirectory = std::filesystem::current_path();
-		state.executableDirectory = Filesystem::GetExecutableDirectory();
-
 		state.workspacePath = Filesystem::ResolveWorkspaceRootPath();
 		DiscoverWorkspaceAssetRoots(state);
 

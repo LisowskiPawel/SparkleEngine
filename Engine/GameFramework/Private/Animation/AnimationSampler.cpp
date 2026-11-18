@@ -69,11 +69,6 @@ namespace AnimationSampler
 	DirectX::XMVECTOR SampleVectorChannel(const AnimationClipResource& clip, const AnimationChannel& channel, float timeSeconds) noexcept
 	{
 		const std::uint32_t first = channel.firstKeyframe;
-		if (channel.keyframeCount == 0u || first >= clip.keyframes.size())
-		{
-			return DirectX::XMVectorZero();
-		}
-
 		if (channel.keyframeCount == 1u)
 		{
 			return DirectX::XMLoadFloat4(&clip.keyframes[first].value);
@@ -95,11 +90,6 @@ namespace AnimationSampler
 	DirectX::XMVECTOR SampleRotationChannel(const AnimationClipResource& clip, const AnimationChannel& channel, float timeSeconds) noexcept
 	{
 		const std::uint32_t first = channel.firstKeyframe;
-		if (channel.keyframeCount == 0u || first >= clip.keyframes.size())
-		{
-			return DirectX::XMQuaternionIdentity();
-		}
-
 		if (channel.keyframeCount == 1u)
 		{
 			return DirectX::XMQuaternionNormalize(DirectX::XMLoadFloat4(&clip.keyframes[first].value));

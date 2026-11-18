@@ -50,7 +50,6 @@ namespace DirectReservoir
 		reservoir.Candidate.Light.Type = (uint)(samplePayload.x + 0.5f);
 		reservoir.Candidate.Light.Index = (uint)(samplePayload.y + 0.5f);
 		reservoir.Candidate.SelectionPdf = 1.0f;
-		reservoir.Candidate.Valid = 1.0f;
 		reservoir.ShapeSample = saturate(samplePayload.zw);
 		reservoir.WeightSum = weightPayload.x;
 		reservoir.TargetPdf = weightPayload.y;
@@ -75,12 +74,6 @@ namespace DirectReservoir
 
 	LightSampling::DirectLightSample ReplayLightSample(DirectLightSampling::LightCandidate candidate, float2 shapeSample, float3 positionWorld)
 	{
-		if (!DirectLightSampling::IsValid(candidate))
-		{
-			return LightSampling::InvalidDirectLightSample();
-		}
-
-		candidate.SelectionPdf = 1.0f;
 		LightSampling::DirectLightSample sample = DirectLightSampling::SampleDirectLight(candidate, positionWorld, shapeSample);
 		sample.LightSelectionPdf = 1.0f;
 		return sample;

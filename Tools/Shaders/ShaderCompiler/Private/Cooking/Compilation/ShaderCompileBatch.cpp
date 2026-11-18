@@ -1,15 +1,13 @@
 #include "PCH.h"
-#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include "Cooking/Compilation/ShaderCompileBatch.h"
 
-#include "Cooking/Compilation/ShaderCompileFailureReplay.h"
 #include "Cooking/Compilation/ShaderCompileJob.h"
 #include "Cooking/Compilation/ShaderCompileJobExecutor.h"
 #include "Cooking/ShaderCookSettings.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "TaskExecutor.h"
-#include "Verification/ShaderParameterStructCookVerifier.h"
+#include "Verification/ShaderParameterStructVerifier.h"
 
 #include <algorithm>
 #include <atomic>
@@ -82,12 +80,11 @@ static std::vector<ShaderCompileResult> CompileProducers(
 	        .MaximumEdgesPerExecution = 1,
 	        .MaximumActiveExecutions = 1});
 	std::vector<ShaderCompileResult> results(producerJobIndices.size());
-	std::vector<std::string> failureDiagnostics(producerJobIndices.size());
 	TaskGraphBuilder graph(TaskGraphLimits{.MaximumTasks = static_cast<std::uint32_t>(producerJobIndices.size()), .MaximumEdges = 1});
 	for (std::uint32_t producerIndex = 0; producerIndex < producerJobIndices.size(); ++producerIndex)
 	{
 		graph.Add(
-		    TaskDesc{TaskName("Compile shader"), TaskLane::Background},
+		    TaskDesc{"Compile shader", TaskLane::Background},
 		    [&, producerIndex](TaskExecutionContext& context)
 		    {
 			    if (context.IsCancellationRequested())
@@ -108,7 +105,6 @@ static std::vector<ShaderCompileResult> CompileProducers(
 			    }
 			    catch (const std::exception& error)
 			    {
-				    failureDiagnostics[producerIndex] = error.what();
 				    return TaskResult::Failure(error.what());
 			    }
 		    });
@@ -119,15 +115,6 @@ static std::vector<ShaderCompileResult> CompileProducers(
 	if (execution.GetStatus() == TaskExecutionStatus::Succeeded)
 	{
 		return results;
-	}
-
-	for (std::size_t producerIndex = 0; producerIndex < failureDiagnostics.size(); ++producerIndex)
-	{
-		if (!failureDiagnostics[producerIndex].empty())
-		{
-			ShaderCompileFailureReplay::Write(Filesystem::GetCookedShaderRootPath(), jobs[producerJobIndices[producerIndex]], failureDiagnostics[producerIndex]);
-			break;
-		}
 	}
 
 	const TaskResult result = execution.GetResult();
@@ -171,15 +158,7 @@ static void FinalizeResults(std::span<const ShaderCompileJob> jobs, std::span<Sh
 	{
 		const ShaderCompileJob& job = jobs[jobIndex];
 		ShaderCompileResult& result = results[jobIndex];
-		try
-		{
-			VerifyCookedShaderParameters(job, result.Output, &result.DebugArtifacts);
-		}
-		catch (const std::exception& error)
-		{
-			ShaderCompileFailureReplay::Write(Filesystem::GetCookedShaderRootPath(), job, error.what());
-			throw;
-		}
+		VerifyCookedShaderParameters(job, result.Output);
 
 		if (progress)
 		{

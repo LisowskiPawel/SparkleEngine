@@ -16,7 +16,7 @@ public:
 	{
 		if (!bCondition)
 		{
-			Diagnostics::Fatal(g_streamlineViewConstantsLogger, __FILE__, __LINE__, std::string(message));
+			Diagnostics::Fatal(g_streamlineViewConstantsLogger, __FILE__, __LINE__, message);
 		}
 	}
 

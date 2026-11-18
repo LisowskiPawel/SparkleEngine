@@ -1,10 +1,14 @@
 #include "PCH.h"
 
 #include "ShaderParameters/PassParameterSet.h"
+#include "Core/Public/Diagnostics/Logger.h"
+#include "Core/Public/Diagnostics/Verify.h"
 
 #include <algorithm>
 #include <cassert>
 #include <utility>
+
+SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_passParameterSetLogger, "Renderer.PassParameters");
 
 template <typename THandle> static bool ValidateResourceBinding(const std::vector<THandle>& handles, const PassParameterDesc& parameter) noexcept
 {
@@ -87,7 +91,7 @@ void PassParameterBinding::SetValue(PassParameterBindingValue value)
 }
 
 PassParameterSet::PassParameterSet(const PassParameterLayout& layout, std::vector<bool> graphResourceParameters) :
-    m_layout(&layout),
+    m_layout(layout),
     m_bindings(layout.GetParameterCount()),
     m_graphResourceParameters(std::move(graphResourceParameters))
 {
@@ -260,7 +264,7 @@ bool PassParameterSet::SetSampler(const char* name, RhiSamplerDesc sampler)
 
 bool PassParameterSet::HasAllRequiredBindings() const noexcept
 {
-	if (m_layout == nullptr || m_bindings.size() != m_layout->GetParameterCount())
+	if (m_bindings.size() != m_layout.GetParameterCount())
 	{
 		return false;
 	}
@@ -279,12 +283,7 @@ bool PassParameterSet::HasAllRequiredBindings() const noexcept
 std::vector<std::string> PassParameterSet::GetMissingBindings() const
 {
 	std::vector<std::string> missing;
-	if (m_layout == nullptr)
-	{
-		return missing;
-	}
-
-	const std::vector<PassParameterDesc>& parameters = m_layout->GetParameters();
+	const std::vector<PassParameterDesc>& parameters = m_layout.GetParameters();
 	for (std::size_t index = 0; index < parameters.size() && index < m_bindings.size(); ++index)
 	{
 		if (!m_bindings[index].IsBound())
@@ -296,15 +295,34 @@ std::vector<std::string> PassParameterSet::GetMissingBindings() const
 	return missing;
 }
 
+[[noreturn]] void PassParameterSet::ReportInvalidBindings(const char* passName) const noexcept
+{
+	std::string message = "Shader pass '";
+	message += passName != nullptr ? passName : "<unnamed>";
+	message += "' has invalid parameters: ";
+	const std::vector<std::string> missingBindings = GetMissingBindings();
+	message += missingBindings.empty() ? "incomplete bindings" : "missing bindings ";
+	for (std::size_t index = 0; index < missingBindings.size(); ++index)
+	{
+		if (index > 0)
+		{
+			message += ", ";
+		}
+		message += missingBindings[index];
+	}
+	message += ".";
+	Diagnostics::Fatal(g_passParameterSetLogger, __FILE__, __LINE__, message);
+}
+
 const PassParameterDesc* PassParameterSet::FindParameter(const char* name, std::uint32_t& outIndex) const noexcept
 {
 	outIndex = 0;
-	if (m_layout == nullptr || name == nullptr)
+	if (name == nullptr)
 	{
 		return nullptr;
 	}
 
-	const std::vector<PassParameterDesc>& parameters = m_layout->GetParameters();
+	const std::vector<PassParameterDesc>& parameters = m_layout.GetParameters();
 	for (std::size_t index = 0; index < parameters.size(); ++index)
 	{
 		if (parameters[index].Name == name)

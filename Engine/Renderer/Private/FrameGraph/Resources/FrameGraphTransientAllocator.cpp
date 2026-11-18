@@ -12,19 +12,16 @@
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogFrameGraphTransientAllocator, "Renderer.FrameGraph");
 
 FrameGraphTransientAllocator::FrameGraphTransientAllocator(RenderHardwareInterface& renderHardwareInterface) noexcept :
-    m_renderHardwareInterface(&renderHardwareInterface)
+    m_renderHardwareInterface(renderHardwareInterface)
 {
 }
 
 void FrameGraphTransientAllocator::Reset() noexcept
 {
 	ReleaseAllocations();
-	if (m_renderHardwareInterface != nullptr)
+	for (MemoryBlockRecord& block : m_memoryBlocks)
 	{
-		for (MemoryBlockRecord& block : m_memoryBlocks)
-		{
-			m_renderHardwareInterface->GetResourceService().ReleaseTransientMemoryBlock(block.memoryBlock);
-		}
+		m_renderHardwareInterface.GetResourceService().ReleaseTransientMemoryBlock(block.memoryBlock);
 	}
 	m_allocations.clear();
 	m_memoryBlocks.clear();
@@ -59,40 +56,35 @@ bool FrameGraphTransientAllocator::Prepare(const FrameGraphTransientPlan& plan) 
 
 void FrameGraphTransientAllocator::ReleaseAllocations() noexcept
 {
-	if (m_renderHardwareInterface == nullptr)
-	{
-		return;
-	}
-
 	for (AllocationRecord& allocation : m_allocations)
 	{
 		if (allocation.Access.renderTargetView)
 		{
-			m_renderHardwareInterface->GetDescriptorService().ReleaseResourceView(allocation.Access.renderTargetView);
+			m_renderHardwareInterface.GetDescriptorService().ReleaseResourceView(allocation.Access.renderTargetView);
 			allocation.Access.renderTargetView = {};
 		}
 
 		if (allocation.Access.depthStencilView)
 		{
-			m_renderHardwareInterface->GetDescriptorService().ReleaseResourceView(allocation.Access.depthStencilView);
+			m_renderHardwareInterface.GetDescriptorService().ReleaseResourceView(allocation.Access.depthStencilView);
 			allocation.Access.depthStencilView = {};
 		}
 
 		if (allocation.Access.shaderResourceView)
 		{
-			m_renderHardwareInterface->GetDescriptorService().ReleaseResourceView(allocation.Access.shaderResourceView);
+			m_renderHardwareInterface.GetDescriptorService().ReleaseResourceView(allocation.Access.shaderResourceView);
 			allocation.Access.shaderResourceView = {};
 		}
 
 		if (allocation.Access.unorderedAccessView)
 		{
-			m_renderHardwareInterface->GetDescriptorService().ReleaseResourceView(allocation.Access.unorderedAccessView);
+			m_renderHardwareInterface.GetDescriptorService().ReleaseResourceView(allocation.Access.unorderedAccessView);
 			allocation.Access.unorderedAccessView = {};
 		}
 
 		if (allocation.ownedResource)
 		{
-			m_renderHardwareInterface->GetResourceService().ReleaseOwnedResource(allocation.ownedResource);
+			m_renderHardwareInterface.GetResourceService().ReleaseOwnedResource(allocation.ownedResource);
 			allocation.ownedResource = {};
 		}
 		allocation.Access.resource = {};
@@ -128,7 +120,7 @@ RhiOwnedMemoryBlockHandle FrameGraphTransientAllocator::GetOrCreateMemoryBlock(c
 
 	const std::wstring debugName = L"FG_TransientBlock_" + std::to_wstring(blockIndex);
 
-	const RhiOwnedMemoryBlockHandle memoryBlock = m_renderHardwareInterface->GetResourceService().CreateTransientMemoryBlock(
+	const RhiOwnedMemoryBlockHandle memoryBlock = m_renderHardwareInterface.GetResourceService().CreateTransientMemoryBlock(
 	    transientPlan.physicalAllocation.pool,
 	    transientPlan.physicalAllocation.sizeInBytes,
 	    transientPlan.physicalAllocation.alignment,
@@ -140,7 +132,6 @@ RhiOwnedMemoryBlockHandle FrameGraphTransientAllocator::GetOrCreateMemoryBlock(c
 
 FrameGraphTransientAllocator::AllocationRecord FrameGraphTransientAllocator::CreateAllocationRecord(const FrameGraphTransientResourcePlan& transientPlan)
 {
-	assert(m_renderHardwareInterface != nullptr);
 	assert(transientPlan.handle.IsValid());
 	assert(transientPlan.physicalAllocation.sizeInBytes > 0);
 	assert(transientPlan.physicalAllocation.alignment > 0);

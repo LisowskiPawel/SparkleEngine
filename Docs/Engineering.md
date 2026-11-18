@@ -107,7 +107,7 @@ The source owners are:
 | Module or source root | Responsibility and placement |
 | --- | --- |
 | `Engine/Core` | Product-independent files, paths, processes, input values, math, logging and time |
-| `Engine/Tasks` | Graph construction, execution, scheduling, scope lifetime and profiling; product scheduling policy stays with callers |
+| `Engine/Tasks` | Graph construction, execution, scheduling and scope lifetime; product scheduling policy stays with callers |
 | `Engine/Platform` | Native window/input implementation; Core owns the shared input values |
 | `Engine/RHI` | Device/resource/command contracts, common validation and separate D3D12/Vulkan implementations |
 | `Engine/Renderer` | Scene/view preparation, GPU scene state, frame graphs, passes and image providers; vendor adapters remain separate from neutral orchestration |
@@ -129,6 +129,8 @@ Borrow with references, views or handles, or move ownership, before copying. Ext
 Choose layout from actual access patterns and data size. Check bounds and arithmetic sizes, and define CPU/GPU representations explicitly. Use values for immutable data, `unique_ptr` for sole heap ownership and `shared_ptr` for genuinely shared lifetime.
 
 Spans and callback captures do not extend lifetime. Finish cancelled work before destroying its inputs. GPU resources remain alive until every queue using them completes.
+
+Check immutable inputs when their owner accepts them; express guaranteed presence with references or construction invariants. Keep checks for changing identity, capacity, thread ownership and GPU retirement at the operation that consumes that state. Report failures there with the operation, affected resource and native error where available; avoid repeating status logs and validation in callers.
 
 Required work needs an implementation. Reject invalid or unsupported input before partially scheduling or publishing a result where possible. A dummy value, clear, copy or swallowed error cannot substitute for the requested operation.
 
@@ -176,7 +178,7 @@ Inspect native captures separately from optimized timing runs. Match the frame, 
 
 Run loads level definitions and cooked dependencies without requiring raw assets or source-selection flags. Game presents the scene; Editor provides inspection and editing.
 
-Prepare the release base with a complete build and cook. [ReleaseProducts.cmake](../CMake/Packaging/ReleaseProducts.cmake) defines staging, verification and archive membership. Matching source can import that base with [SyncProducts.ps1](../CMake/Packaging/SyncProducts.ps1), then rebuild/cook into the same outputs. Installer/updater, old-store migration and a freshness service are outside scope.
+Prepare the release base with a complete build and cook. [ReleaseProducts.cmake](../CMake/Packaging/ReleaseProducts.cmake) defines staging, verification and archive membership. Packaging prints the published archive path and SHA-256; its manifest, SBOM and provenance describe the payload. Matching source can import that base with [SyncProducts.ps1](../CMake/Packaging/SyncProducts.ps1), then rebuild/cook into the same outputs. Installer/updater, old-store migration and a freshness service are outside scope.
 
 Multi-config generators produce both Shipping inventories. Single-config generators produce the selected Shipping inventory and expose packaging only for a Shipping build.
 

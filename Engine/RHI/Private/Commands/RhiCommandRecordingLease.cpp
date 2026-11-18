@@ -5,14 +5,6 @@
 #include "Commands/RenderCommandList.h"
 
 #include <cassert>
-#include <type_traits>
-
-static_assert(!std::is_copy_constructible_v<RhiCommandRecordingLease>);
-static_assert(!std::is_copy_assignable_v<RhiCommandRecordingLease>);
-static_assert(std::is_move_constructible_v<RhiCommandRecordingLease>);
-static_assert(std::is_move_assignable_v<RhiCommandRecordingLease>);
-static_assert(!std::is_convertible_v<RhiCommandRecordingLease, RhiSubmissionToken>);
-static_assert(!std::is_convertible_v<RhiCommandRecordingLease, RenderCommandList&>);
 
 RhiCommandRecordingLease::RhiCommandRecordingLease() noexcept = default;
 

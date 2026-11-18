@@ -50,7 +50,7 @@ std::optional<ConsoleOutputRecord> EditorViewportCaptureCoordinator::Update(Rend
 
 		std::string errorMessage;
 
-		const TaskName taskName = TaskName("Write viewport capture");
+		const std::string taskName = "Write viewport capture";
 
 		auto operationTask = [readback = std::move(readback), outputPath = m_outputPath](ViewportCaptureResult& result, TaskExecutionContext& context) mutable
 		{

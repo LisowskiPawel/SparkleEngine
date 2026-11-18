@@ -1,8 +1,4 @@
 function(sparkle_configure_host_tool_target target_name)
-	if(NOT TARGET ${target_name})
-		message(FATAL_ERROR "Unknown Sparkle tool target '${target_name}'")
-	endif()
-
 	sparkle_enable_parallel_compilation(${target_name})
 
 	foreach(game_config IN LISTS SPARKLE_GAME_CONFIGURATIONS)

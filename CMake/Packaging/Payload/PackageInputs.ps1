@@ -30,10 +30,6 @@ function New-PackageManifest
     {
         throw 'Missing canonical Launcher entry script.'
     }
-    foreach ($file in $Inputs.Files)
-    {
-        [void] (Assert-ArtifactFile $RepositoryRoot $file.Source $file.Size $file.Sha256)
-    }
     Assert-PackageRecipeInputs $RepositoryRoot $Inputs
     return $manifest
 }

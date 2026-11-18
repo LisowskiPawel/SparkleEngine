@@ -30,15 +30,13 @@ private:
 	};
 
 	void InitializeTaskStates();
-	void RecordDependencies() const;
 	void ScheduleInitialTasks();
-	TaskResult ExecuteBody(std::uint32_t index, const TaskWorker& worker);
+	TaskResult ExecuteBody(std::uint32_t index);
 	void RecordTaskResult(std::uint32_t index, const TaskGraphNode& node, const TaskResult& result);
 	void ReleaseNestedTasks(const TaskGraphNode& node, const TaskResult& result, TaskWorker& worker);
 	void TrySchedule(std::uint32_t index, TaskWorker* preferredWorker);
 	void ReleaseUnfinished(std::uint32_t index, TaskWorker* worker);
 	void SettleLogicalTask(std::uint32_t index, TaskWorker* worker);
-	TaskResult RecordLogicalCompletion(std::uint32_t index);
 	void ReleaseDependents(std::uint32_t index, const TaskResult& result, TaskWorker* worker);
 	void CompleteNestedParent(std::uint32_t index, const TaskResult& result, TaskWorker* worker);
 	void FinishIfAllTasksSettled();
@@ -49,11 +47,9 @@ private:
 	std::shared_ptr<const TaskGraphStorage> m_graph;
 	TaskExecutionContext m_context;
 	std::shared_ptr<TaskExecution::State> m_execution;
-	std::uint64_t m_generation = 0;
 	std::unique_ptr<ScheduledTaskState[]> m_tasks;
 	std::mutex m_resultMutex;
 	std::vector<TaskResult> m_taskResults;
-	std::vector<bool> m_settled;
 	std::string m_firstFailureTaskName;
 	TaskResult m_firstFailure = TaskResult::Success();
 	// The last logical settler acquires prior settlements before moving results into terminal publication.

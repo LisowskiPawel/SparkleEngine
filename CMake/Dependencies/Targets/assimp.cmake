@@ -5,11 +5,9 @@
 sparkle_declare_git_dependency(assimp
     https://github.com/assimp/assimp.git
     c35200e38ea8f058812b83de2ef32c6093b0ece2)
-sparkle_log_dependency_step("Assimp" "v5.4.3" "~15 MB" "FBX and DCC scene import support" "https://github.com/assimp/assimp.git")
 FetchContent_Populate(assimp)
 
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
-    sparkle_log_dependency_ready("Assimp" "${assimp_SOURCE_DIR}" "~15 MB")
     return()
 endif()
 
@@ -37,5 +35,3 @@ if(TARGET assimp)
     endif()
     set_target_properties(assimp PROPERTIES FOLDER "ThirdParty/Assimp")
 endif()
-
-sparkle_log_dependency_ready("assimp" "${assimp_SOURCE_DIR}" "~15 MB")

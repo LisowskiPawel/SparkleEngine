@@ -78,7 +78,7 @@ CompiledTaskGraph AssetCookerSceneBatch::BuildTaskGraph(
 	for (std::uint32_t index = 0; index < sceneEntries.size(); ++index)
 	{
 		builder.Add(
-		    TaskDesc{.Name = TaskName("Build cataloged scene"), .Lane = TaskLane::Background},
+		    TaskDesc{.Name = "Build cataloged scene", .Lane = TaskLane::Background},
 		    [&sceneEntries, &items, &itemCompleted, index](TaskExecutionContext& context)
 		    {
 			    TaskResult result = BuildProduct(sceneEntries, items, index, context);

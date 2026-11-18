@@ -18,7 +18,6 @@ namespace ECS
 			m_freeSlots.pop_back();
 			EntitySlot& entry = m_slots[slot];
 			entry.bAlive = true;
-			++m_liveCount;
 			AdvanceStructureVersion();
 			return EntityId(slot, entry.Generation);
 		}
@@ -30,7 +29,6 @@ namespace ECS
 
 		const EntityId::Slot slot = static_cast<EntityId::Slot>(m_slots.size());
 		m_slots.push_back(EntitySlot{.Generation = 1, .bAlive = true});
-		++m_liveCount;
 		AdvanceStructureVersion();
 		return EntityId(slot, 1);
 	}
@@ -45,7 +43,6 @@ namespace ECS
 		std::apply([entity](auto&... stores) { (stores.Remove(entity), ...); }, m_components);
 		EntitySlot& entry = m_slots[entity.GetSlot()];
 		entry.bAlive = false;
-		--m_liveCount;
 		AdvanceStructureVersion();
 
 		if (entry.Generation == (std::numeric_limits<EntityId::Generation>::max)())

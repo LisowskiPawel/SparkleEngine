@@ -4,15 +4,15 @@
 
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Json/JsonInputAdmission.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include <nlohmann/json.hpp>
-#include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include <algorithm>
 #include <array>
-#include <set>
 #include <filesystem>
 #include <optional>
+#include <set>
 #include <string>
 #include <string_view>
 
@@ -30,35 +30,26 @@ static std::optional<MeshDiagnosticMetadata> ParseCookedMeshMetadata(std::string
 		    metadataText.end(),
 		    [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
 		    {
-			    using Event = nlohmann::json::parse_event_t;
 			    admission.CheckDepth(depth);
-			    if (event == Event::key)
+			    if (event != nlohmann::json::parse_event_t::key)
 			    {
-				    const auto& key = value.get_ref<const std::string&>();
-				    const bool bConsumed = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
-				    if (!bConsumed)
-				    {
-					    return false;
-				    }
-				    if (!admission.TryReadKey(depth, key))
-				    {
-					    repeated.insert(key);
-				    }
+				    return true;
 			    }
-			    return true;
+
+			    const auto& key = value.get_ref<const std::string&>();
+			    const bool bConsumed = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
+			    if (bConsumed && !admission.TryReadKey(depth, key))
+			    {
+				    repeated.insert(key);
+			    }
+			    return bConsumed;
 		    });
 
-		if (!document.is_object())
-		{
-			return std::nullopt;
-		}
 		for (const auto& key : repeated)
 		{
 			document.erase(key);
 		}
-		const auto schema = document.find("schema");
-		const bool bSchemaString = schema != document.end() && schema->is_string();
-		if (!bSchemaString || schema->get_ref<const std::string&>() != "cooked-mesh-metadata")
+		if (document.at("schema") != "cooked-mesh-metadata")
 		{
 			return std::nullopt;
 		}

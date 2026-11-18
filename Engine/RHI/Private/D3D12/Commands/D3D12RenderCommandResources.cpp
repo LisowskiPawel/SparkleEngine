@@ -9,7 +9,7 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_d3d12RenderCommandListLogger, "RHI.D3D12.Co
 
 void D3D12RenderCommandList::CopyResource(RhiResourceHandle destinationResource, RhiResourceHandle sourceResource) noexcept
 {
-	if (m_commandList == nullptr || !destinationResource || !sourceResource)
+	if (!destinationResource || !sourceResource)
 	{
 		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 CopyResource requires an active command list and two valid resources.");
 	}
@@ -20,7 +20,7 @@ void D3D12RenderCommandList::CopyResource(RhiResourceHandle destinationResource,
 
 void D3D12RenderCommandList::AliasResource(RhiResourceHandle beforeResource, RhiResourceHandle afterResource) noexcept
 {
-	if (m_commandList == nullptr || !beforeResource || !afterResource)
+	if (!beforeResource || !afterResource)
 	{
 		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 aliasing barriers require an active command list and two valid resources.");
 	}
@@ -38,7 +38,7 @@ void D3D12RenderCommandList::AliasResource(RhiResourceHandle beforeResource, Rhi
 
 void D3D12RenderCommandList::TransitionResource(RhiResourceHandle resource, ResourceState before, ResourceState after) noexcept
 {
-	if (m_commandList == nullptr || !resource)
+	if (!resource)
 	{
 		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 resource transitions require an active command list and a valid resource.");
 	}
@@ -64,7 +64,7 @@ void D3D12RenderCommandList::TransitionResource(RhiResourceHandle resource, Reso
 
 void D3D12RenderCommandList::UnorderedAccessBarrier(RhiResourceHandle resource) noexcept
 {
-	if (m_commandList == nullptr || !resource)
+	if (!resource)
 	{
 		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 unordered-access barriers require an active command list and a valid resource.");
 	}

@@ -4,7 +4,6 @@
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "RayTracing/RhiRayTracingShaderTablePacking.h"
-#include "Validation/RhiContract.h"
 #include "Vulkan/Core/VulkanResult.h"
 #include "Vulkan/Device/VulkanRhi.h"
 #include "Vulkan/Memory/VulkanGpuMemoryAllocator.h"
@@ -98,10 +97,9 @@ static std::unique_ptr<VulkanGpuAllocationRecord> UploadShaderTable(
 }
 
 VulkanRayTracingShaderTable::VulkanRayTracingShaderTable(VulkanRhi& rhi, VulkanGpuMemoryAllocator& memoryAllocator, const RayTracingShaderTableDesc& desc) :
-    RayTracingShaderTable(desc.Generation, desc.Pipeline != nullptr ? desc.Pipeline->GetGeneration() : 0),
+    RayTracingShaderTable(desc),
     m_memoryAllocator(&memoryAllocator)
 {
-	RhiContract::ValidateRayTracingShaderTableDesc(desc);
 	const auto* pipeline = dynamic_cast<const VulkanRayTracingPipeline*>(desc.Pipeline);
 	const RhiRayTracingCapabilities capabilities = rhi.GetRayTracingCapabilities();
 	if (pipeline == nullptr || !capabilities.bSupportsRayTracingPipeline || rhi.GetRayTracingShaderGroupHandles() == nullptr)

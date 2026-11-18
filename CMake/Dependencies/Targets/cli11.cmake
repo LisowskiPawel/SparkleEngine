@@ -9,7 +9,6 @@ sparkle_prepare_git_fetchcontent_source(cli11
     REQUIRED_PATHS CMakeLists.txt include/CLI/CLI.hpp include/CLI/App.hpp include/CLI/impl/App_inl.hpp LICENSE)
 
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
-    sparkle_log_dependency_ready("CLI11" "${cli11_SOURCE_DIR}" "header-only")
     return()
 endif()
 

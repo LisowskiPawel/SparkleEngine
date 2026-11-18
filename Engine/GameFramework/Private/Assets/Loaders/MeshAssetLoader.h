@@ -3,7 +3,6 @@
 #include "Assets/Cooked/LoadedMeshAsset.h"
 
 #include <cstdint>
-#include <filesystem>
 #include <span>
 
 namespace Assets
@@ -12,6 +11,6 @@ namespace Assets
 
 	namespace MeshAssetLoader
 	{
-		LoadedMeshAsset Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget);
+		LoadedMeshAsset Decode(std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget);
 	}
 }

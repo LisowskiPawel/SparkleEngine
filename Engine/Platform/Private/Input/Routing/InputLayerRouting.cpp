@@ -3,20 +3,17 @@
 
 const InputState& InputSystem::GetState(InputLayer layer) const noexcept
 {
-	m_state->OwnerThread.AssertAccess();
-	const InputState* state = m_state->FindLayerState(layer);
-	return state != nullptr ? *state : m_state->GlobalState;
+	const auto index = static_cast<std::size_t>(layer);
+	return index > 0 && index <= State::RoutedLayerCount ? m_state->GetRoutedState(layer) : m_state->GlobalState;
 }
 
-InputState* InputSystem::State::FindLayerState(InputLayer layer) noexcept
+InputState& InputSystem::State::GetRoutedState(InputLayer layer) noexcept
 {
-	const auto index = static_cast<std::size_t>(layer);
-	return index > 0 && index <= RoutedLayerCount ? &LayerStates[index - 1] : nullptr;
+	return LayerStates[static_cast<std::size_t>(layer) - 1];
 }
 
 void InputSystem::BeginInputRoutingFrame(bool bInteractionDisabled, bool bTextInputActive)
 {
-	m_state->OwnerThread.AssertAccess();
 	const InputLayer oldLayer = m_state->FocusRouter.GetActiveTargetLayer();
 	m_state->FocusRouter.BeginFrame(bInteractionDisabled, bTextInputActive);
 	if (oldLayer != m_state->FocusRouter.GetActiveTargetLayer())
@@ -27,7 +24,6 @@ void InputSystem::BeginInputRoutingFrame(bool bInteractionDisabled, bool bTextIn
 
 void InputSystem::RegisterInputTargetRegion(float left, float top, float right, float bottom, InputLayer targetLayer)
 {
-	m_state->OwnerThread.AssertAccess();
 	m_state->FocusRouter.RegisterTargetRegion(left, top, right, bottom, targetLayer);
 }
 

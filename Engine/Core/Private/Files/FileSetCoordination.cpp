@@ -150,9 +150,8 @@ namespace Files
 
 	bool FileSetReadScope::Contains(const std::filesystem::path& path) const
 	{
-		std::error_code error;
-		const auto normalized = std::filesystem::weakly_canonical(std::filesystem::absolute(path), error);
-		return !error && normalized != m_implementation->Root && Paths::IsUnderRoot(normalized, m_implementation->Root);
+		const auto relativePath = Paths::TryMakeRelativeUnderRoot(path, m_implementation->Root);
+		return relativePath && *relativePath != ".";
 	}
 
 }

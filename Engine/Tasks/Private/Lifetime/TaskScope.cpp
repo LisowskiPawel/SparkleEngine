@@ -11,10 +11,6 @@
 TaskScope::State::State(TaskScopeDesc desc) :
     Desc(std::move(desc))
 {
-	if (Desc.Name.empty() || Desc.Name.size() > TaskName::MaximumLength)
-	{
-		throw std::invalid_argument("TaskScope name must be non-empty and at most 96 bytes.");
-	}
 }
 
 bool TaskScope::State::RegisterExecution(const std::shared_ptr<TaskExecution::State>& execution)
@@ -78,8 +74,7 @@ void TaskScope::State::NotifyParentIfSettled(std::unique_lock<std::mutex>& lock)
 
 	bSettled = true;
 	Condition.notify_all();
-	auto parent = bParentNotified ? std::shared_ptr<State>{} : Parent.lock();
-	bParentNotified = true;
+	auto parent = Parent.lock();
 	lock.unlock();
 	if (parent)
 	{

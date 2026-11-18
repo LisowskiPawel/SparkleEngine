@@ -4,6 +4,7 @@
 #include "Maintenance/MaintenanceCleanExecution.h"
 #include "Maintenance/MaintenanceCleanSteps.h"
 #include "Levels/LevelSelectionCommit.h"
+#include "Operations/LauncherOperationProgress.h"
 #include "Workspace/LauncherProductPaths.h"
 
 #include <optional>
@@ -12,18 +13,14 @@
 namespace SparkleLauncher
 {
 
-	static std::string MakeCleanFailureSummary(const MaintenanceCleanStep& step, const OperationRecord& operation, const std::string& errorMessage)
+	static std::string MakeCleanFailureSummary(const MaintenanceCleanStep& step, const std::string& errorMessage)
 	{
 		std::string summary = errorMessage.empty() ? "Clean blocked by locked files or permissions." : errorMessage;
 		summary += " Scope: " + step.DestructivePath.string();
-		if (!operation.LogPath.empty())
-		{
-			summary += " Latest log: " + operation.LogPath.string();
-		}
 		return summary;
 	}
 
-	OperationRecord RunMaintenanceOperationPlan(MaintenanceOperationPlan plan)
+	OperationRecord RunMaintenanceOperationPlan(MaintenanceOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback)
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
@@ -49,20 +46,24 @@ namespace SparkleLauncher
 				preservedPaths.push_back(*activeLogFilePath);
 			}
 		}
-		for (const MaintenanceCleanStep& step : BuildMaintenanceCleanSteps(plan))
+		const std::vector<MaintenanceCleanStep> steps = BuildMaintenanceCleanSteps(plan);
+		for (std::size_t stepIndex = 0; stepIndex < steps.size(); ++stepIndex)
 		{
+			const MaintenanceCleanStep& step = steps[stepIndex];
+			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex, steps.size());
 			std::string errorMessage;
 			if (!RunCleanStep(step, preservedPaths, errorMessage))
 			{
 				SetOperationFailure(
 				    operation,
 				    OperationProblemKind::Filesystem,
-				    MakeCleanFailureSummary(step, operation, errorMessage),
+				    MakeCleanFailureSummary(step, errorMessage),
 				    "Close processes using this scope, verify path permissions, then retry Clean.");
 
 				MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
 				return operation;
 			}
+			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex + 1, steps.size());
 		}
 
 		const bool bSelectionCommitted = !plan.Request.bCleanLevelContent || ClearLevelSelection(ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId), operation);

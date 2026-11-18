@@ -26,6 +26,6 @@ namespace Filesystem
 	{
 		FileSystemPathState& state = GetFileSystemPathState();
 		state.projectPath = Paths::Normalize(projectRoot);
-		RebuildProjectPaths(state);
+		RebuildCookedAssetPaths(state);
 	}
 }

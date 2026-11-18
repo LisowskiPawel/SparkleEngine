@@ -7,7 +7,6 @@
 #include "RHI/Public/Bindings/RenderBindingSet.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 
-#include <limits>
 #include <utility>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_materialTextureTableLogger, "Renderer.MaterialTextureTable");
@@ -41,9 +40,9 @@ std::uint32_t MaterialTextureTable::GetOrAddTextureIndex(RhiResourceViewHandle t
 		}
 	}
 
-	if (m_textureViews.size() >= static_cast<std::size_t>(std::numeric_limits<std::uint32_t>::max()))
+	if (m_textureViews.size() >= MaterialTextureTableFixedCapacity)
 	{
-		Diagnostics::Fatal(g_materialTextureTableLogger, __FILE__, __LINE__, "Material texture table exceeded the 32-bit shader index range.");
+		Diagnostics::Fatal(g_materialTextureTableLogger, __FILE__, __LINE__, "Material texture table exceeded the shader descriptor capacity.");
 	}
 
 	const std::uint32_t index = static_cast<std::uint32_t>(m_textureViews.size());
@@ -57,18 +56,6 @@ void MaterialTextureTable::BuildBindingSet(RenderHardwareInterface& renderHardwa
 	if (m_textureViews.empty())
 	{
 		Diagnostics::Fatal(g_materialTextureTableLogger, __FILE__, __LINE__, "Material texture table has no texture views.");
-	}
-	if (m_textureViews.size() > MaterialTextureTableFixedCapacity)
-	{
-		Diagnostics::Fatal(g_materialTextureTableLogger, __FILE__, __LINE__, "Material texture table exceeded the shader descriptor capacity.");
-	}
-
-	for (const RhiResourceViewHandle textureView : m_textureViews)
-	{
-		if (!textureView)
-		{
-			Diagnostics::Fatal(g_materialTextureTableLogger, __FILE__, __LINE__, "Material texture table contains an invalid texture view.");
-		}
 	}
 
 	auto bindingSet = renderHardwareInterface.GetDescriptorService().CreateBindingSet(
@@ -87,6 +74,10 @@ void MaterialTextureTable::BuildBindingSet(RenderHardwareInterface& renderHardwa
 		}
 	}
 
+	if (!bindingSet->GetTableBinding(0u))
+	{
+		Diagnostics::Fatal(g_materialTextureTableLogger, __FILE__, __LINE__, "Material texture table has no GPU binding.");
+	}
 	m_bindingSet = std::move(bindingSet);
 }
 

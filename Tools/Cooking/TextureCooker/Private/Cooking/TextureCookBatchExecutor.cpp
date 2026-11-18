@@ -98,7 +98,7 @@ CompiledTaskGraph TextureCookBatchExecutor::BuildTaskGraph(std::vector<TaskNodeH
 
 	for (std::uint32_t index = 0; index < m_requests.size(); ++index)
 	{
-		outTaskHandles.push_back(graph.Add(TaskDesc{.Name = TaskName("Cook texture request"), .Lane = TaskLane::Background}, [this, index](TaskExecutionContext&) { return CookRequest(index); }));
+		outTaskHandles.push_back(graph.Add(TaskDesc{.Name = "Cook texture request", .Lane = TaskLane::Background}, [this, index](TaskExecutionContext&) { return CookRequest(index); }));
 	}
 
 	return graph.Compile();

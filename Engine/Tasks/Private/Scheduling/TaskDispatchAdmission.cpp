@@ -24,11 +24,10 @@ void TaskExecutor::Implementation::ValidateDispatchRequest(const TaskScope::Stat
 		throw std::invalid_argument("Prepared dispatch requires its scope owner outside executor workers.");
 	}
 
-	const bool bDescriptionValid = desc.Name.IsValid() && function;
 	const bool bNormalCompletion = desc.CompletionPolicy == TaskCompletionPolicy::Normal;
-	if (!bDescriptionValid || !bNormalCompletion)
+	if (!function || !bNormalCompletion)
 	{
-		throw std::invalid_argument("Prepared dispatch requires a named callable with Normal completion policy.");
+		throw std::invalid_argument("Prepared dispatch requires a callable with Normal completion policy.");
 	}
 
 	const bool bLaneAvailable = GetWorkerCount(desc.Lane) != 0;
@@ -41,8 +40,7 @@ void TaskExecutor::Implementation::ValidateDispatchRequest(const TaskScope::Stat
 
 std::shared_ptr<TaskDispatch::State> TaskExecutor::Implementation::CreateDispatch(const std::shared_ptr<TaskScope::State>& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context)
 {
-	const std::uint64_t generation = m_nextExecutionGeneration.fetch_add(1, std::memory_order_relaxed);
-	auto execution = CreateExecution(generation, scope);
+	auto execution = CreateExecution(scope);
 	auto dispatch = std::make_shared<TaskDispatch::State>(std::move(execution), std::move(desc), std::move(function), std::move(context));
 	dispatch->Cancellation.emplace(dispatch->Execution->Cancellation.get_token(), TaskDispatch::State::CancellationHook{dispatch});
 	return dispatch;

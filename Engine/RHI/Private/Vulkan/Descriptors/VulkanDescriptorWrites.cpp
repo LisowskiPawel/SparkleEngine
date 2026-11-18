@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <format>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanDescriptorWriterLogger, "RHI.Vulkan.DescriptorAllocator");
 
@@ -74,11 +75,6 @@ static bool EntryKindMatchesBinding(const CompiledBinding& binding, VulkanDescri
 
 static bool BuildWriteChunk(std::span<const VulkanDescriptorEntry> entries, VulkanDescriptorEntryKind entryKind, DescriptorWriteChunk& outChunk) noexcept
 {
-	if (entries.empty() || entries.size() > DescriptorWriteChunkCapacity)
-	{
-		return false;
-	}
-
 	outChunk.Count = static_cast<std::uint32_t>(entries.size());
 	for (std::size_t index = 0; index < entries.size(); ++index)
 	{
@@ -160,25 +156,30 @@ static void CommitWriteChunk(
 
 void VulkanDescriptorWrites::Write(VkDevice device, VkDescriptorSet descriptorSet, const CompiledBinding& binding, std::span<const VulkanDescriptorEntry> entries) noexcept
 {
+	const char* const bindingName = binding.Name != nullptr ? binding.Name : "<unnamed>";
 	if (descriptorSet == VK_NULL_HANDLE || entries.empty())
 	{
-		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, "Vulkan descriptor write requires a descriptor set and at least one descriptor.");
+		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, std::format("Vulkan binding '{}' requires a descriptor set and at least one descriptor.", bindingName));
 	}
 	if (entries.size() > binding.DescriptorCount)
 	{
-		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, "Vulkan descriptor write cardinality does not match the compiled shader binding.");
+		Diagnostics::Fatal(
+		    g_vulkanDescriptorWriterLogger,
+		    __FILE__,
+		    __LINE__,
+		    std::format("Vulkan binding '{}' received {} descriptors; its capacity is {}.", bindingName, entries.size(), binding.DescriptorCount));
 	}
 
 	const VulkanDescriptorEntryKind entryKind = entries.front().Kind;
 	const VkDescriptorType descriptorType = ToDescriptorType(entryKind);
 	if (descriptorType == VK_DESCRIPTOR_TYPE_MAX_ENUM)
 	{
-		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, "Vulkan descriptor write contains an empty entry.");
+		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, std::format("Vulkan binding '{}' references an empty or released descriptor.", bindingName));
 	}
 
 	if (!EntryKindMatchesBinding(binding, entryKind))
 	{
-		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, "Vulkan descriptor entry kind does not match the compiled shader binding.");
+		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, std::format("Vulkan descriptor kind does not match binding '{}'.", bindingName));
 	}
 
 	std::size_t firstDescriptor = 0;
@@ -190,7 +191,7 @@ void VulkanDescriptorWrites::Write(VkDevice device, VkDescriptorSet descriptorSe
 		DescriptorWriteChunk chunk{};
 		if (!BuildWriteChunk(entryChunk, entryKind, chunk))
 		{
-			Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, "Vulkan descriptor array contains inconsistent or unsupported entries.");
+			Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, std::format("Vulkan binding '{}' contains inconsistent descriptor entries.", bindingName));
 		}
 
 		CommitWriteChunk(device, descriptorSet, binding, entryKind, descriptorType, static_cast<std::uint32_t>(firstDescriptor), chunk);

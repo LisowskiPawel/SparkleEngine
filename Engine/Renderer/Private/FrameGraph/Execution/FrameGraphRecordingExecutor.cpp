@@ -10,16 +10,12 @@
 
 #include <cassert>
 
-FrameGraphRecordingExecutor::FrameGraphRecordingExecutor(
-    const FrameGraph& frameGraph,
-    const FrameGraphPlan& plan,
-    RhiCommandSubmissionService& submissionService,
-    TaskExecutor& taskExecutor,
-    FrameExecutionDiagnostics& frameDiagnostics) noexcept :
+FrameGraphRecordingExecutor::FrameGraphRecordingExecutor(const FrameGraph& frameGraph, const FrameGraphPlan& plan, RhiCommandSubmissionService& submissionService, TaskExecutor& taskExecutor) noexcept
+    :
     m_plan(plan),
     m_submissionService(submissionService),
     m_taskExecutor(taskExecutor),
-    m_chunkRecorder(frameGraph, plan, frameDiagnostics)
+    m_chunkRecorder(frameGraph, plan)
 {
 }
 
@@ -38,7 +34,8 @@ bool FrameGraphRecordingExecutor::RecordBatch(const FrameGraphSubmissionBatch& b
 
 bool FrameGraphRecordingExecutor::ShouldRecordBatchInParallel(const FrameGraphSubmissionBatch& batch) const noexcept
 {
-	return CVarRendererParallelFrameGraphRecording.Get() && !CVarRendererDiagnosticGpuTiming.Get() && batch.recordingChunkCount >= 2 && m_taskExecutor.GetWorkerCount(TaskLane::FrameCritical) >= 2;
+	const bool bParallelRecordingEnabled = CVarRendererParallelFrameGraphRecording.Get() && batch.recordingChunkCount >= 2;
+	return bParallelRecordingEnabled && m_taskExecutor.GetWorkerCount(TaskLane::FrameCritical) >= 2;
 }
 
 void FrameGraphRecordingExecutor::RecordBatchSerial(const FrameGraphSubmissionBatch& batch, RhiCommandRecordingLease initializationLease)
@@ -153,7 +150,7 @@ bool FrameGraphRecordingExecutor::RecordParallelRange(std::uint32_t firstResult,
 	{
 		const std::uint32_t resultIndex = firstResult + resultOffset;
 		(void) builder.Add(
-		    TaskDesc{.Name = TaskName("Renderer.FrameGraph.RecordChunk"), .Lane = TaskLane::FrameCritical},
+		    TaskDesc{.Name = "Renderer.FrameGraph.RecordChunk", .Lane = TaskLane::FrameCritical},
 		    [resultIndex](TaskExecutionContext& context)
 		    {
 			    FrameGraphRecordingExecutor* const executor = context.TryGet<FrameGraphRecordingExecutor>();

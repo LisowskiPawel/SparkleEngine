@@ -1,6 +1,5 @@
 #include "AssetCookerToolProcess.h"
 
-#include "Core/Public/Diagnostics/Logger.h"
 #include "Core/Public/Process/ChildProcess.h"
 #include "ToolConsole.h"
 
@@ -9,8 +8,6 @@
 
 int AssetCookerToolProcess::Run(const std::filesystem::path& executablePath, const std::vector<std::string>& arguments, const std::filesystem::path& workingDirectory, std::stop_token cancellation)
 {
-	SPARKLE_DEFINE_LOG_CATEGORY_STATIC(toolProcessLogger, "Tools.AssetCooker.Process");
-
 	Process::ChildProcessResult result = Process::RunChildProcess(
 	    Process::ChildProcessRequest{
 	        .ExecutablePath = executablePath,
@@ -31,8 +28,6 @@ int AssetCookerToolProcess::Run(const std::filesystem::path& executablePath, con
 		    ToolConsoleSeverity::Error,
 		    "Failed to launch tool",
 		    {ToolConsole::QuotedField("tool", executablePath.filename().string()), ToolConsole::PathField("path", executablePath), ToolConsole::QuotedField("reason", result.FailureReason)});
-
-		SPDLOG_LOGGER_ERROR(toolProcessLogger, "Failed to launch process '{}': {}", executablePath.string(), result.FailureReason);
 		return 1;
 	}
 	return result.ExitCode;

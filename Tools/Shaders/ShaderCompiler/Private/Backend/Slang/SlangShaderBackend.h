@@ -22,8 +22,6 @@ public:
 	SlangShaderBackend(SlangShaderBackend&&) = delete;
 	SlangShaderBackend& operator=(SlangShaderBackend&&) = delete;
 
-	bool IsValid() const noexcept { return m_globalSession != nullptr; }
-
 	static ShaderBackendCapabilities GetStaticCapabilities() noexcept;
 	static std::uint64_t QueryBackendVersion();
 

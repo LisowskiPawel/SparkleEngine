@@ -24,11 +24,12 @@ D3D12RecordingUploadPage::D3D12RecordingUploadPage() noexcept = default;
 
 D3D12RecordingUploadPage::~D3D12RecordingUploadPage() noexcept = default;
 
-void D3D12RecordingUploadPage::Initialize(D3D12Rhi& rhi, std::uint64_t capacityInBytes, const wchar_t* debugName)
+void D3D12RecordingUploadPage::Initialize(D3D12Rhi& rhi, std::uint64_t capacityInBytes, const wchar_t* debugName, const std::thread::id& recordingThread)
 {
 	assert(capacityInBytes != 0);
 	assert(m_pages.empty());
 	m_memoryAllocator = &rhi.GetMemoryAllocator();
+	m_recordingThread = &recordingThread;
 	m_capacityInBytes = capacityInBytes;
 	AddPage(capacityInBytes, debugName);
 }
@@ -56,22 +57,8 @@ void D3D12RecordingUploadPage::AddPage(std::uint64_t capacityInBytes, const wcha
 	m_pages.push_back(std::move(page));
 }
 
-void D3D12RecordingUploadPage::BeginRecording() noexcept
-{
-	const std::thread::id thread = std::this_thread::get_id();
-	assert(m_recordingThread == std::thread::id{} || m_recordingThread == thread);
-	m_recordingThread = thread;
-}
-
-void D3D12RecordingUploadPage::EndRecording() noexcept
-{
-	assert(m_recordingThread == std::this_thread::get_id());
-	m_recordingThread = {};
-}
-
 void D3D12RecordingUploadPage::Reset() noexcept
 {
-	m_recordingThread = {};
 	m_pageIndex = 0;
 	m_offset = 0;
 }
@@ -80,7 +67,7 @@ RhiGpuVirtualAddress D3D12RecordingUploadPage::AllocateAndCopy(const void* data,
 {
 	assert(data != nullptr);
 	assert(sizeInBytes != 0);
-	assert(m_recordingThread == std::this_thread::get_id());
+	assert(m_recordingThread != nullptr && *m_recordingThread == std::this_thread::get_id());
 
 	std::uint64_t alignedOffset = MathUtils::AlignUp(m_offset, 256ull);
 	const std::uint64_t alignedSize = MathUtils::AlignUp(static_cast<std::uint64_t>(sizeInBytes), 256ull);

@@ -7,7 +7,6 @@
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
-#include "Workspace/LauncherStatePaths.h"
 #include "SparkleLauncher/ToolResolver.h"
 #include "Workspace/LauncherProductPaths.h"
 
@@ -151,7 +150,6 @@ namespace SparkleLauncher
 		}
 		plan.Request = request;
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
-		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.WorkspaceRoot, definition->Id, "Latest.txt");
 		if (!InspectLevelSyncTools(plan))
 		{
 			return plan;

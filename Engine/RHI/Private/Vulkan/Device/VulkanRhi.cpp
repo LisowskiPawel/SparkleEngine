@@ -23,7 +23,6 @@ VulkanRhi::VulkanRhi() noexcept
 	LoadRayTracingFunctions();
 	BuildRayTracingCapabilities();
 	NameBootstrapObjects();
-	LogBootstrapSummary();
 }
 
 VulkanRhi::~VulkanRhi() noexcept

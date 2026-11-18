@@ -7,20 +7,13 @@
 #include <memory>
 
 class RayTracingBlasCache;
-class RayTracingPerformanceDiagnostics;
+class PassExecutionDiagnostics;
 class RayTracingShaderTablePlan;
 class RenderCommandContext;
 class RenderHardwareInterface;
 struct RayTracingCapabilityReport;
 struct PreparedRenderScene;
 struct RayTracingPtlasPartitionPlan;
-
-struct RayTracingTlasBuildResult final
-{
-	std::uint32_t InstanceCount = 0;
-	ERhiRayTracingTlasProvider ActiveProvider = ERhiRayTracingTlasProvider::None;
-	const char* ActiveProviderReason = "not-built";
-};
 
 class RayTracingAccelerationStrategy
 {
@@ -33,13 +26,13 @@ public:
 	RayTracingAccelerationStrategy& operator=(RayTracingAccelerationStrategy&&) = delete;
 	virtual RenderRayTracingFrameBindings Prepare(const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan) noexcept = 0;
 
-	virtual RayTracingTlasBuildResult Build(
+	virtual void Build(
 	    RenderCommandContext& commandContext,
 	    const PreparedRenderScene& preparedScene,
 	    RayTracingBlasCache& blasCache,
 	    const RayTracingShaderTablePlan& shaderTablePlan,
 	    const RayTracingPtlasPartitionPlan& viewPlan,
-	    RayTracingPerformanceDiagnostics* diagnostics) noexcept = 0;
+	    PassExecutionDiagnostics* diagnostics) noexcept = 0;
 
 	virtual void Clear() noexcept = 0;
 

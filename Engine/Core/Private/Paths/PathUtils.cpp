@@ -11,24 +11,12 @@ namespace Paths
 {
 	bool IsUnderRoot(const std::filesystem::path& path, const std::filesystem::path& root)
 	{
-		if (path.empty() || root.empty())
-		{
-			return false;
-		}
-
-		std::error_code ec;
-		const std::filesystem::path relativePath = std::filesystem::relative(path, root, ec);
-		if (ec)
-		{
-			return false;
-		}
-
-		return !relativePath.empty() && !relativePath.is_absolute() && *relativePath.begin() != "..";
+		return TryMakeRelativeUnderRoot(path, root).has_value();
 	}
 
 	std::optional<std::filesystem::path> TryMakeRelativeUnderRoot(const std::filesystem::path& path, const std::filesystem::path& root)
 	{
-		if (!IsUnderRoot(path, root))
+		if (path.empty() || root.empty())
 		{
 			return std::nullopt;
 		}
@@ -36,6 +24,10 @@ namespace Paths
 		std::error_code ec;
 		std::filesystem::path relativePath = std::filesystem::relative(path, root, ec);
 		if (ec || relativePath.empty())
+		{
+			return std::nullopt;
+		}
+		if (relativePath.is_absolute() || *relativePath.begin() == "..")
 		{
 			return std::nullopt;
 		}
@@ -65,14 +57,9 @@ namespace Paths
 
 		const std::filesystem::path normalizedPath = Normalize(path);
 		const std::filesystem::path& projectRoot = Filesystem::GetProjectPath();
-		if (IsUnderRoot(normalizedPath, projectRoot))
+		if (const auto relativePath = TryMakeRelativeUnderRoot(normalizedPath, projectRoot))
 		{
-			std::error_code ec;
-			const std::filesystem::path relativePath = std::filesystem::relative(normalizedPath, projectRoot, ec);
-			if (!ec)
-			{
-				return relativePath.generic_string();
-			}
+			return relativePath->generic_string();
 		}
 
 		return normalizedPath.generic_string();
@@ -109,13 +96,7 @@ namespace Paths
 			resolvedPath = baseDirectory / resolvedPath;
 		}
 
-		resolvedPath = Normalize(resolvedPath);
-		if (resolvedPath.empty())
-		{
-			return std::nullopt;
-		}
-
-		return resolvedPath;
+		return Normalize(resolvedPath);
 	}
 
 	std::string MakeSafePathComponent(std::string_view value)

@@ -9,6 +9,7 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot '../SourceIdentity.ps1')
 . (Join-Path $PSScriptRoot 'Payload/PackageInputs.ps1')
 . (Join-Path $PSScriptRoot 'Payload/PackageOutputs.ps1')
+. (Join-Path $PSScriptRoot 'Payload/PackageDependencies.ps1')
 . (Join-Path $PSScriptRoot 'Payload/PackageMetadata.ps1')
 . (Join-Path $PSScriptRoot 'Publication/PackageStage.ps1')
 . (Join-Path $PSScriptRoot 'Publication/PackageArchive.ps1')
@@ -20,46 +21,23 @@ $versionOwner = Get-Content -LiteralPath (Join-Path $repositoryRoot 'CMake/Spark
 if ($versionOwner -notmatch 'set\(SPARKLE_VERSION "([0-9.]+)"\)') { throw 'Release identity owner has no version.' }
 $version = $Matches[1]
 $outputRoot = Join-Path $repositoryRoot "artifacts/releases/$version"
-$transaction = [Guid]::NewGuid().ToString('N')
-$transactionRoot = Join-Path $outputRoot ".partial-$transaction"
-$report = [ordered]@{
-    Version = $version; Revision = ''; SourceInputsSha256 = ''; Signing = 'UnsignedInternal'; Status = 'BLOCKED'; Steps = @(); Archive = $null
-    Environment = @{ OperatingSystem = [Environment]::OSVersion.VersionString; PowerShell = $PSVersionTable.PSVersion.ToString() }
-    Configurations = @('ShippingEditor', 'ShippingGame'); ReleaseInputs = $null; PayloadSha256 = $null; Outputs = $null
-}
-$phase = 'Inputs'
+$transactionRoot = Join-Path $outputRoot ('.partial-' + [Guid]::NewGuid().ToString('N'))
 $lock = $null
-$reportPath = Join-Path $transactionRoot 'report.json'
 
 function Assert-ReleaseCandidateUnchanged
 {
-    param([string] $RepositoryRoot, $Report)
+    param([string] $RepositoryRoot, [string] $Revision, [string] $SourceInputsSha256)
 
-    $currentRevision = & git -C $repositoryRoot rev-parse HEAD
-    if ($LASTEXITCODE -ne 0 -or $currentRevision.Trim() -cne $report.Revision -or
-        (Get-TextSha256 (Get-ReleaseSourceInputs -SourceRoot $repositoryRoot)) -cne $report.SourceInputsSha256)
+    $currentRevision = & git -C $RepositoryRoot rev-parse HEAD
+    if ($LASTEXITCODE -ne 0 -or $currentRevision.Trim() -cne $Revision -or
+        (Get-TextSha256 (Get-ReleaseSourceInputs -SourceRoot $RepositoryRoot)) -cne $SourceInputsSha256)
     {
-        throw 'Source revision or bytes changed during packaging; prepare and verify the changed outputs before retrying.'
+        throw 'Source revision or bytes changed during packaging; prepare the changed outputs before retrying.'
     }
-}
-
-function Publish-Package
-{
-    param([string] $Partial, [string] $TransactionRoot, [string] $OutputRoot, [string] $Version, [string] $ArchiveHash, $Report)
-    $name = "SparkleEngine-v$Version-windows-x64-unsigned-internal.zip"
-    $destination = Join-Path $OutputRoot $ArchiveHash
-    $Report.Archive = @{ Path = $name; Sha256 = $ArchiveHash; Size = (Get-Item -LiteralPath $Partial).Length }
-    [IO.File]::Move($Partial, (Join-Path $TransactionRoot $Report.Archive.Path))
-    $Report.Steps += @{ Name = 'Package'; Status = 'PASS' }
-    $Report.Status = 'PASS'
-    $Report | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $TransactionRoot 'report.json') -Encoding UTF8
-    [IO.Directory]::Move($TransactionRoot, $destination)
-    return Join-Path $destination 'report.json'
 }
 
 try
 {
-    # This entry owns only the canonical workspace; it never deletes an earlier stage/archive.
     if ($BuildDirectory -ne (Join-Path $repositoryRoot 'build')) { throw 'Release packaging requires the canonical build directory.' }
     $outputRoot = Resolve-LocalArtifactPath $outputRoot
     [void] [IO.Directory]::CreateDirectory($outputRoot)
@@ -67,79 +45,45 @@ try
     [void] (New-Item -ItemType Directory -Path $transactionRoot)
     $revision = & git -C $repositoryRoot rev-parse HEAD
     if ($LASTEXITCODE -ne 0) { throw 'Cannot identify source revision.' }
-    $report.Revision = $revision.Trim()
-    $sourceJson = Get-ReleaseSourceInputs -SourceRoot $repositoryRoot
-    $report.SourceInputsSha256 = Get-TextSha256 $sourceJson
-    [IO.File]::WriteAllText((Join-Path $transactionRoot 'source-inputs.json'), $sourceJson, [Text.UTF8Encoding]::new($false))
-    if ([string]::IsNullOrWhiteSpace($InputsPath) -or !(Test-Path -LiteralPath $InputsPath -PathType Leaf))
+    $revision = $revision.Trim()
+    $sourceInputsSha256 = Get-TextSha256 (Get-ReleaseSourceInputs -SourceRoot $repositoryRoot)
+    if ([string]::IsNullOrWhiteSpace($InputsPath))
     {
-        throw 'Missing reviewed release inputs. Prepare fresh products/content through Launcher, then supply their allowlist and final ShaderExport path. See Docs/Engineering.md#build-and-delivery.'
+        throw 'Missing reviewed release inputs. Prepare products/content through Launcher, then supply their inventory and final ShaderExport path. See Docs/Engineering.md#build-and-delivery.'
     }
-    $inputSnapshot = Join-Path $transactionRoot 'release-inputs.json'
-    [IO.File]::Copy([IO.Path]::GetFullPath($InputsPath), $inputSnapshot, $false)
-    [IO.File]::SetAttributes($inputSnapshot, [IO.FileAttributes]::ReadOnly)
-    $report.ReleaseInputs = @{ Size = (Get-Item -LiteralPath $inputSnapshot).Length; Sha256 = (Get-FileHash -LiteralPath $inputSnapshot).Hash.ToLowerInvariant() }
-    $inputs = Get-Content -LiteralPath $inputSnapshot -Raw -Encoding UTF8 | ConvertFrom-Json
-    if ($inputs.Revision -cne $report.Revision -or $inputs.SourceInputsSha256 -cne $report.SourceInputsSha256)
+    $inputs = Get-Content -LiteralPath $InputsPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($inputs.Revision -cne $revision -or $inputs.SourceInputsSha256 -cne $sourceInputsSha256)
     {
-        throw 'Release inputs do not match the exact current source candidate.'
+        throw 'Release inputs do not match the current source candidate.'
     }
+
     $products = @(Get-PackageProducts $BuildDirectory $version)
-    $report.Steps += @{ Name = 'Inputs'; Status = 'PASS' }
-    $phase = 'Freeze'
-    Assert-ReleaseCandidateUnchanged $repositoryRoot $report
-    $report.Outputs = Freeze-PackageOutputs $repositoryRoot $transactionRoot $products $inputs
-    $manifest = New-PackageManifest $repositoryRoot $version $report.Revision $report.SourceInputsSha256 $products $inputs
-    $report.PayloadSha256 = Get-TextSha256 ($manifest | ConvertTo-Json -Depth 20 -Compress)
-    $inputs | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $transactionRoot 'frozen-inputs.json') -Encoding UTF8
-    $report.Steps += @{ Name = 'Freeze'; Status = 'PASS' }
-    $phase = 'Stage'
+    Assert-PackageOutputs $repositoryRoot $products $inputs
+    $manifest = New-PackageManifest $repositoryRoot $version $revision $sourceInputsSha256 $products $inputs
     $stage = Join-Path $transactionRoot 'stage'
     New-PackageStage $repositoryRoot $stage $inputs.Files $manifest
-    $report.Steps += @{ Name = 'Stage'; Status = 'PASS' }
-    $phase = 'Verify'
     Test-PackageStage $stage $manifest
     Test-PackageDependencyClosure $stage $manifest
     Test-PackageMetadata $stage $manifest
-    $report.Steps += @{ Name = 'Verify'; Status = 'PASS' }
 
-    $phase = 'Package'
     $partial = Join-Path $transactionRoot 'archive.partial'
     Write-PackageArchive $partial $stage $manifest
     Test-PackageArchive $partial $stage $manifest
-    Assert-ReleaseCandidateUnchanged $repositoryRoot $report
+    Assert-ReleaseCandidateUnchanged $repositoryRoot $revision $sourceInputsSha256
     $archiveHash = (Get-FileHash -LiteralPath $partial).Hash.ToLowerInvariant()
-    $reportPath = Publish-Package $partial $transactionRoot $outputRoot $version $archiveHash $report
+    $name = "SparkleEngine-v$version-windows-x64-unsigned-internal.zip"
+    [IO.File]::Move($partial, (Join-Path $transactionRoot $name))
+    $destination = Join-Path $outputRoot $archiveHash
+    [IO.Directory]::Move($transactionRoot, $destination)
+    Write-Output "Package: $(Join-Path $destination $name)"
+    Write-Output "SHA256: $archiveHash"
 }
 catch
 {
-    $report.Status = 'BLOCKED'
-    $report.Archive = $null
-    $report.Steps = @($report.Steps | Where-Object { $_.Name -ne $phase -or $_.Status -ne 'PASS' })
-    $report.Steps += @{ Name = $phase; Status = 'BLOCKED'; Reason = $_.Exception.Message }
-    foreach ($skipped in @('Freeze','Stage','Verify','Package'))
-    {
-        if ($skipped -ne $phase -and !@($report.Steps | Where-Object Name -eq $skipped).Count)
-        {
-            $report.Steps += @{ Name = $skipped; Status = 'SKIPPED'; Reason = "Predecessor $phase did not pass." }
-        }
-    }
+    [Console]::Error.WriteLine("Packaging failed: $($_.Exception.Message) Transaction: $transactionRoot")
+    exit 1
 }
 finally
 {
-    # Failed transactions are retained for diagnosis under .partial; no ZIP is published from them.
-    try
-    {
-        if ($report.Status -ne 'PASS' -and (Test-Path -LiteralPath $transactionRoot -PathType Container))
-        {
-            $report | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $reportPath -Encoding UTF8
-        }
-    }
-    finally { if ($null -ne $lock) { $lock.Dispose() } }
-}
-Write-Output "Release report: $reportPath"
-if ($report.Status -ne 'PASS')
-{
-    [Console]::Error.WriteLine(($report.Steps | Where-Object Status -eq 'BLOCKED' | Select-Object -Last 1).Reason)
-    exit 1
+    if ($null -ne $lock) { $lock.Dispose() }
 }

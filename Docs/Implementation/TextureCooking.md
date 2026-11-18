@@ -70,7 +70,7 @@ Shipping's permitted CRT bundle is `msvcp140.dll`, `msvcp140_1.dll`, `msvcp140_2
 
 The existing notices contain DirectXTex MIT; KTX Apache/Basis/miniz, BSD uthash/zstd and Ericsson ETC terms; and retained provider notices. Source reconstruction compiles the pinned processing libraries rather than taking opaque SDK binaries. Qualified installed MSVC CRT binaries and their hashes remain declared external inputs; Windows supplies built-in WIC codecs. Actual x64, MSVC/CRT, Debug/Shipping and static/shared identities must agree across headers, objects, tool binaries and runtime/package membership.
 
-Failure checks use disposable cache fixtures: missing header/license/runtime/plugin, wrong revision or dirty/interrupted cache, unexpected network access, accidental GUI/full-framework/GPU targets, leaked global compiler/output settings, stale codec targets and SDK edges into Game/Editor. Preserve the active cache and unrelated edits. Existing cold, warm/offline, Launcher/workspace readiness, explicit sync and relocated enabled-source checks passed; they do not establish a physical clean OS or complete release package.
+Failure checks use disposable cache fixtures: missing header/license/runtime/plugin, wrong revision or incomplete cache, unexpected network access, accidental GUI/full-framework/GPU targets, leaked global compiler/output settings, stale codec targets and SDK edges into Game/Editor. Preserve the active cache and unrelated edits. Existing cold, warm/offline, Launcher/workspace readiness, explicit sync and relocated enabled-source checks passed; they do not establish a physical clean OS or complete release package.
 
 ## Evidence and current acceptance
 

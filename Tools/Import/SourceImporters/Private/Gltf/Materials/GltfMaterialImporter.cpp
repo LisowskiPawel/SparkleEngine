@@ -5,13 +5,10 @@
 #include "Gltf/Materials/GltfMaterialPropertyMapper.h"
 #include "Gltf/Materials/GltfMaterialTextureMapper.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Diagnostics/Logger.h"
 
 #include <cgltf.h>
 
 #include <format>
-
-SPARKLE_DEFINE_LOG_CATEGORY_STATIC(gltfMaterialImporterLogger, "Tools.SourceImporters.GltfMaterials");
 
 class GltfMaterialFeatureReporting final
 {
@@ -26,35 +23,6 @@ public:
 			{
 				throw Diagnostics::Error(std::format("Required glTF material extension '{}' has no shading implementation.", extension));
 			}
-		}
-	}
-
-	static void ReportGenericShading(const cgltf_material& material, ImportedMaterialIndex materialIndex)
-	{
-		std::string omittedFeatures;
-		if (material.has_anisotropy)
-		{
-			AppendFeatureName(omittedFeatures, "anisotropy");
-		}
-		if (material.has_clearcoat)
-		{
-			AppendFeatureName(omittedFeatures, "clearcoat");
-		}
-		if (material.has_sheen)
-		{
-			AppendFeatureName(omittedFeatures, "sheen");
-		}
-		if (material.has_transmission)
-		{
-			AppendFeatureName(omittedFeatures, "transmission");
-		}
-		if (material.has_volume)
-		{
-			AppendFeatureName(omittedFeatures, "volume");
-		}
-		if (!omittedFeatures.empty())
-		{
-			SPDLOG_LOGGER_WARN(gltfMaterialImporterLogger, "glTF material {} uses generic metallic-roughness shading; omitted optional lobes: {}.", materialIndex, omittedFeatures);
 		}
 	}
 
@@ -105,7 +73,6 @@ void GltfMaterialImporter::ImportMaterials(const cgltf_data& data, const std::fi
 	for (cgltf_size materialIndex = 0; materialIndex < data.materials_count; ++materialIndex)
 	{
 		importedScene.materials.push_back(ExtractMaterial(data.materials[materialIndex], static_cast<ImportedMaterialIndex>(materialIndex), sourceDirectory));
-		GltfMaterialFeatureReporting::ReportGenericShading(data.materials[materialIndex], static_cast<ImportedMaterialIndex>(materialIndex));
 	}
 }
 

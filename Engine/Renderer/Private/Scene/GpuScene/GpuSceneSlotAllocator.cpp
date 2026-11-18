@@ -2,9 +2,14 @@
 #include "Scene/GpuScene/GpuSceneSlotAllocator.h"
 
 #include "RHI/Public/Commands/RhiCommandSubmissionService.h"
+#include "Core/Public/Diagnostics/Logger.h"
+#include "Core/Public/Diagnostics/Verify.h"
 
 #include <algorithm>
 #include <array>
+#include <limits>
+
+SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_gpuSceneSlotLogger, "Renderer.GpuScene");
 
 GpuSceneSlotAllocator::GpuSceneSlotAllocator(RhiCommandSubmissionService* submissionService) noexcept :
     m_submissionService(submissionService)
@@ -16,6 +21,10 @@ std::uint32_t GpuSceneSlotAllocator::Allocate()
 	DrainCompletedRetirements();
 	if (m_availableSlots.empty())
 	{
+		if (m_nextSlot == (std::numeric_limits<std::uint32_t>::max)())
+		{
+			Diagnostics::Fatal(g_gpuSceneSlotLogger, __FILE__, __LINE__, "GPU-scene slot capacity exhausted.");
+		}
 		return m_nextSlot++;
 	}
 

@@ -14,20 +14,17 @@
 
 struct TaskExecutionCompletion final
 {
-	std::uint64_t Generation = 0;
 	std::uint64_t BuilderIdentity = 0;
 	std::uint32_t BuilderGeneration = 0;
 	TaskExecutionStatus Status = TaskExecutionStatus::Invalid;
 	TaskResult Result = TaskResult::Cancelled("Invalid task execution.");
 	std::string FirstFailureTaskName;
 	std::vector<TaskResult> TaskResults;
-	std::vector<bool> Settled;
-	std::uint32_t SettledTaskCount = 0;
 };
 
 struct TaskExecution::State final
 {
-	explicit State(std::uint64_t generation = 0);
+	State();
 
 	void Publish(TaskExecutionCompletion completion);
 	void WaitUntilSettled();

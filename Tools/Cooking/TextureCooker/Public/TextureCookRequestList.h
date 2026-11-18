@@ -26,6 +26,12 @@ enum class TextureColorProcessingPolicy : std::uint8_t
 	SrgbLinearize = 1,
 };
 
+enum class TextureHdrEncoding : std::uint8_t
+{
+	Rgba32Float,
+	Bc6h,
+};
+
 struct TextureCookPolicy final
 {
 	TextureColorSpace colorSpace = TextureColorSpace::Linear;
@@ -34,6 +40,7 @@ struct TextureCookPolicy final
 	TextureGroup textureGroup = TextureGroup::Default;
 	TextureDimension dimension = TextureDimension::Texture2D;
 	TextureChannelMask channelMask = TextureChannelMask::Rgba;
+	TextureHdrEncoding hdrEncoding = TextureHdrEncoding::Rgba32Float;
 
 	bool IsSrgb() const noexcept { return colorSpace == TextureColorSpace::Srgb; }
 
@@ -78,6 +85,7 @@ const char* GetTextureColorProcessingPolicyName(TextureColorProcessingPolicy col
 const char* GetTextureGroupName(TextureGroup textureGroup) noexcept;
 const char* GetTextureDimensionName(TextureDimension dimension) noexcept;
 const char* GetTextureChannelMaskName(TextureChannelMask channelMask) noexcept;
+const char* GetTextureHdrEncodingName(TextureHdrEncoding hdrEncoding) noexcept;
 
 void WriteTextureCookRequestList(const std::filesystem::path& outputPath, const std::vector<TextureCookRequest>& requests);
 

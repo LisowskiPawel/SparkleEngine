@@ -9,7 +9,6 @@
 #include "ExternalCapture/ExternalCaptureDiscovery.h"
 #include "GpuCrash/GpuCrashLaunch.h"
 #include "Core/Public/Paths/FileSystemPaths.h"
-#include "Workspace/LauncherStatePaths.h"
 #include "SparkleLauncher/ToolResolver.h"
 
 #include <algorithm>
@@ -209,7 +208,6 @@ namespace SparkleLauncher
 		    {"graphicsApi", plan.Request.GraphicsApi},
 		    {"captureProvider", std::string(ExternalCaptureProviderToString(plan.Request.CaptureProvider))}};
 
-		plan.Operation.LogPath = ResolveLauncherOperationLogPath(plan.Request.WorkspaceRoot, definition->Id, "Latest.txt");
 		if (plan.Request.LevelId.empty())
 		{
 			plan.ReadinessMessages.push_back("A catalog level id is required.");

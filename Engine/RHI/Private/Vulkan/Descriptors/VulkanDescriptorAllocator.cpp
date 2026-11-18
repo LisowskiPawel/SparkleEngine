@@ -262,11 +262,6 @@ bool VulkanDescriptorAllocator::WriteRegisteredDescriptor(RhiCpuDescriptorHandle
 
 void VulkanDescriptorAllocator::WriteDescriptorTable(VkDescriptorSet descriptorSet, const CompiledBinding& binding, RhiDescriptorTableBinding tableBinding) noexcept
 {
-	if (descriptorSet == VK_NULL_HANDLE || !tableBinding)
-	{
-		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor-table binding requires a descriptor set and table binding.");
-	}
-
 	const std::shared_ptr<const RecordingReadView> readView = GetRecordingReadView();
 	std::uint32_t tableIndex = 0;
 	std::uint16_t generation = 0;
@@ -299,21 +294,12 @@ void VulkanDescriptorAllocator::WriteDescriptorTable(VkDescriptorSet descriptorS
 	}
 
 	const std::size_t availableDescriptorCount = table.Entries->size() - tableBinding.DescriptorIndex;
-	if (binding.DescriptorCount == 0 || availableDescriptorCount == 0)
-	{
-		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor table does not contain the binding's complete descriptor range.");
-	}
 	const std::size_t descriptorCount = std::min<std::size_t>(availableDescriptorCount, binding.DescriptorCount);
 	VulkanDescriptorWrites::Write(m_rhi.GetDevice(), descriptorSet, binding, std::span<const VulkanDescriptorEntry>(table.Entries->data() + tableBinding.DescriptorIndex, descriptorCount));
 }
 
 void VulkanDescriptorAllocator::WriteDescriptorHandle(VkDescriptorSet descriptorSet, const CompiledBinding& binding, RhiGpuDescriptorHandle handle) noexcept
 {
-	if (descriptorSet == VK_NULL_HANDLE || !handle)
-	{
-		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor-handle binding requires a descriptor set and registered handle.");
-	}
-
 	const std::shared_ptr<const RecordingReadView> readView = GetRecordingReadView();
 	std::uint32_t descriptorIndex = 0;
 	const bool bDescriptorViewAvailable = readView != nullptr && readView->RegisteredDescriptors != nullptr;
@@ -326,17 +312,12 @@ void VulkanDescriptorAllocator::WriteDescriptorHandle(VkDescriptorSet descriptor
 	}
 
 	const VulkanDescriptorEntry& entry = (*readView->RegisteredDescriptors)[descriptorIndex];
-	if (entry.Kind == VulkanDescriptorEntryKind::Empty)
-	{
-		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan descriptor handle references a released entry.");
-	}
-
 	VulkanDescriptorWrites::Write(m_rhi.GetDevice(), descriptorSet, binding, std::span<const VulkanDescriptorEntry>(&entry, 1));
 }
 
 void VulkanDescriptorAllocator::WriteBufferDescriptor(VkDescriptorSet descriptorSet, const CompiledBinding& binding, VkBuffer buffer, VkDeviceSize offset, VkDeviceSize range) noexcept
 {
-	if (descriptorSet == VK_NULL_HANDLE || buffer == VK_NULL_HANDLE || range == 0)
+	if (buffer == VK_NULL_HANDLE || range == 0)
 	{
 		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan buffer binding requires a descriptor set, resolved buffer, and non-zero range.");
 	}
@@ -349,7 +330,7 @@ void VulkanDescriptorAllocator::WriteBufferDescriptor(VkDescriptorSet descriptor
 
 void VulkanDescriptorAllocator::WriteAccelerationStructureDescriptor(VkDescriptorSet descriptorSet, const CompiledBinding& binding, VkAccelerationStructureKHR accelerationStructure) noexcept
 {
-	if (descriptorSet == VK_NULL_HANDLE || accelerationStructure == VK_NULL_HANDLE)
+	if (accelerationStructure == VK_NULL_HANDLE)
 	{
 		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan acceleration-structure binding requires a descriptor set and resolved acceleration structure.");
 	}
@@ -362,7 +343,7 @@ void VulkanDescriptorAllocator::WriteAccelerationStructureDescriptor(VkDescripto
 
 void VulkanDescriptorAllocator::WritePtlasDescriptor(VkDescriptorSet descriptorSet, const CompiledBinding& binding, VkDeviceAddress accelerationStructureAddress) noexcept
 {
-	if (descriptorSet == VK_NULL_HANDLE || accelerationStructureAddress == 0)
+	if (accelerationStructureAddress == 0)
 	{
 		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, "Vulkan PTLAS binding requires a descriptor set and GPU address.");
 	}

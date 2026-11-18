@@ -4,7 +4,7 @@
 #include "D3D12/Descriptors/D3D12DescriptorService.h"
 
 D3D12InteropService::D3D12InteropService(D3D12RenderHardwareInterface& owner) noexcept :
-    m_owner(&owner)
+    m_owner(owner)
 {
 }
 
@@ -15,18 +15,14 @@ RhiNativeDeviceQueueInterop D3D12InteropService::GetDeviceQueueInterop(RhiNative
 		return {};
 	}
 
-	return RhiNativeDeviceQueueInterop{
-	    .BackendApi = m_owner != nullptr ? m_owner->GetCapabilities().BackendApi : ERhiBackendApi::Unknown,
-	    .Device = m_owner != nullptr ? m_owner->GetDeviceHandle() : NativeGraphicsDeviceHandle{},
-	    .GraphicsQueue = m_owner != nullptr ? m_owner->GetGraphicsQueueHandle() : NativeGraphicsQueueHandle{},
-	    .Request = request};
+	return RhiNativeDeviceQueueInterop{.BackendApi = m_owner.GetCapabilities().BackendApi, .Device = m_owner.GetDeviceHandle(), .GraphicsQueue = m_owner.GetGraphicsQueueHandle(), .Request = request};
 }
 
 NativeTextureViewInfo D3D12InteropService::GetNativeTextureViewInfo(RhiResourceViewHandle view, RhiResourceHandle resource, ResourceState state, const RhiNativeInteropRequest& request) const noexcept
 {
-	if (!IsRhiNativeInteropRequestValid(request) || m_owner == nullptr || m_owner->m_descriptorService == nullptr)
+	if (!IsRhiNativeInteropRequestValid(request) || m_owner.m_descriptorService == nullptr)
 	{
 		return {};
 	}
-	return m_owner->m_descriptorService->ResolveNativeTextureViewInfo(view, resource, state);
+	return m_owner.m_descriptorService->ResolveNativeTextureViewInfo(view, resource, state);
 }

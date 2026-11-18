@@ -35,7 +35,7 @@ RenderScenePreparationCapacity ResolveRenderScenePreparationCapacity(const Rende
 
 static TaskDesc MakeTaskDesc(std::string_view name)
 {
-	return TaskDesc{.Name = TaskName(name), .Lane = TaskLane::FrameCritical};
+	return TaskDesc{.Name = std::string(name), .Lane = TaskLane::FrameCritical};
 }
 
 static TaskNodeHandle AddTransformBoundsTasks(TaskGraphBuilder& builder, std::uint32_t capacity)

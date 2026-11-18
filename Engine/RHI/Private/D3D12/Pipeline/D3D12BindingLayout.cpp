@@ -164,7 +164,6 @@ D3D12BindingLayout::~D3D12BindingLayout() noexcept = default;
 
 D3D12RootSignature& D3D12BindingLayout::GetRootSignature() const noexcept
 {
-	assert(m_rootSignature != nullptr);
 	return *m_rootSignature;
 }
 
@@ -174,7 +173,6 @@ static void CompileParameterBindings(D3D12RootSignatureBuilder& builder, std::ve
 	for (const PassParameterDesc& bindingRecord : bindingRecords)
 	{
 		const std::string_view bindingName = bindingRecord.Name;
-		assert(!bindingName.empty());
 		switch (bindingRecord.Kind)
 		{
 			case ShaderParameterSemanticKind::UniformData:

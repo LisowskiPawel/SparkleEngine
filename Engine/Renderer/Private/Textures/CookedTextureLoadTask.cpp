@@ -23,7 +23,7 @@ TaskExecution LaunchCookedTextureLoad(
 	TaskGraphBuilder graph;
 
 	const TaskNodeHandle read = graph.Add(
-	    TaskDesc{.Name = TaskName("Read cooked texture generation"), .Lane = TaskLane::BlockingIo},
+	    TaskDesc{.Name = "Read cooked texture generation", .Lane = TaskLane::BlockingIo},
 	    [path, payload](TaskExecutionContext& context)
 	    {
 		    if (context.IsCancellationRequested())
@@ -36,7 +36,7 @@ TaskExecution LaunchCookedTextureLoad(
 
 	graph.ContinueWith(
 	    read,
-	    TaskDesc{.Name = TaskName("Decode cooked texture generation"), .Lane = TaskLane::Background},
+	    TaskDesc{.Name = "Decode cooked texture generation", .Lane = TaskLane::Background},
 	    [payload, maximumDecodedBytes](TaskExecutionContext& context)
 	    {
 		    if (context.IsCancellationRequested())

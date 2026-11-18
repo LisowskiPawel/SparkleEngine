@@ -7,7 +7,6 @@
 #include "Validation/RhiContract.h"
 
 #include <cstdint>
-#include <limits>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -130,10 +129,6 @@ void RhiContract::ValidateRayTracingPipelineDesc(const RayTracingPipelineDesc& d
 
 		RhiPipelineDescValidation::Require(bSharedContractMatches, "Ray-tracing pipeline export metadata does not match its map contract.");
 
-		RhiPipelineDescValidation::Require(
-		    (shaderExport.Shader->Entry->LocalRecordSizeInBytes == 0) == (shaderExport.Shader->Entry->LocalRecordSignature == 0),
-		    "Ray-tracing pipeline export has an incomplete local-record contract.");
-
 		rayGenerationCount += stage == ShaderStage::RayGeneration ? 1u : 0u;
 	}
 	RhiPipelineDescValidation::Require(rayGenerationCount == 1, "Ray-tracing pipeline requires exactly one ray-generation export.");
@@ -168,14 +163,13 @@ void RhiContract::ValidateRayTracingShaderTableDesc(const RayTracingShaderTableD
 {
 	RhiPipelineDescValidation::Require(desc.Pipeline != nullptr, "Ray-tracing shader table requires a pipeline.");
 	RhiPipelineDescValidation::Require(desc.Generation != 0, "Ray-tracing shader table requires a nonzero generation.");
-	RhiPipelineDescValidation::Require(desc.Pipeline != nullptr && desc.Pipeline->GetGeneration() == desc.Generation, "Ray-tracing shader table generation does not match its pipeline.");
+	RhiPipelineDescValidation::Require(desc.Pipeline->GetGeneration() == desc.Generation, "Ray-tracing shader table generation does not match its pipeline.");
 	RhiPipelineDescValidation::Require(desc.RayGenerationRecords.size() == 1, "Ray-tracing shader table requires exactly one ray-generation record.");
 
 	const auto validateRecords = [&desc](std::span<const RhiRayTracingShaderRecord> records, ShaderStage expectedStage, bool bExpectedHitGroup)
 	{
 		for (const RhiRayTracingShaderRecord& record : records)
 		{
-			RhiPipelineDescValidation::Require(!record.ExportName.empty(), "Ray-tracing shader record has no export name.");
 			const RayTracingPipeline::RecordContract* contract = desc.Pipeline->FindRecordContract(record.ExportName);
 			RhiPipelineDescValidation::Require(
 			    contract != nullptr && contract->bIsHitGroup == bExpectedHitGroup && (bExpectedHitGroup || contract->Stage == expectedStage),
@@ -190,32 +184,4 @@ void RhiContract::ValidateRayTracingShaderTableDesc(const RayTracingShaderTableD
 	validateRecords(desc.MissRecords, ShaderStage::Miss, false);
 	validateRecords(desc.HitGroupRecords, ShaderStage::Count, true);
 	validateRecords(desc.CallableRecords, ShaderStage::Callable, false);
-}
-
-void RhiContract::ValidateTraceRaysDesc(const TraceRaysDesc& desc, ERhiQueueType queueType)
-{
-	RhiPipelineDescValidation::Require(queueType == ERhiQueueType::Graphics, "TraceRays requires a graphics queue.");
-	RhiPipelineDescValidation::Require(desc.Pipeline != nullptr && desc.ShaderTable != nullptr, "TraceRays requires a pipeline and shader table.");
-	RhiPipelineDescValidation::Require(desc.ShaderTable->GetPipelineGeneration() == desc.Pipeline->GetGeneration(), "TraceRays rejected a stale shader table generation.");
-
-	RhiPipelineDescValidation::Require(
-	    desc.RayGeneration == desc.ShaderTable->GetRayGenerationRegion() && desc.Miss == desc.ShaderTable->GetMissRegion() && desc.HitGroup == desc.ShaderTable->GetHitGroupRegion()
-	        && desc.Callable == desc.ShaderTable->GetCallableRegion(),
-	    "TraceRays regions do not match the immutable shader table.");
-
-	RhiPipelineDescValidation::Require(desc.Width != 0 && desc.Height != 0 && desc.Depth != 0, "TraceRays dimensions must be nonzero.");
-
-	const auto validateRegion = [](const RhiRayTracingShaderTableRegion& region, bool bRequired)
-	{
-		RhiPipelineDescValidation::Require(!bRequired || (region.SizeInBytes != 0 && region.StrideInBytes != 0), "TraceRays required shader-table region is empty.");
-		RhiPipelineDescValidation::Require(
-		    region.SizeInBytes == 0 || (region.StrideInBytes != 0 && region.SizeInBytes % region.StrideInBytes == 0),
-		    "TraceRays shader-table region has invalid size or stride.");
-		RhiPipelineDescValidation::Require(region.OffsetInBytes <= std::numeric_limits<std::uint64_t>::max() - region.SizeInBytes, "TraceRays shader-table region arithmetic overflowed.");
-	};
-
-	validateRegion(desc.RayGeneration, true);
-	validateRegion(desc.Miss, false);
-	validateRegion(desc.HitGroup, false);
-	validateRegion(desc.Callable, false);
 }

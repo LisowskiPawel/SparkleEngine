@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Diagnostics/FrameExecutionDiagnostics.h"
-#include "Debug/RendererCVars.h"
+#include "Diagnostics/ScopedGpuScope.h"
 
 #include <string_view>
 
@@ -12,9 +11,8 @@ class RenderCommandContext;
 class FrameGraphExecutionDiagnostics final
 {
 public:
-	FrameGraphExecutionDiagnostics(FrameExecutionDiagnostics& frameDiagnostics, RenderCommandContext& commands) noexcept;
+	FrameGraphExecutionDiagnostics(const RenderDiagnostics& backendDiagnostics, RenderCommandContext& commands) noexcept;
 
-	RendererDiagnosticMarkerVerbosity GetMarkerVerbosity() const noexcept;
 	bool ShouldEmitFramePassMarkers() const noexcept;
 	bool ShouldEmitDetailedMarkers() const noexcept;
 
@@ -27,6 +25,6 @@ public:
 private:
 	void InsertDetailedMarker(std::string_view label) const;
 
-	FrameExecutionDiagnostics* m_frameDiagnostics = nullptr;
-	RenderCommandContext* m_commands = nullptr;
+	const RenderDiagnostics& m_backendDiagnostics;
+	RenderCommandContext& m_commands;
 };

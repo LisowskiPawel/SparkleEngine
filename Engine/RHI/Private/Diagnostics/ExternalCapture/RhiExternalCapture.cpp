@@ -73,7 +73,6 @@ public:
 
 		Snapshot.State = ExternalCaptureState::Failed;
 		Snapshot.Message = error;
-		SPDLOG_LOGGER_WARN(g_externalCaptureLogger.GetLogger(), "Capture request={} rejected: {}", requestId, error);
 	}
 
 	void PublishNativeResult(std::uint64_t requestId, const ExternalCaptureNativeResult& result)
@@ -92,8 +91,6 @@ public:
 		Snapshot.State = result.State;
 		Snapshot.ArtifactPath = result.Artifact.string();
 		Snapshot.Message = result.Message;
-
-		SPDLOG_LOGGER_INFO(g_externalCaptureLogger.GetLogger(), "Capture request={} state={} artifact={} {}", requestId, static_cast<int>(result.State), Snapshot.ArtifactPath, Snapshot.Message);
 	}
 
 	void Quarantine(std::uint64_t requestId, const char* reason)
@@ -128,8 +125,6 @@ RhiExternalCapture::RhiExternalCapture(ERhiBackendApi api, ExternalCaptureProvid
 	auto& state = *m_state;
 	state.Snapshot.Provider = provider;
 	state.Adapter = CreateExternalCaptureAdapter(api, provider, state.Snapshot.Message);
-
-	SPDLOG_LOGGER_INFO(g_externalCaptureLogger.GetLogger(), "Early capture bootstrap provider={} available={} {}", static_cast<int>(provider), state.Adapter != nullptr, state.Snapshot.Message);
 }
 
 RhiExternalCapture::~RhiExternalCapture() noexcept = default;
@@ -224,7 +219,6 @@ void RhiExternalCapture::BeginFrame(std::uint64_t frameId) noexcept
 		}
 
 		state.bFrameStarted = true;
-		SPDLOG_LOGGER_INFO(g_externalCaptureLogger.GetLogger(), "Capture request={} scheduled at host frame={}", requestId, frameId);
 	}
 	catch (const std::exception& error)
 	{

@@ -15,7 +15,6 @@ enum class RendererDiagnosticMarkerVerbosity : std::uint8_t
 extern ConsoleVariable<GBufferAlgorithm> CVarGBufferAlgorithm;
 extern ConsoleVariable<bool> CVarRendererMeshAutoBatching;
 extern ConsoleVariable<RendererDiagnosticMarkerVerbosity> CVarRendererDiagnosticMarkerVerbosity;
-extern ConsoleVariable<bool> CVarRendererDiagnosticGpuTiming;
 extern ConsoleVariable<bool> CVarRendererParallelFrameGraphRecording;
 extern ConsoleVariable<bool> CVarRayTracingTlasRefit;
 extern ConsoleVariable<std::uint32_t> CVarRayTracingPartitionsPerAxis;

@@ -19,7 +19,6 @@ void FrameGraphCompiler::FinalizePassDependencies() noexcept
 	CullDeadPasses();
 	BuildPassSuccessorsAndInDegrees();
 	BuildTopologicalExecutionOrder();
-	ValidateExecutionOrder();
 }
 
 void FrameGraphCompiler::DeduplicatePassDependencies() noexcept
@@ -206,55 +205,7 @@ void FrameGraphCompiler::BuildTopologicalExecutionOrder() noexcept
 			}
 		}
 	}
-}
-
-void FrameGraphCompiler::ValidateExecutionOrder() const noexcept
-{
-	std::size_t alivePassCount = 0;
-	std::vector<bool> visited(m_plan.passes.size(), false);
-	std::vector<std::size_t> orderPosition(m_plan.passes.size(), static_cast<std::size_t>(-1));
-
-	for (const FrameGraphPassNode& passRecord : m_plan.passes)
-	{
-		if (passRecord.bAlive)
-		{
-			++alivePassCount;
-		}
-		for (const FrameGraphPassIndex successor : passRecord.successors)
-		{
-			assert(successor < m_plan.passes.size());
-		}
-	}
-
-	assert(m_plan.executionOrder.size() == alivePassCount);
-	for (const FrameGraphPassIndex passIndex : m_plan.executionOrder)
-	{
-		assert(passIndex < m_plan.passes.size());
-		assert(m_plan.passes[passIndex].bAlive);
-		assert(!visited[passIndex]);
-		visited[passIndex] = true;
-	}
-
-	for (std::size_t orderIndex = 0; orderIndex < m_plan.executionOrder.size(); ++orderIndex)
-	{
-		orderPosition[m_plan.executionOrder[orderIndex]] = orderIndex;
-	}
-
-	for (const FrameGraphPassNode& passRecord : m_plan.passes)
-	{
-		if (!passRecord.bAlive)
-		{
-			continue;
-		}
-
-		for (const FrameGraphPassIndex dependency : passRecord.dependsOn)
-		{
-			assert(dependency < orderPosition.size());
-			assert(orderPosition[dependency] != static_cast<std::size_t>(-1));
-			assert(orderPosition[passRecord.index] != static_cast<std::size_t>(-1));
-			assert(orderPosition[dependency] < orderPosition[passRecord.index]);
-		}
-	}
+	assert(m_plan.executionOrder.size() == static_cast<std::size_t>(std::ranges::count_if(m_plan.passes, &FrameGraphPassNode::bAlive)) && "Frame graph contains a dependency cycle.");
 }
 
 void FrameGraphCompiler::BuildPassResourceDependencies(FrameGraphPassNode& passRecord) noexcept

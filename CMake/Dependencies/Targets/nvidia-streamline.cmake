@@ -1,4 +1,3 @@
-sparkle_log_dependency_step("NVIDIA Streamline SDK" "v2.11.1" "~217 MB" "DLSS external provider SDK headers, import library, and runtime DLLs" "https://github.com/NVIDIA-RTX/Streamline/releases")
 
 set(_sparkle_streamline_url "https://github.com/NVIDIA-RTX/Streamline/releases/download/v2.11.1/streamline-sdk-v2.11.1.zip")
 set(_sparkle_streamline_zip "${FETCHCONTENT_BASE_DIR}/streamline-sdk-v2.11.1.zip")
@@ -34,7 +33,6 @@ sparkle_ensure_archive_dependency(
 )
 
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
-    sparkle_log_dependency_ready("NVIDIA Streamline SDK" "${_sparkle_streamline_root}" "~217 MB release SDK")
     return()
 endif()
 
@@ -51,5 +49,3 @@ list(TRANSFORM _sparkle_streamline_notice_files PREPEND "${_sparkle_streamline_r
 set_target_properties(NVIDIA::Streamline PROPERTIES
     SPARKLE_STREAMLINE_RUNTIME_FILES "${_sparkle_streamline_runtime_files}"
     SPARKLE_STREAMLINE_NOTICE_FILES "${_sparkle_streamline_notice_files}")
-
-sparkle_log_dependency_ready("NVIDIA Streamline SDK" "${_sparkle_streamline_root}" "~217 MB release SDK")

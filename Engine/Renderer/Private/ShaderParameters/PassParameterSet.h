@@ -106,12 +106,11 @@ class SPARKLE_RENDERER_API PassParameterSet final
 {
 public:
 	PassParameterSet(const PassParameterLayout& layout, std::vector<bool> graphResourceParameters);
+	PassParameterSet(const PassParameterLayout&& layout, std::vector<bool> graphResourceParameters) = delete;
 
 	void ClearBindings() noexcept;
 
-	const PassParameterLayout* GetLayout() const noexcept { return m_layout; }
-
-	bool HasLayout() const noexcept { return m_layout != nullptr; }
+	const PassParameterLayout& GetLayout() const noexcept { return m_layout; }
 
 	std::size_t GetBindingCount() const noexcept { return m_bindings.size(); }
 
@@ -143,12 +142,13 @@ public:
 	bool SetSampler(const char* name, RhiSamplerDesc sampler);
 	bool HasAllRequiredBindings() const noexcept;
 	std::vector<std::string> GetMissingBindings() const;
+	[[noreturn]] void ReportInvalidBindings(const char* passName) const noexcept;
 
 private:
 	const PassParameterDesc* FindParameter(const char* name, std::uint32_t& outIndex) const noexcept;
 	const PassParameterBinding* FindBinding(const char* name, std::uint32_t& outIndex) const noexcept;
 	bool SetDescriptorTable(const char* name, PassParameterDescriptorTableBindingData binding, ShaderParameterSemanticKind textureKind, ShaderParameterSemanticKind bufferKind);
-	const PassParameterLayout* m_layout = nullptr;
+	const PassParameterLayout& m_layout;
 	std::vector<PassParameterBinding> m_bindings;
 	std::vector<bool> m_graphResourceParameters;
 };

@@ -8,11 +8,9 @@ set(_sparkle_tinyexr_revision 6e8cac308cdf4d717078f3f37c4aa39bf3b356b4)
 sparkle_declare_git_dependency(tinyexr
     https://github.com/syoyo/tinyexr.git
     ${_sparkle_tinyexr_revision})
-sparkle_log_dependency_step("tinyexr" "v1.0.7" "~1 MB" "Header-only OpenEXR image loading/writing support" "https://github.com/syoyo/tinyexr.git")
 FetchContent_Populate(tinyexr)
 
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
-    sparkle_log_dependency_ready("tinyexr" "${tinyexr_SOURCE_DIR}" "~1 MB")
     return()
 endif()
 
@@ -20,5 +18,3 @@ add_library(tinyexr INTERFACE)
 set_property(TARGET tinyexr PROPERTY SPARKLE_SOURCE_PACKAGE
     "{\"name\":\"tinyexr\",\"versionInfo\":\"1.0.7\",\"licenseDeclared\":\"BSD-3-Clause\",\"downloadLocation\":\"https://github.com/syoyo/tinyexr/tree/${_sparkle_tinyexr_revision}\"}")
 target_include_directories(tinyexr INTERFACE ${tinyexr_SOURCE_DIR})
-
-sparkle_log_dependency_ready("tinyexr" "${tinyexr_SOURCE_DIR}" "~1 MB")

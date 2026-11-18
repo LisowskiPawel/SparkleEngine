@@ -81,7 +81,7 @@ namespace ReferencePathTracer
 
 			const RayTracingPathSurface surface = BuildHitRayTracingPathSurface(hitSurface, path.DirectionWorld);
 			const uint surfaceVertexCount = path.SurfaceDepth + 1u;
-			if (FinitePathDiagnosticSurfaceVertices == 0u && surfaceVertexCount > 4096u)
+			if (surfaceVertexCount > 4096u)
 			{
 				return asfloat(0x7FC00000u).xxx;
 			}
@@ -92,7 +92,7 @@ namespace ReferencePathTracer
 
 			PathTracer::AddRadiance(contribution, path.Throughput, SampleDirectLighting(sceneTlas, skyTexture, skySampler, surface, lobeMasses, lightCounts, sampleIdentity, path.SurfaceDepth));
 
-			if ((FinitePathDiagnosticSurfaceVertices != 0u && surfaceVertexCount == FinitePathDiagnosticSurfaceVertices) || lobeMasses.Count == 0u)
+			if (lobeMasses.Count == 0u)
 			{
 				break;
 			}
@@ -109,8 +109,7 @@ namespace ReferencePathTracer
 
 			PathTracer::ApplyDirectionSample(path, bsdf);
 
-			const bool bRouletteTerminatedSurfaceDepth = FinitePathDiagnosticSurfaceVertices == 0u && path.SurfaceDepth >= 3u;
-			const bool bRouletteTerminated = bRouletteTerminatedSurfaceDepth && (!SurvivesRussianRoulette(path.Throughput, sampleIdentity, surfaceVertexCount));
+			const bool bRouletteTerminated = path.SurfaceDepth >= 3u && !SurvivesRussianRoulette(path.Throughput, sampleIdentity, surfaceVertexCount);
 
 			if (bRouletteTerminated)
 			{

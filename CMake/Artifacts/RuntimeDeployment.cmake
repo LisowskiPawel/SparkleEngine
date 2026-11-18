@@ -24,10 +24,6 @@ function(sparkle_stage_msvc_runtime target_name)
 endfunction()
 
 function(sparkle_stage_linked_runtime product_target)
-    if(NOT TARGET ${product_target})
-        message(FATAL_ERROR "Unknown Sparkle product target '${product_target}'")
-    endif()
-
     set_property(TARGET ${product_target} APPEND PROPERTY SPARKLE_RUNTIME_SUPPORT_FILES
         "$<PATH:GET_FILENAME,$<TARGET_RUNTIME_DLLS:${product_target}>>")
     add_custom_command(TARGET ${product_target} POST_BUILD

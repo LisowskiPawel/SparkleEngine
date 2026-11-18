@@ -1,7 +1,6 @@
 #include "Cook/CookPlanPreview.h"
 
 #include "Cook/CookOperationProcessRequests.h"
-#include "Workspace/LauncherStatePaths.h"
 
 #include <sstream>
 #include <span>
@@ -109,7 +108,6 @@ namespace SparkleLauncher
 		{
 			plan.Operation.Inputs.push_back({"cookScopes", JoinCookScopeNames(plan.Request.SelectedScopes, ToString)});
 		}
-		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.WorkspaceRoot, plan.Operation.Id, "Latest.txt");
 		if (request.Mode == CookMode::Force)
 		{
 			plan.Operation.DestructiveScope = OperationDestructiveScope::CookedOutputs;

@@ -36,26 +36,17 @@ void Window::RestoreWindowedMode()
 
 void Window::Minimize() noexcept
 {
-	if (m_hWnd != nullptr)
-	{
-		m_pendingShowCommand = SW_MINIMIZE;
-	}
+	m_pendingShowCommand = SW_MINIMIZE;
 }
 
 void Window::Maximize() noexcept
 {
-	if (m_hWnd != nullptr)
-	{
-		m_pendingShowCommand = SW_MAXIMIZE;
-	}
+	m_pendingShowCommand = SW_MAXIMIZE;
 }
 
 void Window::Restore() noexcept
 {
-	if (m_hWnd != nullptr)
-	{
-		m_pendingShowCommand = SW_RESTORE;
-	}
+	m_pendingShowCommand = SW_RESTORE;
 }
 
 void Window::BeginDragMove() noexcept
@@ -86,7 +77,7 @@ bool Window::HandleWindowShortcut(UINT message, WPARAM key, LPARAM flags)
 
 UINT Window::GetDpi() const noexcept
 {
-	const UINT dpi = m_hWnd != nullptr ? GetDpiForWindow(m_hWnd) : 0;
+	const UINT dpi = GetDpiForWindow(m_hWnd);
 	return dpi != 0 ? dpi : USER_DEFAULT_SCREEN_DPI;
 }
 
@@ -98,11 +89,6 @@ float Window::GetDpiScale() const noexcept
 void Window::HandleDpiChanged(WPARAM wParam, LPARAM lParam)
 {
 	const auto* suggested = reinterpret_cast<const RECT*>(lParam);
-	if (suggested == nullptr)
-	{
-		return;
-	}
-
 	const RECT bounds = IsFullScreen() ? GetCurrentMonitorInfo().rcMonitor : *suggested;
 	SetWindowPos(m_hWnd, nullptr, bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, SWP_NOACTIVATE | SWP_NOZORDER);
 	const float scale = static_cast<float>(LOWORD(wParam)) / static_cast<float>(USER_DEFAULT_SCREEN_DPI);
@@ -130,7 +116,7 @@ void Window::OnSizeChanged(WPARAM sizeType, LPARAM dimensions)
 
 void Window::ApplyPendingShowCommand() noexcept
 {
-	if (m_pendingShowCommand == kNoShowCommand)
+	if (m_pendingShowCommand == kNoShowCommand || m_hWnd == nullptr)
 	{
 		return;
 	}

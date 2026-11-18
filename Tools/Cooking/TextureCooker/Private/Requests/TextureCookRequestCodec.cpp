@@ -25,14 +25,11 @@ namespace TextureCookRequestEncoding
 	static constexpr PolicyName<TextureMipPolicy> MipPolicies[] = {
 	    {TextureMipPolicy::Generate, "generate"},
 	    {TextureMipPolicy::PreserveExisting, "preserve-existing"},
-	    {TextureMipPolicy::NoMips, "no-mips"},
-	    {TextureMipPolicy::PreserveExisting, "preserveexisting"},
-	    {TextureMipPolicy::NoMips, "nomips"}};
+	    {TextureMipPolicy::NoMips, "no-mips"}};
 
 	static constexpr PolicyName<TextureColorProcessingPolicy> ColorProcessingPolicies[] = {
 	    {TextureColorProcessingPolicy::Linear, "linear"},
-	    {TextureColorProcessingPolicy::SrgbLinearize, "srgb-linearize"},
-	    {TextureColorProcessingPolicy::SrgbLinearize, "srgblinearize"}};
+	    {TextureColorProcessingPolicy::SrgbLinearize, "srgb-linearize"}};
 
 	static constexpr PolicyName<TextureGroup> Groups[] = {
 	    {TextureGroup::Default, "default"},
@@ -44,41 +41,14 @@ namespace TextureCookRequestEncoding
 	    {TextureGroup::Emissive, "emissive"},
 	    {TextureGroup::SubsurfaceColor, "subsurface-color"},
 	    {TextureGroup::SubsurfaceStrength, "subsurface-strength"},
-	    {TextureGroup::HdrColor, "hdr-color"},
-	    {TextureGroup::Default, "none"},
-	    {TextureGroup::Diffuse, "albedo"},
-	    {TextureGroup::Diffuse, "base-color"},
-	    {TextureGroup::Diffuse, "basecolor"},
-	    {TextureGroup::Diffuse, "color"},
-	    {TextureGroup::Metallic, "metalness"},
-	    {TextureGroup::AmbientOcclusion, "ambientocclusion"},
-	    {TextureGroup::AmbientOcclusion, "occlusion"},
-	    {TextureGroup::AmbientOcclusion, "ao"},
-	    {TextureGroup::AmbientOcclusion, "masks"},
-	    {TextureGroup::NormalMap, "normalmap"},
-	    {TextureGroup::HdrColor, "hdrcolor"},
-	    {TextureGroup::Emissive, "emission"},
-	    {TextureGroup::SubsurfaceColor, "subsurfacecolor"},
-	    {TextureGroup::SubsurfaceStrength, "subsurfacestrength"}};
+	    {TextureGroup::HdrColor, "hdr-color"}};
 
-	static constexpr PolicyName<TextureDimension> Dimensions[] = {
-	    {TextureDimension::Texture2D, "2d"},
-	    {TextureDimension::TextureCube, "cube"},
-	    {TextureDimension::Texture2D, "texture2d"},
-	    {TextureDimension::TextureCube, "texturecube"}};
+	static constexpr PolicyName<TextureDimension> Dimensions[] = {{TextureDimension::Texture2D, "2d"}, {TextureDimension::TextureCube, "cube"}};
 
-	static constexpr PolicyName<TextureChannelMask> Channels[] = {
-	    {TextureChannelMask::Rgba, "rgba"},
-	    {TextureChannelMask::Red, "red"},
-	    {TextureChannelMask::Green, "green"},
-	    {TextureChannelMask::Blue, "blue"},
-	    {TextureChannelMask::Alpha, "alpha"},
-	    {TextureChannelMask::Rgba, "all"},
-	    {TextureChannelMask::Rgba, "none"},
-	    {TextureChannelMask::Red, "r"},
-	    {TextureChannelMask::Green, "g"},
-	    {TextureChannelMask::Blue, "b"},
-	    {TextureChannelMask::Alpha, "a"}};
+	static constexpr PolicyName<TextureChannelMask> Channels[] =
+	    {{TextureChannelMask::Rgba, "rgba"}, {TextureChannelMask::Red, "red"}, {TextureChannelMask::Green, "green"}, {TextureChannelMask::Blue, "blue"}, {TextureChannelMask::Alpha, "alpha"}};
+
+	static constexpr PolicyName<TextureHdrEncoding> HdrEncodings[] = {{TextureHdrEncoding::Rgba32Float, "rgba32f"}, {TextureHdrEncoding::Bc6h, "bc6h"}};
 
 	template <typename T, std::size_t N> static T Parse(std::string_view value, const PolicyName<T> (&names)[N])
 	{
@@ -106,7 +76,7 @@ namespace TextureCookRequestEncoding
 
 	static constexpr std::string_view Header = "TextureCookRequests|1";
 
-	static constexpr std::size_t FieldCount = 9;
+	static constexpr std::size_t FieldCount = 10;
 
 	static TextureAssetId ParseAssetId(std::string_view value)
 	{
@@ -129,6 +99,16 @@ namespace TextureCookRequestEncoding
 			throw Diagnostics::Error("Texture cook request path is not valid UTF-8.");
 		}
 	}
+
+	static std::string FormatPath(const std::filesystem::path& path)
+	{
+		const std::string formatted = Strings::ToNarrow(path.generic_wstring());
+		if (formatted.find_first_of(std::string_view("|\r\n\0", 4)) != std::string::npos)
+		{
+			throw Diagnostics::Error("Texture cook request paths cannot contain pipe, CR, LF or NUL characters.");
+		}
+		return formatted;
+	}
 }
 
 std::string_view TextureCookRequestCodec::GetHeader() noexcept
@@ -148,11 +128,11 @@ TextureCookRequest TextureCookRequestCodec::ParseLine(std::string_view line)
 	{
 		throw Diagnostics::Error("Texture cook request entry is malformed.");
 	}
-	if (fields[7].empty())
+	if (fields[8].empty())
 	{
 		throw Diagnostics::Error("Texture cook request entry is missing an output path.");
 	}
-	if (fields[8].empty())
+	if (fields[9].empty())
 	{
 		throw Diagnostics::Error("Texture cook request entry is missing a source path.");
 	}
@@ -165,9 +145,9 @@ TextureCookRequest TextureCookRequestCodec::ParseLine(std::string_view line)
 	request.policy.textureGroup = TextureCookRequestEncoding::Parse(fields[4], TextureCookRequestEncoding::Groups);
 	request.policy.dimension = TextureCookRequestEncoding::Parse(fields[5], TextureCookRequestEncoding::Dimensions);
 	request.policy.channelMask = TextureCookRequestEncoding::Parse(fields[6], TextureCookRequestEncoding::Channels);
-	request.outputPath = TextureCookRequestEncoding::NormalizePath(fields[7]);
-	request.sourcePath = TextureCookRequestEncoding::NormalizePath(fields[8]);
-	ValidateTextureCookRequest(request);
+	request.policy.hdrEncoding = TextureCookRequestEncoding::Parse(fields[7], TextureCookRequestEncoding::HdrEncodings);
+	request.outputPath = TextureCookRequestEncoding::NormalizePath(fields[8]);
+	request.sourcePath = TextureCookRequestEncoding::NormalizePath(fields[9]);
 	return request;
 }
 
@@ -176,8 +156,8 @@ std::string TextureCookRequestCodec::FormatLine(const TextureCookRequest& reques
 	std::ostringstream output;
 	output << Formatting::FormatHexUInt64(request.assetId) << '|' << GetTextureColorSpaceName(request.policy.colorSpace) << '|' << GetTextureMipPolicyName(request.policy.mipPolicy) << '|'
 	       << GetTextureColorProcessingPolicyName(request.policy.colorProcessingPolicy) << '|' << GetTextureGroupName(request.policy.textureGroup) << '|'
-	       << GetTextureDimensionName(request.policy.dimension) << '|' << GetTextureChannelMaskName(request.policy.channelMask) << '|' << Strings::ToNarrow(request.outputPath.generic_wstring()) << '|'
-	       << Strings::ToNarrow(request.sourcePath.generic_wstring());
+	       << GetTextureDimensionName(request.policy.dimension) << '|' << GetTextureChannelMaskName(request.policy.channelMask) << '|' << GetTextureHdrEncodingName(request.policy.hdrEncoding) << '|'
+	       << TextureCookRequestEncoding::FormatPath(request.outputPath) << '|' << TextureCookRequestEncoding::FormatPath(request.sourcePath);
 	return output.str();
 }
 
@@ -209,4 +189,9 @@ const char* GetTextureDimensionName(TextureDimension value) noexcept
 const char* GetTextureChannelMaskName(TextureChannelMask value) noexcept
 {
 	return TextureCookRequestEncoding::Name(value, TextureCookRequestEncoding::Channels);
+}
+
+const char* GetTextureHdrEncodingName(TextureHdrEncoding value) noexcept
+{
+	return TextureCookRequestEncoding::Name(value, TextureCookRequestEncoding::HdrEncodings);
 }

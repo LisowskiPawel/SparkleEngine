@@ -1,4 +1,3 @@
-sparkle_log_dependency_step("Font Awesome Free Solid" "v6.7.1" "~0.5 MB" "Editor icon font asset and license only" "https://github.com/FortAwesome/Font-Awesome")
 
 set(_sparkle_editor_icons_dir "${FETCHCONTENT_BASE_DIR}/editor-icons/fontawesome-6.7.1")
 set(SPARKLE_FONT_AWESOME_SOLID_TTF "${_sparkle_editor_icons_dir}/fa-solid-900.ttf" CACHE FILEPATH "Font Awesome Free Solid TTF path" FORCE)
@@ -16,8 +15,6 @@ download_sparkle_editor_asset(
     "Font Awesome Free license"
     "9b914eae88817d63b576eab5aafde7068c7a1abae125d7cdfb034f1da43a9afc"
 )
-
-sparkle_log_dependency_ready("Font Awesome" "${SPARKLE_FONT_AWESOME_SOLID_TTF}" "~0.5 MB asset-only")
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
     return()
 endif()

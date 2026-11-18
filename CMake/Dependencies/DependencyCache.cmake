@@ -38,10 +38,6 @@ function(sparkle_prepare_git_fetchcontent_source dependency_name)
     set(multiValueArgs REQUIRED_PATHS)
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    string(LENGTH "${ARG_EXPECTED_REVISION}" revision_length)
-    if(NOT revision_length EQUAL 40 OR NOT ARG_EXPECTED_REVISION MATCHES "^[0-9a-f]+$")
-        message(FATAL_ERROR "${dependency_name} requires a full Git commit hash.")
-    endif()
     if("${ARG_DISPLAY_NAME}" STREQUAL "")
         set(ARG_DISPLAY_NAME "${dependency_name}")
     endif()
@@ -115,7 +111,7 @@ function(sparkle_declare_git_dependency dependency_name repository revision)
         GIT_REPOSITORY "${repository}"
         GIT_TAG "${revision}"
         GIT_SHALLOW FALSE
-        GIT_PROGRESS ${_sparkle_git_progress})
+        GIT_PROGRESS FALSE)
     sparkle_prepare_git_fetchcontent_source("${dependency_name}" EXPECTED_REVISION "${revision}")
 endfunction()
 

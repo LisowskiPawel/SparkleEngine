@@ -3,7 +3,8 @@
 #include "FrameGraph/Execution/FrameGraphRecordingChunkRecorder.h"
 
 #include "Commands/RenderCommandContext.h"
-#include "Diagnostics/FrameExecutionDiagnostics.h"
+#include "Diagnostics/ScopedGpuScope.h"
+#include "RHI/Public/Device/RenderHardwareInterface.h"
 #include "Diagnostics/PassExecutionDiagnostics.h"
 #include "FrameGraph/Diagnostics/FrameGraphExecutionDiagnostics.h"
 #include "FrameGraph/Execution/FrameGraphResourceCommands.h"
@@ -12,17 +13,16 @@
 
 #include <format>
 
-FrameGraphRecordingChunkRecorder::FrameGraphRecordingChunkRecorder(const FrameGraph& frameGraph, const FrameGraphPlan& plan, FrameExecutionDiagnostics& frameDiagnostics) noexcept :
+FrameGraphRecordingChunkRecorder::FrameGraphRecordingChunkRecorder(const FrameGraph& frameGraph, const FrameGraphPlan& plan) noexcept :
     m_frameGraph(frameGraph),
-    m_plan(plan),
-    m_frameDiagnostics(frameDiagnostics)
+    m_plan(plan)
 {
 }
 
 void FrameGraphRecordingChunkRecorder::Record(const RecordingChunk& chunk, RenderCommandList& commandList) const
 {
 	RenderCommandContext commands(commandList);
-	FrameGraphExecutionDiagnostics graphDiagnostics(m_frameDiagnostics, commands);
+	FrameGraphExecutionDiagnostics graphDiagnostics(m_frameGraph.m_renderHardwareInterface.GetDiagnostics(), commands);
 	if (graphDiagnostics.ShouldEmitDetailedMarkers())
 	{
 		commands.EnableDrawDispatchDiagnostics();
@@ -38,14 +38,15 @@ void FrameGraphRecordingChunkRecorder::Record(const RecordingChunk& chunk, Rende
 
 ScopedGpuScope FrameGraphRecordingChunkRecorder::BeginChunkScope(const RecordingChunk& chunk, RenderCommandContext& commands) const
 {
-	if (CVarRendererDiagnosticMarkerVerbosity.Get() == RendererDiagnosticMarkerVerbosity::Off)
+	const bool bMarkersEnabled = CVarRendererDiagnosticMarkerVerbosity.Get() != RendererDiagnosticMarkerVerbosity::Off;
+	if (!bMarkersEnabled || !commands.SupportsDiagnosticScopes())
 	{
 		return {};
 	}
 
 	const std::string chunkLabel = std::format("GPU Frame/{}/Batch {}/RecordingChunk {}", RhiQueueTypeToString(chunk.Queue), chunk.SubmissionOrder.Batch, chunk.Index);
 	const RhiDiagnosticLabelColor color{.Red = 180, .Green = 200, .Blue = 220, .Alpha = 255};
-	return m_frameDiagnostics.BeginGpuScope(commands, chunkLabel, color);
+	return ScopedGpuScope(commands, chunkLabel, color);
 }
 
 void FrameGraphRecordingChunkRecorder::RecordGroup(const RecordingGroup& group, RenderCommandList& commandList, RenderCommandContext& commands, FrameGraphExecutionDiagnostics& graphDiagnostics) const
@@ -67,7 +68,7 @@ void FrameGraphRecordingChunkRecorder::RecordPass(FrameGraphPassIndex passIndex,
 	graphDiagnostics.InsertPassResourceBarrierMarker(passRecord);
 	m_frameGraph.EmitCompiledBarriers(commands, passRecord.passName, passRecord.compiledBarriers);
 
-	PassExecutionDiagnostics passDiagnostics(m_frameDiagnostics, commands, passRecord.eventScopeLabel, passRecord.kind);
+	PassExecutionDiagnostics passDiagnostics(commands, passRecord.eventScopeLabel, passRecord.kind);
 	auto passScope = graphDiagnostics.BeginPassScope(passDiagnostics);
 
 	PassCommandContext passContext{commands, passDiagnostics, FrameGraphResourceCommands{m_frameGraph}};

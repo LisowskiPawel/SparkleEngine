@@ -1,14 +1,12 @@
 sparkle_declare_git_dependency(directxtex
     https://github.com/microsoft/DirectXTex.git
     ${SPARKLE_DIRECTXTEX_REVISION})
-sparkle_log_dependency_step("DirectXTex" "may2026 / 2.1.1" "~1 MB" "Tool-only CPU texture decoding, conversion, mip generation and BC encoding" "https://github.com/microsoft/DirectXTex.git")
 FetchContent_Populate(directxtex)
 sparkle_prepare_git_fetchcontent_source(directxtex
     EXPECTED_REVISION "${SPARKLE_DIRECTXTEX_REVISION}"
     REQUIRED_PATHS CMakeLists.txt DirectXTex/DirectXTex.h DirectXTex/DirectXTexDDS.cpp
     DirectXTex/DirectXTexMipmaps.cpp DirectXTex/DirectXTexCompress.cpp LICENSE)
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
-    sparkle_log_dependency_ready("DirectXTex" "${directxtex_SOURCE_DIR}" "~1 MB")
     return()
 endif()
 # Keep upstream's generic options local to this dependency composition.
@@ -28,4 +26,3 @@ function(sparkle_add_directxtex)
         "{\"name\":\"DirectXTex\",\"versionInfo\":\"may2026\",\"licenseDeclared\":\"MIT\",\"downloadLocation\":\"https://github.com/microsoft/DirectXTex/tree/${SPARKLE_DIRECTXTEX_REVISION}\"}")
 endfunction()
 sparkle_add_directxtex()
-sparkle_log_dependency_ready("DirectXTex" "${directxtex_SOURCE_DIR}" "~1 MB")

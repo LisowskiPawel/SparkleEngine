@@ -70,117 +70,37 @@ static std::uint32_t AssignInstanceContributions(std::span<RayTracingShaderTable
 	return static_cast<std::uint32_t>(nextInstanceContribution);
 }
 
-static std::vector<RayTracingShaderTableRecordPlan> BuildShaderTableRecords(std::span<const RayTracingShaderTableInstancePlan> instances, std::uint32_t recordCount)
+static std::vector<RayTracingShaderTableHitGroup> BuildShaderTableHitGroups(std::span<const RayTracingShaderTableInstancePlan> instances, std::uint32_t recordCount)
 {
 	const std::uint32_t geometryMultiplier = static_cast<std::uint32_t>(RayTracingSceneRayType::Count);
-	std::vector<RayTracingShaderTableRecordPlan> records;
-	records.reserve(static_cast<std::size_t>(recordCount));
+	std::vector<RayTracingShaderTableHitGroup> hitGroups;
+	hitGroups.reserve(recordCount);
 	for (const RayTracingShaderTableInstancePlan& instance : instances)
 	{
-		for (std::uint32_t geometryIndex = 0u; geometryIndex < instance.GeometryCount; ++geometryIndex)
-		{
-			for (std::uint32_t rayContribution = 0u; rayContribution < geometryMultiplier; ++rayContribution)
-			{
-				std::uint32_t recordIndex = 0u;
-
-				const bool bRecordIndexComputed = RayTracingShaderTablePlan::ComputeCheckedRecordIndex(
-				    rayContribution,
-				    geometryMultiplier,
-				    geometryIndex,
-				    instance.InstanceContribution,
-				    static_cast<std::uint32_t>(recordCount),
-				    recordIndex);
-
-				if (!bRecordIndexComputed)
-				{
-					Diagnostics::Fatal(g_rayTracingShaderTablePlanLogger, __FILE__, __LINE__, "Ray-tracing shader-table record formula overflowed or escaped the planned table.");
-				}
-
-				records.push_back(
-				    RayTracingShaderTableRecordPlan{
-				        .RecordIndex = recordIndex,
-				        .GpuSceneSlot = instance.GpuSceneSlot,
-				        .GeometryIndex = geometryIndex,
-				        .RayType = static_cast<RayTracingSceneRayType>(rayContribution),
-				        .HitGroup = instance.HitGroup});
-			}
-		}
+		hitGroups.insert(hitGroups.end(), static_cast<std::size_t>(geometryMultiplier) * instance.GeometryCount, instance.HitGroup);
 	}
-
-	return records;
+	return hitGroups;
 }
 
 void RayTracingShaderTablePlan::Synchronize(std::span<const RenderPrimitive> primitives, const RenderMaterialTable& materials) noexcept
 {
 	auto instances = CollectShaderTableInstances(primitives, materials);
 	const std::uint32_t recordCount = AssignInstanceContributions(instances);
-	auto records = BuildShaderTableRecords(instances, recordCount);
-	const RayTracingShaderTableInvalidationReason reason = ResolveInvalidationReason(instances, records);
-	if (reason == RayTracingShaderTableInvalidationReason::None)
+	if (std::ranges::equal(instances, m_instances))
 	{
 		return;
 	}
 
-	PublishMapping(std::move(instances), std::move(records), reason);
-}
-
-RayTracingShaderTableInvalidationReason RayTracingShaderTablePlan::ResolveInvalidationReason(
-    std::span<const RayTracingShaderTableInstancePlan> instances,
-    std::span<const RayTracingShaderTableRecordPlan> records) const noexcept
-{
-	if (instances.size() != m_instances.size())
-	{
-		return RayTracingShaderTableInvalidationReason::GeometryLayout;
-	}
-
-	bool bMaterialSemanticsChanged = false;
-	for (std::size_t index = 0u; index < instances.size(); ++index)
-	{
-		const RayTracingShaderTableInstancePlan& incoming = instances[index];
-		const RayTracingShaderTableInstancePlan& current = m_instances[index];
-		const bool bBindingChanged = incoming.GpuSceneSlot != current.GpuSceneSlot || incoming.InstanceContribution != current.InstanceContribution;
-		const bool bShapeChanged = incoming.GeometryCount != current.GeometryCount || incoming.GeometryIdentity != current.GeometryIdentity;
-		if (bBindingChanged || bShapeChanged)
-		{
-			return RayTracingShaderTableInvalidationReason::GeometryLayout;
-		}
-		bMaterialSemanticsChanged = bMaterialSemanticsChanged || incoming.HitGroup != current.HitGroup;
-	}
-
-	return bMaterialSemanticsChanged || !std::ranges::equal(records, m_records) ? RayTracingShaderTableInvalidationReason::MaterialSemantics : RayTracingShaderTableInvalidationReason::None;
-}
-
-void RayTracingShaderTablePlan::PublishMapping(
-    std::vector<RayTracingShaderTableInstancePlan> instances,
-    std::vector<RayTracingShaderTableRecordPlan> records,
-    RayTracingShaderTableInvalidationReason reason) noexcept
-{
+	m_hitGroups = BuildShaderTableHitGroups(instances, recordCount);
 	m_instances = std::move(instances);
-	m_records = std::move(records);
 	++m_generation;
-	m_metrics.Generation = m_generation;
-	m_metrics.LogicalRecordCount = static_cast<std::uint32_t>(m_records.size());
-	m_metrics.MaterializedTableCount = 0u;
-	m_metrics.TableBytes = 0u;
-	m_metrics.LastBuildTimeMicroseconds = 0u;
-	m_metrics.LastUpdateTimeMicroseconds = 0u;
-
-	m_metrics.InvalidationReason = m_generation == 1u ? RayTracingShaderTableInvalidationReason::RayTypeLayout : reason;
-
-	if (!Validate())
-	{
-		Diagnostics::Fatal(g_rayTracingShaderTablePlanLogger, __FILE__, __LINE__, "Ray-tracing shader-table synchronization produced an invalid logical mapping.");
-	}
 }
 
 void RayTracingShaderTablePlan::Clear() noexcept
 {
 	m_instances.clear();
-	m_records.clear();
+	m_hitGroups.clear();
 	++m_generation;
-	m_metrics = RayTracingShaderTableMetrics{.Generation = m_generation, .InvalidationReason = RayTracingShaderTableInvalidationReason::SceneReset};
-	m_bHasMaterialized = false;
-	m_bRecordingUpdate = false;
 }
 
 bool RayTracingShaderTablePlan::ResolveInstanceContribution(std::uint32_t gpuSceneSlot, std::uint32_t& contribution) const noexcept
@@ -194,93 +114,8 @@ bool RayTracingShaderTablePlan::ResolveInstanceContribution(std::uint32_t gpuSce
 	return true;
 }
 
-bool RayTracingShaderTablePlan::ComputeRecordIndex(std::uint32_t gpuSceneSlot, std::uint32_t geometryIndex, RayTracingSceneRayType rayType, std::uint32_t& recordIndex) const noexcept
-{
-	const RayTracingShaderTableInstancePlan* instance = FindInstance(gpuSceneSlot);
-	const std::uint32_t rayContribution = static_cast<std::uint32_t>(rayType);
-	if (instance == nullptr || geometryIndex >= instance->GeometryCount || rayContribution >= static_cast<std::uint32_t>(RayTracingSceneRayType::Count))
-	{
-		return false;
-	}
-	return ComputeCheckedRecordIndex(rayContribution, GetGeometryMultiplier(), geometryIndex, instance->InstanceContribution, static_cast<std::uint32_t>(m_records.size()), recordIndex);
-}
-
-bool RayTracingShaderTablePlan::Validate() const noexcept
-{
-	if (m_records.size() > std::numeric_limits<std::uint32_t>::max())
-	{
-		return false;
-	}
-	for (std::size_t index = 0u; index < m_records.size(); ++index)
-	{
-		const RayTracingShaderTableRecordPlan& record = m_records[index];
-		std::uint32_t computedIndex = 0u;
-		const bool bRecordOrdered = record.RecordIndex == index;
-		const bool bRecordIndexComputed = bRecordOrdered && ComputeRecordIndex(record.GpuSceneSlot, record.GeometryIndex, record.RayType, computedIndex);
-		const bool bRecordIndexMatches = bRecordIndexComputed && computedIndex == record.RecordIndex;
-
-		if (!bRecordIndexMatches)
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-void RayTracingShaderTablePlan::BeginMaterializationSet() noexcept
-{
-	m_metrics.TableBytes = 0u;
-	m_metrics.MaterializedTableCount = 0u;
-	m_metrics.LastBuildTimeMicroseconds = 0u;
-	m_metrics.LastUpdateTimeMicroseconds = 0u;
-	m_bRecordingUpdate = m_bHasMaterialized;
-}
-
-void RayTracingShaderTablePlan::RecordMaterialization(std::uint64_t tableBytes, std::uint64_t elapsedMicroseconds) noexcept
-{
-	if (m_metrics.TableBytes > std::numeric_limits<std::uint64_t>::max() - tableBytes)
-	{
-		Diagnostics::Fatal(g_rayTracingShaderTablePlanLogger, __FILE__, __LINE__, "Ray-tracing shader-table byte metrics overflowed their bounded owner counter.");
-	}
-	m_metrics.TableBytes += tableBytes;
-	++m_metrics.MaterializedTableCount;
-	if (!m_bRecordingUpdate)
-	{
-		m_metrics.LastBuildTimeMicroseconds += elapsedMicroseconds;
-		++m_metrics.BuildCount;
-	}
-	else
-	{
-		m_metrics.LastUpdateTimeMicroseconds += elapsedMicroseconds;
-		++m_metrics.UpdateCount;
-	}
-	m_bHasMaterialized = true;
-}
-
 const RayTracingShaderTableInstancePlan* RayTracingShaderTablePlan::FindInstance(std::uint32_t gpuSceneSlot) const noexcept
 {
 	const auto instance = std::ranges::lower_bound(m_instances, gpuSceneSlot, {}, &RayTracingShaderTableInstancePlan::GpuSceneSlot);
 	return instance != m_instances.end() && instance->GpuSceneSlot == gpuSceneSlot ? &*instance : nullptr;
-}
-
-bool RayTracingShaderTablePlan::ComputeCheckedRecordIndex(
-    std::uint32_t rayContribution,
-    std::uint32_t geometryMultiplier,
-    std::uint32_t geometryIndex,
-    std::uint32_t instanceContribution,
-    std::uint32_t recordCount,
-    std::uint32_t& recordIndex) noexcept
-{
-	if (geometryMultiplier == 0u || rayContribution >= geometryMultiplier)
-	{
-		return false;
-	}
-	const std::uint64_t geometryTerm = static_cast<std::uint64_t>(geometryMultiplier) * geometryIndex;
-	const std::uint64_t index = static_cast<std::uint64_t>(rayContribution) + geometryTerm + instanceContribution;
-	if (index >= recordCount || index > std::numeric_limits<std::uint32_t>::max())
-	{
-		return false;
-	}
-	recordIndex = static_cast<std::uint32_t>(index);
-	return true;
 }

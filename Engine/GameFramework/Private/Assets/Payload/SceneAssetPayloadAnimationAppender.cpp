@@ -23,7 +23,7 @@ namespace Assets
 		for (const CookedAnimationReference& animationRef : sceneManifest.animationReferences)
 		{
 			const std::filesystem::path animationAssetPath = Paths::CookedAnimationAsset(animationRef.animationAssetId);
-			const LoadedAnimationAsset animationAsset = AnimationAssetLoader::Decode(animationAssetPath, files.Get(animationAssetPath), files.GetAllocationBudget());
+			const LoadedAnimationAsset animationAsset = AnimationAssetLoader::Decode(files.Get(animationAssetPath), files.GetAllocationBudget());
 			files.GetAllocationBudget().ReserveArray<AnimationChannel>(animationAsset.channels.size());
 			files.GetAllocationBudget().ReserveArray<AnimationKeyframe>(animationAsset.keyframes.size());
 			files.GetAllocationBudget().Reserve(sizeof(animationAsset.header.name));

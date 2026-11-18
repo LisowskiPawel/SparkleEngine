@@ -1,16 +1,11 @@
 #include "TaskEvent.h"
 
-#include "Core/Public/Diagnostics/Verify.h"
-#include "Core/Public/Diagnostics/Logger.h"
-
 #include <atomic>
 #include <condition_variable>
 #include <limits>
 #include <mutex>
 #include <stop_token>
 #include <utility>
-
-SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogTaskEvent, "Tasks.Event");
 
 struct TaskEvent::State final
 {
@@ -29,20 +24,7 @@ struct TaskEvent::State final
 std::uint64_t TaskEvent::State::IssueIdentity() noexcept
 {
 	static std::atomic_uint64_t nextIdentity{1};
-	std::uint64_t identity = nextIdentity.load(std::memory_order_relaxed);
-	for (;;)
-	{
-		if (identity == 0)
-		{
-			Diagnostics::Fatal(LogTaskEvent, __FILE__, __LINE__, "TaskEvent identity exhausted.");
-		}
-
-		const std::uint64_t next = identity == (std::numeric_limits<std::uint64_t>::max)() ? 0 : identity + 1;
-		if (nextIdentity.compare_exchange_weak(identity, next, std::memory_order_relaxed, std::memory_order_relaxed))
-		{
-			return identity;
-		}
-	}
+	return nextIdentity.fetch_add(1, std::memory_order_relaxed);
 }
 
 class TaskEvent::State::WaitRegistration final

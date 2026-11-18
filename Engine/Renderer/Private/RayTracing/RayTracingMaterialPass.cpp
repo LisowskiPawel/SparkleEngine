@@ -3,11 +3,6 @@
 
 std::vector<const RayTracingHitGroupComposition*> ResolveRayTracingMaterialRecordGroups(const RayTracingPipelineComposition& composition, const RayTracingShaderTablePlan& plan)
 {
-	if (!plan.Validate())
-	{
-		throw Diagnostics::Error("Ray-tracing shader-table materialization received an invalid scene plan.");
-	}
-
 	const RayTracingHitGroupComposition* opaqueGroup = nullptr;
 	const RayTracingHitGroupComposition* alphaTestedGroup = nullptr;
 	for (const RayTracingHitGroupComposition& group : composition.GetHitGroups())
@@ -35,10 +30,10 @@ std::vector<const RayTracingHitGroupComposition*> ResolveRayTracingMaterialRecor
 	}
 
 	std::vector<const RayTracingHitGroupComposition*> recordGroups;
-	recordGroups.reserve(plan.GetRecords().size());
-	for (const RayTracingShaderTableRecordPlan& record : plan.GetRecords())
+	recordGroups.reserve(plan.GetHitGroups().size());
+	for (const RayTracingShaderTableHitGroup hitGroup : plan.GetHitGroups())
 	{
-		recordGroups.push_back(record.HitGroup == RayTracingShaderTableHitGroup::AlphaTested ? alphaTestedGroup : opaqueGroup);
+		recordGroups.push_back(hitGroup == RayTracingShaderTableHitGroup::AlphaTested ? alphaTestedGroup : opaqueGroup);
 	}
 	return recordGroups;
 }

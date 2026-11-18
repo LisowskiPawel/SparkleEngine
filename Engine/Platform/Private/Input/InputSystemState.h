@@ -5,7 +5,6 @@
 #include "Input/Dispatch/InputEventDispatcher.h"
 #include "Input/Routing/InputFocusRouter.h"
 #include "Events/ScopedEventHandle.h"
-#include "Threading/ThreadOwnership.h"
 
 #include <array>
 #include <cstddef>
@@ -21,7 +20,7 @@ struct InputSystem::State final
 	static constexpr std::size_t RoutedLayerCount = static_cast<std::size_t>(InputLayer::Count) - 1;
 
 	void HandleWindowMessage(const WindowMessageEvent& event);
-	InputState* FindLayerState(InputLayer layer) noexcept;
+	InputState& GetRoutedState(InputLayer layer) noexcept;
 	void SetActiveLayer(InputLayer layer);
 	void UpdateMouseMoveDelta(MouseMoveEvent& event) noexcept;
 
@@ -50,7 +49,6 @@ struct InputSystem::State final
 	InputFocusRouter FocusRouter;
 	InputState GlobalState;
 	std::array<InputState, RoutedLayerCount> LayerStates;
-	Threading::OwnerThread OwnerThread{"InputSystem registration and dispatch"};
 	InputLayer MouseCaptureLayer = InputLayer::System;
 	std::uint64_t CancellationEpoch = 0;
 	std::int32_t LastMouseX = 0;

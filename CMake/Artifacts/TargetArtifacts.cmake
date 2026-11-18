@@ -1,9 +1,5 @@
 # Assign artifact locations; target composition owns runtime staging.
 function(_sparkle_set_target_artifact_directories target_name runtime_root symbol_owner)
-    if(NOT TARGET ${target_name})
-        message(FATAL_ERROR "Unknown Sparkle target '${target_name}'")
-    endif()
-
     set_target_properties(${target_name} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${runtime_root}/$<CONFIG>"
         LIBRARY_OUTPUT_DIRECTORY "${runtime_root}/$<CONFIG>"

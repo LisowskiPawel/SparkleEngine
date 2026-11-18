@@ -1,8 +1,6 @@
 #include "ToolWorkProgressWriter.h"
 #include "ToolWorkProgress.h"
 
-#include "Core/Public/Diagnostics/Error.h"
-
 #include <cstddef>
 #include <limits>
 #include <mutex>
@@ -16,28 +14,12 @@ static std::size_t ProgressPercentage(std::size_t completed, std::size_t total)
 	{
 		return std::numeric_limits<std::size_t>::max();
 	}
-	if (completed > total)
+	if (completed >= total)
 	{
-		throw Diagnostics::Error("Tool progress count exceeds its total.");
+		return 100;
 	}
 
-	std::size_t lower = 0;
-	std::size_t upper = 100;
-	while (lower < upper)
-	{
-		const std::size_t percentage = (lower + upper + 1) / 2;
-		// Divide before multiplying to keep the threshold exact over the full size_t range.
-		const std::size_t threshold = (total / 100) * percentage + ((total % 100) * percentage + 99) / 100;
-		if (completed >= threshold)
-		{
-			lower = percentage;
-		}
-		else
-		{
-			upper = percentage - 1;
-		}
-	}
-	return lower;
+	return static_cast<std::size_t>(100.0 * static_cast<double>(completed) / static_cast<double>(total));
 }
 
 ToolWorkProgressWriter::ToolWorkProgressWriter(std::ostream& output) noexcept :

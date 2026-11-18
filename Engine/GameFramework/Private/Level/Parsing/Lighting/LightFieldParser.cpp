@@ -142,17 +142,11 @@ namespace LevelParsing
 			SetLightPosition(common, ParseFloat3(line.value, "light position"));
 			return;
 		}
-		Diagnostics::Fatal(g_lightFieldParserLogger, __FILE__, __LINE__, "Common light field parser received another field kind.");
 	}
 
 	static void ParseDirectionalField(std::string_view field, const ParsedLevelLine& line, SceneLightDesc& light)
 	{
-		const SceneDirectionalLightDesc* current = light.GetDirectional();
-		if (current == nullptr)
-		{
-			Diagnostics::Fatal(g_lightFieldParserLogger, __FILE__, __LINE__, "Directional light field resolved to another light kind.");
-		}
-		SceneDirectionalLightDesc value = *current;
+		SceneDirectionalLightDesc& value = *light.GetDirectional();
 		if (IsCommonField(field))
 		{
 			ParseCommonField(field, line, light.common);
@@ -177,17 +171,11 @@ namespace LevelParsing
 		{
 			UnsupportedField(SceneLightKind::Directional, field);
 		}
-		light.payload = value;
 	}
 
 	static void ParsePointField(std::string_view field, const ParsedLevelLine& line, SceneLightDesc& light)
 	{
-		const PointLightDesc* current = light.GetPoint();
-		if (current == nullptr)
-		{
-			Diagnostics::Fatal(g_lightFieldParserLogger, __FILE__, __LINE__, "Point light field resolved to another light kind.");
-		}
-		PointLightDesc value = *current;
+		PointLightDesc& value = *light.GetPoint();
 		if (IsCommonField(field))
 		{
 			ParseCommonField(field, line, light.common);
@@ -216,17 +204,11 @@ namespace LevelParsing
 		{
 			UnsupportedField(SceneLightKind::Point, field);
 		}
-		light.payload = value;
 	}
 
 	static void ParseSpotField(std::string_view field, const ParsedLevelLine& line, SceneLightDesc& light)
 	{
-		const SpotLightDesc* current = light.GetSpot();
-		if (current == nullptr)
-		{
-			Diagnostics::Fatal(g_lightFieldParserLogger, __FILE__, __LINE__, "Spot light field resolved to another light kind.");
-		}
-		SpotLightDesc value = *current;
+		SpotLightDesc& value = *light.GetSpot();
 		if (IsCommonField(field))
 		{
 			ParseCommonField(field, line, light.common);
@@ -267,17 +249,11 @@ namespace LevelParsing
 		{
 			UnsupportedField(SceneLightKind::Spot, field);
 		}
-		light.payload = value;
 	}
 
 	static void ParseRectField(std::string_view field, const ParsedLevelLine& line, SceneLightDesc& light)
 	{
-		const RectLightDesc* current = light.GetRect();
-		if (current == nullptr)
-		{
-			Diagnostics::Fatal(g_lightFieldParserLogger, __FILE__, __LINE__, "Rect light field resolved to another light kind.");
-		}
-		RectLightDesc value = *current;
+		RectLightDesc& value = *light.GetRect();
 		if (IsCommonField(field))
 		{
 			ParseCommonField(field, line, light.common);
@@ -310,7 +286,6 @@ namespace LevelParsing
 		{
 			UnsupportedField(SceneLightKind::Rect, field);
 		}
-		light.payload = value;
 	}
 
 	[[noreturn]] static void UnsupportedField(SceneLightKind kind, std::string_view field)

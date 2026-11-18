@@ -4,7 +4,6 @@
 #include "Execution/SerialTaskExecution.h"
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Core/Public/Diagnostics/Logger.h"
-#include "Profiling/TaskProfiler.h"
 
 #include <cassert>
 #include <utility>
@@ -20,10 +19,8 @@ TaskExecutor::Implementation::ScheduledTaskExecution::ScheduledTaskExecution(
     m_graph(std::move(graph)),
     m_context(std::move(context)),
     m_execution(std::move(execution)),
-    m_generation(m_execution->Data.Generation),
     m_tasks(std::make_unique<ScheduledTaskState[]>(m_graph->Nodes.size())),
-    m_taskResults(m_graph->Nodes.size()),
-    m_settled(m_graph->Nodes.size(), false)
+    m_taskResults(m_graph->Nodes.size())
 {
 	InitializeTaskStates();
 }
@@ -43,7 +40,6 @@ void TaskExecutor::Implementation::ScheduledTaskExecution::InitializeTaskStates(
 
 void TaskExecutor::Implementation::ScheduledTaskExecution::Start()
 {
-	RecordDependencies();
 	if (m_graph->Nodes.empty())
 	{
 		Finish();
@@ -51,17 +47,6 @@ void TaskExecutor::Implementation::ScheduledTaskExecution::Start()
 	}
 
 	ScheduleInitialTasks();
-}
-
-void TaskExecutor::Implementation::ScheduledTaskExecution::RecordDependencies() const
-{
-	for (std::uint32_t dependent = 0; dependent < m_graph->Nodes.size(); ++dependent)
-	{
-		for (const std::uint32_t prerequisite : m_graph->Nodes[dependent].Prerequisites)
-		{
-			TaskProfiler::RecordDependency(m_generation, prerequisite, dependent);
-		}
-	}
 }
 
 void TaskExecutor::Implementation::ScheduledTaskExecution::ScheduleInitialTasks()
@@ -75,33 +60,30 @@ void TaskExecutor::Implementation::ScheduledTaskExecution::ScheduleInitialTasks(
 void TaskExecutor::Implementation::ScheduledTaskExecution::Execute(std::uint32_t index, TaskWorker& worker)
 {
 	const TaskGraphNode& node = m_graph->Nodes[index];
-	const TaskResult result = ExecuteBody(index, worker);
+	const TaskResult result = ExecuteBody(index);
 	RecordTaskResult(index, node, result);
 	ReleaseNestedTasks(node, result, worker);
 	ReleaseUnfinished(index, &worker);
 }
 
-TaskResult TaskExecutor::Implementation::ScheduledTaskExecution::ExecuteBody(std::uint32_t index, const TaskWorker& worker)
+TaskResult TaskExecutor::Implementation::ScheduledTaskExecution::ExecuteBody(std::uint32_t index)
 {
 	const ScheduledTaskState& task = m_tasks[index];
 	const TaskGraphNode& node = m_graph->Nodes[index];
-	const TaskProfiler::TimePoint taskStart = TaskProfiler::Begin(node.Desc, m_generation, index, worker.LaneWorkerIndex);
 	TaskExecutionContext taskContext = m_context;
 	taskContext.Bind(node.Desc.Lane, m_execution->Cancellation.get_token());
 
 	const bool bBlockedByDependency = task.bBlockedByPrerequisite.load(std::memory_order_acquire) || task.bBlockedByParent.load(std::memory_order_acquire);
-	TaskResult result = InvokeTaskFunction(node, taskContext, bBlockedByDependency);
-	TaskProfiler::End(node.Desc, m_generation, index, worker.LaneWorkerIndex, result, taskStart);
-	return result;
+	return InvokeTaskFunction(node, taskContext, bBlockedByDependency);
 }
 
 void TaskExecutor::Implementation::ScheduledTaskExecution::RecordTaskResult(std::uint32_t index, const TaskGraphNode& node, const TaskResult& result)
 {
 	std::lock_guard lock(m_resultMutex);
 	m_taskResults[index] = result;
-	if (result.Failed() && m_firstFailureTaskName.empty())
+	if (result.Failed() && !m_firstFailure.Failed())
 	{
-		m_firstFailureTaskName = std::string(node.Desc.Name.Get());
+		m_firstFailureTaskName = node.Desc.Name;
 		m_firstFailure = result;
 	}
 	if (result.WasCancelled())
@@ -155,17 +137,11 @@ void TaskExecutor::Implementation::ScheduledTaskExecution::ReleaseUnfinished(std
 
 void TaskExecutor::Implementation::ScheduledTaskExecution::SettleLogicalTask(std::uint32_t index, TaskWorker* worker)
 {
-	const TaskResult result = RecordLogicalCompletion(index);
+	// The final unfinished release acquires the body and child result writes.
+	const TaskResult result = m_taskResults[index];
 	ReleaseDependents(index, result, worker);
 	CompleteNestedParent(index, result, worker);
 	FinishIfAllTasksSettled();
-}
-
-TaskResult TaskExecutor::Implementation::ScheduledTaskExecution::RecordLogicalCompletion(std::uint32_t index)
-{
-	std::lock_guard lock(m_resultMutex);
-	m_settled[index] = true;
-	return m_taskResults[index];
 }
 
 void TaskExecutor::Implementation::ScheduledTaskExecution::ReleaseDependents(std::uint32_t index, const TaskResult& result, TaskWorker* worker)
@@ -219,17 +195,14 @@ void TaskExecutor::Implementation::ScheduledTaskExecution::FinishIfAllTasksSettl
 TaskExecutionCompletion TaskExecutor::Implementation::ScheduledTaskExecution::BuildCompletion()
 {
 	TaskExecutionCompletion completion;
-	completion.Generation = m_generation;
 	completion.BuilderIdentity = m_graph->BuilderIdentity;
 	completion.BuilderGeneration = m_graph->BuilderGeneration;
-	completion.SettledTaskCount = static_cast<std::uint32_t>(m_graph->Nodes.size());
 
 	{
 		std::lock_guard lock(m_resultMutex);
 		completion.TaskResults = std::move(m_taskResults);
-		completion.Settled = std::move(m_settled);
 		completion.FirstFailureTaskName = std::move(m_firstFailureTaskName);
-		if (!completion.FirstFailureTaskName.empty())
+		if (m_firstFailure.Failed())
 		{
 			completion.Status = TaskExecutionStatus::Failed;
 			completion.Result = std::move(m_firstFailure);
@@ -260,7 +233,7 @@ void TaskExecutor::Implementation::ExecuteSerial(const CompiledTaskGraph& graph,
 {
 	try
 	{
-		TaskExecutionCompletion completion = SerialTaskExecution::Execute(*graph.m_data, context, execution->Data.Generation, execution->Cancellation.get_token());
+		TaskExecutionCompletion completion = SerialTaskExecution::Execute(*graph.m_data, context, execution->Cancellation.get_token());
 		execution->Publish(std::move(completion));
 		OnExecutionSettled();
 	}

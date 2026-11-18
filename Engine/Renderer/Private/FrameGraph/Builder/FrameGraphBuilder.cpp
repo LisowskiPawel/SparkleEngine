@@ -89,12 +89,3 @@ std::uint64_t FrameGraphBuilder::GetRayTracingShaderTableSize(const RayTracingSh
 
 	return std::max({regionEnd(shaderTable.GetRayGenerationRegion()), regionEnd(shaderTable.GetMissRegion()), regionEnd(shaderTable.GetHitGroupRegion()), regionEnd(shaderTable.GetCallableRegion())});
 }
-
-RayTracingShaderTableMaterialization FrameGraphBuilder::MeasureRayTracingShaderTableMaterialization(const RayTracingShaderTable& shaderTable, std::chrono::steady_clock::time_point start)
-{
-	const auto elapsed = std::chrono::steady_clock::now() - start;
-
-	return RayTracingShaderTableMaterialization{
-	    .SizeInBytes = GetRayTracingShaderTableSize(shaderTable),
-	    .ElapsedMicroseconds = static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count())};
-}

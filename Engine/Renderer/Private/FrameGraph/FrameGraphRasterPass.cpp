@@ -147,13 +147,7 @@ static void ValidateRasterPassState(const FrameGraphRasterPass& result, const Ra
 
 FrameGraphRasterPass FrameGraph::BuildRasterPass(const PassParameterSet& parameters, const RasterPassRenderState& renderState) const
 {
-	const PassParameterLayout* const layout = parameters.GetLayout();
-	if (layout == nullptr)
-	{
-		throw Diagnostics::Error("Raster pass has no parameter layout.");
-	}
-
-	FrameGraphRasterPass result = CollectRasterAttachments(*layout, parameters, m_resourceRegistry);
+	FrameGraphRasterPass result = CollectRasterAttachments(parameters.GetLayout(), parameters, m_resourceRegistry);
 	result.Compatibility.ColorCount = result.ColorCount;
 	result.Compatibility.SampleCount = 1;
 	ResolveColorSampleCount(result, m_resourceRegistry);

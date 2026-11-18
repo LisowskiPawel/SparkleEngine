@@ -21,10 +21,6 @@ namespace ECS
 
 	bool TransformSystemExecution::RunTransforms(std::uint32_t begin, std::uint32_t end)
 	{
-		if (begin > end || end > m_dirtyTransforms.size())
-		{
-			return false;
-		}
 		for (std::uint32_t index = begin; index < end; ++index)
 		{
 			const EntityId entity = m_dirtyTransforms[index];
@@ -40,10 +36,6 @@ namespace ECS
 
 	bool TransformSystemExecution::RunCameraDerivedState(std::uint32_t begin, std::uint32_t end)
 	{
-		if (begin > end || end > m_dirtyTransforms.size())
-		{
-			return false;
-		}
 		for (std::uint32_t index = begin; index < end; ++index)
 		{
 			const EntityId entity = m_dirtyTransforms[index];

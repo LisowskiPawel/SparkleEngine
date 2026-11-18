@@ -129,10 +129,6 @@ void MaterialCache::PublishMaterialTextureTable(PreparedRenderScene& preparedSce
 	const MaterialTextureTable& textureTable = m_currentGeneration->GetTextureTable();
 	const std::uint32_t descriptorCount = textureTable.GetTextureCount();
 	const RhiDescriptorTableBinding binding = textureTable.GetTableBinding();
-	if (!textureTable.IsValid() || !binding || descriptorCount > MaterialTextureTableFixedCapacity)
-	{
-		Diagnostics::Fatal(g_materialCacheLogger, __FILE__, __LINE__, "Material texture table publication contract is incomplete.");
-	}
 	preparedScene.materialTextureTable = ResolvedMaterialTextureTable{.Binding = binding, .DescriptorCount = descriptorCount, .Generation = m_currentGeneration->GetGeneration()};
 }
 

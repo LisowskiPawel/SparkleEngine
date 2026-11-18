@@ -11,13 +11,13 @@ public:
 	explicit RayTracingTlasStrategy(RenderHardwareInterface& renderHardwareInterface) noexcept;
 	~RayTracingTlasStrategy() noexcept override;
 	RenderRayTracingFrameBindings Prepare(const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan) noexcept override;
-	RayTracingTlasBuildResult Build(
+	void Build(
 	    RenderCommandContext& commandContext,
 	    const PreparedRenderScene& preparedScene,
 	    RayTracingBlasCache& blasCache,
 	    const RayTracingShaderTablePlan& shaderTablePlan,
 	    const RayTracingPtlasPartitionPlan& viewPlan,
-	    RayTracingPerformanceDiagnostics* diagnostics) noexcept override;
+	    PassExecutionDiagnostics* diagnostics) noexcept override;
 	void Clear() noexcept override;
 
 private:

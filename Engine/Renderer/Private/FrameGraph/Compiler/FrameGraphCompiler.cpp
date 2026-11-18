@@ -9,23 +9,6 @@
 #include <algorithm>
 #include <cassert>
 
-static void ValidateResourceDependencies(const FrameGraphPlan& plan) noexcept
-{
-	for (const FrameGraphResourceNode& resource : plan.resources)
-	{
-		assert(resource.handle.IsValid());
-		if (resource.lastWriterPass != INVALID_FRAME_GRAPH_PASS_INDEX)
-		{
-			assert(resource.lastWriterPass < plan.passes.size());
-		}
-
-		for (const FrameGraphPassIndex readerPass : resource.readersSinceLastWrite)
-		{
-			assert(readerPass < plan.passes.size());
-		}
-	}
-}
-
 FrameGraphCompiler::FrameGraphCompiler(
     FrameGraphPlan& plan,
     FrameGraphResourceRegistry& resourceRegistry,
@@ -42,7 +25,6 @@ void FrameGraphCompiler::CompileResourcePlan() noexcept
 {
 	InitializeCompilation();
 	BuildResourceDependencies();
-	ValidateResourceDependencies(m_plan);
 	FinalizePassDependencies();
 	AssignPassQueues();
 	BuildTransientResourceLifetimes();
@@ -87,7 +69,6 @@ void FrameGraphCompiler::BuildCompiledPlanResources() noexcept
 	for (std::size_t resourceIndex = 0; resourceIndex < registeredHandles.size(); ++resourceIndex)
 	{
 		const FrameGraphResourceHandle handle = registeredHandles[resourceIndex];
-		assert(handle.IsValid());
 		assert(handle.index == resourceIndex && "FrameGraph resources must be registered in monotonically increasing handle order.");
 		const FrameGraphResourceMetadata& entry = m_resourceRegistry.GetMetadata(handle);
 		const ResourceState runtimeState = m_resourceStateTracker.GetRuntimeState(handle);

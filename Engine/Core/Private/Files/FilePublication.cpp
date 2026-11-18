@@ -30,7 +30,7 @@ namespace Files
 	bool TryFinalizeTemporaryFileIfMissing(const std::filesystem::path& temporaryPath, const std::filesystem::path& finalPath, std::string& outErrorMessage)
 	{
 		std::error_code errorCode;
-		if (std::filesystem::exists(finalPath, errorCode) && !errorCode)
+		if (std::filesystem::exists(finalPath, errorCode))
 		{
 			CleanupTemporaryFile(temporaryPath);
 			outErrorMessage.clear();
@@ -46,7 +46,7 @@ namespace Files
 		}
 
 		std::error_code existsError;
-		if (std::filesystem::exists(finalPath, existsError) && !existsError)
+		if (std::filesystem::exists(finalPath, existsError))
 		{
 			CleanupTemporaryFile(temporaryPath);
 			outErrorMessage.clear();

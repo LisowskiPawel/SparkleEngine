@@ -12,8 +12,6 @@
 
 IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_editorLogger, "Editor");
-
 EditorImGuiContext::EditorImGuiContext(Window& window) noexcept :
     m_window(window)
 {
@@ -48,12 +46,6 @@ void EditorImGuiContext::Initialize()
 
 bool EditorImGuiContext::InitializePlatformBackend()
 {
-	if (!m_window.GetHWND())
-	{
-		Diagnostics::Fatal(g_editorLogger, __FILE__, __LINE__, "EditorImGuiContext::InitializePlatformBackend: invalid window handle");
-		return false;
-	}
-
 	m_bPlatformInitialized = ImGui_ImplWin32_Init(m_window.GetHWND());
 	return m_bPlatformInitialized;
 }
@@ -94,7 +86,7 @@ void EditorImGuiContext::UnsubscribeFromWindowEvents() noexcept
 
 static bool TryHandleEditorShortcut(const WindowMessageEvent& event, const EditorImGuiContext::ShortcutHandler& handler)
 {
-	if (!handler || ImGui::GetCurrentContext() == nullptr)
+	if (!handler)
 	{
 		return false;
 	}

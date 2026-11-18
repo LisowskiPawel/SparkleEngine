@@ -87,7 +87,6 @@ namespace SparkleLauncher
 		model.JobOutput.push_back("Game profile: " + model.GameProfile);
 		model.JobOutput.push_back("Workspace IDE: " + DisplayName(model.WorkspaceIdePreference));
 		model.JobOutput.push_back("Workspace compiler: " + DisplayName(model.WorkspaceCompilerPreference));
-		model.JobOutput.push_back("Latest log: " + plan.Operation.LogPath.string());
 		for (const std::string& message : plan.ReadinessMessages)
 		{
 			model.JobOutput.push_back("Readiness: " + message);
@@ -106,7 +105,6 @@ namespace SparkleLauncher
 		model.JobOutput.push_back("Game profile: " + model.GameProfile);
 		model.JobOutput.push_back("Cook mode: " + ToString(plan.Request.Mode));
 		model.JobOutput.push_back("Cooked output: " + plan.CookedOutputDirectory.string());
-		model.JobOutput.push_back("Latest log: " + plan.Operation.LogPath.string());
 		if (plan.Operation.bRequiresConfirmation)
 		{
 			model.JobOutput.push_back("Confirmation required: " + ToString(plan.Operation.DestructiveScope));
@@ -131,7 +129,6 @@ namespace SparkleLauncher
 		{
 			model.JobOutput.push_back("Requested level: " + levelId);
 		}
-		model.JobOutput.push_back("Latest log: " + plan.Operation.LogPath.string());
 		for (const std::string& message : plan.ReadinessMessages)
 		{
 			model.JobOutput.push_back("Readiness: " + message);
@@ -253,49 +250,41 @@ namespace SparkleLauncher
 	int RunLauncherShellOperation(LauncherShellModel& model, const LauncherShellArguments& arguments, std::ostream& output, std::ostream& error)
 	{
 		NativeProcessRunner processRunner;
+		const auto writeOutput = [&output](std::string_view text)
+		{
+			output << text << std::flush;
+		};
 		if (FindBuildWorkspaceOperationDefinition(arguments.RunOperationId).has_value())
 		{
-			const OperationRecord operation = RunBuildWorkspaceOperationPlan(
-			    PlanBuildWorkspaceOperation(arguments.RunOperationId, BuildWorkspaceShellRequest(model)),
-			    processRunner,
-			    [&output](std::string_view text) { output << text; });
+			const OperationRecord operation = RunBuildWorkspaceOperationPlan(PlanBuildWorkspaceOperation(arguments.RunOperationId, BuildWorkspaceShellRequest(model)), processRunner, writeOutput);
 
 			return ReportLauncherShellOperationResult(operation, output, error);
 		}
 
 		if (FindCookOperationDefinition(arguments.RunOperationId).has_value())
 		{
-			const OperationRecord operation = RunCookOperationPlan(
-			    PlanCookOperation(arguments.RunOperationId, BuildCookShellRequest(model, arguments)),
-			    processRunner,
-			    [&output](std::string_view text) { output << text; });
+			const OperationRecord operation = RunCookOperationPlan(PlanCookOperation(arguments.RunOperationId, BuildCookShellRequest(model, arguments)), processRunner, writeOutput);
 
 			return ReportLauncherShellOperationResult(operation, output, error);
 		}
 
 		if (FindLevelOperationDefinition(arguments.RunOperationId).has_value())
 		{
-			const OperationRecord operation = RunLevelOperationPlan(
-			    PlanLevelOperation(arguments.RunOperationId, BuildLevelShellRequest(model, arguments)),
-			    processRunner,
-			    [&output](std::string_view text) { output << text; });
+			const OperationRecord operation = RunLevelOperationPlan(PlanLevelOperation(arguments.RunOperationId, BuildLevelShellRequest(model, arguments)), processRunner, writeOutput);
 
 			return ReportLauncherShellOperationResult(operation, output, error);
 		}
 
 		if (FindLevelRunOperationDefinition(arguments.RunOperationId).has_value())
 		{
-			const OperationRecord operation = RunLevelRunOperationPlan(
-			    PlanLevelRunOperation(arguments.RunOperationId, BuildLevelRunShellRequest(model, arguments)),
-			    processRunner,
-			    [&output](std::string_view text) { output << text; });
+			const OperationRecord operation = RunLevelRunOperationPlan(PlanLevelRunOperation(arguments.RunOperationId, BuildLevelRunShellRequest(model, arguments)), processRunner, writeOutput);
 
 			return ReportLauncherShellOperationResult(operation, output, error);
 		}
 
 		if (FindMaintenanceOperationDefinition(arguments.RunOperationId).has_value())
 		{
-			const OperationRecord operation = RunMaintenanceOperationPlan(PlanMaintenanceOperation(arguments.RunOperationId, BuildMaintenanceShellRequest(model, arguments)));
+			const OperationRecord operation = RunMaintenanceOperationPlan(PlanMaintenanceOperation(arguments.RunOperationId, BuildMaintenanceShellRequest(model, arguments)), writeOutput);
 			return ReportLauncherShellOperationResult(operation, output, error);
 		}
 

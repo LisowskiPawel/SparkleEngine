@@ -38,5 +38,4 @@ struct TaskScope::State final : std::enable_shared_from_this<TaskScope::State>
 	bool bClosed = false;
 	bool bCancellationRequested = false;
 	bool bSettled = false;
-	bool bParentNotified = false;
 };

@@ -8,23 +8,18 @@
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 #include "Window/Window.h"
 
-SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_frameGraphLogger, "Renderer.FrameGraph");
-
 FrameGraph::AllocatedParameterInstanceBase::~AllocatedParameterInstanceBase() noexcept = default;
 
-FrameGraph::FrameGraph(RenderHardwareInterface* renderHardwareInterface, Window* window) :
+FrameGraph::FrameGraph(RenderHardwareInterface& renderHardwareInterface, Window& window) :
     m_renderHardwareInterface(renderHardwareInterface),
     m_window(window),
-    m_transientAllocator(renderHardwareInterface != nullptr ? std::make_unique<FrameGraphTransientAllocator>(*renderHardwareInterface) : nullptr)
+    m_transientAllocator(std::make_unique<FrameGraphTransientAllocator>(renderHardwareInterface))
 {
 }
 
 FrameGraph::~FrameGraph()
 {
-	if (m_transientAllocator != nullptr)
-	{
-		m_transientAllocator->Reset();
-	}
+	m_transientAllocator->Reset();
 
 	ReleaseExternalResourceViews();
 	ReleaseTextureHistories();
@@ -50,7 +45,7 @@ const FrameGraphPlan& FrameGraph::Compile()
 
 void FrameGraph::CompileFramePlan()
 {
-	const RhiQueueCapabilities queueCapabilities = m_renderHardwareInterface != nullptr ? m_renderHardwareInterface->GetCapabilities().Queues : RhiQueueCapabilities{};
+	const RhiQueueCapabilities queueCapabilities = m_renderHardwareInterface.GetCapabilities().Queues;
 	FrameGraphCompiler compiler(m_compiledPlan, m_resourceRegistry, m_resourceStateTracker, queueCapabilities);
 
 	compiler.CompileResourcePlan();
@@ -63,7 +58,7 @@ void FrameGraph::CompileFramePlan()
 void FrameGraph::ExportTexture(FrameGraphTextureHandle handle, std::string_view name) noexcept
 {
 	const FrameGraphResourceHandle resourceHandle = handle.GetResourceHandle();
-	if (!resourceHandle.IsValid() || !m_resourceRegistry.IsRegistered(resourceHandle))
+	if (!m_resourceRegistry.IsRegistered(resourceHandle))
 	{
 		return;
 	}
@@ -74,7 +69,7 @@ void FrameGraph::ExportTexture(FrameGraphTextureHandle handle, std::string_view 
 PixelFormat FrameGraph::GetTextureFormat(FrameGraphTextureHandle handle) const noexcept
 {
 	const FrameGraphResourceHandle resourceHandle = handle.GetResourceHandle();
-	if (!resourceHandle.IsValid() || !m_resourceRegistry.IsRegistered(resourceHandle))
+	if (!m_resourceRegistry.IsRegistered(resourceHandle))
 	{
 		return PixelFormat::Unknown;
 	}
@@ -84,7 +79,7 @@ PixelFormat FrameGraph::GetTextureFormat(FrameGraphTextureHandle handle) const n
 
 ResourceState FrameGraph::GetTrackedResourceState(FrameGraphResourceHandle handle) const noexcept
 {
-	if (!handle.IsValid() || !m_resourceRegistry.IsRegistered(handle))
+	if (!m_resourceRegistry.IsRegistered(handle))
 	{
 		return ResourceState::Common;
 	}
@@ -94,7 +89,7 @@ ResourceState FrameGraph::GetTrackedResourceState(FrameGraphResourceHandle handl
 
 void FrameGraph::UpdateTrackedResourceState(FrameGraphResourceHandle handle, ResourceState currentState) const noexcept
 {
-	if (!handle.IsValid() || !m_resourceRegistry.IsRegistered(handle))
+	if (!m_resourceRegistry.IsRegistered(handle))
 	{
 		return;
 	}

@@ -14,9 +14,9 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_d3d12RenderCommandListLogger, "RHI.D3D12.Co
 void D3D12RenderCommandList::SetRayTracingPipeline(const RayTracingPipeline& pipeline) noexcept
 {
 	const auto* nativePipeline = dynamic_cast<const D3D12RayTracingPipeline*>(&pipeline);
-	if (m_commandList == nullptr || nativePipeline == nullptr)
+	if (nativePipeline == nullptr)
 	{
-		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 ray-tracing pipeline binding received no command list or a foreign pipeline.");
+		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 ray-tracing pipeline binding received a foreign pipeline.");
 	}
 	m_commandList->SetPipelineState1(nativePipeline->GetStateObject());
 	m_boundRayTracingPipeline = &pipeline;
@@ -27,15 +27,13 @@ void D3D12RenderCommandList::BuildBottomLevelAccelerationStructure(const RhiRayT
 	const D3D12_GPU_VIRTUAL_ADDRESS vertexBufferAddress = ResolveRayTracingBufferAddress(geometry.VertexBuffer);
 
 	const D3D12_GPU_VIRTUAL_ADDRESS indexBufferAddress = ResolveRayTracingBufferAddress(geometry.IndexBuffer);
-	const bool bInvalidBuildInputsRhiContract = m_commandList == nullptr || !RhiContract::IsRayTracingGeometryDescUsable(geometry);
-	const bool bInvalidBuildInputsBufferAddress = bInvalidBuildInputsRhiContract || (vertexBufferAddress == 0);
-	const bool bInvalidBufferAddresses = bInvalidBuildInputsBufferAddress || (indexBufferAddress == 0);
-	const bool bInvalidScratchAddress = bInvalidBufferAddresses || (!RhiContract::IsRayTracingGpuAddressPresent(scratchGpuAddress));
-	const bool bInvalidBlasBuildInputs = bInvalidScratchAddress || (!RhiContract::IsRayTracingGpuAddressPresent(resultGpuAddress));
+	const bool bGeometryValid = RhiContract::IsRayTracingGeometryDescUsable(geometry);
+	const bool bBuffersValid = vertexBufferAddress != 0 && indexBufferAddress != 0;
+	const bool bOutputValid = scratchGpuAddress != 0 && resultGpuAddress != 0;
 
-	if (bInvalidBlasBuildInputs)
+	if (!bGeometryValid || !bBuffersValid || !bOutputValid)
 	{
-		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 BLAS build received incomplete geometry, command-list, or GPU-address inputs.");
+		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 BLAS build received incomplete geometry or GPU addresses.");
 	}
 
 	TrackResource(geometry.VertexBuffer.Resource);
@@ -80,13 +78,9 @@ void D3D12RenderCommandList::BuildTlas(
     RhiGpuVirtualAddress resultGpuAddress,
     ERhiTlasBuildMode buildMode) noexcept
 {
-	const bool bInvalidBuildInputsRhiContract = m_commandList == nullptr || !RhiContract::IsRayTracingGpuAddressPresent(instanceDescsGpuAddress);
-	const bool bInvalidScratchAddress = bInvalidBuildInputsRhiContract || (!RhiContract::IsRayTracingGpuAddressPresent(scratchGpuAddress));
-	const bool bInvalidTlasBuildInputs = bInvalidScratchAddress || (!RhiContract::IsRayTracingGpuAddressPresent(resultGpuAddress));
-
-	if (bInvalidTlasBuildInputs)
+	if (instanceDescsGpuAddress == 0 || scratchGpuAddress == 0 || resultGpuAddress == 0)
 	{
-		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 TLAS build received no command list or an empty GPU address.");
+		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 TLAS build received an empty GPU address.");
 	}
 
 	D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS inputs{};
@@ -114,13 +108,13 @@ void D3D12RenderCommandList::BuildTlas(
 
 void D3D12RenderCommandList::BuildPtlas(const RhiPtlasBuildCommandDesc& desc) noexcept
 {
-	if (m_commandList == nullptr || m_owner == nullptr || !desc.DestinationResource)
+	if (!desc.DestinationResource)
 	{
-		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 PTLAS build has no command list, device owner, or destination resource.");
+		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 PTLAS build has no destination resource.");
 	}
 
 	BeginDiagnosticScope("RayTracing.PTLAS.Build", RhiDiagnosticLabelColor{92, 148, 255, 255});
-	const bool bSubmitted = m_owner->BuildPtlas(m_commandList, desc);
+	const bool bSubmitted = m_owner.BuildPtlas(m_commandList, desc);
 	EndDiagnosticScope();
 	if (!bSubmitted)
 	{
@@ -131,15 +125,8 @@ void D3D12RenderCommandList::BuildPtlas(const RhiPtlasBuildCommandDesc& desc) no
 
 void D3D12RenderCommandList::TraceRays(const TraceRaysDesc& desc) noexcept
 {
-	try
-	{
-		RhiContract::ValidateTraceRaysDesc(desc, m_queueType);
-	}
-	catch (const std::exception& error)
-	{
-		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, error.what());
-	}
-	if (m_commandList == nullptr || m_boundRayTracingPipeline != desc.Pipeline)
+	RhiContract::ValidateTraceRaysDesc(desc, m_queueType);
+	if (m_boundRayTracingPipeline != desc.Pipeline)
 	{
 		Diagnostics::Fatal(g_d3d12RenderCommandListLogger, __FILE__, __LINE__, "D3D12 TraceRays requires its exact pipeline to be bound first.");
 	}

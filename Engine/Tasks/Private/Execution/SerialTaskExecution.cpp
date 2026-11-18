@@ -2,8 +2,8 @@
 
 #include "TaskExecutionContext.h"
 #include "TaskFunctionInvoker.h"
-#include "Profiling/TaskProfiler.h"
 
+#include <cassert>
 #include <functional>
 #include <queue>
 #include <utility>
@@ -11,7 +11,7 @@
 class SerialTaskExecution::RunState final
 {
 public:
-	RunState(const TaskGraphStorage& graph, TaskExecutionContext& context, std::uint64_t generation, std::stop_token cancellation);
+	RunState(const TaskGraphStorage& graph, TaskExecutionContext& context, std::stop_token cancellation);
 
 	TaskExecutionCompletion Execute();
 
@@ -24,8 +24,6 @@ private:
 		bool bBlockedByPrerequisite = false;
 		bool bBlockedByParent = false;
 		bool bScheduled = false;
-		bool bBodyComplete = false;
-		bool bTerminal = false;
 		TaskResult AggregateResult = TaskResult::Success();
 	};
 
@@ -46,26 +44,23 @@ private:
 
 	const TaskGraphStorage& m_graph;
 	TaskExecutionContext& m_context;
-	std::uint64_t m_generation = 0;
 	std::stop_token m_cancellation;
 	TaskExecutionCompletion m_completion;
 	std::vector<TaskState> m_tasks;
 	std::priority_queue<std::uint32_t, std::vector<std::uint32_t>, std::greater<>> m_ready;
+	std::uint32_t m_completedTaskCount = 0;
 	bool m_bCancellationObserved = false;
 };
 
-SerialTaskExecution::RunState::RunState(const TaskGraphStorage& graph, TaskExecutionContext& context, std::uint64_t generation, std::stop_token cancellation) :
+SerialTaskExecution::RunState::RunState(const TaskGraphStorage& graph, TaskExecutionContext& context, std::stop_token cancellation) :
     m_graph(graph),
     m_context(context),
-    m_generation(generation),
     m_cancellation(std::move(cancellation)),
     m_tasks(graph.Nodes.size())
 {
-	m_completion.Generation = generation;
 	m_completion.BuilderIdentity = graph.BuilderIdentity;
 	m_completion.BuilderGeneration = graph.BuilderGeneration;
 	m_completion.TaskResults.resize(graph.Nodes.size());
-	m_completion.Settled.resize(graph.Nodes.size(), false);
 }
 
 TaskExecutionCompletion SerialTaskExecution::RunState::Execute()
@@ -87,11 +82,6 @@ void SerialTaskExecution::RunState::Initialize()
 		task.RemainingPrerequisites = static_cast<std::uint32_t>(node.Prerequisites.size());
 		task.UnfinishedCount += static_cast<std::uint32_t>(node.NestedChildren.size());
 		task.bParentBodyComplete = !node.Parent.has_value();
-
-		for (const std::uint32_t prerequisite : node.Prerequisites)
-		{
-			TaskProfiler::RecordDependency(m_generation, prerequisite, index);
-		}
 	}
 }
 
@@ -106,7 +96,8 @@ void SerialTaskExecution::RunState::ScheduleInitialTasks()
 void SerialTaskExecution::RunState::TrySchedule(std::uint32_t index)
 {
 	TaskState& task = m_tasks[index];
-	if (task.bScheduled || task.bBodyComplete || task.RemainingPrerequisites != 0 || !task.bParentBodyComplete)
+	const bool bPrerequisitesPending = task.RemainingPrerequisites != 0 || !task.bParentBodyComplete;
+	if (task.bScheduled || bPrerequisitesPending)
 	{
 		return;
 	}
@@ -137,24 +128,20 @@ TaskResult SerialTaskExecution::RunState::ExecuteBody(std::uint32_t index)
 {
 	const TaskState& task = m_tasks[index];
 	const TaskGraphNode& node = m_graph.Nodes[index];
-	const TaskProfiler::TimePoint taskStart = TaskProfiler::Begin(node.Desc, m_generation, index, 0);
 	TaskExecutionContext taskContext = m_context;
 	taskContext.Bind(node.Desc.Lane, m_cancellation);
 
 	const bool bBlockedByDependency = task.bBlockedByPrerequisite || task.bBlockedByParent;
-	TaskResult result = InvokeTaskFunction(node, taskContext, bBlockedByDependency);
-	TaskProfiler::End(node.Desc, m_generation, index, 0, result, taskStart);
-	return result;
+	return InvokeTaskFunction(node, taskContext, bBlockedByDependency);
 }
 
 void SerialTaskExecution::RunState::RecordTaskResult(std::uint32_t index, const TaskResult& result)
 {
 	TaskState& task = m_tasks[index];
-	task.bBodyComplete = true;
 	task.AggregateResult = result;
-	if (result.Failed() && m_completion.FirstFailureTaskName.empty())
+	if (result.Failed() && !m_completion.Result.Failed())
 	{
-		m_completion.FirstFailureTaskName = std::string(m_graph.Nodes[index].Desc.Name.Get());
+		m_completion.FirstFailureTaskName = m_graph.Nodes[index].Desc.Name;
 		m_completion.Result = result;
 	}
 	m_bCancellationObserved |= result.WasCancelled();
@@ -181,11 +168,6 @@ void SerialTaskExecution::RunState::ReleaseUnfinished(std::uint32_t index)
 
 void SerialTaskExecution::RunState::CompleteTask(std::uint32_t index)
 {
-	if (m_tasks[index].bTerminal)
-	{
-		return;
-	}
-
 	RecordLogicalCompletion(index);
 	ReleaseDependents(index);
 	CompleteNestedParent(index);
@@ -194,10 +176,8 @@ void SerialTaskExecution::RunState::CompleteTask(std::uint32_t index)
 void SerialTaskExecution::RunState::RecordLogicalCompletion(std::uint32_t index)
 {
 	TaskState& completed = m_tasks[index];
-	completed.bTerminal = true;
 	m_completion.TaskResults[index] = completed.AggregateResult;
-	m_completion.Settled[index] = true;
-	++m_completion.SettledTaskCount;
+	++m_completedTaskCount;
 }
 
 void SerialTaskExecution::RunState::ReleaseDependents(std::uint32_t index)
@@ -232,12 +212,8 @@ void SerialTaskExecution::RunState::CompleteNestedParent(std::uint32_t index)
 
 void SerialTaskExecution::RunState::PublishFinalStatus()
 {
-	if (m_completion.SettledTaskCount != m_graph.Nodes.size())
-	{
-		m_completion.Status = TaskExecutionStatus::Rejected;
-		m_completion.Result = TaskResult::Failure("Compiled task graph could not settle all nodes in serial execution.");
-	}
-	else if (!m_completion.FirstFailureTaskName.empty())
+	assert(m_completedTaskCount == m_graph.Nodes.size() && "Compiled task graph did not settle all nodes.");
+	if (m_completion.Result.Failed())
 	{
 		m_completion.Status = TaskExecutionStatus::Failed;
 	}
@@ -253,7 +229,7 @@ void SerialTaskExecution::RunState::PublishFinalStatus()
 	}
 }
 
-TaskExecutionCompletion SerialTaskExecution::Execute(const TaskGraphStorage& graph, TaskExecutionContext& context, std::uint64_t generation, std::stop_token cancellation)
+TaskExecutionCompletion SerialTaskExecution::Execute(const TaskGraphStorage& graph, TaskExecutionContext& context, std::stop_token cancellation)
 {
-	return RunState(graph, context, generation, std::move(cancellation)).Execute();
+	return RunState(graph, context, std::move(cancellation)).Execute();
 }

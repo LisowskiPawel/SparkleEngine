@@ -6,7 +6,6 @@
 
 #include <cstddef>
 #include <array>
-#include <atomic>
 #include <condition_variable>
 #include <cstdint>
 #include <deque>
@@ -82,18 +81,17 @@ private:
 	};
 
 	static void ValidateConfiguration(const TaskExecutorConfig& config);
-	static bool RejectExecution(const std::shared_ptr<TaskExecution::State>& execution, std::uint64_t generation, std::string_view reason);
+	static bool RejectExecution(const std::shared_ptr<TaskExecution::State>& execution, std::string_view reason);
 	static std::size_t LaneIndex(TaskLane lane) noexcept;
 	static const char* LaneName(TaskLane lane) noexcept;
-	std::shared_ptr<TaskExecution::State> CreateExecution(std::uint64_t generation, const std::shared_ptr<TaskScope::State>& scope) const;
+	std::shared_ptr<TaskExecution::State> CreateExecution(const std::shared_ptr<TaskScope::State>& scope) const;
 	bool ValidateLaunchRequest(
 	    const CompiledTaskGraph& graph,
 	    const TaskExecutionContext& context,
 	    const std::shared_ptr<TaskScope::State>& scope,
-	    const std::shared_ptr<TaskExecution::State>& execution,
-	    std::uint64_t generation) const;
-	bool ValidateWorkerLanes(const CompiledTaskGraph& graph, const std::shared_ptr<TaskExecution::State>& execution, std::uint64_t generation) const;
-	bool AdmitExecution(const std::shared_ptr<TaskScope::State>& scope, const std::shared_ptr<TaskExecution::State>& execution, std::uint64_t generation);
+	    const std::shared_ptr<TaskExecution::State>& execution) const;
+	bool ValidateWorkerLanes(const CompiledTaskGraph& graph, const std::shared_ptr<TaskExecution::State>& execution) const;
+	bool AdmitExecution(const std::shared_ptr<TaskScope::State>& scope, const std::shared_ptr<TaskExecution::State>& execution);
 	void ReserveExecutionStorage();
 	void StartExecution(const CompiledTaskGraph& graph, TaskExecutionContext context, const std::shared_ptr<TaskExecution::State>& execution);
 	void ExecuteSerial(const CompiledTaskGraph& graph, TaskExecutionContext& context, const std::shared_ptr<TaskExecution::State>& execution);
@@ -131,5 +129,4 @@ private:
 	std::vector<std::weak_ptr<TaskExecution::State>> m_executions;
 	std::vector<std::shared_ptr<TaskDispatch::State>> m_dispatches;
 	std::mutex m_shutdownMutex;
-	std::atomic_uint64_t m_nextExecutionGeneration{1};
 };

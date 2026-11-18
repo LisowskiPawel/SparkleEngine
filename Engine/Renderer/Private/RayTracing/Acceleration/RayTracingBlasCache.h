@@ -14,7 +14,7 @@
 
 class GpuMesh;
 class GpuMeshCache;
-class RayTracingPerformanceDiagnostics;
+class PassExecutionDiagnostics;
 class RenderCommandContext;
 class RenderHardwareInterface;
 struct MeshDraw;
@@ -32,13 +32,6 @@ public:
 		bool IsValid() const noexcept;
 	};
 
-	struct BuildStats final
-	{
-		std::uint32_t referencedMeshCount = 0;
-		std::uint32_t builtBlasCount = 0;
-		std::uint32_t reusedBlasCount = 0;
-	};
-
 	RayTracingBlasCache(RenderHardwareInterface& renderHardwareInterface, const GpuMeshCache& meshes) noexcept;
 	~RayTracingBlasCache() noexcept;
 
@@ -48,14 +41,14 @@ public:
 	RayTracingBlasCache& operator=(RayTracingBlasCache&&) = delete;
 
 	void BeginFrame() noexcept;
-	BlasHandle EnsureBlas(RenderCommandContext& commandContext, const GpuMesh& gpuMesh, RayTracingPerformanceDiagnostics* diagnostics = nullptr) noexcept;
+	BlasHandle EnsureBlas(RenderCommandContext& commandContext, const GpuMesh& gpuMesh, PassExecutionDiagnostics* diagnostics = nullptr) noexcept;
 	BlasHandle EnsureBlas(
 	    RenderCommandContext& commandContext,
 	    const PreparedRenderScene& preparedScene,
 	    const MeshDraw& draw,
 	    std::uint32_t gpuSceneSlot,
-	    RayTracingPerformanceDiagnostics* diagnostics = nullptr) noexcept;
-	BuildStats EndFrame() noexcept;
+	    PassExecutionDiagnostics* diagnostics = nullptr) noexcept;
+	void EndFrame() noexcept;
 	void Clear() noexcept;
 
 private:
@@ -85,13 +78,13 @@ private:
 	};
 
 	void ReleaseEntryResources(Entry& entry) noexcept;
-	BlasHandle BuildBlas(RenderCommandContext& commandContext, const RhiRayTracingGeometryDesc& geometry, Entry& entry, RayTracingPerformanceDiagnostics* diagnostics) noexcept;
+	BlasHandle BuildBlas(RenderCommandContext& commandContext, const RhiRayTracingGeometryDesc& geometry, Entry& entry, PassExecutionDiagnostics* diagnostics) noexcept;
 	BlasHandle EnsureSkinnedBlas(
 	    RenderCommandContext& commandContext,
 	    const PreparedRenderScene& preparedScene,
 	    const MeshDraw& draw,
 	    std::uint32_t gpuSceneSlot,
-	    RayTracingPerformanceDiagnostics* diagnostics) noexcept;
+	    PassExecutionDiagnostics* diagnostics) noexcept;
 	RhiRayTracingGeometryDesc BuildSkinnedGeometry(const PreparedRenderScene& preparedScene, const MeshDraw& draw, Entry& entry) noexcept;
 	void ReplaceDynamicVertexBuffer(std::span<const DirectX::XMFLOAT3> positions, Entry& entry) noexcept;
 	RhiRayTracingGeometryDesc BuildSkinnedGeometryDesc(const GpuMesh& gpuMesh, const Entry& entry, std::uint32_t vertexCount) const noexcept;
@@ -105,5 +98,4 @@ private:
 	std::map<GpuMeshHandle, Entry> m_entries;
 	std::unordered_map<SkinnedEntryKey, Entry, SkinnedEntryKeyHash> m_skinnedEntries;
 	std::vector<DirectX::XMFLOAT3> m_skinnedPositionScratch;
-	BuildStats m_currentFrameStats = {};
 };

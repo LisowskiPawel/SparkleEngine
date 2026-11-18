@@ -96,7 +96,6 @@ namespace IndirectReservoir
 		                                      surface.PathSurface,
 		                                      candidate.RandomPixel,
 		                                      candidate.SampleIndex,
-		                                      PathSampling::SpecularSampleModeStochasticGGX,
 		                                      RestirIndirectBounceCount,
 		                                      candidate.RandomFrameIndex,
 		                                      RestirIndirectEvaluateDiffuse != 0u,
@@ -138,7 +137,7 @@ namespace IndirectReservoir
 	                      float maxM,
 	                      float random)
 	{
-		if (!surface.bValid || candidateReservoir.M <= 0.0f)
+		if (candidateReservoir.M <= 0.0f)
 		{
 			return false;
 		}

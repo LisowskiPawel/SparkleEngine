@@ -91,6 +91,3 @@ add_compile_definitions(
     "SPARKLE_TARGET_EDITOR=$<CONFIG:DebugEditor,DevelopmentEditor,ShippingEditor>"
     "SPARKLE_TARGET_GAME=$<CONFIG:DebugGame,DevelopmentGame,ShippingGame>"
 )
-
-list(JOIN SPARKLE_BUILD_CONFIGURATIONS ", " SPARKLE_BUILD_CONFIGURATION_LIST)
-message(STATUS "Sparkle build profiles: default=${SPARKLE_DEFAULT_CONFIGURATION}; available=${SPARKLE_BUILD_CONFIGURATION_LIST}")

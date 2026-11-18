@@ -4,7 +4,6 @@
 
 void InputSystem::CaptureMouse()
 {
-	m_state->OwnerThread.AssertAccess();
 	if (CaptureWin32Mouse(m_state->WindowHandle))
 	{
 		m_state->GlobalState.SetMouseCaptured(true);
@@ -14,7 +13,6 @@ void InputSystem::CaptureMouse()
 
 void InputSystem::ReleaseMouse()
 {
-	m_state->OwnerThread.AssertAccess();
 	m_state->ReleaseMouse();
 }
 
@@ -31,13 +29,11 @@ void InputSystem::State::ReleaseMouse()
 
 bool InputSystem::IsMouseCaptured() const noexcept
 {
-	m_state->OwnerThread.AssertAccess();
 	return m_state->GlobalState.IsMouseCaptured();
 }
 
 void InputSystem::CenterCursor()
 {
-	m_state->OwnerThread.AssertAccess();
 	if (const std::optional<MousePosition> center = CenterWin32Cursor(m_state->WindowHandle))
 	{
 		m_state->LastMouseX = center->X;
@@ -48,7 +44,6 @@ void InputSystem::CenterCursor()
 
 void InputSystem::SetCursorVisibility(bool bVisible)
 {
-	m_state->OwnerThread.AssertAccess();
 	m_state->SetCursorVisibility(bVisible);
 }
 

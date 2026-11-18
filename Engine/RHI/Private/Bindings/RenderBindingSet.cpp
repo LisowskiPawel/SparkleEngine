@@ -48,7 +48,7 @@ RenderBindingSet& RenderBindingSet::operator=(RenderBindingSet&& other) noexcept
 
 RhiCpuDescriptorHandle RenderBindingSet::GetCpuDescriptorHandle(std::uint32_t descriptorIndex) const noexcept
 {
-	if (!RhiContract::IsBindingSetDescriptorIndexValid(descriptorIndex, m_descriptorCount))
+	if (descriptorIndex >= m_descriptorCount)
 	{
 		return {};
 	}
@@ -58,7 +58,7 @@ RhiCpuDescriptorHandle RenderBindingSet::GetCpuDescriptorHandle(std::uint32_t de
 
 RhiDescriptorTableBinding RenderBindingSet::GetTableBinding(std::uint32_t descriptorIndex) const noexcept
 {
-	if (!RhiContract::IsBindingSetDescriptorIndexValid(descriptorIndex, m_descriptorCount))
+	if (descriptorIndex >= m_descriptorCount)
 	{
 		return {};
 	}
@@ -80,6 +80,5 @@ void RenderBindingSet::Reset() noexcept
 
 bool RenderBindingSet::WriteResourceView(std::uint32_t descriptorIndex, RhiResourceViewHandle view) noexcept
 {
-	return m_descriptorService != nullptr && RhiContract::IsBindingSetDescriptorIndexValid(descriptorIndex, m_descriptorCount)
-	    && m_descriptorService->WriteResourceView(m_tableHandle, descriptorIndex, view);
+	return m_descriptorService != nullptr && descriptorIndex < m_descriptorCount && m_descriptorService->WriteResourceView(m_tableHandle, descriptorIndex, view);
 }

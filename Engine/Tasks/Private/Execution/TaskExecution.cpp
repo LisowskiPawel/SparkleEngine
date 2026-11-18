@@ -6,9 +6,7 @@
 #include "TaskTypes.h"
 #include "Scheduling/TaskWorkerContext.h"
 
-#include "Core/Public/Diagnostics/Logger.h"
-#include "Core/Public/Diagnostics/Verify.h"
-
+#include <cassert>
 #include <chrono>
 #include <cstdint>
 #include <functional>
@@ -19,11 +17,8 @@
 #include <thread>
 #include <utility>
 
-SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogTaskExecution, "Tasks.Execution");
-
-TaskExecution::State::State(std::uint64_t generation)
+TaskExecution::State::State()
 {
-	Data.Generation = generation;
 	Data.Status = TaskExecutionStatus::Pending;
 }
 
@@ -37,10 +32,7 @@ void TaskExecution::State::Publish(TaskExecutionCompletion completion)
 	std::function<void()> onSettled;
 	{
 		std::scoped_lock lock(Mutex);
-		if (bSettled)
-		{
-			Diagnostics::Fatal(LogTaskExecution, __FILE__, __LINE__, "Task execution completion was published more than once.");
-		}
+		assert(!bSettled && "Task execution completion was published more than once.");
 		Data = std::move(completion);
 		bSettled = true;
 		onSettled = std::move(OnSettled);
@@ -88,26 +80,16 @@ bool TaskExecution::IsSettled() const noexcept
 
 bool TaskExecution::WaitFor(std::chrono::milliseconds timeout) const
 {
-	const bool bInvalidJoinRequestTimeout = m_state == nullptr || timeout < std::chrono::milliseconds::zero();
-	const bool bJoinRequestExecutorIdentity = bInvalidJoinRequestTimeout || (TaskWorkerContext::IsWorkerFor(m_state->ExecutorIdentity));
-	const bool bInvalidJoinRequest = bJoinRequestExecutorIdentity || (std::this_thread::get_id() != m_state->JoinThread);
-
-	if (bInvalidJoinRequest)
+	if (m_state == nullptr || timeout < std::chrono::milliseconds::zero())
+	{
+		return false;
+	}
+	if (TaskWorkerContext::IsWorkerFor(m_state->ExecutorIdentity) || std::this_thread::get_id() != m_state->JoinThread)
 	{
 		return false;
 	}
 	std::unique_lock lock(m_state->Mutex);
 	return m_state->Condition.wait_for(lock, timeout, [this] { return m_state->bSettled; });
-}
-
-std::uint64_t TaskExecution::GetGeneration() const noexcept
-{
-	if (m_state == nullptr)
-	{
-		return 0;
-	}
-	std::scoped_lock lock(m_state->Mutex);
-	return m_state->Data.Generation;
 }
 
 TaskExecutionStatus TaskExecution::GetStatus() const noexcept
@@ -149,24 +131,15 @@ std::optional<TaskResult> TaskExecution::GetTaskResult(TaskNodeHandle handle) co
 	}
 
 	std::scoped_lock lock(m_state->Mutex);
+	if (!m_state->bSettled)
+	{
+		return std::nullopt;
+	}
 	const auto& data = m_state->Data;
 	std::uint32_t index = 0;
-	const bool bHandleDecoded = TaskGraphAccess::Decode(handle, data.BuilderIdentity, data.BuilderGeneration, static_cast<std::uint32_t>(data.TaskResults.size()), index);
-	const bool bTaskSettled = bHandleDecoded && data.Settled[index];
-
-	if (!bTaskSettled)
+	if (!TaskGraphAccess::Decode(handle, data.BuilderIdentity, data.BuilderGeneration, static_cast<std::uint32_t>(data.TaskResults.size()), index))
 	{
 		return std::nullopt;
 	}
 	return data.TaskResults[index];
-}
-
-std::uint32_t TaskExecution::GetSettledTaskCount() const noexcept
-{
-	if (m_state == nullptr)
-	{
-		return 0;
-	}
-	std::scoped_lock lock(m_state->Mutex);
-	return m_state->Data.SettledTaskCount;
 }

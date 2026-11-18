@@ -22,10 +22,6 @@ namespace ShaderCompileJobExecutor
 	static CookedStageBuild CompileStage(IShaderBackend& backend, const ShaderCompileRequest& request, ShaderDebugArtifactSet* outDebugArtifacts)
 	{
 		const ShaderBackendCapabilities capabilities = backend.GetCapabilities();
-		if (!capabilities.SupportsTarget(request.Target))
-		{
-			throw Diagnostics::Error(std::string{"Active shader backend does not support target '"} + GetShaderTargetName(request.Target) + "'.");
-		}
 		const bool bRayLibraryUnsupported = HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::RayTracingPipeline) && !capabilities.SupportsRayTracingLibrary(request.Target);
 
 		if (bRayLibraryUnsupported)
@@ -40,12 +36,6 @@ namespace ShaderCompileJobExecutor
 		}
 
 		CompiledShader compiledShader = backend.Compile(request);
-		const ShaderBytecode bytecode = compiledShader.GetBytecode();
-		if (!bytecode.IsValid())
-		{
-			throw Diagnostics::Error("Backend returned empty bytecode for shader source '" + request.VirtualSourcePath + "'.");
-		}
-
 		CookedStageBuild compiledStage;
 		compiledStage.stage = request.Stage;
 		compiledStage.format = IsSpirVTarget(request.Target) ? ShaderBinaryFormat::SpirV : ShaderBinaryFormat::Dxil;
@@ -68,16 +58,16 @@ namespace ShaderCompileJobExecutor
 
 	ShaderCompileResult Execute(const ShaderCompileJob& job)
 	{
-		std::unique_ptr<IShaderBackend> backend = CreateShaderBackend(job.BackendName);
 		ShaderDebugArtifactSet debugArtifacts;
 		CookedStageBuild output;
 		try
 		{
+			std::unique_ptr<IShaderBackend> backend = CreateShaderBackend(job.BackendName);
 			output = CompileStage(*backend, job.Request, job.Request.bCaptureDebugArtifacts ? &debugArtifacts : nullptr);
 		}
 		catch (const Diagnostics::Error& error)
 		{
-			const std::string jobContext = FormatShaderCompileJob(job, backend->GetBackendName(), job.Request.Target);
+			const std::string jobContext = FormatShaderCompileJob(job, job.BackendName, job.Request.Target);
 			throw Diagnostics::Error(std::format("Failed to compile {} - {}", jobContext, error.what()));
 		}
 

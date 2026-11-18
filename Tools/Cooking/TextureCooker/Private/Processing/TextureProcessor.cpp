@@ -207,7 +207,7 @@ namespace TextureProcessing
 				        const float red = XMVectorGetX(input[x]);
 				        const float green = XMVectorGetY(input[x]);
 				        const float blue = XMVectorGetZ(input[x]);
-				        properties.bHasAlpha |= XMVectorGetW(input[x]) < 0.999f;
+				        properties.bHasAlpha |= XMVectorGetW(input[x]) != 1.0f;
 				        properties.bIsGray &= std::fabs(red - green) <= 1e-4f && std::fabs(red - blue) <= 1e-4f;
 				        properties.bFitsUnsignedHalf &= std::max({red, green, blue}) <= 65504.0f;
 			        }
@@ -220,6 +220,7 @@ namespace TextureProcessing
 	DXGI_FORMAT SelectOutputFormat(const TextureCookRequest& request, bool bFloatValues, const PixelProperties& properties)
 	{
 		const auto uncompressed = bFloatValues ? DXGI_FORMAT_R32G32B32A32_FLOAT : DXGI_FORMAT_R8G8B8A8_UNORM;
+		const auto hdr = request.policy.hdrEncoding == TextureHdrEncoding::Bc6h ? DXGI_FORMAT_BC6H_UF16 : DXGI_FORMAT_R32G32B32A32_FLOAT;
 		DXGI_FORMAT format = uncompressed;
 		switch (request.policy.textureGroup)
 		{
@@ -235,12 +236,13 @@ namespace TextureProcessing
 			case TextureGroup::Diffuse:
 			case TextureGroup::Emissive:
 			case TextureGroup::SubsurfaceColor:
-				format = properties.bHasAlpha ? uncompressed : (bFloatValues ? DXGI_FORMAT_BC6H_UF16 : DXGI_FORMAT_BC1_UNORM);
+				format = properties.bHasAlpha ? uncompressed : (bFloatValues ? hdr : DXGI_FORMAT_BC1_UNORM);
 				break;
 			case TextureGroup::HdrColor:
-				format = properties.bHasAlpha ? uncompressed : DXGI_FORMAT_BC6H_UF16;
+				format = properties.bHasAlpha ? DXGI_FORMAT_R32G32B32A32_FLOAT : hdr;
 				break;
 			case TextureGroup::Default:
+				format = bFloatValues && !properties.bHasAlpha ? hdr : uncompressed;
 				break;
 		}
 		if (format == DXGI_FORMAT_BC6H_UF16 && !properties.bFitsUnsignedHalf)
@@ -287,7 +289,9 @@ bool CanPreserveTextureBlocks(const TextureCookRequest& request, DXGI_FORMAT for
 	const bool bSuppliedMips = request.policy.mipPolicy != TextureMipPolicy::Generate;
 	const bool bUnchangedChannels = request.policy.channelMask == TextureChannelMask::Rgba;
 	const bool bSignedNormal = request.policy.textureGroup == TextureGroup::NormalMap && format == DXGI_FORMAT_BC5_SNORM;
-	const bool bUnchangedEncoding = IsCompressed(format) && !bSignedNormal;
+	const bool bDecodeHdr = format == DXGI_FORMAT_BC6H_UF16 && request.policy.hdrEncoding == TextureHdrEncoding::Rgba32Float;
+	const bool bPreserveSemantics = !bSignedNormal && !bDecodeHdr;
+	const bool bUnchangedEncoding = IsCompressed(format) && bPreserveSemantics;
 	return bUnchangedEncoding && bSuppliedMips && bUnchangedChannels;
 }
 

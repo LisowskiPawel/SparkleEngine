@@ -26,8 +26,7 @@ SlangShaderBackend::SlangShaderBackend()
 {
 	if (SLANG_FAILED(slang::createGlobalSession(m_globalSession.writeRef())) || !m_globalSession)
 	{
-		m_backendVersion = Hash::Fnv1a64("slang-unavailable");
-		return;
+		throw Diagnostics::Error("Slang global session is unavailable.");
 	}
 
 	m_backendVersion = QueryBackendVersion(*m_globalSession.get());
@@ -58,12 +57,7 @@ std::uint64_t SlangShaderBackend::QueryBackendVersion(slang::IGlobalSession& glo
 
 ShaderBackendCapabilities SlangShaderBackend::GetCapabilities() const
 {
-	ShaderBackendCapabilities capabilities = GetStaticCapabilities();
-	capabilities.bSupportsDxil = capabilities.bSupportsDxil && IsValid();
-	capabilities.bSupportsSpirV = capabilities.bSupportsSpirV && IsValid();
-	capabilities.bSupportsSpirVRayTracingLibrary = capabilities.bSupportsSpirVRayTracingLibrary && IsValid();
-	capabilities.bSupportsSpirVInlineRayQuery = capabilities.bSupportsSpirVInlineRayQuery && IsValid();
-	return capabilities;
+	return GetStaticCapabilities();
 }
 
 std::string_view SlangShaderBackend::GetBackendName() const
@@ -78,11 +72,6 @@ std::uint64_t SlangShaderBackend::GetBackendVersion() const
 
 CompiledShader SlangShaderBackend::Compile(const ShaderCompileRequest& request)
 {
-	if (!IsValid())
-	{
-		throw Diagnostics::Error("Slang global session is unavailable");
-	}
-
 	const Slang::ComPtr<slang::ISession> session = CreateSession(request);
 	std::string diagnostics;
 	const Slang::ComPtr<slang::IComponentType> program = LinkProgram(*session.get(), request, diagnostics);

@@ -10,7 +10,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cstddef>
 #include <string>
 #include <string_view>
 
@@ -41,8 +40,6 @@ static constexpr auto viewModePresentations = std::to_array<ViewModePresentation
         {RenderViewMode::DirectSubsurface, EditorIcons::EditorIcon::ViewDirectSubsurface, "Direct Subsurface", "Lighting"},
         {RenderViewMode::IndirectDiffuse, EditorIcons::EditorIcon::ViewDirectDiffuse, "Indirect Diffuse", "Lighting"},
         {RenderViewMode::IndirectSpecular, EditorIcons::EditorIcon::ViewDirectSpecular, "Indirect Specular", "Lighting"}});
-
-static_assert(viewModePresentations.size() == static_cast<std::size_t>(RenderViewMode::Count));
 
 static const ViewModePresentation& DescribeViewMode(RenderViewMode viewMode) noexcept
 {

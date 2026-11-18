@@ -79,7 +79,6 @@ private:
 	void CopyBuilderState(TaskGraphStorage& graph) const
 	{
 		graph.Error = m_builder.Error;
-		graph.Limits = m_builder.Limits;
 		graph.BuilderIdentity = m_builder.BuilderIdentity;
 		graph.BuilderGeneration = m_builder.BuilderGeneration;
 		graph.EdgeCount = m_builder.EdgeCount;

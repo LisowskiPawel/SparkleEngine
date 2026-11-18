@@ -32,21 +32,6 @@ bool TaskNodeHandle::operator==(const TaskNodeHandle&) const noexcept = default;
 
 CompiledTaskGraph::CompiledTaskGraph() noexcept = default;
 
-std::uint64_t TaskGraphAccess::GetBuilderIdentity(TaskNodeHandle handle) noexcept
-{
-	return handle.m_builderIdentity;
-}
-
-std::uint32_t TaskGraphAccess::GetBuilderGeneration(TaskNodeHandle handle) noexcept
-{
-	return handle.m_builderGeneration;
-}
-
-std::uint32_t TaskGraphAccess::GetIndex(TaskNodeHandle handle) noexcept
-{
-	return handle.m_indexPlusOne - 1u;
-}
-
 bool TaskGraphAccess::Decode(TaskNodeHandle handle, std::uint64_t builderIdentity, std::uint32_t builderGeneration, std::uint32_t taskCount, std::uint32_t& outIndex) noexcept
 {
 	if (!handle || handle.m_builderIdentity != builderIdentity || handle.m_builderGeneration != builderGeneration)
@@ -101,17 +86,12 @@ TaskNodeHandle TaskGraphBuilder::Add(TaskDesc desc, TaskFunction function)
 	{
 		return {};
 	}
-	if (!desc.Name.IsValid())
-	{
-		m_state->RecordError(TaskGraphErrorCode::InvalidTaskName, "Task names must be non-empty and at most 96 bytes.");
-		return {};
-	}
 	if (!State::IsValidTaskLane(desc.Lane))
 	{
 		m_state->RecordError(TaskGraphErrorCode::InvalidTaskLane, "Task lane is not recognized.");
 		return {};
 	}
-	if (!State::IsValidCompletionPolicy(desc.CompletionPolicy))
+	if (desc.CompletionPolicy != TaskCompletionPolicy::Normal && desc.CompletionPolicy != TaskCompletionPolicy::Cleanup)
 	{
 		m_state->RecordError(TaskGraphErrorCode::InvalidCompletionPolicy, "Task completion policy is not recognized.");
 		return {};
@@ -172,11 +152,6 @@ bool TaskGraphBuilder::DependsOn(TaskNodeHandle task, TaskNodeHandle prerequisit
 	{
 		return false;
 	}
-	if (taskIndex == prerequisiteIndex)
-	{
-		m_state->RecordError(TaskGraphErrorCode::SelfDependency, "A task cannot depend on itself.");
-		return false;
-	}
 	if (m_state->EdgeCount >= m_state->Limits.MaximumEdges)
 	{
 		m_state->RecordError(TaskGraphErrorCode::EdgeCapacityExceeded, "Task graph exceeded its configured edge capacity.");
@@ -184,12 +159,6 @@ bool TaskGraphBuilder::DependsOn(TaskNodeHandle task, TaskNodeHandle prerequisit
 	}
 
 	auto& prerequisites = m_state->Nodes[taskIndex].Prerequisites;
-	if (std::find(prerequisites.begin(), prerequisites.end(), prerequisiteIndex) != prerequisites.end())
-	{
-		m_state->RecordError(TaskGraphErrorCode::DuplicateDependency, "A task dependency edge was added more than once.");
-		return false;
-	}
-
 	// Both directions commit without allocation after either adjacency changes.
 	auto& dependents = m_state->Nodes[prerequisiteIndex].Dependents;
 	ReserveRelationSlot(prerequisites);
@@ -211,7 +180,7 @@ TaskNodeHandle TaskGraphBuilder::WhenAll(TaskDesc desc, std::span<const TaskNode
 	return barrier;
 }
 
-TaskNodeHandle TaskGraphBuilder::WhenAll(TaskName name, std::span<const TaskNodeHandle> prerequisites)
+TaskNodeHandle TaskGraphBuilder::WhenAll(std::string name, std::span<const TaskNodeHandle> prerequisites)
 {
 	return WhenAll(TaskDesc{.Name = std::move(name)}, prerequisites);
 }
@@ -230,14 +199,13 @@ CompiledTaskGraph TaskGraphBuilder::Compile() const
 
 void TaskGraphBuilder::Reset() noexcept
 {
+	if (m_state->Error.Code == TaskGraphErrorCode::InvalidLimits || m_state->Error.Code == TaskGraphErrorCode::GenerationExhausted)
+	{
+		return;
+	}
 	m_state->Nodes.clear();
 	m_state->EdgeCount = 0;
 	m_state->Error = {};
-	if (!State::AreValidLimits(m_state->Limits))
-	{
-		m_state->RecordError(TaskGraphErrorCode::InvalidLimits, "Task capacity is zero or a task/edge limit exceeds the hard maximum.");
-		return;
-	}
 	if (m_state->BuilderGeneration == std::numeric_limits<std::uint32_t>::max())
 	{
 		m_state->RecordError(TaskGraphErrorCode::GenerationExhausted, "Task graph builder generation is exhausted and cannot be reused.");

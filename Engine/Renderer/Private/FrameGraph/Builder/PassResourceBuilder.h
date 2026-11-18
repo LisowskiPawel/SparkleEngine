@@ -35,7 +35,7 @@ public:
 	FrameGraphAccelerationStructureHandle Read(FrameGraphAccelerationStructureHandle handle, ResourceUsage usage, std::string_view label) noexcept;
 	FrameGraphAccelerationStructureHandle Write(FrameGraphAccelerationStructureHandle handle, ResourceUsage usage, std::string_view label) noexcept;
 	FrameGraphAccelerationStructureHandle Use(FrameGraphAccelerationStructureHandle handle, ResourceUsage usage, std::string_view label) noexcept;
-	bool DeclareParameterUsages(const PassParameterSet& parameterSet, std::string_view passName = {}) noexcept;
+	void DeclareParameterUsages(const PassParameterSet& parameterSet) noexcept;
 
 private:
 	void Record(FrameGraphResourceHandle handle, ResourceUsage usage, std::string_view label) noexcept;
@@ -45,5 +45,5 @@ private:
 	void DeclareAccelerationStructureBinding(const PassParameterDesc& parameter, const PassParameterBinding& binding) noexcept;
 	void DeclareResourceHandle(FrameGraphResourceHandle handle, ResourceUsage usage, const PassParameterDesc& parameter, std::uint32_t arrayIndex) noexcept;
 
-	std::vector<PassResourceDeclaration>* m_declarations = nullptr;
+	std::vector<PassResourceDeclaration>& m_declarations;
 };

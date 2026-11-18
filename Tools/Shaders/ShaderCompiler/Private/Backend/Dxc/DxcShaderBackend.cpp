@@ -9,6 +9,7 @@
 #include "Compiler/ShaderCompileProfile.h"
 #include "Constants/ShaderCompilerConstants.h"
 #include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Diagnostics/Logger.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "DxilReflectionExtractor.h"
 #include "Compiler/SpirV/SpirVReflectionExtractor.h"
@@ -20,29 +21,21 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_dxcShaderBackendLogger, kDxcCompilerLoggerC
 DxcShaderBackend::DxcShaderBackend()
 {
 	HRESULT hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(m_compiler.ReleaseAndGetAddressOf()));
-	if (FAILED(hr))
+	if (FAILED(hr) || !m_compiler)
 	{
-		Diagnostics::Fatal(g_dxcShaderBackendLogger, __FILE__, __LINE__, "Failed to create DXC compiler instance");
-		return;
+		throw Diagnostics::Error("Failed to create DXC compiler instance.");
 	}
 
 	hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(m_utils.ReleaseAndGetAddressOf()));
-	if (FAILED(hr))
+	if (FAILED(hr) || !m_utils)
 	{
-		Diagnostics::Fatal(g_dxcShaderBackendLogger, __FILE__, __LINE__, "Failed to create DXC utils instance");
-		m_compiler.Reset();
-		return;
+		throw Diagnostics::Error("Failed to create DXC utils instance.");
 	}
 
 	m_backendVersion = QueryBackendVersion(*m_compiler.Get());
 }
 
 DxcShaderBackend::~DxcShaderBackend() = default;
-
-bool DxcShaderBackend::IsValid() const noexcept
-{
-	return m_compiler != nullptr && m_utils != nullptr;
-}
 
 ShaderBackendCapabilities DxcShaderBackend::GetStaticCapabilities() noexcept
 {
@@ -93,14 +86,7 @@ std::uint64_t DxcShaderBackend::QueryBackendVersion(IDxcCompiler3& compiler)
 
 ShaderBackendCapabilities DxcShaderBackend::GetCapabilities() const
 {
-	ShaderBackendCapabilities capabilities = GetStaticCapabilities();
-	capabilities.bSupportsDxil = capabilities.bSupportsDxil && IsValid();
-	capabilities.bSupportsSpirV = capabilities.bSupportsSpirV && IsValid();
-	capabilities.bSupportsDxilRayTracingLibrary = capabilities.bSupportsDxilRayTracingLibrary && IsValid();
-	capabilities.bSupportsSpirVRayTracingLibrary = capabilities.bSupportsSpirVRayTracingLibrary && IsValid();
-	capabilities.bSupportsDxilInlineRayQuery = capabilities.bSupportsDxilInlineRayQuery && IsValid();
-	capabilities.bSupportsSpirVInlineRayQuery = capabilities.bSupportsSpirVInlineRayQuery && IsValid();
-	return capabilities;
+	return GetStaticCapabilities();
 }
 
 std::string_view DxcShaderBackend::GetBackendName() const
@@ -115,11 +101,6 @@ std::uint64_t DxcShaderBackend::GetBackendVersion() const
 
 CompiledShader DxcShaderBackend::Compile(const ShaderCompileRequest& request)
 {
-	if (!IsValid())
-	{
-		throw Diagnostics::Error("DXC backend is not initialized");
-	}
-
 	const std::string& sourceText = request.SourceCode;
 
 	DxcBuffer sourceBuffer{};
@@ -190,15 +171,6 @@ Microsoft::WRL::ComPtr<IDxcResult> DxcShaderBackend::CompileSource(const ShaderC
 		{
 			compilerOutput = "Compilation failed with no error message";
 		}
-
-		SPDLOG_LOGGER_ERROR(
-		    g_dxcShaderBackendLogger,
-		    "Shader compilation failed for type '{}' source '{}' entry '{}' target '{}': {}",
-		    request.ShaderTypeName,
-		    request.VirtualSourcePath,
-		    request.EntryPoint,
-		    GetShaderTargetName(request.Target),
-		    compilerOutput);
 
 		throw Diagnostics::Error(compilerOutput);
 	}

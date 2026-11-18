@@ -1,7 +1,5 @@
 #include "ToolWorkProgress.h"
 
-#include "Core/Public/Diagnostics/Error.h"
-
 #include <algorithm>
 #include <charconv>
 #include <cstddef>
@@ -17,15 +15,6 @@ static std::optional<std::size_t> ParseProgressCount(std::string_view text);
 
 std::string FormatToolWorkProgress(std::string_view phase, std::size_t completed, std::size_t total)
 {
-	if (phase.empty())
-	{
-		throw Diagnostics::Error("Tool progress phase is empty.");
-	}
-	if (total != 0 && completed > total)
-	{
-		throw Diagnostics::Error("Tool progress count exceeds its total.");
-	}
-
 	std::string output(kWorkProgressPrefix);
 	if (total == 0)
 	{
@@ -33,7 +22,7 @@ std::string FormatToolWorkProgress(std::string_view phase, std::size_t completed
 	}
 	else
 	{
-		output += std::to_string(completed) + '/' + std::to_string(total) + ' ';
+		output += std::to_string(std::min(completed, total)) + '/' + std::to_string(total) + ' ';
 	}
 
 	std::string label(phase);

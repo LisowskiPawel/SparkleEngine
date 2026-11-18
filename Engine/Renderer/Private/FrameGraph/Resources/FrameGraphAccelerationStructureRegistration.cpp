@@ -85,10 +85,10 @@ void FrameGraph::BindPersistentAccelerationStructure(FrameGraphAccelerationStruc
 
 void FrameGraph::BindPersistentAccelerationStructure(FrameGraphAccelerationStructureHandle handle, RhiOwnedResourceHandle resource, ResourceState currentState) noexcept
 {
-	if (m_renderHardwareInterface == nullptr || !resource)
+	if (!resource)
 	{
 		FailInvalidAccelerationStructureBinding("BindPersistentAccelerationStructure", {}, handle.GetResourceHandle(), currentState, false);
 	}
 
-	BindPersistentAccelerationStructure(handle, m_renderHardwareInterface->GetResourceService().GetResourceHandle(resource), currentState);
+	BindPersistentAccelerationStructure(handle, m_renderHardwareInterface.GetResourceService().GetResourceHandle(resource), currentState);
 }

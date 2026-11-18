@@ -148,7 +148,7 @@ void ReferencePathTracerArtifactCoordinator::PublishIfReady()
 void ReferencePathTracerArtifactCoordinator::StartPublication(ReferencePathTracerArtifactWriteRequest request)
 {
 	std::string errorMessage;
-	const TaskName taskName = TaskName("Publish Reference Path Tracer artifact");
+	const std::string taskName = "Publish Reference Path Tracer artifact";
 
 	auto operationTask = [request = std::move(request)](ReferencePathTracerArtifactWriteResult& result, TaskExecutionContext& context) mutable
 	{

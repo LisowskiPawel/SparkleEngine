@@ -3,9 +3,6 @@
 #include "Widgets/UiIconWidgets.h"
 
 #include "Style/SparkleUiPalette.h"
-#include "Style/SparkleUiTheme.h"
-
-#include "Core/Public/Strings/StringUtils.h"
 
 #include <algorithm>
 
@@ -64,12 +61,9 @@ namespace EditorWidgets
 			drawList->AddRect(start, end, SparkleUiPalette::PanelHeaderBorder(), 3.0f, 0, 1.0f);
 		}
 
-		if (text != nullptr && text[0] != '\0')
-		{
-			const ImVec2 textSize = ImGui::CalcTextSize(text);
-			const ImVec2 textPos(start.x + ((size.x - textSize.x) * 0.5f), start.y + ((size.y - textSize.y) * 0.5f));
-			drawList->AddText(textPos, SparkleUiPalette::SceneOutlinerBadgeText(), text);
-		}
+		const ImVec2 textSize = ImGui::CalcTextSize(text);
+		const ImVec2 textPos(start.x + ((size.x - textSize.x) * 0.5f), start.y + ((size.y - textSize.y) * 0.5f));
+		drawList->AddText(textPos, SparkleUiPalette::SceneOutlinerBadgeText(), text);
 
 		if (tooltip != nullptr && tooltip[0] != '\0' && ImGui::IsItemHovered())
 		{

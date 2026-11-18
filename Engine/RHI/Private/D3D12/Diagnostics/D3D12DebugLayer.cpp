@@ -98,8 +98,18 @@ void D3D12DebugLayer::InitializeInfoQueue(ID3D12Device* device)
 		return;
 	}
 
-	ConfigureInfoQueue(device);
-	ApplyInfoQueueFilters(device);
+	const BOOL debuggerAttached = IsDebuggerPresent();
+	m_infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, debuggerAttached);
+	m_infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, debuggerAttached);
+
+	D3D12_MESSAGE_SEVERITY disabledSeverities[] = {D3D12_MESSAGE_SEVERITY_INFO, D3D12_MESSAGE_SEVERITY_MESSAGE};
+	D3D12_MESSAGE_ID disabledMessages[] = {D3D12_MESSAGE_ID_FENCE_ZERO_WAIT};
+	D3D12_INFO_QUEUE_FILTER filter = {};
+	filter.DenyList.NumSeverities = static_cast<UINT>(std::size(disabledSeverities));
+	filter.DenyList.pSeverityList = disabledSeverities;
+	filter.DenyList.NumIDs = static_cast<UINT>(std::size(disabledMessages));
+	filter.DenyList.pIDList = disabledMessages;
+	m_infoQueue->AddStorageFilterEntries(&filter);
 	ClearMessages();
 }
 
@@ -193,31 +203,6 @@ void D3D12DebugLayer::InitDXGIDebug()
 {
 	CHECK(DXGIGetDebugInterface1(0, IID_PPV_ARGS(m_dxgiDebug.ReleaseAndGetAddressOf())));
 	m_dxgiDebug->EnableLeakTrackingForThread();
-}
-
-void D3D12DebugLayer::ConfigureInfoQueue(ID3D12Device* device)
-{
-	static_cast<void>(device);
-
-	if (m_infoQueue != nullptr)
-	{
-		const BOOL debuggerAttached = IsDebuggerPresent();
-		m_infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, debuggerAttached);
-		m_infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, debuggerAttached);
-		m_infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, debuggerAttached);
-	}
-}
-
-void D3D12DebugLayer::ApplyInfoQueueFilters(ID3D12Device* device)
-{
-	if (m_infoQueue != nullptr)
-	{
-		D3D12_MESSAGE_ID disabledMessages[] = {static_cast<D3D12_MESSAGE_ID>(1424)};
-		D3D12_INFO_QUEUE_FILTER filter = {};
-		filter.DenyList.NumIDs = static_cast<UINT>(std::size(disabledMessages));
-		filter.DenyList.pIDList = disabledMessages;
-		m_infoQueue->AddStorageFilterEntries(&filter);
-	}
 }
 
 void D3D12DebugLayer::DrainStoredMessages()

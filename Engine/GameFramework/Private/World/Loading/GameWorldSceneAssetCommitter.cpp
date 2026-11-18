@@ -14,21 +14,6 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_sceneAssetCommitterLogger, "GameFramework.SceneAssetCommitter");
 
-static void ValidatePayloadContents(const SceneAssetPayload& sceneAssetPayload)
-{
-	const bool bScenePayloadEmptyCameras = !sceneAssetPayload.HasMeshes() && sceneAssetPayload.cameras.empty();
-	const bool bScenePayloadEmptyLights = bScenePayloadEmptyCameras && (sceneAssetPayload.lights.empty());
-	const bool bScenePayloadEmptySkeletons = bScenePayloadEmptyLights && (sceneAssetPayload.skeletons.empty());
-	const bool bScenePayloadEmptyAnimations = bScenePayloadEmptySkeletons && (sceneAssetPayload.animations.empty());
-	const bool bScenePayloadEmptyMaterials = bScenePayloadEmptyAnimations && (sceneAssetPayload.materials.empty());
-	const bool bScenePayloadEmpty = bScenePayloadEmptyMaterials && (sceneAssetPayload.materialVariants.empty());
-
-	if (bScenePayloadEmpty)
-	{
-		Diagnostics::Fatal(g_sceneAssetCommitterLogger, __FILE__, __LINE__, "A validated scene asset payload contains no resources or entities.");
-	}
-}
-
 static void AppendAnimationResources(ECS::GameWorldState& state, GameWorldResourceStores& resources, SceneAssetPayload& sceneAssetPayload)
 {
 	if (!sceneAssetPayload.skeletons.empty())
@@ -61,14 +46,6 @@ static void AppendMeshes(
 	const auto sceneGroupBaseIndex = static_cast<SceneMeshInstanceGroupIndex>(state.GetMeshInstanceGroupCount());
 
 	std::vector<ECS::SceneMeshInstanceData> meshInstances = SceneAssetMeshInstanceBuilder::BuildInstances(sceneAssetPayload, materials, materialBaseHandle, sceneGroupBaseIndex);
-	for (const ECS::SceneMeshInstanceData& meshInstance : meshInstances)
-	{
-		if (!materials.Contains(meshInstance.Material))
-		{
-			Diagnostics::Fatal(g_sceneAssetCommitterLogger, __FILE__, __LINE__, "A validated mesh instance resolved an absent material.");
-		}
-	}
-
 	for (ECS::SceneMeshInstanceData& meshInstance : meshInstances)
 	{
 		if (!state.AddMesh(std::move(meshInstance)).IsValid())
@@ -119,7 +96,6 @@ static void AppendLights(ECS::GameWorldState& state, SceneAssetPayload& sceneAss
 
 void CommitSceneAssetPayload(ECS::GameWorldState& state, GameWorldResourceStores& resources, SceneAssetPayload&& sceneAssetPayload)
 {
-	ValidatePayloadContents(sceneAssetPayload);
 	const bool bHasSkeletons = !sceneAssetPayload.skeletons.empty();
 	const bool bHasMaterials = !sceneAssetPayload.materials.empty();
 

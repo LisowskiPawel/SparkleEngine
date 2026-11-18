@@ -35,10 +35,7 @@ template <typename TEvent> void InputSystem::State::ProcessEvent(const TEvent& e
 	}
 
 	UpdateStateFromEvent(GlobalState, event);
-	if (InputState* state = FindLayerState(targetLayer))
-	{
-		UpdateStateFromEvent(*state, event);
-	}
+	UpdateStateFromEvent(GetRoutedState(targetLayer), event);
 
 	// Queue before user code so nested cancellation removes this event as well.
 	Dispatcher.QueueDeferred(event, targetLayer);
@@ -47,7 +44,6 @@ template <typename TEvent> void InputSystem::State::ProcessEvent(const TEvent& e
 
 void InputSystem::State::HandleWindowMessage(const WindowMessageEvent& message)
 {
-	OwnerThread.AssertAccess();
 	Win32InputEvent input = ProcessWin32InputMessage(message);
 	if (auto* move = std::get_if<MouseMoveEvent>(&input))
 	{

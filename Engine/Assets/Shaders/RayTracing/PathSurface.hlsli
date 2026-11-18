@@ -5,7 +5,6 @@
 
 struct RayTracingPathSurface
 {
-	bool bValid;
 	float3 PositionWorld;
 	float PositionError;
 	float3 GeometricNormalWorld;
@@ -24,7 +23,6 @@ struct RayTracingPathSurface
 RayTracingPathSurface BuildPrimaryRayTracingPathSurface(float3 positionWorld, float3 normalWorld, float3 viewDirWorld, float3 baseColor, float roughness, float metallic, float dielectricF0)
 {
 	RayTracingPathSurface surface;
-	surface.bValid = true;
 	surface.PositionWorld = positionWorld;
 	surface.PositionError = 0x1.0p-23f * dot(abs(normalWorld), abs(positionWorld));
 	surface.GeometricNormalWorld = normalWorld;
@@ -44,7 +42,6 @@ RayTracingPathSurface BuildPrimaryRayTracingPathSurface(float3 positionWorld, fl
 RayTracingPathSurface BuildHitRayTracingPathSurface(RayTracingHitSurfaceData hitSurface, float3 incomingRayDirectionWorld)
 {
 	RayTracingPathSurface surface;
-	surface.bValid = hitSurface.bValid;
 	surface.PositionWorld = hitSurface.PositionWorld;
 	surface.PositionError = hitSurface.PositionError;
 	surface.GeometricNormalWorld = hitSurface.GeometricNormalWorld;

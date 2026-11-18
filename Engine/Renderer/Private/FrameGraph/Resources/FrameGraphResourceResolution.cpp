@@ -14,12 +14,7 @@ RhiGpuDescriptorHandle FrameGraph::ResolveShaderResourceView(FrameGraphResourceH
 	assert(metadata.kind != FrameGraphResourceKind::BackBuffer);
 
 	assert(access.shaderResourceView);
-	if (m_renderHardwareInterface == nullptr)
-	{
-		return {};
-	}
-
-	return m_renderHardwareInterface->GetDescriptorService().GetResourceViewGpuHandle(access.shaderResourceView);
+	return m_renderHardwareInterface.GetDescriptorService().GetResourceViewGpuHandle(access.shaderResourceView);
 }
 
 RhiResourceHandle FrameGraph::ResolveResource(FrameGraphResourceHandle handle) const noexcept
@@ -35,7 +30,7 @@ RhiResourceHandle FrameGraph::ResolveResource(FrameGraphResourceHandle handle) c
 	switch (metadata.kind)
 	{
 		case FrameGraphResourceKind::BackBuffer:
-			return m_renderHardwareInterface != nullptr ? m_renderHardwareInterface->GetPresentationService().GetBackBufferResource() : RhiResourceHandle{};
+			return m_renderHardwareInterface.GetPresentationService().GetBackBufferResource();
 		case FrameGraphResourceKind::DepthStencil:
 		case FrameGraphResourceKind::ColorRenderTarget:
 		case FrameGraphResourceKind::Buffer:
@@ -48,12 +43,10 @@ RhiResourceHandle FrameGraph::ResolveResource(FrameGraphResourceHandle handle) c
 
 RhiResourceHandle FrameGraph::ResolveResource(FrameGraphTextureHandle handle) const noexcept
 {
-	assert(handle.IsValid());
 	return ResolveResource(handle.GetResourceHandle());
 }
 
 RhiGpuDescriptorHandle FrameGraph::ResolveShaderResourceView(FrameGraphTextureHandle handle) const noexcept
 {
-	assert(handle.IsValid());
 	return ResolveShaderResourceView(handle.GetResourceHandle());
 }

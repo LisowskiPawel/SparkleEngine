@@ -8,14 +8,8 @@ namespace Filesystem
 	{
 		FileSystemPathState state;
 		DiscoverFileSystemPathRoots(state);
-		RebuildProjectPaths(state);
-		return state;
-	}
-
-	void RebuildProjectPaths(FileSystemPathState& state)
-	{
 		RebuildCookedAssetPaths(state);
-		ValidateConfiguredPaths(state);
+		return state;
 	}
 
 	FileSystemPathState& GetFileSystemPathState()

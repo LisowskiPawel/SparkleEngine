@@ -76,11 +76,6 @@ namespace DirectReservoir
 
 	float3 EvaluateCandidateContribution(Surface surface, DirectLightSampling::LightCandidate candidate, float2 shapeSample)
 	{
-		if (!surface.bValid || !DirectLightSampling::IsValid(candidate))
-		{
-			return 0.0f.xxx;
-		}
-
 		const LightSampling::DirectLightSample lightSample = ReplayLightSample(candidate, shapeSample, surface.PositionWorld);
 
 		const SurfaceLighting::Surface lightingSurface = BuildLightingSurface(surface.GBuffer, surface.ViewDirWorld, surface.bEvaluateSubsurface);
@@ -128,7 +123,7 @@ namespace DirectReservoir
 	bool StreamWeightedSample(inout Reservoir reservoir, DirectLightSampling::LightCandidate candidate, float2 shapeSample, float targetPdf, float sourcePdf, float random)
 	{
 		reservoir.M += 1.0f;
-		if (!DirectLightSampling::IsValid(candidate) || targetPdf <= MinPdf || sourcePdf <= MinPdf)
+		if (targetPdf <= MinPdf || sourcePdf <= MinPdf)
 		{
 			return false;
 		}
@@ -150,7 +145,7 @@ namespace DirectReservoir
 
 	bool CombineReservoir(inout Reservoir reservoir, Reservoir candidateReservoir, Surface surface, float maxM, float random)
 	{
-		if (!surface.bValid || candidateReservoir.M <= 0.0f)
+		if (candidateReservoir.M <= 0.0f)
 		{
 			return false;
 		}
@@ -191,11 +186,6 @@ namespace DirectReservoir
 
 	Reservoir BuildInitialReservoir(Surface surface, uint2 pixelCoord)
 	{
-		if (!surface.bValid)
-		{
-			return EmptyReservoir();
-		}
-
 		Reservoir reservoir = EmptyReservoir();
 		uint rng = RestirReservoirCommon::BuildSeed(pixelCoord, 0xC0FFEEu);
 		[unroll]

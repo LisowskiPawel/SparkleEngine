@@ -5,7 +5,6 @@
 
 #include "EditorAPI.h"
 #include "Renderer/Public/Diagnostics/MeshPreviewGeometry.h"
-#include "Renderer/Public/Diagnostics/RendererMemoryDiagnostics.h"
 #include "Renderer/Public/Diagnostics/ShaderDiagnostics.h"
 #include "Renderer/Public/UI/UiRenderPacket.h"
 #include "Renderer/Public/Settings/EngineRenderingSettings.h"
@@ -50,7 +49,6 @@ struct EditorDiagnosticsProviders final
 	std::function<ShaderDiagnosticsSnapshot()> Shaders;
 	std::function<MeshDiagnosticsSnapshot()> MeshDiagnostics;
 	std::function<TextureDiagnosticsSnapshot()> TextureDiagnostics;
-	std::function<RendererMemoryDiagnosticsSnapshot()> MemoryDiagnostics;
 	std::function<MeshPreviewGeometry(std::uintptr_t)> MeshPreview;
 };
 
@@ -75,7 +73,6 @@ public:
 	void SetDiagnosticsProviders(EditorDiagnosticsProviders providers);
 	void SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler);
 	void SetShaderCompileStatus(bool bBusy, std::string_view message = {});
-	RendererMemoryDiagnosticsSnapshot CaptureMemoryDiagnostics() const;
 	void AppendConsoleOutput(ConsoleOutputRecord record, bool bShowConsole = false);
 	bool ConsumeShaderReloadRequest() noexcept;
 	ViewportOutputAction ConsumeViewportOutputAction() noexcept;

@@ -34,18 +34,7 @@ template <typename TRayGenerationShader, typename TBuildParameters> void AddPipe
 
 	auto& parameters = buildParameters.template operator()<TRayGenerationShader>();
 
-	const auto materialization = builder.TraceRays<TRayGenerationShader>(
-	    label,
-	    composition,
-	    plan.GetGeneration(),
-	    parameters,
-	    dimensions,
-	    [&plan]() { return ResolveRayTracingMaterialRecordGroups(composition, plan); });
-
-	if (materialization)
-	{
-		plan.RecordMaterialization(materialization->SizeInBytes, materialization->ElapsedMicroseconds);
-	}
+	builder.TraceRays<TRayGenerationShader>(label, composition, plan.GetGeneration(), parameters, dimensions, [&plan]() { return ResolveRayTracingMaterialRecordGroups(composition, plan); });
 }
 
 template <typename TInlineShader, typename TRayGenerationShader, typename TBuildParameters> void AddRayTracingMaterialPass(

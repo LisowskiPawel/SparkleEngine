@@ -7,28 +7,18 @@
 
 #include <algorithm>
 #include <cstring>
-#include <thread>
 #include <vector>
-
-SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_editorIconLogger, "EditorIcons");
 
 class EditorIconService::Implementation final
 {
 public:
 	Implementation() :
-	    m_context(ImGui::GetCurrentContext()),
-	    m_atlas(m_context != nullptr ? ImGui::GetIO().Fonts : nullptr),
-	    m_thread(std::this_thread::get_id())
+	    m_atlas(ImGui::GetIO().Fonts)
 	{
-		if (m_atlas == nullptr)
-		{
-			Diagnostics::Fatal(g_editorIconLogger, __FILE__, __LINE__, "EditorIconService requires an initialized UI context");
-		}
 	}
 
 	~Implementation() noexcept
 	{
-		ValidateOwner();
 		for (const RegisteredIcon& icon : m_icons)
 		{
 			m_atlas->RemoveCustomRect(icon.Rectangle);
@@ -44,25 +34,14 @@ private:
 		ImFontAtlasRectId Rectangle;
 	};
 
-	void ValidateOwner() const noexcept
-	{
-		if (std::this_thread::get_id() != m_thread || ImGui::GetCurrentContext() != m_context || ImGui::GetIO().Fonts != m_atlas)
-		{
-			Diagnostics::Fatal(g_editorIconLogger, __FILE__, __LINE__, "EditorIconService used outside its owning thread/context/atlas lifetime");
-		}
-	}
-
 	ImFontAtlasRect Resolve(const EditorIconAsset& asset) noexcept;
 
-	ImGuiContext* const m_context;
 	ImFontAtlas* const m_atlas;
-	const std::thread::id m_thread;
 	std::vector<RegisteredIcon> m_icons;
 };
 
 ImFontAtlasRect EditorIconService::Implementation::Resolve(const EditorIconAsset& asset) noexcept
 {
-	ValidateOwner();
 	auto found = std::ranges::find(m_icons, &asset, &RegisteredIcon::Asset);
 	ImFontAtlasRect rectangle;
 	if (found != m_icons.end() && m_atlas->GetCustomRect(found->Rectangle, &rectangle))
@@ -70,18 +49,10 @@ ImFontAtlasRect EditorIconService::Implementation::Resolve(const EditorIconAsset
 		return rectangle;
 	}
 
-	const bool bInvalidIconAssetExtent = asset.Extent < 1 || asset.Extent > 512;
-	const bool bInvalidIconAsset = bInvalidIconAssetExtent || (asset.Pixels.size() != static_cast<std::size_t>(asset.Extent) * asset.Extent * 4);
-
-	if (bInvalidIconAsset)
-	{
-		Diagnostics::Fatal(g_editorIconLogger, __FILE__, __LINE__, "Editor icon requires square RGBA8 pixels and extent in [1,512]");
-	}
+	IM_ASSERT(asset.Extent >= 1 && asset.Extent <= 512);
+	IM_ASSERT(asset.Pixels.size() == static_cast<std::size_t>(asset.Extent) * asset.Extent * 4);
 	const ImFontAtlasRectId rectangleId = m_atlas->AddCustomRect(asset.Extent, asset.Extent, &rectangle);
-	if (rectangleId == ImFontAtlasRectId_Invalid || m_atlas->TexData->Format != ImTextureFormat_RGBA32)
-	{
-		Diagnostics::Fatal(g_editorIconLogger, __FILE__, __LINE__, "Editor icon could not register an RGBA32 atlas rectangle");
-	}
+	IM_ASSERT(rectangleId != ImFontAtlasRectId_Invalid && m_atlas->TexData->Format == ImTextureFormat_RGBA32);
 	m_atlas->TexPixelsUseColors = true;
 	for (int row = 0; row < asset.Extent; ++row)
 	{

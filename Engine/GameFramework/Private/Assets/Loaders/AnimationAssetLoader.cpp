@@ -4,7 +4,7 @@
 
 #include "Assets/Cooked/LoadedAnimationAsset.h"
 #include "Assets/Loaders/CookedAssetByteReader.h"
-#include "Assets/Loaders/CookedAssetLoaderDiagnostics.h"
+#include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 #include <span>
@@ -52,21 +52,21 @@ static bool IsFinite(const DirectX::XMFLOAT4& value) noexcept
 
 namespace Assets
 {
-	static void ValidateAnimationHeader(const CookedAnimationAssetHeader& header, const CookedAssetLoaderDiagnostics& diagnostics)
+	static void ValidateAnimationHeader(const CookedAnimationAssetHeader& header)
 	{
 		const bool bCurrentChannelLayout = header.fileHeader.HasMagic(kCookedAnimationAssetMagic) && header.channelStride == sizeof(CookedAnimationChannelRecord);
 		const bool bCurrentLayout = bCurrentChannelLayout && header.keyframeStride == sizeof(CookedAnimationKeyframeRecord);
 		if (!bCurrentLayout || !Strings::IsNullTerminated(std::span(header.name)))
 		{
-			throw diagnostics.MakeError("header", "animation magic and current channel/keyframe strides", "Invalid cooked animation asset header; recook the asset");
+			throw Diagnostics::Error("Invalid cooked animation asset header; recook the asset");
 		}
 		if (!std::isfinite(header.durationSeconds) || header.durationSeconds < 0.0f)
 		{
-			throw diagnostics.MakeError("payload", "a finite non-negative clip duration", "Cooked animation asset has an invalid duration");
+			throw Diagnostics::Error("Cooked animation asset has an invalid duration");
 		}
 	}
 
-	static void ValidateChannelRange(const CookedAnimationChannelRecord& channel, std::size_t keyframeCount, const CookedAssetLoaderDiagnostics& diagnostics)
+	static void ValidateChannelRange(const CookedAnimationChannelRecord& channel, std::size_t keyframeCount)
 	{
 		const bool bKnownSemantics = IsKnownTargetPath(channel.targetPath) && IsKnownInterpolation(channel.interpolation);
 		const bool bValidTarget = channel.targetNodeIndex != (std::numeric_limits<std::uint32_t>::max)();
@@ -74,11 +74,11 @@ namespace Assets
 		const bool bValidRange = bValidOffset && channel.keyframeCount <= keyframeCount - channel.firstKeyframe;
 		if (!bKnownSemantics || !bValidTarget)
 		{
-			throw diagnostics.MakeError("channels", "known target and interpolation", "Cooked animation channel semantics are invalid");
+			throw Diagnostics::Error("Cooked animation channel semantics are invalid");
 		}
 		if (!bValidRange)
 		{
-			throw diagnostics.MakeError("channels", "an in-range non-empty keyframe span", "Cooked animation channel range is invalid");
+			throw Diagnostics::Error("Cooked animation channel range is invalid");
 		}
 	}
 
@@ -108,7 +108,7 @@ namespace Assets
 		return previous == nullptr || DirectX::XMVectorGetX(DirectX::XMVector4Dot(DirectX::XMLoadFloat4(previous), rotation)) >= -1.0e-5f;
 	}
 
-	static void ValidateChannelKeys(const LoadedAnimationAsset& asset, const CookedAnimationChannelRecord& channel, std::size_t channelIndex, const CookedAssetLoaderDiagnostics& diagnostics)
+	static void ValidateChannelKeys(const LoadedAnimationAsset& asset, const CookedAnimationChannelRecord& channel, std::size_t channelIndex)
 	{
 		float previousTime = -1.0f;
 		const DirectX::XMFLOAT4* previousRotation = nullptr;
@@ -118,19 +118,13 @@ namespace Assets
 			const auto& key = asset.keyframes[channel.firstKeyframe + offset];
 			if (!IsValidKeyframe(key, previousTime, asset.header.durationSeconds, bCubicSpline))
 			{
-				throw diagnostics.MakeError(
-				    "payload",
-				    "finite strictly ordered keyframes within clip duration",
-				    std::format("Cooked animation channel {} keyframe {} is invalid", channelIndex, offset));
+				throw Diagnostics::Error(std::format("Cooked animation channel {} keyframe {} is invalid", channelIndex, offset));
 			}
 			if (channel.targetPath == CookedAnimationTargetPath::Rotation)
 			{
 				if (!IsContinuousRotation(key.value, previousRotation))
 				{
-					throw diagnostics.MakeError(
-					    "payload",
-					    "normalized sign-continuous rotation keys",
-					    std::format("Cooked animation channel {} keyframe {} has an invalid rotation", channelIndex, offset));
+					throw Diagnostics::Error(std::format("Cooked animation channel {} keyframe {} has an invalid rotation", channelIndex, offset));
 				}
 				previousRotation = &key.value;
 			}
@@ -138,28 +132,27 @@ namespace Assets
 		}
 	}
 
-	static void ValidateAnimationChannels(const LoadedAnimationAsset& asset, const CookedAssetLoaderDiagnostics& diagnostics)
+	static void ValidateAnimationChannels(const LoadedAnimationAsset& asset)
 	{
 		for (std::size_t index = 0; index < asset.channels.size(); ++index)
 		{
-			ValidateChannelRange(asset.channels[index], asset.keyframes.size(), diagnostics);
-			ValidateChannelKeys(asset, asset.channels[index], index, diagnostics);
+			ValidateChannelRange(asset.channels[index], asset.keyframes.size());
+			ValidateChannelKeys(asset, asset.channels[index], index);
 		}
 	}
 
-	LoadedAnimationAsset AnimationAssetLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget)
+	LoadedAnimationAsset AnimationAssetLoader::Decode(std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget)
 	{
-		const CookedAssetLoaderDiagnostics diagnostics(path, "CookedAnimationAsset");
 		CookedAssetByteReader reader(bytes, budget);
 		LoadedAnimationAsset asset;
 		asset.header = reader.Read<CookedAnimationAssetHeader>();
-		ValidateAnimationHeader(asset.header, diagnostics);
+		ValidateAnimationHeader(asset.header);
 		asset.channels = reader.ReadArray<CookedAnimationChannelRecord>(asset.header.channelCount);
 		asset.keyframes = reader.ReadArray<CookedAnimationKeyframeRecord>(asset.header.keyframeCount);
-		ValidateAnimationChannels(asset, diagnostics);
+		ValidateAnimationChannels(asset);
 		if (reader.GetRemainingByteCount() != 0)
 		{
-			throw diagnostics.MakeError("payload", "no trailing bytes after declared animation records", "Cooked animation asset contains unexpected trailing bytes");
+			throw Diagnostics::Error("Cooked animation asset contains unexpected trailing bytes");
 		}
 		return asset;
 	}

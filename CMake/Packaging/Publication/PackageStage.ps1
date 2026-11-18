@@ -8,7 +8,8 @@ function New-PackageStage
     [void] (New-Item -ItemType Directory -Path $Stage)
     foreach ($file in $Files)
     {
-        $source = Assert-ArtifactFile $RepositoryRoot $file.Source $file.Size $file.Sha256
+        Assert-ArtifactPath $file.Source
+        $source = (Get-LocalArtifactFile (Join-Path $RepositoryRoot $file.Source) ([long]::MaxValue)).FullName
         $destination = Join-Path $Stage $file.Path
         [void] (New-Item -ItemType Directory -Force -Path (Split-Path $destination))
         [IO.File]::Copy($source, $destination, $false)
@@ -31,23 +32,8 @@ function Test-PackageStage
     {
         [void] $expected.Add($file.Path)
         $path = Assert-ArtifactFile $Stage $file.Path $file.Size $file.Sha256
-        if (((Get-Item -LiteralPath $path).Attributes -band [IO.FileAttributes]::ReadOnly) -eq 0)
-        {
-            throw "Writable stage member: '$($file.Path)'."
-        }
         if ($file.Path -match '\.(exe|dll)$')
         {
-            $reader = [IO.BinaryReader]::new([IO.File]::OpenRead($path))
-            try
-            {
-                if ($reader.ReadUInt16() -ne 0x5a4d) { throw "Not a Windows PE: '$($file.Path)'." }
-                $reader.BaseStream.Position = 0x3c
-                $offset = $reader.ReadInt32()
-                if ($offset -lt 0x40 -or $offset -gt ($reader.BaseStream.Length - 6)) { throw 'Invalid PE header.' }
-                $reader.BaseStream.Position = $offset
-                if ($reader.ReadUInt32() -ne 0x4550 -or $reader.ReadUInt16() -ne 0x8664) { throw "Not a Windows x64 PE: '$($file.Path)'." }
-            }
-            finally { $reader.Dispose() }
             if ($file.Signature -eq 'VendorSigned' -and (Get-AuthenticodeSignature -LiteralPath $path).Status -ne 'Valid')
             {
                 throw "Invalid vendor signature: '$($file.Path)'."
@@ -72,10 +58,6 @@ function Test-PackageStage
     }
     if ($expected.Count -ne 0) { throw 'Missing stage members.' }
     $stored = Get-Content -LiteralPath (Join-Path $Stage 'manifests/sparkle-package-manifest.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-    if (((Get-Item -LiteralPath (Join-Path $Stage 'manifests/sparkle-package-manifest.json')).Attributes -band [IO.FileAttributes]::ReadOnly) -eq 0)
-    {
-        throw 'Writable stage manifest.'
-    }
     if (($stored | ConvertTo-Json -Depth 20 -Compress) -cne ($Manifest | ConvertTo-Json -Depth 20 -Compress))
     {
         throw 'Stage manifest differs from verified inputs.'

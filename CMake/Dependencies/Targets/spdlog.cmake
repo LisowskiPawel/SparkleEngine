@@ -1,11 +1,9 @@
 sparkle_declare_git_dependency(spdlog
     https://github.com/gabime/spdlog.git
     27cb4c76708608465c413f6d0e6b8d99a4d84302)
-sparkle_log_dependency_step("spdlog" "v1.14.1" "~3 MB" "Repo-wide logging backend" "https://github.com/gabime/spdlog.git")
 FetchContent_Populate(spdlog)
 
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
-    sparkle_log_dependency_ready("spdlog" "${spdlog_SOURCE_DIR}" "~3 MB")
     return()
 endif()
 
@@ -26,5 +24,3 @@ function(sparkle_add_spdlog)
     target_compile_definitions(spdlog PUBLIC FMT_CONSTEVAL=constexpr)
 endfunction()
 sparkle_add_spdlog()
-
-sparkle_log_dependency_ready("spdlog" "${spdlog_SOURCE_DIR}" "~3 MB")

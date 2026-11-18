@@ -16,7 +16,6 @@
 #include <utility>
 #include <vector>
 
-class FrameExecutionDiagnostics;
 class UiFrameRenderer;
 struct RenderFrame;
 struct RenderFrameSubmission;
@@ -86,7 +85,6 @@ private:
 	MeshDiagnosticsSnapshot CaptureMeshDiagnostics() const;
 	MeshPreviewGeometry CaptureMeshPreview(std::uintptr_t meshRuntimeId) const;
 	TextureDiagnosticsSnapshot CaptureTextureDiagnostics();
-	void InitializeFrameStorage();
 	void InitializeRenderFrames();
 	void PrepareFrameGraph(const RenderFrame& frame);
 	RenderFrameGraphResources BuildRenderFrameGraph(FrameGraphBuilder& builder, const RenderFrame& frame);
@@ -115,8 +113,6 @@ private:
 	RenderFrame& InitializeRenderFrame(const RenderFrameTime& time);
 	void PrepareRenderView(RenderFrame& frame, const RenderViewInput& viewInput);
 	void InvalidateViewHistory(RenderViewInvalidationReason reason) noexcept;
-	FrameExecutionDiagnostics& GetCurrentFrameDiagnostics() noexcept;
-	const FrameExecutionDiagnostics& GetCurrentFrameDiagnostics() const noexcept;
 
 	Window& m_window;
 	RenderDeviceServices& m_deviceServices;
@@ -131,7 +127,6 @@ private:
 	std::unique_ptr<RenderScene> m_renderScene;
 	std::unique_ptr<RendererImageProviderStack> m_imageProviders;
 	std::unique_ptr<FrameGraph> m_frameGraph;
-	std::vector<std::unique_ptr<FrameExecutionDiagnostics>> m_frameExecutionDiagnostics;
 	std::vector<std::unique_ptr<RenderFrame>> m_renderFrames;
 	FrameExecutionRetirementQueue m_frameExecutionRetirementQueue;
 	RenderFrameGraphSettings m_frameGraphSettings = {};

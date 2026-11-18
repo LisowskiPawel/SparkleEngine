@@ -23,6 +23,5 @@ namespace SparkleLauncher
 
 		std::string m_pendingLine;
 		ToolWorkProgress m_lastProgress;
-		bool m_bHasProgress = false;
 	};
 }

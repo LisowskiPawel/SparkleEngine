@@ -2,7 +2,6 @@
 
 #include "FrameGraph/Compiler/FrameGraphPlan.h"
 
-class FrameExecutionDiagnostics;
 class FrameGraph;
 class FrameGraphExecutionDiagnostics;
 class RenderCommandContext;
@@ -14,7 +13,7 @@ struct RecordingChunk;
 class FrameGraphRecordingChunkRecorder final
 {
 public:
-	FrameGraphRecordingChunkRecorder(const FrameGraph& frameGraph, const FrameGraphPlan& plan, FrameExecutionDiagnostics& frameDiagnostics) noexcept;
+	FrameGraphRecordingChunkRecorder(const FrameGraph& frameGraph, const FrameGraphPlan& plan) noexcept;
 
 	void Record(const RecordingChunk& chunk, RenderCommandList& commandList) const;
 
@@ -26,5 +25,4 @@ private:
 
 	const FrameGraph& m_frameGraph;
 	const FrameGraphPlan& m_plan;
-	FrameExecutionDiagnostics& m_frameDiagnostics;
 };

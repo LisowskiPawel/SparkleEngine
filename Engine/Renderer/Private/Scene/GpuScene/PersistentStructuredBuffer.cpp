@@ -5,16 +5,14 @@
 #include "RHI/Public/Resources/RhiResourceService.h"
 
 #include <algorithm>
+#include <cassert>
 #include <cstring>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_persistentStructuredBufferLogger, "Renderer.PersistentStructuredBuffer");
 
 void PersistentStructuredBuffer::Update(RhiResourceService& resourceService, std::span<const std::byte> payload, std::uint32_t strideInBytes, std::wstring_view debugName)
 {
-	if (strideInBytes == 0 || payload.size_bytes() % strideInBytes != 0)
-	{
-		Diagnostics::Fatal(g_persistentStructuredBufferLogger, __FILE__, __LINE__, "Persistent structured-buffer update has an invalid stride or payload size.");
-	}
+	assert(strideInBytes != 0u && payload.size_bytes() % strideInBytes == 0u);
 	if (payload.empty())
 	{
 		UpdateEmpty(resourceService, strideInBytes, debugName);
@@ -32,6 +30,7 @@ void PersistentStructuredBuffer::Update(RhiResourceService& resourceService, std
 
 void PersistentStructuredBuffer::Replace(RhiResourceService& resourceService, std::span<const std::byte> payload, std::uint32_t strideInBytes, std::wstring_view debugName)
 {
+	assert(strideInBytes != 0u && payload.size_bytes() % strideInBytes == 0u);
 	Reset();
 	Grow(resourceService, payload, strideInBytes, debugName);
 }
@@ -43,10 +42,7 @@ void PersistentStructuredBuffer::UpdateRanges(
     std::span<const StructuredBufferElementRange> ranges,
     std::wstring_view debugName)
 {
-	if (strideInBytes == 0u || payload.size_bytes() % strideInBytes != 0u)
-	{
-		Diagnostics::Fatal(g_persistentStructuredBufferLogger, __FILE__, __LINE__, "Persistent structured-buffer range update has an invalid stride or payload size.");
-	}
+	assert(strideInBytes != 0u && payload.size_bytes() % strideInBytes == 0u);
 	if (payload.empty())
 	{
 		UpdateEmpty(resourceService, strideInBytes, debugName);
@@ -76,10 +72,6 @@ void PersistentStructuredBuffer::Reset() noexcept
 
 void PersistentStructuredBuffer::Grow(RhiResourceService& resourceService, std::span<const std::byte> payload, std::uint32_t strideInBytes, std::wstring_view debugName)
 {
-	if (strideInBytes == 0u || payload.size_bytes() % strideInBytes != 0u)
-	{
-		Diagnostics::Fatal(g_persistentStructuredBufferLogger, __FILE__, __LINE__, "Persistent structured-buffer allocation has an invalid stride or payload size.");
-	}
 	const std::size_t capacity = ResolveCapacity(payload.size_bytes(), strideInBytes);
 	std::vector<std::byte> shadow(capacity);
 	std::copy(payload.begin(), payload.end(), shadow.begin());

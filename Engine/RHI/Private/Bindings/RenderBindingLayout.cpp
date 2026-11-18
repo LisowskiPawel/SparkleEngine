@@ -24,7 +24,6 @@ RenderBindingLayout::~RenderBindingLayout() noexcept = default;
 
 const PassParameterLayout& RenderBindingLayout::GetParameterLayout() const noexcept
 {
-	assert(m_parameterLayout != nullptr);
 	return *m_parameterLayout;
 }
 

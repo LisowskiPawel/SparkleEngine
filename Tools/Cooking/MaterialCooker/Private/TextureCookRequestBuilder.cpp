@@ -31,7 +31,7 @@ static std::string BuildTextureSourceKey(const TextureCookRequest& request, cons
 {
 	return std::string(location.rootName) + ":" + GetTextureColorSpaceName(request.policy.colorSpace) + ":" + GetTextureMipPolicyName(request.policy.mipPolicy) + ":"
 	    + GetTextureColorProcessingPolicyName(request.policy.colorProcessingPolicy) + ":" + GetTextureGroupName(request.policy.textureGroup) + ":" + GetTextureDimensionName(request.policy.dimension)
-	    + ":" + GetTextureChannelMaskName(request.policy.channelMask) + ":" + location.relativePath.generic_string();
+	    + ":" + GetTextureChannelMaskName(request.policy.channelMask) + ":" + GetTextureHdrEncodingName(request.policy.hdrEncoding) + ":" + location.relativePath.generic_string();
 }
 
 static std::filesystem::path BuildTextureOutputPath(const TextureCookRequest& request, const TextureSourceLocation& location)

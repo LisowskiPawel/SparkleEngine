@@ -2,6 +2,8 @@
 
 #include "Core/Public/Files/BinaryStreamWriter.h"
 
+#include <limits>
+
 bool Files::BinaryStreamWriter::WriteBytes(std::ostream& output, const void* bytes, std::size_t byteCount, std::string& outErrorMessage)
 {
 	if (byteCount > static_cast<std::size_t>((std::numeric_limits<std::streamsize>::max)()))

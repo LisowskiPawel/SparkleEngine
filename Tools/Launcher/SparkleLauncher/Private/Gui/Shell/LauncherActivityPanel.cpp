@@ -244,6 +244,10 @@ namespace SparkleLauncher
 		if (result.Status == OperationStatus::Succeeded)
 		{
 			AppendRunOutput(runId, "\nResult: " + statusText + "\n");
+			if (!result.LogPath.isEmpty())
+			{
+				AppendRunOutput(runId, "Log: " + result.LogPath + "\n");
+			}
 		}
 		else
 		{

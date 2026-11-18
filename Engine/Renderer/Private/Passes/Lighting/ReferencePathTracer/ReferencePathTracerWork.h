@@ -11,7 +11,6 @@ struct ReferencePathTracerWork final
 	std::uint32_t SessionSeed = 0u;
 	std::uint32_t ReplicateId = 0u;
 	std::uint32_t SampleOrdinal = 0u;
-	std::uint32_t FinitePathDiagnosticSurfaceVertices = 0u;
 	std::uint32_t FirstRow = 0u;
 	std::uint32_t RowCount = 0u;
 	std::uint32_t PriorSampleCount = 0u;

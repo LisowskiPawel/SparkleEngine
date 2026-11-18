@@ -51,8 +51,7 @@ bool FramePipeline::ShouldOutputToBackBuffer() const noexcept
 void FramePipeline::InitializeFrameGraph(const RenderFrameGraphSettings& settings) noexcept
 {
 	RenderRayTracingScene& rayTracingScene = m_renderScene->GetRayTracingScene();
-	rayTracingScene.BeginGraphBuild();
-	auto frameGraph = std::make_unique<FrameGraph>(&m_deviceServices.GetRenderHardwareInterface(), &m_window);
+	auto frameGraph = std::make_unique<FrameGraph>(m_deviceServices.GetRenderHardwareInterface(), m_window);
 	FrameGraphBuilder builder(*frameGraph, m_renderPassRuntimeCache);
 	m_frameResources = CreateRenderFrameGraphResources(builder, settings);
 

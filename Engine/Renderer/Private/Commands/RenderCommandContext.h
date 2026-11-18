@@ -94,8 +94,6 @@ public:
 	void BeginDiagnosticScope(std::string_view label, RhiDiagnosticLabelColor color = {}) noexcept;
 	void EndDiagnosticScope() noexcept;
 	void InsertDiagnosticMarker(std::string_view label, RhiDiagnosticLabelColor color = {}) noexcept;
-	std::uint16_t AcquireGpuDiagnosticScopeDepth() noexcept;
-	void ReleaseGpuDiagnosticScopeDepth() noexcept;
 
 	void CopyResource(RhiResourceHandle destinationResource, RhiResourceHandle sourceResource) noexcept;
 
@@ -103,15 +101,14 @@ public:
 	void TransitionResource(RhiResourceHandle resource, ResourceState before, ResourceState after) noexcept;
 	void UnorderedAccessBarrier(RhiResourceHandle resource) noexcept;
 
-	RenderCommandList& GetRenderCommandList() const noexcept { return *m_commandList; }
+	RenderCommandList& GetRenderCommandList() const noexcept { return m_commandList; }
 
 private:
 	void EmitDrawMarker() noexcept;
 	void EmitDispatchMarker(std::uint32_t groupCountX, std::uint32_t groupCountY, std::uint32_t groupCountZ) noexcept;
 
-	RenderCommandList* m_commandList = nullptr;
+	RenderCommandList& m_commandList;
 	bool m_bDrawDispatchDiagnosticsEnabled = false;
 	std::uint32_t m_drawCount = 0;
 	std::uint32_t m_dispatchCount = 0;
-	std::uint16_t m_gpuDiagnosticScopeDepth = 0;
 };

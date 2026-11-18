@@ -7,16 +7,14 @@
 
 #include "Assets/Cooked/LoadedSceneManifest.h"
 #include "Assets/Loaders/CookedAssetByteReader.h"
-#include "Assets/Loaders/CookedAssetLoaderDiagnostics.h"
+#include "Core/Public/Diagnostics/Error.h"
 #include "Assets/Loaders/SceneManifestValidator.h"
 #include <cstdint>
 
 namespace Assets
 {
-	LoadedSceneManifest SceneManifestLoader::Decode(const std::filesystem::path& path, std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget)
+	LoadedSceneManifest SceneManifestLoader::Decode(std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget)
 	{
-		const CookedAssetLoaderDiagnostics diagnostics(path, "CookedSceneManifest");
-
 		CookedAssetByteReader reader(bytes, budget);
 		LoadedSceneManifest manifest;
 		manifest.header = reader.Read<CookedSceneManifestHeader>();
@@ -37,7 +35,7 @@ namespace Assets
 
 		if (reader.GetRemainingByteCount() != 0)
 		{
-			throw diagnostics.MakeError("payload", "no trailing bytes after declared scene manifest records", "Cooked scene manifest contains unexpected trailing bytes");
+			throw Diagnostics::Error("Cooked scene manifest contains unexpected trailing bytes");
 		}
 
 		return manifest;

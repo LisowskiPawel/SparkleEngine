@@ -28,8 +28,6 @@ namespace ECS
 		bool Destroy(EntityId entity);
 		bool IsAlive(EntityId entity) const noexcept;
 
-		std::size_t GetLiveCount() const noexcept { return m_liveCount; }
-
 		std::uint64_t GetStructureVersion() const noexcept { return m_structureVersion; }
 
 		bool IsStructureFrozen() const noexcept { return m_bStructureFrozen; }
@@ -78,7 +76,6 @@ namespace ECS
 		std::vector<EntitySlot> m_slots;
 		std::vector<EntityId::Slot> m_freeSlots;
 		WorldComponentStores m_components;
-		std::size_t m_liveCount = 0;
 		std::uint64_t m_structureVersion = 0;
 		bool m_bStructureFrozen = false;
 	};

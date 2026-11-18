@@ -100,7 +100,7 @@ SortIncludes:
 IncludeBlocks: Preserve
 SortUsingDeclarations: Never
 ReflowComments: IndentOnly
-# Prevent additions. Existing namespace-end comments require the migration check.
+# Prevent additions. Review existing namespace-end comments with the code.
 FixNamespaceComments: false
 MaxEmptyLinesToKeep: 1
 KeepEmptyLinesAtTheStartOfBlocks: false

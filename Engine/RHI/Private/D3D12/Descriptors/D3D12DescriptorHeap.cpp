@@ -1,6 +1,8 @@
 #include "PCH.h"
 #include "D3D12/Descriptors/D3D12DescriptorHeap.h"
 
+#include <format>
+
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_descriptorHeapLogger, "RHI.D3D12.Descriptors");
 
 static constexpr UINT kRenderTargetDescriptorHeapSize = 4096;
@@ -26,7 +28,11 @@ D3D12DescriptorHandle D3D12DescriptorHeap::GetHandleAt(UINT index) const
 {
 	if (index >= m_desc.NumDescriptors)
 	{
-		Diagnostics::Fatal(g_descriptorHeapLogger, __FILE__, __LINE__, "Index out of range");
+		Diagnostics::Fatal(
+		    g_descriptorHeapLogger,
+		    __FILE__,
+		    __LINE__,
+		    std::format("D3D12 descriptor index {} exceeds heap capacity {} (type {}).", index, m_desc.NumDescriptors, static_cast<unsigned>(m_desc.Type)));
 	}
 
 	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = {0};

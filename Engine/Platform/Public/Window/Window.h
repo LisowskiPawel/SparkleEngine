@@ -107,7 +107,6 @@ private:
 
 	HINSTANCE m_hInstance = nullptr;
 	HWND m_hWnd = nullptr;
-	ATOM m_windowClassAtom = 0;
 
 	WINDOWPLACEMENT m_windowedPlacement{sizeof(WINDOWPLACEMENT)};
 	std::atomic<uint32_t> m_clientWidth{0};

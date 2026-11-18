@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Diagnostics/FrameExecutionDiagnostics.h"
+#include "Diagnostics/ScopedGpuScope.h"
 
 #include "FrameGraph/FrameGraphPassKind.h"
 
@@ -10,7 +10,7 @@
 class PassExecutionDiagnostics final
 {
 public:
-	PassExecutionDiagnostics(FrameExecutionDiagnostics& frameDiagnostics, RenderCommandContext& commands, std::string_view passScopeLabel, EFrameGraphPassKind passKind) noexcept;
+	PassExecutionDiagnostics(RenderCommandContext& commands, std::string_view passScopeLabel, EFrameGraphPassKind passKind) noexcept;
 
 	ScopedGpuScope BeginPassGpuScope() noexcept;
 	ScopedGpuScope BeginGpuScope(std::string_view label) noexcept;
@@ -19,8 +19,8 @@ private:
 	static RhiDiagnosticLabelColor GetPassEventColor(EFrameGraphPassKind passKind) noexcept;
 	std::string FormatEventScopeLabel(std::string_view label) const;
 
-	FrameExecutionDiagnostics* m_frameDiagnostics = nullptr;
-	RenderCommandContext* m_commands = nullptr;
-	std::string m_passScopeLabel;
+	RenderCommandContext& m_commands;
+	// The compiled plan owns the label until recording has joined.
+	std::string_view m_passScopeLabel;
 	RhiDiagnosticLabelColor m_passColor = {};
 };

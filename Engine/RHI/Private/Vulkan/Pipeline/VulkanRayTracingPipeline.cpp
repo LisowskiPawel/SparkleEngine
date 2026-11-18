@@ -4,7 +4,6 @@
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
-#include "Validation/RhiContract.h"
 #include "Vulkan/Device/VulkanRhi.h"
 #include "Vulkan/Diagnostics/VulkanDebugNames.h"
 #include "Vulkan/Pipeline/VulkanPipelineLayoutBuilder.h"
@@ -16,7 +15,6 @@ VulkanRayTracingPipeline::VulkanRayTracingPipeline(VulkanRhi& rhi, const RayTrac
     RayTracingPipeline(desc),
     m_device(rhi.GetDevice())
 {
-	RhiContract::ValidateRayTracingPipelineDesc(desc);
 	const RhiRayTracingCapabilities capabilities = rhi.GetRayTracingCapabilities();
 	const bool bTracingPipelineTracingPipelines = !capabilities.bSupportsRayTracingPipeline || rhi.GetCreateRayTracingPipelines() == nullptr;
 	const bool bUnsupportedTracingPipelineInBytes = bTracingPipelineTracingPipelines || (desc.MaxPayloadSizeInBytes > capabilities.MaxRayPayloadSizeInBytes);

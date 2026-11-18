@@ -8,7 +8,6 @@
 #include <cstdint>
 #include <span>
 
-class FrameExecutionDiagnostics;
 class FrameGraph;
 class RhiCommandSubmissionService;
 class TaskExecutor;
@@ -22,12 +21,7 @@ struct RecordingChunkResult final
 class FrameGraphRecordingExecutor final
 {
 public:
-	FrameGraphRecordingExecutor(
-	    const FrameGraph& frameGraph,
-	    const FrameGraphPlan& plan,
-	    RhiCommandSubmissionService& submissionService,
-	    TaskExecutor& taskExecutor,
-	    FrameExecutionDiagnostics& frameDiagnostics) noexcept;
+	FrameGraphRecordingExecutor(const FrameGraph& frameGraph, const FrameGraphPlan& plan, RhiCommandSubmissionService& submissionService, TaskExecutor& taskExecutor) noexcept;
 
 	bool RecordBatch(const FrameGraphSubmissionBatch& batch, RhiCommandRecordingLease initializationLease = {});
 	std::span<RhiCommandRecordingLease> Aggregate();

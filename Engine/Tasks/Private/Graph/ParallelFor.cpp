@@ -6,17 +6,6 @@
 #include <algorithm>
 #include <utility>
 
-static TaskName DerivedTaskName(const TaskName& base, std::string_view suffix)
-{
-	std::string value(base.Get());
-	if (value.size() + suffix.size() > TaskName::MaximumLength)
-	{
-		value.resize(TaskName::MaximumLength - suffix.size());
-	}
-	value += suffix;
-	return TaskName(value);
-}
-
 TaskNodeHandle ParallelFor(TaskGraphBuilder& graph, TaskDesc desc, std::uint32_t itemCount, ParallelForPolicy policy, ParallelForFunction function)
 {
 	if (policy.GrainSize == 0 || policy.MaximumPartitions == 0)
@@ -31,7 +20,7 @@ TaskNodeHandle ParallelFor(TaskGraphBuilder& graph, TaskDesc desc, std::uint32_t
 	}
 
 	TaskDesc groupDesc = desc;
-	groupDesc.Name = DerivedTaskName(desc.Name, ".Group");
+	groupDesc.Name = desc.Name + ".Group";
 	const TaskNodeHandle group = graph.Add(std::move(groupDesc), [](TaskExecutionContext&) { return TaskResult::Success(); });
 	if (!group)
 	{
@@ -49,7 +38,7 @@ TaskNodeHandle ParallelFor(TaskGraphBuilder& graph, TaskDesc desc, std::uint32_t
 		const std::uint32_t begin = static_cast<std::uint32_t>(static_cast<std::uint64_t>(itemCount) * partition / partitionCount);
 		const std::uint32_t end = static_cast<std::uint32_t>(static_cast<std::uint64_t>(itemCount) * (partition + 1u) / partitionCount);
 		TaskDesc partitionDesc = desc;
-		partitionDesc.Name = DerivedTaskName(desc.Name, ".Range" + std::to_string(partition));
+		partitionDesc.Name = desc.Name + ".Range" + std::to_string(partition);
 
 		auto partitionTask = [begin, end, function](TaskExecutionContext& context)
 		{

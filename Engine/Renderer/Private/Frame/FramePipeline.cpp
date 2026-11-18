@@ -1,7 +1,6 @@
 #include "PCH.h"
 #include "Frame/FramePipeline.h"
 
-#include "Diagnostics/FrameExecutionDiagnostics.h"
 #include "Diagnostics/MeshDiagnosticsCollector.h"
 #include "UI/UiFrameRenderer.h"
 #include "Frame/RenderFrame.h"
@@ -72,22 +71,8 @@ FramePipeline::FramePipeline(
 	m_viewportCaptureService = std::make_unique<ViewportCaptureService>(m_deviceServices);
 	m_windowExtent = {static_cast<std::uint32_t>(m_window.GetWidth()), static_cast<std::uint32_t>(m_window.GetHeight())};
 
-	InitializeFrameStorage();
-	InitializeFrameGraph(ResolveFrameGraphSettings());
-}
-
-void FramePipeline::InitializeFrameStorage()
-{
-	const std::uint32_t maximumFramesInFlight = m_deviceServices.GetRenderHardwareInterface().GetCapabilities().Presentation.MaximumFramesInFlight;
-
-	m_frameExecutionDiagnostics.resize(maximumFramesInFlight);
 	InitializeRenderFrames();
-
-	RenderDiagnostics& backendDiagnostics = m_deviceServices.GetRenderHardwareInterface().GetDiagnostics();
-	for (std::unique_ptr<FrameExecutionDiagnostics>& frameDiagnostics : m_frameExecutionDiagnostics)
-	{
-		frameDiagnostics = std::make_unique<FrameExecutionDiagnostics>(backendDiagnostics);
-	}
+	InitializeFrameGraph(ResolveFrameGraphSettings());
 }
 
 void FramePipeline::InitializeRenderFrames()
@@ -206,8 +191,6 @@ void FramePipeline::BeginBackendFrame() noexcept
 	m_uiFrameRenderer->BeginFrame();
 
 	m_memoryMonitor.Tick(m_frameId);
-	FrameExecutionDiagnostics& frameDiagnostics = GetCurrentFrameDiagnostics();
-	frameDiagnostics.ResolveTimings();
 }
 
 void FramePipeline::PrepareFrame(const RenderViewInput& viewInput, const RenderFrameTime& time)

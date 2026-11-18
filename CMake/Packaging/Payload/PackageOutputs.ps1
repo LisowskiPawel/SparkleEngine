@@ -25,40 +25,12 @@ function Get-PackageShaderExport
         @{ Source = $product.FullName.Substring($RepositoryRoot.Length + 1).Replace('\','/')
             Size = $product.Length; Sha256 = $export.($binding[1]) }
     })
-    return @{ Path = $file.FullName.Substring($RepositoryRoot.Length + 1).Replace('\','/')
-        Size = $file.Length; Sha256 = (Get-FileHash -LiteralPath $file.FullName).Hash.ToLowerInvariant()
-        CompilerSha256 = $export.shaderCompilerExecutableSha256; CookedFiles = $cookedFiles }
+    return @{ CompilerSha256 = $export.shaderCompilerExecutableSha256; CookedFiles = $cookedFiles }
 }
 
-function Update-PackageSbom
+function Assert-PackageOutputs
 {
-    param([string] $RepositoryRoot, [string] $TransactionRoot, $Inputs)
-    $entry = @($Inputs.Files | Where-Object { $_.Path -ceq 'manifests/sparkle-sbom.spdx.json' })
-    if ($entry.Count -ne 1) { throw 'Missing/duplicate reviewed SBOM.' }
-    $sbom = Get-Content -LiteralPath (Join-Path $RepositoryRoot $entry[0].Source) -Raw -Encoding UTF8 | ConvertFrom-Json
-    $files = @{}
-    foreach ($file in $Inputs.Files) { $files[$file.Path] = $file }
-    foreach ($file in $sbom.files)
-    {
-        if (!$file.fileName.StartsWith('./')) { throw 'SPDX file names must be package relative.' }
-        $path = $file.fileName.Substring(2)
-        if (!$files.ContainsKey($path)) { throw 'SBOM contains an unadmitted output.' }
-        $checksums = @($file.checksums | Where-Object { $_.algorithm -ceq 'SHA256' })
-        if ($checksums.Count -ne 1) { throw 'SBOM output has no unique SHA-256 checksum.' }
-        $checksums[0].checksumValue = $files[$path].Sha256
-    }
-    $metadata = Join-Path $TransactionRoot 'metadata'
-    [void] (New-Item -ItemType Directory -Path $metadata)
-    $path = Join-Path $metadata 'sparkle-sbom.spdx.json'
-    $sbom | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $path -Encoding UTF8
-    $entry[0].Source = $path.Substring($RepositoryRoot.Length + 1).Replace('\','/')
-    $entry[0].Size = (Get-Item -LiteralPath $path).Length
-    $entry[0].Sha256 = (Get-FileHash -LiteralPath $path).Hash.ToLowerInvariant()
-}
-
-function Freeze-PackageOutputs
-{
-    param([string] $RepositoryRoot, [string] $TransactionRoot, $Products, $Inputs)
+    param([string] $RepositoryRoot, $Products, $Inputs)
     $prepared = @(Get-PreparedProductInputs $RepositoryRoot $Products)
     $shader = Get-PackageShaderExport $RepositoryRoot $Inputs.ShaderExport
     $compiler = @($prepared | Where-Object { $_.Component -ceq 'ShaderCompiler' })
@@ -67,32 +39,8 @@ function Freeze-PackageOutputs
         throw 'Shader export belongs to a different compiler executable.'
     }
 
-    $qualified = @{}
-    foreach ($product in $prepared) { $qualified[$product.Binary.Source] = $product.Binary }
-    foreach ($file in $shader.CookedFiles) { $qualified[$file.Source] = $file }
     foreach ($file in $Inputs.Files)
     {
-        Assert-ArtifactPath $file.Source
-        $path = [IO.Path]::GetFullPath((Join-Path $RepositoryRoot $file.Source))
-        $cooked = $file.Path.StartsWith('artifacts/dev/Projects/Showcase/Cooked/', [StringComparison]::Ordinal) -and $file.Role -ceq 'EngineContent' -and
-            $file.Source.StartsWith('artifacts/dev/Projects/Showcase/Cooked/', [StringComparison]::Ordinal)
-        if ($qualified.ContainsKey($file.Source))
-        {
-            $identity = $qualified[$file.Source]
-            [void] (Assert-ArtifactFile $RepositoryRoot $file.Source $identity.Size $identity.Sha256)
-            $file.Size = $identity.Size
-            $file.Sha256 = $identity.Sha256
-        }
-        elseif ($cooked)
-        {
-            # Freeze prepared build/cook outputs once. External inputs stay pinned.
-            $output = Get-LocalArtifactFile $path ([long]::MaxValue)
-            $file.Size = $output.Length
-            $file.Sha256 = (Get-FileHash -LiteralPath $output.FullName).Hash.ToLowerInvariant()
-        }
-        else { [void] (Assert-ArtifactFile $RepositoryRoot $file.Source $file.Size $file.Sha256) }
+        [void] (Assert-ArtifactFile $RepositoryRoot $file.Source $file.Size $file.Sha256)
     }
-
-    Update-PackageSbom $RepositoryRoot $TransactionRoot $Inputs
-    return @{ Products = $prepared; ShaderExport = $shader }
 }

@@ -91,14 +91,9 @@ void InputSystem::State::CancelPointerInput()
 
 void InputSystem::State::CancelLayer(InputLayer layer)
 {
-	InputState* state = FindLayerState(layer);
-	if (state == nullptr)
-	{
-		return;
-	}
-
-	InputState canceled = std::move(*state);
-	*state = InputState{};
+	InputState& state = GetRoutedState(layer);
+	InputState canceled = std::move(state);
+	state = InputState{};
 	Dispatcher.CancelLayerEvents(layer);
 	if (MouseCaptureLayer == layer)
 	{

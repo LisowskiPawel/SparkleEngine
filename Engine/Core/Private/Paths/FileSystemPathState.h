@@ -20,13 +20,9 @@ namespace Filesystem
 		std::filesystem::path sceneAssetRegistryPath;
 		std::filesystem::path projectPath;
 		std::filesystem::path enginePath;
-		std::filesystem::path workingDirectory;
-		std::filesystem::path executableDirectory;
 	};
 
 	FileSystemPathState& GetFileSystemPathState();
-	void RebuildProjectPaths(FileSystemPathState& state);
 	void DiscoverFileSystemPathRoots(FileSystemPathState& state);
 	void RebuildCookedAssetPaths(FileSystemPathState& state);
-	void ValidateConfiguredPaths(const FileSystemPathState& state);
 }

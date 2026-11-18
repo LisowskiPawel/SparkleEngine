@@ -191,8 +191,6 @@ void LevelSession::ActivateLoadedLevel(LevelAsset& level, Assets::SceneLoadPacka
 	NotifyLevelUnloading(previousName, loadedName);
 	m_gameWorld->FinalizeSceneLoadCommit();
 	m_activeLevel = &level;
-	SPDLOG_LOGGER_INFO(g_levelSessionLogger, "Activated level '{}'.", loadedName);
-	g_levelSessionLogger->flush();
 	NotifyLevelChanged(previousName, loadedName);
 	m_bLevelChangeInProgress = false;
 	m_lastLoadDiagnostic.clear();
@@ -218,11 +216,6 @@ void LevelSession::CompleteLevelChange() noexcept
 		RejectLevelLoad(level, std::move(completion->Diagnostic));
 		return;
 	}
-	if (!completion->Package)
-	{
-		Diagnostics::Fatal(g_levelSessionLogger, __FILE__, __LINE__, "Ready scene-load completion has no package.");
-	}
-
 	const Assets::SceneLoadPackage& package = *completion->Package;
 	const bool bStaleOwners = package.WorldGeneration != m_gameWorld->GetGeneration() || package.DocumentGeneration != m_documentGeneration;
 	if (bStaleOwners || package.CatalogGeneration != m_loadExecutor->GetCatalogGeneration())

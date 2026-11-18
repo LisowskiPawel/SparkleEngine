@@ -54,12 +54,6 @@ endif()
 include("${CMAKE_CURRENT_LIST_DIR}/DependencySetup.cmake" NO_POLICY_SCOPE)
 include("${CMAKE_CURRENT_LIST_DIR}/DependencyCache.cmake")
 
-if(SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
-    message(STATUS "Third-party dependencies: checking cache (set SPARKLE_VERBOSE_DEPENDENCIES=ON for details)")
-else()
-    message(STATUS "Source dependency sync: checking ${SPARKLE_SYNC_SOURCE_DEPENDENCY}")
-endif()
-
 # Source-only acquisition skips LFS media and tolerates machines without git-lfs.
 # Restore the caller's environment after every recipe, including selective sync.
 foreach(_variable IN ITEMS GIT_LFS_SKIP_SMUDGE GIT_CONFIG_PARAMETERS)
@@ -83,4 +77,3 @@ foreach(_variable IN ITEMS GIT_LFS_SKIP_SMUDGE GIT_CONFIG_PARAMETERS)
         unset(ENV{${_variable}})
     endif()
 endforeach()
-message(STATUS "Third-party dependencies: ready")

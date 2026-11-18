@@ -8,7 +8,6 @@
 #include "D3D12/Resources/D3D12ResourceService.h"
 #include "D3D12/Resources/D3D12UploadBuffer.h"
 #include "RayTracing/RhiRayTracingShaderTablePacking.h"
-#include "Validation/RhiContract.h"
 
 #include <cstring>
 #include <limits>
@@ -36,10 +35,9 @@ std::vector<std::byte> D3D12RayTracingShaderTable::CollectShaderIdentifiers(cons
 }
 
 D3D12RayTracingShaderTable::D3D12RayTracingShaderTable(D3D12Rhi& rhi, D3D12ResourceService& resourceService, const RayTracingShaderTableDesc& desc) :
-    RayTracingShaderTable(desc.Generation, desc.Pipeline != nullptr ? desc.Pipeline->GetGeneration() : 0),
+    RayTracingShaderTable(desc),
     m_resourceService(&resourceService)
 {
-	RhiContract::ValidateRayTracingShaderTableDesc(desc);
 	const auto* pipeline = dynamic_cast<const D3D12RayTracingPipeline*>(desc.Pipeline);
 	if (pipeline == nullptr)
 	{

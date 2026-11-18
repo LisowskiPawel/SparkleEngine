@@ -9,7 +9,7 @@
 
 namespace Threading
 {
-	// Diagnostic metadata only; this does not grant ownership or synchronize memory.
+	// Sets the native thread name used by debuggers and profilers.
 	SPARKLE_CORE_API void SetCurrentThreadRole(std::string_view role) noexcept;
 
 	class SPARKLE_CORE_API OwnerThread final

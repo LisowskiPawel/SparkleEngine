@@ -1,6 +1,5 @@
 #pragma once
 
-#include "RHI/Public/Shaders/ShaderBytecode.h"
 #include "Compiler/Output/ShaderDebugArtifactSet.h"
 #include "Compiler/Output/ShaderReflection.h"
 
@@ -8,13 +7,10 @@
 #include <vector>
 
 // Compiled product from one backend invocation.
-// ShaderBytecode stays under RHI public because runtime readers return it.
 class CompiledShader final
 {
 public:
 	explicit CompiledShader(std::vector<std::uint8_t>&& bytecode);
-
-	ShaderBytecode GetBytecode() const noexcept { return {m_bytecode.data(), m_bytecode.size()}; }
 
 	std::vector<std::uint8_t> TakeBytecode() noexcept;
 	ShaderReflection TakeReflection() noexcept;

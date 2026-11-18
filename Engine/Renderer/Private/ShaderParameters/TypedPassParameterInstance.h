@@ -2,7 +2,6 @@
 
 #include "ShaderParameterStructBuilder.h"
 
-#include <string>
 #include <vector>
 
 template <typename TParameters> class TypedPassParameterInstance final
@@ -12,10 +11,12 @@ public:
 	using Metadata = ShaderParameterStructMetadata<TParameters>;
 
 	explicit TypedPassParameterInstance(const Metadata& metadata) :
-	    m_metadata(&metadata),
+	    m_metadata(metadata),
 	    m_parameterSet(metadata.GetLayout(), metadata.GetGraphResourceParameters())
 	{
 	}
+
+	TypedPassParameterInstance(const Metadata&& metadata) = delete;
 
 	TypedPassParameterInstance(const TypedPassParameterInstance&) = delete;
 	TypedPassParameterInstance& operator=(const TypedPassParameterInstance&) = delete;
@@ -50,17 +51,12 @@ public:
 	{
 		if (!m_bIsDirty)
 		{
-			return m_missingBindings.empty() && m_parameterSet.HasAllRequiredBindings();
+			return m_bBindingsValid;
 		}
 
+		m_bBindingsValid = m_metadata.Commit(m_fields, m_parameterSet, m_bindingStorage);
 		m_bIsDirty = false;
-		return m_metadata->Commit(m_fields, m_parameterSet, m_bindingStorage, &m_missingBindings);
-	}
-
-	const std::vector<std::string>& GetMissingBindings() const
-	{
-		Sync();
-		return m_missingBindings;
+		return m_bBindingsValid;
 	}
 
 	const PassParameterSet& GetPassParameterSet() const
@@ -70,10 +66,10 @@ public:
 	}
 
 private:
-	const Metadata* m_metadata = nullptr;
+	const Metadata& m_metadata;
 	TParameters m_fields = {};
 	mutable bool m_bIsDirty = true;
-	mutable std::vector<std::string> m_missingBindings;
+	mutable bool m_bBindingsValid = false;
 	mutable PassParameterSet m_parameterSet;
 	mutable std::vector<std::vector<std::byte>> m_bindingStorage;
 };

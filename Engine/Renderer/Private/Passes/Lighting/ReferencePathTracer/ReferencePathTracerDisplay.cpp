@@ -22,12 +22,6 @@ void AddReferencePathTracerDisplayPass(
 	parameters->CommittedM2 = builder.CreateUAV(graphResources.CommittedM2);
 	parameters->SceneColor = builder.CreateUAV(resources.Transient.Scene.SceneColor);
 
-	parameters->SessionSeed = work.SessionSeed;
-	parameters->ReplicateId = work.ReplicateId;
-	parameters->SampleOrdinal = work.SampleOrdinal;
-	parameters->FinitePathDiagnosticSurfaceVertices = work.FinitePathDiagnosticSurfaceVertices;
-	parameters->FirstRow = work.FirstRow;
-	parameters->RowCount = work.RowCount;
 	parameters->PriorSampleCount = work.PriorSampleCount;
 	parameters->WorkFlags = work.WorkFlags;
 

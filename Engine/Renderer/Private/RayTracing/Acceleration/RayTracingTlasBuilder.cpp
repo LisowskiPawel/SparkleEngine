@@ -9,7 +9,7 @@
 #include "Core/Public/Math/MathUtils.h"
 #include "Meshes/GpuMesh.h"
 #include "Debug/RendererCVars.h"
-#include "RayTracing/Diagnostics/RayTracingPerformanceDiagnostics.h"
+#include "Diagnostics/PassExecutionDiagnostics.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 #include "RHI/Public/RayTracing/RhiRayTracingTransformPacking.h"
 #include "Scene/Preparation/PreparedRenderScene.h"
@@ -105,7 +105,7 @@ std::uint32_t RayTracingTlasBuilder::Build(
     const PreparedRenderScene& preparedScene,
     RayTracingBlasCache& blasCache,
     const RayTracingShaderTablePlan& shaderTablePlan,
-    RayTracingPerformanceDiagnostics* diagnostics) noexcept
+    PassExecutionDiagnostics* diagnostics) noexcept
 {
 	const auto& instances = preparedScene.rayTracingInstances;
 	BuildState state;
@@ -125,7 +125,7 @@ void RayTracingTlasBuilder::CollectInstances(
     const PreparedRenderScene& preparedScene,
     RayTracingBlasCache& blasCache,
     const RayTracingShaderTablePlan& shaderTablePlan,
-    RayTracingPerformanceDiagnostics* diagnostics,
+    PassExecutionDiagnostics* diagnostics,
     BuildState& state) noexcept
 {
 	const auto& instances = preparedScene.rayTracingInstances;
@@ -202,7 +202,7 @@ void RayTracingTlasBuilder::PrepareBuild(BuildState& state) noexcept
 	state.EventName = bCanRefit ? "TLAS Refit" : "TLAS Build";
 }
 
-void RayTracingTlasBuilder::RecordBuild(RenderCommandContext& commandContext, const BuildState& state, RayTracingPerformanceDiagnostics* diagnostics) const noexcept
+void RayTracingTlasBuilder::RecordBuild(RenderCommandContext& commandContext, const BuildState& state, PassExecutionDiagnostics* diagnostics) const noexcept
 {
 	for (void* resourceValue : state.BuiltBlasResources)
 	{

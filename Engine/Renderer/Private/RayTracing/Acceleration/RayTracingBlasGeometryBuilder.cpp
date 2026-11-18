@@ -55,30 +55,11 @@ void ComputeRayTracingSkinnedPositions(const PreparedRenderScene& preparedScene,
 	outPositions.reserve(vertices.size());
 	for (std::size_t vertexIndex = 0; vertexIndex < vertices.size(); ++vertexIndex)
 	{
-		for (std::uint32_t influenceIndex = 0u; influenceIndex < 8u; ++influenceIndex)
-		{
-			if (skinInfluences[vertexIndex].jointWeights[influenceIndex] <= 0.0f)
-			{
-				continue;
-			}
-
-			const std::uint32_t jointMatrixIndex = draw.Skinning.JointMatrixOffset + skinInfluences[vertexIndex].jointIndices[influenceIndex];
-			if (jointMatrixIndex >= preparedScene.jointMatrices.size())
-			{
-				Diagnostics::Fatal(g_rayTracingBlasGeometryBuilderLogger, __FILE__, __LINE__, "Skinned BLAS vertex references a joint matrix outside the render scene.");
-			}
-		}
-
 		outPositions.push_back(TransformSkinnedPosition(
 		    ApplyMorphPosition(vertices[vertexIndex].Position, vertexIndex, preparedScene, draw, mesh),
 		    skinInfluences[vertexIndex],
 		    draw.Skinning.JointMatrixOffset,
 		    preparedScene.jointMatrices));
-	}
-
-	if (outPositions.empty())
-	{
-		Diagnostics::Fatal(g_rayTracingBlasGeometryBuilderLogger, __FILE__, __LINE__, "Skinned BLAS input contains no vertices.");
 	}
 }
 
@@ -100,7 +81,11 @@ static DirectX::XMFLOAT3 TransformSkinnedPosition(
 			continue;
 		}
 
-		const std::uint32_t jointMatrixIndex = jointMatrixOffset + influence.jointIndices[influenceIndex];
+		const std::size_t jointMatrixIndex = static_cast<std::size_t>(jointMatrixOffset) + influence.jointIndices[influenceIndex];
+		if (jointMatrixIndex >= jointMatrices.size())
+		{
+			Diagnostics::Fatal(g_rayTracingBlasGeometryBuilderLogger, __FILE__, __LINE__, "Skinned BLAS vertex references a joint matrix outside the render scene.");
+		}
 		const DirectX::XMMATRIX skinningMatrix = DirectX::XMLoadFloat4x4(&jointMatrices[jointMatrixIndex]);
 		skinnedPosition = DirectX::XMVectorAdd(skinnedPosition, DirectX::XMVectorScale(DirectX::XMVector3Transform(sourcePosition, skinningMatrix), weight));
 		totalWeight += weight;

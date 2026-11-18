@@ -5,7 +5,6 @@
 #include "Commands/RenderCommandContext.h"
 #include "Meshes/GpuMeshCache.h"
 #include "RayTracing/Acceleration/RayTracingBlasCache.h"
-#include "RayTracing/Diagnostics/RayTracingPerformanceDiagnostics.h"
 #include "RayTracing/Acceleration/RayTracingAccelerationStrategy.h"
 #include "RayTracing/Acceleration/RayTracingPtlasPartitionPlanner.h"
 #include "RayTracing/RayTracingCapabilityReport.h"
@@ -30,11 +29,6 @@ static RayTracingExecutionFrontend SelectExecutionFrontend(const RayTracingCapab
 RenderRayTracingScene::RenderRayTracingScene(RenderHardwareInterface& renderHardwareInterface, const GpuMeshCache& meshes, const RayTracingCapabilityReport& capabilityReport) noexcept :
     m_executionFrontend(SelectExecutionFrontend(capabilityReport))
 {
-	m_performanceMetrics.Providers.TlasProvider = capabilityReport.TlasProvider.SelectedProvider;
-	m_performanceMetrics.Providers.TlasProviderReason = capabilityReport.TlasProvider.SelectionReason;
-	m_performanceMetrics.Providers.PtlasProvider = capabilityReport.Ptlas.Provider;
-	m_performanceMetrics.Providers.bSupportsPtlas = capabilityReport.Ptlas.bSupported;
-	m_performanceMetrics.Providers.PtlasCapabilityReason = capabilityReport.Ptlas.CapabilityStatusReason;
 	if (!capabilityReport.bSupportsAccelerationStructure)
 	{
 		return;
@@ -45,14 +39,6 @@ RenderRayTracingScene::RenderRayTracingScene(RenderHardwareInterface& renderHard
 }
 
 RenderRayTracingScene::~RenderRayTracingScene() noexcept = default;
-
-void RenderRayTracingScene::BeginGraphBuild() noexcept
-{
-	if (m_executionFrontend == RayTracingExecutionFrontend::Pipeline)
-	{
-		m_shaderTablePlan.BeginMaterializationSet();
-	}
-}
 
 std::uint64_t RenderRayTracingScene::GetGraphGeneration() const noexcept
 {
@@ -74,8 +60,6 @@ void RenderRayTracingScene::Build(
     const RayTracingPtlasPartitionPlan& viewPlan,
     PassExecutionDiagnostics* diagnostics) noexcept
 {
-	RayTracingPerformanceDiagnostics performanceDiagnostics{diagnostics};
-
 	if (m_blasCache == nullptr || m_accelerationStrategy == nullptr)
 	{
 		Diagnostics::Fatal(g_renderRayTracingSceneLogger, __FILE__, __LINE__, "Ray-tracing scene build has no BLAS cache or top-level strategy.");
@@ -83,16 +67,9 @@ void RenderRayTracingScene::Build(
 
 	m_blasCache->BeginFrame();
 
-	const RayTracingTlasBuildResult topLevelBuild = m_accelerationStrategy->Build(commandContext, preparedScene, *m_blasCache, m_shaderTablePlan, viewPlan, &performanceDiagnostics);
+	m_accelerationStrategy->Build(commandContext, preparedScene, *m_blasCache, m_shaderTablePlan, viewPlan, diagnostics);
 
-	const RayTracingBlasCache::BuildStats blasStats = m_blasCache->EndFrame();
-
-	m_performanceMetrics.Providers.TlasProvider = topLevelBuild.ActiveProvider;
-	m_performanceMetrics.Providers.TlasProviderReason = topLevelBuild.ActiveProviderReason;
-	m_performanceMetrics.Blas.ReferencedMeshCount = blasStats.referencedMeshCount;
-	m_performanceMetrics.Blas.BuiltCount = blasStats.builtBlasCount;
-	m_performanceMetrics.Blas.ReusedCount = blasStats.reusedBlasCount;
-	m_performanceMetrics.TopLevelInstanceCount = topLevelBuild.InstanceCount;
+	m_blasCache->EndFrame();
 }
 
 void RenderRayTracingScene::Clear() noexcept

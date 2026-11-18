@@ -23,20 +23,16 @@ RenderRayTracingFrameBindings RayTracingTlasStrategy::Prepare(const PreparedRend
 	return frameBindings;
 }
 
-RayTracingTlasBuildResult RayTracingTlasStrategy::Build(
+void RayTracingTlasStrategy::Build(
     RenderCommandContext& commandContext,
     const PreparedRenderScene& preparedScene,
     RayTracingBlasCache& blasCache,
     const RayTracingShaderTablePlan& shaderTablePlan,
     const RayTracingPtlasPartitionPlan& viewPlan,
-    RayTracingPerformanceDiagnostics* diagnostics) noexcept
+    PassExecutionDiagnostics* diagnostics) noexcept
 {
 	(void) viewPlan;
-	RayTracingTlasBuildResult result{};
-	result.ActiveProvider = ERhiRayTracingTlasProvider::Tlas;
-	result.ActiveProviderReason = "TLAS-strategy-selected";
-	result.InstanceCount = m_tlasBuilder.Build(commandContext, preparedScene, blasCache, shaderTablePlan, diagnostics);
-	return result;
+	m_tlasBuilder.Build(commandContext, preparedScene, blasCache, shaderTablePlan, diagnostics);
 }
 
 void RayTracingTlasStrategy::Clear() noexcept

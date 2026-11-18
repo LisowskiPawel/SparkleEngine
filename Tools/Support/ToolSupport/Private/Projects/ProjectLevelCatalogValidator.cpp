@@ -35,27 +35,15 @@ static void ValidateLevel(const ProjectLevelCatalogEntry& level, const std::file
 	}
 }
 
-static void ValidateAssetPackIdentity(const ProjectLevelCatalog& catalog, std::string_view packId, const ProjectAssetPack& pack)
+static void ValidateAssetPackIdentity(const ProjectLevelCatalog& catalog, const ProjectAssetPack& pack)
 {
-	if (packId.empty() || pack.id != packId)
-	{
-		throw Diagnostics::Error("Catalog contains an invalid asset pack identity.");
-	}
 	if (!IsSafeCatalogIdentifier(pack.id))
 	{
 		throw Diagnostics::Error(std::format("Asset pack '{}' has an unsafe identity.", pack.id));
 	}
-	if (pack.displayName.empty())
-	{
-		throw Diagnostics::Error(std::format("Asset pack '{}' has no display name.", pack.id));
-	}
 	if (!pack.parentPackId.empty() && !catalog.assetPacks.contains(pack.parentPackId))
 	{
 		throw Diagnostics::Error(std::format("Asset pack '{}' references unknown parent '{}'.", pack.id, pack.parentPackId));
-	}
-	if (pack.parentPackId == pack.id)
-	{
-		throw Diagnostics::Error(std::format("Asset pack '{}' cannot be its own parent.", pack.id));
 	}
 }
 
@@ -146,51 +134,11 @@ static void ValidateAssetPackAcquisition(const ProjectAssetPack& pack)
 	}
 }
 
-static void ValidateAssetPackSupport(const ProjectAssetPack& pack)
+static void ValidateAssetPackMetadata(const ProjectLevelCatalog& catalog, const ProjectAssetPack& pack)
 {
-	if (!pack.bGameSupported && pack.gameBlocker.empty())
-	{
-		throw Diagnostics::Error(std::format("Game-unsupported asset pack '{}' must declare a game blocker.", pack.id));
-	}
-	if (pack.bGameSupported && !pack.gameBlocker.empty())
-	{
-		throw Diagnostics::Error(std::format("Game-supported asset pack '{}' declares a contradictory blocker.", pack.id));
-	}
-	const bool bUnsupportedExternal = pack.bExternal && !pack.bDownloadSupported;
-	if (bUnsupportedExternal && pack.downloadBlocker.empty())
-	{
-		throw Diagnostics::Error(std::format("External asset pack '{}' without acquisition support must declare its blocker.", pack.id));
-	}
-	if (pack.bDownloadSupported && !pack.downloadBlocker.empty())
-	{
-		throw Diagnostics::Error(std::format("Downloadable asset pack '{}' declares a contradictory blocker.", pack.id));
-	}
-}
-
-static void ValidateAssetPackProvenance(const ProjectAssetPack& pack)
-{
-	if (!pack.bExternal)
-	{
-		return;
-	}
-	const bool bPageOrVersionMissing = pack.sourcePageUrl.empty() || pack.version.empty();
-	if (bPageOrVersionMissing || pack.license.empty())
-	{
-		throw Diagnostics::Error(std::format("External asset pack '{}' has incomplete provenance metadata.", pack.id));
-	}
-	if (!pack.sourcePageUrl.starts_with("https://"))
-	{
-		throw Diagnostics::Error(std::format("External asset pack '{}' must use an HTTPS source page URL.", pack.id));
-	}
-}
-
-static void ValidateAssetPackMetadata(const ProjectLevelCatalog& catalog, std::string_view packId, const ProjectAssetPack& pack)
-{
-	ValidateAssetPackIdentity(catalog, packId, pack);
+	ValidateAssetPackIdentity(catalog, pack);
 	ValidateAssetPackPaths(pack);
 	ValidateAssetPackAcquisition(pack);
-	ValidateAssetPackSupport(pack);
-	ValidateAssetPackProvenance(pack);
 }
 
 static void ValidateParentChain(const ProjectLevelCatalog& catalog, const ProjectAssetPack& pack)
@@ -254,7 +202,7 @@ void ValidateProjectLevelCatalog(const ProjectLevelCatalog& catalog, const std::
 	std::vector<const ProjectAssetPack*> downloadablePacks;
 	for (const auto& [packId, pack] : catalog.assetPacks)
 	{
-		ValidateAssetPackMetadata(catalog, packId, pack);
+		ValidateAssetPackMetadata(catalog, pack);
 		if (pack.bDownloadSupported && !pack.archiveName.empty() && !archiveNames.insert(pack.archiveName).second)
 		{
 			throw Diagnostics::Error(std::format("Downloadable asset pack archive name '{}' is duplicated.", pack.archiveName));

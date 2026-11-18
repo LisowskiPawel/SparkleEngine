@@ -18,11 +18,11 @@ namespace Assets
 		for (std::size_t index = 0; index < state->Assets.size(); ++index)
 		{
 			const TaskNodeHandle read = graph.Add(
-			    TaskDesc{TaskName(std::format("Read scene asset {}", index)), TaskLane::BlockingIo},
+			    TaskDesc{std::string(std::format("Read scene asset {}", index)), TaskLane::BlockingIo},
 			    [state, index](TaskExecutionContext& context) { return state->ReadAsset(index, context); });
 
 			const TaskNodeHandle decode = graph.Add(
-			    TaskDesc{TaskName(std::format("Decode scene asset {}", index)), TaskLane::Background},
+			    TaskDesc{std::string(std::format("Decode scene asset {}", index)), TaskLane::Background},
 			    [state, index](TaskExecutionContext& context) { return state->DecodeAsset(index, context); });
 
 			graph.DependsOn(decode, read);
@@ -44,9 +44,9 @@ namespace Assets
 		    TaskGraphLimits{.MaximumTasks = static_cast<std::uint32_t>(assetCount * 2u + 2u), .MaximumEdges = static_cast<std::uint32_t>(assetCount * 2u + throttlingEdgeCount + 1u)});
 		const auto decodedNodes = AddAssetTasks(graph, state);
 
-		const TaskNodeHandle decoded = graph.WhenAll(TaskDesc{TaskName("Join decoded scene assets"), TaskLane::Background}, decodedNodes);
+		const TaskNodeHandle decoded = graph.WhenAll(TaskDesc{"Join decoded scene assets", TaskLane::Background}, decodedNodes);
 
-		graph.ContinueWith(decoded, TaskDesc{TaskName("Finalize scene load package"), TaskLane::Background}, [state](TaskExecutionContext& context) { return state->FinalizePackage(context); });
+		graph.ContinueWith(decoded, TaskDesc{"Finalize scene load package", TaskLane::Background}, [state](TaskExecutionContext& context) { return state->FinalizePackage(context); });
 
 		return graph.Compile();
 	}

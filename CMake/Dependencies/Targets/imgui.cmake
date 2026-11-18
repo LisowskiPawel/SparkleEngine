@@ -1,11 +1,9 @@
 sparkle_declare_git_dependency(imgui
     https://github.com/ocornut/imgui.git
     6d910d5487d11ca567b61c7824b0c78c569d62f0)
-sparkle_log_dependency_step("Dear ImGui" "v1.92.5" "~7 MB" "Immediate-mode UI core and Win32 platform backend" "https://github.com/ocornut/imgui.git")
 FetchContent_Populate(imgui)
 
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
-    sparkle_log_dependency_ready("imgui" "${imgui_SOURCE_DIR}" "~7 MB")
     return()
 endif()
 
@@ -44,4 +42,3 @@ if(MSVC)
 endif()
 
 set_target_properties(imgui PROPERTIES FOLDER "ThirdParty")
-sparkle_log_dependency_ready("imgui" "${imgui_SOURCE_DIR}" "~7 MB")

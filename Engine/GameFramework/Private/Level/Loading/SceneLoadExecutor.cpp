@@ -115,10 +115,6 @@ namespace Assets
 			completion.Package = std::move(m_control->Shared->Package);
 		}
 
-		if (!m_control->Scope)
-		{
-			Diagnostics::Fatal(g_sceneLoadExecutorLogger, __FILE__, __LINE__, "Settled scene-load execution has no owning task scope.");
-		}
 		m_control->Scope->JoinFor(std::chrono::milliseconds::zero());
 		m_control->Execution = {};
 		m_control->Scope.reset();

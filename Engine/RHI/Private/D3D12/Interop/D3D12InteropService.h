@@ -14,5 +14,5 @@ public:
 	NativeTextureViewInfo GetNativeTextureViewInfo(RhiResourceViewHandle view, RhiResourceHandle resource, ResourceState state, const RhiNativeInteropRequest& request) const noexcept override;
 
 private:
-	D3D12RenderHardwareInterface* m_owner = nullptr;
+	D3D12RenderHardwareInterface& m_owner;
 };

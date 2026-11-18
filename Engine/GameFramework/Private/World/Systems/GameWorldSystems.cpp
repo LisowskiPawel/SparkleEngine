@@ -35,7 +35,7 @@ namespace ECS
 	{
 		return ParallelFor(
 		    tasks,
-		    TaskDesc{TaskName(name), TaskLane::FrameCritical},
+		    TaskDesc{std::string(name), TaskLane::FrameCritical},
 		    count,
 		    policy,
 		    [execute](std::uint32_t begin, std::uint32_t end, TaskExecutionContext& context)
@@ -73,7 +73,7 @@ namespace ECS
 		TaskGraphBuilder tasks;
 
 		const auto camera = tasks.Add(
-		    TaskDesc{TaskName("Game.CameraMovement"), TaskLane::FrameCritical},
+		    TaskDesc{"Game.CameraMovement", TaskLane::FrameCritical},
 		    [](TaskExecutionContext& context)
 		    {
 			    return ExecuteSystemTask(
@@ -119,11 +119,11 @@ namespace ECS
 		    [](GameWorldSystemExecution& systems, std::uint32_t begin, std::uint32_t end) { return systems.m_animation.RunSkinning(begin, end); });
 
 		const auto morphCommit = tasks.Add(
-		    TaskDesc{TaskName("Game.MorphOutputCommit"), TaskLane::FrameCritical},
+		    TaskDesc{"Game.MorphOutputCommit", TaskLane::FrameCritical},
 		    [](TaskExecutionContext& context) { return ExecuteSystemTask(context, [](GameWorldSystemExecution& systems) { return systems.m_animation.CommitMorphOutputs(); }); });
 
 		const auto transformPreparation = tasks.Add(
-		    TaskDesc{TaskName("Game.PrepareTransforms"), TaskLane::FrameCritical},
+		    TaskDesc{"Game.PrepareTransforms", TaskLane::FrameCritical},
 		    [](TaskExecutionContext& context)
 		    {
 			    return ExecuteSystemTask(
@@ -181,7 +181,7 @@ namespace ECS
 		    [](GameWorldSystemExecution& systems, std::uint32_t begin, std::uint32_t end) { return systems.m_extraction.Run(begin, end); });
 
 		const auto commit = tasks.Add(
-		    TaskDesc{TaskName("Game.ExtractionCommit"), TaskLane::FrameCritical},
+		    TaskDesc{"Game.ExtractionCommit", TaskLane::FrameCritical},
 		    [](TaskExecutionContext& context)
 		    {
 			    return ExecuteSystemTask(

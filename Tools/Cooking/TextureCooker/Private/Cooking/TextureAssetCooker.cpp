@@ -8,8 +8,6 @@
 
 void CookTextureAsset(const TextureCookRequest& request, TextureCookMemoryLimiter& memoryLimiter, TextureCookMemoryLimiter& sourceMemory)
 {
-	ValidateTextureCookRequest(request);
-
 	auto sourceLease = sourceMemory.Acquire(2 * MaximumTextureSourceBytes);
 	TextureSource source = LoadTextureSource(request, memoryLimiter);
 	auto cookedTexture = ProcessTexture(request, std::move(source.Images));

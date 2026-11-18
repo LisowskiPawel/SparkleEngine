@@ -20,7 +20,7 @@ public:
 	{
 	}
 
-	template <typename TOperation> bool Start(TaskName taskName, std::string_view activeMessage, TOperation operation, std::string& errorMessage)
+	template <typename TOperation> bool Start(std::string taskName, std::string_view activeMessage, TOperation operation, std::string& errorMessage)
 	{
 		if (m_execution.IsValid())
 		{

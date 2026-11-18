@@ -97,7 +97,7 @@ namespace SparkleLauncher
 			TaskGraphBuilder graph;
 
 			const TaskNodeHandle execute = graph.Add(
-			    TaskDesc{TaskName("Launcher operation"), TaskLane::BlockingIo},
+			    TaskDesc{"Launcher operation", TaskLane::BlockingIo},
 			    [request = std::move(request), processRunnerFactory = m_implementation->m_processRunnerFactory, outputCallback = std::move(outputCallback), record](TaskExecutionContext& context)
 			    {
 				    try
@@ -126,7 +126,7 @@ namespace SparkleLauncher
 			// Cleanup runs even when cancellation prevents the operation body from starting.
 			graph.ContinueWith(
 			    execute,
-			    TaskDesc{TaskName("Complete Launcher operation"), TaskLane::BlockingIo, TaskCompletionPolicy::Cleanup},
+			    TaskDesc{"Complete Launcher operation", TaskLane::BlockingIo, TaskCompletionPolicy::Cleanup},
 			    [record, completionCallback, implementation = m_implementation.get()](TaskExecutionContext& context)
 			    {
 				    if (record->Status == OperationStatus::Pending)
@@ -175,7 +175,7 @@ namespace SparkleLauncher
 	{
 		const auto execution = m_implementation->m_executor.Launch(
 		    m_implementation->m_rootScope,
-		    TaskDesc{TaskName("Read GPU crash session"), TaskLane::BlockingIo},
+		    TaskDesc{"Read GPU crash session", TaskLane::BlockingIo},
 		    [incident = std::move(incident), completion = std::move(completion)](TaskExecutionContext&)
 		    {
 			    std::string state = ReadGpuCrashCollectionState(incident);

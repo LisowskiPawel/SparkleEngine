@@ -39,10 +39,7 @@ GpuCrashIncidentSink::GpuCrashIncidentSink(ApplicationTaskRuntime& runtime, cons
 		m_inputs = std::make_unique<GpuCrashInputs>(startup, api);
 		WriteManifest("Preparing");
 
-		m_dispatch = runtime.GetExecutor().PrepareDispatch(
-		    m_scope,
-		    TaskDesc{TaskName("Write GPU crash artifacts"), TaskLane::BlockingIo},
-		    [this](TaskExecutionContext& context) { return Drain(context); });
+		m_dispatch = runtime.GetExecutor().PrepareDispatch(m_scope, TaskDesc{"Write GPU crash artifacts", TaskLane::BlockingIo}, [this](TaskExecutionContext& context) { return Drain(context); });
 	}
 	catch (...)
 	{

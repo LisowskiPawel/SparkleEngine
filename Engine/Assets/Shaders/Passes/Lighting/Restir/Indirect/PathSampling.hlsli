@@ -10,8 +10,6 @@
 
 namespace PathSampling
 {
-	static const uint SpecularSampleModeStochasticGGX = 1u;
-
 	struct RandomSamples
 	{
 		float Lobe;
@@ -38,19 +36,8 @@ namespace PathSampling
 		return totalWeight > 0.0f ? saturate(diffuseWeight / totalWeight) : 0.5f;
 	}
 
-	PathSample::DirectionSample InvalidSample()
+	PathSample::DirectionSample SampleBSDF(RayTracingPathSurface surface, RandomSamples randomSamples, bool bEvaluateDiffuse, bool bEvaluateSpecular)
 	{
-		PathSample::DirectionSample result = (PathSample::DirectionSample)0;
-		return result;
-	}
-
-	PathSample::DirectionSample SampleBSDF(RayTracingPathSurface surface, uint specularSampleMode, RandomSamples randomSamples, bool bEvaluateDiffuse, bool bEvaluateSpecular)
-	{
-		if (!surface.bValid)
-		{
-			return InvalidSample();
-		}
-
 		const float3 f0 = SurfaceLighting::BuildF0(surface.BaseColor, surface.Metallic, surface.DielectricF0);
 		const float diffuseMass = DiffuseLobeProbability(surface, f0);
 		PathBsdf::LobeMasses masses;
@@ -58,10 +45,6 @@ namespace PathSampling
 		masses.Specular = 1.0f - diffuseMass;
 		masses.Count = (masses.Diffuse > 0.0f ? 1u : 0u) + (masses.Specular > 0.0f ? 1u : 0u);
 		masses.bSpecularDelta = surface.Roughness == 0.0f;
-		if (specularSampleMode != SpecularSampleModeStochasticGGX && !masses.bSpecularDelta)
-		{
-			return InvalidSample();
-		}
 
 		uint selectedLobe = PathSample::LobeSpecular;
 		if (randomSamples.Lobe < diffuseMass)

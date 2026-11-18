@@ -13,6 +13,3 @@
 #include <algorithm>
 
 #include <Windows.h>
-
-#include "Diagnostics/Logger.h"
-#include "Diagnostics/Verify.h"

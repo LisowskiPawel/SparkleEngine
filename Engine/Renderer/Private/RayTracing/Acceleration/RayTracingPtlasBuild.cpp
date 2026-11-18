@@ -8,7 +8,7 @@
 #include "Meshes/GpuMesh.h"
 #include "RayTracing/Acceleration/RayTracingBlasCache.h"
 #include "RayTracing/Acceleration/RayTracingPtlasPartitionPlanner.h"
-#include "RayTracing/Diagnostics/RayTracingPerformanceDiagnostics.h"
+#include "Diagnostics/PassExecutionDiagnostics.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 #include "RHI/Public/RayTracing/RhiRayTracingTransformPacking.h"
 #include "Scene/Preparation/PreparedRenderScene.h"
@@ -45,17 +45,14 @@ RhiPtlasInstanceFlags RayTracingPtlasStrategy::ResolveInstanceFlags(const Prepar
 	return flags;
 }
 
-RayTracingTlasBuildResult RayTracingPtlasStrategy::Build(
+void RayTracingPtlasStrategy::Build(
     RenderCommandContext& commandContext,
     const PreparedRenderScene& preparedScene,
     RayTracingBlasCache& blasCache,
     const RayTracingShaderTablePlan& shaderTablePlan,
     const RayTracingPtlasPartitionPlan& viewPlan,
-    RayTracingPerformanceDiagnostics* diagnostics) noexcept
+    PassExecutionDiagnostics* diagnostics) noexcept
 {
-	RayTracingTlasBuildResult result{};
-	result.ActiveProvider = ERhiRayTracingTlasProvider::Ptlas;
-	result.ActiveProviderReason = "PTLAS-selected";
 	const auto& instances = preparedScene.rayTracingInstances;
 
 	if (!m_ptlasResources.Storage || !m_ptlasResources.Scratch)
@@ -66,12 +63,9 @@ RayTracingTlasBuildResult RayTracingPtlasStrategy::Build(
 	PtlasBuildState state;
 	state.InstanceWrites.reserve(instances.size());
 	CollectPtlasInstances(commandContext, preparedScene, viewPlan, blasCache, shaderTablePlan, diagnostics, state);
-	const std::uint32_t nativeWriteCount = static_cast<std::uint32_t>(state.InstanceWrites.size());
-	result.InstanceCount = nativeWriteCount;
 	PreparePtlasOperationBuffer(state);
 
 	RecordPtlasBuild(commandContext, state, diagnostics);
-	return result;
 }
 
 void RayTracingPtlasStrategy::CollectPtlasInstances(
@@ -80,7 +74,7 @@ void RayTracingPtlasStrategy::CollectPtlasInstances(
     const RayTracingPtlasPartitionPlan& partitionPlan,
     RayTracingBlasCache& blasCache,
     const RayTracingShaderTablePlan& shaderTablePlan,
-    RayTracingPerformanceDiagnostics* diagnostics,
+    PassExecutionDiagnostics* diagnostics,
     PtlasBuildState& state) noexcept
 {
 	const auto& instances = preparedScene.rayTracingInstances;
@@ -156,7 +150,7 @@ void RayTracingPtlasStrategy::PreparePtlasOperationBuffer(PtlasBuildState& state
 	}
 }
 
-void RayTracingPtlasStrategy::RecordPtlasBuild(RenderCommandContext& commandContext, const PtlasBuildState& state, RayTracingPerformanceDiagnostics* diagnostics) const noexcept
+void RayTracingPtlasStrategy::RecordPtlasBuild(RenderCommandContext& commandContext, const PtlasBuildState& state, PassExecutionDiagnostics* diagnostics) const noexcept
 {
 	for (void* resourceValue : state.BuiltBlasResources)
 	{

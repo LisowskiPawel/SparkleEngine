@@ -36,9 +36,6 @@ try
     $manifest = Get-Content -LiteralPath (Join-Path $stage 'manifests/sparkle-package-manifest.json') -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($manifest.Revision -cne $revision.Trim()) { throw 'Product sync archive belongs to a different source revision.' }
     Test-PackageArchive $Archive $stage $manifest
-    # Extraction does not preserve Windows file attributes. Restore the declared
-    # immutable stage attributes before invoking the existing stage verifier.
-    foreach ($file in Get-ChildItem -LiteralPath $stage -Recurse -File -Force) { $file.IsReadOnly = $true }
     Test-PackageStage $stage $manifest
     Test-PackageMetadata $stage $manifest
     Test-PackageDependencyClosure $stage $manifest

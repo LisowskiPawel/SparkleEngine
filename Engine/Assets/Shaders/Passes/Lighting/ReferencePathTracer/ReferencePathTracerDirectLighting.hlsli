@@ -67,8 +67,7 @@ namespace ReferencePathTracer
 		}
 
 		const float lightProbability = light.LightSelectionPdf * (light.bDelta ? 1.0f : light.PdfW);
-		const bool bContinuesPath = FinitePathDiagnosticSurfaceVertices == 0u || surfaceDepth + 1u < FinitePathDiagnosticSurfaceVertices;
-		const float competingPdfW = bContinuesPath && selection.Kind != KindAnalytic ? bsdf.PdfW : 0.0f;
+		const float competingPdfW = selection.Kind != KindAnalytic ? bsdf.PdfW : 0.0f;
 		const float misWeight = light.bDelta ? 1.0f : PathTracer::PowerHeuristic(lightProbability, competingPdfW);
 		return (bsdf.Diffuse + bsdf.Specular) * light.IncidentRadiance * bsdf.Cosine * misWeight / lightProbability;
 	}

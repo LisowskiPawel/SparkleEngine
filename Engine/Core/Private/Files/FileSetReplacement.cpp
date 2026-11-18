@@ -57,12 +57,12 @@ namespace Files
 	static void RequirePublicationInputs(const FilePublication& file)
 	{
 		std::error_code error;
-		if (!std::filesystem::is_regular_file(file.StagedPath, error) || error)
+		if (!std::filesystem::is_regular_file(file.StagedPath, error))
 		{
 			throw Diagnostics::Error("Publication staging input is missing or is not a regular file.");
 		}
 		const bool bPublishedExists = std::filesystem::exists(file.PublishedPath, error);
-		if (error || (bPublishedExists && !std::filesystem::is_regular_file(file.PublishedPath, error)) || error)
+		if (error || (bPublishedExists && !std::filesystem::is_regular_file(file.PublishedPath, error)))
 		{
 			throw Diagnostics::Error("Publication destination is not a regular file.");
 		}

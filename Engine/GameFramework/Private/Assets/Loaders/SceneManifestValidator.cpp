@@ -31,54 +31,6 @@ namespace Assets
 		throw Diagnostics::Error(message);
 	}
 
-	static bool HasFeatureFlag(std::uint32_t flags, CookedSceneFeatureFlags feature) noexcept
-	{
-		return (flags & ToCookedSceneFeatureFlagMask(feature)) != 0u;
-	}
-
-	static void ValidateFeatures(const LoadedSceneManifest& manifest)
-	{
-		constexpr std::uint32_t knownFeatureFlags = ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::Cameras) | ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::Lights)
-		    | ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::Skeletons) | ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::Animations)
-		    | ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::SkinnedMeshes) | ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::MorphTargets)
-		    | ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::MaterialVariants) | ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::AuthoredMeshInstancing);
-
-		if ((manifest.header.featureFlags & ~knownFeatureFlags) != 0u)
-		{
-			Invalid(std::format("Cooked scene manifest uses unknown feature flag bits 0x{:08X}", manifest.header.featureFlags));
-		}
-
-		if (!manifest.cameras.empty() && !HasFeatureFlag(manifest.header.featureFlags, CookedSceneFeatureFlags::Cameras))
-		{
-			Invalid("Cooked scene manifest has camera records but is missing the Cameras feature flag");
-		}
-
-		if (!manifest.lights.empty() && !HasFeatureFlag(manifest.header.featureFlags, CookedSceneFeatureFlags::Lights))
-		{
-			Invalid("Cooked scene manifest has light records but is missing the Lights feature flag");
-		}
-
-		if (!manifest.skeletonRefs.empty() && !HasFeatureFlag(manifest.header.featureFlags, CookedSceneFeatureFlags::Skeletons))
-		{
-			Invalid("Cooked scene manifest has skeleton refs but is missing the Skeletons feature flag");
-		}
-
-		const bool bAnimationFeatureMissing = !manifest.animationReferences.empty() && !HasFeatureFlag(manifest.header.featureFlags, CookedSceneFeatureFlags::Animations);
-
-		if (bAnimationFeatureMissing)
-		{
-			Invalid("Cooked scene manifest has animation refs but is missing the Animations feature flag");
-		}
-
-		const bool bFeatureMissingVariantMappings = !manifest.materialVariants.empty() || !manifest.materialVariantMappings.empty();
-		const bool bMaterialVariantFeatureMissing = bFeatureMissingVariantMappings && (!HasFeatureFlag(manifest.header.featureFlags, CookedSceneFeatureFlags::MaterialVariants));
-
-		if (bMaterialVariantFeatureMissing)
-		{
-			Invalid("Cooked scene manifest has material variant records but is missing the MaterialVariants feature flag");
-		}
-	}
-
 	static void ValidateMeshReferences(const LoadedSceneManifest& manifest)
 	{
 		for (std::size_t meshReferenceIndex = 0; meshReferenceIndex < manifest.meshAssetReferences.size(); ++meshReferenceIndex)
@@ -350,7 +302,6 @@ namespace Assets
 
 	void SceneManifestValidator::ValidateRecords(const LoadedSceneManifest& manifest)
 	{
-		ValidateFeatures(manifest);
 		ValidateMeshReferences(manifest);
 		ValidateInstances(manifest);
 		ValidateInstanceGroups(manifest);

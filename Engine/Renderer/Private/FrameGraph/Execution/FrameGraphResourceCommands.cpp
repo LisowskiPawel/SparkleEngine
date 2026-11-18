@@ -67,15 +67,11 @@ void FrameGraphResourceCommands::BindRenderTargets(
 
 void FrameGraphResourceCommands::CopyTexture(RenderCommandContext& commandContext, FrameGraphTextureHandle destinationHandle, FrameGraphTextureHandle sourceHandle) const noexcept
 {
-	assert(destinationHandle.IsValid());
-	assert(sourceHandle.IsValid());
 	CopyResource(commandContext, destinationHandle.GetResourceHandle(), sourceHandle.GetResourceHandle());
 }
 
 void FrameGraphResourceCommands::CopyBuffer(RenderCommandContext& commandContext, FrameGraphBufferHandle destinationHandle, FrameGraphBufferHandle sourceHandle) const noexcept
 {
-	assert(destinationHandle.IsValid());
-	assert(sourceHandle.IsValid());
 	CopyResource(commandContext, destinationHandle.GetResourceHandle(), sourceHandle.GetResourceHandle());
 }
 
@@ -103,13 +99,7 @@ RhiResourceHandle FrameGraphResourceCommands::ResolveResource(FrameGraphTextureH
 
 NativeTextureViewInfo FrameGraphResourceCommands::ResolveNativeTextureView(FrameGraphTextureHandle handle, ResourceState state, const RhiNativeInteropRequest& request) const noexcept
 {
-	assert(handle.IsValid());
 	const FrameGraphResourceHandle resourceHandle = handle.GetResourceHandle();
-	if (m_frameGraph.m_renderHardwareInterface == nullptr)
-	{
-		return {};
-	}
-
 	const FrameGraphResourceMetadata& metadata = m_frameGraph.m_resourceRegistry.GetMetadata(resourceHandle);
 	const FrameGraphResourceAccess& access = m_frameGraph.m_resourceResolver.GetResolvedAccess(resourceHandle);
 	RhiResourceViewHandle view = {};
@@ -149,7 +139,7 @@ NativeTextureViewInfo FrameGraphResourceCommands::ResolveNativeTextureView(Frame
 		return {};
 	}
 
-	NativeTextureViewInfo nativeView = m_frameGraph.m_renderHardwareInterface->GetInteropService().GetNativeTextureViewInfo(view, m_frameGraph.ResolveResource(resourceHandle), state, request);
+	NativeTextureViewInfo nativeView = m_frameGraph.m_renderHardwareInterface.GetInteropService().GetNativeTextureViewInfo(view, m_frameGraph.ResolveResource(resourceHandle), state, request);
 	if (nativeView.Width == 0u || nativeView.Height == 0u)
 	{
 		nativeView.Width = metadata.textureDesc.width;
@@ -165,25 +155,21 @@ RhiGpuDescriptorHandle FrameGraphResourceCommands::ResolveShaderResourceView(Fra
 
 RhiGpuDescriptorHandle FrameGraphResourceCommands::ResolveShaderResourceView(FrameGraphBufferHandle handle) const noexcept
 {
-	assert(handle.IsValid());
 	return m_frameGraph.ResolveShaderResourceView(handle.GetResourceHandle());
 }
 
 RhiGpuDescriptorHandle FrameGraphResourceCommands::ResolveUnorderedAccessView(FrameGraphTextureHandle handle) const noexcept
 {
-	assert(handle.IsValid());
 	return ResolveUnorderedAccessView(handle.GetResourceHandle());
 }
 
 RhiGpuDescriptorHandle FrameGraphResourceCommands::ResolveUnorderedAccessView(FrameGraphBufferHandle handle) const noexcept
 {
-	assert(handle.IsValid());
 	return ResolveUnorderedAccessView(handle.GetResourceHandle());
 }
 
 RhiResourceHandle FrameGraphResourceCommands::ResolveAccelerationStructure(FrameGraphAccelerationStructureHandle handle) const noexcept
 {
-	assert(handle.IsValid());
 	return m_frameGraph.ResolveResource(handle.GetResourceHandle());
 }
 
@@ -194,7 +180,7 @@ void FrameGraphResourceCommands::BindGlobalDescriptorState(RenderCommandContext&
 
 RenderHardwareInterface& FrameGraphResourceCommands::GetRenderHardwareInterface() const noexcept
 {
-	return *m_frameGraph.m_renderHardwareInterface;
+	return m_frameGraph.m_renderHardwareInterface;
 }
 
 RhiCpuDescriptorHandle FrameGraphResourceCommands::ResolveRenderTargetView(FrameGraphResourceHandle handle) const noexcept
@@ -205,16 +191,11 @@ RhiCpuDescriptorHandle FrameGraphResourceCommands::ResolveRenderTargetView(Frame
 
 	if (metadata.kind == FrameGraphResourceKind::BackBuffer)
 	{
-		return m_frameGraph.m_renderHardwareInterface != nullptr ? m_frameGraph.m_renderHardwareInterface->GetPresentationService().GetBackBufferRenderTargetView() : RhiCpuDescriptorHandle{};
+		return m_frameGraph.m_renderHardwareInterface.GetPresentationService().GetBackBufferRenderTargetView();
 	}
 
 	assert(access.renderTargetView);
-	if (m_frameGraph.m_renderHardwareInterface == nullptr)
-	{
-		return {};
-	}
-
-	return m_frameGraph.m_renderHardwareInterface->GetDescriptorService().GetResourceViewCpuHandle(access.renderTargetView);
+	return m_frameGraph.m_renderHardwareInterface.GetDescriptorService().GetResourceViewCpuHandle(access.renderTargetView);
 }
 
 RhiCpuDescriptorHandle FrameGraphResourceCommands::ResolveDepthStencilView(FrameGraphResourceHandle handle) const noexcept
@@ -224,12 +205,7 @@ RhiCpuDescriptorHandle FrameGraphResourceCommands::ResolveDepthStencilView(Frame
 	assert(metadata.kind == FrameGraphResourceKind::DepthStencil);
 
 	assert(access.depthStencilView);
-	if (m_frameGraph.m_renderHardwareInterface == nullptr)
-	{
-		return {};
-	}
-
-	return m_frameGraph.m_renderHardwareInterface->GetDescriptorService().GetResourceViewCpuHandle(access.depthStencilView);
+	return m_frameGraph.m_renderHardwareInterface.GetDescriptorService().GetResourceViewCpuHandle(access.depthStencilView);
 }
 
 RhiGpuDescriptorHandle FrameGraphResourceCommands::ResolveUnorderedAccessView(FrameGraphResourceHandle handle) const noexcept
@@ -240,25 +216,14 @@ RhiGpuDescriptorHandle FrameGraphResourceCommands::ResolveUnorderedAccessView(Fr
 	assert(metadata.kind != FrameGraphResourceKind::DepthStencil);
 
 	assert(access.unorderedAccessView);
-	if (m_frameGraph.m_renderHardwareInterface == nullptr)
-	{
-		return {};
-	}
-
-	return m_frameGraph.m_renderHardwareInterface->GetDescriptorService().GetResourceViewGpuHandle(access.unorderedAccessView);
+	return m_frameGraph.m_renderHardwareInterface.GetDescriptorService().GetResourceViewGpuHandle(access.unorderedAccessView);
 }
 
 void FrameGraphResourceCommands::CopyResource(RenderCommandContext& commandContext, FrameGraphResourceHandle destinationHandle, FrameGraphResourceHandle sourceHandle) const noexcept
 {
-	assert(destinationHandle.IsValid());
-	assert(sourceHandle.IsValid());
-
 	const FrameGraphResourceMetadata& destinationMetadata = m_frameGraph.m_resourceRegistry.GetMetadata(destinationHandle);
 	const FrameGraphResourceMetadata& sourceMetadata = m_frameGraph.m_resourceRegistry.GetMetadata(sourceHandle);
 	assert(destinationMetadata.resourceClass == sourceMetadata.resourceClass);
-
-	assert(
-	    destinationMetadata.kind == sourceMetadata.kind || (destinationMetadata.resourceClass == FrameGraphResourceClass::Texture && sourceMetadata.resourceClass == FrameGraphResourceClass::Texture));
 
 	const RhiResourceHandle destinationResource = m_frameGraph.ResolveResource(destinationHandle);
 	const RhiResourceHandle sourceResource = m_frameGraph.ResolveResource(sourceHandle);

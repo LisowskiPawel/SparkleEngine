@@ -12,11 +12,9 @@
 sparkle_declare_git_dependency(spirv_reflect
     https://github.com/KhronosGroup/SPIRV-Reflect.git
     b4dc70d8e6ac30c719a2d05b8ad05e1d277c92b4)
-sparkle_log_dependency_step("SPIRV-Reflect" "vulkan-sdk-1.3.290.0" "~2 MB" "SPIR-V reflection for offline shader compiler backends" "https://github.com/KhronosGroup/SPIRV-Reflect.git")
 FetchContent_Populate(spirv_reflect)
 
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
-    sparkle_log_dependency_ready("SPIRV-Reflect" "${spirv_reflect_SOURCE_DIR}" "~2 MB")
     return()
 endif()
 
@@ -35,4 +33,3 @@ if(MSVC)
 endif()
 
 set_target_properties(spirv_reflect PROPERTIES FOLDER "ThirdParty")
-sparkle_log_dependency_ready("SPIRV-Reflect" "${spirv_reflect_SOURCE_DIR}" "~2 MB")

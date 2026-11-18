@@ -37,7 +37,6 @@ public:
 	void SetDiagnosticsProviders(EditorDiagnosticsProviders providers);
 	void SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler);
 	void SetShaderCompileStatus(bool bBusy, std::string_view message);
-	RendererMemoryDiagnosticsSnapshot CaptureMemoryDiagnostics() const;
 
 	void AppendConsoleOutput(ConsoleOutputRecord record, bool bShowConsole);
 
@@ -94,7 +93,6 @@ private:
 	LevelSession* m_levelSession = nullptr;
 	Window& m_window;
 	InputSystem& m_inputSystem;
-	std::function<RendererMemoryDiagnosticsSnapshot()> m_memoryDiagnosticsProvider;
 	std::unique_ptr<ImGuiRenderPacketBuilder> m_renderPacketBuilder;
 	UiRenderPacket m_renderPacket;
 	std::uint64_t m_viewportGeneration = 0;

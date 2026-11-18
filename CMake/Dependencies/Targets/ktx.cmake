@@ -2,7 +2,7 @@
 set(_ktx_source "${FETCHCONTENT_BASE_DIR}/ktx-src")
 if(NOT EXISTS "${_ktx_source}")
     execute_process(COMMAND "${GIT_EXECUTABLE}" clone --no-checkout --filter=blob:none --sparse
-        ${_sparkle_git_progress_args} https://github.com/KhronosGroup/KTX-Software.git "${_ktx_source}"
+        https://github.com/KhronosGroup/KTX-Software.git "${_ktx_source}"
         RESULT_VARIABLE _ktx_result)
     if(NOT _ktx_result EQUAL 0)
         message(FATAL_ERROR "KTX clone was interrupted or failed. Cache preserved at '${_ktx_source}'. Explicitly Clean KTX before retrying.")
@@ -29,7 +29,6 @@ sparkle_prepare_git_fetchcontent_source(ktx EXPECTED_REVISION "${SPARKLE_KTX_REV
 set(ktx_SOURCE_DIR "${_ktx_source}")
 set(ktx_BINARY_DIR "${CMAKE_BINARY_DIR}/_deps/ktx-build")
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
-    sparkle_log_dependency_ready("KTX-Software" "${ktx_SOURCE_DIR}" "sparse source checkout")
     return()
 endif()
 
@@ -71,5 +70,3 @@ if(TARGET ktx_read)
     set_property(TARGET ktx_read PROPERTY SPARKLE_SOURCE_PACKAGE
         "{\"name\":\"KTX-Software\",\"versionInfo\":\"4.3.2\",\"licenseDeclared\":\"Apache-2.0 AND BSD-1-Clause AND BSD-3-Clause AND LicenseRef-ETCSLA\",\"downloadLocation\":\"https://github.com/KhronosGroup/KTX-Software/tree/${SPARKLE_KTX_REVISION}\"}")
 endif()
-
-sparkle_log_dependency_ready("KTX-Software" "${ktx_SOURCE_DIR}" "sparse source checkout")

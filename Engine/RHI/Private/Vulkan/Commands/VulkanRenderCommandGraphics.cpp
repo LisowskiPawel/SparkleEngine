@@ -17,7 +17,7 @@ void VulkanRenderCommandList::SetPrimitiveTopology(RhiPrimitiveTopology) noexcep
 
 void VulkanRenderCommandList::BindVertexBuffer(const RhiVertexBufferView& view) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE || view.BufferLocation == 0)
+	if (view.BufferLocation == 0)
 	{
 		return;
 	}
@@ -34,7 +34,7 @@ void VulkanRenderCommandList::BindVertexBuffer(const RhiVertexBufferView& view) 
 
 void VulkanRenderCommandList::BindIndexBuffer(const RhiIndexBufferView& view) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE || view.BufferLocation == 0)
+	if (view.BufferLocation == 0)
 	{
 		return;
 	}
@@ -82,7 +82,7 @@ void VulkanRenderCommandList::SetRenderTargets(std::uint32_t renderTargetCount, 
 
 void VulkanRenderCommandList::ClearRenderTarget(RhiCpuDescriptorHandle renderTarget, RhiClearColorView color) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE || !m_bHasScissorRect)
+	if (!m_bHasScissorRect)
 	{
 		return;
 	}
@@ -134,7 +134,7 @@ void VulkanRenderCommandList::ClearRenderTarget(RhiCpuDescriptorHandle renderTar
 
 void VulkanRenderCommandList::ClearDepthStencil(RhiCpuDescriptorHandle depthStencil, float depth, std::uint8_t stencil) noexcept
 {
-	const bool bDepthClearUnavailableScissorRect = m_commandBuffer == VK_NULL_HANDLE || !m_bHasScissorRect;
+	const bool bDepthClearUnavailableScissorRect = !m_bHasScissorRect;
 	const bool bDepthClearUnavailable = bDepthClearUnavailableScissorRect || (VulkanDescriptorHandles::DecodeImageViewCpuHandle(depthStencil) != m_depthStencil);
 
 	if (bDepthClearUnavailable)
@@ -163,11 +163,6 @@ void VulkanRenderCommandList::EndRasterPass() noexcept
 
 void VulkanRenderCommandList::SetViewport(const RhiViewport& viewport) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE)
-	{
-		return;
-	}
-
 	const VkViewport
 	    nativeViewport{.x = viewport.X, .y = viewport.Y + viewport.Height, .width = viewport.Width, .height = -viewport.Height, .minDepth = viewport.MinDepth, .maxDepth = viewport.MaxDepth};
 
@@ -176,11 +171,6 @@ void VulkanRenderCommandList::SetViewport(const RhiViewport& viewport) noexcept
 
 void VulkanRenderCommandList::SetScissorRect(const RhiRect& rect) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE)
-	{
-		return;
-	}
-
 	const VkRect2D nativeRect{
 	    .offset = VkOffset2D{.x = rect.Left, .y = rect.Top},
 	    .extent = VkExtent2D{.width = static_cast<std::uint32_t>(rect.Right - rect.Left), .height = static_cast<std::uint32_t>(rect.Bottom - rect.Top)}};
@@ -197,11 +187,6 @@ void VulkanRenderCommandList::DrawIndexedInstanced(
     std::int32_t baseVertexLocation,
     std::uint32_t startInstanceLocation) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE)
-	{
-		return;
-	}
-
 	BeginDynamicRenderingIfNeeded();
 	if (!m_bDynamicRenderingActive)
 	{
@@ -214,11 +199,6 @@ void VulkanRenderCommandList::DrawIndexedInstanced(
 
 void VulkanRenderCommandList::DrawInstanced(std::uint32_t vertexCountPerInstance, std::uint32_t instanceCount, std::uint32_t startVertexLocation, std::uint32_t startInstanceLocation) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE)
-	{
-		return;
-	}
-
 	BeginDynamicRenderingIfNeeded();
 	if (!m_bDynamicRenderingActive)
 	{
@@ -231,11 +211,6 @@ void VulkanRenderCommandList::DrawInstanced(std::uint32_t vertexCountPerInstance
 
 void VulkanRenderCommandList::Dispatch(std::uint32_t groupCountX, std::uint32_t groupCountY, std::uint32_t groupCountZ) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE)
-	{
-		return;
-	}
-
 	EndDynamicRenderingIfNeeded();
 	FlushComputeDescriptorSets();
 	vkCmdDispatch(m_commandBuffer, groupCountX, groupCountY, groupCountZ);
@@ -243,7 +218,7 @@ void VulkanRenderCommandList::Dispatch(std::uint32_t groupCountX, std::uint32_t 
 
 void VulkanRenderCommandList::BeginDynamicRenderingIfNeeded() noexcept
 {
-	if (m_bDynamicRenderingActive || m_commandBuffer == VK_NULL_HANDLE || !m_bHasScissorRect || (m_renderTargetCount == 0 && m_depthStencil == VK_NULL_HANDLE))
+	if (m_bDynamicRenderingActive || !m_bHasScissorRect || (m_renderTargetCount == 0 && m_depthStencil == VK_NULL_HANDLE))
 	{
 		return;
 	}
@@ -318,7 +293,7 @@ VkImageAspectFlags VulkanRenderCommandList::ResolveDepthStencilAspectMask(VkImag
 
 void VulkanRenderCommandList::EndDynamicRenderingIfNeeded() noexcept
 {
-	if (m_commandBuffer != VK_NULL_HANDLE && m_bDynamicRenderingActive)
+	if (m_bDynamicRenderingActive)
 	{
 		vkCmdEndRendering(m_commandBuffer);
 		m_bDynamicRenderingActive = false;

@@ -50,7 +50,6 @@ enum class TaskGraphErrorCode : std::uint8_t
 {
 	None,
 	InvalidLimits,
-	InvalidTaskName,
 	InvalidTaskLane,
 	InvalidCompletionPolicy,
 	InvalidLaneDependency,
@@ -58,11 +57,7 @@ enum class TaskGraphErrorCode : std::uint8_t
 	TaskCapacityExceeded,
 	EdgeCapacityExceeded,
 	InvalidHandle,
-	ForeignHandle,
-	StaleHandle,
 	GenerationExhausted,
-	SelfDependency,
-	DuplicateDependency,
 	Cycle
 };
 
@@ -111,7 +106,7 @@ public:
 	TaskNodeHandle AddNested(TaskNodeHandle parent, TaskDesc desc, TaskFunction function);
 	bool DependsOn(TaskNodeHandle task, TaskNodeHandle prerequisite);
 	TaskNodeHandle WhenAll(TaskDesc desc, std::span<const TaskNodeHandle> prerequisites);
-	TaskNodeHandle WhenAll(TaskName name, std::span<const TaskNodeHandle> prerequisites);
+	TaskNodeHandle WhenAll(std::string name, std::span<const TaskNodeHandle> prerequisites);
 	TaskNodeHandle ContinueWith(TaskNodeHandle prerequisite, TaskDesc desc, TaskFunction function);
 
 	CompiledTaskGraph Compile() const;

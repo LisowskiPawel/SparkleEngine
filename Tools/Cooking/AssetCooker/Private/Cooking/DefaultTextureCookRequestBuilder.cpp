@@ -75,7 +75,7 @@ static constexpr std::array DefaultTextures = {
         DefaultTexture::Sky,
         TextureColorSpace::Linear,
         TextureColorProcessingPolicy::Linear,
-        TextureGroup::Default,
+        TextureGroup::HdrColor,
         TextureDimension::Texture2D},
 };
 

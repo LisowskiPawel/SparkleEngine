@@ -31,11 +31,6 @@ namespace ECS
 		const auto& meshes = m_registry.GetStorage<MeshInstance>();
 		const auto entities = meshes.GetEntities();
 		const auto components = meshes.GetComponents();
-		const bool bInvalidRange = begin > end || end > entities.size();
-		if (bInvalidRange || end > m_slots.size())
-		{
-			return false;
-		}
 		for (std::uint32_t index = begin; index < end; ++index)
 		{
 			ExtractMesh(entities[index], components[index], m_slots[index]);

@@ -19,7 +19,6 @@ struct PreviewBounds final
 {
 	MeshPreviewVertex Min;
 	MeshPreviewVertex Max;
-	bool bIsValid = false;
 };
 
 struct PreviewProjection final
@@ -34,11 +33,6 @@ struct PreviewProjection final
 static PreviewBounds ComputePreviewBounds(const MeshPreviewGeometry& geometry) noexcept
 {
 	PreviewBounds bounds;
-	if (geometry.Vertices.empty())
-	{
-		return bounds;
-	}
-
 	bounds.Min.X = bounds.Min.Y = bounds.Min.Z = (std::numeric_limits<float>::max)();
 	bounds.Max.X = bounds.Max.Y = bounds.Max.Z = (std::numeric_limits<float>::lowest)();
 	for (const MeshPreviewVertex& vertex : geometry.Vertices)
@@ -50,7 +44,6 @@ static PreviewBounds ComputePreviewBounds(const MeshPreviewGeometry& geometry) n
 		bounds.Max.Y = (std::max) (bounds.Max.Y, vertex.Y);
 		bounds.Max.Z = (std::max) (bounds.Max.Z, vertex.Z);
 	}
-	bounds.bIsValid = true;
 	return bounds;
 }
 
@@ -222,13 +215,13 @@ void MeshPreview::DrawGeometry(bool bGpuResident) const
 		return;
 	}
 
-	const PreviewBounds bounds = ComputePreviewBounds(m_geometry);
-	if (!bounds.bIsValid || canvasSize.x <= 1.0f || canvasSize.y <= 1.0f)
+	if (canvasSize.x <= 1.0f || canvasSize.y <= 1.0f)
 	{
 		ImGui::EndChild();
 		return;
 	}
 
+	const PreviewBounds bounds = ComputePreviewBounds(m_geometry);
 	const PreviewProjection projection = BuildProjection(m_geometry, bounds, canvasMin, canvasSize, m_yawRadians, m_pitchRadians);
 	const bool bDrawSolid = m_mode != MeshPreviewMode::Wireframe;
 	const bool bDrawWire = m_mode != MeshPreviewMode::Solid;

@@ -103,11 +103,7 @@ private:
 		m_features.features.shaderStorageImageReadWithoutFormat = status.bSupportsStorageImageReadWithoutFormat ? VK_TRUE : VK_FALSE;
 		m_features.features.shaderStorageImageWriteWithoutFormat = status.bSupportsStorageImageWriteWithoutFormat ? VK_TRUE : VK_FALSE;
 		status.bEnabledSamplerAnisotropy = m_features.features.samplerAnisotropy == VK_TRUE;
-		status.bEnabledFillModeNonSolid = m_features.features.fillModeNonSolid == VK_TRUE;
-		status.bEnabledShaderInt64 = m_features.features.shaderInt64 == VK_TRUE;
 		status.bEnabledShaderFloat64 = m_features.features.shaderFloat64 == VK_TRUE;
-		status.bEnabledStorageImageReadWithoutFormat = m_features.features.shaderStorageImageReadWithoutFormat == VK_TRUE;
-		status.bEnabledStorageImageWriteWithoutFormat = m_features.features.shaderStorageImageWriteWithoutFormat == VK_TRUE;
 	}
 
 	void EnableVulkan12Features(std::uint32_t apiVersion, VulkanFeatureStatus& status) noexcept
@@ -115,7 +111,6 @@ private:
 		if (apiVersion >= VK_API_VERSION_1_2)
 		{
 			m_features12.scalarBlockLayout = status.bSupportsScalarBlockLayout ? VK_TRUE : VK_FALSE;
-			status.bEnabledScalarBlockLayout = m_features12.scalarBlockLayout == VK_TRUE;
 			m_features12.hostQueryReset = status.bSupportsHostQueryReset ? VK_TRUE : VK_FALSE;
 			status.bEnabledHostQueryReset = m_features12.hostQueryReset == VK_TRUE;
 			m_features12.timelineSemaphore = status.bSupportsTimelineSemaphore ? VK_TRUE : VK_FALSE;
@@ -125,7 +120,6 @@ private:
 			m_next = &m_features12.pNext;
 			status.bNonUniformSampledImagesEnabled = m_features12.shaderSampledImageArrayNonUniformIndexing == VK_TRUE;
 			status.bEnabledPartiallyBoundDescriptorArrays = m_features12.descriptorBindingPartiallyBound == VK_TRUE;
-			status.bEnabledTimelineSemaphore = m_features12.timelineSemaphore == VK_TRUE;
 		}
 	}
 
@@ -138,10 +132,6 @@ private:
 			m_features13.shaderDemoteToHelperInvocation = status.bSupportsShaderDemoteToHelperInvocation ? VK_TRUE : VK_FALSE;
 			*m_next = &m_features13;
 			m_next = &m_features13.pNext;
-			status.bEnabledSynchronization2 = m_features13.synchronization2 == VK_TRUE;
-			status.bEnabledDynamicRendering = m_features13.dynamicRendering == VK_TRUE;
-
-			status.bEnabledShaderDemoteToHelperInvocation = m_features13.shaderDemoteToHelperInvocation == VK_TRUE;
 		}
 	}
 

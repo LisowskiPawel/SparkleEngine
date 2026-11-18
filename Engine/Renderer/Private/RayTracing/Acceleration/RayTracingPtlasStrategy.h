@@ -15,13 +15,13 @@ public:
 	~RayTracingPtlasStrategy() noexcept override;
 
 	RenderRayTracingFrameBindings Prepare(const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan) noexcept override;
-	RayTracingTlasBuildResult Build(
+	void Build(
 	    RenderCommandContext& commandContext,
 	    const PreparedRenderScene& preparedScene,
 	    RayTracingBlasCache& blasCache,
 	    const RayTracingShaderTablePlan& shaderTablePlan,
 	    const RayTracingPtlasPartitionPlan& viewPlan,
-	    RayTracingPerformanceDiagnostics* diagnostics) noexcept override;
+	    PassExecutionDiagnostics* diagnostics) noexcept override;
 	void Clear() noexcept override;
 
 private:
@@ -45,10 +45,10 @@ private:
 	    const RayTracingPtlasPartitionPlan& partitionPlan,
 	    RayTracingBlasCache& blasCache,
 	    const RayTracingShaderTablePlan& shaderTablePlan,
-	    RayTracingPerformanceDiagnostics* diagnostics,
+	    PassExecutionDiagnostics* diagnostics,
 	    PtlasBuildState& state) noexcept;
 	void PreparePtlasOperationBuffer(PtlasBuildState& state) noexcept;
-	void RecordPtlasBuild(RenderCommandContext& commandContext, const PtlasBuildState& state, RayTracingPerformanceDiagnostics* diagnostics) const noexcept;
+	void RecordPtlasBuild(RenderCommandContext& commandContext, const PtlasBuildState& state, PassExecutionDiagnostics* diagnostics) const noexcept;
 	void TrackBuildResources(RenderCommandContext& commandContext) const noexcept;
 	void ReleasePtlasResources() noexcept;
 

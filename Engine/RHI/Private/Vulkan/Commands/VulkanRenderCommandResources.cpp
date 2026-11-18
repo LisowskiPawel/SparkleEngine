@@ -13,7 +13,7 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanRenderCommandListLogger, "RHI.Vulkan.
 
 void VulkanRenderCommandList::CopyResource(RhiResourceHandle destinationResource, RhiResourceHandle sourceResource) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE || m_memoryAllocator == nullptr || !destinationResource || !sourceResource)
+	if (m_memoryAllocator == nullptr || !destinationResource || !sourceResource)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan CopyResource requires an active command buffer and two valid resources.");
 	}
@@ -64,7 +64,7 @@ void VulkanRenderCommandList::CopyResource(RhiResourceHandle destinationResource
 
 void VulkanRenderCommandList::AliasResource(RhiResourceHandle beforeResource, RhiResourceHandle afterResource) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE || !beforeResource || !afterResource)
+	if (!beforeResource || !afterResource)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan aliasing barriers require an active command buffer and two valid resources.");
 	}
@@ -96,7 +96,7 @@ void VulkanRenderCommandList::AliasResource(RhiResourceHandle beforeResource, Rh
 
 void VulkanRenderCommandList::TransitionResource(RhiResourceHandle resource, ResourceState before, ResourceState after) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE || !resource)
+	if (!resource)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan resource transitions require an active command buffer and a valid resource.");
 	}
@@ -228,7 +228,7 @@ void VulkanRenderCommandList::RecordImageTransition(
 
 void VulkanRenderCommandList::UnorderedAccessBarrier(RhiResourceHandle resource) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE || !resource)
+	if (!resource)
 	{
 		Diagnostics::Fatal(g_vulkanRenderCommandListLogger, __FILE__, __LINE__, "Vulkan unordered-access barriers require an active command buffer and a valid resource.");
 	}

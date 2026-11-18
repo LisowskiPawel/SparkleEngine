@@ -40,7 +40,6 @@ include("${CMAKE_CURRENT_LIST_DIR}/Build/Sanitizers.cmake")
 
 option(ENABLE_STRICT_WARNINGS "Enable strict compiler warnings and treat warnings as errors" OFF)
 if(ENABLE_STRICT_WARNINGS)
-    message(STATUS "Strict warnings enabled: adding compiler warning flags and Werror")
     if(MSVC)
         add_compile_options(/W4 /WX)
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")

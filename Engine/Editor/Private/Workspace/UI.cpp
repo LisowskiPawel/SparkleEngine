@@ -41,11 +41,6 @@ void UI::SetDiagnosticsProviders(EditorDiagnosticsProviders providers)
 	m_implementation->SetDiagnosticsProviders(std::move(providers));
 }
 
-RendererMemoryDiagnosticsSnapshot UI::CaptureMemoryDiagnostics() const
-{
-	return m_implementation->CaptureMemoryDiagnostics();
-}
-
 void UI::SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler)
 {
 	m_implementation->SetShaderCompileHandler(std::move(handler));

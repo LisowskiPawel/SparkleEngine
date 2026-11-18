@@ -9,7 +9,6 @@ sparkle_prepare_git_fetchcontent_source(nlohmann_json
     REQUIRED_PATHS CMakeLists.txt include/nlohmann/json.hpp include/nlohmann/json_fwd.hpp LICENSE.MIT)
 
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
-    sparkle_log_dependency_ready("nlohmann/json" "${nlohmann_json_SOURCE_DIR}" "header-only")
     return()
 endif()
 

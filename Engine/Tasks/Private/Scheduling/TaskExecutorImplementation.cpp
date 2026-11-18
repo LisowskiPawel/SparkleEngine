@@ -25,14 +25,13 @@ std::shared_ptr<TaskExecution::State> TaskExecutor::Implementation::Submit(const
 std::shared_ptr<TaskExecution::State> TaskExecutor::Implementation::Launch(const CompiledTaskGraph& graph, TaskExecutionContext context, TaskScope* scope)
 {
 	const std::shared_ptr<TaskScope::State> scopeState = scope != nullptr ? scope->m_state : nullptr;
-	const std::uint64_t generation = m_nextExecutionGeneration.fetch_add(1, std::memory_order_relaxed);
-	auto execution = CreateExecution(generation, scopeState);
+	auto execution = CreateExecution(scopeState);
 
-	if (!ValidateLaunchRequest(graph, context, scopeState, execution, generation))
+	if (!ValidateLaunchRequest(graph, context, scopeState, execution))
 	{
 		return execution;
 	}
-	const bool bAdmitted = AdmitExecution(scopeState, execution, generation);
+	const bool bAdmitted = AdmitExecution(scopeState, execution);
 	if (!bAdmitted)
 	{
 		return execution;

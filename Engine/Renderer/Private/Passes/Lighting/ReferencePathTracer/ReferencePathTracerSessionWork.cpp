@@ -37,7 +37,6 @@ void ReferencePathTracerSession::PrepareWork(RenderViewportExtent extent) noexce
 	    .SessionSeed = 0u,
 	    .ReplicateId = 0u,
 	    .SampleOrdinal = m_committedSamples,
-	    .FinitePathDiagnosticSurfaceVertices = 0u,
 	    .FirstRow = m_nextRow,
 	    .RowCount = (std::min) (WorkRowsPerDispatch, extent.Height - m_nextRow),
 	    .PriorSampleCount = m_committedSamples,

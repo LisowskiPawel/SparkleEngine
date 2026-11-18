@@ -137,10 +137,6 @@ namespace SparkleLauncher
 		}
 		std::ostringstream dryRun;
 		dryRun << "Dry-run plan for " << plan.Operation.DisplayName << ":";
-		if (!plan.Operation.LogPath.empty())
-		{
-			dryRun << "\n  Latest log: " << plan.Operation.LogPath.string();
-		}
 		if (plan.Operation.bRequiresConfirmation)
 		{
 			dryRun << "\n  Confirmation required for clean scope: " << ToString(plan.Request.RequestedCleanScope);
@@ -148,10 +144,6 @@ namespace SparkleLauncher
 		for (const MaintenanceOperationStep& step : plan.Steps)
 		{
 			dryRun << "\n  " << step.DisplayName << ": " << step.DisplayCommandLine;
-			if (!step.LogPath.empty())
-			{
-				dryRun << "\n    Log: " << step.LogPath.string();
-			}
 			if (step.bDestructive)
 			{
 				dryRun << "\n    Scope: " << step.DestructivePath.string();

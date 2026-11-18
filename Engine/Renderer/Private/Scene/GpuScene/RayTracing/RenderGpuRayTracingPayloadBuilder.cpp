@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <limits>
 #include <unordered_map>
-#include <unordered_set>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_renderGpuRayTracingPayloadBuilderLogger, "Renderer.RenderGpuRayTracingPayloadBuilder");
 
@@ -133,16 +132,8 @@ static void AppendMaterials(const PreparedRenderScene& preparedScene, RenderGpuR
 static void PrepareInstances(const PreparedRenderScene& preparedScene, RenderGpuRayTracingPayloads& payloads, MeshHitDataOffsets& meshOffsets)
 {
 	std::uint32_t instanceCapacity = 1;
-	std::unordered_set<std::uint32_t> occupiedGpuSceneSlots;
 	for (const RenderRayTracingInstance& input : preparedScene.rayTracingInstances)
 	{
-		const bool bGpuSceneSlotValid = input.GpuSceneSlot != (std::numeric_limits<std::uint32_t>::max)();
-		const bool bGpuSceneSlotUnique = bGpuSceneSlotValid && occupiedGpuSceneSlots.insert(input.GpuSceneSlot).second;
-
-		if (!bGpuSceneSlotUnique)
-		{
-			Diagnostics::Fatal(g_renderGpuRayTracingPayloadBuilderLogger, __FILE__, __LINE__, "Ray-tracing work contains an invalid or duplicate GPU-scene slot.");
-		}
 		instanceCapacity = std::max(instanceCapacity, input.GpuSceneSlot + 1u);
 	}
 

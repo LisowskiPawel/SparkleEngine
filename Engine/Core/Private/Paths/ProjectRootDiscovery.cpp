@@ -28,11 +28,6 @@ namespace Filesystem
 			executableStem.resize(executableStem.size() - std::string_view("Game").size());
 		}
 
-		if (executableStem.empty())
-		{
-			return {};
-		}
-
 		return executableStem;
 	}
 
@@ -45,18 +40,13 @@ namespace Filesystem
 		}
 
 		const std::filesystem::path projectsRoot = *workspaceRoot / "Projects";
-		std::error_code ec;
-		if (!std::filesystem::exists(projectsRoot, ec) || ec)
-		{
-			return std::nullopt;
-		}
-
 		const std::string executableStem = InferProjectNameFromExecutableStem(GetExecutableStem());
 		if (executableStem.empty())
 		{
 			return std::nullopt;
 		}
 
+		std::error_code ec;
 		for (const auto& entry : std::filesystem::directory_iterator(projectsRoot, ec))
 		{
 			if (ec)
@@ -64,14 +54,14 @@ namespace Filesystem
 				break;
 			}
 
-			if (!entry.is_directory(ec) || ec)
+			if (!entry.is_directory(ec))
 			{
 				ec.clear();
 				continue;
 			}
 
 			const std::filesystem::path& projectRoot = entry.path();
-			if (!std::filesystem::exists(projectRoot / Filesystem::kProjectMarker, ec) || ec)
+			if (!std::filesystem::exists(projectRoot / Filesystem::kProjectMarker, ec))
 			{
 				ec.clear();
 				continue;

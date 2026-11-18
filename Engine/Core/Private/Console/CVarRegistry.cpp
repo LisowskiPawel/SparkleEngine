@@ -24,7 +24,6 @@ void ConsoleVariableRegistry::Register(ConsoleVariableBase& variable) noexcept
 	if (!bInserted)
 	{
 		Diagnostics::Fatal(LogCoreConsole, __FILE__, __LINE__, "ConsoleVariableRegistry: Duplicate cvar registration for '" + std::string(variable.GetName()) + "'");
-		return;
 	}
 
 	(void) iterator;

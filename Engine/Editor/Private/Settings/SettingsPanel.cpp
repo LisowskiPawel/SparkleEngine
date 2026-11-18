@@ -50,10 +50,7 @@ void SettingsPanel::BuildUI(bool bDisableInteraction)
 
 	if (m_bRefreshFromRuntimeOnNextOpen)
 	{
-		if (m_renderingPanel != nullptr)
-		{
-			m_renderingPanel->RefreshFromRuntimeState();
-		}
+		m_renderingPanel->RefreshFromRuntimeState();
 		m_bRefreshFromRuntimeOnNextOpen = false;
 	}
 
@@ -68,10 +65,7 @@ void SettingsPanel::BuildUI(bool bDisableInteraction)
 	ImGui::BeginChild("##SettingsContent", ImVec2(0.0f, -restartBarHeight));
 	DrawToolbar(bDisableInteraction);
 	ImGui::Dummy(ImVec2(0.0f, 4.0f));
-	if (m_renderingPanel != nullptr)
-	{
-		m_renderingPanel->BuildUI(bDisableInteraction, m_filterText.c_str());
-	}
+	m_renderingPanel->BuildUI(bDisableInteraction, m_filterText.c_str());
 	ImGui::EndChild();
 
 	if (bShowRestartBar)

@@ -44,20 +44,11 @@ struct VulkanFeatureStatus final
 	bool bNonUniformSampledImages = false;
 	bool bSupportsPartiallyBoundDescriptorArrays = false;
 	bool bSupportsShaderDemoteToHelperInvocation = false;
-	bool bEnabledSynchronization2 = false;
-	bool bEnabledTimelineSemaphore = false;
-	bool bEnabledDynamicRendering = false;
 	bool bEnabledSamplerAnisotropy = false;
-	bool bEnabledFillModeNonSolid = false;
-	bool bEnabledShaderInt64 = false;
 	bool bEnabledShaderFloat64 = false;
-	bool bEnabledScalarBlockLayout = false;
 	bool bEnabledHostQueryReset = false;
-	bool bEnabledStorageImageReadWithoutFormat = false;
-	bool bEnabledStorageImageWriteWithoutFormat = false;
 	bool bNonUniformSampledImagesEnabled = false;
 	bool bEnabledPartiallyBoundDescriptorArrays = false;
-	bool bEnabledShaderDemoteToHelperInvocation = false;
 	VulkanRayTracingFeatureStatus RayTracing;
 };
 
@@ -125,7 +116,6 @@ private:
 	void BuildRayTracingCapabilities() noexcept;
 	void SelectRayTracingTlasProvider() noexcept;
 	void NameBootstrapObjects() noexcept;
-	void LogBootstrapSummary() noexcept;
 	void PushDiagnosticMessage(ERhiDiagnosticMessageSeverity severity, ERhiDiagnosticMessageCategory category, std::string text) noexcept;
 
 	static bool IsLayerAvailable(const char* layerName) noexcept;
@@ -133,7 +123,6 @@ private:
 	static VulkanAdapterInfo BuildAdapterInfo(const VkPhysicalDeviceProperties& properties);
 	static std::string FormatApiVersion(std::uint32_t version);
 	static std::string FormatDriverVersion(const VkPhysicalDeviceProperties& properties);
-	static std::string PhysicalDeviceTypeToString(VkPhysicalDeviceType type);
 	static VkBool32 VKAPI_PTR DebugUtilsCallback(
 	    VkDebugUtilsMessageSeverityFlagBitsEXT severity,
 	    VkDebugUtilsMessageTypeFlagsEXT messageTypes,

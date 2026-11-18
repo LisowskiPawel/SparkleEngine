@@ -18,6 +18,14 @@ namespace SparkleLauncher
 {
 	Process::ChildProcessResult NativeProcessRunner::Run(const Process::ChildProcessRequest& request)
 	{
+		if (request.OutputCallback)
+		{
+			request.OutputCallback("Running: " + BuildDisplayCommandLine(request.ExecutablePath, request.Arguments) + "\n");
+			if (!request.LogPath.empty())
+			{
+				request.OutputCallback("Log: " + Strings::ToNarrow(request.LogPath.wstring()) + "\n");
+			}
+		}
 		return Process::RunChildProcess(request);
 	}
 

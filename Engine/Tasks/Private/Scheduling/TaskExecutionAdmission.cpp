@@ -24,25 +24,24 @@ void TaskExecutor::Implementation::ValidateConfiguration(const TaskExecutorConfi
 	}
 }
 
-bool TaskExecutor::Implementation::RejectExecution(const std::shared_ptr<TaskExecution::State>& execution, std::uint64_t generation, std::string_view reason)
+bool TaskExecutor::Implementation::RejectExecution(const std::shared_ptr<TaskExecution::State>& execution, std::string_view reason)
 {
 	TaskExecutionCompletion completion;
-	completion.Generation = generation;
 	completion.Status = TaskExecutionStatus::Rejected;
 	completion.Result = TaskResult::Failure(reason);
 	execution->Publish(std::move(completion));
 	return false;
 }
 
-std::shared_ptr<TaskExecution::State> TaskExecutor::Implementation::CreateExecution(std::uint64_t generation, const std::shared_ptr<TaskScope::State>& scope) const
+std::shared_ptr<TaskExecution::State> TaskExecutor::Implementation::CreateExecution(const std::shared_ptr<TaskScope::State>& scope) const
 {
-	auto execution = std::make_shared<TaskExecution::State>(generation);
+	auto execution = std::make_shared<TaskExecution::State>();
 	execution->JoinThread = scope ? scope->OwnerThread : std::this_thread::get_id();
 	execution->ExecutorIdentity = this;
 	return execution;
 }
 
-bool TaskExecutor::Implementation::ValidateWorkerLanes(const CompiledTaskGraph& graph, const std::shared_ptr<TaskExecution::State>& execution, std::uint64_t generation) const
+bool TaskExecutor::Implementation::ValidateWorkerLanes(const CompiledTaskGraph& graph, const std::shared_ptr<TaskExecution::State>& execution) const
 {
 	if (m_workers.empty())
 	{
@@ -53,7 +52,7 @@ bool TaskExecutor::Implementation::ValidateWorkerLanes(const CompiledTaskGraph& 
 	{
 		if (GetWorkerCount(node.Desc.Lane) == 0)
 		{
-			return RejectExecution(execution, generation, "Compiled task graph uses a lane with no configured workers.");
+			return RejectExecution(execution, "Compiled task graph uses a lane with no configured workers.");
 		}
 	}
 
@@ -64,27 +63,26 @@ bool TaskExecutor::Implementation::ValidateLaunchRequest(
     const CompiledTaskGraph& graph,
     const TaskExecutionContext& context,
     const std::shared_ptr<TaskScope::State>& scope,
-    const std::shared_ptr<TaskExecution::State>& execution,
-    std::uint64_t generation) const
+    const std::shared_ptr<TaskExecution::State>& execution) const
 {
 	if (TaskWorkerContext::IsWorkerFor(this))
 	{
-		return RejectExecution(execution, generation, "A task worker cannot submit work to its own executor; use graph dependencies or nested tasks.");
+		return RejectExecution(execution, "A task worker cannot submit work to its own executor; use graph dependencies or nested tasks.");
 	}
 	if (scope && context.HasUserData() && !context.HasOwnedUserData())
 	{
-		return RejectExecution(execution, generation, "Scoped asynchronous launch received non-owned TaskExecutionContext data.");
+		return RejectExecution(execution, "Scoped asynchronous launch received non-owned TaskExecutionContext data.");
 	}
 	if (!graph.IsValid())
 	{
-		return RejectExecution(execution, generation, graph.GetError().Message);
+		return RejectExecution(execution, graph.GetError().Message);
 	}
 	if (graph.GetTaskCount() > m_config.MaximumTasksPerExecution || graph.GetEdgeCount() > m_config.MaximumEdgesPerExecution)
 	{
-		return RejectExecution(execution, generation, "Compiled task graph exceeds this executor's bounded execution capacity.");
+		return RejectExecution(execution, "Compiled task graph exceeds this executor's bounded execution capacity.");
 	}
 
-	return ValidateWorkerLanes(graph, execution, generation);
+	return ValidateWorkerLanes(graph, execution);
 }
 
 void TaskExecutor::Implementation::ReserveExecutionStorage()
@@ -106,7 +104,7 @@ void TaskExecutor::Implementation::ReserveExecutionStorage()
 	m_executions.reserve(m_executions.size() + 1);
 }
 
-bool TaskExecutor::Implementation::AdmitExecution(const std::shared_ptr<TaskScope::State>& scope, const std::shared_ptr<TaskExecution::State>& execution, std::uint64_t generation)
+bool TaskExecutor::Implementation::AdmitExecution(const std::shared_ptr<TaskScope::State>& scope, const std::shared_ptr<TaskExecution::State>& execution)
 {
 	const char* rejection = nullptr;
 	{
@@ -136,7 +134,7 @@ bool TaskExecutor::Implementation::AdmitExecution(const std::shared_ptr<TaskScop
 	}
 
 	// Completion can invoke scope settlement; never publish under the lifecycle lock.
-	return rejection == nullptr || RejectExecution(execution, generation, rejection);
+	return rejection == nullptr || RejectExecution(execution, rejection);
 }
 
 void TaskExecutor::Implementation::OnExecutionSettled()

@@ -27,11 +27,6 @@ bool TaskGraphBuilder::State::AreValidLimits(TaskGraphLimits limits) noexcept
 	return limits.MaximumTasks > 0 && limits.MaximumTasks <= TaskGraphLimits::HardMaximumTasks && limits.MaximumEdges <= TaskGraphLimits::HardMaximumEdges;
 }
 
-bool TaskGraphBuilder::State::IsValidCompletionPolicy(TaskCompletionPolicy policy) noexcept
-{
-	return policy == TaskCompletionPolicy::Normal || policy == TaskCompletionPolicy::Cleanup;
-}
-
 bool TaskGraphBuilder::State::IsValidTaskLane(TaskLane lane) noexcept
 {
 	return lane == TaskLane::FrameCritical || lane == TaskLane::Background || lane == TaskLane::BlockingIo;
@@ -52,26 +47,9 @@ void TaskGraphBuilder::State::RecordError(TaskGraphErrorCode code, std::string m
 
 bool TaskGraphBuilder::State::ResolveHandle(TaskNodeHandle handle, std::uint32_t& outIndex)
 {
-	if (!handle)
+	if (!TaskGraphAccess::Decode(handle, BuilderIdentity, BuilderGeneration, static_cast<std::uint32_t>(Nodes.size()), outIndex))
 	{
-		RecordError(TaskGraphErrorCode::InvalidHandle, "Task graph operation received an invalid task handle.");
-		return false;
-	}
-	if (TaskGraphAccess::GetBuilderIdentity(handle) != BuilderIdentity)
-	{
-		RecordError(TaskGraphErrorCode::ForeignHandle, "Task graph operation received a handle from another builder.");
-		return false;
-	}
-	if (TaskGraphAccess::GetBuilderGeneration(handle) != BuilderGeneration)
-	{
-		RecordError(TaskGraphErrorCode::StaleHandle, "Task graph operation received a stale builder-generation handle.");
-		return false;
-	}
-
-	outIndex = TaskGraphAccess::GetIndex(handle);
-	if (outIndex >= Nodes.size())
-	{
-		RecordError(TaskGraphErrorCode::InvalidHandle, "Task graph handle index is outside the builder task range.");
+		RecordError(TaskGraphErrorCode::InvalidHandle, "Task handle is invalid, stale, or belongs to another builder.");
 		return false;
 	}
 	return true;

@@ -6,7 +6,6 @@
 #include "Compiler/ShaderIncludeResolver.h"
 #include "Compiler/ShaderSourceMountTable.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Diagnostics/Verify.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Hash/HashUtils.h"
 
@@ -19,9 +18,6 @@ using HashPair = std::pair<std::string, std::uint64_t>;
 
 static void VisitFile(std::string_view filePath, const ShaderCompileRequest& request, std::unordered_set<std::string>& visitedPathKeys, std::vector<HashPair>& outFileHashes);
 static std::uint64_t ComputeClosureHash(std::vector<HashPair>& fileHashes);
-static std::uint64_t FindSourceHash(std::string_view sourcePath, const std::vector<HashPair>& fileHashes);
-
-SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_includeClosureHasherLogger, "ShaderCompiler.IncludeClosureHasher");
 
 static void VisitFile(std::string_view filePath, const ShaderCompileRequest& request, std::unordered_set<std::string>& visitedPathKeys, std::vector<HashPair>& outFileHashes)
 {
@@ -71,10 +67,7 @@ IncludeClosureHash HashShaderIncludeClosure(const ShaderCompileRequest& request)
 	std::vector<HashPair> fileHashes;
 	VisitFile(request.VirtualSourcePath, request, visited, fileHashes);
 
-	if (fileHashes.empty())
-	{
-		Diagnostics::Fatal(g_includeClosureHasherLogger, __FILE__, __LINE__, "Include closure hash computation produced no source inputs.");
-	}
+	const std::uint64_t sourceHash = fileHashes.front().second;
 
 	std::vector<std::string> virtualDependencies;
 	virtualDependencies.reserve(fileHashes.size());
@@ -84,10 +77,7 @@ IncludeClosureHash HashShaderIncludeClosure(const ShaderCompileRequest& request)
 	}
 	std::ranges::sort(virtualDependencies);
 
-	return IncludeClosureHash{
-	    .sourceHash = FindSourceHash(request.VirtualSourcePath, fileHashes),
-	    .includeClosureHash = ComputeClosureHash(fileHashes),
-	    .virtualDependencies = std::move(virtualDependencies)};
+	return IncludeClosureHash{.sourceHash = sourceHash, .includeClosureHash = ComputeClosureHash(fileHashes), .virtualDependencies = std::move(virtualDependencies)};
 }
 
 static std::uint64_t ComputeClosureHash(std::vector<HashPair>& fileHashes)
@@ -108,18 +98,4 @@ static std::uint64_t ComputeClosureHash(std::vector<HashPair>& fileHashes)
 
 	const std::uint64_t closureHash = Hash::Fnv1a64(canonical);
 	return closureHash == 0 ? Hash::kFnv64OffsetBasis : closureHash;
-}
-
-static std::uint64_t FindSourceHash(std::string_view sourcePath, const std::vector<HashPair>& fileHashes)
-{
-	const std::string sourcePathKey(sourcePath);
-	for (const auto& [path, hash] : fileHashes)
-	{
-		if (path == sourcePathKey)
-		{
-			return hash;
-		}
-	}
-
-	Diagnostics::Fatal(g_includeClosureHasherLogger, __FILE__, __LINE__, "Include closure omitted its root shader source.");
 }

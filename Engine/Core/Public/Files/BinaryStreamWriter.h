@@ -4,7 +4,6 @@
 
 #include <cstddef>
 #include <ostream>
-#include <limits>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -22,12 +21,6 @@ namespace Files::BinaryStreamWriter
 	template <typename T> bool WriteArray(std::ostream& output, const std::vector<T>& values, std::string& outErrorMessage)
 	{
 		static_assert(std::is_trivially_copyable_v<T>, "BinaryStreamWriter requires trivially-copyable values");
-		if (values.size() > (std::numeric_limits<std::size_t>::max)() / sizeof(T))
-		{
-			outErrorMessage = "Binary array size overflow";
-			return false;
-		}
-
 		return WriteBytes(output, values.data(), sizeof(T) * values.size(), outErrorMessage);
 	}
 }

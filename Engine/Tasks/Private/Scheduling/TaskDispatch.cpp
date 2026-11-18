@@ -51,8 +51,7 @@ TaskDispatch::State::State(std::shared_ptr<TaskExecution::State> execution, Task
     AllocationFailure(TaskResult::Failure("Prepared task dispatch failed with an exception.")),
     Cancelled(TaskResult::Cancelled("Prepared task dispatch was cancelled."))
 {
-	Completion.Generation = Execution->Data.Generation;
-	Completion.FirstFailureTaskName = Desc.Name.Get();
+	Completion.FirstFailureTaskName = Desc.Name;
 	Context.Bind(Desc.Lane, Execution->Cancellation.get_token());
 	PreparedSettlement = [this]
 	{
@@ -172,7 +171,6 @@ void TaskDispatch::State::Finish(TaskResult result) noexcept
 		Completion.FirstFailureTaskName.clear();
 	}
 	Completion.Result = std::move(result);
-	Completion.SettledTaskCount = 1;
 	Execution->Publish(std::move(Completion));
 }
 

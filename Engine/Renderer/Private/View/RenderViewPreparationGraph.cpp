@@ -20,7 +20,7 @@ void RenderViewPreparation::EnsureGraph(std::size_t primitiveCount)
 	TaskGraphBuilder builder;
 	(void) ParallelFor(
 	    builder,
-	    TaskDesc{.Name = TaskName("Renderer.View.Visibility"), .Lane = TaskLane::FrameCritical},
+	    TaskDesc{.Name = "Renderer.View.Visibility", .Lane = TaskLane::FrameCritical},
 	    capacity,
 	    ParallelForPolicy{.GrainSize = 64u, .SerialThreshold = 128u, .MaximumPartitions = 8u},
 	    &EvaluateRenderViewVisibility);

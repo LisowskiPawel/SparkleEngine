@@ -197,7 +197,6 @@ void EditorApplication::ConfigureUiDiagnostics(Renderer& renderer)
 	        .Shaders = [&renderer]() { return renderer.CaptureShaderDiagnostics(); },
 	        .MeshDiagnostics = [&renderer]() { return renderer.CaptureMeshDiagnostics(); },
 	        .TextureDiagnostics = [&renderer]() { return renderer.CaptureTextureDiagnostics(); },
-	        .MemoryDiagnostics = [&renderer]() { return renderer.CaptureMemoryDiagnostics(); },
 	        .MeshPreview = [&renderer](std::uintptr_t meshRuntimeId) { return renderer.CaptureMeshPreview(meshRuntimeId); }});
 }
 

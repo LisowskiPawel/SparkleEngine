@@ -7,7 +7,7 @@
 
 class RenderCommandContext;
 class RenderHardwareInterface;
-class RayTracingPerformanceDiagnostics;
+class PassExecutionDiagnostics;
 class RayTracingShaderTablePlan;
 class RayTracingBlasCache;
 struct MeshDraw;
@@ -30,7 +30,7 @@ public:
 	    const PreparedRenderScene& preparedScene,
 	    RayTracingBlasCache& blasCache,
 	    const RayTracingShaderTablePlan& shaderTablePlan,
-	    RayTracingPerformanceDiagnostics* diagnostics = nullptr) noexcept;
+	    PassExecutionDiagnostics* diagnostics = nullptr) noexcept;
 
 	RhiOwnedResourceHandle GetResource() const noexcept { return m_accelerationStructureBuffer; }
 
@@ -49,10 +49,10 @@ private:
 	    const PreparedRenderScene& preparedScene,
 	    RayTracingBlasCache& blasCache,
 	    const RayTracingShaderTablePlan& shaderTablePlan,
-	    RayTracingPerformanceDiagnostics* diagnostics,
+	    PassExecutionDiagnostics* diagnostics,
 	    BuildState& state) noexcept;
 	void PrepareBuild(BuildState& state) noexcept;
-	void RecordBuild(RenderCommandContext& commandContext, const BuildState& state, RayTracingPerformanceDiagnostics* diagnostics) const noexcept;
+	void RecordBuild(RenderCommandContext& commandContext, const BuildState& state, PassExecutionDiagnostics* diagnostics) const noexcept;
 	void TrackBuildResources(RenderCommandContext& commandContext) const noexcept;
 	void ReleaseResources() noexcept;
 	void EnsureResources(const RhiRayTracingAccelerationStructurePrebuildInfo& prebuildInfo, ERhiTlasBuildFlags buildFlags) noexcept;

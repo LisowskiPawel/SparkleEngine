@@ -11,6 +11,8 @@
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Interop/RhiInteropService.h"
 
+#include <cassert>
+
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanRenderCommandListLogger, "RHI.Vulkan.CommandList");
 
 VulkanRenderCommandList::VulkanRenderCommandList()
@@ -46,6 +48,8 @@ void VulkanRenderCommandList::SetNativeCommandBuffer(
     PFN_vkCmdEndDebugUtilsLabelEXT endLabel,
     PFN_vkCmdInsertDebugUtilsLabelEXT insertLabel) noexcept
 {
+	assert(commandBuffer != VK_NULL_HANDLE);
+	assert(m_rhi != nullptr && m_memoryAllocator != nullptr);
 	m_commandBuffer = commandBuffer;
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	m_gpuCrashScopes.Reset();
@@ -126,7 +130,7 @@ bool VulkanRenderCommandList::SupportsDiagnosticScopes() const noexcept
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	if (GpuCrashSession::Current() != nullptr)
 	{
-		return m_commandBuffer != VK_NULL_HANDLE;
+		return true;
 	}
 #endif
 	return VulkanDebugEvents::SupportsScopes(m_commandBuffer, m_debugEvents);
@@ -158,17 +162,7 @@ void VulkanRenderCommandList::InsertDiagnosticMarker(std::string_view label, Rhi
 
 void VulkanRenderCommandList::SetPipeline(const RenderPipeline& pipeline) noexcept
 {
-	if (m_commandBuffer == VK_NULL_HANDLE)
-	{
-		return;
-	}
-
 	const auto& vulkanPipeline = static_cast<const VulkanPipeline&>(pipeline);
-	if (vulkanPipeline.GetPipeline() == VK_NULL_HANDLE || vulkanPipeline.GetPipelineLayout() == VK_NULL_HANDLE)
-	{
-		SPDLOG_LOGGER_ERROR(g_vulkanRenderCommandListLogger, "VulkanRenderCommandList: refused to bind an incomplete pipeline.");
-		return;
-	}
 	if (vulkanPipeline.GetBindPoint() == VK_PIPELINE_BIND_POINT_COMPUTE)
 	{
 		EndDynamicRenderingIfNeeded();

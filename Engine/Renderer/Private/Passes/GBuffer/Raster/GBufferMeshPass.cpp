@@ -8,7 +8,8 @@
 #include "Commands/RenderCommandContext.h"
 #include "Meshes/GpuMesh.h"
 #include "Meshes/GpuMeshCache.h"
-#include "Passes/Core/ShaderPassOperations.h"
+#include "Passes/Core/ShaderPass.h"
+#include "RHI/Public/Bindings/RenderBindingLayout.h"
 #include "Pipeline/PassPipelineRuntime.h"
 #include "Pipeline/GraphicsPipelineMaterialization.h"
 #include "Pipeline/RasterPassRenderState.h"
@@ -123,15 +124,14 @@ RhiRasterizerState GBufferMeshPass::ResolveRasterizerState(const MaterialData& m
 	    .bDepthClipEnable = gpuMesh.UsesDepthClipping()};
 }
 
-bool GBufferMeshPass::BindBatchPipeline(const FrameGraphResourceCommands& resources, RenderCommandContext& commandContext, DrawParameterInstance& drawParameters, const PreparedDraw& draw)
+void GBufferMeshPass::BindBatchPipeline(const FrameGraphResourceCommands& resources, RenderCommandContext& commandContext, DrawParameterInstance& drawParameters, const PreparedDraw& draw)
 {
 	const GpuMesh& mesh = draw.Mesh.get();
 	PassBindingOverrides overrides;
 	overrides.SetDescriptorTable("SkinInfluences", mesh.GetSkinInfluencesShaderResourceView());
 	overrides.SetDescriptorTable("MorphTargetDeltas", mesh.GetMorphTargetDeltasShaderResourceView());
 
-	const RasterPassRuntime runtime{draw.BindingLayout.get(), draw.Pipeline.get()};
-	return ShaderPassOperations::BindCompiledRasterPassWithRuntime(resources, commandContext, runtime, drawParameters.GetPassParameterSet(), &overrides, "GBuffer", true);
+	BindRasterShaderPass(commandContext, resources, draw.BindingLayout.get(), draw.Pipeline.get(), drawParameters.GetPassParameterSet(), &overrides);
 }
 
 void GBufferMeshPass::DrawBatch(
@@ -148,10 +148,7 @@ void GBufferMeshPass::DrawBatch(
 	ConfigureDrawParameters(passParameters, draw.FirstInstance, drawParameters);
 	BindMaterial(drawParameters, draw);
 
-	if (!BindBatchPipeline(resources, commandContext, drawParameters, draw))
-	{
-		return;
-	}
+	BindBatchPipeline(resources, commandContext, drawParameters, draw);
 
 	commandContext.DrawIndexedInstanced(mesh.GetIndexCount(), draw.InstanceCount, 0, 0, 0);
 }

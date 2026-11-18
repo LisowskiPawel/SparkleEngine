@@ -25,11 +25,6 @@ bool RhiContract::IsBindingSetDescUsable(const RhiCapabilities& capabilities, co
 	return desc.DescriptorCount != 0 && (descriptorLimit == 0 || desc.DescriptorCount <= descriptorLimit);
 }
 
-bool RhiContract::IsBindingSetDescriptorIndexValid(std::uint32_t descriptorIndex, std::uint32_t descriptorCount) noexcept
-{
-	return descriptorIndex < descriptorCount;
-}
-
 bool RhiContract::IsTextureResourceDescUsable(const RhiCapabilities& capabilities, const RhiTextureResourceDesc& desc) noexcept
 {
 	if (desc.Width == 0 || desc.Height == 0 || desc.MipLevels == 0 || desc.ArraySize == 0 || desc.Format == PixelFormat::Unknown
@@ -127,11 +122,6 @@ bool RhiContract::IsPtlasOperationPackUsable(const RhiPtlasOperationPackDesc& op
 	}
 
 	return true;
-}
-
-bool RhiContract::IsRayTracingGpuAddressPresent(RhiGpuVirtualAddress gpuAddress) noexcept
-{
-	return gpuAddress != 0;
 }
 
 bool RhiContract::IsRayTracingBufferSizeUsable(std::uint64_t sizeInBytes, std::uint64_t alignmentInBytes) noexcept

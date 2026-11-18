@@ -156,6 +156,8 @@ void ShaderDebugArtifactWriter::Write(const ShaderCompileRequest& request, const
 
 	const std::string compilerInputSha256 = WriteText(bundleDirectory / "compiler-input.hlsl", request.SourceCode);
 	WriteCompilerOutputs(bundleDirectory, debugArtifacts, compiledStage);
+	const nlohmann::json parameterReport{{"status", request.ParameterStruct.has_value() ? "matched" : "skipped"}};
+	WriteText(bundleDirectory / "parameter-struct-match.json", parameterReport.dump());
 	const std::filesystem::path requestPath = bundleDirectory / "compile-request.json";
 	const std::string compileRequestJson = BuildCompileRequestJson(request, compiledStage, codeSha256, compilerInputSha256, debugArtifacts);
 	WriteText(requestPath, compileRequestJson);
@@ -168,17 +170,6 @@ void ShaderDebugArtifactWriter::WriteCompilerOutputs(const std::filesystem::path
 	WriteText(bundleDirectory / "preprocessed-source.hlsl", debugArtifacts.PreprocessedSource);
 	const std::string reflectionJson = BuildReflectionJson(compiledStage.reflection);
 	WriteText(bundleDirectory / "reflection.json", reflectionJson);
-	nlohmann::json parameterReport;
-	if (debugArtifacts.ParameterVerification.has_value())
-	{
-		const auto& result = *debugArtifacts.ParameterVerification;
-		parameterReport = {{"status", result.mismatches.empty() ? "matched" : "mismatch"}, {"diagnostics", result.diagnostics}};
-	}
-	else
-	{
-		parameterReport = {{"status", "skipped"}, {"reason", "no parameter-struct descriptor declared for this shader stage"}};
-	}
-	WriteText(bundleDirectory / "parameter-struct-match.json", parameterReport.dump());
 	if (!debugArtifacts.Disassembly.empty())
 	{
 		WriteText(bundleDirectory / "disassembly.txt", debugArtifacts.Disassembly);

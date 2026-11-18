@@ -11,12 +11,11 @@ FrameGraphSubmissionExecutor::FrameGraphSubmissionExecutor(
     const FrameGraph& frameGraph,
     const FrameGraphPlan& plan,
     RhiCommandSubmissionService& submissionService,
-    FrameExecutionDiagnostics& frameDiagnostics,
     TaskExecutor& taskExecutor,
     std::span<RhiSubmissionToken> batchTokens) noexcept :
     m_plan(plan),
     m_submissionService(submissionService),
-    m_recordingExecutor(frameGraph, plan, submissionService, taskExecutor, frameDiagnostics),
+    m_recordingExecutor(frameGraph, plan, submissionService, taskExecutor),
     m_batchTokens(batchTokens)
 {
 }

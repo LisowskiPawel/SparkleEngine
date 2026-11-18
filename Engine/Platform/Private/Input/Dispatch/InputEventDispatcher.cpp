@@ -5,11 +5,6 @@
 
 void InputEventDispatcher::Unsubscribe(EventHandle handle)
 {
-	if (!handle.IsValid())
-	{
-		return;
-	}
-
 	auto removeByHandle = [handle](auto& callbacks)
 	{
 		std::erase_if(callbacks, [handle](const auto& entry) { return entry.Handle == handle; });
@@ -61,11 +56,6 @@ void InputEventDispatcher::CancelAllEvents()
 void InputEventDispatcher::CancelLayerEvents(InputLayer layer)
 {
 	const auto index = static_cast<std::size_t>(layer);
-	if (index >= LayerCount)
-	{
-		return;
-	}
-
 	++m_layerEpochs[index];
 	for (auto& event : m_deferredEvents)
 	{

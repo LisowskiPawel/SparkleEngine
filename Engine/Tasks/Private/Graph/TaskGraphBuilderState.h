@@ -16,7 +16,6 @@ struct TaskGraphBuilder::State final
 
 	static std::uint64_t AcquireBuilderIdentity() noexcept;
 	static bool AreValidLimits(TaskGraphLimits limits) noexcept;
-	static bool IsValidCompletionPolicy(TaskCompletionPolicy policy) noexcept;
 	static bool IsValidTaskLane(TaskLane lane) noexcept;
 	static TaskGraphError CreateError(TaskGraphErrorCode code, std::string message);
 

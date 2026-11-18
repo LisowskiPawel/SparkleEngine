@@ -16,15 +16,13 @@ function(sparkle_populate_nvidia_nvapi)
         GIT_REPOSITORY https://github.com/NVIDIA/nvapi.git
         GIT_TAG        ${_sparkle_nvapi_revision}
         GIT_SHALLOW    FALSE
-        GIT_PROGRESS   ${_sparkle_git_progress}
+        GIT_PROGRESS   FALSE
     )
     FetchContent_Populate(sparkle_nvapi)
     set(sparkle_nvapi_SOURCE_DIR "${sparkle_nvapi_SOURCE_DIR}" PARENT_SCOPE)
 endfunction()
 
 if(SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "nvidia-nvapi")
-    sparkle_log_dependency_step("NVIDIA NVAPI SDK" "git 9b181ea" "source SDK" "D3D12 NVAPI headers and import library" "https://github.com/NVIDIA/nvapi.git")
     sparkle_populate_nvidia_nvapi()
-    sparkle_log_dependency_ready("NVIDIA NVAPI SDK" "${sparkle_nvapi_SOURCE_DIR}" "source SDK")
     return()
 endif()

@@ -30,7 +30,6 @@ namespace Logging
 	// Acquire a named engine-owned logger and log through SPDLOG_LOGGER_* macros.
 	// SparkleCore owns bootstrap, sink policy, and logger lifetime.
 	SPARKLE_CORE_API void Initialize() noexcept;
-	SPARKLE_CORE_API bool IsInitialized() noexcept;
 	// Returns the file sink path owned by this process when file logging initialized successfully.
 	SPARKLE_CORE_API std::optional<std::filesystem::path> GetActiveLogFilePath() noexcept;
 }

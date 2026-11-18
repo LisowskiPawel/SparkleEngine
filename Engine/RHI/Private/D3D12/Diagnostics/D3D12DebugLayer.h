@@ -41,8 +41,6 @@ private:
 	void InitDredSettings() noexcept;
 	void InitD3D12Debug();
 	void InitDXGIDebug();
-	void ConfigureInfoQueue(ID3D12Device* device);
-	void ApplyInfoQueueFilters(ID3D12Device* device);
 
 	ComPtr<ID3D12Debug> m_d3d12Debug;
 	ComPtr<IDXGIDebug1> m_dxgiDebug;

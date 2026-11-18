@@ -118,8 +118,8 @@ private:
 	void BeginDiagnosticRecording() noexcept;
 #endif
 
-	D3D12RenderHardwareInterface* m_owner = nullptr;
-	ID3D12GraphicsCommandList7* m_commandList = nullptr;
+	D3D12RenderHardwareInterface& m_owner;
+	ID3D12GraphicsCommandList7* const m_commandList;
 	D3D12RecordingUploadPage* m_recordingUploadPage = nullptr;
 	ERhiQueueType m_queueType = ERhiQueueType::Graphics;
 	RhiCommandRecordingOwner m_recordingOwner = {};

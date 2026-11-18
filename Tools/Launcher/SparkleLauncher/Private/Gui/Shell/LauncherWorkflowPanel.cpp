@@ -144,7 +144,6 @@ namespace SparkleLauncher
 
 		QWidget* optionsPanel = createOptionsPanel(this);
 		QVBoxLayout* optionsLayout = qobject_cast<QVBoxLayout*>(optionsPanel->layout());
-		Q_ASSERT(optionsLayout != nullptr);
 		m_operationTabs->setParent(optionsPanel);
 		optionsLayout->insertWidget(0, m_operationTabs, 0);
 

@@ -1,21 +1,19 @@
 #include "PCH.h"
 #include "FrameGraph/Builder/PassResourceBuilder.h"
 
-#include "FrameGraph/Diagnostics/FrameGraphResourceContractDiagnostics.h"
+#include "Core/Public/Diagnostics/Logger.h"
+#include "Core/Public/Diagnostics/Verify.h"
 
 #include <cassert>
+#include <format>
 #include <string>
 
-bool PassResourceBuilder::DeclareParameterUsages(const PassParameterSet& parameterSet, std::string_view passName) noexcept
+SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_passResourceBuilderLogger, "Renderer.FrameGraph");
+
+void PassResourceBuilder::DeclareParameterUsages(const PassParameterSet& parameterSet) noexcept
 {
-	assert(m_declarations != nullptr);
-	assert(parameterSet.HasLayout());
-
-	const PassParameterLayout* layout = parameterSet.GetLayout();
-	assert(layout != nullptr);
-
-	const std::vector<PassParameterDesc>& parameters = layout->GetParameters();
-	assert(parameterSet.GetBindingCount() == parameters.size());
+	const PassParameterLayout& layout = parameterSet.GetLayout();
+	const std::vector<PassParameterDesc>& parameters = layout.GetParameters();
 
 	for (std::uint32_t index = 0; index < static_cast<std::uint32_t>(parameters.size()); ++index)
 	{
@@ -26,11 +24,9 @@ bool PassResourceBuilder::DeclareParameterUsages(const PassParameterSet& paramet
 		}
 
 		const PassParameterBinding* binding = parameterSet.GetBinding(index);
-		assert(binding != nullptr);
-		assert(binding->IsBound());
-		if (!FrameGraphResourceContractDiagnostics::ValidatePassParameterBinding(passName, parameter, *binding))
+		if (binding == nullptr || !binding->IsBound())
 		{
-			return false;
+			Diagnostics::Fatal(g_passResourceBuilderLogger, __FILE__, __LINE__, std::format("Graph pass '{}' has no binding for '{}'.", layout.GetDebugName(), parameter.Name));
 		}
 
 		if (binding->AsDescriptorTableData() != nullptr)
@@ -58,8 +54,6 @@ bool PassResourceBuilder::DeclareParameterUsages(const PassParameterSet& paramet
 
 		assert(false);
 	}
-
-	return true;
 }
 
 ResourceUsage PassResourceBuilder::GetFrameGraphUsage(const PassParameterDesc& parameter) noexcept
@@ -88,7 +82,6 @@ ResourceUsage PassResourceBuilder::GetFrameGraphUsage(const PassParameterDesc& p
 
 void PassResourceBuilder::DeclareAccelerationStructureBinding(const PassParameterDesc& parameter, const PassParameterBinding& binding) noexcept
 {
-	assert(parameter.ResourceDomain == ShaderParameterResourceDomain::AccelerationStructure);
 	const FrameGraphAccelerationStructureHandle* accelerationStructure = binding.AsAccelerationStructureHandle();
 	assert(accelerationStructure != nullptr);
 	assert(accelerationStructure->IsValid());
@@ -98,7 +91,6 @@ void PassResourceBuilder::DeclareAccelerationStructureBinding(const PassParamete
 
 void PassResourceBuilder::DeclareTextureBinding(const PassParameterDesc& parameter, const PassParameterBinding& binding) noexcept
 {
-	assert(parameter.ResourceDomain == ShaderParameterResourceDomain::Texture);
 	const PassParameterTextureBindingData* textureData = binding.AsTextureData();
 	assert(textureData != nullptr);
 
@@ -120,7 +112,6 @@ void PassResourceBuilder::DeclareTextureBinding(const PassParameterDesc& paramet
 
 void PassResourceBuilder::DeclareBufferBinding(const PassParameterDesc& parameter, const PassParameterBinding& binding) noexcept
 {
-	assert(parameter.ResourceDomain == ShaderParameterResourceDomain::Buffer);
 	const PassParameterBufferBindingData* bufferData = binding.AsBufferData();
 	assert(bufferData != nullptr);
 
@@ -133,9 +124,6 @@ void PassResourceBuilder::DeclareBufferBinding(const PassParameterDesc& paramete
 
 void PassResourceBuilder::DeclareResourceHandle(FrameGraphResourceHandle handle, ResourceUsage usage, const PassParameterDesc& parameter, std::uint32_t arrayIndex) noexcept
 {
-	assert(handle.IsValid());
-	assert(m_declarations != nullptr);
-
 	std::string label = parameter.Name;
 	if (parameter.ArrayCount > 1)
 	{
@@ -156,6 +144,5 @@ void PassResourceBuilder::DeclareResourceHandle(FrameGraphResourceHandle handle,
 		return;
 	}
 
-	assert(IsReadWriteUsage(usage));
 	Use(handle, usage, label);
 }

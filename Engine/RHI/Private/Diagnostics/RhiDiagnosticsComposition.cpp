@@ -5,7 +5,6 @@
   #include "Diagnostics/GpuCrash/GpuCrashSession.h"
 #endif
 
-#include <cassert>
 #include <utility>
 
 class RhiDiagnosticsComposition final : public RenderDiagnostics
@@ -25,7 +24,6 @@ public:
 	    m_memoryDiagnostics(std::move(memoryDiagnostics)),
 	    m_bSupportsGpuEvents(bSupportsGpuEvents)
 	{
-		assert(m_objectDiagnostics != nullptr);
 	}
 
 	RhiDiagnosticsCapabilities GetCapabilities() const noexcept override

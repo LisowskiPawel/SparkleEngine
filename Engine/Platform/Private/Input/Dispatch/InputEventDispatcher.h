@@ -45,9 +45,7 @@ public:
 	{
 		for (const auto& entry : GetCallbacks<TEvent>())
 		{
-			const bool bDeferred = entry.Function && entry.Mode == DispatchMode::Deferred;
-			const bool bEligible = bDeferred && ShouldDispatchToLayer(entry.Layer, targetLayer);
-			if (bEligible)
+			if (entry.Mode == DispatchMode::Deferred && ShouldDispatchToLayer(entry.Layer, targetLayer))
 			{
 				m_deferredEvents.push_back({event, targetLayer});
 				return;
@@ -101,7 +99,7 @@ private:
 		std::vector<std::pair<std::shared_ptr<Callback<TEvent>>, InputLayer>> callbacks;
 		for (const auto& entry : GetCallbacks<TEvent>())
 		{
-			if (entry.Function && select(entry))
+			if (select(entry))
 			{
 				callbacks.emplace_back(entry.Function, entry.Layer);
 			}

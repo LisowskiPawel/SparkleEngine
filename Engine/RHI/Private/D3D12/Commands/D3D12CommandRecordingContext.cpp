@@ -233,7 +233,7 @@ void D3D12CommandRecordingContext::InitializeSlotResources(CommandSlot& slot)
 	slot.DescriptorPage = m_descriptorHeapManager->AllocateContiguous(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, DescriptorPageCapacity);
 
 	const std::wstring uploadName = std::format(L"Sparkle {} Recording Upload Frame {} Context {}", QueueTypeName(slot.QueueType), slot.FrameSlot, slot.ContextIndex);
-	slot.UploadPage.Initialize(*m_rhi, UploadPageCapacityInBytes, uploadName.c_str());
+	slot.UploadPage.Initialize(*m_rhi, UploadPageCapacityInBytes, uploadName.c_str(), slot.RecordingThread);
 	slot.CommandList->SetRecordingUploadPage(slot.UploadPage);
 }
 
@@ -290,7 +290,6 @@ void D3D12CommandRecordingContext::BeginSlot(CommandSlot& slot) noexcept
 
 	slot.CommandList->ResetTrackedResources();
 	slot.CommandList->ResetBoundState();
-	slot.UploadPage.BeginRecording();
 	slot.RecordingThread = thread;
 }
 
@@ -306,7 +305,7 @@ void D3D12CommandRecordingContext::CloseSlot(CommandSlot& slot) noexcept
 		FailClose(slot, closeResult);
 	}
 
-	slot.UploadPage.EndRecording();
+	slot.RecordingThread = {};
 	slot.State = SlotState::Closed;
 }
 

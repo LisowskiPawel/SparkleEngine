@@ -57,7 +57,7 @@ namespace Assets
 		for (const CookedSceneMeshAssetRef& meshReference : sceneManifest.meshAssetReferences)
 		{
 			const std::filesystem::path meshAssetPath = Paths::CookedMeshAsset(meshReference.meshAssetId);
-			LoadedMeshAsset loadedMesh = MeshAssetLoader::Decode(meshAssetPath, files.Get(meshAssetPath), files.GetAllocationBudget());
+			LoadedMeshAsset loadedMesh = MeshAssetLoader::Decode(files.Get(meshAssetPath), files.GetAllocationBudget());
 
 			if (loadedMesh.GetAssetKind() != meshReference.meshAssetKind)
 			{

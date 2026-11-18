@@ -3,6 +3,8 @@
 #include "Console/CVarControlOperations.h"
 #include "Core/Public/Console/CVar.h"
 #include "Core/Public/Console/CVarRegistry.h"
+#include "Core/Public/Diagnostics/Logger.h"
+#include "Core/Public/Diagnostics/Verify.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogCoreCVarControl, "Core.Console.Control");
@@ -25,7 +27,7 @@ static bool CollectFilteredCVars(ConsoleVariableRegistry& registry, const CVarCo
 	}
 	for (ConsoleVariableBase* variable : registry.GetVariables())
 	{
-		if (variable != nullptr && MatchesCVarFilter(*variable, request.Filter))
+		if (MatchesCVarFilter(*variable, request.Filter))
 		{
 			variables.push_back(variable);
 		}

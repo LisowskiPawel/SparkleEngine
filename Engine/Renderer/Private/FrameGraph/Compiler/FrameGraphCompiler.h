@@ -41,7 +41,6 @@ private:
 	bool WritesProductRoot(const FrameGraphPassNode& passRecord) const noexcept;
 	void BuildPassSuccessorsAndInDegrees() noexcept;
 	void BuildTopologicalExecutionOrder() noexcept;
-	void ValidateExecutionOrder() const noexcept;
 	void AssignPassQueues() noexcept;
 	void BuildSubmissionBatches() noexcept;
 	void AddSynchronizationDependency(FrameGraphPassNode& passRecord, FrameGraphPassIndex dependency) noexcept;

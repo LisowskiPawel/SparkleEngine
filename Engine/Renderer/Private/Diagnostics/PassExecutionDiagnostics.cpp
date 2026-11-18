@@ -2,12 +2,11 @@
 
 #include "Diagnostics/PassExecutionDiagnostics.h"
 
+#include "Commands/RenderCommandContext.h"
 #include "Debug/RendererCVars.h"
 
-PassExecutionDiagnostics::PassExecutionDiagnostics(FrameExecutionDiagnostics& frameDiagnostics, RenderCommandContext& commands, std::string_view passScopeLabel, EFrameGraphPassKind passKind) noexcept
-    :
-    m_frameDiagnostics(&frameDiagnostics),
-    m_commands(&commands),
+PassExecutionDiagnostics::PassExecutionDiagnostics(RenderCommandContext& commands, std::string_view passScopeLabel, EFrameGraphPassKind passKind) noexcept :
+    m_commands(commands),
     m_passScopeLabel(passScopeLabel),
     m_passColor(GetPassEventColor(passKind))
 {
@@ -15,26 +14,19 @@ PassExecutionDiagnostics::PassExecutionDiagnostics(FrameExecutionDiagnostics& fr
 
 ScopedGpuScope PassExecutionDiagnostics::BeginPassGpuScope() noexcept
 {
-	if (m_frameDiagnostics == nullptr || m_commands == nullptr)
-	{
-		return {};
-	}
-
-	return m_frameDiagnostics->BeginGpuScope(*m_commands, m_passScopeLabel, m_passColor);
+	return ScopedGpuScope(m_commands, m_passScopeLabel, m_passColor);
 }
 
 ScopedGpuScope PassExecutionDiagnostics::BeginGpuScope(std::string_view label) noexcept
 {
-	const bool bDetailedMarkersDisabledCommands = m_frameDiagnostics == nullptr || m_commands == nullptr;
-	const bool bDetailedMarkersDisabled = bDetailedMarkersDisabledCommands || (CVarRendererDiagnosticMarkerVerbosity.Get() != RendererDiagnosticMarkerVerbosity::Detailed);
-
-	if (bDetailedMarkersDisabled)
+	const bool bDetailedMarkersEnabled = CVarRendererDiagnosticMarkerVerbosity.Get() == RendererDiagnosticMarkerVerbosity::Detailed;
+	if (!bDetailedMarkersEnabled || !m_commands.SupportsDiagnosticScopes())
 	{
 		return {};
 	}
 
 	const std::string eventLabel = FormatEventScopeLabel(label);
-	return m_frameDiagnostics->BeginGpuScope(*m_commands, eventLabel, m_passColor);
+	return ScopedGpuScope(m_commands, eventLabel, m_passColor);
 }
 
 RhiDiagnosticLabelColor PassExecutionDiagnostics::GetPassEventColor(EFrameGraphPassKind passKind) noexcept
@@ -65,10 +57,10 @@ std::string PassExecutionDiagnostics::FormatEventScopeLabel(std::string_view lab
 {
 	if (label.empty())
 	{
-		return m_passScopeLabel;
+		return std::string(m_passScopeLabel);
 	}
 
-	std::string scopeLabel = m_passScopeLabel;
+	std::string scopeLabel(m_passScopeLabel);
 	scopeLabel.push_back('/');
 	scopeLabel.append(label.begin(), label.end());
 	return scopeLabel;

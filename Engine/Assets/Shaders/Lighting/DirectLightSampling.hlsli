@@ -18,7 +18,6 @@ namespace DirectLightSampling
 	{
 		LightId Light;
 		float SelectionPdf;
-		float Valid;
 	};
 
 	LightCandidate InvalidLightCandidate()
@@ -27,13 +26,12 @@ namespace DirectLightSampling
 		candidate.Light.Type = LightSampling::LightTypeInvalid;
 		candidate.Light.Index = LightSampling::LightIndexInvalid;
 		candidate.SelectionPdf = 0.0f;
-		candidate.Valid = 0.0f;
 		return candidate;
 	}
 
 	bool IsValid(LightCandidate candidate)
 	{
-		return candidate.Valid > 0.5f && candidate.SelectionPdf > 0.0f;
+		return candidate.SelectionPdf > 0.0f;
 	}
 
 	bool IsLightIdInRange(LightId light)
@@ -105,20 +103,6 @@ namespace DirectLightSampling
 		return light;
 	}
 
-	LightCandidate BuildLightCandidate(LightId light, float selectionPdf)
-	{
-		LightCandidate candidate;
-		candidate.Light = light;
-		candidate.SelectionPdf = selectionPdf;
-		candidate.Valid = IsLightIdInRange(light) && selectionPdf > 0.0f ? 1.0f : 0.0f;
-		if (IsValid(candidate))
-		{
-			return candidate;
-		}
-
-		return InvalidLightCandidate();
-	}
-
 	bool CastsShadow(LightId light)
 	{
 		if (light.Type == LightSampling::LightTypeDirectional)
@@ -153,7 +137,10 @@ namespace DirectLightSampling
 		}
 
 		const uint linearIndex = min((uint)(saturate(random) * (float)lightCount), lightCount - 1u);
-		return BuildLightCandidate(GetDirectLightId(linearIndex), rcp((float)lightCount));
+		LightCandidate candidate;
+		candidate.Light = GetDirectLightId(linearIndex);
+		candidate.SelectionPdf = rcp((float)lightCount);
+		return candidate;
 	}
 
 	LightSampling::DirectLightSample SampleDirectLight(LightCandidate candidate, float3 positionWorld, float2 shapeSample)

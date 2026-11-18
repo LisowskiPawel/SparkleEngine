@@ -5,7 +5,6 @@
 #include "Core/Public/Diagnostics/Logger.h"
 #include "Core/Public/Diagnostics/Verify.h"
 
-#include <format>
 #include <utility>
 
 #if defined(_WIN32)
@@ -17,27 +16,27 @@
 namespace Threading
 {
 
-	thread_local std::string g_currentThreadRole = "Sparkle.UnlabeledThread";
 	SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogThreadOwnership, "Threading.Ownership");
 
 	void SetCurrentThreadRole(std::string_view role) noexcept
 	{
+#if defined(_WIN32)
 		try
 		{
-			g_currentThreadRole.assign(role);
-#if defined(_WIN32)
 			const std::wstring wideRole(role.begin(), role.end());
 			(void) ::SetThreadDescription(::GetCurrentThread(), wideRole.c_str());
-#endif
 		}
 		catch (...)
 		{
 			// A diagnostic label must never alter program control flow.
 		}
+#else
+		(void) role;
+#endif
 	}
 
 	OwnerThread::OwnerThread(std::string ownerDescription) noexcept :
-	    m_ownerDescription(std::move(ownerDescription))
+	    m_ownerDescription("Thread-affinity violation: " + std::move(ownerDescription))
 	{
 	}
 
@@ -48,16 +47,6 @@ namespace Threading
 			return;
 		}
 
-		const std::string message = std::format(
-		    "Thread-affinity violation: '{}' requires its creator thread {}, but '{}' (thread {}) accessed it from {}:{} ({}).",
-		    m_ownerDescription,
-		    std::hash<std::thread::id>{}(m_thread),
-		    g_currentThreadRole,
-		    std::hash<std::thread::id>{}(std::this_thread::get_id()),
-		    location.file_name(),
-		    location.line(),
-		    location.function_name());
-
-		Diagnostics::Fatal(LogThreadOwnership, location.file_name(), location.line(), message);
+		Diagnostics::Fatal(LogThreadOwnership, location.file_name(), location.line(), m_ownerDescription);
 	}
 }

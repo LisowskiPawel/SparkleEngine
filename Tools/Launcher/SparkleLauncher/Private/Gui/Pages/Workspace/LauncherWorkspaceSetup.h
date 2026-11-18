@@ -19,6 +19,7 @@ namespace SparkleLauncher
 	class LauncherSettings;
 	struct LauncherOperationResult;
 	struct ThirdPartyDependencyUiEntry;
+	struct ThirdPartyDependencyUiStatus;
 	struct ToolchainItemStatus;
 	struct BuildFilesFreshnessStatus;
 	struct BuildWorkspaceOperationRequest;
@@ -49,7 +50,7 @@ namespace SparkleLauncher
 	private:
 		void AddSyncDependencies(QVBoxLayout& layout, bool bOptional);
 		QPushButton* CreateSourceDependencyActionButton(const ThirdPartyDependencyUiEntry& dependency);
-		void ApplySourceDependencyRowState(const ThirdPartyDependencyUiEntry& dependency, QLabel& statusLabel, QPushButton& button);
+		void ApplySourceDependencyRowState(const ThirdPartyDependencyUiEntry& dependency, const ThirdPartyDependencyUiStatus& status, QLabel& statusLabel, QPushButton& button);
 		void RefreshSourceDependencyRows();
 		void SyncSourceDependency(const ThirdPartyDependencyUiEntry& dependency);
 		void CleanSourceDependency(const ThirdPartyDependencyUiEntry& dependency);

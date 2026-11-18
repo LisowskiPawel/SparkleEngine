@@ -104,14 +104,10 @@ public:
 
 	const std::vector<bool>& GetGraphResourceParameters() const noexcept { return m_graphResourceParameters; }
 
-	bool Commit(const TParameters& parameters, PassParameterSet& parameterSet, std::vector<std::vector<std::byte>>& storage, std::vector<std::string>* failedBindings = nullptr) const
+	bool Commit(const TParameters& parameters, PassParameterSet& parameterSet, std::vector<std::vector<std::byte>>& storage) const
 	{
 		storage.resize(m_bindings.size());
 		parameterSet.ClearBindings();
-		if (failedBindings != nullptr)
-		{
-			failedBindings->clear();
-		}
 
 		bool bSucceeded = true;
 		for (std::size_t index = 0; index < m_bindings.size(); ++index)
@@ -120,29 +116,10 @@ public:
 			if (!binding.Bind || !binding.Bind(parameterSet, binding.Name.c_str(), parameters, storage[index]))
 			{
 				bSucceeded = false;
-				if (failedBindings != nullptr)
-				{
-					failedBindings->push_back(binding.Name);
-				}
 			}
 		}
 
-		if (!parameterSet.HasAllRequiredBindings())
-		{
-			bSucceeded = false;
-			if (failedBindings != nullptr)
-			{
-				for (const std::string& missingBinding : parameterSet.GetMissingBindings())
-				{
-					if (std::find(failedBindings->begin(), failedBindings->end(), missingBinding) == failedBindings->end())
-					{
-						failedBindings->push_back(missingBinding);
-					}
-				}
-			}
-		}
-
-		return bSucceeded;
+		return bSucceeded && parameterSet.HasAllRequiredBindings();
 	}
 
 private:

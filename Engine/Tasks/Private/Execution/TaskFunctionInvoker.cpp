@@ -2,10 +2,7 @@
 
 #include "TaskExecutionContext.h"
 
-#include "Core/Public/Diagnostics/Error.h"
-
 #include <exception>
-#include <format>
 
 TaskResult InvokeTaskFunction(const TaskGraphNode& node, TaskExecutionContext& context, bool bBlockedByDependency)
 {
@@ -24,13 +21,9 @@ TaskResult InvokeTaskFunction(const TaskGraphNode& node, TaskExecutionContext& c
 	{
 		return node.Function(context);
 	}
-	catch (const Diagnostics::Error& error)
-	{
-		return TaskResult::Failure(error.what());
-	}
 	catch (const std::exception& exception)
 	{
-		return TaskResult::Failure(std::format("Unhandled task exception: {}", exception.what()));
+		return TaskResult::Failure(exception.what());
 	}
 	catch (...)
 	{

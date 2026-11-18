@@ -22,7 +22,7 @@ ConsoleCommandResult EditorShaderCompileOperation::Request(bool bGenerateSymbols
 	}
 
 	std::string error;
-	const TaskName taskName = TaskName{"Compile editor shaders"};
+	const std::string taskName = "Compile editor shaders";
 
 	auto operationTask = [compile = m_compile, bGenerateSymbols](ConsoleCommandResult& result, TaskExecutionContext& context)
 	{

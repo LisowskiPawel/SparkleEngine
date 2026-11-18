@@ -7,11 +7,6 @@ function ConvertTo-CanonicalShaderText
     $canonicalText = $Text.Replace("`r`n", "`n").Replace("`r", "`n")
     $canonicalText = [regex]::Replace(
         $canonicalText,
-        '^(?<Indent>[\t ]*)}\s*//\s*namespace(?:\s+\S+)?\s*$',
-        '${Indent}}',
-        [Text.RegularExpressions.RegexOptions]::Multiline)
-    $canonicalText = [regex]::Replace(
-        $canonicalText,
         '^[\t ]*(?<Attribute>\[(?:shader|numthreads)[^\]\r\n]*\])[\t ]+(?<Code>\S[^\r\n]*)$',
         '${Attribute}' + "`n" + '${Code}',
         [Text.RegularExpressions.RegexOptions]::Multiline)
@@ -47,228 +42,40 @@ function ConvertTo-CanonicalShaderText
     return $canonicalText
 }
 
-function Test-ClangFormatReplacements
-{
-    param([string] $RepositoryRoot, [string[]] $Paths, [string] $ReplacementXml, [switch] $BracesOnly)
-
-    $documents = @([regex]::Split($ReplacementXml, '(?=<\?xml)') | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-    if ($documents.Count -ne $Paths.Count)
-    {
-        throw "clang-format returned an unexpected replacement-document count."
-    }
-
-    $changed = $false
-    for ($fileIndex = 0; $fileIndex -lt $Paths.Count; ++$fileIndex)
-    {
-        $relativePath = $Paths[$fileIndex]
-        $absolutePath = Join-Path $repositoryRoot $relativePath
-        $bytes = [IO.File]::ReadAllBytes($absolutePath)
-        $document = [xml] $documents[$fileIndex]
-        if ($document.replacements.incomplete_format -eq "true")
-        {
-            throw "${relativePath}: clang-format could not complete formatting."
-        }
-
-        foreach ($replacement in $document.SelectNodes('/replacements/replacement'))
-        {
-            if ($BracesOnly -and $replacement.InnerText -notmatch '[{}]') { continue }
-            $offset = [int] $replacement.offset
-            $length = [int] $replacement.length
-            $existing = [Text.Encoding]::UTF8.GetString($bytes, $offset, $length)
-            $proposed = $replacement.InnerText
-            if ($BracesOnly)
-            {
-                $existing = [regex]::Replace($existing, '\s', '')
-                $proposed = [regex]::Replace($proposed, '\s', '')
-            }
-            if ($existing -ceq $proposed)
-            {
-                continue
-            }
-
-            if ($BracesOnly)
-            {
-                $lineNumber = [Text.Encoding]::UTF8.GetString($bytes, 0, $offset).Split("`n").Length
-                [Console]::Error.WriteLine("${relativePath}:${lineNumber}: control-flow bodies require explicit braces; repair the source before formatting")
-            }
-            else { [Console]::Error.WriteLine("${relativePath}: code should be clang-formatted") }
-            $changed = $true
-            break
-        }
-    }
-
-    return $changed
-}
-
-function Invoke-CppFormatting
+function Invoke-SourceFormatting
 {
     param([string] $RepositoryRoot, [string] $Mode, [string[]] $Paths, [string] $ClangFormat)
 
     $formatFailed = $false
-    $braceCheckStylePath = $null
-    try
-    {
-        if ($Mode -eq "Check" -and $Paths.Count -ne 0)
-        {
-            $resolvedStyle = @(& $clangFormat --style=file --dump-config)
-            if ($LASTEXITCODE -ne 0)
-            {
-                throw "clang-format could not resolve the repository style for the brace check."
-            }
-
-            $braceCheckStyle = [regex]::Replace(($resolvedStyle -join "`n"), '(?m)^InsertBraces:[^\r\n]*', 'InsertBraces: true')
-            $braceCheckStylePath = [IO.Path]::GetTempFileName()
-            [IO.File]::WriteAllText($braceCheckStylePath, $braceCheckStyle, [Text.UTF8Encoding]::new($false))
-        }
-
-        for ($offset = 0; $offset -lt $Paths.Count; $offset += 64)
-        {
-            $lastIndex = [Math]::Min($offset + 63, $Paths.Count - 1)
-            $batch = $Paths[$offset..$lastIndex]
-            Write-Host "C/C++ formatter: $($lastIndex + 1)/$($Paths.Count) files."
-            $arguments = if ($Mode -eq "Check")
-            {
-                @("--output-replacements-xml", "--Werror", "--style=file") + $batch
-            }
-            else
-            {
-                @("-i", "--Werror", "--style=file") + $batch
-            }
-
-            if ($Mode -eq "Check")
-            {
-                $replacementLines = @(& $clangFormat $arguments)
-                if ($LASTEXITCODE -ne 0)
-                {
-                    $formatFailed = $true
-                }
-                elseif (Test-ClangFormatReplacements -RepositoryRoot $RepositoryRoot -Paths $batch -ReplacementXml ($replacementLines -join "`n"))
-                {
-                    $formatFailed = $true
-                }
-
-                $braceLines = @(& $clangFormat --output-replacements-xml --Werror "--style=file:$braceCheckStylePath" $batch)
-                if ($LASTEXITCODE -ne 0)
-                {
-                    $formatFailed = $true
-                }
-                elseif (Test-ClangFormatReplacements -RepositoryRoot $RepositoryRoot -Paths $batch -ReplacementXml ($braceLines -join "`n") -BracesOnly)
-                {
-                    $formatFailed = $true
-                }
-            }
-            else
-            {
-                & $clangFormat $arguments
-                if ($LASTEXITCODE -ne 0)
-                {
-                    $formatFailed = $true
-                }
-            }
-        }
-    }
-    finally
-    {
-        if ($null -ne $braceCheckStylePath)
-        {
-            Remove-Item -LiteralPath $braceCheckStylePath -Force
-        }
-    }
-
-    return $formatFailed
-}
-
-function Invoke-ParagraphFormatting
-{
-    param([string] $RepositoryRoot, [string] $Mode, [string[]] $Paths)
-
-    $formatFailed = $false
-    $utf8WithoutBom = [Text.UTF8Encoding]::new($false)
     foreach ($relativePath in $Paths)
     {
-        $absolutePath = Join-Path $repositoryRoot ($relativePath -replace "/", [IO.Path]::DirectorySeparatorChar)
-        $currentText = [IO.File]::ReadAllText($absolutePath)
-        $canonicalText = [CodeStyleParagraphSpacing]::Format($currentText)
-        if ($currentText.Replace("`r`n", "`n").Replace("`r", "`n") -ceq $canonicalText)
-        {
-            continue
-        }
-
-        if ($Mode -eq "Format")
-        {
-            [IO.File]::WriteAllText($absolutePath, $canonicalText, $utf8WithoutBom)
-        }
-        else
-        {
-            [Console]::Error.WriteLine("${relativePath}: multiline statements require blank paragraph boundaries")
-            $formatFailed = $true
-        }
-    }
-
-    return $formatFailed
-}
-
-function Invoke-ShaderFormatting
-{
-    param([string] $RepositoryRoot, [string] $Mode, [string[]] $Paths, [string] $ClangFormat)
-
-    $formatFailed = $false
-    $utf8WithoutBom = [Text.UTF8Encoding]::new($false)
-    $shaderIndex = 0
-    foreach ($relativePath in $Paths)
-    {
-        ++$shaderIndex
-        if ($shaderIndex % 32 -eq 0 -or $shaderIndex -eq $Paths.Count)
-        {
-            Write-Host "Shader formatter: $shaderIndex/$($Paths.Count) files."
-        }
-
-        $absolutePath = Join-Path $repositoryRoot ($relativePath -replace "/", [IO.Path]::DirectorySeparatorChar)
-        $formattedLines = @(& $clangFormat --Werror --style=file $absolutePath)
+        $absolutePath = Join-Path $RepositoryRoot $relativePath
+        # Compare formatted text: clang-format 22 can report no-op replacements in --dry-run.
+        $formattedLines = @(& $ClangFormat --Werror --style=file $absolutePath)
         if ($LASTEXITCODE -ne 0)
         {
             $formatFailed = $true
             continue
         }
 
-        $formattedText = ($formattedLines -join "`n") + "`n"
-        $canonicalText = ConvertTo-CanonicalShaderText -Text $formattedText
-        $canonicalText = [CodeStyleParagraphSpacing]::Format($canonicalText)
-        $currentText = ([IO.File]::ReadAllText($absolutePath)).Replace("`r`n", "`n").Replace("`r", "`n")
-        if ($currentText -ceq $canonicalText)
+        $canonicalText = ($formattedLines -join "`n") + "`n"
+        if ([IO.Path]::GetExtension($relativePath) -in @('.hlsl', '.hlsli'))
         {
-            continue
+            # clang-format uses its C++ parser for HLSL; restore own-line shader attributes.
+            $canonicalText = ConvertTo-CanonicalShaderText -Text $canonicalText
         }
+        $currentText = ([IO.File]::ReadAllText($absolutePath)).Replace("`r`n", "`n").Replace("`r", "`n")
+        if ($currentText -ceq $canonicalText) { continue }
 
-        if ($Mode -eq "Format")
+        if ($Mode -eq 'Format')
         {
-            [IO.File]::WriteAllText($absolutePath, $canonicalText, $utf8WithoutBom)
+            [IO.File]::WriteAllText($absolutePath, $canonicalText, [Text.UTF8Encoding]::new($false))
         }
         else
         {
-            [Console]::Error.WriteLine("${relativePath}: code should be formatted with the canonical shader policy")
+            [Console]::Error.WriteLine("${relativePath}: code should be formatted")
             $formatFailed = $true
         }
     }
-
     return $formatFailed
-}
-
-function Invoke-SourceFormatting
-{
-    param([string] $RepositoryRoot, [string] $Mode, [string[]] $Paths, [string] $ClangFormat)
-
-    $cppPaths = @($Paths | Where-Object { [IO.Path]::GetExtension($_) -notin @('.hlsl', '.hlsli') })
-    $shaderPaths = @($Paths | Where-Object { [IO.Path]::GetExtension($_) -in @('.hlsl', '.hlsli') })
-    Add-Type -Path (Join-Path $PSScriptRoot 'CodeStyleParagraphSpacing.cs')
-
-    Push-Location $RepositoryRoot
-    try
-    {
-        $cppFailed = Invoke-CppFormatting $RepositoryRoot $Mode $cppPaths $ClangFormat
-        $paragraphFailed = Invoke-ParagraphFormatting $RepositoryRoot $Mode $cppPaths
-        $shaderFailed = Invoke-ShaderFormatting $RepositoryRoot $Mode $shaderPaths $ClangFormat
-        return $cppFailed -or $paragraphFailed -or $shaderFailed
-    }
-    finally { Pop-Location }
 }

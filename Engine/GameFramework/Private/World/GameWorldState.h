@@ -40,8 +40,6 @@ namespace ECS
 
 		bool IsAlive(EntityId entity) const noexcept { return m_registry.IsAlive(entity); }
 
-		std::size_t GetEntityCount() const noexcept { return m_registry.GetLiveCount(); }
-
 		EntityId AddCamera(SceneCameraEntry&& entry, bool bActive = false);
 		std::size_t GetCameraCount() const noexcept;
 		EntityId GetCameraEntity(std::size_t index) const noexcept;

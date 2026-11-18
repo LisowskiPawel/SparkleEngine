@@ -1,7 +1,6 @@
 #include "PCH.h"
 #include "FrameGraph/FrameGraph.h"
 
-#include "FrameGraph/Diagnostics/FrameGraphResourceContractDiagnostics.h"
 #include <algorithm>
 #include <cassert>
 #include <string>
@@ -57,7 +56,6 @@ void FrameGraph::Setup()
 		std::vector<PassResourceDeclaration> declarations;
 		PassResourceBuilder builder(declarations);
 		pass.bActive = pass.setupCallback(builder);
-		FrameGraphResourceContractDiagnostics::ValidatePassDeclarations(pass.name, pass.kind, declarations);
 		assert(IsQueuePreferenceCompatible(pass.kind, pass.queuePreference));
 
 		m_compiledPlan.passes.push_back(

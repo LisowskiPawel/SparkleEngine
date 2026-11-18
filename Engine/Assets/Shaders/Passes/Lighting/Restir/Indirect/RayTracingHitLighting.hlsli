@@ -10,11 +10,6 @@ float3 ShadeRayTracingHitIncidentRadiance(RaytracingAccelerationStructure sceneT
                                           uint randomFrameIndex,
                                           bool bTraceShadows)
 {
-	if (!surface.bValid)
-	{
-		return 0.0f.xxx;
-	}
-
 	float3 incidentRadiance = max(surface.EmissiveColor, 0.0f.xxx);
 	const float3 viewDirWorld = normalize(-rayDirectionWorld);
 

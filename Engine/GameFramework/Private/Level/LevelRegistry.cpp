@@ -2,7 +2,6 @@
 #include "Level/LevelRegistry.h"
 
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Diagnostics/Verify.h"
 #include "Level/LevelAsset.h"
 #include "Level/Parsing/LevelParser.h"
 
@@ -73,20 +72,13 @@ void LevelRegistry::EnsureDefaultLevel()
 
 void LevelRegistry::Register(std::unique_ptr<LevelAsset> level)
 {
-	if (!level)
-	{
-		Diagnostics::Fatal(g_levelRegistryLogger, __FILE__, __LINE__, "LevelRegistry: Attempted to register a null level.");
-	}
-
 	auto name = level->GetName();
 	std::string nameKey(name);
 
-	if (m_levels.contains(nameKey))
+	if (!m_levels.try_emplace(std::move(nameKey), std::move(level)).second)
 	{
-		Diagnostics::Fatal(g_levelRegistryLogger, __FILE__, __LINE__, std::format("LevelRegistry: Duplicate level name '{}'.", nameKey));
+		throw Diagnostics::Error(std::format("Duplicate level name '{}'.", name));
 	}
-
-	m_levels.emplace(std::move(nameKey), std::move(level));
 }
 
 LevelAsset* LevelRegistry::FindLevel(std::string_view name) const

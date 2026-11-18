@@ -6,6 +6,7 @@
 #include "Device/RenderDeviceServices.h"
 #include "Device/RhiDeviceLaunch.h"
 #include "Core/RhiBackendSelection.h"
+#include "Core/RhiCapabilities.h"
 #include "Diagnostics/RhiExternalCapture.h"
 #include "Device/RenderDeviceBackendFactory.h"
 #include "Device/RenderDeviceBackendServices.h"
@@ -21,10 +22,11 @@
 #include <string>
 #include <utility>
 
+SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_renderDeviceServicesLogger, "RHI.Services");
+
 void RenderDeviceServices::FailCreation(std::string_view message) noexcept
 {
-	SPARKLE_DEFINE_LOG_CATEGORY_STATIC(logger, "RHI.Services");
-	Diagnostics::Fatal(logger, __FILE__, __LINE__, message);
+	Diagnostics::Fatal(g_renderDeviceServicesLogger, __FILE__, __LINE__, message);
 }
 
 void RenderDeviceServices::FailUnsupportedBackend(ERhiBackendApi api) noexcept
@@ -113,6 +115,16 @@ std::unique_ptr<RenderDeviceServices> RenderDeviceServices::Create(Window& windo
 		services->m_state->GetBackendServices().BindExternalCapture(*launch.ExternalCapture);
 	}
 #endif
+	const RhiAdapterIdentity& adapter = services->GetCapabilities().ExternalFeatureInterop.Adapter;
+
+	SPDLOG_LOGGER_INFO(
+	    g_renderDeviceServicesLogger,
+	    "Device created: backend={} adapter='{}' vendor={:#06x} device={:#06x}",
+	    RhiBackendApiToString(backendApi),
+	    adapter.Name,
+	    adapter.VendorId,
+	    adapter.DeviceId);
+
 	return services;
 }
 

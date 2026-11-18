@@ -3,22 +3,40 @@
 #include "LoggerBootstrap.h"
 
 #include "Core/Public/Environment/EnvironmentVariables.h"
-#include "Paths/LogPathPolicy.h"
+#include "Core/Public/Paths/FileSystemPaths.h"
+#include "Core/Public/Paths/PathFormatting.h"
+#include "Core/Public/Paths/PathUtils.h"
+#include "Core/Public/Paths/ProductUserStatePaths.h"
 
 #include <memory>
-#include <mutex>
 #include <string>
 
-#include <spdlog/sinks/base_sink.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_sinks.h>
 
 #if defined(_WIN32)
-  #include <Windows.h>
+  #include <spdlog/sinks/msvc_sink.h>
 #endif
 
 namespace Logging
 {
+	static std::filesystem::path ResolveLogFile()
+	{
+		const Filesystem::ProductUserStatePaths& userState = Filesystem::GetProductUserStatePaths();
+		std::string configuredFile;
+		if (Environment::TryGetVariable("SPARKLE_LOG_FILE", configuredFile))
+		{
+			const auto configuredPath = Paths::Normalize(userState.LogsRoot / configuredFile);
+			if (Paths::IsUnderRoot(configuredPath, userState.LogsRoot))
+			{
+				return configuredPath;
+			}
+		}
+
+		const std::string executableStem = PathFormatting::SanitizePathSegment(Filesystem::GetExecutablePath().stem().string());
+		return userState.LogsRoot / PathFormatting::TimestampedFileName(executableStem, ".log");
+	}
+
 	spdlog::level::level_enum ReadConfiguredLoggerLevel() noexcept
 	{
 		std::string configuredLevel;
@@ -39,22 +57,6 @@ namespace Logging
 		return configuredSpdlogLevel == spdlog::level::off && configuredLevel != "off" ? spdlog::level::info : configuredSpdlogLevel;
 	}
 
-#if defined(_WIN32)
-	class DebugOutputSink final : public spdlog::sinks::base_sink<std::mutex>
-	{
-	protected:
-		void sink_it_(const spdlog::details::log_msg& msg) override
-		{
-			spdlog::memory_buf_t formatted;
-			spdlog::sinks::base_sink<std::mutex>::formatter_->format(msg, formatted);
-			formatted.push_back('\0');
-			::OutputDebugStringA(formatted.data());
-		}
-
-		void flush_() override {}
-	};
-#endif
-
 	std::vector<spdlog::sink_ptr> CreateLoggerSinks(std::optional<std::filesystem::path>& activeLogFilePath)
 	{
 		std::vector<spdlog::sink_ptr> sinks;
@@ -65,16 +67,14 @@ namespace Logging
 		sinks.push_back(stderrSink);
 
 #if defined(_WIN32)
-		auto debuggerSink = std::make_shared<DebugOutputSink>();
+		auto debuggerSink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
 		debuggerSink->set_pattern("[%n] [%l] %s:%# %v");
 		sinks.push_back(debuggerSink);
 #endif
 
 		try
 		{
-			std::string configuredFile;
-			Environment::TryGetVariable("SPARKLE_LOG_FILE", configuredFile);
-			const std::filesystem::path logPath = Paths::ResolveBootstrapLogFile(configuredFile, Paths::LogParentDirectoryPolicy::EnsureExists);
+			const std::filesystem::path logPath = ResolveLogFile();
 
 			auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logPath.string(), 5 * 1024 * 1024, 2);
 			fileSink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] %s:%# %v");

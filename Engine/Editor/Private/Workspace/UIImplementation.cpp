@@ -17,7 +17,6 @@
 #include "AssetInspection/UsedTexturesPanel.h"
 #include "Viewport/ViewportPanel.h"
 #include "Viewport/ViewportToolbar.h"
-#include "Renderer/Public/Diagnostics/RendererMemoryDiagnostics.h"
 #include "Renderer/Public/UI/UiTextureHandle.h"
 #include "Renderer/Public/Settings/EngineRenderingSettings.h"
 #include "Renderer/Public/UI/ImGuiRenderPacketBuilder.h"
@@ -80,17 +79,10 @@ void UI::Implementation::SetViewportFinalColorTexture(UiTextureHandle texture) n
 
 void UI::Implementation::SetDiagnosticsProviders(EditorDiagnosticsProviders providers)
 {
-	m_memoryDiagnosticsProvider = std::move(providers.MemoryDiagnostics);
-
 	m_shaderToolsPanel->SetDiagnosticsProvider(std::move(providers.Shaders));
 	m_usedMeshesPanel->SetDiagnosticsProvider(std::move(providers.MeshDiagnostics));
 	m_usedMeshesPanel->SetPreviewGeometryProvider(std::move(providers.MeshPreview));
 	m_usedTexturesPanel->SetDiagnosticsProvider(std::move(providers.TextureDiagnostics));
-}
-
-RendererMemoryDiagnosticsSnapshot UI::Implementation::CaptureMemoryDiagnostics() const
-{
-	return m_memoryDiagnosticsProvider ? m_memoryDiagnosticsProvider() : RendererMemoryDiagnosticsSnapshot{};
 }
 
 bool UI::Implementation::ConsumeShaderReloadRequest() noexcept

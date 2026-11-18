@@ -87,6 +87,7 @@ namespace SparkleLauncher
 			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex, processSteps.size());
 			Process::ChildProcessRequest request = step.Request;
 			AppendProcessOutputCallback(request, outputCallback);
+			operation.LogPath = request.LogPath;
 
 			const Process::ChildProcessResult result = processRunner.Run(request);
 			if (!result.Succeeded())

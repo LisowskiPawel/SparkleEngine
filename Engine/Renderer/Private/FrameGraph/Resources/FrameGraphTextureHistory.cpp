@@ -67,8 +67,8 @@ void FrameGraph::InvalidateTextureHistory(FrameGraphTextureHistory history) noex
 
 void FrameGraph::PrepareTextureHistories(const FrameGraphPlan& plan)
 {
-	RhiResourceService& resourceService = m_renderHardwareInterface->GetResourceService();
-	const std::uint32_t historyResourceCount = (std::max) (2u, m_renderHardwareInterface->GetCapabilities().Presentation.MaximumFramesInFlight);
+	RhiResourceService& resourceService = m_renderHardwareInterface.GetResourceService();
+	const std::uint32_t historyResourceCount = (std::max) (2u, m_renderHardwareInterface.GetCapabilities().Presentation.MaximumFramesInFlight);
 	for (TextureHistoryRecord& history : m_textureHistories)
 	{
 		PrepareTextureHistory(plan, history, historyResourceCount, resourceService);
@@ -208,12 +208,7 @@ void FrameGraph::CommitTextureHistories() const noexcept
 
 void FrameGraph::ReleaseTextureHistories() noexcept
 {
-	if (m_renderHardwareInterface == nullptr)
-	{
-		return;
-	}
-
-	RhiResourceService& resourceService = m_renderHardwareInterface->GetResourceService();
+	RhiResourceService& resourceService = m_renderHardwareInterface.GetResourceService();
 	for (TextureHistoryRecord& history : m_textureHistories)
 	{
 		for (RhiOwnedResourceHandle& resource : history.resources)
@@ -230,7 +225,7 @@ void FrameGraph::ReleaseTextureHistories() noexcept
 
 bool FrameGraph::IsTextureHistoryValid(FrameGraphTextureHistory handles) const noexcept
 {
-	const std::uint32_t count = (std::max) (2u, m_renderHardwareInterface->GetCapabilities().Presentation.MaximumFramesInFlight);
+	const std::uint32_t count = (std::max) (2u, m_renderHardwareInterface.GetCapabilities().Presentation.MaximumFramesInFlight);
 	const std::uint32_t previousIndex = static_cast<std::uint32_t>((m_historyFrameIndex + count - 1u) % count);
 	for (const TextureHistoryRecord& history : m_textureHistories)
 	{

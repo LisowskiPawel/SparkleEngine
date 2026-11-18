@@ -32,12 +32,10 @@ public:
 	bool IsValid() const noexcept;
 	bool IsSettled() const noexcept;
 	bool WaitFor(std::chrono::milliseconds timeout) const;
-	std::uint64_t GetGeneration() const noexcept;
 	TaskExecutionStatus GetStatus() const noexcept;
 	TaskResult GetResult() const;
 	std::string GetFirstFailureTaskName() const;
 	std::optional<TaskResult> GetTaskResult(TaskNodeHandle handle) const;
-	std::uint32_t GetSettledTaskCount() const noexcept;
 
 private:
 	friend class TaskExecutor;

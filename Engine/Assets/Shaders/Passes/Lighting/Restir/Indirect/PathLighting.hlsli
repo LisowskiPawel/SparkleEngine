@@ -127,7 +127,6 @@ namespace PathLighting
 	                        RayTracingPathSurface primarySurface,
 	                        uint2 pixelCoord,
 	                        uint sampleIndex,
-	                        uint specularSampleMode,
 	                        uint bounceCount,
 	                        uint randomFrameIndex,
 	                        bool bEvaluatePrimaryDiffuse,
@@ -148,11 +147,7 @@ namespace PathLighting
 		{
 			const PathSampling::RandomSamples randomSamples = PathSampling::GenerateRandomSamples(pixelCoord, bounceIndex, sampleIndex, randomFrameIndex);
 
-			const PathSample::DirectionSample sample = PathSampling::SampleBSDF(surface,
-			                                                                    specularSampleMode,
-			                                                                    randomSamples,
-			                                                                    bounceIndex != 0u || bEvaluatePrimaryDiffuse,
-			                                                                    bounceIndex != 0u || bEvaluatePrimarySpecular);
+			const PathSample::DirectionSample sample = PathSampling::SampleBSDF(surface, randomSamples, bounceIndex != 0u || bEvaluatePrimaryDiffuse, bounceIndex != 0u || bEvaluatePrimarySpecular);
 
 			if (!sample.bHasSupport)
 			{

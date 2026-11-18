@@ -93,7 +93,7 @@ Light/lobe probabilities, comparable measures, MIS and emitter endpoints must ma
 
 ### Accumulation and validation
 
-The full surface reference has no valid deterministic depth/distance cutoff. The finite-path diagnostic is a separately labeled bounded product without roulette.
+The full surface reference has no valid deterministic depth/distance cutoff.
 
 Binary32 mean/variance accumulation and exact counts commit complete sample prefixes up to 1,048,576 samples per pixel. Non-finite values, overflow, safety-depth termination and mixed, stale or truncated output invalidate a reference result.
 
@@ -181,6 +181,8 @@ A warmed Bistro scene switch aims to avoid hitches above 50 ms; report cold load
 Application hosts the world and renderer. GameFramework publishes immutable input; [Renderer](../Engine/Renderer) prepares scene/view/frame work; [RHI](../Engine/RHI) implements GPU operations through D3D12/Vulkan. [Module ownership and placement](Engineering.md#file-placement) describes the supporting systems.
 
 Shader [passes](../Engine/Assets/Shaders/Passes) own entry points and pass-specific resources. Shared [material rules](../Engine/Assets/Shaders/Material) and [color mathematics](../Engine/Assets/Shaders/Common/Color.hlsli) stay independent of passes. Match CPU upload records and shader layouts at their shared boundary.
+
+Renderer owns pass and recording-chunk labels; the recording command list determines native marker support. Required GPU-crash scopes stay active when optional markers are disabled. Native timestamp queries and resolution belong to RHI.
 
 World updates and extraction finish before immutable publication; structural edits wait for workers. Animation-only publication preserves edit history and viewport navigation.
 

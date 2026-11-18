@@ -87,7 +87,6 @@ namespace SparkleLauncher
 		std::string Id;
 		std::string DisplayName;
 		std::string DisplayCommandLine;
-		std::filesystem::path LogPath;
 		std::filesystem::path DestructivePath;
 		bool bDestructive = false;
 	};
@@ -110,5 +109,5 @@ namespace SparkleLauncher
 	const std::vector<MaintenanceOperationDefinition>& GetMaintenanceOperationDefinitions();
 	std::optional<MaintenanceOperationDefinition> FindMaintenanceOperationDefinition(std::string_view operationId);
 	MaintenanceOperationPlan PlanMaintenanceOperation(std::string_view operationId, const MaintenanceOperationRequest& request);
-	OperationRecord RunMaintenanceOperationPlan(MaintenanceOperationPlan plan);
+	OperationRecord RunMaintenanceOperationPlan(MaintenanceOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback = {});
 }

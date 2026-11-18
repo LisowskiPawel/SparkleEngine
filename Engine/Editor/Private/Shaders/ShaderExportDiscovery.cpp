@@ -134,15 +134,15 @@ static void SelectNewestShaderExport(
 	{
 		const ShaderDiagnosticsEntry& active = diagnostics.Entries[index];
 		const bool bSameCompile = active.ShaderType == shader.ShaderType && active.CompileInputHash == shader.CompileInputHash;
-		const bool bSameTarget = bSameCompile && active.Backend == shader.Backend;
-		const bool bFirstExport = bSameTarget && selected[index].empty();
-		const bool bCompareAge = bSameTarget && !bFirstExport;
-		const bool bNewerExport = bCompareAge && request.parent_path().native() > selected[index].native();
-		const bool bSelectExport = bFirstExport || bNewerExport;
-
-		if (bSelectExport)
+		if (!bSameCompile || active.Backend != shader.Backend)
 		{
-			selected[index] = request.parent_path();
+			continue;
+		}
+
+		const auto directory = request.parent_path();
+		if (selected[index].empty() || directory.native() > selected[index].native())
+		{
+			selected[index] = directory;
 		}
 	}
 }
@@ -184,7 +184,7 @@ static void InspectPublishedCook(
 	{
 		const auto document = ReadExportDocument(manifest, {"jobs"});
 		const auto& jobs = document.at("jobs");
-		if (!jobs.is_array() || jobs.size() > 65'536)
+		if (!jobs.is_array())
 		{
 			return;
 		}

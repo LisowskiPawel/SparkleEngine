@@ -32,8 +32,6 @@ public:
 	DxcShaderBackend(DxcShaderBackend&&) = delete;
 	DxcShaderBackend& operator=(DxcShaderBackend&&) = delete;
 
-	bool IsValid() const noexcept;
-
 	static ShaderBackendCapabilities GetStaticCapabilities() noexcept;
 	static std::uint64_t QueryBackendVersion();
 

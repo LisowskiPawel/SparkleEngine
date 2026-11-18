@@ -12,7 +12,6 @@ namespace SparkleLauncher
 		std::filesystem::path ContentArchivesRoot;
 		std::filesystem::path LiveInstancesRoot;
 		std::filesystem::path ActivityFile;
-		std::filesystem::path SettingsFile;
 	};
 
 	LauncherStatePaths ResolveLauncherStatePaths(const std::filesystem::path& workspaceRoot);

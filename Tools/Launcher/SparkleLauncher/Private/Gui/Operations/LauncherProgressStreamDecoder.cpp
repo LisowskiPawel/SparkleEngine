@@ -50,24 +50,15 @@ namespace SparkleLauncher
 
 	bool LauncherProgressStreamDecoder::Accept(const ToolWorkProgress& progress)
 	{
-		if (progress.phase.empty())
+		if (progress.phase == m_lastProgress.phase)
 		{
-			return false;
-		}
-		if (m_bHasProgress && progress.phase == m_lastProgress.phase)
-		{
-			if (progress.total != m_lastProgress.total || progress.completed < m_lastProgress.completed)
-			{
-				return false;
-			}
-			if (progress.completed == m_lastProgress.completed)
+			if (progress.total != m_lastProgress.total || progress.completed <= m_lastProgress.completed)
 			{
 				return false;
 			}
 		}
 
 		m_lastProgress = progress;
-		m_bHasProgress = true;
 		return true;
 	}
 }

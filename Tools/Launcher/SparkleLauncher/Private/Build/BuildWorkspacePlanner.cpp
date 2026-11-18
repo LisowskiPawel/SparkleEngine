@@ -7,7 +7,6 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "SparkleLauncher/ArtifactNaming.h"
-#include "Workspace/LauncherStatePaths.h"
 #include "ToolOutputPaths.h"
 
 #include <algorithm>
@@ -290,6 +289,10 @@ namespace SparkleLauncher
 		for (const BuildWorkspaceOperationStep& step : plan.Steps)
 		{
 			dryRun << "\n  " << step.DisplayName << ": " << step.DisplayCommandLine;
+			if (!step.LogPath.empty())
+			{
+				dryRun << "\n    Log: " << step.LogPath.string();
+			}
 		}
 		if (plan.Steps.empty())
 		{
@@ -313,7 +316,6 @@ namespace SparkleLauncher
 		plan.Kind = definition->Kind;
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
 		plan.Request = request;
-		plan.Operation.LogPath = ResolveLauncherOperationLogPath(request.WorkspaceRoot, definition->Id, "Latest.txt");
 		RecordBuildInputs(plan);
 		if (!HasBuildSources(request.WorkspaceRoot))
 		{

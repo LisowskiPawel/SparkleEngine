@@ -50,10 +50,6 @@ namespace ECS
 	bool AnimationSystemExecution::RunPlayback(std::uint32_t begin, std::uint32_t end)
 	{
 		const auto entities = m_registry.GetStorage<AnimationState>().GetEntities();
-		if (begin > end || end > entities.size())
-		{
-			return false;
-		}
 		for (std::uint32_t index = begin; index < end; ++index)
 		{
 			const EntityId entity = entities[index];
@@ -72,11 +68,6 @@ namespace ECS
 	bool AnimationSystemExecution::RunPose(std::uint32_t begin, std::uint32_t end)
 	{
 		const auto work = m_evaluation.GetPoseWork();
-		if (begin > end || end > work.size())
-		{
-			return false;
-		}
-
 		for (std::uint32_t index = begin; index < end; ++index)
 		{
 			AnimationEvaluationStorage::PoseWorkSlot& slot = work[index];
@@ -101,11 +92,6 @@ namespace ECS
 	bool AnimationSystemExecution::RunMorphSamples(std::uint32_t begin, std::uint32_t end)
 	{
 		const auto samples = m_evaluation.GetMorphSamples();
-		if (begin > end || end > samples.size())
-		{
-			return false;
-		}
-
 		for (std::uint32_t index = begin; index < end; ++index)
 		{
 			AnimationEvaluationStorage::MorphSampleSlot& sample = samples[index];
@@ -133,11 +119,6 @@ namespace ECS
 	bool AnimationSystemExecution::RunSkinning(std::uint32_t begin, std::uint32_t end)
 	{
 		std::span<AnimationEvaluationStorage::PoseWorkSlot> work = m_evaluation.GetPoseWork();
-		if (begin > end || end > work.size())
-		{
-			return false;
-		}
-
 		for (std::uint32_t index = begin; index < end; ++index)
 		{
 			AnimationEvaluationStorage::PoseWorkSlot& slot = work[index];
@@ -159,11 +140,6 @@ namespace ECS
 		for (std::size_t index = 0; index < bindings.size(); ++index)
 		{
 			const AnimationEvaluationStorage::MorphTargetBinding& binding = bindings[index];
-			if (binding.SampleIndex >= samples.size())
-			{
-				return false;
-			}
-
 			const bool bMorphWeightsWritten = m_weights.Write(binding.TargetWeights, samples[binding.SampleIndex].Weights);
 
 			if (!bMorphWeightsWritten)

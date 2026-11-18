@@ -11,7 +11,6 @@
 #include "D3D12/Device/D3D12Rhi.h"
 #include "D3D12/Pipeline/D3D12BindingLayout.h"
 #include "Core/Public/Strings/StringUtils.h"
-#include "Validation/RhiContract.h"
 
 #include <format>
 #include <string>
@@ -22,7 +21,6 @@ class D3D12RayTracingPipelineAssembly final
 public:
 	explicit D3D12RayTracingPipelineAssembly(const RayTracingPipelineDesc& desc)
 	{
-		RhiContract::ValidateRayTracingPipelineDesc(desc);
 		ReserveSubobjects(desc);
 		BuildShaderLibraries(desc);
 		BuildHitGroups(desc);

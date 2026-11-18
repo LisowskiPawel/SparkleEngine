@@ -12,11 +12,9 @@ set(_sparkle_zlib_revision 51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf)
 sparkle_declare_git_dependency(zlib
     https://github.com/madler/zlib.git
     ${_sparkle_zlib_revision})
-sparkle_log_dependency_step("zlib" "v1.3.1" "~1 MB" "Compression backend used by TinyEXR and Assimp" "https://github.com/madler/zlib.git")
 FetchContent_Populate(zlib)
 
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
-    sparkle_log_dependency_ready("zlib" "${zlib_SOURCE_DIR}" "~1 MB")
     return()
 endif()
 
@@ -41,5 +39,3 @@ set(ZLIB_FOUND TRUE)
 set(ZLIB_LIBRARIES zlibstatic)
 set(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR} ${zlib_BINARY_DIR})
 set(ZLIB_INCLUDE_DIRS ${ZLIB_INCLUDE_DIR})
-
-sparkle_log_dependency_ready("zlib" "${zlib_SOURCE_DIR}" "~1 MB")

@@ -7,7 +7,6 @@
 #include <array>
 #include <span>
 
-class FrameExecutionDiagnostics;
 class FrameGraph;
 class RenderCommandList;
 class RhiCommandSubmissionService;
@@ -20,7 +19,6 @@ public:
 	    const FrameGraph& frameGraph,
 	    const FrameGraphPlan& plan,
 	    RhiCommandSubmissionService& submissionService,
-	    FrameExecutionDiagnostics& frameDiagnostics,
 	    TaskExecutor& taskExecutor,
 	    std::span<RhiSubmissionToken> batchTokens) noexcept;
 

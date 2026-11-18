@@ -24,6 +24,5 @@ else()
     message(FATAL_ERROR "Unknown SANITIZER_TYPE: ${SANITIZER_TYPE}")
 endif()
 
-message(STATUS "Sanitizers enabled: ${SANITIZER_TYPE}")
 add_compile_options("-fsanitize=${_sparkle_sanitizer}" -fno-omit-frame-pointer -g -O1)
 add_link_options("-fsanitize=${_sparkle_sanitizer}")

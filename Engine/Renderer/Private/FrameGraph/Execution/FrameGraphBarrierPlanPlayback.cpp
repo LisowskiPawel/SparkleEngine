@@ -28,7 +28,7 @@ static void FailUnresolvedAliasingBarrier(std::string_view passName, const Frame
 	    __LINE__,
 	    std::format(
 	        "FrameGraph aliasing barrier validation failed: pass='{}' block={} beforeHandle={} beforeResource='{}' afterHandle={} "
-	        "afterResource='{}' remediation='verify transient resource lifetimes and materialization before barrier playback'",
+	        "afterResource='{}'",
 	        passName,
 	        barrier.physicalBlockIndex,
 	        FormatResourceLabel(barrier.beforeHandle),
@@ -44,25 +44,13 @@ static void FailUnresolvedResourceBarrier(std::string_view passName, const Frame
 	    __FILE__,
 	    __LINE__,
 	    std::format(
-	        "FrameGraph resource barrier validation failed: pass='{}' handle={} resource='{}' label='{}' beforeState={} afterState={} "
-	        "remediation='declare the resource in setup and ensure the resource is imported, persistent-bound, or "
-	        "transient-materialized before execution'",
+	        "FrameGraph resource barrier failed: pass='{}' handle={} resource='{}' label='{}' beforeState={} afterState={}",
 	        passName,
 	        FormatResourceLabel(barrier.handle),
 	        resourceName,
 	        barrier.label.empty() ? "<unlabeled>" : barrier.label,
 	        ResourceStateToString(barrier.before),
 	        ResourceStateToString(barrier.after)));
-}
-
-void FrameGraph::EmitCompiledBarriers(RenderCommandContext& commandContext, const std::vector<FrameGraphBarrier>& barriers) const noexcept
-{
-	EmitCompiledBarriers(commandContext, "Unknown", barriers);
-}
-
-void FrameGraph::EmitTransientAliasingBarriers(RenderCommandContext& commandContext, const std::vector<FrameGraphAliasingBarrier>& barriers) const noexcept
-{
-	EmitTransientAliasingBarriers(commandContext, "Unknown", barriers);
 }
 
 void FrameGraph::EmitTransientAliasingBarriers(RenderCommandContext& commandContext, std::string_view passName, const std::vector<FrameGraphAliasingBarrier>& barriers) const noexcept

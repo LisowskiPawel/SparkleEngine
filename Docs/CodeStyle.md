@@ -2,7 +2,7 @@
 
 [Documentation](README.md) | [Developer guide](Engineering.md)
 
-These conventions apply to project C++ and shaders. [.clang-format](../.clang-format), [.clang-tidy](../.clang-tidy), [CodeStyle.ps1](../CMake/CodeStyle.ps1), [source checks](../CMake/CodeStyle) and module CMake define the mechanical settings.
+These conventions apply to project C++ and shaders. [.clang-format](../.clang-format), [.clang-tidy](../.clang-tidy) and module CMake define the mechanical settings. [CodeStyle.ps1](../CMake/CodeStyle.ps1) runs the formatter; naming, decision complexity, braces and logical paragraphs are reviewed with the code.
 
 ## Formatting and paragraphs
 
@@ -85,7 +85,7 @@ Future fields, naming symmetry and member-access appearance are insufficient. Re
 
 ## Naming and vocabulary
 
-Types, functions, methods and enum values use `UpperCamelCase`; parameters/locals use `lowerCamelCase`; private members use `m_`. **All boolean variables, fields, constants and atomics use `bUpperCamelCase`**, preserving existing scope prefixes such as `m_bReady` and `s_bReady`. Apply boolean naming to C# check helpers too. External serialized/native names remain exact.
+Types, functions, methods and enum values use `UpperCamelCase`; parameters/locals use `lowerCamelCase`; private members use `m_`. **All boolean variables, fields, constants and atomics use `bUpperCamelCase`**, preserving existing scope prefixes such as `m_bReady` and `s_bReady`. External serialized/native names remain exact.
 
 Use the surrounding context without repeating an operation's entire name. Acronyms use `Rhi/Gpu/Io`; macros serve build/export/preprocessor requirements. Write TLAS/PTLAS in prose/UI and `Tlas/Ptlas` in C++.
 
@@ -149,7 +149,7 @@ CMake\CodeStyle.bat -Mode Check -Path "<repo-relative-file>"
 git diff --check
 ```
 
-Repeat per file. Use `-Staged` only when it covers the whole change; it checks working-tree content, so inspect the actual index for partial staging. `-ManifestPath` records file selection.
+Repeat per file. Use `-Staged` only when it covers the whole change; it checks working-tree content, so inspect the actual index for partial staging.
 
 Record the tool, coverage, mechanical result and manual layout review. Repeat affected checks after edits and identify unchecked files. Documentation changes use documentation checks.
 

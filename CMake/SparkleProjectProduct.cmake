@@ -4,10 +4,6 @@ set(SPARKLE_WINDOWS_APPLICATION_MANIFEST
     "${SPARKLE_REPOSITORY_ROOT}/Engine/Platform/Private/Window/SparkleApplication.manifest")
 
 function(sparkle_configure_project_product target_name project_name product_role)
-    if(NOT TARGET ${target_name})
-        message(FATAL_ERROR "Unknown Sparkle project product '${target_name}'")
-    endif()
-
     sparkle_configure_project_artifacts("${target_name}" "${project_name}" "${product_role}")
     sparkle_stage_msvc_runtime(${target_name})
     sparkle_stage_d3d12_pix_event_runtime(${target_name})
@@ -40,10 +36,6 @@ function(sparkle_configure_project_product target_name project_name product_role
     endif()
 
     if(WIN32)
-        if(NOT EXISTS "${SPARKLE_WINDOWS_APPLICATION_MANIFEST}")
-            message(FATAL_ERROR
-                "Sparkle Windows application manifest is missing: '${SPARKLE_WINDOWS_APPLICATION_MANIFEST}'")
-        endif()
         target_sources(${target_name} PRIVATE "${SPARKLE_WINDOWS_APPLICATION_MANIFEST}")
     endif()
 endfunction()

@@ -30,7 +30,6 @@ template <typename TShader> static auto& BuildReferencePathTracerParameters(
 	parameters->SessionSeed = work.SessionSeed;
 	parameters->ReplicateId = work.ReplicateId;
 	parameters->SampleOrdinal = work.SampleOrdinal;
-	parameters->FinitePathDiagnosticSurfaceVertices = work.FinitePathDiagnosticSurfaceVertices;
 	parameters->FirstRow = work.FirstRow;
 	parameters->RowCount = work.RowCount;
 	parameters->PriorSampleCount = work.PriorSampleCount;

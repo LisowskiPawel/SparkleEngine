@@ -23,11 +23,7 @@ void Window::DestroyNativeWindow() noexcept
 	{
 		DestroyWindow(m_hWnd);
 	}
-	if (m_windowClassAtom && m_hInstance)
-	{
-		UnregisterClassW(kWindowClassName, m_hInstance);
-		m_windowClassAtom = 0;
-	}
+	UnregisterClassW(kWindowClassName, m_hInstance);
 }
 
 void Window::RegisterWindowClass()
@@ -42,8 +38,8 @@ void Window::RegisterWindowClass()
 	windowClass.lpszClassName = kWindowClassName;
 	windowClass.hIconSm = LoadIconW(nullptr, MAKEINTRESOURCEW(32512));
 
-	m_windowClassAtom = RegisterClassExW(&windowClass);
-	if (!m_windowClassAtom)
+	const ATOM windowClassAtom = RegisterClassExW(&windowClass);
+	if (!windowClassAtom)
 	{
 		Diagnostics::Fatal(g_platformLogger, __FILE__, __LINE__, "Window: Failed to register window class");
 	}

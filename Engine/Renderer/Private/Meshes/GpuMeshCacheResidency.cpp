@@ -98,7 +98,7 @@ void GpuMeshCache::LaunchPreparation(MeshRequest& request)
 
 	request.Execution = m_taskExecutor->Launch(
 	    *m_taskScope,
-	    TaskDesc{.Name = TaskName("Prepare immutable mesh generation"), .Lane = TaskLane::Background},
+	    TaskDesc{.Name = "Prepare immutable mesh generation", .Lane = TaskLane::Background},
 	    [mesh, prepared](TaskExecutionContext& context)
 	    {
 		    if (context.IsCancellationRequested())

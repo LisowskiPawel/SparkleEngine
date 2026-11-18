@@ -151,10 +151,6 @@ namespace Assets
 		const auto existing = m_files.find(path);
 		if (existing != m_files.end())
 		{
-			if (existing->second->ReferenceCount == (std::numeric_limits<std::size_t>::max)())
-			{
-				throw Diagnostics::Error(std::format("Cooked asset '{}' reference count exceeds the host range.", path.generic_string()));
-			}
 			++existing->second->ReferenceCount;
 			return;
 		}

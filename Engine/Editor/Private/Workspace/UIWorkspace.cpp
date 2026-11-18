@@ -46,11 +46,6 @@ void UI::Implementation::Build()
 	BuildSceneInspector(bDisableInteraction, mainMenuBarHeight);
 	BuildUtilityPanels(bDisableInteraction);
 
-#if USE_IMGUI_DEMO_WINDOW
-	bool bShowDemoWindow = true;
-	ImGui::ShowDemoWindow(&bShowDemoWindow);
-#endif
-
 	m_mainMenuBar->BuildOverlays();
 
 	if (!ImGui::IsAnyItemActive())

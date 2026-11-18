@@ -11,6 +11,3 @@
 #include <vector>
 #include <string>
 #include <functional>
-
-#include "Core/Public/Diagnostics/Logger.h"
-#include "Core/Public/Diagnostics/Verify.h"
