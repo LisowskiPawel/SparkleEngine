@@ -217,7 +217,7 @@ namespace TextureProcessing
 		return properties;
 	}
 
-	DXGI_FORMAT SelectOutputFormat(const TextureCookRequest& request, bool bFloatValues, const PixelProperties& properties)
+	DXGI_FORMAT SelectOutputFormat(const TextureCookRequest& request, bool bFloatValues, bool bNativeFloat, const PixelProperties& properties)
 	{
 		const auto uncompressed = bFloatValues ? DXGI_FORMAT_R32G32B32A32_FLOAT : DXGI_FORMAT_R8G8B8A8_UNORM;
 		const auto hdr = request.policy.hdrEncoding == TextureHdrEncoding::Bc6h ? DXGI_FORMAT_BC6H_UF16 : DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -242,7 +242,7 @@ namespace TextureProcessing
 				format = properties.bHasAlpha ? DXGI_FORMAT_R32G32B32A32_FLOAT : hdr;
 				break;
 			case TextureGroup::Default:
-				format = bFloatValues && !properties.bHasAlpha ? hdr : uncompressed;
+				format = bNativeFloat && !properties.bHasAlpha ? hdr : uncompressed;
 				break;
 		}
 		if (format == DXGI_FORMAT_BC6H_UF16 && !properties.bFitsUnsignedHalf)
@@ -318,7 +318,7 @@ ScratchImage ProcessTexture(const TextureCookRequest& request, ScratchImage sour
 
 	const auto policy = request.policy.mipPolicy == TextureMipPolicy::NoMips ? TextureMipPolicy::NoMips : TextureMipPolicy::PreserveExisting;
 	const auto properties = InspectPixels(pixels, policy);
-	const DXGI_FORMAT format = SelectOutputFormat(request, bFloatValues, properties);
+	const DXGI_FORMAT format = SelectOutputFormat(request, bFloatValues, bNativeFloat, properties);
 
 	return EncodeTexture(std::move(pixels), format, policy);
 }

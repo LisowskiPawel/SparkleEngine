@@ -100,7 +100,7 @@ void RayTracingTlasBuilder::Prepare(std::uint32_t instanceCapacity) noexcept
 	}
 }
 
-std::uint32_t RayTracingTlasBuilder::Build(
+void RayTracingTlasBuilder::Build(
     RenderCommandContext& commandContext,
     const PreparedRenderScene& preparedScene,
     RayTracingBlasCache& blasCache,
@@ -111,13 +111,11 @@ std::uint32_t RayTracingTlasBuilder::Build(
 	BuildState state;
 	state.Instances.reserve(instances.size());
 	CollectInstances(commandContext, preparedScene, blasCache, shaderTablePlan, diagnostics, state);
-	const std::uint32_t instanceCount = static_cast<std::uint32_t>(state.Instances.size());
 	PrepareBuild(state);
 
 	RecordBuild(commandContext, state, diagnostics);
 
-	m_builtInstanceCount = instanceCount;
-	return instanceCount;
+	m_builtInstanceCount = static_cast<std::uint32_t>(state.Instances.size());
 }
 
 void RayTracingTlasBuilder::CollectInstances(

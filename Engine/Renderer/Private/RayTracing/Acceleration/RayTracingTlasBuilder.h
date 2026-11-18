@@ -25,7 +25,7 @@ public:
 	RayTracingTlasBuilder& operator=(RayTracingTlasBuilder&&) = delete;
 
 	void Prepare(std::uint32_t instanceCapacity) noexcept;
-	std::uint32_t Build(
+	void Build(
 	    RenderCommandContext& commandContext,
 	    const PreparedRenderScene& preparedScene,
 	    RayTracingBlasCache& blasCache,
