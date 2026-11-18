@@ -5,7 +5,7 @@
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Hash/HashUtils.h"
-#include "Core/Public/Json/JsonReader.h"
+#include <nlohmann/json.hpp>
 #include "Core/Public/Formatting/HexFormat.h"
 #include "Core/Public/Paths/PathUtils.h"
 #include "RHI/Public/Shaders/GlobalShaderMap.h"
@@ -21,14 +21,14 @@ namespace GpuCrashInputVerification
 	static void VerifyShaderDebugData(
 	    std::string_view format,
 	    const std::filesystem::path& requestPath,
-	    std::string_view request,
+	    const nlohmann::json& request,
 	    const std::filesystem::path& bundleRoot,
 	    const std::set<std::wstring>& files)
 	{
-		const auto information = ReadRequiredString(request, "debugInformation");
+		const auto information = request.at("debugInformation").get<std::string>();
 		if (format == "Dxil")
 		{
-			const auto symbolPath = ResolveReceiptFile(requestPath.parent_path(), ReadRequiredString(request, "symbolName"));
+			const auto symbolPath = ResolveReceiptFile(requestPath.parent_path(), request.at("symbolName").get<std::string>());
 			if (information != "full-pdb" || !files.contains(Paths::MakePathKey(symbolPath)))
 			{
 				throw Diagnostics::Error("Shader export is missing its full PDB receipt.");
@@ -39,15 +39,14 @@ namespace GpuCrashInputVerification
 			throw Diagnostics::Error("Shader export does not request full SPIR-V debug information.");
 		}
 
-		std::vector<std::string_view> sources;
-		if (!Json::TryReadArrayProperty(request, "sources", sources) || sources.empty())
+		const auto& sources = request.at("sources");
+		if (!sources.is_array() || sources.empty())
 		{
 			throw Diagnostics::Error("Shader export omits transitive source identity.");
 		}
-		for (const auto source : sources)
+		for (const auto& source : sources)
 		{
-			const auto sourceJson = "{\"path\":" + std::string(source) + "}";
-			const auto sourcePath = ResolveReceiptFile(bundleRoot, ReadRequiredString(sourceJson, "path"));
+			const auto sourcePath = ResolveReceiptFile(bundleRoot, source.get_ref<const std::string&>());
 			if (!files.contains(Paths::MakePathKey(sourcePath)))
 			{
 				throw Diagnostics::Error("Shader source is outside verified export membership.");
@@ -55,23 +54,19 @@ namespace GpuCrashInputVerification
 		}
 	}
 
-	static ExportedShaderJobs ReadExportedShaderJobs(ERhiBackendApi api, const std::filesystem::path& bundleRoot, std::string_view bundle, const std::set<std::wstring>& files)
+	static ExportedShaderJobs ReadExportedShaderJobs(ERhiBackendApi api, const std::filesystem::path& bundleRoot, const nlohmann::json& bundle, const std::set<std::wstring>& files)
 	{
-		std::vector<std::string_view> jobs;
-		if (!Json::TryReadArrayProperty(bundle, "jobs", jobs) || jobs.empty() || jobs.size() > files.size())
+		const auto& jobs = bundle.at("jobs");
+		const bool bInvalidJobs = !jobs.is_array() || jobs.empty();
+		if (bInvalidJobs || jobs.size() > files.size())
 		{
 			throw Diagnostics::Error("Shader job membership is missing or exceeds verified export files.");
 		}
 		ExportedShaderJobs exportedJobs;
-		for (const auto job : jobs)
+		for (const auto& job : jobs)
 		{
 			// Jobs name the receipt-owned compile requests.
-			std::string requestName;
-			const std::string object = "{\"job\":" + std::string(job) + "}";
-			if (!Json::TryReadStringProperty(object, "job", requestName))
-			{
-				throw Diagnostics::Error("Shader job membership is malformed.");
-			}
+			const auto& requestName = job.get_ref<const std::string&>();
 
 			const auto requestPath = ResolveReceiptFile(bundleRoot, requestName);
 			if (!files.contains(Paths::MakePathKey(requestPath)))
@@ -79,21 +74,27 @@ namespace GpuCrashInputVerification
 				throw Diagnostics::Error("Shader job is outside verified export membership.");
 			}
 
-			const auto request = ReadReceipt(requestPath);
-			const auto format = ReadRequiredString(request, "format");
+			const auto request = ReadReceipt(requestPath, {"format", "codeSha256", "debugInformation", "symbolName", "sources", "shaderTypeId", "compileInputHash", "target"});
+			const auto format = request.at("format").get<std::string>();
+			if (format.empty())
+			{
+				throw Diagnostics::Error("Shader export requires a format identity.");
+			}
 			if ((api == ERhiBackendApi::D3D12 && format == "Dxil") || (api == ERhiBackendApi::Vulkan && format == "SpirV"))
 			{
 				const auto codePath = requestPath.parent_path() / (format == "Dxil" ? "shader.dxil" : "shader.spv");
-				if (!files.contains(Paths::MakePathKey(codePath)) || HashFile(codePath) != ReadRequiredString(request, "codeSha256"))
+				if (!files.contains(Paths::MakePathKey(codePath)) || HashFile(codePath) != request.at("codeSha256").get<std::string>())
 				{
 					throw Diagnostics::Error("Shader request identity differs from its exported code.");
 				}
 				VerifyShaderDebugData(format, requestPath, request, bundleRoot, files);
 				std::uint64_t type = 0;
 				std::uint64_t input = 0;
-				const bool bShaderTypeRead = Formatting::TryParseHexUInt64(ReadRequiredString(request, "shaderTypeId"), type);
-				const bool bCompileInputRead = bShaderTypeRead && Formatting::TryParseHexUInt64(ReadRequiredString(request, "compileInputHash"), input);
-				const bool bJobUnique = bCompileInputRead && exportedJobs.emplace(type, ReadRequiredString(request, "target"), input, ReadRequiredString(request, "codeSha256")).second;
+				const bool bShaderTypeRead = Formatting::TryParseHexUInt64(request.at("shaderTypeId").get<std::string>(), type);
+				const bool bCompileInputRead = bShaderTypeRead && Formatting::TryParseHexUInt64(request.at("compileInputHash").get<std::string>(), input);
+				const auto& target = request.at("target").get_ref<const std::string&>();
+				const bool bTargetKnown = bCompileInputRead && !target.empty();
+				const bool bJobUnique = bTargetKnown && exportedJobs.emplace(type, target, input, request.at("codeSha256").get<std::string>()).second;
 
 				if (!bJobUnique)
 				{
@@ -104,7 +105,7 @@ namespace GpuCrashInputVerification
 		return exportedJobs;
 	}
 
-	static void VerifyShaderJobs(ERhiBackendApi api, const std::filesystem::path& bundleRoot, std::string_view bundle, const std::set<std::wstring>& files)
+	static void VerifyShaderJobs(ERhiBackendApi api, const std::filesystem::path& bundleRoot, const nlohmann::json& bundle, const std::set<std::wstring>& files)
 	{
 		const auto library = CookedShaderLibrary::Open(Filesystem::GetCookedShaderLibraryPath());
 		const auto map = GlobalShaderMap::Open(Filesystem::GetGlobalShaderMapPath(), library);
@@ -141,36 +142,39 @@ namespace GpuCrashInputVerification
 		}
 	}
 
-	std::string VerifyShaderBundle(const std::filesystem::path& exportPath, std::string_view product, ERhiBackendApi api)
+	nlohmann::json VerifyShaderBundle(const std::filesystem::path& exportPath, const nlohmann::json& product, ERhiBackendApi api)
 	{
-		const auto bundle = ReadReceipt(exportPath);
-		if (ReadRequiredString(bundle, "scope") != "registered-catalog")
+		const auto bundle = ReadReceipt(exportPath, {"scope", "files", "jobs", "shaderCompilerExecutableSha256", "globalShaderMapSha256", "cookedShaderLibrarySha256"});
+		if (bundle.at("scope").get<std::string>() != "registered-catalog")
 		{
 			throw Diagnostics::Error("Aftermath requires a complete registered-catalog export, not a selective shader cook.");
 		}
 
 		const auto bundleRoot = exportPath.parent_path();
-		const auto files = VerifyReceiptFiles(bundleRoot, bundle, "files");
+		const auto files = VerifyReceiptFiles(bundleRoot, bundle.at("files"), true);
 		const auto compilerPath = bundleRoot / "product-receipt.json";
 		if (!files.contains(Paths::MakePathKey(compilerPath)))
 		{
 			throw Diagnostics::Error("Shader export has no build-bound compiler receipt.");
 		}
 
-		const auto compiler = ReadReceipt(compilerPath);
+		const auto compiler = ReadReceipt(compilerPath, {"revision", "sourceInputsSha256", "dirtyPatchSha256", "product", "variant", "executableSha256"});
 		for (const auto key : {"revision", "sourceInputsSha256", "dirtyPatchSha256"})
 		{
-			if (ReadRequiredString(compiler, key) != ReadRequiredString(product, key))
+			const auto& identity = compiler.at(key).get_ref<const std::string&>();
+			if (identity.empty() || identity != product.at(key).get_ref<const std::string&>())
 			{
 				throw Diagnostics::Error("Shader export and product belong to different source candidates.");
 			}
 		}
 
-		const bool bCompilerMatches = ReadRequiredString(compiler, "product") == "ShaderCompiler";
-		const bool bVariantMatches = bCompilerMatches && ReadRequiredString(compiler, "variant") == "gpu-crash";
-		const bool bCompilerHashMatches = bVariantMatches && ReadRequiredString(compiler, "executableSha256") == ReadRequiredString(bundle, "shaderCompilerExecutableSha256");
-		const bool bMapMatches = bCompilerHashMatches && ReadRequiredString(bundle, "globalShaderMapSha256") == HashFile(Filesystem::GetGlobalShaderMapPath());
-		const bool bLibraryMatches = bMapMatches && ReadRequiredString(bundle, "cookedShaderLibrarySha256") == HashFile(Filesystem::GetCookedShaderLibraryPath());
+		const bool bCompilerMatches = compiler.at("product").get<std::string>() == "ShaderCompiler";
+		const bool bVariantMatches = bCompilerMatches && compiler.at("variant").get<std::string>() == "gpu-crash";
+		const auto& compilerHash = compiler.at("executableSha256").get_ref<const std::string&>();
+		const bool bCompilerIdentity = bVariantMatches && !compilerHash.empty();
+		const bool bCompilerHashMatches = bCompilerIdentity && compilerHash == bundle.at("shaderCompilerExecutableSha256").get_ref<const std::string&>();
+		const bool bMapMatches = bCompilerHashMatches && bundle.at("globalShaderMapSha256").get<std::string>() == HashFile(Filesystem::GetGlobalShaderMapPath());
+		const bool bLibraryMatches = bMapMatches && bundle.at("cookedShaderLibrarySha256").get<std::string>() == HashFile(Filesystem::GetCookedShaderLibraryPath());
 
 		if (!bLibraryMatches)
 		{

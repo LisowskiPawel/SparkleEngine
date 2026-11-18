@@ -41,5 +41,6 @@ SPARKLE_RHI_API bool PixelFormatHasStencilAspect(PixelFormat format) noexcept;
 SPARKLE_RHI_API bool IsSrgbPixelFormat(PixelFormat format) noexcept;
 SPARKLE_RHI_API PixelFormat PixelFormatToLinear(PixelFormat format) noexcept;
 SPARKLE_RHI_API std::uint32_t PixelFormatBytesPerTexel(PixelFormat format) noexcept;
+SPARKLE_RHI_API std::uint64_t PixelFormatRowBytes(PixelFormat format, std::uint32_t width) noexcept;
 SPARKLE_RHI_API PixelFormat PixelFormatFromSerializedTextureFormat(std::uint32_t value) noexcept;
 SPARKLE_RHI_API std::uint32_t PixelFormatToSerializedTextureFormat(PixelFormat format) noexcept;

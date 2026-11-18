@@ -20,6 +20,7 @@ namespace Json
 		void BeginObject(int depth);
 		void EndObject(int depth);
 		void ReadKey(int depth, const std::string& key);
+		bool TryReadKey(int depth, const std::string& key);
 
 	private:
 		std::vector<std::unordered_set<std::string>> m_keys;

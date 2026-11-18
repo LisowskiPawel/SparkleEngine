@@ -35,45 +35,5 @@ struct RhiTextureUploadDesc
 
 	bool IsCube() const noexcept { return Dimension == TextureResourceDimension::TextureCube; }
 
-	bool IsValid() const noexcept
-	{
-		if (Width == 0 || Height == 0 || ArraySize == 0 || Format == PixelFormat::Unknown || ArraySlices.empty())
-		{
-			return false;
-		}
-
-		if (ArraySlices.size() != ArraySize)
-		{
-			return false;
-		}
-
-		const std::size_t expectedMipCount = ArraySlices.front().size();
-		if (expectedMipCount == 0)
-		{
-			return false;
-		}
-
-		if (IsCube() && ArraySize != 6)
-		{
-			return false;
-		}
-
-		for (const RhiTextureArraySliceUploadData& arraySlice : ArraySlices)
-		{
-			if (arraySlice.size() != expectedMipCount)
-			{
-				return false;
-			}
-
-			for (const RhiTextureMipUploadData& mip : arraySlice)
-			{
-				if (mip.Width == 0 || mip.Height == 0 || mip.RowPitch == 0 || mip.SlicePitch == 0 || mip.Data.empty())
-				{
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
+	SPARKLE_RHI_API bool IsValid() const noexcept;
 };

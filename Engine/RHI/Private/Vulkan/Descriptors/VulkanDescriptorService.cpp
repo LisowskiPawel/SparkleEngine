@@ -512,12 +512,14 @@ void VulkanDescriptorService::RecycleResourceViewRecord(std::uint32_t recordInde
 
 VkImageView VulkanDescriptorService::CreateImageView(const RhiResourceViewDesc& desc) const
 {
+	const VkImageViewType flatViewType = desc.Texture.ArraySize > 1 ? VK_IMAGE_VIEW_TYPE_2D_ARRAY : VK_IMAGE_VIEW_TYPE_2D;
+
 	const VkImageViewCreateInfo createInfo{
 	    .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
 	    .pNext = nullptr,
 	    .flags = 0,
 	    .image = static_cast<VkImage>(desc.Resource.Value),
-	    .viewType = desc.TextureDimension == TextureResourceDimension::TextureCube ? VK_IMAGE_VIEW_TYPE_CUBE : VK_IMAGE_VIEW_TYPE_2D,
+	    .viewType = desc.TextureDimension == TextureResourceDimension::TextureCube ? VK_IMAGE_VIEW_TYPE_CUBE : flatViewType,
 	    .format = ResolveViewFormat(desc),
 	    .components = VkComponentMapping{.r = VK_COMPONENT_SWIZZLE_IDENTITY, .g = VK_COMPONENT_SWIZZLE_IDENTITY, .b = VK_COMPONENT_SWIZZLE_IDENTITY, .a = VK_COMPONENT_SWIZZLE_IDENTITY},
 	    .subresourceRange = VkImageSubresourceRange{

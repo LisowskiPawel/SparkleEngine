@@ -3,13 +3,84 @@
 #include "AssetInspection/MeshDiagnosticMetadataCatalog.h"
 
 #include "Core/Public/Files/FileUtils.h"
-#include "Core/Public/Json/JsonReader.h"
+#include "Core/Public/Json/JsonInputAdmission.h"
+
+#include <nlohmann/json.hpp>
 #include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include <algorithm>
+#include <array>
+#include <set>
 #include <filesystem>
 #include <optional>
 #include <string>
+#include <string_view>
+
+static std::optional<MeshDiagnosticMetadata> ParseCookedMeshMetadata(std::string_view metadataText)
+{
+	try
+	{
+		Json::InputAdmission admission(metadataText, metadataText.size());
+		admission.BeginObject(0);
+		std::set<std::string> repeated;
+		const std::array<std::string_view, 3> fields{"schema", "displayName", "source"};
+
+		auto document = nlohmann::json::parse(
+		    metadataText.begin(),
+		    metadataText.end(),
+		    [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
+		    {
+			    using Event = nlohmann::json::parse_event_t;
+			    admission.CheckDepth(depth);
+			    if (event == Event::key)
+			    {
+				    const auto& key = value.get_ref<const std::string&>();
+				    const bool bConsumed = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
+				    if (!bConsumed)
+				    {
+					    return false;
+				    }
+				    if (!admission.TryReadKey(depth, key))
+				    {
+					    repeated.insert(key);
+				    }
+			    }
+			    return true;
+		    });
+
+		if (!document.is_object())
+		{
+			return std::nullopt;
+		}
+		for (const auto& key : repeated)
+		{
+			document.erase(key);
+		}
+		const auto schema = document.find("schema");
+		const bool bSchemaString = schema != document.end() && schema->is_string();
+		if (!bSchemaString || schema->get_ref<const std::string&>() != "cooked-mesh-metadata")
+		{
+			return std::nullopt;
+		}
+
+		MeshDiagnosticMetadata metadata;
+		const auto display = document.find("displayName");
+		if (display != document.end() && display->is_string())
+		{
+			metadata.DisplayName = display->get_ref<const std::string&>();
+		}
+		const auto source = document.find("source");
+		if (source != document.end() && source->is_string())
+		{
+			metadata.SourcePath = source->get_ref<const std::string&>();
+		}
+		return metadata;
+	}
+	catch (const std::exception&)
+	{
+		return std::nullopt;
+	}
+}
 
 static std::optional<MeshDiagnosticMetadata> LoadCookedMeshMetadata(std::uint64_t meshAssetId)
 {
@@ -22,16 +93,7 @@ static std::optional<MeshDiagnosticMetadata> LoadCookedMeshMetadata(std::uint64_
 		return std::nullopt;
 	}
 
-	std::string schema;
-	if (!Json::TryReadStringProperty(metadataText, "schema", schema) || schema != "cooked-mesh-metadata")
-	{
-		return std::nullopt;
-	}
-
-	MeshDiagnosticMetadata metadata;
-	Json::TryReadStringProperty(metadataText, "displayName", metadata.DisplayName);
-	Json::TryReadStringProperty(metadataText, "source", metadata.SourcePath);
-	return metadata;
+	return ParseCookedMeshMetadata(metadataText);
 }
 
 void MeshDiagnosticMetadataCatalog::Update(std::span<const MeshDiagnosticsRow> rows)

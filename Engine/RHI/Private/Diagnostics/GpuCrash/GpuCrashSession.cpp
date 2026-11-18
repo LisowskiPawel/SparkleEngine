@@ -5,7 +5,9 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Core/Public/Hash/HashUtils.h"
-#include "Core/Public/Json/JsonWriter.h"
+#include "Core/Public/Formatting/HexFormat.h"
+
+#include <nlohmann/json.hpp>
 #include "Diagnostics/ExternalToolActivity.h"
 
 #include <algorithm>
@@ -243,20 +245,19 @@ void GpuCrashSession::ShaderIdentity(std::span<const std::byte> code, std::uint6
 			Incomplete();
 			return;
 		}
-		Json::ObjectWriter json;
-		json.WriteString("codeSha256", sha256);
-		json.WriteRaw("nativeShaderHash", bHashAvailable ? Json::QuoteHexUInt64(nativeHash) : "null");
+
+		nlohmann::json json{
+		    {"codeSha256", sha256},
+		    {"nativeShaderHash", bHashAvailable ? nlohmann::json(Formatting::FormatHexUInt64(nativeHash)) : nlohmann::json(nullptr)},
+		    {"nativeDebugName", nullptr},
+		    {"compilerLookupKey", nullptr},
+		    {"cpuPdbIdentity", nullptr}};
+
 		if (debugName != nullptr)
 		{
-			json.WriteString("nativeDebugName", std::string_view(debugName->name, strnlen(debugName->name, sizeof(debugName->name))));
+			json["nativeDebugName"] = std::string_view(debugName->name, strnlen(debugName->name, sizeof(debugName->name)));
 		}
-		else
-		{
-			json.WriteRaw("nativeDebugName", "null");
-		}
-		json.WriteRaw("compilerLookupKey", "null");
-		json.WriteRaw("cpuPdbIdentity", "null");
-		const auto text = json.Finish();
+		const auto text = json.dump();
 		Enqueue({RhiGpuCrashArtifactKind::ShaderIdentity, m_shaderSequence.fetch_add(1), 0}, std::as_bytes(std::span(text)));
 	}
 	catch (...)

@@ -46,7 +46,7 @@ namespace CookedTextureWriting
 		return mipHeaders;
 	}
 
-	void WriteContents(std::ofstream& output, const DirectX::ScratchImage& texture, std::span<const CookedTextureMipHeader> mipHeaders, std::stop_token cancellation)
+	void WriteContents(std::ofstream& output, const DirectX::ScratchImage& texture, std::span<const CookedTextureMipHeader> mipHeaders)
 	{
 		const auto& metadata = texture.GetMetadata();
 		const auto levels = mipHeaders.size() / metadata.arraySize;
@@ -72,7 +72,6 @@ namespace CookedTextureWriting
 		{
 			for (std::size_t mip = 0; mip < levels; ++mip)
 			{
-				CheckTextureCancellation(cancellation);
 				const auto& image = *texture.GetImage(mip, item, 0);
 				const bool bWritten = Files::BinaryStreamWriter::WriteBytes(output, image.pixels, image.slicePitch, error);
 				if (!bWritten)
@@ -84,43 +83,21 @@ namespace CookedTextureWriting
 	}
 }
 
-void WriteCookedTextureAsset(const DirectX::ScratchImage& texture, TextureMipPolicy policy, const std::filesystem::path& outputPath, std::stop_token cancellation)
+void StageCookedTextureAsset(const DirectX::ScratchImage& texture, TextureMipPolicy policy, const std::filesystem::path& stagedOutputPath)
 {
-	CheckTextureCancellation(cancellation);
-
 	const auto& metadata = texture.GetMetadata();
 	const std::size_t levels = policy == TextureMipPolicy::NoMips ? 1 : metadata.mipLevels;
 	const auto mipHeaders = CookedTextureWriting::BuildMipHeaders(texture, levels);
 
-	const auto temporaryPath = Files::BuildTemporaryPath(outputPath);
-	Files::CleanupTemporaryFile(temporaryPath);
 	std::ofstream output;
 	std::string error;
-	try
+	if (!Files::TryOpenBinaryOutput(stagedOutputPath, output, error))
 	{
-		if (!Files::TryOpenBinaryOutput(temporaryPath, output, error))
-		{
-			throw Diagnostics::Error(error);
-		}
-		CookedTextureWriting::WriteContents(output, texture, mipHeaders, cancellation);
-
-		output.flush();
-		if (!output.good())
-		{
-			throw Diagnostics::Error("Failed to flush cooked texture output.");
-		}
-
-		CheckTextureCancellation(cancellation);
-		const bool bClosed = Files::TryCloseOutput(output, temporaryPath, error);
-		const bool bFinalized = bClosed && Files::TryFinalizeTemporaryFile(temporaryPath, outputPath, error);
-		if (!bFinalized)
-		{
-			throw Diagnostics::Error(error);
-		}
+		throw Diagnostics::Error(error);
 	}
-	catch (...)
+	CookedTextureWriting::WriteContents(output, texture, mipHeaders);
+	if (!Files::TryCloseOutput(output, stagedOutputPath, error))
 	{
-		Files::CleanupTemporaryFile(temporaryPath, &output);
-		throw;
+		throw Diagnostics::Error(error);
 	}
 }

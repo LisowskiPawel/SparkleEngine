@@ -6,18 +6,22 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Hash/HashUtils.h"
-#include "Core/Public/Json/JsonReader.h"
+#include "Core/Public/Json/JsonInputAdmission.h"
 #include "Core/Public/Paths/PathUtils.h"
 #include "Core/Public/Strings/StringUtils.h"
 
+#include <nlohmann/json.hpp>
+
 #include <Windows.h>
-#include <vector>
+#include <algorithm>
 
 namespace GpuCrashInputVerification
 {
 	void CheckLocalPath(const std::filesystem::path& path)
 	{
-		if (!path.is_absolute() || path.native().starts_with(L"\\\\"))
+		const bool bInvalidLocation = !path.is_absolute() || path.native().starts_with(L"\\\\");
+		const bool bEmbeddedNul = path.native().find(L'\0') != std::wstring::npos;
+		if (bInvalidLocation || bEmbeddedNul)
 		{
 			throw Diagnostics::Error("GPU crash receipts require local absolute paths.");
 		}
@@ -35,7 +39,71 @@ namespace GpuCrashInputVerification
 		}
 	}
 
-	std::string ReadReceipt(const std::filesystem::path& path)
+	static nlohmann::json ParseReceipt(std::string_view text, std::initializer_list<std::string_view> fields)
+	{
+		Json::InputAdmission admission(text, 32u * 1024u * 1024u);
+		bool bMembers = false;
+		std::size_t memberCount = 0;
+
+		auto document = nlohmann::json::parse(
+		    text.begin(),
+		    text.end(),
+		    [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
+		    {
+			    using Event = nlohmann::json::parse_event_t;
+			    const bool bContainerStart = event == Event::object_start || event == Event::array_start;
+			    const bool bEntry = bContainerStart || event == Event::value;
+			    const bool bMemberEntry = bMembers && depth == 2;
+			    const bool bCountMember = bMemberEntry && bEntry;
+			    if (bCountMember && ++memberCount > 65'536)
+			    {
+				    throw Diagnostics::Error("GPU crash receipt exceeds its membership limit.");
+			    }
+			    if (event == Event::object_start)
+			    {
+				    admission.BeginObject(depth);
+			    }
+			    if (event == Event::array_start || event == Event::value)
+			    {
+				    admission.CheckDepth(depth);
+			    }
+			    if (event == Event::key)
+			    {
+				    const auto& key = value.get_ref<const std::string&>();
+				    const bool bRootField = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
+				    const bool bFileIdentity = key == "path" || key == "sha256";
+				    const bool bFileField = bFileIdentity || key == "bytes";
+				    const bool bMemberDepth = bMembers && depth == 3;
+				    const bool bMemberField = bMemberDepth && bFileField;
+				    if (depth == 1)
+				    {
+					    const bool bFileArray = key == "files" || key == "runtimeFiles";
+					    const bool bPathArray = key == "jobs" || key == "sources";
+					    const bool bArray = bFileArray || bPathArray;
+					    bMembers = bRootField && bArray;
+					    memberCount = 0;
+				    }
+				    if (!bRootField && !bMemberField)
+				    {
+					    return false;
+				    }
+				    admission.ReadKey(depth, key);
+			    }
+			    if (event == Event::object_end)
+			    {
+				    admission.EndObject(depth);
+			    }
+			    return true;
+		    });
+
+		if (!document.is_object())
+		{
+			throw Diagnostics::Error("GPU crash receipt requires an object root.");
+		}
+		return document;
+	}
+
+	nlohmann::json ReadReceipt(const std::filesystem::path& path, std::initializer_list<std::string_view> fields, std::string* rawBytes)
 	{
 		CheckLocalPath(path);
 		std::string text;
@@ -44,17 +112,13 @@ namespace GpuCrashInputVerification
 		{
 			throw Diagnostics::Error("GPU crash receipt is unreadable or exceeds its size limit.");
 		}
-		return text;
-	}
 
-	std::string ReadRequiredString(std::string_view json, std::string_view key)
-	{
-		std::string value;
-		if (!Json::TryReadStringProperty(json, key, value) || value.empty())
+		auto document = ParseReceipt(text, fields);
+		if (rawBytes != nullptr)
 		{
-			throw Diagnostics::Error("GPU crash receipt has a missing or ambiguous identity field.");
+			*rawBytes = std::move(text);
 		}
-		return value;
+		return document;
 	}
 
 	std::string HashFile(const std::filesystem::path& path)
@@ -74,7 +138,8 @@ namespace GpuCrashInputVerification
 		const std::filesystem::path relative = Strings::ToWide(value);
 		const bool bInvalidRelativePathIsabsolute = relative.empty() || relative.is_absolute();
 		const bool bInvalidRelativePathRootpath = bInvalidRelativePathIsabsolute || (relative.has_root_path());
-		const bool bInvalidReceiptRelativePath = bInvalidRelativePathRootpath || (relative.generic_string().find(':') != std::string::npos);
+		const bool bInvalidCharacters = relative.generic_string().find(':') != std::string::npos || value.find('\0') != std::string_view::npos;
+		const bool bInvalidReceiptRelativePath = bInvalidRelativePathRootpath || bInvalidCharacters;
 
 		if (bInvalidReceiptRelativePath)
 		{
@@ -90,24 +155,27 @@ namespace GpuCrashInputVerification
 		return root / relative;
 	}
 
-	std::set<std::wstring> VerifyReceiptFiles(const std::filesystem::path& root, std::string_view receipt, std::string_view property)
+	std::set<std::wstring> VerifyReceiptFiles(const std::filesystem::path& root, const nlohmann::json& files, bool bRequired)
 	{
-		std::vector<std::string_view> files;
-		if (!Json::TryReadArrayProperty(receipt, property, files) || (property == "files" && files.empty()) || files.size() > 65'536)
+		const bool bInvalidMembership = !files.is_array() || files.size() > 65'536;
+		if (bInvalidMembership || (bRequired && files.empty()))
 		{
 			throw Diagnostics::Error("GPU crash file membership is missing or exceeds its bound.");
 		}
 
 		std::set<std::wstring> verified;
-		for (const auto file : files)
+		for (const auto& file : files)
 		{
-			const auto path = ResolveReceiptFile(root, ReadRequiredString(file, "path"));
-			std::uint64_t bytes = 0;
-			const bool bByteCountRead = Json::TryReadUInt64Property(file, "bytes", bytes);
-			const bool bPathUnique = bByteCountRead && verified.insert(Paths::MakePathKey(path)).second;
-			const bool bFileHashMatches = bPathUnique && HashFile(path) == ReadRequiredString(file, "sha256");
+			const auto path = ResolveReceiptFile(root, file.at("path").get_ref<const std::string&>());
+			const auto& size = file.at("bytes");
+			if (!size.is_number_unsigned())
+			{
+				throw Diagnostics::Error("GPU crash file size requires an unsigned integer.");
+			}
+			const auto bytes = size.get<std::uint64_t>();
+			const bool bPathUnique = verified.insert(Paths::MakePathKey(path)).second;
+			const bool bFileHashMatches = bPathUnique && HashFile(path) == file.at("sha256").get_ref<const std::string&>();
 			const bool bFileSizeMatches = bFileHashMatches && std::filesystem::file_size(path) == bytes;
-
 			if (!bFileSizeMatches)
 			{
 				throw Diagnostics::Error("GPU crash input is stale, duplicated or incomplete.");

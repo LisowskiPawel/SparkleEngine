@@ -1,10 +1,11 @@
-set(_sparkle_json_revision "55f93686c01528224f448c19128836e7df245f72")
+set(SPARKLE_NLOHMANN_JSON_REVISION "55f93686c01528224f448c19128836e7df245f72")
+set(SPARKLE_NLOHMANN_JSON_VERSION "3.12.0")
 sparkle_declare_git_dependency(nlohmann_json
     https://github.com/nlohmann/json.git
-    ${_sparkle_json_revision})
+    ${SPARKLE_NLOHMANN_JSON_REVISION})
 FetchContent_Populate(nlohmann_json)
 sparkle_prepare_git_fetchcontent_source(nlohmann_json
-    EXPECTED_REVISION "${_sparkle_json_revision}"
+    EXPECTED_REVISION "${SPARKLE_NLOHMANN_JSON_REVISION}"
     REQUIRED_PATHS CMakeLists.txt include/nlohmann/json.hpp include/nlohmann/json_fwd.hpp LICENSE.MIT)
 
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
@@ -21,4 +22,4 @@ set(JSON_Diagnostic_Positions OFF CACHE BOOL "" FORCE)
 set(JSON_LegacyDiscardedValueComparison OFF CACHE BOOL "" FORCE)
 sparkle_add_dependency_subdirectory(${nlohmann_json_SOURCE_DIR} ${nlohmann_json_BINARY_DIR})
 set_property(TARGET nlohmann_json PROPERTY SPARKLE_SOURCE_PACKAGE
-    "{\"name\":\"nlohmann/json\",\"versionInfo\":\"3.12.0\",\"licenseDeclared\":\"MIT\",\"downloadLocation\":\"https://github.com/nlohmann/json/archive/${_sparkle_json_revision}.tar.gz\"}")
+    "{\"name\":\"nlohmann/json\",\"versionInfo\":\"${SPARKLE_NLOHMANN_JSON_VERSION}\",\"licenseDeclared\":\"MIT\",\"downloadLocation\":\"https://github.com/nlohmann/json/archive/${SPARKLE_NLOHMANN_JSON_REVISION}.tar.gz\"}")

@@ -45,11 +45,11 @@ namespace ExrSourceLoading
 	}
 }
 
-TextureSource LoadExrTextureSource(std::span<const std::uint8_t> bytes, const TextureCookRequest& request, TextureCookMemoryLimiter& processingMemory, std::stop_token cancellation)
+TextureSource LoadExrTextureSource(std::span<const std::uint8_t> bytes, const TextureCookRequest& request, TextureCookMemoryLimiter& processingMemory)
 {
 	const auto metadata = ExrSourceLoading::ReadMetadata(bytes);
 	TextureSource source;
-	source.ProcessingMemory = processingMemory.Acquire(MeasureTextureProcessingMemory(metadata, bytes.size(), request), cancellation);
+	source.ProcessingMemory = processingMemory.Acquire(MeasureTextureProcessingMemory(metadata, bytes.size(), request));
 
 	int width = 0;
 	int height = 0;

@@ -42,36 +42,48 @@ namespace SparkleLauncher
 		};
 	}
 
+	static std::filesystem::path ReadCompletionPath(std::string_view text)
+	{
+		const auto first = text.find_first_not_of(" \t\r");
+		const bool bStringRoot = first != std::string_view::npos && text[first] == '"';
+		if (!bStringRoot)
+		{
+			return {};
+		}
+
+		try
+		{
+			Json::InputAdmission admission(text, 32u * 1024u * 1024u);
+			const auto value = nlohmann::json::parse(text.begin(), text.end());
+			const auto& path = value.get_ref<const std::string&>();
+			if (path.find('\0') != std::string::npos)
+			{
+				return {};
+			}
+
+			return Strings::ToWide(path);
+		}
+		catch (const std::exception&)
+		{
+			return {};
+		}
+	}
+
 	std::filesystem::path ReadProcessOutputPath(std::string_view output, std::string_view prefix)
 	{
 		std::filesystem::path manifest;
-		bool bSeenRecord = false;
 		while (!output.empty())
 		{
 			const auto end = output.find('\n');
 			const auto line = output.substr(0, end);
 			if (line.starts_with(prefix))
 			{
-				const auto suffix = line.substr(prefix.size());
-				const auto first = suffix.find_first_not_of(" \t\r");
-				const bool bStringRoot = first != std::string_view::npos && suffix[first] == '"';
-				if (bSeenRecord || !bStringRoot)
+				if (!manifest.empty())
 				{
 					return {};
 				}
-				bSeenRecord = true;
-				try
-				{
-					Json::InputAdmission admission(suffix, 32u * 1024u * 1024u);
-					const auto value = nlohmann::json::parse(suffix.begin(), suffix.end());
-					const auto& path = value.get_ref<const std::string&>();
-					if (path.find('\0') != std::string::npos)
-					{
-						return {};
-					}
-					manifest = Strings::ToWide(path);
-				}
-				catch (const std::exception&)
+				manifest = ReadCompletionPath(line.substr(prefix.size()));
+				if (manifest.empty())
 				{
 					return {};
 				}

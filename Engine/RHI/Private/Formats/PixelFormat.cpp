@@ -143,6 +143,33 @@ std::uint32_t PixelFormatBytesPerTexel(PixelFormat format) noexcept
 	}
 }
 
+std::uint64_t PixelFormatRowBytes(PixelFormat format, std::uint32_t width) noexcept
+{
+	const std::uint32_t texelBytes = PixelFormatBytesPerTexel(format);
+	if (texelBytes != 0)
+	{
+		return static_cast<std::uint64_t>(width) * texelBytes;
+	}
+
+	const std::uint64_t blocks = (static_cast<std::uint64_t>(width) + 3) / 4;
+	switch (PixelFormatToLinear(format))
+	{
+		case PixelFormat::BC1_UNorm:
+		case PixelFormat::BC4_UNorm:
+		case PixelFormat::BC4_SNorm:
+			return blocks * 8;
+		case PixelFormat::BC2_UNorm:
+		case PixelFormat::BC3_UNorm:
+		case PixelFormat::BC5_UNorm:
+		case PixelFormat::BC5_SNorm:
+		case PixelFormat::BC6H_UF16:
+		case PixelFormat::BC7_UNorm:
+			return blocks * 16;
+		default:
+			return 0;
+	}
+}
+
 PixelFormat PixelFormatFromSerializedTextureFormat(std::uint32_t value) noexcept
 {
 	switch (value)

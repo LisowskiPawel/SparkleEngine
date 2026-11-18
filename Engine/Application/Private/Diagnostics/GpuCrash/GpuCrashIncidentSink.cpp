@@ -5,7 +5,7 @@
 
 #include "Concurrency/ApplicationTaskRuntime.h"
 #include "Diagnostics/GpuCrash/GpuCrashInputs.h"
-#include "Core/Public/Json/JsonWriter.h"
+#include <nlohmann/json.hpp>
 #include "Core/Public/Strings/StringUtils.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Diagnostics/Verify.h"
@@ -34,7 +34,7 @@ GpuCrashIncidentSink::GpuCrashIncidentSink(ApplicationTaskRuntime& runtime, cons
 		m_identity = startup.SessionId;
 		ReserveSlot();
 		const auto manifestPath = Strings::ToNarrow((m_directory / "incident.json").wstring());
-		const auto quotedManifest = Json::QuoteString(manifestPath);
+		const auto quotedManifest = nlohmann::json(manifestPath).dump();
 		std::cout << "SPARKLE_GPU_CRASH_INCIDENT " << quotedManifest << std::endl;
 		m_inputs = std::make_unique<GpuCrashInputs>(startup, api);
 		WriteManifest("Preparing");

@@ -50,6 +50,7 @@ function Assert-PackageManifest
 function Assert-PackageLayout
 {
     param($Manifest)
+    $paths = [Collections.Generic.HashSet[string]]::new([string[]] @($Manifest.Files.Path), [StringComparer]::OrdinalIgnoreCase)
     foreach ($path in @('LaunchSparkle.cmd', '.sparkle', 'Engine/.sparkle-engine', 'Projects/Showcase/.sparkle-project', 'Projects/Showcase/Levels.catalog', 'Config/DefaultEngine.ini'))
     {
         if (@($Manifest.Files | Where-Object Path -ceq $path).Count -ne 1) { throw "Missing package recipe input: '$path'." }
@@ -65,6 +66,11 @@ function Assert-PackageLayout
     }
     foreach ($file in $Manifest.Files)
     {
+        if ($file.Path.EndsWith('.stex', [StringComparison]::OrdinalIgnoreCase))
+        {
+            $directory = $file.Path.Substring(0, $file.Path.LastIndexOf('/') + 1)
+            if (!$paths.Contains($directory + '.publication-lock')) { throw "Missing texture publication guard: '$directory'." }
+        }
         if ($file.Path -match '^Projects/Showcase/(Cache|Downloads)(/|$)')
         {
             throw "Writable selected-content output inside immutable package: '$($file.Path)'."

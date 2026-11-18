@@ -77,3 +77,54 @@ sparkle_target_precompile_headers(SparkleRendererNvidiaStreamlineProviders
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/PCH.h
 )
 
+function(sparkle_stage_nvidia_streamline_runtime product_target)
+    if(NOT TARGET ${product_target})
+        message(FATAL_ERROR "Unknown Sparkle product target '${product_target}'")
+    endif()
+
+    if(NOT SPARKLE_ENABLE_NVIDIA_STREAMLINE)
+        return()
+    endif()
+
+    if(NOT TARGET NVIDIA::Streamline)
+        message(FATAL_ERROR "NVIDIA Streamline SDK target is unavailable for ${product_target}")
+    endif()
+    get_target_property(_runtime_files NVIDIA::Streamline SPARKLE_STREAMLINE_RUNTIME_FILES)
+    get_target_property(_notice_sources NVIDIA::Streamline SPARKLE_STREAMLINE_NOTICE_FILES)
+    if(_runtime_files STREQUAL "_runtime_files-NOTFOUND" OR NOT _notice_sources)
+        message(FATAL_ERROR "NVIDIA Streamline SDK deployment metadata is unavailable for ${product_target}")
+    endif()
+
+    foreach(_notice_source IN LISTS _notice_sources)
+        if(NOT EXISTS "${_notice_source}")
+            message(FATAL_ERROR "NVIDIA Streamline runtime notice is missing: '${_notice_source}'")
+        endif()
+    endforeach()
+
+    set(_notice_directory "$<TARGET_FILE_DIR:${product_target}>/Notices/NVIDIA")
+    add_custom_target(${product_target}NvidiaNotices
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${_notice_directory}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_notice_sources} "${_notice_directory}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/NVIDIA/README.md"
+            "${_notice_directory}/README.md"
+        COMMENT "Staging NVIDIA runtime notices for ${product_target}"
+        COMMAND_EXPAND_LISTS
+        VERBATIM
+    )
+    add_dependencies(${product_target} ${product_target}NvidiaNotices)
+
+    foreach(runtime_dll IN LISTS _runtime_files)
+        if(NOT EXISTS "${runtime_dll}")
+            message(FATAL_ERROR "NVIDIA Streamline runtime DLL is missing: '${runtime_dll}'")
+        endif()
+    endforeach()
+    if(_runtime_files)
+        add_custom_command(TARGET ${product_target} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                ${_runtime_files} "$<TARGET_FILE_DIR:${product_target}>"
+            COMMENT "Staging NVIDIA Streamline runtime for ${product_target}"
+            COMMAND_EXPAND_LISTS
+            VERBATIM)
+    endif()
+endfunction()

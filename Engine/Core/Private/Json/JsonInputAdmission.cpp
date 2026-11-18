@@ -36,9 +36,15 @@ namespace Json
 
 	void InputAdmission::ReadKey(int depth, const std::string& key)
 	{
-		if (!m_keys.at(static_cast<std::size_t>(depth) - 1).insert(key).second)
+		if (!TryReadKey(depth, key))
 		{
 			throw Diagnostics::Error("JSON input repeats a consumed member.");
 		}
 	}
+
+	bool InputAdmission::TryReadKey(int depth, const std::string& key)
+	{
+		return m_keys.at(static_cast<std::size_t>(depth) - 1).insert(key).second;
+	}
+
 }

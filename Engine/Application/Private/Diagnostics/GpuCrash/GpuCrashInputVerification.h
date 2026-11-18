@@ -2,7 +2,10 @@
 
 #include "RHI/Public/Core/RhiBackendSelection.h"
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <filesystem>
+#include <initializer_list>
 #include <set>
 #include <string>
 #include <string_view>
@@ -10,10 +13,9 @@
 namespace GpuCrashInputVerification
 {
 	void CheckLocalPath(const std::filesystem::path& path);
-	std::string ReadReceipt(const std::filesystem::path& path);
-	std::string ReadRequiredString(std::string_view json, std::string_view key);
+	nlohmann::json ReadReceipt(const std::filesystem::path& path, std::initializer_list<std::string_view> fields, std::string* rawBytes = nullptr);
 	std::string HashFile(const std::filesystem::path& path);
 	std::filesystem::path ResolveReceiptFile(const std::filesystem::path& root, std::string_view value);
-	std::set<std::wstring> VerifyReceiptFiles(const std::filesystem::path& root, std::string_view receipt, std::string_view property);
-	std::string VerifyShaderBundle(const std::filesystem::path& exportPath, std::string_view product, ERhiBackendApi api);
+	std::set<std::wstring> VerifyReceiptFiles(const std::filesystem::path& root, const nlohmann::json& files, bool bRequired);
+	nlohmann::json VerifyShaderBundle(const std::filesystem::path& exportPath, const nlohmann::json& product, ERhiBackendApi api);
 }

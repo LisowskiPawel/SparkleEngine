@@ -3,11 +3,17 @@
 #include "Build/State/BuildFreshnessSignature.h"
 #include "Build/Toolchains/CMakeGeneratorModel.h"
 #include "Build/State/BuildWorkspaceStateFiles.h"
-#include "Core/Public/Strings/StringUtils.h"
+#include "Core/Public/Files/FileUtils.h"
+#include "Core/Public/Json/JsonInputAdmission.h"
+
+#include <nlohmann/json.hpp>
 #include "ToolOutputPaths.h"
 
-#include <fstream>
+#include <algorithm>
+#include <array>
+#include <set>
 #include <optional>
+#include <string_view>
 #include <system_error>
 
 namespace SparkleLauncher
@@ -15,6 +21,66 @@ namespace SparkleLauncher
 	static std::string ToCMakeBool(bool bValue)
 	{
 		return bValue ? "ON" : "OFF";
+	}
+
+	static nlohmann::json ParseFreshnessStamp(std::string_view text)
+	{
+		try
+		{
+			Json::InputAdmission admission(text, text.size());
+			admission.BeginObject(0);
+			std::set<std::string> repeated;
+			const std::array<std::string_view, 9> fields{"generator", "platform", "toolset", "qtRoot", "vulkanSdkRoot", "contentPipeline", "shaderCompiler", "nvidiaStreamline", "sourceListHash"};
+
+			auto document = nlohmann::json::parse(
+			    text.begin(),
+			    text.end(),
+			    [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
+			    {
+				    using Event = nlohmann::json::parse_event_t;
+				    admission.CheckDepth(depth);
+				    if (event == Event::key)
+				    {
+					    const auto& key = value.get_ref<const std::string&>();
+					    const bool bConsumed = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
+					    if (!bConsumed)
+					    {
+						    return false;
+					    }
+					    if (!admission.TryReadKey(depth, key))
+					    {
+						    repeated.insert(key);
+					    }
+				    }
+				    return true;
+			    });
+
+			if (!document.is_object())
+			{
+				return nlohmann::json::object();
+			}
+			for (const auto& key : repeated)
+			{
+				document.erase(key);
+			}
+			return document;
+		}
+		catch (const std::exception&)
+		{
+			return nlohmann::json::object();
+		}
+	}
+
+	static nlohmann::json ReadFreshnessStamp(const std::filesystem::path& path)
+	{
+		std::string text;
+		std::string error;
+		if (!Files::TryReadAllText(path, text, error))
+		{
+			return nlohmann::json::object();
+		}
+
+		return ParseFreshnessStamp(text);
 	}
 
 	BuildFilesFreshnessStatus CheckBuildFilesFreshness(const std::filesystem::path& workspaceRoot, const BuildToolchainStatus& toolchain)
@@ -84,11 +150,20 @@ namespace SparkleLauncher
 			return status;
 		}
 
-		const bool bStampGeneratorMatches = ReadBuildFilesFreshnessStampValue(status.StampPath, "generator").value_or(std::string()) == toolchain.Generator;
-		const bool bStampPlatformMatches = bStampGeneratorMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "platform").value_or(std::string()) == toolchain.Platform;
-		const bool bStampToolsetMatches = bStampPlatformMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "toolset").value_or(std::string()) == toolchain.Toolset;
-		const bool bStampQtMatches = bStampToolsetMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "qtRoot").value_or(std::string()) == selectedQtPrefixPath;
-		const bool bStampVulkanMatches = bStampQtMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "vulkanSdkRoot").value_or(std::string()) == selectedVulkanSdkRoot;
+		const auto stamp = ReadFreshnessStamp(status.StampPath);
+
+		const auto matches = [&stamp](const char* key, const std::string& expected)
+		{
+			const auto entry = stamp.find(key);
+			const auto* value = entry == stamp.end() ? nullptr : entry->get_ptr<const std::string*>();
+			return value != nullptr ? *value == expected : expected.empty();
+		};
+
+		const bool bStampGeneratorMatches = matches("generator", toolchain.Generator);
+		const bool bStampPlatformMatches = bStampGeneratorMatches && matches("platform", toolchain.Platform);
+		const bool bStampToolsetMatches = bStampPlatformMatches && matches("toolset", toolchain.Toolset);
+		const bool bStampQtMatches = bStampToolsetMatches && matches("qtRoot", selectedQtPrefixPath);
+		const bool bStampVulkanMatches = bStampQtMatches && matches("vulkanSdkRoot", selectedVulkanSdkRoot);
 
 		if (!bStampVulkanMatches)
 		{
@@ -97,12 +172,11 @@ namespace SparkleLauncher
 			return status;
 		}
 
-		const bool bStampContentPipelineMatches = ReadBuildFilesFreshnessStampValue(status.StampPath, "contentPipeline").value_or(std::string()) == selectedContentPipeline;
+		const bool bStampContentPipelineMatches = matches("contentPipeline", selectedContentPipeline);
 
-		const bool bStampShaderCompilerMatches = bStampContentPipelineMatches
-		    && ReadBuildFilesFreshnessStampValue(status.StampPath, "shaderCompiler").value_or(std::string()) == selectedShaderCompiler;
+		const bool bStampShaderCompilerMatches = bStampContentPipelineMatches && matches("shaderCompiler", selectedShaderCompiler);
 
-		const bool bStampStreamlineMatches = bStampShaderCompilerMatches && ReadBuildFilesFreshnessStampValue(status.StampPath, "nvidiaStreamline").value_or(std::string()) == selectedNvidiaStreamline;
+		const bool bStampStreamlineMatches = bStampShaderCompilerMatches && matches("nvidiaStreamline", selectedNvidiaStreamline);
 
 		if (!bStampStreamlineMatches)
 		{
@@ -119,7 +193,7 @@ namespace SparkleLauncher
 			return status;
 		}
 
-		if (ReadBuildFilesFreshnessStampValue(status.StampPath, "sourceListHash").value_or(std::string()) != *sourceListHash)
+		if (!matches("sourceListHash", *sourceListHash))
 		{
 			status.State = BuildFilesFreshnessState::SourceListChanged;
 			status.Summary = "Source file list changed since build files were generated.";
@@ -166,26 +240,27 @@ namespace SparkleLauncher
 			return false;
 		}
 
-		std::ofstream stream(stampPath, std::ios::out | std::ios::trunc);
-		if (!stream.is_open())
+		try
 		{
-			errorMessage = "Failed to open build freshness stamp for writing.";
+			const nlohmann::json stamp{
+			    {"generator", toolchain.Generator},
+			    {"platform", toolchain.Platform},
+			    {"toolset", toolchain.Toolset},
+			    {"qtRoot", toolchain.QtRootPath.generic_string()},
+			    {"vulkanSdkRoot", toolchain.VulkanSdkRoot.generic_string()},
+			    {"contentPipeline", ToCMakeBool(featureSettings.bContentPipelineEnabled)},
+			    {"shaderCompiler", ToCMakeBool(featureSettings.bShaderCompilerEnabled)},
+			    {"nvidiaStreamline", ToCMakeBool(featureSettings.bNvidiaStreamlineEnabled)},
+			    {"sourceListHash", *sourceListHash},
+			    {"updatedUtc", BuildUtcTimestamp()}};
+
+			const auto text = stamp.dump(4) + "\n";
+			return Files::TryWriteAllTextAtomic(stampPath, text, errorMessage);
+		}
+		catch (const std::exception&)
+		{
+			errorMessage = "Failed to encode build freshness stamp.";
 			return false;
 		}
-
-		stream << "{\n"
-		       << "    \"generator\": \"" << Strings::EscapeJsonString(toolchain.Generator) << "\",\n"
-		       << "    \"platform\": \"" << Strings::EscapeJsonString(toolchain.Platform) << "\",\n"
-		       << "    \"toolset\": \"" << Strings::EscapeJsonString(toolchain.Toolset) << "\",\n"
-		       << "    \"qtRoot\": \"" << Strings::EscapeJsonString(toolchain.QtRootPath.generic_string()) << "\",\n"
-		       << "    \"vulkanSdkRoot\": \"" << Strings::EscapeJsonString(toolchain.VulkanSdkRoot.generic_string()) << "\",\n"
-		       << "    \"contentPipeline\": \"" << ToCMakeBool(featureSettings.bContentPipelineEnabled) << "\",\n"
-		       << "    \"shaderCompiler\": \"" << ToCMakeBool(featureSettings.bShaderCompilerEnabled) << "\",\n"
-		       << "    \"nvidiaStreamline\": \"" << ToCMakeBool(featureSettings.bNvidiaStreamlineEnabled) << "\",\n"
-		       << "    \"sourceListHash\": \"" << *sourceListHash << "\",\n"
-		       << "    \"updatedUtc\": \"" << BuildUtcTimestamp() << "\"\n"
-		       << "}\n";
-
-		return true;
 	}
 }

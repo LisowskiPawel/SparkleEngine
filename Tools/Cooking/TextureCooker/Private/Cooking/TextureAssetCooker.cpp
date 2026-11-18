@@ -6,13 +6,13 @@
 #include "Processing/TextureProcessor.h"
 #include "SourceLoading/TextureSource.h"
 
-void CookTextureAsset(const TextureCookRequest& request, TextureCookMemoryLimiter& memoryLimiter, TextureCookMemoryLimiter& sourceMemory, std::stop_token cancellation)
+void CookTextureAsset(const TextureCookRequest& request, TextureCookMemoryLimiter& memoryLimiter, TextureCookMemoryLimiter& sourceMemory)
 {
 	ValidateTextureCookRequest(request);
 
-	auto sourceLease = sourceMemory.Acquire(2 * MaximumTextureSourceBytes, cancellation);
-	TextureSource source = LoadTextureSource(request, memoryLimiter, cancellation);
-	auto cookedTexture = ProcessTexture(request, std::move(source.Images), cancellation);
+	auto sourceLease = sourceMemory.Acquire(2 * MaximumTextureSourceBytes);
+	TextureSource source = LoadTextureSource(request, memoryLimiter);
+	auto cookedTexture = ProcessTexture(request, std::move(source.Images));
 
-	WriteCookedTextureAsset(cookedTexture, request.policy.mipPolicy, request.outputPath, cancellation);
+	StageCookedTextureAsset(cookedTexture, request.policy.mipPolicy, request.outputPath);
 }

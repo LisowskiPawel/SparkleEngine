@@ -44,9 +44,12 @@ namespace Files
 			{
 				throw Diagnostics::Error(std::format("Publication path '{}' escapes its output directories.", path.string()));
 			}
-			if (path.filename().wstring().starts_with(L".publication-") || !paths.insert(Paths::MakePathKey(path)).second)
+			const auto key = Paths::MakePathKey(path);
+			const bool bCoordinationPath = std::filesystem::path(key).filename().wstring().starts_with(L".publication-");
+			const bool bUniquePath = paths.insert(key).second;
+			if (bCoordinationPath || !bUniquePath)
 			{
-				throw Diagnostics::Error("Publication paths overlap each other or coordination files.");
+				throw Diagnostics::Error("Publication paths overlap inputs, outputs or coordination files.");
 			}
 		}
 	}
@@ -69,20 +72,33 @@ namespace Files
 		}
 	}
 
-	std::vector<FileSetReplacement> PlanFileSetReplacements(std::span<const FilePublication> files, std::span<const std::filesystem::path> roots)
+	void ValidateFileSetPaths(std::span<const FilePublication> files, std::span<const std::filesystem::path> roots, std::span<const std::filesystem::path> protectedInputs)
 	{
-		std::vector<FileSetReplacement> replacements;
-		replacements.reserve(files.size());
 		std::unordered_set<std::wstring> paths;
+		for (const auto& input : protectedInputs)
+		{
+			paths.insert(Paths::MakePathKey(input));
+		}
 		for (const FilePublication& file : files)
 		{
 			if (file.StagedPath.empty() || file.PublishedPath.empty())
 			{
 				throw Diagnostics::Error("Publication paths must not be empty.");
 			}
+			const FilePublication normalized{Paths::Normalize(file.StagedPath), Paths::Normalize(file.PublishedPath)};
+			RequirePublicationPaths(normalized, roots, paths);
+		}
+	}
+
+	std::vector<FileSetReplacement> PlanFileSetReplacements(std::span<const FilePublication> files, std::span<const std::filesystem::path> roots)
+	{
+		ValidateFileSetPaths(files, roots, {});
+		std::vector<FileSetReplacement> replacements;
+		replacements.reserve(files.size());
+		for (const FilePublication& file : files)
+		{
 			FileSetReplacement& replacement = replacements.emplace_back();
 			replacement.File = {Paths::Normalize(file.StagedPath), Paths::Normalize(file.PublishedPath)};
-			RequirePublicationPaths(replacement.File, roots, paths);
 			RequirePublicationInputs(replacement.File);
 		}
 		return replacements;

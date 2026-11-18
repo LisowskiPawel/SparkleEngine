@@ -9,6 +9,10 @@ function(sparkle_configure_project_product target_name project_name product_role
     endif()
 
     sparkle_configure_project_artifacts("${target_name}" "${project_name}" "${product_role}")
+    sparkle_stage_msvc_runtime(${target_name})
+    sparkle_stage_d3d12_pix_event_runtime(${target_name})
+    sparkle_stage_external_capture_notices(${target_name})
+
     if(project_name STREQUAL "Showcase")
         if(product_role STREQUAL "editor")
             sparkle_configure_product_identity(${target_name} "Sparkle Editor")

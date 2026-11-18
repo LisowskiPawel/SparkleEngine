@@ -83,9 +83,9 @@ std::string ShaderDebugArtifactWriter::WriteBytes(const std::filesystem::path& r
 	return hash;
 }
 
-void ShaderDebugArtifactWriter::WriteText(const std::filesystem::path& path, std::string_view contents)
+std::string ShaderDebugArtifactWriter::WriteText(const std::filesystem::path& path, std::string_view contents)
 {
-	WriteBytes(path, std::as_bytes(std::span(contents.data(), contents.size())));
+	return WriteBytes(path, std::as_bytes(std::span(contents.data(), contents.size())));
 }
 
 void ShaderDebugArtifactWriter::RecordCompiler(std::string_view backendName)
@@ -154,10 +154,10 @@ void ShaderDebugArtifactWriter::Write(const ShaderCompileRequest& request, const
 		WriteText(sourcePath, source.Contents);
 	}
 
-	WriteText(bundleDirectory / "compiler-input.hlsl", request.SourceCode);
+	const std::string compilerInputSha256 = WriteText(bundleDirectory / "compiler-input.hlsl", request.SourceCode);
 	WriteCompilerOutputs(bundleDirectory, debugArtifacts, compiledStage);
 	const std::filesystem::path requestPath = bundleDirectory / "compile-request.json";
-	const std::string compileRequestJson = BuildCompileRequestJson(request, compiledStage, codeSha256, debugArtifacts);
+	const std::string compileRequestJson = BuildCompileRequestJson(request, compiledStage, codeSha256, compilerInputSha256, debugArtifacts);
 	WriteText(requestPath, compileRequestJson);
 	WriteText(bundleDirectory / "defines.json", nlohmann::json(request.Defines).dump());
 	m_jobs.push_back(requestPath.generic_string());
@@ -291,9 +291,9 @@ std::string ShaderDebugArtifactWriter::BuildCompileRequestJson(
     const ShaderCompileRequest& request,
     const CookedStageBuild& compiledStage,
     std::string_view codeSha256,
+    std::string_view compilerInputSha256,
     const ShaderDebugArtifactSet& debugArtifacts)
 {
-	const std::string compilerInputSha256 = HashBytes(std::as_bytes(std::span(request.SourceCode)));
 	const std::string symbolName = std::filesystem::path(debugArtifacts.SymbolName).filename().generic_string();
 
 	nlohmann::json document{

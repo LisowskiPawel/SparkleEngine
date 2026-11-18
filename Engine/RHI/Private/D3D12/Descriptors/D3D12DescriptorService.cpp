@@ -525,6 +525,15 @@ static bool WriteTextureSrv(ID3D12Device* device, const RhiResourceViewDesc& des
 		viewDesc.TextureCube.MipLevels = desc.Texture.MipCount;
 		viewDesc.TextureCube.ResourceMinLODClamp = 0.0f;
 	}
+	else if (desc.Texture.ArraySize > 1)
+	{
+		viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
+		viewDesc.Texture2DArray.MostDetailedMip = desc.Texture.MostDetailedMip;
+		viewDesc.Texture2DArray.MipLevels = desc.Texture.MipCount;
+		viewDesc.Texture2DArray.FirstArraySlice = desc.Texture.FirstArraySlice;
+		viewDesc.Texture2DArray.ArraySize = desc.Texture.ArraySize;
+		viewDesc.Texture2DArray.ResourceMinLODClamp = 0.0f;
+	}
 	else
 	{
 		viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;

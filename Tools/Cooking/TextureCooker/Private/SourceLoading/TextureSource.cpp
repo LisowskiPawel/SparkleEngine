@@ -5,15 +5,46 @@
 #include "TextureCookRequestList.h"
 #include "SourceAssetPaths.h"
 #include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Paths/PathUtils.h"
 
-#include <fstream>
 #include <vector>
+#include <Windows.h>
+#include <objbase.h>
 
 using namespace DirectX;
 
 namespace TextureSourceLoading
 {
+	class ComApartment final
+	{
+	public:
+		ComApartment();
+		~ComApartment();
+		ComApartment(const ComApartment&) = delete;
+		ComApartment& operator=(const ComApartment&) = delete;
+
+	private:
+		HRESULT m_result;
+	};
+
+	ComApartment::ComApartment() :
+	    m_result(CoInitializeEx(nullptr, COINIT_MULTITHREADED))
+	{
+		if (FAILED(m_result) && m_result != RPC_E_CHANGED_MODE)
+		{
+			throw Diagnostics::Error("Failed to initialize COM for source texture loading.");
+		}
+	}
+
+	ComApartment::~ComApartment()
+	{
+		if (SUCCEEDED(m_result))
+		{
+			CoUninitialize();
+		}
+	}
+
 	std::vector<std::uint8_t> ReadSource(const std::filesystem::path& path)
 	{
 		const auto resolved = SparkleTools::ResolveSourceAssetPath(path, SparkleTools::SourceAssetType::Texture);
@@ -21,18 +52,11 @@ namespace TextureSourceLoading
 		{
 			throw Diagnostics::Error("Unable to resolve source texture.");
 		}
-		std::ifstream file(*resolved, std::ios::binary | std::ios::ate);
-		const auto size = file.tellg();
-		if (size <= 0 || size > static_cast<std::streamoff>(MaximumTextureSourceBytes))
+		std::vector<std::uint8_t> bytes;
+		std::string error;
+		if (!Files::TryReadAllBytes(*resolved, bytes, error, MaximumTextureSourceBytes))
 		{
-			throw Diagnostics::Error("Source texture is unreadable, empty or exceeds the 64 MiB file limit.");
-		}
-		std::vector<std::uint8_t> bytes(static_cast<std::size_t>(size));
-		file.seekg(0);
-		file.read(reinterpret_cast<char*>(bytes.data()), size);
-		if (!file || file.peek() != std::ifstream::traits_type::eof())
-		{
-			throw Diagnostics::Error("Source texture changed size or could not be read completely.");
+			throw Diagnostics::Error(error);
 		}
 		return bytes;
 	}
@@ -96,27 +120,29 @@ namespace TextureSourceLoading
 
 using namespace TextureSourceLoading;
 
-TextureSource LoadTextureSource(const TextureCookRequest& request, TextureCookMemoryLimiter& processingMemory, std::stop_token cancellation)
+TextureSource LoadTextureSource(const TextureCookRequest& request, TextureCookMemoryLimiter& processingMemory)
 {
+	thread_local const ComApartment comApartment;
+
 	const auto bytes = ReadSource(request.sourcePath);
 	const auto extension = Paths::GetLowercaseExtension(request.sourcePath);
 
 	if (extension == L".ktx" || extension == L".ktx2")
 	{
-		return LoadKtxTextureSource(bytes, request, processingMemory, cancellation);
+		return LoadKtxTextureSource(bytes, request, processingMemory);
 	}
 	if (extension == L".exr")
 	{
-		return LoadExrTextureSource(bytes, request, processingMemory, cancellation);
+		return LoadExrTextureSource(bytes, request, processingMemory);
 	}
 	if (extension == L".psd" || extension == L".pic" || extension == L".pnm" || extension == L".ppm" || extension == L".pgm" || extension == L".tga")
 	{
-		return LoadRasterTextureSource(bytes, request, processingMemory, cancellation);
+		return LoadRasterTextureSource(bytes, request, processingMemory);
 	}
 
 	const auto metadata = ReadNativeMetadata(bytes, extension);
 	TextureSource source;
-	source.ProcessingMemory = processingMemory.Acquire(MeasureTextureProcessingMemory(metadata, bytes.size(), request), cancellation);
+	source.ProcessingMemory = processingMemory.Acquire(MeasureTextureProcessingMemory(metadata, bytes.size(), request));
 	source.Images = DecodeNativeSource(bytes, extension, metadata);
 	return source;
 }

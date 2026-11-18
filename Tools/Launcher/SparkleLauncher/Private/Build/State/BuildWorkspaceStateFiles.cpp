@@ -1,6 +1,5 @@
 #include "Build/State/BuildWorkspaceStateFiles.h"
 
-#include "Core/Public/Json/JsonReader.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "ToolOutputPaths.h"
 
@@ -36,20 +35,6 @@ namespace SparkleLauncher
 		}
 
 		return std::nullopt;
-	}
-
-	std::optional<std::string> ReadBuildFilesFreshnessStampValue(const std::filesystem::path& stampPath, std::string_view key)
-	{
-		std::ifstream stream(stampPath);
-		if (!stream.is_open())
-		{
-			return std::nullopt;
-		}
-
-		std::stringstream buffer;
-		buffer << stream.rdbuf();
-		std::string value;
-		return Json::TryReadStringProperty(buffer.str(), key, value) ? std::optional<std::string>(value) : std::nullopt;
 	}
 
 	std::optional<std::string> ReadRootCMakeProjectName(const std::filesystem::path& workspaceRoot)

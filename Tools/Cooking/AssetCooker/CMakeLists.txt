@@ -76,6 +76,7 @@ add_executable(AssetCooker
 )
 sparkle_configure_host_tool_target(AssetCooker)
 sparkle_configure_development_tool_artifacts(AssetCooker)
+sparkle_stage_msvc_runtime(AssetCooker)
 
 target_include_directories(AssetCooker
     PRIVATE

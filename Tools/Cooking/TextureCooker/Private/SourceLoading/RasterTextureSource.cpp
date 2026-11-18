@@ -16,7 +16,7 @@
 
 using namespace DirectX;
 
-TextureSource LoadRasterTextureSource(std::span<const std::uint8_t> bytes, const TextureCookRequest& request, TextureCookMemoryLimiter& processingMemory, std::stop_token cancellation)
+TextureSource LoadRasterTextureSource(std::span<const std::uint8_t> bytes, const TextureCookRequest& request, TextureCookMemoryLimiter& processingMemory)
 {
 	TextureSource source;
 	int width = 0;
@@ -28,7 +28,7 @@ TextureSource LoadRasterTextureSource(std::span<const std::uint8_t> bytes, const
 	}
 
 	const auto metadata = MakeFlatTextureMetadata(width, height, DXGI_FORMAT_R8G8B8A8_UNORM);
-	source.ProcessingMemory = processingMemory.Acquire(MeasureTextureProcessingMemory(metadata, bytes.size(), request), cancellation);
+	source.ProcessingMemory = processingMemory.Acquire(MeasureTextureProcessingMemory(metadata, bytes.size(), request));
 
 	std::unique_ptr<stbi_uc, decltype(&stbi_image_free)> pixels(stbi_load_from_memory(bytes.data(), static_cast<int>(bytes.size()), &width, &height, &channels, STBI_rgb_alpha), &stbi_image_free);
 

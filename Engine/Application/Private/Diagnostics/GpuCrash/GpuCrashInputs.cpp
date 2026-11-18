@@ -5,20 +5,37 @@
 #include "Diagnostics/GpuCrash/GpuCrashInputVerification.h"
 
 #include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Paths/FileSystemPaths.h"
-#include "Core/Public/Json/JsonReader.h"
-#include "Core/Public/Json/JsonWriter.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 namespace GpuCrashInputVerification
 {
-	static std::string VerifyProductReceipt(const std::filesystem::path& executable)
+	static nlohmann::json VerifyProductReceipt(const std::filesystem::path& executable)
 	{
-		const auto product = ReadReceipt(executable.parent_path() / "gpu-crash-product.json");
-		const auto profile = ReadRequiredString(product, "profile");
+		std::string productBytes;
+
+		const auto product = ReadReceipt(
+		    executable.parent_path() / "gpu-crash-product.json",
+		    {"profile",
+		        "revision",
+		        "sourceInputsSha256",
+		        "dirtyPatchSha256",
+		        "variant",
+		        "product",
+		        "executableSha256",
+		        "retainedReceiptPath",
+		        "runtimeFiles",
+		        "cpuPdbPath",
+		        "cpuPdbSha256",
+		        "cpuPdbGuid",
+		        "cpuPdbAge"},
+		    &productBytes);
+
+		const auto profile = product.at("profile").get<std::string>();
 		for (const auto key : {"revision", "sourceInputsSha256", "dirtyPatchSha256"})
 		{
-			const auto value = ReadRequiredString(product, key);
+			const auto value = product.at(key).get<std::string>();
 			const auto expectedDigestLength = std::string_view(key) == "revision" ? 40u : 64u;
 			const bool bInvalidCandidateDigest = value.size() != expectedDigestLength || value.find_first_not_of("0123456789abcdef") != std::string::npos;
 
@@ -32,24 +49,28 @@ namespace GpuCrashInputVerification
 		const bool bKnownEditorProfile = bProfileKnownProfile || (profile == "ShippingEditor");
 		const bool bProfileKnown = bKnownEditorProfile || (profile == "ShippingGame");
 		const bool bDirectoryMatches = bProfileKnown && profile == Strings::ToNarrow(executable.parent_path().filename().wstring());
-		const bool bVariantMatches = bDirectoryMatches && ReadRequiredString(product, "variant") == "gpu-crash";
+		const bool bVariantMatches = bDirectoryMatches && product.at("variant").get<std::string>() == "gpu-crash";
 		const bool bProductKindMatches = bVariantMatches && Strings::ToNarrow(executable.stem().wstring()).ends_with("Editor") == profile.ends_with("Editor");
-		const bool bProductNameMatches = bProductKindMatches && ReadRequiredString(product, "product") == Strings::ToNarrow(executable.stem().wstring());
-		const bool bExecutableMatches = bProductNameMatches && ReadRequiredString(product, "executableSha256") == HashFile(executable);
+		const bool bProductNameMatches = bProductKindMatches && product.at("product").get<std::string>() == Strings::ToNarrow(executable.stem().wstring());
+		const bool bExecutableMatches = bProductNameMatches && product.at("executableSha256").get<std::string>() == HashFile(executable);
 
 		if (!bExecutableMatches)
 		{
 			throw Diagnostics::Error("GPU crash product/profile receipt does not match this executable.");
 		}
 
-		const std::filesystem::path retainedReceipt = Strings::ToWide(ReadRequiredString(product, "retainedReceiptPath"));
-		if (ReadReceipt(retainedReceipt) != product)
+		const std::filesystem::path retainedReceipt = Strings::ToWide(product.at("retainedReceiptPath").get<std::string>());
+		CheckLocalPath(retainedReceipt);
+		std::string retainedBytes;
+		std::string error;
+		const bool bRetainedRead = Files::TryReadAllText(retainedReceipt, retainedBytes, error, 32u * 1024u * 1024u);
+		if (!bRetainedRead || retainedBytes != productBytes)
 		{
 			throw Diagnostics::Error("Retained product receipt differs from this build's startup receipt.");
 		}
-		VerifyReceiptFiles(executable.parent_path(), product, "runtimeFiles");
-		const std::filesystem::path pdb = Strings::ToWide(ReadRequiredString(product, "cpuPdbPath"));
-		if (HashFile(pdb) != ReadRequiredString(product, "cpuPdbSha256"))
+		VerifyReceiptFiles(executable.parent_path(), product.at("runtimeFiles"), false);
+		const std::filesystem::path pdb = Strings::ToWide(product.at("cpuPdbPath").get<std::string>());
+		if (HashFile(pdb) != product.at("cpuPdbSha256").get<std::string>())
 		{
 			throw Diagnostics::Error("Matching CPU symbols are missing or changed.");
 		}
@@ -58,36 +79,41 @@ namespace GpuCrashInputVerification
 
 }
 
-static std::string VerifyGpuCrashInputs(const GpuCrashStartup& startup, ERhiBackendApi api)
+static nlohmann::json VerifyGpuCrashInputs(const GpuCrashStartup& startup, ERhiBackendApi api)
 {
 	using namespace GpuCrashInputVerification;
 	const auto executable = Filesystem::GetExecutablePath();
 	const auto product = VerifyProductReceipt(executable);
-	const std::filesystem::path productPath = Strings::ToWide(ReadRequiredString(product, "retainedReceiptPath"));
+	const std::filesystem::path productPath = Strings::ToWide(product.at("retainedReceiptPath").get<std::string>());
 	const auto bundle = VerifyShaderBundle(startup.ShaderExport, product, api);
-	const std::filesystem::path pdb = Strings::ToWide(ReadRequiredString(product, "cpuPdbPath"));
-	Json::ObjectWriter identity;
+	const std::filesystem::path pdb = Strings::ToWide(product.at("cpuPdbPath").get<std::string>());
+	nlohmann::json identity = nlohmann::json::object();
 	for (const auto key : {"product", "profile", "revision", "sourceInputsSha256", "dirtyPatchSha256", "cpuPdbGuid", "cpuPdbSha256"})
 	{
-		identity.WriteString(key, ReadRequiredString(product, key));
+		const auto& value = product.at(key).get_ref<const std::string&>();
+		if (value.empty())
+		{
+			throw Diagnostics::Error("Diagnostic candidate identity strings must be nonempty.");
+		}
+		identity[key] = value;
 	}
-	std::uint64_t age = 0;
-	if (!Json::TryReadUInt64Property(product, "cpuPdbAge", age))
+	const auto& age = product.at("cpuPdbAge");
+	if (!age.is_number_unsigned())
 	{
 		throw Diagnostics::Error("CPU PDB age is unavailable.");
 	}
-	identity.WriteUInt64("cpuPdbAge", age);
-	identity.WriteString("graphicsApi", RhiBackendApiToString(api));
-	identity.WriteString("productReceiptSha256", HashFile(productPath));
-	identity.WriteString("shaderExportSha256", HashFile(startup.ShaderExport));
-	identity.WriteString("globalShaderMapSha256", ReadRequiredString(bundle, "globalShaderMapSha256"));
-	identity.WriteString("cookedShaderLibrarySha256", ReadRequiredString(bundle, "cookedShaderLibrarySha256"));
-	identity.WriteString("aftermathRuntimeSha256", HashFile(ResolveAftermathLibraryPath()));
+	identity["cpuPdbAge"] = age;
+	identity["graphicsApi"] = RhiBackendApiToString(api);
+	identity["productReceiptSha256"] = HashFile(productPath);
+	identity["shaderExportSha256"] = HashFile(startup.ShaderExport);
+	identity["globalShaderMapSha256"] = bundle.at("globalShaderMapSha256").get<std::string>();
+	identity["cookedShaderLibrarySha256"] = bundle.at("cookedShaderLibrarySha256").get<std::string>();
+	identity["aftermathRuntimeSha256"] = HashFile(ResolveAftermathLibraryPath());
 	// These references are private, never projected into the default export.
-	identity.WriteString("shaderExportPath", Strings::ToNarrow(startup.ShaderExport.wstring()));
-	identity.WriteString("productReceiptPath", Strings::ToNarrow(productPath.wstring()));
-	identity.WriteString("cpuPdbPath", Strings::ToNarrow(pdb.wstring()));
-	return identity.Finish();
+	identity["shaderExportPath"] = Strings::ToNarrow(startup.ShaderExport.wstring());
+	identity["productReceiptPath"] = Strings::ToNarrow(productPath.wstring());
+	identity["cpuPdbPath"] = Strings::ToNarrow(pdb.wstring());
+	return identity;
 }
 
 GpuCrashInputs::GpuCrashInputs(const GpuCrashStartup& startup, ERhiBackendApi api)
@@ -127,7 +153,7 @@ GpuCrashInputs::~GpuCrashInputs()
 	}
 }
 
-const std::string& GpuCrashInputs::GetIdentity() const noexcept
+const nlohmann::json& GpuCrashInputs::GetIdentity() const noexcept
 {
 	return m_identity;
 }

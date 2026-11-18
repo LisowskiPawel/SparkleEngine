@@ -1,9 +1,8 @@
+# Assign artifact locations; target composition owns runtime staging.
 function(_sparkle_set_target_artifact_directories target_name runtime_root symbol_owner)
     if(NOT TARGET ${target_name})
         message(FATAL_ERROR "Unknown Sparkle target '${target_name}'")
     endif()
-
-    sparkle_stage_msvc_runtime(${target_name})
 
     set_target_properties(${target_name} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${runtime_root}/$<CONFIG>"
@@ -49,8 +48,6 @@ function(sparkle_configure_project_artifacts target_name project_name product_ro
         ${target_name}
         "${_sparkle_project_artifact_root}/${project_name}/Binaries"
         "projects/${project_name}/${product_role}")
-    sparkle_stage_d3d12_pix_event_runtime(${target_name})
-    sparkle_stage_external_capture_notices(${target_name})
 endfunction()
 
 function(sparkle_get_project_cooked_directory output_variable project_name)

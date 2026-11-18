@@ -37,7 +37,7 @@ target_compile_features(SparkleEditor PUBLIC cxx_std_20)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/EditorIconAssets.cmake")
 
-set(SPARKLE_EDITOR_CAPTURE_UI_CONFIG "$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>")
+set(SPARKLE_EDITOR_CAPTURE_UI_CONFIG "$<CONFIG:DebugEditor,DevelopmentEditor>")
 foreach(_source IN LISTS _sparkle_editor_capture_sources)
     target_sources(SparkleEditor PRIVATE "$<${SPARKLE_EDITOR_CAPTURE_UI_CONFIG}:${_source}>")
 endforeach()

@@ -73,8 +73,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private/RayReconstruction/NvidiaDl
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private/Streamline PREFIX "Private\\Streamline" FILES ${SPARKLE_RENDERER_STREAMLINE_SHARED_SOURCES} ${SPARKLE_RENDERER_STREAMLINE_SHARED_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES ${SPARKLE_RENDERER_SHADER_REGISTRATION_SOURCES})
 
-target_compile_definitions(SparkleRenderer PRIVATE SPARKLE_WITH_EXTERNAL_CAPTURE=$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>>)
+target_compile_definitions(SparkleRenderer PRIVATE SPARKLE_WITH_EXTERNAL_CAPTURE=$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<CONFIG:DebugEditor,DevelopmentEditor>>)
 
 foreach(_capture_source IN LISTS _sparkle_capture_controls)
- target_sources(SparkleRenderer PRIVATE "$<$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>>:${_capture_source}>")
+ target_sources(SparkleRenderer PRIVATE "$<$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<CONFIG:DebugEditor,DevelopmentEditor>>:${_capture_source}>")
 endforeach()

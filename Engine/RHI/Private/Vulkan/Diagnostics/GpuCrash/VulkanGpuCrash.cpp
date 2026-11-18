@@ -2,7 +2,9 @@
 #include "Vulkan/Diagnostics/GpuCrash/VulkanGpuCrash.h"
 #include "Vulkan/Device/VulkanRhi.h"
 
-#include "Core/Public/Json/JsonWriter.h"
+#include "Core/Public/Formatting/HexFormat.h"
+
+#include <nlohmann/json.hpp>
 
 #include <algorithm>
 #include <array>
@@ -117,12 +119,13 @@ void VulkanGpuCrash::ObserveLoss(VulkanRhi& rhi, ERhiQueueType observedQueue, Vk
 	}
 	try
 	{
-		Json::ObjectWriter json;
-		json.WriteUInt64("cpuObservedQueue", static_cast<std::uint64_t>(observedQueue));
-		json.WriteRaw("frame", "null");
-		json.WriteRaw("recording", "null");
-		json.WriteRaw("resourceAliases", "null");
-		std::string queues = "[";
+		nlohmann::json json{
+		    {"cpuObservedQueue", static_cast<std::uint64_t>(observedQueue)},
+		    {"frame", nullptr},
+		    {"recording", nullptr},
+		    {"resourceAliases", nullptr},
+		    {"queues", nlohmann::json::array()}};
+
 		std::array<VkCheckpointDataNV, 64> data{};
 		for (auto& item : data)
 		{
@@ -136,10 +139,7 @@ void VulkanGpuCrash::ObserveLoss(VulkanRhi& rhi, ERhiQueueType observedQueue, Vk
 			{
 				continue;
 			}
-			Json::ObjectWriter observation;
-			observation.WriteUInt64("logicalQueue", queueIndex);
-			observation.WriteHexUInt64("nativeQueue", reinterpret_cast<std::uint64_t>(queue));
-			std::string checkpoints = "[";
+			nlohmann::json observation{{"logicalQueue", queueIndex}, {"nativeQueue", Formatting::FormatHexUInt64(reinterpret_cast<std::uint64_t>(queue))}, {"checkpoints", nlohmann::json::array()}};
 			std::uint32_t available = 0;
 			GetCheckpoints(queue, &available, nullptr);
 			std::uint32_t count = std::min(available, static_cast<std::uint32_t>(data.size()));
@@ -150,28 +150,13 @@ void VulkanGpuCrash::ObserveLoss(VulkanRhi& rhi, ERhiQueueType observedQueue, Vk
 			}
 			for (std::size_t index = 0; index < std::min<std::size_t>(count, data.size()); ++index)
 			{
-				Json::ObjectWriter checkpoint;
-				checkpoint.WriteUInt64("stage", data[index].stage);
-				checkpoint.WriteString("semanticScope", session->MarkerText(data[index].pCheckpointMarker));
-				if (checkpoints.size() > 1)
-				{
-					checkpoints += ',';
-				}
-				checkpoints += checkpoint.Finish();
+				observation["checkpoints"].push_back({{"stage", data[index].stage}, {"semanticScope", session->MarkerText(data[index].pCheckpointMarker)}});
 			}
-			checkpoints += ']';
-			observation.WriteUInt64("reportedCount", available);
-			observation.WriteRaw("truncated", available > data.size() ? "true" : "false");
-			observation.WriteRaw("checkpoints", checkpoints);
-			if (queues.size() > 1)
-			{
-				queues += ',';
-			}
-			queues += observation.Finish();
+			observation["reportedCount"] = available;
+			observation["truncated"] = available > data.size();
+			json["queues"].push_back(std::move(observation));
 		}
-		queues += ']';
-		json.WriteRaw("queues", queues);
-		const auto text = json.Finish();
+		const auto text = json.dump();
 		session->Enqueue({RhiGpuCrashArtifactKind::NativeDiagnostics, 1, 0}, std::as_bytes(std::span(text)));
 	}
 	catch (...)

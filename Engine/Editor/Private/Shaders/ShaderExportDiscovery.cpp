@@ -8,11 +8,11 @@
 #include "Core/Public/Json/JsonInputAdmission.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
+#include "Core/Public/Formatting/HexFormat.h"
 
 #include <nlohmann/json.hpp>
 
 #include <algorithm>
-#include <charconv>
 #include <string_view>
 #include <system_error>
 
@@ -88,14 +88,8 @@ static nlohmann::json ReadExportDocument(std::string_view text, std::initializer
 static bool ReadExportIdentity(const nlohmann::json& document, std::string_view key, std::uint64_t& value)
 {
 	const auto& hex = document.at(std::string(key)).get_ref<const std::string&>();
-	std::string_view digits(hex);
-	if (digits.starts_with("0x") || digits.starts_with("0X"))
-	{
-		digits.remove_prefix(2);
-	}
-
-	const auto parsed = std::from_chars(digits.data(), digits.data() + digits.size(), value, 16);
-	return parsed.ec == std::errc{} && parsed.ptr == digits.data() + digits.size();
+	const bool bUnpadded = hex == Strings::TrimAsciiWhitespace(hex);
+	return bUnpadded && Formatting::TryParseHexUInt64(hex, value);
 }
 
 static bool ReadExportShader(std::string_view text, ShaderTarget target, ShaderDiagnosticsEntry& shader)

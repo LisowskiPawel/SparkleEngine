@@ -3,7 +3,6 @@
 #include <condition_variable>
 #include <cstddef>
 #include <mutex>
-#include <stop_token>
 
 class TextureCookMemoryLimiter final
 {
@@ -27,13 +26,13 @@ public:
 	};
 
 	explicit TextureCookMemoryLimiter(std::size_t capacityBytes);
-	Lease Acquire(std::size_t bytes, std::stop_token cancellation);
+	Lease Acquire(std::size_t bytes);
 
 private:
 	void Release(std::size_t bytes) noexcept;
 
 	const std::size_t m_capacityBytes;
-	mutable std::mutex m_mutex;
-	std::condition_variable_any m_condition;
+	std::mutex m_mutex;
+	std::condition_variable m_condition;
 	std::size_t m_usedBytes = 0;
 };

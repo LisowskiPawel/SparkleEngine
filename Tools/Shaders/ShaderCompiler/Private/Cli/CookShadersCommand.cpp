@@ -14,11 +14,13 @@
 
 #include <iostream>
 #include <exception>
+#include <filesystem>
 #include <ostream>
 #include <span>
 #include <string>
 
 static void PrintSummary(const ShaderCookResult& result, const ShaderCookSettings& settings);
+static void PrintExportCompletion(const std::filesystem::path& manifest);
 static int RunAnalysisPasses(const ShaderCookResult& result, const ShaderCookSettings& settings);
 static std::string FormatTargets(std::span<const ShaderTarget> targets);
 static void RunCookedShaderStats(const ShaderCookResult& result);
@@ -31,6 +33,7 @@ int CookShaders(const ShaderCookSettings& settings)
 	{
 		cookResult = CookGlobalShaders(settings, [&progressOutput](const ToolWorkProgressEvent& progress) { progressOutput.Report(progress); });
 		PrintSummary(cookResult, settings);
+		PrintExportCompletion(cookResult.output.debugManifestPath);
 	}
 	catch (const std::exception& error)
 	{
@@ -55,13 +58,18 @@ static void PrintSummary(const ShaderCookResult& result, const ShaderCookSetting
 	        ToolConsole::Field("mapEntries", std::to_string(result.output.entries.size())),
 	        ToolConsole::Field("uniqueCodeRecords", std::to_string(result.output.uniqueCodeCount)),
 	        ToolConsole::QuotedField("targets", FormatTargets(settings.targets))});
+}
 
-	if (!result.output.debugManifestPath.empty())
+static void PrintExportCompletion(const std::filesystem::path& manifest)
+{
+	if (manifest.empty())
 	{
-		const auto manifestPath = Strings::ToNarrow(result.output.debugManifestPath.wstring());
-		const auto quotedManifest = nlohmann::json(manifestPath).dump();
-		std::cout << "SPARKLE_SHADER_EXPORT " << quotedManifest << std::endl;
+		return;
 	}
+
+	const auto manifestPath = Strings::ToNarrow(manifest.wstring());
+	const auto quotedManifest = nlohmann::json(manifestPath).dump();
+	std::cout << "SPARKLE_SHADER_EXPORT " << quotedManifest << std::endl;
 }
 
 static int RunAnalysisPasses(const ShaderCookResult& result, const ShaderCookSettings& settings)

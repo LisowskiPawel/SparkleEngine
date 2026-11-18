@@ -63,9 +63,9 @@ endif()
 
 target_compile_definitions(SparkleCore
     PUBLIC
-    $<$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DebugGame>>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE>
-    $<$<OR:$<CONFIG:DevelopmentEditor>,$<CONFIG:DevelopmentGame>>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO>
-    $<$<OR:$<CONFIG:ShippingEditor>,$<CONFIG:ShippingGame>>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_WARN>
+    $<$<CONFIG:DebugEditor,DebugGame>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE>
+    $<$<CONFIG:DevelopmentEditor,DevelopmentGame>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO>
+    $<$<CONFIG:ShippingEditor,ShippingGame>:SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_WARN>
 )
 
 # IDE organization

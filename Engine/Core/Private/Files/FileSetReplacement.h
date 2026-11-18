@@ -13,6 +13,7 @@ namespace Files
 		bool bPublished = false;
 	};
 
+	void ValidateFileSetPaths(std::span<const FilePublication> files, std::span<const std::filesystem::path> roots, std::span<const std::filesystem::path> protectedInputs);
 	std::vector<FileSetReplacement> PlanFileSetReplacements(std::span<const FilePublication> files, std::span<const std::filesystem::path> roots);
 	void ReplaceFileSet(std::span<FileSetReplacement> replacements);
 	void DiscardFileSetBackups(std::span<const FileSetReplacement> replacements);

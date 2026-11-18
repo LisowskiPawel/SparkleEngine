@@ -7,7 +7,9 @@
 #include "BinaryAssetWriter.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Files/FileSetPublication.h"
-#include "Core/Public/Json/JsonWriter.h"
+#include "Core/Public/Formatting/HexFormat.h"
+
+#include <nlohmann/json.hpp>
 #include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include <cstdint>
@@ -48,13 +50,14 @@ void CookedMeshAssetWriter::WriteMeshAsset(const CookedMeshAssetBuild& meshAsset
 
 void CookedMeshAssetWriter::WriteMeshMetadata(const CookedMeshAssetBuild& meshAsset, const std::filesystem::path& outputPath)
 {
-	Json::ObjectWriter writer;
-	writer.WriteString("schema", "cooked-mesh-metadata");
-	writer.WriteHexUInt64("assetId", meshAsset.assetId);
-	writer.WriteString("displayName", meshAsset.displayName);
-	writer.WriteString("source", meshAsset.sourcePath.generic_string());
+	const nlohmann::json metadata{
+	    {"schema", "cooked-mesh-metadata"},
+	    {"assetId", Formatting::FormatHexUInt64(meshAsset.assetId)},
+	    {"displayName", meshAsset.displayName},
+	    {"source", meshAsset.sourcePath.generic_string()}};
+
 	std::string errorMessage;
-	if (!Files::TryWriteAllText(outputPath, writer.Finish(), errorMessage))
+	if (!Files::TryWriteAllText(outputPath, metadata.dump(2) + "\n", errorMessage))
 	{
 		throw Diagnostics::Error(errorMessage);
 	}

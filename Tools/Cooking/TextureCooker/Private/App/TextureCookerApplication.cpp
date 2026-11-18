@@ -2,12 +2,11 @@
 
 #include "App/TextureCookerApplication.h"
 
-#include "Cli/CookTextureCookRequestFileCommand.h"
+#include "Cooking/CookTextureRequestFile.h"
 #include "Cli/InspectTextureCookRequestFileCommand.h"
 #include "Constants/TextureCookerConstants.h"
 #include "Core/Public/Strings/StringUtils.h"
 
-#include <filesystem>
 #include <iostream>
 #include <string_view>
 
@@ -29,7 +28,7 @@ int RunTextureCooker(int argc, char** argv)
 		}
 		if (command == TextureCookerConstants::CookRequestFileCommand)
 		{
-			return CookTextureCookRequestFile(Strings::ToWide(argv[2]));
+			return CookTextureRequestFile(Strings::ToWide(argv[2]));
 		}
 	}
 	PrintUsage(std::cerr);

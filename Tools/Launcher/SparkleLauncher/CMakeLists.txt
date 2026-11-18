@@ -175,6 +175,7 @@ set_target_properties(SparkleLauncher PROPERTIES
     AUTOMOC ON
 )
 sparkle_configure_launcher_artifacts(SparkleLauncher)
+sparkle_stage_msvc_runtime(SparkleLauncher)
 sparkle_configure_product_identity(SparkleLauncher "Sparkle Launcher")
 sparkle_stage_linked_runtime(SparkleLauncher)
 

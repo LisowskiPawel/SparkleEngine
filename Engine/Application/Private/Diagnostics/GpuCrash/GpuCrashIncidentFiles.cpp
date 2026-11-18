@@ -8,7 +8,7 @@
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Identifiers/Uuid.h"
-#include "Core/Public/Json/JsonWriter.h"
+#include <nlohmann/json.hpp>
 #include "Core/Public/Paths/ProductUserStatePaths.h"
 
 #include <Windows.h>
@@ -151,33 +151,23 @@ std::string GpuCrashIncidentSink::BuildManifest(std::string_view state) const
 		bSdkFinished = m_bSdkFinished;
 	}
 
-	Json::ObjectWriter manifest;
-	manifest.WriteString("incidentId", m_identity);
-	manifest.WriteString("state", state);
-	manifest.WriteUInt64("childPid", GetCurrentProcessId());
-	manifest.WriteRaw("candidate", m_inputs ? m_inputs->GetIdentity() : "null");
-	manifest.WriteString("executableSha256", m_executableHash);
-	manifest.WriteString("privacy", "private-native-artifacts");
-	manifest.WriteString("sourceMapping", "unqualified");
+	nlohmann::json manifest{
+	    {"incidentId", m_identity},
+	    {"state", state},
+	    {"childPid", GetCurrentProcessId()},
+	    {"candidate", m_inputs ? m_inputs->GetIdentity() : nlohmann::json(nullptr)},
+	    {"executableSha256", m_executableHash},
+	    {"privacy", "private-native-artifacts"},
+	    {"sourceMapping", "unqualified"},
+	    {"nativeFailure", nativeFailure},
+	    {"sdkFinished", bSdkFinished},
+	    {"files", nlohmann::json::array()}};
 
-	manifest.WriteRaw("nativeFailure", std::to_string(nativeFailure));
-	manifest.WriteRaw("sdkFinished", bSdkFinished ? "true" : "false");
-	std::string files = "[";
 	for (const auto& [name, receipt] : m_files)
 	{
-		Json::ObjectWriter file;
-		file.WriteString("path", name);
-		file.WriteString("sha256", receipt.Sha256);
-		file.WriteUInt64("bytes", receipt.Bytes);
-		if (files.size() > 1)
-		{
-			files += ',';
-		}
-		files += file.Finish();
+		manifest["files"].push_back({{"path", name}, {"sha256", receipt.Sha256}, {"bytes", receipt.Bytes}});
 	}
-	files += ']';
-	manifest.WriteRaw("files", files);
-	return manifest.Finish();
+	return manifest.dump();
 }
 
 void GpuCrashIncidentSink::WriteManifest(std::string_view state)

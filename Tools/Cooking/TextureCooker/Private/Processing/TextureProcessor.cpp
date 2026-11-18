@@ -11,14 +11,6 @@
 
 using namespace DirectX;
 
-void CheckTextureCancellation(std::stop_token cancellation)
-{
-	if (cancellation.stop_requested())
-	{
-		throw Diagnostics::Error("Texture cooking was cancelled.");
-	}
-}
-
 namespace TextureProcessing
 {
 	DXGI_FORMAT ApplyOutputIntent(DXGI_FORMAT format, const TextureCookRequest& request)
@@ -89,7 +81,7 @@ namespace TextureProcessing
 		return XMVectorSetW(XMVectorMultiplyAdd(normal, g_XMOneHalf, g_XMOneHalf), XMVectorGetW(pixel));
 	}
 
-	void ApplySourcePolicy(ScratchImage& pixels, const TextureCookRequest& request, DXGI_FORMAT sourceFormat, bool bFloatValues, std::stop_token cancellation)
+	void ApplySourcePolicy(ScratchImage& pixels, const TextureCookRequest& request, DXGI_FORMAT sourceFormat, bool bFloatValues)
 	{
 		const bool bDecodeSrgb = !bFloatValues && request.policy.colorProcessingPolicy == TextureColorProcessingPolicy::SrgbLinearize;
 		const bool bExtractChannel = request.policy.channelMask != TextureChannelMask::Rgba;
@@ -111,10 +103,8 @@ namespace TextureProcessing
 		        images.data(),
 		        images.size(),
 		        metadata,
-		        [channel, bDecodeSrgb, bExtractChannel, bNormalBc5, bSignedBc5, cancellation](XMVECTOR* output, const XMVECTOR* input, std::size_t width, std::size_t)
+		        [channel, bDecodeSrgb, bExtractChannel, bNormalBc5, bSignedBc5](XMVECTOR* output, const XMVECTOR* input, std::size_t width, std::size_t)
 		        {
-			        CheckTextureCancellation(cancellation);
-
 			        for (std::size_t x = 0; x < width; ++x)
 			        {
 				        auto pixel = bDecodeSrgb ? XMColorSRGBToRGB(input[x]) : input[x];
@@ -131,7 +121,7 @@ namespace TextureProcessing
 		pixels = std::move(extracted);
 	}
 
-	void NormalizeGeneratedNormals(ScratchImage& pixels, std::stop_token cancellation)
+	void NormalizeGeneratedNormals(ScratchImage& pixels)
 	{
 		const auto& metadata = pixels.GetMetadata();
 		for (std::size_t item = 0; item < metadata.arraySize; ++item)
@@ -144,10 +134,8 @@ namespace TextureProcessing
 				CheckTextureOperation(
 				    TransformImage(
 				        image,
-				        [cancellation](XMVECTOR* output, const XMVECTOR* input, std::size_t width, std::size_t)
+				        [](XMVECTOR* output, const XMVECTOR* input, std::size_t width, std::size_t)
 				        {
-					        CheckTextureCancellation(cancellation);
-
 					        for (std::size_t x = 0; x < width; ++x)
 					        {
 						        auto normal = XMVectorSubtract(XMVectorScale(input[x], 2.0f), XMVectorReplicate(1.0f));
@@ -164,7 +152,7 @@ namespace TextureProcessing
 		}
 	}
 
-	void GenerateMips(ScratchImage& pixels, const TextureCookRequest& request, std::stop_token cancellation)
+	void GenerateMips(ScratchImage& pixels, const TextureCookRequest& request)
 	{
 		if (request.policy.mipPolicy != TextureMipPolicy::Generate)
 		{
@@ -183,10 +171,9 @@ namespace TextureProcessing
 		ScratchImage generated;
 		CheckTextureOperation(GenerateMipMaps(pixels.GetImages(), pixels.GetImageCount(), pixels.GetMetadata(), flags, 0, generated), "generate mip chain");
 		pixels = std::move(generated);
-		CheckTextureCancellation(cancellation);
 		if (group == TextureGroup::NormalMap)
 		{
-			NormalizeGeneratedNormals(pixels, cancellation);
+			NormalizeGeneratedNormals(pixels);
 		}
 	}
 
@@ -197,7 +184,7 @@ namespace TextureProcessing
 		bool bFitsUnsignedHalf = true;
 	};
 
-	PixelProperties InspectPixels(const ScratchImage& pixels, TextureMipPolicy policy, std::stop_token cancellation)
+	PixelProperties InspectPixels(const ScratchImage& pixels, TextureMipPolicy policy)
 	{
 		PixelProperties properties;
 		const auto images = SelectImages(pixels, policy);
@@ -208,10 +195,8 @@ namespace TextureProcessing
 		        images.data(),
 		        images.size(),
 		        metadata,
-		        [&properties, cancellation](const XMVECTOR* input, std::size_t width, std::size_t)
+		        [&properties](const XMVECTOR* input, std::size_t width, std::size_t)
 		        {
-			        CheckTextureCancellation(cancellation);
-
 			        for (std::size_t x = 0; x < width; ++x)
 			        {
 				        if (XMVector4IsNaN(input[x]) || XMVector4IsInfinite(input[x]))
@@ -265,14 +250,14 @@ namespace TextureProcessing
 		return ApplyOutputIntent(format, request);
 	}
 
-	ScratchImage EncodeTexture(ScratchImage pixels, DXGI_FORMAT format, TextureMipPolicy policy, std::stop_token cancellation)
+	ScratchImage EncodeTexture(ScratchImage pixels, DXGI_FORMAT format, TextureMipPolicy policy)
 	{
 		if (format == DXGI_FORMAT_R32G32B32A32_FLOAT)
 		{
 			return pixels;
 		}
 		const auto images = SelectImages(pixels, policy);
-		auto metadata = SelectMetadata(pixels, policy);
+		const auto metadata = SelectMetadata(pixels, policy);
 		ScratchImage output;
 		if (!IsCompressed(format))
 		{
@@ -280,26 +265,8 @@ namespace TextureProcessing
 			return output;
 		}
 
-		metadata.format = format;
-		CheckTextureOperation(output.Initialize(metadata), "allocate encoded subresources");
-
-		CompressOptions options{};
-		options.flags = IsSRGB(format) ? TEX_COMPRESS_SRGB_OUT : TEX_COMPRESS_DEFAULT;
-		options.threshold = TEX_THRESHOLD_DEFAULT;
-		options.alphaWeight = 1.0f;
-		for (std::size_t index = 0; index < images.size(); ++index)
-		{
-			ScratchImage encoded;
-			CheckTextureOperation(CompressEx(images[index], format, options, encoded, [cancellation](std::size_t, std::size_t) { return !cancellation.stop_requested(); }), "encode BC image");
-			const Image& destination = output.GetImages()[index];
-			const Image& actual = encoded.GetImages()[0];
-			if (destination.rowPitch != actual.rowPitch || destination.slicePitch != actual.slicePitch)
-			{
-				throw Diagnostics::Error("Native BC output layout does not match its allocated subresource.");
-			}
-
-			std::memcpy(destination.pixels, actual.pixels, actual.slicePitch);
-		}
+		const auto flags = IsSRGB(format) ? TEX_COMPRESS_SRGB_OUT : TEX_COMPRESS_DEFAULT;
+		CheckTextureOperation(Compress(images.data(), images.size(), metadata, format, flags, TEX_THRESHOLD_DEFAULT, output), "encode BC subresources");
 
 		return output;
 	}
@@ -324,9 +291,8 @@ bool CanPreserveTextureBlocks(const TextureCookRequest& request, DXGI_FORMAT for
 	return bUnchangedEncoding && bSuppliedMips && bUnchangedChannels;
 }
 
-ScratchImage ProcessTexture(const TextureCookRequest& request, ScratchImage source, std::stop_token cancellation)
+ScratchImage ProcessTexture(const TextureCookRequest& request, ScratchImage source)
 {
-	CheckTextureCancellation(cancellation);
 	const auto sourceFormat = source.GetMetadata().format;
 	if (CanPreserveTextureBlocks(request, sourceFormat))
 	{
@@ -340,15 +306,15 @@ ScratchImage ProcessTexture(const TextureCookRequest& request, ScratchImage sour
 	ScratchImage pixels = DecodeWorkingPixels(source, request);
 	if (bNativeFloat)
 	{
-		InspectPixels(pixels, request.policy.mipPolicy, cancellation);
+		InspectPixels(pixels, request.policy.mipPolicy);
 	}
 
-	ApplySourcePolicy(pixels, request, sourceFormat, bFloatValues, cancellation);
-	GenerateMips(pixels, request, cancellation);
+	ApplySourcePolicy(pixels, request, sourceFormat, bFloatValues);
+	GenerateMips(pixels, request);
 
 	const auto policy = request.policy.mipPolicy == TextureMipPolicy::NoMips ? TextureMipPolicy::NoMips : TextureMipPolicy::PreserveExisting;
-	const auto properties = InspectPixels(pixels, policy, cancellation);
+	const auto properties = InspectPixels(pixels, policy);
 	const DXGI_FORMAT format = SelectOutputFormat(request, bFloatValues, properties);
 
-	return EncodeTexture(std::move(pixels), format, policy, cancellation);
+	return EncodeTexture(std::move(pixels), format, policy);
 }

@@ -81,6 +81,21 @@ namespace Files
 
 	FileSetPublisher::~FileSetPublisher() = default;
 
+	bool FileSetPublisher::ValidatePaths(std::span<const FilePublication> files, std::span<const std::filesystem::path> protectedInputs, std::string& outErrorMessage) const
+	{
+		try
+		{
+			ValidateFileSetPaths(files, m_implementation->Roots, protectedInputs);
+			outErrorMessage.clear();
+			return true;
+		}
+		catch (const Diagnostics::Error& error)
+		{
+			outErrorMessage = error.what();
+			return false;
+		}
+	}
+
 	bool FileSetPublisher::Publish(std::span<const FilePublication> files, std::string& outErrorMessage)
 	{
 		return m_implementation->Publish(files, outErrorMessage);

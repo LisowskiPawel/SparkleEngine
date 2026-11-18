@@ -26,7 +26,6 @@ namespace Strings
 	SPARKLE_CORE_API std::vector<std::string_view> Split(std::string_view str, char separator, bool bKeepEmptyFields = true);
 	SPARKLE_CORE_API std::string ToLowerCopy(std::string_view str);
 	SPARKLE_CORE_API std::string EscapeCsvField(std::string_view str);
-	SPARKLE_CORE_API std::string EscapeJsonString(std::string_view str);
 	SPARKLE_CORE_API bool EqualsIgnoreCase(std::string_view lhs, std::string_view rhs) noexcept;
 	SPARKLE_CORE_API bool StartsWithIgnoreCase(std::string_view value, std::string_view prefix) noexcept;
 	SPARKLE_CORE_API bool ContainsIgnoreCase(std::string_view haystack, std::string_view needle) noexcept;

@@ -4,10 +4,9 @@
 
 #include "Core/Public/Files/BinaryBufferWriter.h"
 #include "Core/Public/Hash/HashUtils.h"
-#include "Core/Public/Json/JsonWriter.h"
+#include <nlohmann/json.hpp>
 #include "Editor/Capture/ImageEncoding.h"
 
-#include <algorithm>
 #include <array>
 #include <bit>
 #include <cstring>
@@ -140,42 +139,29 @@ std::string ReferencePathTracerArtifactEncoding::BuildManifest(
 {
 	const char* status = request.Kind == ReferencePathTracerArtifactKind::Complete ? "Complete" : (request.Kind == ReferencePathTracerArtifactKind::Checkpoint ? "Checkpoint" : "PartialPrefix");
 
-	std::vector<std::pair<std::string, std::string>> properties = {
-	    {"beauty", Json::QuoteString("beauty.exr")},
-	    {"beautyBytes", std::to_string(artifact.Beauty.size())},
-	    {"beautySha256", Json::QuoteString(beautyHash)},
-	    {"committedBegin", "0"},
-	    {"committedEnd", std::to_string(request.Mean.Result.SamplePrefix.SampleCount)},
-	    {"displayProduct", Json::QuoteString("separate viewport derivative")},
-	    {"frameId", std::to_string(request.Mean.Result.FrameId)},
-	    {"height", std::to_string(artifact.Height)},
-	    {"providerGeneration", std::to_string(request.Mean.Result.ProviderGeneration)},
-	    {"rawProduct", Json::QuoteString("scene-linear RGB32F")},
-	    {"sceneGeneration", std::to_string(request.Mean.Result.SceneGeneration)},
-	    {"schema", Json::QuoteString("sparkle-reference-path-tracer-artifact")},
-	    {"sessionDigestSha256", Json::QuoteString(Hash::Sha256ToHex(request.Mean.Result.SamplePrefix.RenderIdentitySha256))},
-	    {"status", Json::QuoteString(status)},
-	    {"targetSpp", std::to_string(request.Mean.Result.SamplePrefix.TargetSampleCount)},
-	    {"width", std::to_string(artifact.Width)}};
+	nlohmann::json manifest{
+	    {"beauty", "beauty.exr"},
+	    {"beautyBytes", artifact.Beauty.size()},
+	    {"beautySha256", beautyHash},
+	    {"committedBegin", std::uint64_t{0}},
+	    {"committedEnd", request.Mean.Result.SamplePrefix.SampleCount},
+	    {"displayProduct", "separate viewport derivative"},
+	    {"frameId", request.Mean.Result.FrameId},
+	    {"height", artifact.Height},
+	    {"providerGeneration", request.Mean.Result.ProviderGeneration},
+	    {"rawProduct", "scene-linear RGB32F"},
+	    {"sceneGeneration", request.Mean.Result.SceneGeneration},
+	    {"schema", "sparkle-reference-path-tracer-artifact"},
+	    {"sessionDigestSha256", Hash::Sha256ToHex(request.Mean.Result.SamplePrefix.RenderIdentitySha256)},
+	    {"status", status},
+	    {"targetSpp", request.Mean.Result.SamplePrefix.TargetSampleCount},
+	    {"width", artifact.Width}};
 
 	if (!checkpointHash.empty())
 	{
-		properties.emplace_back("checkpoint", Json::QuoteString("checkpoint.bin"));
-		properties.emplace_back("checkpointBytes", std::to_string(artifact.Checkpoint->size()));
-		properties.emplace_back("checkpointSha256", Json::QuoteString(checkpointHash));
+		manifest["checkpoint"] = "checkpoint.bin";
+		manifest["checkpointBytes"] = artifact.Checkpoint.value().size();
+		manifest["checkpointSha256"] = checkpointHash;
 	}
-	std::sort(properties.begin(), properties.end(), [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; });
-	std::string manifest = "{";
-	for (std::size_t index = 0; index < properties.size(); ++index)
-	{
-		if (index != 0u)
-		{
-			manifest += ',';
-		}
-		manifest += Json::QuoteString(properties[index].first);
-		manifest += ':';
-		manifest += properties[index].second;
-	}
-	manifest += '}';
-	return manifest;
+	return manifest.dump();
 }

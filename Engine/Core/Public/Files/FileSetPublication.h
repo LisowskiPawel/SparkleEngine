@@ -41,6 +41,8 @@ namespace Files
 		FileSetPublisher(const FileSetPublisher&) = delete;
 		FileSetPublisher& operator=(const FileSetPublisher&) = delete;
 
+		// Check before staging so overlapping outputs cannot overwrite inputs or coordination files.
+		bool ValidatePaths(std::span<const FilePublication> files, std::span<const std::filesystem::path> protectedInputs, std::string& outErrorMessage) const;
 		bool Publish(std::span<const FilePublication> files, std::string& outErrorMessage);
 
 	private:

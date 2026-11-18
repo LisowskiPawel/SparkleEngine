@@ -83,6 +83,10 @@ target_link_libraries(SparkleApplication
         SparkleTasks
 )
 
+if(SPARKLE_WITH_GPU_CRASH_DEBUGGING)
+    target_link_libraries(SparkleApplication PRIVATE nlohmann_json::nlohmann_json)
+endif()
+
 sparkle_add_engine_module(SparkleApplicationEditor SPARKLE_APPLICATION_EDITOR_EXPORTS
         ${SPARKLE_APPLICATION_EDITOR_PUBLIC_HEADERS}
         ${SPARKLE_APPLICATION_EDITOR_PRIVATE_SOURCES}
@@ -99,7 +103,7 @@ target_include_directories(SparkleApplicationEditor
 
 target_compile_features(SparkleApplicationEditor PUBLIC cxx_std_20)
 target_compile_definitions(SparkleApplicationEditor PRIVATE
-    SPARKLE_APPLICATION_WITH_EXTERNAL_CAPTURE_UI=$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>>
+    SPARKLE_APPLICATION_WITH_EXTERNAL_CAPTURE_UI=$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<CONFIG:DebugEditor,DevelopmentEditor>>
 )
 
 sparkle_target_precompile_headers(SparkleApplicationEditor
@@ -118,6 +122,7 @@ target_link_libraries(SparkleApplicationEditor
         SparkleTasks
         imgui
         tinyexr
+        nlohmann_json::nlohmann_json
         ZLIB::ZLIB
 )
 
@@ -128,19 +133,19 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private PREFIX "Private" FILES
     ${SPARKLE_APPLICATION_EDITOR_PRIVATE_SOURCES}
     ${SPARKLE_APPLICATION_EDITOR_PRIVATE_HEADERS})
 
-target_compile_definitions(SparkleApplication PRIVATE SPARKLE_WITH_EXTERNAL_CAPTURE=$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>>)
+target_compile_definitions(SparkleApplication PRIVATE SPARKLE_WITH_EXTERNAL_CAPTURE=$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<CONFIG:DebugEditor,DevelopmentEditor>>)
 
 if(SPARKLE_RHI_WITH_EXTERNAL_CAPTURE)
     foreach(capture_source IN LISTS SPARKLE_APPLICATION_CAPTURE_UI_SOURCES)
         target_sources(SparkleApplicationEditor PRIVATE
-            "$<$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>:${capture_source}>")
+            "$<$<CONFIG:DebugEditor,DevelopmentEditor>:${capture_source}>")
     endforeach()
 endif()
 foreach(capture_source IN LISTS SPARKLE_APPLICATION_CAPTURE_SOURCES)
     target_sources(SparkleApplication PRIVATE
-        "$<$<OR:$<BOOL:${SPARKLE_WITH_GPU_CRASH_DEBUGGING}>,$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>>>:${capture_source}>")
+        "$<$<OR:$<BOOL:${SPARKLE_WITH_GPU_CRASH_DEBUGGING}>,$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<CONFIG:DebugEditor,DevelopmentEditor>>>:${capture_source}>")
 endforeach()
 
 foreach(console_source IN LISTS SPARKLE_APPLICATION_CONSOLE_SOURCES)
-    target_sources(SparkleApplication PRIVATE "$<$<NOT:$<OR:$<CONFIG:ShippingEditor>,$<CONFIG:ShippingGame>>>:${console_source}>")
+    target_sources(SparkleApplication PRIVATE "$<$<NOT:$<CONFIG:ShippingEditor,ShippingGame>>:${console_source}>")
 endforeach()

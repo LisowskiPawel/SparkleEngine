@@ -54,7 +54,11 @@ Build and dependency files are under `build/`; binaries and cooked content are u
 
 The root [CMakeLists.txt](../CMakeLists.txt) composes dependencies, Engine, Tools and projects. Shared build policy lives under `CMake/`; target-specific backend, SDK and deployment rules stay beside their module. [EngineModule.cmake](../Engine/CMake/EngineModule.cmake) owns shared linkage/export rules; each module declares its sources and dependencies.
 
+[Artifact helpers](../CMake/Artifacts/TargetArtifacts.cmake) assign output and symbol paths. Module and product composition select runtime staging explicitly.
+
 Linked targets own runtime dependencies. Staging and release inventories derive DLL membership from that graph, including private transitive dependencies and imported SDK targets. Dynamically loaded plugins and data files use their owner's deployment rules. Keep one artifact layout and dependency inventory.
+
+Streamline's imported SDK target owns its DLL and notice lists; its Renderer integration stages them. RHI owns PIX and native capture deployment.
 
 Cleaning a cook action removes its selected outputs; scene cleanup includes its dependent assets and registry. Clean Cook All and the Cooked Outputs scope remove all cooked content.
 

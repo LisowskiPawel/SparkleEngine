@@ -3,13 +3,13 @@ set(TEXTURE_COOK_SHARED_PUBLIC_HEADERS
 )
 
 set(TEXTURE_COOK_SHARED_PRIVATE_SOURCES
-	${CMAKE_CURRENT_SOURCE_DIR}/Private/Requests/TextureCookRequestCodec.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Requests/TextureCookRequestCodec.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Requests/TextureCookRequestList.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Private/Requests/TextureCookRequestSet.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Requests/TextureCookRequestSet.cpp
 )
 
 set(TEXTURE_COOK_SHARED_PRIVATE_HEADERS
-	${CMAKE_CURRENT_SOURCE_DIR}/Private/Requests/TextureCookRequestCodec.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Requests/TextureCookRequestCodec.h
 )
 
 set(TEXTURE_COOKER_PRIVATE_SOURCES
@@ -20,10 +20,9 @@ set(TEXTURE_COOKER_PRIVATE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/TextureSource.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/KtxTextureSource.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/App/TextureCookerApplication.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/CookTextureCookRequestFileCommand.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/InspectTextureCookRequestFileCommand.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureCookRequestBatchProcessor.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureCookBatchExecutor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/CookTextureRequestFile.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureCookBatchExecutor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureCookMemoryLimiter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureAssetCooker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/CookedTextureAssetWriter.cpp
@@ -33,11 +32,10 @@ set(TEXTURE_COOKER_PRIVATE_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Processing/TextureProcessor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/TextureSource.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/App/TextureCookerApplication.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/CookTextureCookRequestFileCommand.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/InspectTextureCookRequestFileCommand.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Constants/TextureCookerConstants.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureCookRequestBatchProcessor.h
-	${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureCookBatchExecutor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/CookTextureRequestFile.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureCookBatchExecutor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureCookMemoryLimiter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureAssetCooker.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/CookedTextureAssetWriter.h
@@ -71,6 +69,7 @@ add_executable(TextureCooker
 )
 sparkle_configure_host_tool_target(TextureCooker)
 sparkle_configure_development_tool_artifacts(TextureCooker)
+sparkle_stage_msvc_runtime(TextureCooker)
 
 target_include_directories(TextureCooker
     PRIVATE

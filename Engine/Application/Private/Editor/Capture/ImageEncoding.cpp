@@ -2,7 +2,7 @@
 
 #include "Editor/Capture/ImageEncoding.h"
 
-#include "Core/Public/Pixel/FloatConversion.h"
+#include <DirectXPackedVector.h>
 
 #include <algorithm>
 #include <array>
@@ -101,10 +101,10 @@ static void ConvertPixel(const std::byte* source, ImagePixelEncoding encoding, s
 		{
 			std::array<std::uint16_t, 4> rgba{};
 			std::memcpy(rgba.data(), source, sizeof(rgba));
-			destination[0] = ToByte(Pixel::HalfToFloat(rgba[2]));
-			destination[1] = ToByte(Pixel::HalfToFloat(rgba[1]));
-			destination[2] = ToByte(Pixel::HalfToFloat(rgba[0]));
-			destination[3] = ToByte(Pixel::HalfToFloat(rgba[3]));
+			destination[0] = ToByte(DirectX::PackedVector::XMConvertHalfToFloat(rgba[2]));
+			destination[1] = ToByte(DirectX::PackedVector::XMConvertHalfToFloat(rgba[1]));
+			destination[2] = ToByte(DirectX::PackedVector::XMConvertHalfToFloat(rgba[0]));
+			destination[3] = ToByte(DirectX::PackedVector::XMConvertHalfToFloat(rgba[3]));
 			break;
 		}
 

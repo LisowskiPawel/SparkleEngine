@@ -6,6 +6,7 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/BinarySpanReader.h"
 #include "Core/Public/Files/FileUtils.h"
+#include "Core/Public/Files/FileSetPublication.h"
 #include "RHI/Public/Textures/CookedTextureAsset.h"
 
 #include <format>
@@ -45,11 +46,15 @@ static void ValidateHeader(const CookedTextureAssetHeader& header, const std::fi
 	}
 }
 
-static void ValidateMipHeader(const CookedTextureMipHeader& mipHeader, std::uint32_t mipIndex, const std::filesystem::path& resolvedPath)
+static void ValidateMipHeader(const CookedTextureMipHeader& mipHeader, PixelFormat format, std::uint32_t mipIndex, const std::filesystem::path& resolvedPath)
 {
-	if (mipHeader.width == 0 || mipHeader.height == 0 || mipHeader.rowPitch == 0 || mipHeader.slicePitch == 0 || mipHeader.dataSize == 0)
+	if (mipHeader.width == 0 || mipHeader.height == 0 || mipHeader.slicePitch == 0 || mipHeader.dataSize == 0)
 	{
 		throw Diagnostics::Error(std::format("Cooked texture asset '{}' has an invalid mip header at index {}", resolvedPath.string(), mipIndex));
+	}
+	if (mipHeader.rowPitch != PixelFormatRowBytes(format, mipHeader.width))
+	{
+		throw Diagnostics::Error(std::format("Cooked texture asset '{}' has a noncanonical row pitch at mip {}.", resolvedPath.string(), mipIndex));
 	}
 
 	if (mipHeader.dataSize != mipHeader.slicePitch)
@@ -81,6 +86,7 @@ CookedTextureFilePayload ReadCookedTexturePayload(const std::filesystem::path& t
 		throw Diagnostics::Error("Cooked texture not found or not a .stex product: '" + texturePath.string() + "'.");
 	}
 	payload.ResolvedPath = *resolvedPath;
+	const Files::FileSetReadScope publication(payload.ResolvedPath.parent_path());
 	std::string errorMessage;
 	if (!Files::TryReadAllBytes(payload.ResolvedPath, payload.Bytes, errorMessage))
 	{
@@ -117,7 +123,7 @@ LoadedTextureData DecodeCookedTexture(const CookedTextureFilePayload& payload, s
 	std::uint64_t decodedBytes = 0;
 	for (std::uint32_t mipIndex = 0; mipIndex < static_cast<std::uint32_t>(mipHeaders.size()); ++mipIndex)
 	{
-		ValidateMipHeader(mipHeaders[mipIndex], mipIndex, payload.ResolvedPath);
+		ValidateMipHeader(mipHeaders[mipIndex], PixelFormatFromSerializedTextureFormat(header.format), mipIndex, payload.ResolvedPath);
 		if (mipHeaders[mipIndex].dataSize > maximumDecodedBytes - decodedBytes)
 		{
 			throw Diagnostics::Error(std::format("Cooked texture asset '{}' exceeds its decoded-byte reservation.", payload.ResolvedPath.string()));

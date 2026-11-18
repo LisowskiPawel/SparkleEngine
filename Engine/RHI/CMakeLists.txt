@@ -67,13 +67,11 @@ function(sparkle_configure_rhi_implementation_target target_name)
         PRIVATE
             SPARKLE_RHI_WITH_D3D12=$<BOOL:${SPARKLE_RHI_WITH_D3D12}>
             SPARKLE_WITH_GPU_CRASH_DEBUGGING=$<BOOL:${SPARKLE_WITH_GPU_CRASH_DEBUGGING}>
-            SPARKLE_WITH_EXTERNAL_CAPTURE=$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>>
+            SPARKLE_WITH_EXTERNAL_CAPTURE=$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<CONFIG:DebugEditor,DevelopmentEditor>>
             SPARKLE_RHI_WITH_VULKAN=$<BOOL:${SPARKLE_RHI_WITH_VULKAN}>
             SPARKLE_RHI_DEFAULT_BACKEND_${SPARKLE_RHI_DEFAULT_BACKEND_UPPER}=1
-            "$<$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DebugGame>,$<CONFIG:DevelopmentEditor>,$<CONFIG:DevelopmentGame>>:ENGINE_GPU_VALIDATION=1>"
-            "$<$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DebugGame>,$<CONFIG:DevelopmentEditor>,$<CONFIG:DevelopmentGame>>:ENGINE_REPORT_LIVE_OBJECTS=1>"
-            "$<$<OR:$<CONFIG:ShippingEditor>,$<CONFIG:ShippingGame>>:ENGINE_GPU_VALIDATION=0>"
-            "$<$<OR:$<CONFIG:ShippingEditor>,$<CONFIG:ShippingGame>>:ENGINE_REPORT_LIVE_OBJECTS=0>"
+            ENGINE_GPU_VALIDATION=$<NOT:$<CONFIG:ShippingEditor,ShippingGame>>
+            ENGINE_REPORT_LIVE_OBJECTS=$<NOT:$<CONFIG:ShippingEditor,ShippingGame>>
     )
 
     if(SPARKLE_BUILD_SHARED)
@@ -146,6 +144,12 @@ if(SPARKLE_RHI_WITH_VULKAN)
     include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/Vulkan.cmake")
 endif()
 
+if(SPARKLE_WITH_GPU_CRASH_DEBUGGING)
+    foreach(target_name IN ITEMS SparkleRHIDiagnostics ${SPARKLE_RHI_BACKEND_TARGETS})
+        target_link_libraries(${target_name} PRIVATE nlohmann_json::nlohmann_json)
+    endforeach()
+endif()
+
 sparkle_add_engine_module(SparkleRHI SPARKLE_RHI_EXPORTS
         ${SPARKLE_RHI_PUBLIC_HEADERS}
         $<TARGET_OBJECTS:SparkleRHICommon>
@@ -202,3 +206,4 @@ if(SPARKLE_RHI_WITH_VULKAN)
 endif()
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/ExternalCapture.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/RuntimeDeployment.cmake")

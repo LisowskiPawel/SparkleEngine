@@ -8,6 +8,7 @@
 #include "Core/Public/Paths/PathUtils.h"
 
 #include <format>
+#include <unordered_set>
 
 namespace Files
 {
@@ -71,15 +72,12 @@ namespace Files
 	std::vector<std::filesystem::path> PublicationRoots(std::span<const std::filesystem::path> roots)
 	{
 		std::vector<std::filesystem::path> result;
+		std::unordered_set<std::wstring> keys;
 		for (const auto& root : roots)
 		{
 			const auto normalized = PublicationRoot(root);
-			bool bContained = false;
-			for (const auto& accepted : result)
-			{
-				bContained |= Paths::IsUnderRoot(normalized, accepted);
-			}
-			if (!bContained)
+			const bool bInserted = keys.insert(Paths::MakePathKey(normalized)).second;
+			if (bInserted)
 			{
 				result.push_back(normalized);
 			}

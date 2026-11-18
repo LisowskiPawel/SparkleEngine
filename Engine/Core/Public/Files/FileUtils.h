@@ -14,7 +14,11 @@
 
 namespace Files
 {
-	SPARKLE_CORE_API bool TryReadAllBytes(const std::filesystem::path& path, std::vector<std::uint8_t>& outBytes, std::string& outErrorMessage);
+	SPARKLE_CORE_API bool TryReadAllBytes(
+	    const std::filesystem::path& path,
+	    std::vector<std::uint8_t>& outBytes,
+	    std::string& outErrorMessage,
+	    std::size_t maximumBytes = (std::numeric_limits<std::size_t>::max)());
 	SPARKLE_CORE_API bool TryReadAllText(const std::filesystem::path& path, std::string& outText, std::string& outErrorMessage, std::size_t maximumBytes = (std::numeric_limits<std::size_t>::max)());
 	SPARKLE_CORE_API bool TryWriteAllBytes(const std::filesystem::path& path, std::span<const std::byte> bytes, std::string& outErrorMessage);
 	SPARKLE_CORE_API bool TryWriteAllBytes(const std::filesystem::path& path, const std::vector<std::uint8_t>& bytes, std::string& outErrorMessage);

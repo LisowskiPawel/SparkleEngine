@@ -71,6 +71,7 @@ target_link_libraries(ShaderCompiler
 include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/ShaderCompilerRuntime.cmake")
 
 sparkle_configure_development_tool_artifacts(ShaderCompiler)
+sparkle_stage_msvc_runtime(ShaderCompiler)
 sparkle_stage_linked_runtime(ShaderCompiler)
 sparkle_get_project_cooked_directory(SHADER_COMPILER_VALIDATION_COOKED_DIRECTORY Shared)
 

@@ -52,12 +52,8 @@ TextureCookMemoryLimiter::TextureCookMemoryLimiter(std::size_t capacityBytes) :
 	}
 }
 
-TextureCookMemoryLimiter::Lease TextureCookMemoryLimiter::Acquire(std::size_t bytes, std::stop_token cancellation)
+TextureCookMemoryLimiter::Lease TextureCookMemoryLimiter::Acquire(std::size_t bytes)
 {
-	if (cancellation.stop_requested())
-	{
-		throw Diagnostics::Error("Texture memory admission was cancelled.");
-	}
 	if (bytes == 0)
 	{
 		throw Diagnostics::Error("Texture cook pixel-data reservation is zero.");
@@ -68,10 +64,7 @@ TextureCookMemoryLimiter::Lease TextureCookMemoryLimiter::Acquire(std::size_t by
 	}
 
 	std::unique_lock lock(m_mutex);
-	if (!m_condition.wait(lock, cancellation, [this, bytes] { return bytes <= m_capacityBytes - m_usedBytes; }))
-	{
-		throw Diagnostics::Error("Texture memory admission was cancelled.");
-	}
+	m_condition.wait(lock, [this, bytes] { return bytes <= m_capacityBytes - m_usedBytes; });
 
 	m_usedBytes += bytes;
 	return Lease(*this, bytes);

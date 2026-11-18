@@ -3,7 +3,7 @@
 
 #include "D3D12/Diagnostics/D3D12DebugLayer.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Json/JsonWriter.h"
+#include <nlohmann/json.hpp>
 
 #include <wrl/client.h>
 #include <format>
@@ -90,22 +90,13 @@ void D3D12GpuCrash::ObserveLoss(ID3D12Device* device, HRESULT result) noexcept
 	try
 	{
 		Dred->CollectCrashDiagnostics(device);
-		Json::ObjectWriter json;
-		json.WriteRaw("frame", "null");
-		json.WriteString("resourceAliases", "ambiguous; native allocation candidates only");
-		std::string messages = "[";
+		nlohmann::json json{{"frame", nullptr}, {"resourceAliases", "ambiguous; native allocation candidates only"}, {"dred", nlohmann::json::array()}};
 		RhiDiagnosticMessage message;
 		while (Dred->TryPopMessage(message))
 		{
-			if (messages.size() > 1)
-			{
-				messages += ',';
-			}
-			messages += Json::QuoteString(message.Text);
+			json["dred"].push_back(message.Text);
 		}
-		messages += ']';
-		json.WriteRaw("dred", messages);
-		const auto text = json.Finish();
+		const auto text = json.dump();
 		session->Enqueue({RhiGpuCrashArtifactKind::NativeDiagnostics, 0, 0}, std::as_bytes(std::span(text)));
 	}
 	catch (...)

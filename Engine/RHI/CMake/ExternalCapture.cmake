@@ -1,5 +1,5 @@
 # Development-only application-controlled GPU capture. Native SDK headers stay private.
-set(_capture_profile "$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>>>")
+set(_capture_profile "$<AND:$<BOOL:${SPARKLE_RHI_WITH_EXTERNAL_CAPTURE}>,$<CONFIG:DebugEditor,DevelopmentEditor>>")
 find_path(SPARKLE_RENDERDOC_CAPTURE_INCLUDE_DIR renderdoc_app.h
     PATHS "$ENV{ProgramFiles}/RenderDoc" DOC "Directory containing the official RenderDoc application header")
 find_path(SPARKLE_NSIGHT_CAPTURE_INCLUDE_DIR NGFX_GraphicsCapture_D3D12.h

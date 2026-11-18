@@ -22,7 +22,6 @@ set(SPARKLE_BUILD_CONFIGURATIONS
 set(SPARKLE_DEBUG_CONFIGURATIONS DebugEditor DebugGame)
 set(SPARKLE_DEVELOPMENT_CONFIGURATIONS DevelopmentEditor DevelopmentGame)
 set(SPARKLE_SHIPPING_CONFIGURATIONS ShippingEditor ShippingGame)
-set(SPARKLE_EDITOR_CONFIGURATIONS DevelopmentEditor DebugEditor ShippingEditor)
 set(SPARKLE_GAME_CONFIGURATIONS DevelopmentGame DebugGame ShippingGame)
 
 set(SPARKLE_DEFAULT_CONFIGURATION DevelopmentEditor)
@@ -39,138 +38,58 @@ else()
     endif()
 endif()
 
-function(sparkle_set_profile_flags profile c_flags cxx_flags exe_linker_flags shared_linker_flags module_linker_flags static_linker_flags)
-    string(TOUPPER "${profile}" profile_upper)
-    set(CMAKE_C_FLAGS_${profile_upper} "${c_flags}" CACHE STRING "${profile} C flags" FORCE)
-    set(CMAKE_CXX_FLAGS_${profile_upper} "${cxx_flags}" CACHE STRING "${profile} CXX flags" FORCE)
-    set(CMAKE_EXE_LINKER_FLAGS_${profile_upper} "${exe_linker_flags}" CACHE STRING "${profile} executable linker flags" FORCE)
-    set(CMAKE_SHARED_LINKER_FLAGS_${profile_upper} "${shared_linker_flags}" CACHE STRING "${profile} shared linker flags" FORCE)
-    set(CMAKE_MODULE_LINKER_FLAGS_${profile_upper} "${module_linker_flags}" CACHE STRING "${profile} module linker flags" FORCE)
-    set(CMAKE_STATIC_LINKER_FLAGS_${profile_upper} "${static_linker_flags}" CACHE STRING "${profile} static linker flags" FORCE)
-endfunction()
-
-function(sparkle_join_profile_options option_list output_variable)
-    list(JOIN ${option_list} " " joined_options)
-    set(${output_variable} "${joined_options}" PARENT_SCOPE)
-endfunction()
-
-set(SPARKLE_MSVC_DEBUG_COMPILE_OPTIONS
-    /Od      # Disable optimization for straightforward source-level debugging.
-    /Ob0     # Disable inline expansion so stepping follows source structure.
-    /Zi      # Emit complete PDB debug information.
-    /FS      # Serialize compiler PDB writes when targets use multi-process compilation.
-    /RTC1    # Enable runtime checks for stack frames and uninitialized locals.
-)
-
-set(SPARKLE_MSVC_DEVELOPMENT_COMPILE_OPTIONS
-    /O2      # Enable regular speed optimizations for realistic development performance.
-    /Ob2     # Let the compiler expand suitable inline functions.
-    /Zi      # Keep PDB debug information for profiling and practical debugging.
-    /FS      # Serialize compiler PDB writes when targets use multi-process compilation.
-    /DNDEBUG # Disable standard assert paths while keeping Sparkle developer diagnostics.
-)
-
-set(SPARKLE_MSVC_SHIPPING_COMPILE_OPTIONS
-    /O2      # Enable regular speed optimizations for final runtime performance.
-    /Ob2     # Let the compiler expand suitable inline functions.
-    /Zi      # Retain matching native symbols outside the product package.
-    /FS      # Serialize compiler PDB writes.
-    /DNDEBUG # Disable standard assert paths for shipping-style builds.
-)
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    file(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}" _sparkle_source_prefix)
-    list(APPEND SPARKLE_MSVC_SHIPPING_COMPILE_OPTIONS "/d1trimfile:\"${_sparkle_source_prefix}\"")
+if(MSVC)
+    # Keep PDBs in every state; /FS supports concurrent compiler writes.
+    set(_sparkle_DEBUG_compile_flags "/Od /Ob0 /Zi /FS /RTC1")
+    set(_sparkle_DEVELOPMENT_compile_flags "/O2 /Ob2 /Zi /FS /DNDEBUG")
+    set(_sparkle_SHIPPING_compile_flags "${_sparkle_DEVELOPMENT_compile_flags}")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+        # Remove the workspace prefix from shipping source paths in native symbols.
+        file(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}" _sparkle_source_prefix)
+        string(APPEND _sparkle_SHIPPING_compile_flags " /d1trimfile:\"${_sparkle_source_prefix}\"")
+    endif()
+    set(_sparkle_DEBUG_link_flags "/DEBUG:FULL")
+    set(_sparkle_DEVELOPMENT_link_flags "/DEBUG:FULL /INCREMENTAL:NO /OPT:REF /OPT:ICF")
+    set(_sparkle_SHIPPING_link_flags "${_sparkle_DEVELOPMENT_link_flags}")
+else()
+    set(_sparkle_DEBUG_compile_flags "-O0 -g")
+    set(_sparkle_DEVELOPMENT_compile_flags "-O2 -g -DNDEBUG")
+    set(_sparkle_SHIPPING_compile_flags "-O3 -DNDEBUG")
+    set(_sparkle_DEBUG_link_flags "")
+    set(_sparkle_DEVELOPMENT_link_flags "")
+    set(_sparkle_SHIPPING_link_flags "")
 endif()
 
-set(SPARKLE_CLANG_DEBUG_COMPILE_OPTIONS
-    -O0      # Disable optimization for straightforward source-level debugging.
-    -g       # Emit debug information.
-)
-
-set(SPARKLE_CLANG_DEVELOPMENT_COMPILE_OPTIONS
-    -O2      # Enable regular speed optimizations for realistic development performance.
-    -g       # Keep debug information for profiling and practical debugging.
-    -DNDEBUG # Disable standard assert paths while keeping Sparkle developer diagnostics.
-)
-
-set(SPARKLE_CLANG_SHIPPING_COMPILE_OPTIONS
-    -O3      # Prefer maximum optimization for final runtime performance.
-    -DNDEBUG # Disable standard assert paths for shipping-style builds.
-)
-
-sparkle_join_profile_options(SPARKLE_MSVC_DEBUG_COMPILE_OPTIONS SPARKLE_MSVC_DEBUG_COMPILE_FLAGS)
-sparkle_join_profile_options(SPARKLE_MSVC_DEVELOPMENT_COMPILE_OPTIONS SPARKLE_MSVC_DEVELOPMENT_COMPILE_FLAGS)
-sparkle_join_profile_options(SPARKLE_MSVC_SHIPPING_COMPILE_OPTIONS SPARKLE_MSVC_SHIPPING_COMPILE_FLAGS)
-sparkle_join_profile_options(SPARKLE_CLANG_DEBUG_COMPILE_OPTIONS SPARKLE_CLANG_DEBUG_COMPILE_FLAGS)
-sparkle_join_profile_options(SPARKLE_CLANG_DEVELOPMENT_COMPILE_OPTIONS SPARKLE_CLANG_DEVELOPMENT_COMPILE_FLAGS)
-sparkle_join_profile_options(SPARKLE_CLANG_SHIPPING_COMPILE_OPTIONS SPARKLE_CLANG_SHIPPING_COMPILE_FLAGS)
-
 # SDKs use standard configuration names; the empty entry also admits a generic import.
-foreach(profile IN LISTS SPARKLE_DEBUG_CONFIGURATIONS)
-    string(TOUPPER "${profile}" profile_upper)
-    set(CMAKE_MAP_IMPORTED_CONFIG_${profile_upper} "Debug;Release;")
-    if(MSVC)
-        sparkle_set_profile_flags(
-            ${profile}
-            "${SPARKLE_MSVC_DEBUG_COMPILE_FLAGS}"
-            "${SPARKLE_MSVC_DEBUG_COMPILE_FLAGS}"
-            "/DEBUG:FULL"
-            "/DEBUG:FULL"
-            "/DEBUG:FULL"
-            ""
-        )
-    else()
-        sparkle_set_profile_flags(${profile} "${SPARKLE_CLANG_DEBUG_COMPILE_FLAGS}" "${SPARKLE_CLANG_DEBUG_COMPILE_FLAGS}" "" "" "" "")
-    endif()
+set(_sparkle_DEBUG_imported_configs "Debug;Release;")
+set(_sparkle_DEVELOPMENT_imported_configs "RelWithDebInfo;Release;")
+set(_sparkle_SHIPPING_imported_configs "Release;")
+
+# Editor and Game share compiler, linker and SDK policy for their build state.
+foreach(_sparkle_state IN ITEMS DEBUG DEVELOPMENT SHIPPING)
+    foreach(_sparkle_profile IN LISTS SPARKLE_${_sparkle_state}_CONFIGURATIONS)
+        string(TOUPPER "${_sparkle_profile}" _sparkle_profile_upper)
+        set(CMAKE_MAP_IMPORTED_CONFIG_${_sparkle_profile_upper} "${_sparkle_${_sparkle_state}_imported_configs}")
+        foreach(_sparkle_language IN ITEMS C CXX)
+            set(CMAKE_${_sparkle_language}_FLAGS_${_sparkle_profile_upper}
+                "${_sparkle_${_sparkle_state}_compile_flags}" CACHE STRING "${_sparkle_profile} ${_sparkle_language} flags" FORCE)
+        endforeach()
+        foreach(_sparkle_link_kind IN ITEMS EXE SHARED MODULE)
+            set(CMAKE_${_sparkle_link_kind}_LINKER_FLAGS_${_sparkle_profile_upper}
+                "${_sparkle_${_sparkle_state}_link_flags}" CACHE STRING "${_sparkle_profile} ${_sparkle_link_kind} linker flags" FORCE)
+        endforeach()
+        set(CMAKE_STATIC_LINKER_FLAGS_${_sparkle_profile_upper} "" CACHE STRING "${_sparkle_profile} static linker flags" FORCE)
+    endforeach()
 endforeach()
 
-foreach(profile IN LISTS SPARKLE_DEVELOPMENT_CONFIGURATIONS)
-    string(TOUPPER "${profile}" profile_upper)
-    set(CMAKE_MAP_IMPORTED_CONFIG_${profile_upper} "RelWithDebInfo;Release;")
-    if(MSVC)
-        sparkle_set_profile_flags(
-            ${profile}
-            "${SPARKLE_MSVC_DEVELOPMENT_COMPILE_FLAGS}"
-            "${SPARKLE_MSVC_DEVELOPMENT_COMPILE_FLAGS}"
-            "/DEBUG:FULL /INCREMENTAL:NO /OPT:REF /OPT:ICF"
-            "/DEBUG:FULL /INCREMENTAL:NO /OPT:REF /OPT:ICF"
-            "/DEBUG:FULL /INCREMENTAL:NO /OPT:REF /OPT:ICF"
-            ""
-        )
-    else()
-        sparkle_set_profile_flags(${profile} "${SPARKLE_CLANG_DEVELOPMENT_COMPILE_FLAGS}" "${SPARKLE_CLANG_DEVELOPMENT_COMPILE_FLAGS}" "" "" "" "")
-    endif()
-endforeach()
-
-foreach(profile IN LISTS SPARKLE_SHIPPING_CONFIGURATIONS)
-    string(TOUPPER "${profile}" profile_upper)
-    set(CMAKE_MAP_IMPORTED_CONFIG_${profile_upper} "Release;")
-    if(MSVC)
-        sparkle_set_profile_flags(${profile} "${SPARKLE_MSVC_SHIPPING_COMPILE_FLAGS}" "${SPARKLE_MSVC_SHIPPING_COMPILE_FLAGS}"
-            "/DEBUG:FULL /INCREMENTAL:NO /OPT:REF /OPT:ICF"
-            "/DEBUG:FULL /INCREMENTAL:NO /OPT:REF /OPT:ICF"
-            "/DEBUG:FULL /INCREMENTAL:NO /OPT:REF /OPT:ICF" "")
-    else()
-        sparkle_set_profile_flags(${profile} "${SPARKLE_CLANG_SHIPPING_COMPILE_FLAGS}" "${SPARKLE_CLANG_SHIPPING_COMPILE_FLAGS}" "" "" "" "")
-    endif()
-endforeach()
-
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DebugGame>>:Debug>DLL")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:DebugEditor,DebugGame>:Debug>DLL")
 
 add_compile_definitions(
-    "$<$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DebugGame>>:SPARKLE_BUILD_DEBUG=1>"
-    "$<$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DebugGame>>:SPARKLE_BUILD_DEVELOPMENT=0>"
-    "$<$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DebugGame>>:SPARKLE_BUILD_SHIPPING=0>"
-    "$<$<OR:$<CONFIG:DevelopmentEditor>,$<CONFIG:DevelopmentGame>>:SPARKLE_BUILD_DEBUG=0>"
-    "$<$<OR:$<CONFIG:DevelopmentEditor>,$<CONFIG:DevelopmentGame>>:SPARKLE_BUILD_DEVELOPMENT=1>"
-    "$<$<OR:$<CONFIG:DevelopmentEditor>,$<CONFIG:DevelopmentGame>>:SPARKLE_BUILD_SHIPPING=0>"
-    "$<$<OR:$<CONFIG:ShippingEditor>,$<CONFIG:ShippingGame>>:SPARKLE_BUILD_DEBUG=0>"
-    "$<$<OR:$<CONFIG:ShippingEditor>,$<CONFIG:ShippingGame>>:SPARKLE_BUILD_DEVELOPMENT=0>"
-    "$<$<OR:$<CONFIG:ShippingEditor>,$<CONFIG:ShippingGame>>:SPARKLE_BUILD_SHIPPING=1>"
-    "$<$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>,$<CONFIG:ShippingEditor>>:SPARKLE_TARGET_EDITOR=1>"
-    "$<$<OR:$<CONFIG:DebugEditor>,$<CONFIG:DevelopmentEditor>,$<CONFIG:ShippingEditor>>:SPARKLE_TARGET_GAME=0>"
-    "$<$<OR:$<CONFIG:DebugGame>,$<CONFIG:DevelopmentGame>,$<CONFIG:ShippingGame>>:SPARKLE_TARGET_EDITOR=0>"
-    "$<$<OR:$<CONFIG:DebugGame>,$<CONFIG:DevelopmentGame>,$<CONFIG:ShippingGame>>:SPARKLE_TARGET_GAME=1>"
+    "SPARKLE_BUILD_DEBUG=$<CONFIG:DebugEditor,DebugGame>"
+    "SPARKLE_BUILD_DEVELOPMENT=$<CONFIG:DevelopmentEditor,DevelopmentGame>"
+    "SPARKLE_BUILD_SHIPPING=$<CONFIG:ShippingEditor,ShippingGame>"
+    "SPARKLE_TARGET_EDITOR=$<CONFIG:DebugEditor,DevelopmentEditor,ShippingEditor>"
+    "SPARKLE_TARGET_GAME=$<CONFIG:DebugGame,DevelopmentGame,ShippingGame>"
 )
 
 list(JOIN SPARKLE_BUILD_CONFIGURATIONS ", " SPARKLE_BUILD_CONFIGURATION_LIST)

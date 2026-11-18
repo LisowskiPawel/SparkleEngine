@@ -129,7 +129,7 @@ namespace KtxSourceLoading
 
 using namespace KtxSourceLoading;
 
-TextureSource LoadKtxTextureSource(std::span<const std::uint8_t> bytes, const TextureCookRequest& request, TextureCookMemoryLimiter& processingMemory, std::stop_token cancellation)
+TextureSource LoadKtxTextureSource(std::span<const std::uint8_t> bytes, const TextureCookRequest& request, TextureCookMemoryLimiter& processingMemory)
 {
 	ktxTexture* texture = nullptr;
 	const auto created = ktxTexture_CreateFromMemory(bytes.data(), bytes.size(), KTX_TEXTURE_CREATE_NO_FLAGS, &texture);
@@ -147,7 +147,7 @@ TextureSource LoadKtxTextureSource(std::span<const std::uint8_t> bytes, const Te
 
 	const auto metadata = ReadMetadata(*texture);
 	TextureSource source;
-	source.ProcessingMemory = processingMemory.Acquire(MeasureTextureProcessingMemory(metadata, bytes.size(), request), cancellation);
+	source.ProcessingMemory = processingMemory.Acquire(MeasureTextureProcessingMemory(metadata, bytes.size(), request));
 	const bool bFlipX = texture->orientation.x == KTX_ORIENT_X_LEFT;
 	const bool bFlipY = texture->orientation.y == KTX_ORIENT_Y_UP;
 	if (IsCompressed(metadata.format) && (bFlipX || bFlipY))
