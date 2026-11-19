@@ -121,6 +121,7 @@ namespace KtxSourceLoading
 		{
 			return;
 		}
+		InitializeTextureWicApartment();
 		ScratchImage oriented;
 		CheckTextureOperation(FlipRotate(images.GetImages(), images.GetImageCount(), images.GetMetadata(), flags, oriented), "orient imported KTX pixels");
 		images = std::move(oriented);

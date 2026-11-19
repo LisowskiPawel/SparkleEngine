@@ -66,18 +66,13 @@ struct TextureCookRequest final
 class TextureCookRequestSet final
 {
 public:
-	void Clear() noexcept;
 	void Add(const TextureCookRequest& request);
 	std::vector<TextureCookRequest> ReleaseRequests() noexcept;
-
-	const std::vector<TextureCookRequest>& Requests() const noexcept { return m_requests; }
 
 private:
 	std::map<TextureAssetId, std::size_t> m_requestIndices;
 	std::vector<TextureCookRequest> m_requests;
 };
-
-void ValidateTextureCookRequest(const TextureCookRequest& request);
 
 const char* GetTextureColorSpaceName(TextureColorSpace colorSpace) noexcept;
 const char* GetTextureMipPolicyName(TextureMipPolicy mipPolicy) noexcept;
@@ -87,6 +82,6 @@ const char* GetTextureDimensionName(TextureDimension dimension) noexcept;
 const char* GetTextureChannelMaskName(TextureChannelMask channelMask) noexcept;
 const char* GetTextureHdrEncodingName(TextureHdrEncoding hdrEncoding) noexcept;
 
-void WriteTextureCookRequestList(const std::filesystem::path& outputPath, const std::vector<TextureCookRequest>& requests);
+void WriteTextureCookRequestList(const std::filesystem::path& outputPath, TextureCookRequestSet&& requests);
 
 std::vector<TextureCookRequest> LoadTextureCookRequestList(const std::filesystem::path& inputPath);

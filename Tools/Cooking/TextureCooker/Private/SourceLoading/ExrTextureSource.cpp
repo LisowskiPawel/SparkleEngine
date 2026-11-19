@@ -37,11 +37,7 @@ namespace ExrSourceLoading
 		}
 		const std::int64_t admittedWidth = static_cast<std::int64_t>(header.data_window.max_x) - header.data_window.min_x + 1;
 		const std::int64_t admittedHeight = static_cast<std::int64_t>(header.data_window.max_y) - header.data_window.min_y + 1;
-		if (admittedWidth <= 0 || admittedWidth > 16384 || admittedHeight <= 0 || admittedHeight > 16384)
-		{
-			throw Diagnostics::Error("EXR source dimensions exceed the supported 2D scope.");
-		}
-		return MakeFlatTextureMetadata(static_cast<int>(admittedWidth), static_cast<int>(admittedHeight), DXGI_FORMAT_R32G32B32A32_FLOAT);
+		return MakeFlatTextureMetadata(admittedWidth, admittedHeight, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	}
 }
 

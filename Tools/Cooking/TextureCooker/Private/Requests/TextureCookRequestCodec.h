@@ -7,8 +7,7 @@
 
 namespace TextureCookRequestCodec
 {
-	std::string_view GetHeader() noexcept;
-	bool IsHeader(std::string_view line) noexcept;
+	inline constexpr std::string_view Header = "TextureCookRequests|1";
 	TextureCookRequest ParseLine(std::string_view line);
 	std::string FormatLine(const TextureCookRequest& request);
 }

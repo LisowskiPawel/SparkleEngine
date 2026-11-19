@@ -4,6 +4,7 @@
 #include "Processing/TextureProcessor.h"
 #include "Core/Public/Diagnostics/Error.h"
 
+#define STBI_ONLY_PNG
 #define STBI_ONLY_PSD
 #define STBI_ONLY_PIC
 #define STBI_ONLY_PNM
@@ -27,10 +28,15 @@ TextureSource LoadRasterTextureSource(std::span<const std::uint8_t> bytes, const
 		throw Diagnostics::Error("Unable to read raster source metadata.");
 	}
 
-	const auto metadata = MakeFlatTextureMetadata(width, height, DXGI_FORMAT_R8G8B8A8_UNORM);
+	const bool b16Bit = stbi_is_16_bit_from_memory(bytes.data(), static_cast<int>(bytes.size())) != 0;
+	const auto format = b16Bit ? DXGI_FORMAT_R16G16B16A16_UNORM : DXGI_FORMAT_R8G8B8A8_UNORM;
+	const auto metadata = MakeFlatTextureMetadata(width, height, format);
 	source.ProcessingMemory = processingMemory.Acquire(MeasureTextureProcessingMemory(metadata, bytes.size(), request));
 
-	std::unique_ptr<stbi_uc, decltype(&stbi_image_free)> pixels(stbi_load_from_memory(bytes.data(), static_cast<int>(bytes.size()), &width, &height, &channels, STBI_rgb_alpha), &stbi_image_free);
+	std::unique_ptr<void, decltype(&stbi_image_free)> pixels(
+	    b16Bit ? static_cast<void*>(stbi_load_16_from_memory(bytes.data(), static_cast<int>(bytes.size()), &width, &height, &channels, STBI_rgb_alpha))
+	           : stbi_load_from_memory(bytes.data(), static_cast<int>(bytes.size()), &width, &height, &channels, STBI_rgb_alpha),
+	    &stbi_image_free);
 
 	if (!pixels || metadata.width != width || metadata.height != height)
 	{

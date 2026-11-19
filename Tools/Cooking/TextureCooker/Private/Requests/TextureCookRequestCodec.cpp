@@ -8,7 +8,6 @@
 
 #include <sstream>
 #include <stdexcept>
-#include <vector>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_textureCookRequestCodecLogger, "TextureCooker.RequestCodec");
 
@@ -74,8 +73,6 @@ namespace TextureCookRequestEncoding
 		Diagnostics::Fatal(g_textureCookRequestCodecLogger, __FILE__, __LINE__, "Unknown texture request policy value.");
 	}
 
-	static constexpr std::string_view Header = "TextureCookRequests|1";
-
 	static constexpr std::size_t FieldCount = 10;
 
 	static TextureAssetId ParseAssetId(std::string_view value)
@@ -111,32 +108,13 @@ namespace TextureCookRequestEncoding
 	}
 }
 
-std::string_view TextureCookRequestCodec::GetHeader() noexcept
-{
-	return TextureCookRequestEncoding::Header;
-}
-
-bool TextureCookRequestCodec::IsHeader(std::string_view line) noexcept
-{
-	return line == TextureCookRequestEncoding::Header;
-}
-
 TextureCookRequest TextureCookRequestCodec::ParseLine(std::string_view line)
 {
-	const std::vector<std::string_view> fields = Strings::Split(line, '|');
+	const auto fields = Strings::Split(line, '|');
 	if (fields.size() != TextureCookRequestEncoding::FieldCount)
 	{
 		throw Diagnostics::Error("Texture cook request entry is malformed.");
 	}
-	if (fields[8].empty())
-	{
-		throw Diagnostics::Error("Texture cook request entry is missing an output path.");
-	}
-	if (fields[9].empty())
-	{
-		throw Diagnostics::Error("Texture cook request entry is missing a source path.");
-	}
-
 	TextureCookRequest request;
 	request.assetId = TextureCookRequestEncoding::ParseAssetId(fields[0]);
 	request.policy.colorSpace = TextureCookRequestEncoding::Parse(fields[1], TextureCookRequestEncoding::ColorSpaces);

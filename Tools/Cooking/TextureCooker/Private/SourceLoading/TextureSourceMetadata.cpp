@@ -66,7 +66,7 @@ namespace TextureSourceAdmission
 	}
 }
 
-TexMetadata MakeFlatTextureMetadata(int width, int height, DXGI_FORMAT format)
+TexMetadata MakeFlatTextureMetadata(std::int64_t width, std::int64_t height, DXGI_FORMAT format)
 {
 	TexMetadata metadata{};
 	metadata.width = width > 0 ? static_cast<std::size_t>(width) : 0;

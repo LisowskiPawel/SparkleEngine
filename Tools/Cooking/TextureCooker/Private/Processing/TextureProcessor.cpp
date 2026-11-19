@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstring>
 #include <format>
+#include <span>
 #include <vector>
 
 using namespace DirectX;
@@ -67,7 +68,7 @@ namespace TextureProcessing
 		}
 		else
 		{
-			CheckTextureOperation(Convert(images.data(), images.size(), metadata, DXGI_FORMAT_R32G32B32A32_FLOAT, TEX_FILTER_DEFAULT, TEX_THRESHOLD_DEFAULT, pixels), "convert source");
+			CheckTextureOperation(Convert(images.data(), images.size(), metadata, DXGI_FORMAT_R32G32B32A32_FLOAT, TEX_FILTER_FORCE_NON_WIC, TEX_THRESHOLD_DEFAULT, pixels), "convert source");
 		}
 		source.Release();
 		return pixels;
@@ -252,6 +253,42 @@ namespace TextureProcessing
 		return ApplyOutputIntent(format, request);
 	}
 
+	void ValidateBc6hQuality(std::span<const Image> reference, const ScratchImage& encoded)
+	{
+		ScratchImage decoded;
+		CheckTextureOperation(Decompress(encoded.GetImages(), encoded.GetImageCount(), encoded.GetMetadata(), DXGI_FORMAT_R32G32B32A32_FLOAT, decoded), "verify BC6H pixels");
+		for (std::size_t index = 0; index < reference.size(); ++index)
+		{
+			const auto& image = reference[index];
+			double squaredError = 0;
+			bool bExceedsLimit = false;
+			CheckTextureOperation(
+			    EvaluateImage(
+			        decoded.GetImages()[index],
+			        [&image, &squaredError, &bExceedsLimit](const XMVECTOR* pixels, std::size_t width, std::size_t y)
+			        {
+				        const auto* row = reinterpret_cast<const XMFLOAT4*>(image.pixels + y * image.rowPitch);
+				        for (std::size_t x = 0; x < width; ++x)
+				        {
+					        const auto expected = XMVectorMax(XMLoadFloat4(&row[x]), g_XMZero);
+					        const auto error = XMVectorAbs(XMVectorSubtract(pixels[x], expected));
+					        const auto scale = XMVectorMax(expected, g_XMOne);
+					        const auto limits = XMVectorSelect(XMVectorReplicate(0.08f), XMVectorScale(scale, 0.15f), XMVectorGreater(expected, g_XMOne));
+					        bExceedsLimit |= !XMVector3LessOrEqual(error, limits);
+					        const auto relative = XMVectorDivide(error, scale);
+					        squaredError += XMVectorGetX(XMVector3LengthSq(relative));
+				        }
+			        }),
+			    "evaluate BC6H quality");
+
+			const double maximumSquaredError = 0.04 * 0.04 * image.width * image.height * 3;
+			if (bExceedsLimit || squaredError > maximumSquaredError)
+			{
+				throw Diagnostics::Error(std::format("BC6H quality limit exceeded at subresource {}. Use rgba32f.", index));
+			}
+		}
+	}
+
 	ScratchImage EncodeTexture(ScratchImage pixels, DXGI_FORMAT format, TextureMipPolicy policy)
 	{
 		if (format == DXGI_FORMAT_R32G32B32A32_FLOAT)
@@ -263,12 +300,16 @@ namespace TextureProcessing
 		ScratchImage output;
 		if (!IsCompressed(format))
 		{
-			CheckTextureOperation(Convert(images.data(), images.size(), metadata, format, TEX_FILTER_DEFAULT, TEX_THRESHOLD_DEFAULT, output), "encode output pixels");
+			CheckTextureOperation(Convert(images.data(), images.size(), metadata, format, TEX_FILTER_FORCE_NON_WIC, TEX_THRESHOLD_DEFAULT, output), "encode output pixels");
 			return output;
 		}
 
 		const auto flags = IsSRGB(format) ? TEX_COMPRESS_SRGB_OUT : TEX_COMPRESS_DEFAULT;
 		CheckTextureOperation(Compress(images.data(), images.size(), metadata, format, flags, TEX_THRESHOLD_DEFAULT, output), "encode BC subresources");
+		if (format == DXGI_FORMAT_BC6H_UF16)
+		{
+			ValidateBc6hQuality(images, output);
+		}
 
 		return output;
 	}

@@ -75,8 +75,9 @@ namespace TextureSourceLoading
 		{
 			result = GetMetadataFromHDRMemory(bytes.data(), bytes.size(), metadata);
 		}
-		else if (extension == L".png" || extension == L".jpg" || extension == L".jpeg" || extension == L".bmp" || extension == L".gif")
+		else if (extension == L".jpg" || extension == L".jpeg" || extension == L".bmp" || extension == L".gif")
 		{
+			InitializeTextureWicApartment();
 			result = GetMetadataFromWICMemory(bytes.data(), bytes.size(), static_cast<WIC_FLAGS>(WicFlags | WIC_FLAGS_ALL_FRAMES), metadata);
 			if (SUCCEEDED(result) && metadata.arraySize != 1)
 			{
@@ -120,10 +121,13 @@ namespace TextureSourceLoading
 
 using namespace TextureSourceLoading;
 
-TextureSource LoadTextureSource(const TextureCookRequest& request, TextureCookMemoryLimiter& processingMemory)
+void InitializeTextureWicApartment()
 {
 	thread_local const ComApartment comApartment;
+}
 
+TextureSource LoadTextureSource(const TextureCookRequest& request, TextureCookMemoryLimiter& processingMemory)
+{
 	const auto bytes = ReadSource(request.sourcePath);
 	const auto extension = Paths::GetLowercaseExtension(request.sourcePath);
 
@@ -135,7 +139,7 @@ TextureSource LoadTextureSource(const TextureCookRequest& request, TextureCookMe
 	{
 		return LoadExrTextureSource(bytes, request, processingMemory);
 	}
-	if (extension == L".psd" || extension == L".pic" || extension == L".pnm" || extension == L".ppm" || extension == L".pgm" || extension == L".tga")
+	if (extension == L".png" || extension == L".psd" || extension == L".pic" || extension == L".pnm" || extension == L".ppm" || extension == L".pgm" || extension == L".tga")
 	{
 		return LoadRasterTextureSource(bytes, request, processingMemory);
 	}

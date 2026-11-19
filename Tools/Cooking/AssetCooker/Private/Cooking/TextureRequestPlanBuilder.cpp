@@ -7,7 +7,7 @@
 #include "TextureCookRequestList.h"
 
 #include <string>
-#include <vector>
+#include <utility>
 
 void TextureRequestPlanBuilder::CollectSceneRequests(const AssetCookerSceneEntry& sceneEntry, TextureCookRequestSet& requestSet)
 {
@@ -49,10 +49,9 @@ bool TextureRequestPlanBuilder::Build(const AssetCookerProjectCookPlan& plan, As
 		return false;
 	}
 
-	std::vector<TextureCookRequest> requests = requestSet.ReleaseRequests();
 	try
 	{
-		WriteTextureCookRequestList(outputPath, requests);
+		WriteTextureCookRequestList(outputPath, std::move(requestSet));
 	}
 	catch (const Diagnostics::Error& error)
 	{

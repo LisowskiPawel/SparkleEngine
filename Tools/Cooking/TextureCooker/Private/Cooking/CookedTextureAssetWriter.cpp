@@ -68,16 +68,13 @@ namespace CookedTextureWriting
 			throw Diagnostics::Error(error);
 		}
 
-		for (std::size_t item = 0; item < metadata.arraySize; ++item)
+		for (std::size_t index = 0; index < mipHeaders.size(); ++index)
 		{
-			for (std::size_t mip = 0; mip < levels; ++mip)
+			const auto& image = *texture.GetImage(index % levels, index / levels, 0);
+			const bool bWritten = Files::BinaryStreamWriter::WriteBytes(output, image.pixels, image.slicePitch, error);
+			if (!bWritten)
 			{
-				const auto& image = *texture.GetImage(mip, item, 0);
-				const bool bWritten = Files::BinaryStreamWriter::WriteBytes(output, image.pixels, image.slicePitch, error);
-				if (!bWritten)
-				{
-					throw Diagnostics::Error(error);
-				}
+				throw Diagnostics::Error(error);
 			}
 		}
 	}

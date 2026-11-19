@@ -17,7 +17,8 @@ struct TextureSource final
 
 struct TextureCookRequest;
 
-DirectX::TexMetadata MakeFlatTextureMetadata(int width, int height, DXGI_FORMAT format);
+void InitializeTextureWicApartment();
+DirectX::TexMetadata MakeFlatTextureMetadata(std::int64_t width, std::int64_t height, DXGI_FORMAT format);
 std::size_t MeasureTextureProcessingMemory(const DirectX::TexMetadata& metadata, std::size_t fileBytes, const TextureCookRequest& request);
 
 TextureSource LoadTextureSource(const TextureCookRequest& request, TextureCookMemoryLimiter& processingMemory);

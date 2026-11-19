@@ -4,7 +4,7 @@
 
 Temporary implementation plan; delete it at closure.
 
-**Status, 2026-11-18:** stage 6 is **COMPLETE: all four broader format families are explicitly retained**. The lasting decisions and owners are in the [migration guide](../ThirdPartyMigration.md#retained-text-formats). No additional JSON format, dual reader, upgrade engine or settings DOM was introduced. The unused Launcher settings-file declaration is removed. Texture request serialization now rejects unrepresentable path characters before publication; the existing protocol and concurrent HDR extension are preserved.
+**Status, 2026-11-18:** stage 6 is **COMPLETE: all four broader format families are explicitly retained**. The lasting decisions and owners are in the [migration guide](../ThirdPartyMigration.md#retained-text-formats). No additional JSON format, dual reader, upgrade engine or settings DOM was introduced. The unused Launcher settings-file declaration is removed. Texture request serialization now rejects unrepresentable path characters and reuses Core atomic publication; the existing protocol and concurrent HDR extension are preserved.
 
 Stages 2–5 implementation is delivered: upstream C++ JSON owns parsing/values/serialization, the six Core reader/writer/tokenizer files and JSON escaping are gone, freshness reads/parses once, and transferred fragment/access paths are retired. Their completed instructions and historical checkpoint narratives have been removed from this active plan. Earlier missing or failed acceptance checks are consolidated below; removing completed instructions does not mark those gates passed.
 
