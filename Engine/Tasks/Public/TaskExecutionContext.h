@@ -29,9 +29,17 @@ public:
 	{
 	}
 
-	template <typename T> T* TryGet() noexcept { return m_userType != nullptr && *m_userType == typeid(T) ? static_cast<T*>(m_userData) : nullptr; }
+	template <typename T> T* TryGet() noexcept
+	{
+		const bool bTypeMatches = m_userType != nullptr && *m_userType == typeid(T);
+		return bTypeMatches ? static_cast<T*>(m_userData) : nullptr;
+	}
 
-	template <typename T> const T* TryGet() const noexcept { return m_userType != nullptr && *m_userType == typeid(T) ? static_cast<const T*>(m_userData) : nullptr; }
+	template <typename T> const T* TryGet() const noexcept
+	{
+		const bool bTypeMatches = m_userType != nullptr && *m_userType == typeid(T);
+		return bTypeMatches ? static_cast<const T*>(m_userData) : nullptr;
+	}
 
 	TaskLane GetLane() const noexcept { return m_lane; }
 

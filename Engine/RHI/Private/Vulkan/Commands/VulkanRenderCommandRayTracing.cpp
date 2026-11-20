@@ -153,7 +153,9 @@ void VulkanRenderCommandList::TraceRays(const TraceRaysDesc& desc) noexcept
 VkDeviceAddress VulkanRenderCommandList::ResolveRayTracingBufferAddress(const RhiRayTracingBufferBinding& binding) const noexcept
 {
 	VulkanRecordingResource resource;
-	if (!ResolveResource(binding.Resource, resource) || resource.Buffer == VK_NULL_HANDLE || resource.BufferDeviceAddress == 0)
+	const bool bResourceResolved = ResolveResource(binding.Resource, resource);
+	const bool bBufferAvailable = bResourceResolved && resource.Buffer != VK_NULL_HANDLE;
+	if (!bBufferAvailable || resource.BufferDeviceAddress == 0)
 	{
 		return 0;
 	}

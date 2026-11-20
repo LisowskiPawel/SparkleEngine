@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <optional>
+#include <utility>
 
 EditorConsolePanel::EditorConsolePanel(ConsoleSession& session) noexcept :
     m_session(session)
@@ -81,7 +82,8 @@ int EditorConsolePanel::HandleHistoryCallback(ImGuiInputTextCallbackData& data)
 	std::optional<std::string> replacement;
 	if (data.EventKey == ImGuiKey_UpArrow)
 	{
-		replacement = m_session.NavigateHistoryPrevious(std::string_view(data.Buf, static_cast<std::size_t>(data.BufTextLen)));
+		const std::string_view currentLine(data.Buf, static_cast<std::size_t>(data.BufTextLen));
+		replacement = m_session.NavigateHistoryPrevious(currentLine);
 	}
 	else if (data.EventKey == ImGuiKey_DownArrow)
 	{
@@ -106,13 +108,16 @@ int EditorConsolePanel::HandleCompletionCallback(ImGuiInputTextCallbackData& dat
 
 	if (completions.size() > 1)
 	{
-		m_session.AddOutput(ConsoleCommandSeverity::Info, BuildCompletionList(completions));
+		std::string completionList = BuildCompletionList(completions);
+		m_session.AddOutput(ConsoleCommandSeverity::Info, std::move(completionList));
 		return 0;
 	}
 
 	const std::size_t replaceStart = FindCompletionTokenStart(input);
-	data.DeleteChars(static_cast<int>(replaceStart), data.BufTextLen - static_cast<int>(replaceStart));
-	data.InsertChars(static_cast<int>(replaceStart), completions.front().c_str());
+	const int replaceOffset = static_cast<int>(replaceStart);
+	const int replaceLength = data.BufTextLen - replaceOffset;
+	data.DeleteChars(replaceOffset, replaceLength);
+	data.InsertChars(replaceOffset, completions.front().c_str());
 	if (replaceStart == 0)
 	{
 		data.InsertChars(data.BufTextLen, " ");
@@ -190,7 +195,9 @@ void EditorConsolePanel::DrawScrollback()
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8.0f, 6.0f));
 	const ImGuiInputTextFlags flags = ImGuiInputTextFlags_ReadOnly | ImGuiInputTextFlags_NoUndoRedo;
 	const ImVec2 available = ImGui::GetContentRegionAvail();
-	ImGui::InputTextMultiline("##EditorConsoleScrollback", m_outputTextBuffer.data(), m_outputTextBuffer.size(), ImVec2(available.x, (std::max) (32.0f, available.y - 34.0f)), flags);
+	const float scrollbackHeight = (std::max) (32.0f, available.y - 34.0f);
+	const ImVec2 scrollbackSize(available.x, scrollbackHeight);
+	ImGui::InputTextMultiline("##EditorConsoleScrollback", m_outputTextBuffer.data(), m_outputTextBuffer.size(), scrollbackSize, flags);
 	ImGui::PopStyleVar();
 	ImGui::PopStyleColor(3);
 	if (monoFont != nullptr)

@@ -45,7 +45,8 @@ namespace SceneAssetMeshInstanceBuilder
 		resources.reserve(assets.size());
 		for (SceneAssetPayload::StaticMeshAsset& asset : assets)
 		{
-			resources.push_back(std::make_shared<CookedMesh>(std::move(asset.mesh), asset.assetId));
+			std::shared_ptr<const Mesh> resource = std::make_shared<CookedMesh>(std::move(asset.mesh), asset.assetId);
+			resources.push_back(std::move(resource));
 		}
 		return resources;
 	}
@@ -56,7 +57,8 @@ namespace SceneAssetMeshInstanceBuilder
 		resources.reserve(assets.size());
 		for (SceneAssetPayload::SkeletalMeshAsset& asset : assets)
 		{
-			resources.push_back(std::make_shared<SkeletalCookedMesh>(std::move(asset.mesh), asset.assetId));
+			std::shared_ptr<const Mesh> resource = std::make_shared<SkeletalCookedMesh>(std::move(asset.mesh), asset.assetId);
+			resources.push_back(std::move(resource));
 		}
 		return resources;
 	}

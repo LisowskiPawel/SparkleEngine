@@ -23,7 +23,9 @@ namespace ToneMapping
 		const float c = 2.43f;
 		const float d = 0.59f;
 		const float e = 0.14f;
-		return saturate((x * (a * x + b)) / max(x * (c * x + d) + e, 1.0e-6f.xxx));
+		const float3 numerator = x * (a * x + b);
+		const float3 denominator = x * (c * x + d) + e;
+		return saturate(numerator / max(denominator, 1.0e-6f.xxx));
 	}
 
 	float3 RrtAndOdtFit(float3 color)
@@ -38,7 +40,8 @@ namespace ToneMapping
 		const float3x3 acesInputMatrix = float3x3(0.59719f, 0.35458f, 0.04823f, 0.07600f, 0.90834f, 0.01566f, 0.02840f, 0.13383f, 0.83777f);
 		const float3x3 acesOutputMatrix = float3x3(1.60475f, -0.53108f, -0.07367f, -0.10208f, 1.10813f, -0.00605f, -0.00327f, -0.07276f, 1.07602f);
 
-		float3 fittedColor = mul(acesInputMatrix, CommonColor::ClampPositive(color));
+		const float3 positiveColor = CommonColor::ClampPositive(color);
+		float3 fittedColor = mul(acesInputMatrix, positiveColor);
 		fittedColor = RrtAndOdtFit(fittedColor);
 		fittedColor = mul(acesOutputMatrix, fittedColor);
 		return saturate(fittedColor);

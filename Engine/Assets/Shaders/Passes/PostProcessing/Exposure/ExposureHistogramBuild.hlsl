@@ -22,8 +22,10 @@ void main(uint3 groupId : SV_GroupID, uint3 groupThreadId : SV_GroupThreadID)
 		const float3 color = SceneColor.Load(int3(pixel, 0)).rgb;
 		if (all(isfinite(color)))
 		{
-			const float luminance = CommonColor::LuminanceRec709(CommonColor::ClampPositive(color));
-			InterlockedAdd(LocalHistogram[ExposureHistogram::FindBin(luminance)], 1u);
+			const float3 positiveColor = CommonColor::ClampPositive(color);
+			const float luminance = CommonColor::LuminanceRec709(positiveColor);
+			const uint bin = ExposureHistogram::FindBin(luminance);
+			InterlockedAdd(LocalHistogram[bin], 1u);
 		}
 	}
 

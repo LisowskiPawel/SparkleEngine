@@ -9,6 +9,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <limits>
+#include <utility>
 
 #define TINYEXR_USE_MINIZ 0
 #define TINYEXR_USE_ZFP 0
@@ -80,7 +82,9 @@ static bool ResolvePixelFormat(PixelFormat format, ImagePixelEncoding& imageForm
 
 static std::byte ToByte(float value) noexcept
 {
-	return static_cast<std::byte>(static_cast<std::uint32_t>(std::clamp(value, 0.0f, 1.0f) * 255.0f + 0.5f));
+	const float clamped = std::clamp(value, 0.0f, 1.0f);
+	const auto rounded = static_cast<std::uint32_t>(clamped * 255.0f + 0.5f);
+	return static_cast<std::byte>(rounded);
 }
 
 static void ConvertPixel(const std::byte* source, ImagePixelEncoding encoding, std::byte* destination) noexcept
@@ -126,12 +130,11 @@ bool ImageEncoding::DecodeLinearRgb(const ImageBufferView& source, LinearRgbImag
 	constexpr std::uint32_t bytesPerPixel = sizeof(float) * 4u;
 	const std::uint64_t minimumRowPitch = static_cast<std::uint64_t>(source.Width) * bytesPerPixel;
 	const std::uint64_t requiredBytes = static_cast<std::uint64_t>(source.RowPitch) * source.Height;
-	const bool bInvalidFloatImageWidth = source.Format != PixelFormat::R32G32B32A32_Float || source.Width == 0u;
-	const bool bInvalidFloatImageHeight = bInvalidFloatImageWidth || (source.Height == 0u);
-	const bool bInvalidFloatImageRowPitch = bInvalidFloatImageHeight || (source.RowPitch < minimumRowPitch);
-	const bool bInvalidFloatImage = bInvalidFloatImageRowPitch || (source.Pixels.size() < requiredBytes);
+	const bool bEmptyExtent = source.Width == 0u || source.Height == 0u;
+	const bool bIncompleteStorage = source.RowPitch < minimumRowPitch || source.Pixels.size() < requiredBytes;
+	const bool bInvalidLayout = bEmptyExtent || bIncompleteStorage;
 
-	if (bInvalidFloatImage)
+	if (source.Format != PixelFormat::R32G32B32A32_Float || bInvalidLayout)
 	{
 		errorMessage = "Image is not a complete RGBA32_FLOAT buffer.";
 		return false;
@@ -167,44 +170,54 @@ bool ImageEncoding::EncodeBmp(const ImageBufferView& image, std::vector<std::byt
 {
 	ImagePixelEncoding imageFormat = ImagePixelEncoding::Rgba8Unorm;
 	const std::uint32_t bytesPerPixel = PixelFormatBytesPerTexel(image.Format);
+	const std::uint64_t minimumRowPitch = static_cast<std::uint64_t>(image.Width) * bytesPerPixel;
 	const std::uint64_t requiredBytes = static_cast<std::uint64_t>(image.RowPitch) * image.Height;
 	const bool bPixelFormatResolved = ResolvePixelFormat(image.Format, imageFormat);
-	const bool bImageStorageUsableWidth = bPixelFormatResolved && image.Width != 0u;
-	const bool bImageStorageUsableHeight = bImageStorageUsableWidth && (image.Height != 0u);
-	const bool bRowPitchFits = bImageStorageUsableHeight && (image.RowPitch >= static_cast<std::uint64_t>(image.Width) * bytesPerPixel);
-	const bool bImageStorageUsable = bRowPitchFits && (image.Pixels.size() >= requiredBytes);
+	const bool bEmptyExtent = image.Width == 0u || image.Height == 0u;
+	const bool bIncompleteStorage = image.RowPitch < minimumRowPitch || image.Pixels.size() < requiredBytes;
+	const bool bInvalidLayout = bEmptyExtent || bIncompleteStorage;
 
-	if (!bImageStorageUsable)
+	if (!bPixelFormatResolved || bInvalidLayout)
 	{
 		errorMessage = "Image cannot be encoded as BMP.";
 		return false;
 	}
 
-	const std::uint32_t outputRowPitch = image.Width * 4u;
-	std::vector<std::byte> outputPixels(static_cast<std::size_t>(outputRowPitch) * image.Height);
+	BmpFileHeader fileHeader;
+	BmpInfoHeader infoHeader;
+	const std::size_t headerBytes = sizeof(fileHeader) + sizeof(infoHeader);
+	const std::size_t outputRowPitch = static_cast<std::size_t>(image.Width) * 4u;
+	const std::size_t maximumPixelBytes = (std::numeric_limits<std::uint32_t>::max)() - headerBytes;
+	if (outputRowPitch > maximumPixelBytes / image.Height)
+	{
+		errorMessage = "Image storage exceeds the BMP format limit.";
+		return false;
+	}
+
+	const std::size_t outputPixelBytes = outputRowPitch * image.Height;
+	std::vector<std::byte> output(headerBytes + outputPixelBytes);
+	std::byte* const outputPixels = output.data() + headerBytes;
 	for (std::uint32_t y = 0; y < image.Height; ++y)
 	{
 		const std::byte* sourceRow = image.Pixels.data() + static_cast<std::size_t>(image.RowPitch) * y;
-		std::byte* outputRow = outputPixels.data() + static_cast<std::size_t>(outputRowPitch) * y;
+		std::byte* outputRow = outputPixels + outputRowPitch * y;
 		for (std::uint32_t x = 0; x < image.Width; ++x)
 		{
-			ConvertPixel(sourceRow + static_cast<std::size_t>(x) * bytesPerPixel, imageFormat, outputRow + static_cast<std::size_t>(x) * 4u);
+			const std::byte* sourcePixel = sourceRow + static_cast<std::size_t>(x) * bytesPerPixel;
+			std::byte* outputPixel = outputRow + static_cast<std::size_t>(x) * 4u;
+			ConvertPixel(sourcePixel, imageFormat, outputPixel);
 		}
 	}
 
-	BmpFileHeader fileHeader;
-	BmpInfoHeader infoHeader;
 	infoHeader.Width = static_cast<std::int32_t>(image.Width);
 	infoHeader.Height = -static_cast<std::int32_t>(image.Height);
-	infoHeader.SizeImage = static_cast<std::uint32_t>(outputPixels.size());
+	infoHeader.SizeImage = static_cast<std::uint32_t>(outputPixelBytes);
 	fileHeader.Size = fileHeader.OffBits + infoHeader.SizeImage;
-	encodedBytes.resize(sizeof(fileHeader) + sizeof(infoHeader) + outputPixels.size());
-	std::byte* destination = encodedBytes.data();
+	std::byte* destination = output.data();
 	std::memcpy(destination, &fileHeader, sizeof(fileHeader));
 	destination += sizeof(fileHeader);
 	std::memcpy(destination, &infoHeader, sizeof(infoHeader));
-	destination += sizeof(infoHeader);
-	std::memcpy(destination, outputPixels.data(), outputPixels.size());
+	encodedBytes = std::move(output);
 	errorMessage.clear();
 	return true;
 }

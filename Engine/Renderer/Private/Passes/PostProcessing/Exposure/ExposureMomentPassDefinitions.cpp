@@ -12,10 +12,10 @@ void AddExposureSceneDownsamplePass(FrameGraphBuilder& builder, FrameGraphTextur
 	parameters->SceneColor = builder.CreateSRV(sceneColor);
 	parameters->LuminanceMomentsOutput = builder.CreateUAV(output.Handle);
 
-	builder.Dispatch<ExposureDownsampleSceneCS>(
-	    parameters,
-	    ComputeDispatchDesc{MathUtils::DivideRoundUp(output.Width, 8u), MathUtils::DivideRoundUp(output.Height, 8u), 1u},
-	    EFrameGraphQueuePreference::AsyncCompute);
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(output.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(output.Height, 8u);
+
+	builder.Dispatch<ExposureDownsampleSceneCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u}, EFrameGraphQueuePreference::AsyncCompute);
 }
 
 void AddExposureTextureDownsamplePass(FrameGraphBuilder& builder, const ExposureMomentTexture& input, const ExposureMomentTexture& output)
@@ -24,8 +24,8 @@ void AddExposureTextureDownsamplePass(FrameGraphBuilder& builder, const Exposure
 	parameters->LuminanceMomentsInput = builder.CreateSRV(input.Handle);
 	parameters->LuminanceMomentsOutput = builder.CreateUAV(output.Handle);
 
-	builder.Dispatch<ExposureDownsampleTextureCS>(
-	    parameters,
-	    ComputeDispatchDesc{MathUtils::DivideRoundUp(output.Width, 8u), MathUtils::DivideRoundUp(output.Height, 8u), 1u},
-	    EFrameGraphQueuePreference::AsyncCompute);
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(output.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(output.Height, 8u);
+
+	builder.Dispatch<ExposureDownsampleTextureCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u}, EFrameGraphQueuePreference::AsyncCompute);
 }

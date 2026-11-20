@@ -11,9 +11,9 @@ void CreateDirectLightReservoirResources(FrameGraphBuilder& builder, RenderViewp
 {
 	resources.History.DirectLightReservoir = DeclareLightingReservoirHistory(builder, extent, "DirectLightReservoir");
 
-	resources.Transient.DirectLightTemporalReservoirSample = builder.CreateTexture(
-	    FrameGraphTextureDesc::CreateColor("DirectLightTemporalReservoirSample", extent.Width, extent.Height, PixelFormat::R32G32B32A32_Float));
+	const FrameGraphTextureDesc sampleDesc = FrameGraphTextureDesc::CreateColor("DirectLightTemporalReservoirSample", extent.Width, extent.Height, PixelFormat::R32G32B32A32_Float);
+	resources.Transient.DirectLightTemporalReservoirSample = builder.CreateTexture(sampleDesc);
 
-	resources.Transient.DirectLightTemporalReservoirWeight = builder.CreateTexture(
-	    FrameGraphTextureDesc::CreateColor("DirectLightTemporalReservoirWeight", extent.Width, extent.Height, PixelFormat::R32G32B32A32_Float));
+	const FrameGraphTextureDesc weightDesc = FrameGraphTextureDesc::CreateColor("DirectLightTemporalReservoirWeight", extent.Width, extent.Height, PixelFormat::R32G32B32A32_Float);
+	resources.Transient.DirectLightTemporalReservoirWeight = builder.CreateTexture(weightDesc);
 }

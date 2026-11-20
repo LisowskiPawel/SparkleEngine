@@ -40,17 +40,26 @@ namespace EditorWidgets
 		const float checkOffset = bHasCheckColumn ? menuCheckColumnWidth : 0.0f;
 		if (icon != EditorIcons::EditorIcon::None)
 		{
-			drawList.AddText(ImVec2(position.x + (menuIconOffset + checkOffset) * fontSize, position.y), ImGui::GetColorU32(SparkleUiPalette::Menu().Icon), EditorIcons::GetEditorIconGlyph(icon));
+			const ImVec2 iconPosition(position.x + (menuIconOffset + checkOffset) * fontSize, position.y);
+			const ImU32 iconColor = ImGui::GetColorU32(SparkleUiPalette::Menu().Icon);
+			const char* glyph = EditorIcons::GetEditorIconGlyph(icon);
+			drawList.AddText(iconPosition, iconColor, glyph);
 		}
 		const char* labelEnd = std::strstr(label, "##");
-		drawList.AddText(ImVec2(position.x + (menuLabelOffset + checkOffset) * fontSize, position.y), ImGui::GetColorU32(ImGuiCol_Text), label, labelEnd);
+		const ImVec2 labelPosition(position.x + (menuLabelOffset + checkOffset) * fontSize, position.y);
+		const ImU32 labelColor = ImGui::GetColorU32(ImGuiCol_Text);
+		drawList.AddText(labelPosition, labelColor, label, labelEnd);
 	}
 
 	MenuStyleScope::MenuStyleScope()
 	{
 		const float fontSize = ImGui::GetFontSize();
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(std::round(menuHorizontalPadding * fontSize), std::round(menuVerticalPadding * fontSize)));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(std::round(menuHorizontalSpacing * fontSize), std::round(menuVerticalSpacing * fontSize)));
+		const float horizontalPadding = std::round(menuHorizontalPadding * fontSize);
+		const float verticalPadding = std::round(menuVerticalPadding * fontSize);
+		const float horizontalSpacing = std::round(menuHorizontalSpacing * fontSize);
+		const float verticalSpacing = std::round(menuVerticalSpacing * fontSize);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(horizontalPadding, verticalPadding));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(horizontalSpacing, verticalSpacing));
 		ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 0.12f * fontSize);
 		const SparkleUiPalette::MenuColors& colors = SparkleUiPalette::Menu();
@@ -80,25 +89,35 @@ namespace EditorWidgets
 		{
 			columns += menuArrowColumnWidth;
 		}
-		return std::ceil(ImGui::CalcTextSize(label, nullptr, true).x + columns * ImGui::GetFontSize());
+		const float labelWidth = ImGui::CalcTextSize(label, nullptr, true).x;
+		const float columnWidth = columns * ImGui::GetFontSize();
+		return std::ceil(labelWidth + columnWidth);
 	}
 
 	float MeasureMenuSection(const char* label)
 	{
 		const float fontSize = ImGui::GetFontSize();
+		ImFont* font = ImGui::GetFont();
+		const float headingSize = fontSize * menuHeadingScale;
+		const float maximumTextWidth = (std::numeric_limits<float>::max)();
 		float width = (menuHeadingLineGap + menuHeadingLineWidth + 2.0f * menuHorizontalPadding) * fontSize;
 		for (const char* character = label; *character != '\0'; character = NextMenuHeadingGlyph(character))
 		{
-			width += ImGui::GetFont()->CalcTextSizeA(fontSize * menuHeadingScale, (std::numeric_limits<float>::max)(), 0.0f, character, NextMenuHeadingGlyph(character)).x
-			    + menuHeadingTracking * fontSize;
+			const char* glyphEnd = NextMenuHeadingGlyph(character);
+			const float glyphWidth = font->CalcTextSizeA(headingSize, maximumTextWidth, 0.0f, character, glyphEnd).x;
+			width += glyphWidth + menuHeadingTracking * fontSize;
 		}
 		return std::ceil(width);
 	}
 
 	bool BeginMenuPopup(const char* id, ImVec2 anchor, float width)
 	{
-		ImGui::SetNextWindowSizeConstraints(ImVec2(width, 0.0f), ImVec2(width, ImGui::GetIO().DisplaySize.y));
-		ImGui::SetNextWindowPos(ImVec2(anchor.x, anchor.y + 0.15f * ImGui::GetFontSize()), ImGuiCond_Appearing);
+		const ImVec2 minimumSize(width, 0.0f);
+		const ImVec2 maximumSize(width, ImGui::GetIO().DisplaySize.y);
+		ImGui::SetNextWindowSizeConstraints(minimumSize, maximumSize);
+		const float popupOffset = 0.15f * ImGui::GetFontSize();
+		const ImVec2 popupPosition(anchor.x, anchor.y + popupOffset);
+		ImGui::SetNextWindowPos(popupPosition, ImGuiCond_Appearing);
 		return ImGui::BeginPopup(id);
 	}
 
@@ -108,7 +127,9 @@ namespace EditorWidgets
 		const float width = ImGui::GetContentRegionAvail().x;
 		const float fontSize = ImGui::GetFontSize();
 		ImDrawList& drawList = *ImGui::GetWindowDrawList();
-		ImGui::SetNextWindowSizeConstraints(ImVec2(childWidth, 0.0f), ImVec2(childWidth, ImGui::GetIO().DisplaySize.y));
+		const ImVec2 minimumSize(childWidth, 0.0f);
+		const ImVec2 maximumSize(childWidth, ImGui::GetIO().DisplaySize.y);
+		ImGui::SetNextWindowSizeConstraints(minimumSize, maximumSize);
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
 		const bool bOpen = ImGui::BeginMenu(label, bEnabled);
 		ImGui::PopStyleColor();
@@ -117,8 +138,11 @@ namespace EditorWidgets
 		const float arrowX = position.x + width - menuHorizontalPadding * fontSize;
 		const float centerY = position.y + 0.5f * fontSize;
 		const ImU32 arrowColor = ImGui::GetColorU32(SparkleUiPalette::Menu().Icon);
-		drawList.AddLine(ImVec2(arrowX, centerY - 0.25f * fontSize), ImVec2(arrowX + 0.25f * fontSize, centerY), arrowColor, 0.09f * fontSize);
-		drawList.AddLine(ImVec2(arrowX + 0.25f * fontSize, centerY), ImVec2(arrowX, centerY + 0.25f * fontSize), arrowColor, 0.09f * fontSize);
+		const ImVec2 arrowTop(arrowX, centerY - 0.25f * fontSize);
+		const ImVec2 arrowTip(arrowX + 0.25f * fontSize, centerY);
+		const ImVec2 arrowBottom(arrowX, centerY + 0.25f * fontSize);
+		drawList.AddLine(arrowTop, arrowTip, arrowColor, 0.09f * fontSize);
+		drawList.AddLine(arrowTip, arrowBottom, arrowColor, 0.09f * fontSize);
 		ImGui::EndDisabled();
 		return bOpen;
 	}
@@ -127,7 +151,9 @@ namespace EditorWidgets
 	{
 		const ImVec2 position = ImGui::GetCursorScreenPos();
 		const bool bHasCheckColumn = checkState != MenuCheckState::Hidden;
-		const float minimumWidth = MeasureMenuRow(label, bHasCheckColumn ? MenuRowKind::Toggle : MenuRowKind::Action) - 2.0f * ImGui::GetStyle().WindowPadding.x;
+		const MenuRowKind kind = bHasCheckColumn ? MenuRowKind::Toggle : MenuRowKind::Action;
+		const float rowWidth = MeasureMenuRow(label, kind);
+		const float minimumWidth = rowWidth - 2.0f * ImGui::GetStyle().WindowPadding.x;
 		const float width = (std::max) (minimumWidth, ImGui::GetContentRegionAvail().x);
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
 		const bool bPressed = ImGui::Selectable(label, false, flags, ImVec2(width, ImGui::GetFontSize()));
@@ -139,12 +165,17 @@ namespace EditorWidgets
 		const ImU32 color = ImGui::GetColorU32(ImGuiCol_Text);
 		if (checkState == MenuCheckState::Checked)
 		{
-			drawList.AddLine(ImVec2(position.x + 0.1f * fontSize, centerY), ImVec2(position.x + 0.35f * fontSize, centerY + 0.25f * fontSize), color, 0.11f * fontSize);
-			drawList.AddLine(ImVec2(position.x + 0.35f * fontSize, centerY + 0.25f * fontSize), ImVec2(position.x + 0.85f * fontSize, centerY - 0.3f * fontSize), color, 0.11f * fontSize);
+			const ImVec2 checkStart(position.x + 0.1f * fontSize, centerY);
+			const ImVec2 checkCorner(position.x + 0.35f * fontSize, centerY + 0.25f * fontSize);
+			const ImVec2 checkEnd(position.x + 0.85f * fontSize, centerY - 0.3f * fontSize);
+			drawList.AddLine(checkStart, checkCorner, color, 0.11f * fontSize);
+			drawList.AddLine(checkCorner, checkEnd, color, 0.11f * fontSize);
 		}
 		else if (checkState == MenuCheckState::Mixed)
 		{
-			drawList.AddLine(ImVec2(position.x + 0.1f * fontSize, centerY), ImVec2(position.x + 0.85f * fontSize, centerY), color, 0.11f * fontSize);
+			const ImVec2 dashStart(position.x + 0.1f * fontSize, centerY);
+			const ImVec2 dashEnd(position.x + 0.85f * fontSize, centerY);
+			drawList.AddLine(dashStart, dashEnd, color, 0.11f * fontSize);
 		}
 		return bPressed;
 	}
@@ -156,22 +187,27 @@ namespace EditorWidgets
 		const float width = ImGui::GetContentRegionAvail().x;
 		ImDrawList& drawList = *ImGui::GetWindowDrawList();
 		const float headingSize = fontSize * menuHeadingScale;
+		ImFont* font = ImGui::GetFont();
+		const ImU32 headingColor = ImGui::GetColorU32(SparkleUiPalette::Menu().Heading);
+		const float maximumTextWidth = (std::numeric_limits<float>::max)();
 		float textX = position.x;
 		for (const char* character = label; *character != '\0'; character = NextMenuHeadingGlyph(character))
 		{
 			const char* glyphEnd = NextMenuHeadingGlyph(character);
-			drawList.AddText(ImGui::GetFont(), headingSize, ImVec2(textX, position.y + 0.1f * fontSize), ImGui::GetColorU32(SparkleUiPalette::Menu().Heading), character, glyphEnd);
-			textX += ImGui::GetFont()->CalcTextSizeA(headingSize, (std::numeric_limits<float>::max)(), 0.0f, character, glyphEnd).x + menuHeadingTracking * fontSize;
+			const ImVec2 glyphPosition(textX, position.y + 0.1f * fontSize);
+			drawList.AddText(font, headingSize, glyphPosition, headingColor, character, glyphEnd);
+			const float glyphWidth = font->CalcTextSizeA(headingSize, maximumTextWidth, 0.0f, character, glyphEnd).x;
+			textX += glyphWidth + menuHeadingTracking * fontSize;
 		}
 		const float lineStart = textX + menuHeadingLineGap * fontSize;
 		if (lineStart < position.x + width)
 		{
-			drawList.AddLine(
-			    ImVec2(lineStart, position.y + 0.5f * fontSize),
-			    ImVec2(position.x + width, position.y + 0.5f * fontSize),
-			    ImGui::GetColorU32(SparkleUiPalette::Menu().Divider),
-			    fontSize / 14.0f);
+			const ImVec2 dividerStart(lineStart, position.y + 0.5f * fontSize);
+			const ImVec2 dividerEnd(position.x + width, position.y + 0.5f * fontSize);
+			const ImU32 dividerColor = ImGui::GetColorU32(SparkleUiPalette::Menu().Divider);
+			drawList.AddLine(dividerStart, dividerEnd, dividerColor, fontSize / 14.0f);
 		}
-		ImGui::Dummy(ImVec2(width, std::round(0.9f * fontSize)));
+		const float sectionHeight = std::round(0.9f * fontSize);
+		ImGui::Dummy(ImVec2(width, sectionHeight));
 	}
 }

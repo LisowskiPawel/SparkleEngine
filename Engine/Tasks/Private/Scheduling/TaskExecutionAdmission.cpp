@@ -10,13 +10,13 @@
 void TaskExecutor::Implementation::ValidateConfiguration(const TaskExecutorConfig& config)
 {
 	const std::uint64_t totalWorkers = static_cast<std::uint64_t>(config.FrameCriticalWorkerCount) + config.BackgroundWorkerCount + config.BlockingIoWorkerCount;
-	const bool bInvalidSerialMixWorkerCount = config.FrameCriticalWorkerCount == 0;
-	const bool bWorkerLanesConfigured = config.BackgroundWorkerCount != 0 || config.BlockingIoWorkerCount != 0;
-	const bool bInvalidSerialMix = bInvalidSerialMixWorkerCount && bWorkerLanesConfigured;
+	const bool bFrameWorkersDisabled = config.FrameCriticalWorkerCount == 0;
+	const bool bNonFrameWorkersConfigured = config.BackgroundWorkerCount != 0 || config.BlockingIoWorkerCount != 0;
+	const bool bInvalidSerialMix = bFrameWorkersDisabled && bNonFrameWorkersConfigured;
 
-	const bool bInvalidCapacityPerExecution = config.MaximumTasksPerExecution == 0 || config.MaximumTasksPerExecution > TaskGraphLimits::HardMaximumTasks;
-	const bool bEdgeCapacityInvalid = bInvalidCapacityPerExecution || (config.MaximumEdgesPerExecution > TaskGraphLimits::HardMaximumEdges);
-	const bool bInvalidCapacity = bEdgeCapacityInvalid || (config.MaximumActiveExecutions == 0);
+	const bool bInvalidTaskCapacity = config.MaximumTasksPerExecution == 0 || config.MaximumTasksPerExecution > TaskGraphLimits::HardMaximumTasks;
+	const bool bInvalidGraphCapacity = bInvalidTaskCapacity || config.MaximumEdgesPerExecution > TaskGraphLimits::HardMaximumEdges;
+	const bool bInvalidCapacity = bInvalidGraphCapacity || config.MaximumActiveExecutions == 0;
 
 	if (totalWorkers > MaximumWorkerCount || bInvalidSerialMix || bInvalidCapacity)
 	{
@@ -69,7 +69,9 @@ bool TaskExecutor::Implementation::ValidateLaunchRequest(
 	{
 		return RejectExecution(execution, "A task worker cannot submit work to its own executor; use graph dependencies or nested tasks.");
 	}
-	if (scope && context.HasUserData() && !context.HasOwnedUserData())
+	const bool bScopedUserData = scope != nullptr && context.HasUserData();
+	const bool bBorrowedUserData = bScopedUserData && !context.HasOwnedUserData();
+	if (bBorrowedUserData)
 	{
 		return RejectExecution(execution, "Scoped asynchronous launch received non-owned TaskExecutionContext data.");
 	}
@@ -77,7 +79,9 @@ bool TaskExecutor::Implementation::ValidateLaunchRequest(
 	{
 		return RejectExecution(execution, graph.GetError().Message);
 	}
-	if (graph.GetTaskCount() > m_config.MaximumTasksPerExecution || graph.GetEdgeCount() > m_config.MaximumEdgesPerExecution)
+	const bool bTaskCapacityExceeded = graph.GetTaskCount() > m_config.MaximumTasksPerExecution;
+	const bool bCapacityExceeded = bTaskCapacityExceeded || graph.GetEdgeCount() > m_config.MaximumEdgesPerExecution;
+	if (bCapacityExceeded)
 	{
 		return RejectExecution(execution, "Compiled task graph exceeds this executor's bounded execution capacity.");
 	}
@@ -87,20 +91,19 @@ bool TaskExecutor::Implementation::ValidateLaunchRequest(
 
 void TaskExecutor::Implementation::ReserveExecutionStorage()
 {
-	std::erase_if(
-	    m_executions,
-	    [](const auto& item)
-	    {
-		    const auto execution = item.lock();
-		    if (!execution)
-		    {
-			    return true;
-		    }
+	const auto isExpiredOrSettled = [](const auto& item)
+	{
+		const auto execution = item.lock();
+		if (!execution)
+		{
+			return true;
+		}
 
-		    std::lock_guard lock(execution->Mutex);
-		    return execution->bSettled;
-	    });
+		std::lock_guard lock(execution->Mutex);
+		return execution->bSettled;
+	};
 
+	std::erase_if(m_executions, isExpiredOrSettled);
 	m_executions.reserve(m_executions.size() + 1);
 }
 
@@ -149,7 +152,8 @@ void TaskExecutor::Implementation::OnExecutionSettled()
 
 CompiledTaskGraph TaskExecutor::Implementation::CompileTask(TaskDesc desc, TaskFunction function) const
 {
-	TaskGraphBuilder builder(TaskGraphLimits{.MaximumTasks = m_config.MaximumTasksPerExecution, .MaximumEdges = m_config.MaximumEdgesPerExecution});
+	const TaskGraphLimits limits{.MaximumTasks = m_config.MaximumTasksPerExecution, .MaximumEdges = m_config.MaximumEdgesPerExecution};
+	TaskGraphBuilder builder(limits);
 	builder.Add(std::move(desc), std::move(function));
 	return builder.Compile();
 }

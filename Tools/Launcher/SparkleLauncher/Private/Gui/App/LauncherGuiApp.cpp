@@ -71,10 +71,9 @@ namespace SparkleLauncher
 
 		std::string repositoryError;
 
-		const std::optional<std::filesystem::path> workspace = TryResolveLauncherRoot(
-		    ParseLauncherGuiRoot(argc, argv),
-		    std::filesystem::path(QCoreApplication::applicationDirPath().toStdWString()),
-		    repositoryError);
+		const auto requestedRoot = ParseLauncherGuiRoot(argc, argv);
+		const std::filesystem::path applicationDirectory(QCoreApplication::applicationDirPath().toStdWString());
+		const std::optional<std::filesystem::path> workspace = TryResolveLauncherRoot(requestedRoot, applicationDirectory, repositoryError);
 
 		if (!workspace)
 		{

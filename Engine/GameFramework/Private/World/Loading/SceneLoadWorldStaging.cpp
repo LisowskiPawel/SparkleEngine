@@ -19,14 +19,17 @@ static void InitializeLevelCamera(ECS::GameWorldState& state, const LevelDesc& d
 		SceneCameraEntry entry;
 		entry.name = "Scene Camera";
 		entry.desc = desc.cameraDesc;
-		if (!state.AddCamera(std::move(entry), true).IsValid())
+		const EntityId camera = state.AddCamera(std::move(entry), true);
+		if (!camera.IsValid())
 		{
 			Diagnostics::Fatal(g_sceneLoadStagingLogger, __FILE__, __LINE__, "The staged world rejected its level camera.");
 		}
 	}
 	else
 	{
-		if (!state.WriteCameraDesc(state.GetActiveCamera(), desc.cameraDesc))
+		const EntityId camera = state.GetActiveCamera();
+		const bool bWritten = state.WriteCameraDesc(camera, desc.cameraDesc);
+		if (!bWritten)
 		{
 			Diagnostics::Fatal(g_sceneLoadStagingLogger, __FILE__, __LINE__, "The staged world could not update its active camera.");
 		}
@@ -49,7 +52,9 @@ static void AppendLevelLights(ECS::GameWorldState& state, const LevelDesc& desc)
 {
 	for (const SceneLightDesc& light : desc.lights)
 	{
-		if (!state.AddLight(SceneLightDesc(light)).IsValid())
+		SceneLightDesc description = light;
+		const EntityId entity = state.AddLight(std::move(description));
+		if (!entity.IsValid())
 		{
 			Diagnostics::Fatal(g_sceneLoadStagingLogger, __FILE__, __LINE__, "The staged world rejected a level light.");
 		}
@@ -61,10 +66,11 @@ static void SelectStagedCamera(ECS::GameWorldState& state)
 	EntityId selectedCamera;
 	for (std::size_t index = 1; index < state.GetCameraCount(); ++index)
 	{
-		const std::optional<SceneCameraEntry> camera = state.ReadCamera(state.GetCameraEntity(index));
+		const EntityId entity = state.GetCameraEntity(index);
+		const std::optional<SceneCameraEntry> camera = state.ReadCamera(entity);
 		if (camera->IsPerspective())
 		{
-			selectedCamera = state.GetCameraEntity(index);
+			selectedCamera = entity;
 			break;
 		}
 	}

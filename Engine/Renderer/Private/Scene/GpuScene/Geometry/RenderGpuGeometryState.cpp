@@ -159,10 +159,17 @@ void RenderGpuGeometryState::UpdateDeformation(const PreparedRenderScene& prepar
 
 MeshInstanceData RenderGpuGeometryState::BuildMeshInstance(const MeshDraw& draw) noexcept
 {
+	const DirectX::XMMATRIX world = DirectX::XMLoadFloat4x4(&draw.Transform.WorldMatrix);
+	const DirectX::XMMATRIX inverseWorld = DirectX::XMMatrixInverse(nullptr, world);
 	DirectX::XMFLOAT4X4 worldInverse;
-	DirectX::XMStoreFloat4x4(&worldInverse, DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&draw.Transform.WorldMatrix)));
+	DirectX::XMStoreFloat4x4(&worldInverse, inverseWorld);
+	const DirectX::XMMATRIX inverseTranspose = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&worldInverse));
 	DirectX::XMFLOAT3X4 worldInverseTranspose;
-	DirectX::XMStoreFloat3x4(&worldInverseTranspose, DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&worldInverse)));
+	DirectX::XMStoreFloat3x4(&worldInverseTranspose, inverseTranspose);
+
+	const bool bSkinned = draw.Geometry.MeshKind == RenderMeshKind::Skeletal && draw.Skinning.JointMatrixOffset != kInvalidMeshInstanceJointMatrixOffset;
+	const bool bMorphed = draw.Morph.TargetCount > 0u && draw.Morph.WeightOffset != kInvalidMeshInstanceMorphWeightOffset;
+	const std::uint32_t flags = (bSkinned ? MeshInstanceFlag_Skinned : 0u) | (bMorphed ? MeshInstanceFlag_Morphed : 0u);
 
 	return MeshInstanceData{
 	    .WorldMatrix = draw.Transform.WorldMatrix,
@@ -170,8 +177,7 @@ MeshInstanceData RenderGpuGeometryState::BuildMeshInstance(const MeshDraw& draw)
 	    .WorldInverseMatrix = worldInverse,
 	    .WorldInverseTranspose = worldInverseTranspose,
 	    .MaterialSlot = draw.MaterialSlot,
-	    .Flags = (draw.Geometry.MeshKind == RenderMeshKind::Skeletal && draw.Skinning.JointMatrixOffset != kInvalidMeshInstanceJointMatrixOffset ? MeshInstanceFlag_Skinned : 0u)
-	        | (draw.Morph.TargetCount > 0u && draw.Morph.WeightOffset != kInvalidMeshInstanceMorphWeightOffset ? MeshInstanceFlag_Morphed : 0u),
+	    .Flags = flags,
 	    .JointMatrixOffset = draw.Skinning.JointMatrixOffset,
 	    .MorphWeightOffset = draw.Morph.WeightOffset,
 	    .MorphTargetCount = draw.Morph.TargetCount,

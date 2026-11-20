@@ -22,10 +22,15 @@ FrameGraphTextureHandle AddVignettePass(FrameGraphBuilder& builder, RenderViewMo
 		return input;
 	}
 
-	const FrameGraphTextureHandle output = builder.CreateTexture(FrameGraphTextureDesc::CreateColor("VignetteColor", outputExtent.Width, outputExtent.Height, RenderFrameGraphFormats::SceneColor));
+	const FrameGraphTextureDesc outputDesc = FrameGraphTextureDesc::CreateColor("VignetteColor", outputExtent.Width, outputExtent.Height, RenderFrameGraphFormats::SceneColor);
+	const FrameGraphTextureHandle output = builder.CreateTexture(outputDesc);
 	auto& parameters = builder.AllocParameters<VignetteCS>();
 	parameters->DisplayLinearColor = builder.CreateSRV(input);
 	parameters->OutputColor = builder.CreateUAV(output);
-	builder.Dispatch<VignetteCS>(parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(outputExtent.Width, 8u), MathUtils::DivideRoundUp(outputExtent.Height, 8u), 1u});
+
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(outputExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(outputExtent.Height, 8u);
+
+	builder.Dispatch<VignetteCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u});
 	return output;
 }

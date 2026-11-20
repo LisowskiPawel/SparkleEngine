@@ -71,7 +71,8 @@ static std::vector<ShaderCompileResult> CompileProducers(
 
 	std::atomic<std::size_t> completedWork{0};
 	const std::uint32_t hardwareThreads = std::max(1u, std::thread::hardware_concurrency());
-	const std::uint32_t compileWorkers = std::clamp(settings.maximumParallelCompiles, 1u, std::min(hardwareThreads, 8u));
+	const std::uint32_t workerLimit = std::min(hardwareThreads, 8u);
+	const std::uint32_t compileWorkers = std::clamp(settings.maximumParallelCompiles, 1u, workerLimit);
 	TaskExecutor executor(
 	    TaskExecutorConfig{
 	        .FrameCriticalWorkerCount = 1,

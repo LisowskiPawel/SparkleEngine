@@ -12,6 +12,7 @@
 #include "RHI/Public/Shaders/Authoring/GlobalShader.h"
 
 #include <format>
+#include <string>
 
 void PipelineMaterialization::ValidateShaderCapabilities(RenderHardwareInterface& renderHardwareInterface, std::string_view shaderName, const ResolvedShader& shader)
 {
@@ -24,25 +25,29 @@ void PipelineMaterialization::ValidateShaderCapabilities(RenderHardwareInterface
 
 	if (bAccelerationStructuresUnsupported)
 	{
-		throw Diagnostics::Error(std::format("Shader '{}' requires ray tracing, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi)));
+		const std::string message = std::format("Shader '{}' requires ray tracing, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi));
+		throw Diagnostics::Error(message);
 	}
 	const bool bInlineRayQueriesUnsupported = HasShaderFeature(shader.Entry->Features, ShaderFeatureFlags::UsesInlineRayQuery) && !capabilities.RayTracing.bSupportsInlineRayQuery;
 
 	if (bInlineRayQueriesUnsupported)
 	{
-		throw Diagnostics::Error(std::format("Shader '{}' requires inline ray query, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi)));
+		const std::string message = std::format("Shader '{}' requires inline ray query, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi));
+		throw Diagnostics::Error(message);
 	}
-	const bool bIndexingUnsupportedEntry = HasShaderFeature(shader.Entry->Features, ShaderFeatureFlags::UsesDescriptorIndexing);
-	const bool bIndexingUnsupportedIndexing = !capabilities.DescriptorIndexing.bNonUniformSampledImages || !capabilities.DescriptorIndexing.bSupportsPartiallyBoundDescriptorArrays;
-	const bool bDescriptorIndexingUnsupported = bIndexingUnsupportedEntry && bIndexingUnsupportedIndexing;
+	const bool bRequiresDescriptorIndexing = HasShaderFeature(shader.Entry->Features, ShaderFeatureFlags::UsesDescriptorIndexing);
+	const bool bDescriptorIndexingUnavailable = !capabilities.DescriptorIndexing.bNonUniformSampledImages || !capabilities.DescriptorIndexing.bSupportsPartiallyBoundDescriptorArrays;
+	const bool bDescriptorIndexingUnsupported = bRequiresDescriptorIndexing && bDescriptorIndexingUnavailable;
 
 	if (bDescriptorIndexingUnsupported)
 	{
-		throw Diagnostics::Error(std::format("Shader '{}' requires descriptor indexing, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi)));
+		const std::string message = std::format("Shader '{}' requires descriptor indexing, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi));
+		throw Diagnostics::Error(message);
 	}
 	if (HasShaderFeature(shader.Entry->Features, ShaderFeatureFlags::UsesFloat64) && !capabilities.bSupportsShaderFloat64)
 	{
-		throw Diagnostics::Error(std::format("Shader '{}' requires float64 arithmetic, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi)));
+		const std::string message = std::format("Shader '{}' requires float64 arithmetic, but backend '{}' does not support it.", shaderName, RhiBackendApiToString(capabilities.BackendApi));
+		throw Diagnostics::Error(message);
 	}
 }
 
@@ -53,8 +58,8 @@ void PipelineMaterialization::ValidateResolvedShader(
     const PassParameterLayout& parameterLayout)
 {
 	PipelineMaterialization::ValidateShaderCapabilities(renderHardwareInterface, registration.ShaderName, shader);
-	const bool bShaderContractMismatchFeatures = shader.Entry->Stage != registration.Stage || shader.Entry->Features != registration.Features;
-	const bool bShaderContractMismatch = bShaderContractMismatchFeatures || (shader.Entry->ParameterSignature != BuildShaderParameterSignature(parameterLayout));
+	const bool bStageOrFeaturesMismatch = shader.Entry->Stage != registration.Stage || shader.Entry->Features != registration.Features;
+	const bool bShaderContractMismatch = bStageOrFeaturesMismatch || shader.Entry->ParameterSignature != BuildShaderParameterSignature(parameterLayout);
 
 	if (bShaderContractMismatch)
 	{

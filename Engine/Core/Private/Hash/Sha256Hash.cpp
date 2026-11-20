@@ -57,9 +57,10 @@ namespace Hash
 		bool Update(const void* data, std::size_t size, std::string& errorMessage) noexcept
 		{
 			const auto* bytes = static_cast<const unsigned char*>(data);
+			const auto maximumChunkSize = static_cast<std::size_t>((std::numeric_limits<unsigned long>::max)());
 			while (size > 0)
 			{
-				const std::size_t chunk = (std::min) (size, static_cast<std::size_t>((std::numeric_limits<unsigned long>::max)()));
+				const std::size_t chunk = (std::min) (size, maximumChunkSize);
 				if (BCryptHashData(m_hash, const_cast<unsigned char*>(bytes), static_cast<unsigned long>(chunk), 0) != 0)
 				{
 					errorMessage = "Failed to update SHA-256 hash.";
@@ -73,7 +74,8 @@ namespace Hash
 
 		bool Finish(Sha256Digest& hash, std::string& errorMessage) noexcept
 		{
-			if (BCryptFinishHash(m_hash, reinterpret_cast<unsigned char*>(hash.data()), static_cast<unsigned long>(hash.size()), 0) != 0)
+			const auto finishStatus = BCryptFinishHash(m_hash, reinterpret_cast<unsigned char*>(hash.data()), static_cast<unsigned long>(hash.size()), 0);
+			if (finishStatus != 0)
 			{
 				errorMessage = "Failed to finish SHA-256 hash.";
 				return false;
@@ -95,7 +97,9 @@ namespace Hash
 
 #if defined(_WIN32)
 		Sha256Context context;
-		return context.Initialize(outErrorMessage) && context.Update(data, size, outErrorMessage) && context.Finish(outHash, outErrorMessage);
+		const bool bInitialized = context.Initialize(outErrorMessage);
+		const bool bUpdated = bInitialized && context.Update(data, size, outErrorMessage);
+		return bUpdated && context.Finish(outHash, outErrorMessage);
 #else
 		(void) data;
 		(void) size;
@@ -169,7 +173,8 @@ namespace Hash
 
 	bool TrySha256Hex(std::string_view text, std::string& outHashHex, std::string& outErrorMessage)
 	{
-		return TrySha256Hex(std::as_bytes(std::span<const char>(text.data(), text.size())), outHashHex, outErrorMessage);
+		const auto bytes = std::as_bytes(std::span<const char>(text.data(), text.size()));
+		return TrySha256Hex(bytes, outHashHex, outErrorMessage);
 	}
 
 }

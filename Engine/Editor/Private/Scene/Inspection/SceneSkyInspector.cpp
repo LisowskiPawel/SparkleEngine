@@ -44,7 +44,10 @@ void SceneSkyInspector::Build(const std::optional<SkyEnvironment>& current, Edit
 		const float defaultColor[3] = {1.0f, 1.0f, 1.0f};
 		if (EditorWidgets::EditDetailsColor3("Color", color, defaultColor))
 		{
-			after.color = {(std::max) (0.0f, color[0]), (std::max) (0.0f, color[1]), (std::max) (0.0f, color[2])};
+			const float red = (std::max) (0.0f, color[0]);
+			const float green = (std::max) (0.0f, color[1]);
+			const float blue = (std::max) (0.0f, color[2]);
+			after.color = {red, green, blue};
 			bChanged = true;
 		}
 

@@ -25,13 +25,16 @@ namespace PunctualLights
 
 	float ComputeDistanceAttenuationDenominator(float distanceToLight, float3 distanceAttenuationCoefficients)
 	{
-		return distanceAttenuationCoefficients.x + distanceAttenuationCoefficients.y * distanceToLight + distanceAttenuationCoefficients.z * distanceToLight * distanceToLight;
+		const float linearTerm = distanceAttenuationCoefficients.y * distanceToLight;
+		const float quadraticTerm = distanceAttenuationCoefficients.z * distanceToLight * distanceToLight;
+		return distanceAttenuationCoefficients.x + linearTerm + quadraticTerm;
 	}
 
 	float ComputePunctualDistanceAttenuation(float distanceToLight, float range, float3 distanceAttenuationCoefficients)
 	{
 		const float denominator = ComputeDistanceAttenuationDenominator(distanceToLight, distanceAttenuationCoefficients);
-		return rcp(max(denominator, 1.0e-4f)) * ComputeRangeAttenuation(distanceToLight, range);
+		const float rangeAttenuation = ComputeRangeAttenuation(distanceToLight, range);
+		return rcp(max(denominator, 1.0e-4f)) * rangeAttenuation;
 	}
 
 	float ComputeAreaDistanceAttenuationCorrection(float distanceToLight, float3 distanceAttenuationCoefficients)

@@ -105,7 +105,13 @@ namespace Assets
 		{
 			return false;
 		}
-		return previous == nullptr || DirectX::XMVectorGetX(DirectX::XMVector4Dot(DirectX::XMLoadFloat4(previous), rotation)) >= -1.0e-5f;
+		if (previous == nullptr)
+		{
+			return true;
+		}
+		const DirectX::XMVECTOR previousRotation = DirectX::XMLoadFloat4(previous);
+		const DirectX::XMVECTOR alignment = DirectX::XMVector4Dot(previousRotation, rotation);
+		return DirectX::XMVectorGetX(alignment) >= -1.0e-5f;
 	}
 
 	static void ValidateChannelKeys(const LoadedAnimationAsset& asset, const CookedAnimationChannelRecord& channel, std::size_t channelIndex)

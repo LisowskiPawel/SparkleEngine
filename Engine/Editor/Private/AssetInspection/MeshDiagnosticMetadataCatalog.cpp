@@ -21,29 +21,27 @@ static std::optional<MeshDiagnosticMetadata> ParseCookedMeshMetadata(std::string
 	try
 	{
 		Json::InputAdmission admission(metadataText, metadataText.size());
-		admission.BeginObject(0);
 		std::set<std::string> repeated;
 		const std::array<std::string_view, 3> fields{"schema", "displayName", "source"};
 
-		auto document = nlohmann::json::parse(
-		    metadataText.begin(),
-		    metadataText.end(),
-		    [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
-		    {
-			    admission.CheckDepth(depth);
-			    if (event != nlohmann::json::parse_event_t::key)
-			    {
-				    return true;
-			    }
+		const auto admitValue = [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
+		{
+			admission.ReadEvent(depth, event);
+			if (event != nlohmann::json::parse_event_t::key)
+			{
+				return true;
+			}
 
-			    const auto& key = value.get_ref<const std::string&>();
-			    const bool bConsumed = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
-			    if (bConsumed && !admission.TryReadKey(depth, key))
-			    {
-				    repeated.insert(key);
-			    }
-			    return bConsumed;
-		    });
+			const auto& key = value.get_ref<const std::string&>();
+			const bool bConsumed = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
+			if (bConsumed && !admission.TryReadKey(depth, key))
+			{
+				repeated.insert(key);
+			}
+			return bConsumed;
+		};
+
+		auto document = nlohmann::json::parse(metadataText.begin(), metadataText.end(), admitValue);
 
 		for (const auto& key : repeated)
 		{

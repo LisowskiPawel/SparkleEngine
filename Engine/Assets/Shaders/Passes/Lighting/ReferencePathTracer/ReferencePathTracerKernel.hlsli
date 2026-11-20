@@ -35,7 +35,9 @@ namespace ReferencePathTracer
 		sampleIdentity.SampleOrdinal = SampleOrdinal;
 		sampleIdentity.SessionSeed = SessionSeed;
 		sampleIdentity.ReplicateId = ReplicateId;
-		const float2 filmSample = float2(CommonRandom::OpenUnitInterval(RandomWord(sampleIdentity, FilmXDimension)), CommonRandom::OpenUnitInterval(RandomWord(sampleIdentity, FilmYDimension)));
+		const uint filmXWord = RandomWord(sampleIdentity, FilmXDimension);
+		const uint filmYWord = RandomWord(sampleIdentity, FilmYDimension);
+		const float2 filmSample = float2(CommonRandom::OpenUnitInterval(filmXWord), CommonRandom::OpenUnitInterval(filmYWord));
 		const RayDesc primaryRay = BuildPerspectiveViewCameraRay(pixelCoord, uint2(width, height), filmSample);
 		const float3 contribution = TraceSurfaceTransport(SceneTlas, SkyTexture, SamplerLinearNoMipWrapClampClamp, primaryRay, sampleIdentity);
 

@@ -38,7 +38,9 @@ static VkStencilOpState BuildStencilFaceState(CompareOp compareOp, RhiStencilOp 
 
 static void HandlePipelineCreateFailure(std::string_view debugName, const char* functionName, VkResult result)
 {
-	Diagnostics::Fatal(g_vulkanPipelineLogger, __FILE__, __LINE__, std::format("Failed to create Vulkan pipeline '{}': {}", debugName, VulkanResult::FormatFailure(functionName, result)));
+	const std::string nativeFailure = VulkanResult::FormatFailure(functionName, result);
+	const auto failureMessage = std::format("Failed to create Vulkan pipeline '{}': {}", debugName, nativeFailure);
+	Diagnostics::Fatal(g_vulkanPipelineLogger, __FILE__, __LINE__, failureMessage);
 }
 
 static VkFrontFace ToVkFrontFace(ERhiFrontFaceWinding winding) noexcept

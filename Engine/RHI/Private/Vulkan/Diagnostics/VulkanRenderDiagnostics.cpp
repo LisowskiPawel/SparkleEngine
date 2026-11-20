@@ -17,6 +17,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_vulkanRenderDiagnosticsLogger, "RHI.Vulkan.Diagnostics");
@@ -159,7 +160,8 @@ public:
 		}
 		if (!VulkanResult::Succeeded(result))
 		{
-			Diagnostics::Fatal(g_vulkanRenderDiagnosticsLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkGetQueryPoolResults", result));
+			const auto failureMessage = VulkanResult::FormatFailure("vkGetQueryPoolResults", result);
+			Diagnostics::Fatal(g_vulkanRenderDiagnosticsLogger, __FILE__, __LINE__, failureMessage);
 		}
 		if (queueState.TimestampValidBits < 64)
 		{
@@ -232,7 +234,8 @@ private:
 			const VkResult result = vkCreateQueryPool(m_rhi.GetDevice(), &queryPoolCreateInfo, nullptr, &queueState.QueryPool);
 			if (!VulkanResult::Succeeded(result))
 			{
-				Diagnostics::Fatal(g_vulkanRenderDiagnosticsLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateQueryPool", result));
+				const auto failureMessage = VulkanResult::FormatFailure("vkCreateQueryPool", result);
+				Diagnostics::Fatal(g_vulkanRenderDiagnosticsLogger, __FILE__, __LINE__, failureMessage);
 			}
 			const std::string queryPoolName = std::string("VulkanTimestampQueryPool_") + RhiQueueTypeToString(queueType);
 			(void)
@@ -291,11 +294,10 @@ std::unique_ptr<RenderDiagnostics> CreateVulkanRenderDiagnostics(VulkanRhi& rhi,
 	const bool bEndLabelLoaded = bSupportsGpuEventsUtilsLabel && (rhi.GetCmdEndDebugUtilsLabel() != nullptr);
 	const bool bSupportsGpuEvents = bEndLabelLoaded && (rhi.GetCmdInsertDebugUtilsLabel() != nullptr);
 
-	return CreateRhiDiagnosticsComposition(
-	    std::make_unique<VulkanRenderObjectDiagnostics>(rhi),
-	    std::make_unique<VulkanRenderTimingDiagnostics>(rhi),
-	    std::make_unique<VulkanRenderMessageDiagnostics>(rhi),
-	    nullptr,
-	    std::make_unique<VulkanRenderMemoryDiagnostics>(memoryAllocator),
-	    bSupportsGpuEvents);
+	auto objectDiagnostics = std::make_unique<VulkanRenderObjectDiagnostics>(rhi);
+	auto timingDiagnostics = std::make_unique<VulkanRenderTimingDiagnostics>(rhi);
+	auto messageDiagnostics = std::make_unique<VulkanRenderMessageDiagnostics>(rhi);
+	auto memoryDiagnostics = std::make_unique<VulkanRenderMemoryDiagnostics>(memoryAllocator);
+
+	return CreateRhiDiagnosticsComposition(std::move(objectDiagnostics), std::move(timingDiagnostics), std::move(messageDiagnostics), nullptr, std::move(memoryDiagnostics), bSupportsGpuEvents);
 }

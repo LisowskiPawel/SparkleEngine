@@ -3,6 +3,7 @@
 #include "../Resources/TextureTypes.h"
 
 #include <cstdint>
+#include <bit>
 #include <string_view>
 #include <type_traits>
 
@@ -15,6 +16,9 @@ constexpr std::uint32_t MakeCookedTextureAssetMagic(char a, char b, char c, char
 inline constexpr std::string_view kCookedTextureAssetExtension = ".stex";
 inline constexpr std::wstring_view kCookedTextureAssetExtensionWide = L".stex";
 inline constexpr std::uint32_t kCookedTextureAssetMagic = MakeCookedTextureAssetMagic('S', 'T', 'E', 'X');
+inline constexpr std::uint32_t kMaximumCookedTextureDimension = 16384;
+inline constexpr std::uint32_t kMaximumCookedTextureArraySize = 2048;
+inline constexpr std::uint32_t kMaximumCookedTextureMipCount = std::bit_width(kMaximumCookedTextureDimension);
 
 constexpr std::uint32_t PackCookedTextureLayout(TextureResourceDimension dimension, std::uint16_t arraySize) noexcept
 {
@@ -23,8 +27,7 @@ constexpr std::uint32_t PackCookedTextureLayout(TextureResourceDimension dimensi
 
 constexpr std::uint16_t UnpackCookedTextureArraySize(std::uint32_t packedLayout) noexcept
 {
-	const std::uint16_t arraySize = static_cast<std::uint16_t>(packedLayout & 0xffffu);
-	return arraySize == 0 ? 1 : arraySize;
+	return static_cast<std::uint16_t>(packedLayout & 0xffffu);
 }
 
 constexpr TextureResourceDimension UnpackCookedTextureDimension(std::uint32_t packedLayout) noexcept

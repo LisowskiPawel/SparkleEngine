@@ -50,7 +50,8 @@ void EditorApplication::Initialize()
 	InitializeEditorOperations();
 	InitializeUi();
 #if SPARKLE_APPLICATION_WITH_EXTERNAL_CAPTURE_UI
-	m_ui->SetViewportOverlay(CreateEditorExternalCaptureOverlay(m_game->GetRenderer()));
+	auto overlay = CreateEditorExternalCaptureOverlay(m_game->GetRenderer());
+	m_ui->SetViewportOverlay(std::move(overlay));
 #endif
 	m_bIsEditorSessionActive = true;
 }
@@ -75,7 +76,8 @@ bool EditorApplication::Tick()
 
 	Renderer& renderer = m_game->GetRenderer();
 	UpdateEditorOperations(renderer);
-	m_game->UpdateEditorGame(UpdateViewportCamera());
+	const RenderViewCameraData camera = UpdateViewportCamera();
+	m_game->UpdateEditorGame(camera);
 	RenderEditorFrame(renderer);
 	return true;
 }
@@ -101,10 +103,12 @@ void EditorApplication::RenderEditorFrame(Renderer& renderer)
 	m_ui->SetViewportFinalColorTexture(presentation.Texture);
 	m_ui->Update();
 
-	renderer.SubmitUiRenderPacket(m_ui->ConsumeRenderPacket());
+	auto renderPacket = m_ui->ConsumeRenderPacket();
+	renderer.SubmitUiRenderPacket(std::move(renderPacket));
 	renderer.OnRender();
 
-	m_viewportOutput->HandleAction(*m_ui, renderer, m_game->GetTimer().GetFrameCount());
+	const std::uint64_t frameId = m_game->GetTimer().GetFrameCount();
+	m_viewportOutput->HandleAction(*m_ui, renderer, frameId);
 	m_game->SubmitViewportRenderRequest(m_ui->GetViewportRenderRequest());
 }
 
@@ -144,7 +148,9 @@ void EditorApplication::InitializeEditorOperations()
 {
 	if (!m_operationScope)
 	{
-		m_operationScope = std::make_unique<TaskScope>(TaskScopeDesc{TaskScopeKind::Document, "Editor operations"}, &m_game->GetApplicationTaskScope());
+		TaskScopeDesc scopeDesc{TaskScopeKind::Document, "Editor operations"};
+		TaskScope& applicationScope = m_game->GetApplicationTaskScope();
+		m_operationScope = std::make_unique<TaskScope>(std::move(scopeDesc), &applicationScope);
 	}
 
 	if (!m_viewportOutput)
@@ -169,7 +175,7 @@ void EditorApplication::InitializeUi()
 	Renderer& renderer = m_game->GetRenderer();
 	GameWorld& world = m_game->GetWorldForEditor();
 
-	m_ui = std::make_unique<UI>(EditorHostServices{
+	EditorHostServices hostServices{
 	    .GameTimer = m_game->GetTimer(),
 	    .Levels = m_game->GetLevelSession(),
 	    .AcquireWorldReadView = [&world]() { return world.AcquireReadView(); },
@@ -181,7 +187,9 @@ void EditorApplication::InitializeUi()
 	    .ConsoleVariables = [&renderer](CVarControlRequest request) { return renderer.ExecuteConsoleVariables(std::move(request)); },
 	    .RequestRestart = [this]() { Restart(); },
 	    .HostWindow = m_game->GetWindow(),
-	    .Input = m_game->GetInputSystem()});
+	    .Input = m_game->GetInputSystem()};
+
+	m_ui = std::make_unique<UI>(std::move(hostServices));
 
 	ConfigureUiDiagnostics(renderer);
 	if (m_shaderCompileOperation)
@@ -192,12 +200,13 @@ void EditorApplication::InitializeUi()
 
 void EditorApplication::ConfigureUiDiagnostics(Renderer& renderer)
 {
-	m_ui->SetDiagnosticsProviders(
-	    EditorDiagnosticsProviders{
-	        .Shaders = [&renderer]() { return renderer.CaptureShaderDiagnostics(); },
-	        .MeshDiagnostics = [&renderer]() { return renderer.CaptureMeshDiagnostics(); },
-	        .TextureDiagnostics = [&renderer]() { return renderer.CaptureTextureDiagnostics(); },
-	        .MeshPreview = [&renderer](std::uintptr_t meshRuntimeId) { return renderer.CaptureMeshPreview(meshRuntimeId); }});
+	EditorDiagnosticsProviders providers{
+	    .Shaders = [&renderer]() { return renderer.CaptureShaderDiagnostics(); },
+	    .MeshDiagnostics = [&renderer]() { return renderer.CaptureMeshDiagnostics(); },
+	    .TextureDiagnostics = [&renderer]() { return renderer.CaptureTextureDiagnostics(); },
+	    .MeshPreview = [&renderer](std::uintptr_t meshRuntimeId) { return renderer.CaptureMeshPreview(meshRuntimeId); }};
+
+	m_ui->SetDiagnosticsProviders(std::move(providers));
 }
 
 void EditorApplication::Restart()
@@ -215,9 +224,11 @@ void EditorApplication::Restart()
 RenderViewCameraData EditorApplication::UpdateViewportCamera()
 {
 	const ViewportRenderRequest& viewportRequest = m_ui->GetViewportRenderRequest();
-	const float aspectRatio = viewportRequest.Extent.IsValid() ? static_cast<float>(viewportRequest.Extent.Width) / static_cast<float>(viewportRequest.Extent.Height) : 1.0f;
+	const RenderViewportExtent& extent = viewportRequest.Extent;
+	const float aspectRatio = extent.IsValid() ? static_cast<float>(extent.Width) / static_cast<float>(extent.Height) : 1.0f;
 	const CameraInputIntent cameraIntent = m_game->CollectCameraInputIntent(aspectRatio);
-	const float deltaSeconds = static_cast<float>(m_game->GetTimer().GetDelta(TimeDomain::Scaled, TimeUnit::Seconds));
+	const Timer& timer = m_game->GetTimer();
+	const float deltaSeconds = static_cast<float>(timer.GetDelta(TimeDomain::Scaled, TimeUnit::Seconds));
 	const RenderViewCameraData renderCamera = m_ui->UpdateViewportCamera(cameraIntent, deltaSeconds);
 	return renderCamera;
 }

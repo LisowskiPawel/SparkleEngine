@@ -10,6 +10,7 @@
 
 #include <format>
 #include <unordered_set>
+#include <utility>
 
 namespace Files
 {
@@ -19,7 +20,8 @@ namespace Files
 		std::filesystem::remove(path, error);
 		if (error)
 		{
-			throw Diagnostics::Error(std::format("Could not remove publication file '{}': {}", path.string(), error.message()));
+			const std::string message = std::format("Could not remove publication file '{}': {}", path.string(), error.message());
+			throw Diagnostics::Error(message);
 		}
 	}
 
@@ -27,13 +29,16 @@ namespace Files
 	{
 		if (!MoveFileExW(source.c_str(), destination.c_str(), MOVEFILE_REPLACE_EXISTING))
 		{
-			throw Diagnostics::Error(std::format("Could not replace publication file '{}' with '{}': {}", destination.string(), source.string(), GetLastError()));
+			const DWORD moveError = GetLastError();
+			const std::string message = std::format("Could not replace publication file '{}' with '{}': {}", destination.string(), source.string(), moveError);
+			throw Diagnostics::Error(message);
 		}
 	}
 
 	static void RequirePublicationPaths(const FilePublication& file, std::span<const std::filesystem::path> roots, std::unordered_set<std::wstring>& paths)
 	{
-		for (const auto& path : {file.StagedPath, file.PublishedPath, BuildTemporaryPath(file.PublishedPath, ".previous-generation")})
+		auto backupPath = BuildTemporaryPath(file.PublishedPath, ".previous-generation");
+		for (const auto& path : {file.StagedPath, file.PublishedPath, std::move(backupPath)})
 		{
 			bool bContained = false;
 			for (const auto& root : roots)
@@ -42,10 +47,12 @@ namespace Files
 			}
 			if (!bContained)
 			{
-				throw Diagnostics::Error(std::format("Publication path '{}' escapes its output directories.", path.string()));
+				const std::string message = std::format("Publication path '{}' escapes its output directories.", path.string());
+				throw Diagnostics::Error(message);
 			}
 			const auto key = Paths::MakePathKey(path);
-			const bool bCoordinationPath = std::filesystem::path(key).filename().wstring().starts_with(L".publication-");
+			const auto fileName = std::filesystem::path(key).filename().wstring();
+			const bool bCoordinationPath = fileName.starts_with(L".publication-");
 			const bool bUniquePath = paths.insert(key).second;
 			if (bCoordinationPath || !bUniquePath)
 			{
@@ -66,7 +73,8 @@ namespace Files
 		{
 			throw Diagnostics::Error("Publication destination is not a regular file.");
 		}
-		if (std::filesystem::exists(BuildTemporaryPath(file.PublishedPath, ".previous-generation"), error) || error)
+		const auto backupPath = BuildTemporaryPath(file.PublishedPath, ".previous-generation");
+		if (std::filesystem::exists(backupPath, error) || error)
 		{
 			throw Diagnostics::Error("Publication has an orphaned backup. Clean generated output and cook again.");
 		}
@@ -116,7 +124,8 @@ namespace Files
 			}
 			if (bExists)
 			{
-				MovePublishedFile(replacement.File.PublishedPath, BuildTemporaryPath(replacement.File.PublishedPath, ".previous-generation"));
+				const auto backupPath = BuildTemporaryPath(replacement.File.PublishedPath, ".previous-generation");
+				MovePublishedFile(replacement.File.PublishedPath, backupPath);
 				replacement.bPreserved = true;
 			}
 			MovePublishedFile(replacement.File.StagedPath, replacement.File.PublishedPath);
@@ -130,7 +139,8 @@ namespace Files
 		{
 			if (replacement.bPreserved)
 			{
-				RemovePublicationFile(BuildTemporaryPath(replacement.File.PublishedPath, ".previous-generation"));
+				const auto backupPath = BuildTemporaryPath(replacement.File.PublishedPath, ".previous-generation");
+				RemovePublicationFile(backupPath);
 			}
 		}
 	}
@@ -141,7 +151,8 @@ namespace Files
 		{
 			if (replacement->bPreserved)
 			{
-				MovePublishedFile(BuildTemporaryPath(replacement->File.PublishedPath, ".previous-generation"), replacement->File.PublishedPath);
+				const auto backupPath = BuildTemporaryPath(replacement->File.PublishedPath, ".previous-generation");
+				MovePublishedFile(backupPath, replacement->File.PublishedPath);
 			}
 			else if (replacement->bPublished)
 			{

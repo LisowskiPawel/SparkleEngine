@@ -9,6 +9,7 @@
 #include <cgltf.h>
 
 #include <format>
+#include <utility>
 
 class GltfMaterialFeatureReporting final
 {
@@ -72,7 +73,8 @@ void GltfMaterialImporter::ImportMaterials(const cgltf_data& data, const std::fi
 	GltfMaterialFeatureReporting::ValidateRequiredExtensions(data);
 	for (cgltf_size materialIndex = 0; materialIndex < data.materials_count; ++materialIndex)
 	{
-		importedScene.materials.push_back(ExtractMaterial(data.materials[materialIndex], static_cast<ImportedMaterialIndex>(materialIndex), sourceDirectory));
+		auto material = ExtractMaterial(data.materials[materialIndex], static_cast<ImportedMaterialIndex>(materialIndex), sourceDirectory);
+		importedScene.materials.push_back(std::move(material));
 	}
 }
 

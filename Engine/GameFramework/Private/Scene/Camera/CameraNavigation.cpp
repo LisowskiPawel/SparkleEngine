@@ -29,15 +29,20 @@ bool CameraNavigation::Apply(const CameraInputIntent& intent, const CameraNaviga
 	const float speed = settings.MoveSpeedMetersPerSecond * (intent.bSprint ? settings.SprintMultiplier : 1.0f);
 	const float distance = speed * clampedDeltaSeconds;
 	const DirectX::XMVECTOR orientation = DirectX::XMQuaternionRotationRollPitchYaw(state.PitchRadians, state.YawRadians, 0.0f);
-	const DirectX::XMVECTOR forward = DirectX::XMVector3Rotate(DirectX::XMVectorSet(WorldCoordinates::kForwardX, WorldCoordinates::kForwardY, WorldCoordinates::kForwardZ, 0.0f), orientation);
+	const DirectX::XMVECTOR forwardAxis = DirectX::XMVectorSet(WorldCoordinates::kForwardX, WorldCoordinates::kForwardY, WorldCoordinates::kForwardZ, 0.0f);
+	const DirectX::XMVECTOR forward = DirectX::XMVector3Rotate(forwardAxis, orientation);
 	const DirectX::XMVECTOR right = DirectX::XMVectorSet(std::cos(state.YawRadians), 0.0f, -std::sin(state.YawRadians), 0.0f);
 	DirectX::XMVECTOR translation = DirectX::XMLoadFloat3(&state.Position);
 	translation = DirectX::XMVectorMultiplyAdd(forward, DirectX::XMVectorReplicate(distance * intent.ForwardAxis), translation);
 	translation = DirectX::XMVectorMultiplyAdd(right, DirectX::XMVectorReplicate(distance * intent.RightAxis), translation);
 
-	translation = DirectX::XMVectorAdd(
-	    translation,
-	    DirectX::XMVectorSet(WorldCoordinates::kUpX * distance * intent.UpAxis, WorldCoordinates::kUpY * distance * intent.UpAxis, WorldCoordinates::kUpZ * distance * intent.UpAxis, 0.0f));
+	const DirectX::XMVECTOR upTranslation = DirectX::XMVectorSet(
+	    WorldCoordinates::kUpX * distance * intent.UpAxis,
+	    WorldCoordinates::kUpY * distance * intent.UpAxis,
+	    WorldCoordinates::kUpZ * distance * intent.UpAxis,
+	    0.0f);
+
+	translation = DirectX::XMVectorAdd(translation, upTranslation);
 
 	DirectX::XMStoreFloat3(&state.Position, translation);
 	return true;
@@ -46,7 +51,8 @@ bool CameraNavigation::Apply(const CameraInputIntent& intent, const CameraNaviga
 DirectX::XMFLOAT3 CameraNavigation::BuildDirection(const CameraNavigationState& state) noexcept
 {
 	const DirectX::XMVECTOR orientation = DirectX::XMQuaternionRotationRollPitchYaw(state.PitchRadians, state.YawRadians, 0.0f);
-	const DirectX::XMVECTOR direction = DirectX::XMVector3Rotate(DirectX::XMVectorSet(WorldCoordinates::kForwardX, WorldCoordinates::kForwardY, WorldCoordinates::kForwardZ, 0.0f), orientation);
+	const DirectX::XMVECTOR forwardAxis = DirectX::XMVectorSet(WorldCoordinates::kForwardX, WorldCoordinates::kForwardY, WorldCoordinates::kForwardZ, 0.0f);
+	const DirectX::XMVECTOR direction = DirectX::XMVector3Rotate(forwardAxis, orientation);
 	DirectX::XMFLOAT3 result;
 	DirectX::XMStoreFloat3(&result, direction);
 	return result;
@@ -57,5 +63,6 @@ float CameraNavigation::ApplySpeedSteps(float speedMetersPerSecond, float stepCo
 	const float safeMinimum = (std::max) (minimumSpeed, 0.0001f);
 	const float safeMaximum = (std::max) (maximumSpeed, safeMinimum);
 	const float safeSpeed = std::clamp(speedMetersPerSecond, safeMinimum, safeMaximum);
-	return std::clamp(safeSpeed * std::pow(1.25f, stepCount), safeMinimum, safeMaximum);
+	const float speedMultiplier = std::pow(1.25f, stepCount);
+	return std::clamp(safeSpeed * speedMultiplier, safeMinimum, safeMaximum);
 }

@@ -124,6 +124,18 @@ void VulkanRhi::LoadRayTracingFunctions() noexcept
 void VulkanRhi::BuildRayTracingCapabilities() noexcept
 {
 	m_rayTracingCapabilities = {};
+	const auto resolvePtlasStatusReason = [this](const char* availableReason) noexcept
+	{
+		if (m_adapterInfo.VendorId != NvidiaVendorId)
+		{
+			return "vulkan-nv-ptlas-requires-nvidia-device";
+		}
+		if (!m_featureStatus.RayTracing.bSupportsPtlasExtension)
+		{
+			return "vulkan-nv-ptlas-extension-not-present";
+		}
+		return m_featureStatus.RayTracing.bSupportsPtlasFeature ? availableReason : "vulkan-nv-ptlas-feature-not-present";
+	};
 
 	m_rayTracingCapabilities.Groups.Ptlas = RhiPtlasCapabilities{
 	    .bSupported = false,
@@ -131,11 +143,7 @@ void VulkanRhi::BuildRayTracingCapabilities() noexcept
 	    .bNvidiaDeviceOnly = true,
 	    .bCurrentDeviceIsNvidia = m_adapterInfo.VendorId == NvidiaVendorId,
 	    .bSupportsDescriptorAccess = false,
-	    .CapabilityStatusReason = m_adapterInfo.VendorId != NvidiaVendorId
-	        ? "vulkan-nv-ptlas-requires-nvidia-device"
-	        : (!m_featureStatus.RayTracing.bSupportsPtlasExtension
-	                  ? "vulkan-nv-ptlas-extension-not-present"
-	                  : (!m_featureStatus.RayTracing.bSupportsPtlasFeature ? "vulkan-nv-ptlas-feature-not-present" : "vulkan-ray-tracing-backend-not-enabled"))};
+	    .CapabilityStatusReason = resolvePtlasStatusReason("vulkan-ray-tracing-backend-not-enabled")};
 
 	m_rayTracingCapabilities.Groups.Provider = RhiRayTracingProviderCapabilities{.SelectedTlasProvider = ERhiRayTracingTlasProvider::None, .SelectedTlasProviderReason = "ray-tracing-not-enabled"};
 
@@ -182,6 +190,8 @@ void VulkanRhi::BuildRayTracingCapabilities() noexcept
 
 	const bool bPtlasReadyBuildSizes = m_featureStatus.RayTracing.bEnabledPtlas && m_getPtlasBuildSizes != nullptr;
 	const bool bPtlasReady = bPtlasReadyBuildSizes && (m_cmdBuildPtlas != nullptr);
+	const char* const loadedStatusReason = bPtlasReady ? "vulkan-nv-ptlas-provider-ready" : "vulkan-nv-ptlas-functions-not-loaded";
+	const char* const enabledStatusReason = m_featureStatus.RayTracing.bEnabledPtlas ? loadedStatusReason : "vulkan-nv-ptlas-not-enabled";
 
 	m_rayTracingCapabilities.Groups.Ptlas = RhiPtlasCapabilities{
 	    .bSupported = bPtlasReady,
@@ -203,15 +213,7 @@ void VulkanRhi::BuildRayTracingCapabilities() noexcept
 	    .PartitionWriteDataSizeInBytes = static_cast<std::uint32_t>(sizeof(VkPartitionedAccelerationStructureWritePartitionTranslationDataNV)),
 	    .OperationDataSizeInBytes = static_cast<std::uint32_t>(sizeof(VkBuildPartitionedAccelerationStructureIndirectCommandNV)),
 	    .OperationCountDataSizeInBytes = static_cast<std::uint32_t>(sizeof(std::uint32_t)),
-	    .CapabilityStatusReason = m_adapterInfo.VendorId != NvidiaVendorId
-	        ? "vulkan-nv-ptlas-requires-nvidia-device"
-	        : (!m_featureStatus.RayTracing.bSupportsPtlasExtension
-	                  ? "vulkan-nv-ptlas-extension-not-present"
-	                  : (!m_featureStatus.RayTracing.bSupportsPtlasFeature
-	                            ? "vulkan-nv-ptlas-feature-not-present"
-	                            : (!m_featureStatus.RayTracing.bEnabledPtlas
-	                                      ? "vulkan-nv-ptlas-not-enabled"
-	                                      : (m_getPtlasBuildSizes == nullptr || m_cmdBuildPtlas == nullptr ? "vulkan-nv-ptlas-functions-not-loaded" : "vulkan-nv-ptlas-provider-ready"))))};
+	    .CapabilityStatusReason = resolvePtlasStatusReason(enabledStatusReason)};
 
 	SelectRayTracingTlasProvider();
 }

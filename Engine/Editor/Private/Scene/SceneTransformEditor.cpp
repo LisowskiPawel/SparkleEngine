@@ -20,7 +20,8 @@ static bool EditTranslation(Transform& transform, const float (&defaultPosition)
 
 static bool EditRotation(Transform& transform) noexcept
 {
-	const auto degrees = MathUtils::RadiansToDegrees(transform.GetRotationEuler());
+	const auto rotation = transform.GetRotationEuler();
+	const auto degrees = MathUtils::RadiansToDegrees(rotation);
 	float values[3] = {degrees.x, degrees.y, degrees.z};
 	const float defaultRotation[3] = {};
 	if (!EditorWidgets::EditDetailsFloat3("Rotation", values, 0.1f, -360.0f, 360.0f, "%.2f", defaultRotation))
@@ -28,7 +29,9 @@ static bool EditRotation(Transform& transform) noexcept
 		return false;
 	}
 
-	transform.SetRotationEuler(MathUtils::DegreesToRadians(DirectX::XMFLOAT3{values[0], values[1], values[2]}));
+	const DirectX::XMFLOAT3 editedDegrees{values[0], values[1], values[2]};
+	const auto editedRadians = MathUtils::DegreesToRadians(editedDegrees);
+	transform.SetRotationEuler(editedRadians);
 	return true;
 }
 

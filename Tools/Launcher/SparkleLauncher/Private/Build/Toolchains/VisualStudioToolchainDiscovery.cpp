@@ -196,7 +196,9 @@ namespace SparkleLauncher
 	{
 		VisualStudioToolchainDiscovery discovery;
 		discovery.DiscoveryPath = ResolveVswherePath().value_or(std::filesystem::path());
-		discovery.InstallationPath = FindVisualStudioInstallWithCppTools().value_or(QueryVisualStudioInstallWithCppTools(discovery.DiscoveryPath).value_or(std::filesystem::path()));
+		const auto installation = FindVisualStudioInstallWithCppTools();
+		const auto queriedInstallation = QueryVisualStudioInstallWithCppTools(discovery.DiscoveryPath).value_or(std::filesystem::path());
+		discovery.InstallationPath = installation.value_or(queriedInstallation);
 		discovery.IdePath = FindVisualStudioIde(discovery.InstallationPath).value_or(std::filesystem::path());
 		discovery.InstallerPath = ResolveVisualStudioInstallerPath().value_or(std::filesystem::path());
 		discovery.ClangClPath = FindVisualStudioClangCl(discovery.InstallationPath).value_or(std::filesystem::path());

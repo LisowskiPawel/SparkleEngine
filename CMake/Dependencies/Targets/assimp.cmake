@@ -2,9 +2,10 @@
 # https://github.com/assimp/assimp
 #
 # SourceImporters owns FBX and PLY import; runtime modules remain cooked-only.
+set(_sparkle_assimp_revision c35200e38ea8f058812b83de2ef32c6093b0ece2)
 sparkle_declare_git_dependency(assimp
     https://github.com/assimp/assimp.git
-    c35200e38ea8f058812b83de2ef32c6093b0ece2)
+    ${_sparkle_assimp_revision})
 FetchContent_Populate(assimp)
 
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
@@ -34,4 +35,6 @@ if(TARGET assimp)
         target_compile_options(assimp PRIVATE /MP1 /FS)
     endif()
     set_target_properties(assimp PROPERTIES FOLDER "ThirdParty/Assimp")
+    sparkle_set_source_package(assimp "Assimp" "${_sparkle_assimp_revision}"
+        "BSD-3-Clause" "https://github.com/assimp/assimp")
 endif()

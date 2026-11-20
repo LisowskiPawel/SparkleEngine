@@ -27,10 +27,22 @@ namespace RayReconstructionGuides
 		const float2x2 M3 = float2x2(0.0365463f, 3.32707f, 9.0632f, -9.04756f);
 		const float3x3 M4 = float3x3(1.0f, 3.59685f, -1.36772f, 9.04401f, -16.3174f, 9.22949f, 5.56589f, 19.7886f, -20.2123f);
 
-		float bias = dot(mul(M1, X.xy), Y.xy) * rcp(dot(mul(M2, X.xyw), Y.xyw));
-		const float scale = dot(mul(M3, X.xy), Y.xy) * rcp(dot(mul(M4, X.xzw), Y.xyw));
+		const float2 biasNumeratorTerms = mul(M1, X.xy);
+		const float3 biasDenominatorTerms = mul(M2, X.xyw);
+		const float biasNumerator = dot(biasNumeratorTerms, Y.xy);
+		const float biasDenominator = dot(biasDenominatorTerms, Y.xyw);
+		float bias = biasNumerator * rcp(biasDenominator);
+
+		const float2 scaleNumeratorTerms = mul(M3, X.xy);
+		const float3 scaleDenominatorTerms = mul(M4, X.xzw);
+		const float scaleNumerator = dot(scaleNumeratorTerms, Y.xy);
+		const float scaleDenominator = dot(scaleDenominatorTerms, Y.xyw);
+		const float scale = scaleNumerator * rcp(scaleDenominator);
+
 		bias *= saturate(specularColor.g * 50.0f);
-		return mad(specularColor, max(0.0f, scale), max(0.0f, bias));
+		const float positiveScale = max(0.0f, scale);
+		const float positiveBias = max(0.0f, bias);
+		return mad(specularColor, positiveScale, positiveBias);
 	}
 
 	float3 ComputeSpecularAlbedo(GBufferData gBuffer, float3 viewDirWorld)
@@ -56,8 +68,10 @@ namespace RayReconstructionGuides
 
 	void WriteSurface(uint2 pixelCoord, GBufferData gBuffer, float3 viewDirWorld)
 	{
-		RayReconstructionDiffuseAlbedo[pixelCoord] = float4(ComputeDiffuseReflectance(gBuffer), 1.0f);
-		RayReconstructionSpecularAlbedo[pixelCoord] = float4(ComputeSpecularAlbedo(gBuffer, viewDirWorld), 1.0f);
+		const float3 diffuseAlbedo = ComputeDiffuseReflectance(gBuffer);
+		const float3 specularAlbedo = ComputeSpecularAlbedo(gBuffer, viewDirWorld);
+		RayReconstructionDiffuseAlbedo[pixelCoord] = float4(diffuseAlbedo, 1.0f);
+		RayReconstructionSpecularAlbedo[pixelCoord] = float4(specularAlbedo, 1.0f);
 		RayReconstructionRoughness[pixelCoord] = saturate(gBuffer.Roughness);
 	}
 

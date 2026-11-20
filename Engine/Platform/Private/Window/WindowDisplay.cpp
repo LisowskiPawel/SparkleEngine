@@ -63,12 +63,14 @@ bool Window::HandleWindowShortcut(UINT message, WPARAM key, LPARAM flags)
 {
 	const bool bToggleKey = message == WM_KEYDOWN && key == VK_F11;
 	const bool bAltReturn = message == WM_SYSKEYDOWN && key == VK_RETURN;
-	const bool bAltEnter = bAltReturn && (flags & (LPARAM{1} << 29)) != 0;
+	const bool bAltHeld = (flags & (LPARAM{1} << 29)) != 0;
+	const bool bAltEnter = bAltReturn && bAltHeld;
 	if (!bToggleKey && !bAltEnter)
 	{
 		return false;
 	}
-	if ((flags & (LPARAM{1} << 30)) == 0)
+	const bool bPreviouslyDown = (flags & (LPARAM{1} << 30)) != 0;
+	if (!bPreviouslyDown)
 	{
 		ToggleFullScreen();
 	}

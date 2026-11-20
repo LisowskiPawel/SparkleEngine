@@ -93,7 +93,8 @@ ShaderSourceMountTable::ShaderSourceMountTable(const std::filesystem::path& engi
 		{
 			throw Diagnostics::Error(std::format("Invalid shader plugin mount name '{}'.", plugin.Name));
 		}
-		addMount(std::format("/Plugin/{}", plugin.Name), plugin.PhysicalRoot);
+		const auto virtualRoot = std::format("/Plugin/{}", plugin.Name);
+		addMount(virtualRoot, plugin.PhysicalRoot);
 	}
 
 	if (std::ranges::none_of(m_mounts, [](const Mount& mount) { return mount.VirtualRoot == "/Engine"; }))

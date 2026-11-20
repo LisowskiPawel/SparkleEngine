@@ -15,6 +15,6 @@ if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
 endif()
 
 add_library(tinyexr INTERFACE)
-set_property(TARGET tinyexr PROPERTY SPARKLE_SOURCE_PACKAGE
-    "{\"name\":\"tinyexr\",\"versionInfo\":\"1.0.7\",\"licenseDeclared\":\"BSD-3-Clause\",\"downloadLocation\":\"https://github.com/syoyo/tinyexr/tree/${_sparkle_tinyexr_revision}\"}")
+sparkle_set_source_package(tinyexr "tinyexr" "1.0.7"
+    "BSD-3-Clause" "https://github.com/syoyo/tinyexr/tree/${_sparkle_tinyexr_revision}")
 target_include_directories(tinyexr INTERFACE ${tinyexr_SOURCE_DIR})

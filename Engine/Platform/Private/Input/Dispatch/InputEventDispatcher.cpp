@@ -28,7 +28,11 @@ void InputEventDispatcher::ProcessDeferredEvents()
 			// Remove before invoking user code, which can clear, append or recursively process the queue.
 			const RoutedInputEvent routedEvent = std::move(m_deferredEvents.front());
 			m_deferredEvents.pop_front();
-			std::visit([&](const auto& event) { DispatchToCallbacks(event, DispatchMode::Deferred, routedEvent.TargetLayer); }, routedEvent.Event);
+			const auto dispatchEvent = [&](const auto& event)
+			{
+				DispatchToCallbacks(event, DispatchMode::Deferred, routedEvent.TargetLayer);
+			};
+			std::visit(dispatchEvent, routedEvent.Event);
 		}
 	}
 	catch (...)
@@ -71,9 +75,4 @@ void InputEventDispatcher::CancelPointerEvents()
 {
 	++m_pointerEpoch;
 	std::erase_if(m_deferredEvents, [](const RoutedInputEvent& event) { return !std::holds_alternative<KeyboardEvent>(event.Event); });
-}
-
-bool InputEventDispatcher::ShouldDispatchToLayer(InputLayer registeredLayer, InputLayer targetLayer) noexcept
-{
-	return registeredLayer == InputLayer::System || registeredLayer == targetLayer;
 }

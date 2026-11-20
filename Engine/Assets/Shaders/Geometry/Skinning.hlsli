@@ -12,7 +12,10 @@ struct SkinnedVertexAttributes
 float3 TransformSkinnedNormal(const float3 normal, const float4x4 skinningMatrix)
 {
 	const float3x3 linearTransform = (float3x3)skinningMatrix;
-	const float3x3 cofactorMatrix = float3x3(cross(linearTransform[1], linearTransform[2]), cross(linearTransform[2], linearTransform[0]), cross(linearTransform[0], linearTransform[1]));
+	const float3 cofactor0 = cross(linearTransform[1], linearTransform[2]);
+	const float3 cofactor1 = cross(linearTransform[2], linearTransform[0]);
+	const float3 cofactor2 = cross(linearTransform[0], linearTransform[1]);
+	const float3x3 cofactorMatrix = float3x3(cofactor0, cofactor1, cofactor2);
 	const float determinant = dot(linearTransform[0], cofactorMatrix[0]);
 	if (abs(determinant) <= 1.0e-8f)
 	{

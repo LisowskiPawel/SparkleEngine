@@ -73,15 +73,22 @@ bool D3D12CaptureService::AllocateReadbackBuffer(PendingReadback& pending) noexc
 	readbackDesc.MipLevels = 1;
 	readbackDesc.SampleDesc.Count = 1;
 	readbackDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	return SUCCEEDED(device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &readbackDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&pending.Buffer)));
+	const HRESULT result = device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &readbackDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&pending.Buffer));
+	return SUCCEEDED(result);
 }
 
 bool D3D12CaptureService::BeginReadbackCommands(PendingReadback& pending) noexcept
 {
 	ID3D12Device* const device = m_rhi.GetDevice().Get();
 
-	return SUCCEEDED(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&pending.CommandAllocator)))
-	    && SUCCEEDED(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, pending.CommandAllocator.Get(), nullptr, IID_PPV_ARGS(&pending.CommandList)));
+	const HRESULT allocatorResult = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&pending.CommandAllocator));
+	if (FAILED(allocatorResult))
+	{
+		return false;
+	}
+
+	const HRESULT commandListResult = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, pending.CommandAllocator.Get(), nullptr, IID_PPV_ARGS(&pending.CommandList));
+	return SUCCEEDED(commandListResult);
 }
 
 bool D3D12CaptureService::RecordReadbackCopy(PendingReadback& pending) noexcept

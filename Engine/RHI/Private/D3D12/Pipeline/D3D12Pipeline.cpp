@@ -192,17 +192,15 @@ static D3D12_SHADER_BYTECODE ResolveD3D12ShaderStage(const ResolvedShader* resol
 	const ResolvedShader& shader = *resolvedShader;
 	if (shader.Entry->BinaryFormat != ShaderBinaryFormat::Dxil)
 	{
-		Diagnostics::Fatal(g_pipelineLogger, __FILE__, __LINE__, std::format("Pipeline '{}' received non-DXIL code for shader stage '{}'", pipelineName, GetShaderStagePrefix(shader.Entry->Stage)));
+		const auto failureMessage = std::format("Pipeline '{}' received non-DXIL code for shader stage '{}'", pipelineName, GetShaderStagePrefix(shader.Entry->Stage));
+		Diagnostics::Fatal(g_pipelineLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	const ShaderBytecode bytecode = shader.GetBytecode();
 	if (!bytecode.IsValid())
 	{
-		Diagnostics::Fatal(
-		    g_pipelineLogger,
-		    __FILE__,
-		    __LINE__,
-		    std::format("Pipeline '{}' has invalid cooked shader bytecode for stage '{}'", pipelineName, GetShaderStagePrefix(shader.Entry->Stage)));
+		const auto failureMessage = std::format("Pipeline '{}' has invalid cooked shader bytecode for stage '{}'", pipelineName, GetShaderStagePrefix(shader.Entry->Stage));
+		Diagnostics::Fatal(g_pipelineLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	const D3D12_SHADER_BYTECODE nativeCode{.pShaderBytecode = bytecode.Data, .BytecodeLength = bytecode.Size};

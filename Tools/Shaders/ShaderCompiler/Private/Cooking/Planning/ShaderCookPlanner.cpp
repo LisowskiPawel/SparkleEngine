@@ -23,9 +23,9 @@ std::vector<ShaderCookDesc> SelectShadersForCook(const ShaderCookSettings& setti
 	std::unordered_set<ShaderTypeId> affectedShaderTypes;
 	if (!settings.changedVirtualPaths.empty())
 	{
-		const ShaderSourceMountTable sourceMounts(
-		    SparkleTools::GetSourceAssetRoot(SparkleTools::SourceAssetType::Shader, SparkleTools::SourceAssetRoot::Engine),
-		    SparkleTools::GetSourceAssetRoot(SparkleTools::SourceAssetType::Shader, SparkleTools::SourceAssetRoot::Project));
+		const auto engineSourceRoot = SparkleTools::GetSourceAssetRoot(SparkleTools::SourceAssetType::Shader, SparkleTools::SourceAssetRoot::Engine);
+		const auto projectSourceRoot = SparkleTools::GetSourceAssetRoot(SparkleTools::SourceAssetType::Shader, SparkleTools::SourceAssetRoot::Project);
+		const ShaderSourceMountTable sourceMounts(engineSourceRoot, projectSourceRoot);
 		std::vector<std::string> canonicalChangedPaths;
 		canonicalChangedPaths.reserve(settings.changedVirtualPaths.size());
 		for (const std::string& changedPath : settings.changedVirtualPaths)

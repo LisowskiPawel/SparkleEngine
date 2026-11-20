@@ -18,15 +18,20 @@ namespace DirectReservoir
 		const float2 motionPixels = motionVectors.Load(int3(pixelCoord, 0)).xy;
 		const float2 previousPixel = MotionVectors::ReprojectToPreviousPixelCenter(pixelCoord, motionPixels, float2(extent.x, extent.y));
 		const int2 previousPixelCoord = int2(floor(previousPixel));
-		if (previousPixelCoord.x >= 0 && previousPixelCoord.y >= 0 && previousPixelCoord.x < (int)extent.x && previousPixelCoord.y < (int)extent.y)
+		const bool bPreviousXInBounds = previousPixelCoord.x >= 0 && previousPixelCoord.x < (int)extent.x;
+		const bool bPreviousYInBounds = previousPixelCoord.y >= 0 && previousPixelCoord.y < (int)extent.y;
+		if (bPreviousXInBounds && bPreviousYInBounds)
 		{
 			const float4 previousSurface = previousSurfaceTexture.Load(int3(previousPixelCoord, 0));
 			if (AreSurfacesCompatible(surface, previousSurface))
 			{
-				const Reservoir previousReservoir = UnpackReservoir(previousSamples.Load(int3(previousPixelCoord, 0)), previousWeights.Load(int3(previousPixelCoord, 0)));
+				const float4 samplePayload = previousSamples.Load(int3(previousPixelCoord, 0));
+				const float4 weightPayload = previousWeights.Load(int3(previousPixelCoord, 0));
+				const Reservoir previousReservoir = UnpackReservoir(samplePayload, weightPayload);
 
 				uint rng = RestirReservoirCommon::BuildSeed(pixelCoord, 0x7151u);
-				CombineReservoir(reservoir, previousReservoir, surface, RestirReservoirCommon::MaxTemporalM, CommonRandom::Random01(rng));
+				const float selectionSample = CommonRandom::Random01(rng);
+				CombineReservoir(reservoir, previousReservoir, surface, RestirReservoirCommon::MaxTemporalM, selectionSample);
 			}
 		}
 	}
@@ -39,20 +44,26 @@ namespace DirectReservoir
 		for (uint sampleIndex = 0u; sampleIndex < RestirReservoirCommon::SpatialNeighborCount; ++sampleIndex)
 		{
 			const int2 neighborCoord = int2(pixelCoord) + RestirReservoirCommon::SpatialOffsets[(offsetStart + sampleIndex * 2u) & 7u];
-			if (neighborCoord.x < 0 || neighborCoord.y < 0 || neighborCoord.x >= (int)extent.x || neighborCoord.y >= (int)extent.y)
+			const bool bNeighborXInBounds = neighborCoord.x >= 0 && neighborCoord.x < (int)extent.x;
+			const bool bNeighborYInBounds = neighborCoord.y >= 0 && neighborCoord.y < (int)extent.y;
+			if (!bNeighborXInBounds || !bNeighborYInBounds)
 			{
 				continue;
 			}
 
 			const Surface neighborSurface = LoadSurface((uint2)neighborCoord);
-			if (!AreSurfacesCompatible(surface, PackSurface(neighborSurface)))
+			const float4 packedNeighborSurface = PackSurface(neighborSurface);
+			if (!AreSurfacesCompatible(surface, packedNeighborSurface))
 			{
 				continue;
 			}
 
-			const Reservoir neighborReservoir = UnpackReservoir(temporalSamples.Load(int3(neighborCoord, 0)), temporalWeights.Load(int3(neighborCoord, 0)));
+			const float4 samplePayload = temporalSamples.Load(int3(neighborCoord, 0));
+			const float4 weightPayload = temporalWeights.Load(int3(neighborCoord, 0));
+			const Reservoir neighborReservoir = UnpackReservoir(samplePayload, weightPayload);
 
-			CombineReservoir(reservoir, neighborReservoir, surface, RestirReservoirCommon::MaxSpatialM, CommonRandom::Random01(rng));
+			const float selectionSample = CommonRandom::Random01(rng);
+			CombineReservoir(reservoir, neighborReservoir, surface, RestirReservoirCommon::MaxSpatialM, selectionSample);
 		}
 	}
 }

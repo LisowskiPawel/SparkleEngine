@@ -57,7 +57,13 @@ namespace Process
 		{
 			const std::wstring prefix = Utf8ToWide(overrideValue.Name) + L"=";
 			const std::wstring replacement = prefix + Utf8ToWide(overrideValue.Value);
-			auto entry = std::find_if(entries.begin(), entries.end(), [&prefix](const std::wstring& value) { return value.rfind(prefix, 0) == 0; });
+
+			const auto matchesName = [&prefix](const std::wstring& value)
+			{
+				return value.rfind(prefix, 0) == 0;
+			};
+
+			auto entry = std::find_if(entries.begin(), entries.end(), matchesName);
 			if (entry == entries.end())
 			{
 				entries.push_back(replacement);

@@ -105,6 +105,11 @@ function(sparkle_prepare_git_fetchcontent_source dependency_name)
     set(${source_cache_key} "${ARG_SOURCE_DIR}" CACHE PATH "" FORCE)
 endfunction()
 
+function(sparkle_set_source_package target_name package_name version license location)
+    set_property(TARGET ${target_name} PROPERTY SPARKLE_SOURCE_PACKAGE
+        "{\"name\":\"${package_name}\",\"versionInfo\":\"${version}\",\"licenseDeclared\":\"${license}\",\"downloadLocation\":\"${location}\"}")
+endfunction()
+
 function(sparkle_declare_git_dependency dependency_name repository revision)
     FetchContent_Declare(${dependency_name}
         BINARY_DIR "${CMAKE_BINARY_DIR}/_deps/${dependency_name}-build"

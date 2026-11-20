@@ -148,7 +148,12 @@ void D3D12SwapChain::Resize()
 
 void D3D12SwapChain::ResizeBuffersToWindow()
 {
-	CHECK(GetPresentationInterface()->ResizeBuffers(m_backBufferCount, GetWindowWidth(), GetWindowHeight(), D3D12TypeConversions::ToDxgiFormat(m_backBufferFormat), ComputeSwapChainFlags()));
+	auto* const swapChain = GetPresentationInterface();
+	const UINT width = GetWindowWidth();
+	const UINT height = GetWindowHeight();
+	const DXGI_FORMAT format = D3D12TypeConversions::ToDxgiFormat(m_backBufferFormat);
+	const UINT flags = ComputeSwapChainFlags();
+	CHECK(swapChain->ResizeBuffers(m_backBufferCount, width, height, format, flags));
 }
 
 void D3D12SwapChain::AllocateHandles()
@@ -234,7 +239,8 @@ void D3D12SwapChain::WaitForPresentationSlot() const noexcept
 	const DWORD waitResult = WaitForSingleObject(m_waitableObject, INFINITE);
 	if (waitResult != WAIT_OBJECT_0)
 	{
-		Diagnostics::Fatal(g_d3d12SwapChainLogger, __FILE__, __LINE__, std::format("D3D12 frame-latency wait failed with result 0x{:08X}.", waitResult));
+		const auto failureMessage = std::format("D3D12 frame-latency wait failed with result 0x{:08X}.", waitResult);
+		Diagnostics::Fatal(g_d3d12SwapChainLogger, __FILE__, __LINE__, failureMessage);
 	}
 }
 

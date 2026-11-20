@@ -31,7 +31,10 @@ namespace DirectReservoir
 
 	bool IsValid(Reservoir reservoir)
 	{
-		return reservoir.Valid > 0.5f && DirectLightSampling::IsValid(reservoir.Candidate) && reservoir.WeightSum > 0.0f && reservoir.TargetPdf > 0.0f && reservoir.M > 0.0f;
+		const bool bCandidateValid = reservoir.Valid > 0.5f && DirectLightSampling::IsValid(reservoir.Candidate);
+		const bool bPositiveWeights = reservoir.WeightSum > 0.0f && reservoir.TargetPdf > 0.0f;
+		const bool bWeightedSamples = bPositiveWeights && reservoir.M > 0.0f;
+		return bCandidateValid && bWeightedSamples;
 	}
 
 	float4 PackReservoirSample(Reservoir reservoir)

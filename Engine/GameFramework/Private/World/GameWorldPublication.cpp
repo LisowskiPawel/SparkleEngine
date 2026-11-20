@@ -132,10 +132,11 @@ namespace ECS
 	void GameWorldState::PublishReadView(std::span<const EntityId> changes, bool bFullBaseline)
 	{
 		const std::shared_ptr<const WorldReadView::Storage> previous = m_publishedReadView.load(std::memory_order_acquire);
-		auto next = previous != nullptr && !bFullBaseline ? std::make_shared<WorldReadView::Storage>(*previous) : std::make_shared<WorldReadView::Storage>();
+		const bool bCopyPrevious = previous != nullptr && !bFullBaseline;
+		auto next = bCopyPrevious ? std::make_shared<WorldReadView::Storage>(*previous) : std::make_shared<WorldReadView::Storage>();
 		next->Sequence = previous != nullptr ? previous->Sequence + 1 : 1;
 
-		if (previous == nullptr || bFullBaseline)
+		if (!bCopyPrevious)
 		{
 			BuildReadViewBaseline(*next);
 		}

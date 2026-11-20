@@ -32,7 +32,8 @@ void VulkanRecordingDescriptorPool::Reset() noexcept
 		const VkResult result = vkResetDescriptorPool(m_rhi->GetDevice(), page.Pool, 0);
 		if (!VulkanResult::Succeeded(result))
 		{
-			Diagnostics::Fatal(g_vulkanRecordingDescriptorPoolLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkResetDescriptorPool", result));
+			const auto failureMessage = VulkanResult::FormatFailure("vkResetDescriptorPool", result);
+			Diagnostics::Fatal(g_vulkanRecordingDescriptorPoolLogger, __FILE__, __LINE__, failureMessage);
 		}
 		page.Remaining = page.Capacity;
 		page.AllocatedSets = 0;
@@ -92,7 +93,8 @@ VkDescriptorSet VulkanRecordingDescriptorPool::AllocateSet(PoolPage& page, VkDes
 	const VkResult result = vkAllocateDescriptorSets(m_rhi->GetDevice(), &allocateInfo, &descriptorSet);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanRecordingDescriptorPoolLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkAllocateDescriptorSets", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkAllocateDescriptorSets", result);
+		Diagnostics::Fatal(g_vulkanRecordingDescriptorPoolLogger, __FILE__, __LINE__, failureMessage);
 	}
 	for (const VkDescriptorPoolSize& requirement : requirements)
 	{
@@ -147,7 +149,8 @@ void VulkanRecordingDescriptorPool::CreatePool(std::span<const VkDescriptorPoolS
 	const VkResult result = vkCreateDescriptorPool(m_rhi->GetDevice(), &createInfo, nullptr, &page.Pool);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanRecordingDescriptorPoolLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateDescriptorPool", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkCreateDescriptorPool", result);
+		Diagnostics::Fatal(g_vulkanRecordingDescriptorPoolLogger, __FILE__, __LINE__, failureMessage);
 	}
 	m_pages.push_back(std::move(page));
 }

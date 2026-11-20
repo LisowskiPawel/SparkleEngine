@@ -59,7 +59,8 @@ namespace MathUtils
 
 	DirectX::XMFLOAT3 DirectionToRotationDegrees(const DirectX::XMFLOAT3& direction) noexcept
 	{
-		const float clampedY = (std::max) (-1.0f, (std::min) (1.0f, direction.y));
+		const float upperClampedY = (std::min) (1.0f, direction.y);
+		const float clampedY = (std::max) (-1.0f, upperClampedY);
 		const float pitch = std::asin(clampedY);
 		const float yaw = std::atan2(direction.x, direction.z);
 		return {RadiansToDegrees(pitch), RadiansToDegrees(yaw), 0.0f};
@@ -75,7 +76,8 @@ namespace MathUtils
 
 	DirectX::XMFLOAT3 ExtractEulerRadians(const DirectX::XMFLOAT4X4& rotationMatrix) noexcept
 	{
-		const float sinePitch = (std::max) (-1.0f, (std::min) (1.0f, -rotationMatrix._32));
+		const float upperClampedSinePitch = (std::min) (1.0f, -rotationMatrix._32);
+		const float sinePitch = (std::max) (-1.0f, upperClampedSinePitch);
 		const float cosinePitch = std::hypot(rotationMatrix._31, rotationMatrix._33);
 		const float pitch = std::atan2(sinePitch, cosinePitch);
 

@@ -39,7 +39,8 @@ namespace CommonSampling
 		const float phi = TWO_PI * sample.y;
 
 		const OrthonormalBasis basis = BuildOrthonormalBasis(normalizedAxis);
-		return SafeNormalize(basis.Tangent * (cos(phi) * sinTheta) + basis.Bitangent * (sin(phi) * sinTheta) + normalizedAxis * cosTheta);
+		const float3 direction = basis.Tangent * (cos(phi) * sinTheta) + basis.Bitangent * (sin(phi) * sinTheta) + normalizedAxis * cosTheta;
+		return SafeNormalize(direction);
 	}
 
 	float3 SampleSpherePoint(float3 center, float radius, float3 referenceDirection, float2 sample)
@@ -80,7 +81,8 @@ namespace CommonSampling
 		const float sinTheta = sqrt(saturate(sample.y));
 
 		const OrthonormalBasis basis = BuildOrthonormalBasis(normal);
-
-		return SafeNormalize(basis.Tangent * (cos(phi) * sinTheta) + basis.Bitangent * (sin(phi) * sinTheta) + SafeNormalize(normal) * cosTheta, SafeNormalize(normal));
+		const float3 normalizedNormal = SafeNormalize(normal);
+		const float3 direction = basis.Tangent * (cos(phi) * sinTheta) + basis.Bitangent * (sin(phi) * sinTheta) + normalizedNormal * cosTheta;
+		return SafeNormalize(direction, normalizedNormal);
 	}
 }

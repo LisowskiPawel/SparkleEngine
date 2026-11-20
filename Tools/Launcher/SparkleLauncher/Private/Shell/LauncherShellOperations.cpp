@@ -14,6 +14,7 @@
 #include <ostream>
 #include <string>
 #include <string_view>
+#include <utility>
 
 namespace SparkleLauncher
 {
@@ -194,31 +195,41 @@ namespace SparkleLauncher
 
 		if (FindBuildWorkspaceOperationDefinition(operation->Id).has_value())
 		{
-			AppendBuildPlanDryRun(model, PlanBuildWorkspaceOperation(operation->Id, BuildWorkspaceShellRequest(model)));
+			const auto request = BuildWorkspaceShellRequest(model);
+			const auto plan = PlanBuildWorkspaceOperation(operation->Id, request);
+			AppendBuildPlanDryRun(model, plan);
 			return true;
 		}
 
 		if (FindCookOperationDefinition(operation->Id).has_value())
 		{
-			AppendCookPlanDryRun(model, PlanCookOperation(operation->Id, BuildCookShellRequest(model, arguments)));
+			const auto request = BuildCookShellRequest(model, arguments);
+			const auto plan = PlanCookOperation(operation->Id, request);
+			AppendCookPlanDryRun(model, plan);
 			return true;
 		}
 
 		if (FindLevelOperationDefinition(operation->Id).has_value())
 		{
-			AppendLevelPlanDryRun(model, PlanLevelOperation(operation->Id, BuildLevelShellRequest(model, arguments)));
+			const auto request = BuildLevelShellRequest(model, arguments);
+			const auto plan = PlanLevelOperation(operation->Id, request);
+			AppendLevelPlanDryRun(model, plan);
 			return true;
 		}
 
 		if (FindLevelRunOperationDefinition(operation->Id).has_value())
 		{
-			AppendLevelRunPlanDryRun(model, PlanLevelRunOperation(operation->Id, BuildLevelRunShellRequest(model, arguments)));
+			const auto request = BuildLevelRunShellRequest(model, arguments);
+			const auto plan = PlanLevelRunOperation(operation->Id, request);
+			AppendLevelRunPlanDryRun(model, plan);
 			return true;
 		}
 
 		if (FindMaintenanceOperationDefinition(operation->Id).has_value())
 		{
-			AppendMaintenancePlanDryRun(model, PlanMaintenanceOperation(operation->Id, BuildMaintenanceShellRequest(model, arguments)));
+			const auto request = BuildMaintenanceShellRequest(model, arguments);
+			const auto plan = PlanMaintenanceOperation(operation->Id, request);
+			AppendMaintenancePlanDryRun(model, plan);
 			return true;
 		}
 
@@ -256,35 +267,45 @@ namespace SparkleLauncher
 		};
 		if (FindBuildWorkspaceOperationDefinition(arguments.RunOperationId).has_value())
 		{
-			const OperationRecord operation = RunBuildWorkspaceOperationPlan(PlanBuildWorkspaceOperation(arguments.RunOperationId, BuildWorkspaceShellRequest(model)), processRunner, writeOutput);
+			const auto request = BuildWorkspaceShellRequest(model);
+			auto plan = PlanBuildWorkspaceOperation(arguments.RunOperationId, request);
+			const OperationRecord operation = RunBuildWorkspaceOperationPlan(std::move(plan), processRunner, writeOutput);
 
 			return ReportLauncherShellOperationResult(operation, output, error);
 		}
 
 		if (FindCookOperationDefinition(arguments.RunOperationId).has_value())
 		{
-			const OperationRecord operation = RunCookOperationPlan(PlanCookOperation(arguments.RunOperationId, BuildCookShellRequest(model, arguments)), processRunner, writeOutput);
+			const auto request = BuildCookShellRequest(model, arguments);
+			auto plan = PlanCookOperation(arguments.RunOperationId, request);
+			const OperationRecord operation = RunCookOperationPlan(std::move(plan), processRunner, writeOutput);
 
 			return ReportLauncherShellOperationResult(operation, output, error);
 		}
 
 		if (FindLevelOperationDefinition(arguments.RunOperationId).has_value())
 		{
-			const OperationRecord operation = RunLevelOperationPlan(PlanLevelOperation(arguments.RunOperationId, BuildLevelShellRequest(model, arguments)), processRunner, writeOutput);
+			const auto request = BuildLevelShellRequest(model, arguments);
+			auto plan = PlanLevelOperation(arguments.RunOperationId, request);
+			const OperationRecord operation = RunLevelOperationPlan(std::move(plan), processRunner, writeOutput);
 
 			return ReportLauncherShellOperationResult(operation, output, error);
 		}
 
 		if (FindLevelRunOperationDefinition(arguments.RunOperationId).has_value())
 		{
-			const OperationRecord operation = RunLevelRunOperationPlan(PlanLevelRunOperation(arguments.RunOperationId, BuildLevelRunShellRequest(model, arguments)), processRunner, writeOutput);
+			const auto request = BuildLevelRunShellRequest(model, arguments);
+			auto plan = PlanLevelRunOperation(arguments.RunOperationId, request);
+			const OperationRecord operation = RunLevelRunOperationPlan(std::move(plan), processRunner, writeOutput);
 
 			return ReportLauncherShellOperationResult(operation, output, error);
 		}
 
 		if (FindMaintenanceOperationDefinition(arguments.RunOperationId).has_value())
 		{
-			const OperationRecord operation = RunMaintenanceOperationPlan(PlanMaintenanceOperation(arguments.RunOperationId, BuildMaintenanceShellRequest(model, arguments)), writeOutput);
+			const auto request = BuildMaintenanceShellRequest(model, arguments);
+			auto plan = PlanMaintenanceOperation(arguments.RunOperationId, request);
+			const OperationRecord operation = RunMaintenanceOperationPlan(std::move(plan), writeOutput);
 			return ReportLauncherShellOperationResult(operation, output, error);
 		}
 

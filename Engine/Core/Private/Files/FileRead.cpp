@@ -28,7 +28,8 @@ namespace Files
 			return false;
 		}
 		const bool bInvalidSize = fileSize < 0 || static_cast<std::uint64_t>(fileSize) > maximumBytes;
-		const auto storageLimit = std::min<std::uint64_t>(output.max_size(), static_cast<std::uint64_t>((std::numeric_limits<std::streamsize>::max)()));
+		const auto streamSizeLimit = static_cast<std::uint64_t>((std::numeric_limits<std::streamsize>::max)());
+		const auto storageLimit = std::min<std::uint64_t>(output.max_size(), streamSizeLimit);
 		if (bInvalidSize || static_cast<std::uint64_t>(fileSize) > storageLimit)
 		{
 			const std::string displayPath = Strings::ToNarrow(path.wstring());

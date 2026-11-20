@@ -58,7 +58,8 @@ void VulkanDescriptorAllocator::PublishRecordingReadView() noexcept
 		readView->RegisteredDescriptors = m_registeredDescriptors;
 	}
 
-	m_recordingReadView.store(std::shared_ptr<const RecordingReadView>(std::move(readView)), std::memory_order_release);
+	std::shared_ptr<const RecordingReadView> publishedReadView = std::move(readView);
+	m_recordingReadView.store(std::move(publishedReadView), std::memory_order_release);
 }
 
 void VulkanDescriptorAllocator::ReleaseDescriptor(ERhiDescriptorAllocatorType, const RhiDescriptorAllocation& allocation) noexcept
@@ -277,20 +278,18 @@ void VulkanDescriptorAllocator::WriteDescriptorTable(VkDescriptorSet descriptorS
 
 	if (bInvalidDescriptorTable)
 	{
-		Diagnostics::Fatal(
-		    g_vulkanDescriptorAllocatorLogger,
-		    __FILE__,
-		    __LINE__,
-		    std::format(
-		        "Vulkan descriptor-table binding '{}' references stale or unavailable table {} generation {} "
-		        "(snapshot allocated={}, generation={}, descriptor count={}, first descriptor={}).",
-		        binding.Name != nullptr ? binding.Name : "<unnamed>",
-		        tableIndex,
-		        generation,
-		        table.bAllocated,
-		        table.Generation,
-		        table.Entries != nullptr ? table.Entries->size() : 0u,
-		        tableBinding.DescriptorIndex));
+		const auto failureMessage = std::format(
+		    "Vulkan descriptor-table binding '{}' references stale or unavailable table {} generation {} "
+		    "(snapshot allocated={}, generation={}, descriptor count={}, first descriptor={}).",
+		    binding.Name != nullptr ? binding.Name : "<unnamed>",
+		    tableIndex,
+		    generation,
+		    table.bAllocated,
+		    table.Generation,
+		    table.Entries != nullptr ? table.Entries->size() : 0u,
+		    tableBinding.DescriptorIndex);
+
+		Diagnostics::Fatal(g_vulkanDescriptorAllocatorLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	const std::size_t availableDescriptorCount = table.Entries->size() - tableBinding.DescriptorIndex;

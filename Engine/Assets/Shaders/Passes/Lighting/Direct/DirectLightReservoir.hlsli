@@ -117,7 +117,8 @@ namespace DirectReservoir
 
 	float EvaluateTargetPdf(Surface surface, DirectLightSampling::LightCandidate candidate, float2 shapeSample)
 	{
-		return CommonColor::LuminanceRec709(EvaluateCandidateContribution(surface, candidate, shapeSample));
+		const float3 contribution = EvaluateCandidateContribution(surface, candidate, shapeSample);
+		return CommonColor::LuminanceRec709(contribution);
 	}
 
 	bool StreamWeightedSample(inout Reservoir reservoir, DirectLightSampling::LightCandidate candidate, float2 shapeSample, float targetPdf, float sourcePdf, float random)
@@ -191,10 +192,12 @@ namespace DirectReservoir
 		[unroll]
 		for (uint candidateIndex = 0u; candidateIndex < RestirReservoirCommon::InitialCandidateCount; ++candidateIndex)
 		{
-			const DirectLightSampling::LightCandidate candidate = DirectLightSampling::SampleUniformLightCandidate(CommonRandom::Random01(rng));
+			const float lightSelectionSample = CommonRandom::Random01(rng);
+			const DirectLightSampling::LightCandidate candidate = DirectLightSampling::SampleUniformLightCandidate(lightSelectionSample);
 			const float2 shapeSample = CommonRandom::Random02(rng);
 			const float targetPdf = EvaluateTargetPdf(surface, candidate, shapeSample);
-			StreamWeightedSample(reservoir, candidate, shapeSample, targetPdf, candidate.SelectionPdf, CommonRandom::Random01(rng));
+			const float reservoirSelectionSample = CommonRandom::Random01(rng);
+			StreamWeightedSample(reservoir, candidate, shapeSample, targetPdf, candidate.SelectionPdf, reservoirSelectionSample);
 		}
 
 		return reservoir;

@@ -9,6 +9,7 @@
 #include "Textures/CookedTextureLoader.h"
 
 #include <format>
+#include <string>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_rendererTextureFactoryLogger, "Renderer.RendererTextureFactory");
 
@@ -36,28 +37,32 @@ RendererTexture RendererTextureFactory::Create(const std::filesystem::path& text
 	RhiOwnedResourceHandle resource = m_resourceService.CreateTextureResource(resourceDesc, initialState, RhiMemoryCategory::Texture, RhiMemoryResidencyClass::DeviceLocal, debugName);
 	if (!resource)
 	{
-		Diagnostics::Fatal(g_rendererTextureFactoryLogger, __FILE__, __LINE__, std::format("Texture resource creation failed for '{}'.", texturePath.string()));
+		const std::string message = std::format("Texture resource creation failed for '{}'.", texturePath.string());
+
+		Diagnostics::Fatal(g_rendererTextureFactoryLogger, __FILE__, __LINE__, message);
 	}
 
 	if (!m_uploadService.UploadTexture(commandList, resource, textureUpload, ResourceState::ShaderResource, debugName))
 	{
 		m_resourceService.ReleaseOwnedResource(resource);
-		Diagnostics::Fatal(g_rendererTextureFactoryLogger, __FILE__, __LINE__, std::format("Texture upload failed for '{}'.", texturePath.string()));
+		const std::string message = std::format("Texture upload failed for '{}'.", texturePath.string());
+
+		Diagnostics::Fatal(g_rendererTextureFactoryLogger, __FILE__, __LINE__, message);
 	}
 
 	const RhiResourceHandle nativeResource = m_resourceService.GetResourceHandle(resource);
 
-	RhiResourceViewHandle shaderResourceView = m_descriptorService.CreateResourceView(
-	    RhiResourceViewDesc::TextureShaderResource(
-	        nativeResource,
-	        textureUpload.Format,
-	        RhiTextureViewRange{.MostDetailedMip = 0, .MipCount = textureUpload.GetMipCount(), .FirstArraySlice = 0, .ArraySize = textureUpload.GetArraySize()},
-	        textureUpload.Dimension));
+	const RhiTextureViewRange viewRange{.MostDetailedMip = 0, .MipCount = textureUpload.GetMipCount(), .FirstArraySlice = 0, .ArraySize = textureUpload.GetArraySize()};
+
+	const RhiResourceViewDesc viewDesc = RhiResourceViewDesc::TextureShaderResource(nativeResource, textureUpload.Format, viewRange, textureUpload.Dimension);
+	RhiResourceViewHandle shaderResourceView = m_descriptorService.CreateResourceView(viewDesc);
 
 	if (!shaderResourceView)
 	{
 		m_resourceService.ReleaseOwnedResource(resource);
-		Diagnostics::Fatal(g_rendererTextureFactoryLogger, __FILE__, __LINE__, std::format("Texture shader-resource view creation failed for '{}'.", texturePath.string()));
+		const std::string message = std::format("Texture shader-resource view creation failed for '{}'.", texturePath.string());
+
+		Diagnostics::Fatal(g_rendererTextureFactoryLogger, __FILE__, __LINE__, message);
 	}
 
 	return RendererTexture{

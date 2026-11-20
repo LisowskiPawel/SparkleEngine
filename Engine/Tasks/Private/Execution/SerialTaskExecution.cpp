@@ -231,5 +231,6 @@ void SerialTaskExecution::RunState::PublishFinalStatus()
 
 TaskExecutionCompletion SerialTaskExecution::Execute(const TaskGraphStorage& graph, TaskExecutionContext& context, std::stop_token cancellation)
 {
-	return RunState(graph, context, std::move(cancellation)).Execute();
+	RunState execution(graph, context, std::move(cancellation));
+	return execution.Execute();
 }

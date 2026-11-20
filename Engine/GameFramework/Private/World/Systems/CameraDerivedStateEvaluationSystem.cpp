@@ -10,10 +10,10 @@ namespace ECS
 {
 	void CameraDerivedStateEvaluationSystem::Evaluate(const LocalTransform& local, CameraDerivedState& derived) noexcept
 	{
-		const DirectX::XMVECTOR forward = DirectX::XMVector3Rotate(
-		    DirectX::XMVectorSet(WorldCoordinates::kForwardX, WorldCoordinates::kForwardY, WorldCoordinates::kForwardZ, 0.0f),
-		    DirectX::XMLoadFloat4(&local.Rotation));
-
-		DirectX::XMStoreFloat3(&derived.Direction, DirectX::XMVector3Normalize(forward));
+		const DirectX::XMVECTOR forwardAxis = DirectX::XMVectorSet(WorldCoordinates::kForwardX, WorldCoordinates::kForwardY, WorldCoordinates::kForwardZ, 0.0f);
+		const DirectX::XMVECTOR rotation = DirectX::XMLoadFloat4(&local.Rotation);
+		const DirectX::XMVECTOR forward = DirectX::XMVector3Rotate(forwardAxis, rotation);
+		const DirectX::XMVECTOR direction = DirectX::XMVector3Normalize(forward);
+		DirectX::XMStoreFloat3(&derived.Direction, direction);
 	}
 }

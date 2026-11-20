@@ -47,19 +47,22 @@ RhiPresentationConfiguration RenderDeviceServices::ResolvePresentationConfigurat
 	const RhiPresentationConfiguration configuration{.BackBufferCount = CVarBackBufferCount.Get(), .MaximumFramesInFlight = CVarMaximumFramesInFlight.Get()};
 	if (configuration.BackBufferCount < RhiPresentationDefaults::MinBackBufferCount || configuration.BackBufferCount > RhiPresentationDefaults::MaxBackBufferCount)
 	{
-		FailCreation(
-		    std::format(
-		        "r.BackBufferCount={} is outside the DXGI flip-model and Sparkle presentation range [2, 3]. Use r.MaximumFramesInFlight=1 "
-		        "for single-frame pacing.",
-		        configuration.BackBufferCount));
+		const std::string failureMessage = std::format(
+		    "r.BackBufferCount={} is outside the DXGI flip-model and Sparkle presentation range [2, 3]. Use r.MaximumFramesInFlight=1 "
+		    "for single-frame pacing.",
+		    configuration.BackBufferCount);
+
+		FailCreation(failureMessage);
 	}
 	if (configuration.MaximumFramesInFlight < RhiPresentationDefaults::MinFramesInFlight || configuration.MaximumFramesInFlight > RhiPresentationDefaults::MaxFramesInFlight)
 	{
-		FailCreation(std::format("r.MaximumFramesInFlight={} is outside the supported range [1, 3].", configuration.MaximumFramesInFlight));
+		const std::string failureMessage = std::format("r.MaximumFramesInFlight={} is outside the supported range [1, 3].", configuration.MaximumFramesInFlight);
+		FailCreation(failureMessage);
 	}
 	if (configuration.MaximumFramesInFlight > configuration.BackBufferCount)
 	{
-		FailCreation(std::format("r.MaximumFramesInFlight={} exceeds r.BackBufferCount={}.", configuration.MaximumFramesInFlight, configuration.BackBufferCount));
+		const std::string failureMessage = std::format("r.MaximumFramesInFlight={} exceeds r.BackBufferCount={}.", configuration.MaximumFramesInFlight, configuration.BackBufferCount);
+		FailCreation(failureMessage);
 	}
 	return configuration;
 }
@@ -81,11 +84,12 @@ std::unique_ptr<RenderDeviceServices> RenderDeviceServices::Create(Window& windo
 	const RhiPresentationConfiguration presentationConfiguration = ResolvePresentationConfiguration();
 
 	auto services = std::unique_ptr<RenderDeviceServices>(new RenderDeviceServices());
+	std::unique_ptr<RenderDeviceBackendServices> backendServices;
 	switch (backendApi)
 	{
 		case ERhiBackendApi::D3D12:
 #if SPARKLE_RHI_WITH_D3D12
-			services->m_state->SetBackendServices(CreateD3D12RenderDeviceServices(window, backBufferFormat, presentationConfiguration, interposerHooks));
+			backendServices = CreateD3D12RenderDeviceServices(window, backBufferFormat, presentationConfiguration, interposerHooks);
 			break;
 #else
 			FailUnsupportedBackend(backendApi);
@@ -97,7 +101,7 @@ std::unique_ptr<RenderDeviceServices> RenderDeviceServices::Create(Window& windo
 			{
 				FailCreation("Vulkan device creation received interposer hooks that only the D3D12 bridge implements.");
 			}
-			services->m_state->SetBackendServices(CreateVulkanRenderDeviceServices(window, backBufferFormat, presentationConfiguration));
+			backendServices = CreateVulkanRenderDeviceServices(window, backBufferFormat, presentationConfiguration);
 			break;
 #else
 			FailUnsupportedBackend(backendApi);
@@ -107,6 +111,8 @@ std::unique_ptr<RenderDeviceServices> RenderDeviceServices::Create(Window& windo
 		default:
 			FailUnsupportedBackend(backendApi);
 	}
+
+	services->m_state->SetBackendServices(std::move(backendServices));
 
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
 	services->m_externalCapture = launch.ExternalCapture;

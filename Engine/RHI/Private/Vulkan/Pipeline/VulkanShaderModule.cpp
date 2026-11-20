@@ -28,21 +28,15 @@ VulkanShaderModule::VulkanShaderModule(VulkanRhi& rhi, const ResolvedShader* res
 	const ResolvedShader& shader = *resolvedShader;
 	if (shader.Entry->BinaryFormat != ShaderBinaryFormat::SpirV)
 	{
-		Diagnostics::Fatal(
-		    g_vulkanShaderModuleLogger,
-		    __FILE__,
-		    __LINE__,
-		    std::format("Pipeline '{}' received non-SPIR-V code for shader stage '{}'", pipelineName, GetShaderStagePrefix(shader.Entry->Stage)));
+		const auto failureMessage = std::format("Pipeline '{}' received non-SPIR-V code for shader stage '{}'", pipelineName, GetShaderStagePrefix(shader.Entry->Stage));
+		Diagnostics::Fatal(g_vulkanShaderModuleLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	const ShaderBytecode bytecode = shader.GetBytecode();
 	if (!bytecode.IsValid() || (bytecode.Size % sizeof(std::uint32_t)) != 0)
 	{
-		Diagnostics::Fatal(
-		    g_vulkanShaderModuleLogger,
-		    __FILE__,
-		    __LINE__,
-		    std::format("Pipeline '{}' has invalid cooked SPIR-V bytecode for stage '{}'", pipelineName, GetShaderStagePrefix(shader.Entry->Stage)));
+		const auto failureMessage = std::format("Pipeline '{}' has invalid cooked SPIR-V bytecode for stage '{}'", pipelineName, GetShaderStagePrefix(shader.Entry->Stage));
+		Diagnostics::Fatal(g_vulkanShaderModuleLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	const std::string_view entryPoint = shader.Map->ResolveString(shader.Entry->EntryPoint);
@@ -64,17 +58,14 @@ VulkanShaderModule::VulkanShaderModule(VulkanRhi& rhi, const ResolvedShader* res
 	const VkResult result = vkCreateShaderModule(m_device, &createInfo, nullptr, &m_module);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanShaderModuleLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateShaderModule", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkCreateShaderModule", result);
+		Diagnostics::Fatal(g_vulkanShaderModuleLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	m_stage = shader.Entry->Stage;
+	const std::string moduleName = std::format("{}:{}", pipelineName, GetShaderStagePrefix(m_stage));
 
-	VulkanDebugNames::SetObjectName(
-	    rhi.GetSetDebugUtilsObjectName(),
-	    m_device,
-	    VK_OBJECT_TYPE_SHADER_MODULE,
-	    reinterpret_cast<std::uint64_t>(m_module),
-	    std::format("{}:{}", pipelineName, GetShaderStagePrefix(shader.Entry->Stage)));
+	VulkanDebugNames::SetObjectName(rhi.GetSetDebugUtilsObjectName(), m_device, VK_OBJECT_TYPE_SHADER_MODULE, reinterpret_cast<std::uint64_t>(m_module), moduleName);
 }
 
 VulkanShaderModule::~VulkanShaderModule() noexcept

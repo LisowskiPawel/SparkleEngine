@@ -73,7 +73,8 @@ TaskResult TaskExecutor::Implementation::ScheduledTaskExecution::ExecuteBody(std
 	TaskExecutionContext taskContext = m_context;
 	taskContext.Bind(node.Desc.Lane, m_execution->Cancellation.get_token());
 
-	const bool bBlockedByDependency = task.bBlockedByPrerequisite.load(std::memory_order_acquire) || task.bBlockedByParent.load(std::memory_order_acquire);
+	const bool bBlockedByPrerequisite = task.bBlockedByPrerequisite.load(std::memory_order_acquire);
+	const bool bBlockedByDependency = bBlockedByPrerequisite || task.bBlockedByParent.load(std::memory_order_acquire);
 	return InvokeTaskFunction(node, taskContext, bBlockedByDependency);
 }
 
@@ -110,7 +111,8 @@ void TaskExecutor::Implementation::ScheduledTaskExecution::ReleaseNestedTasks(co
 void TaskExecutor::Implementation::ScheduledTaskExecution::TrySchedule(std::uint32_t index, TaskWorker* preferredWorker)
 {
 	ScheduledTaskState& task = m_tasks[index];
-	const bool bPrerequisitesPending = task.RemainingPrerequisites.load(std::memory_order_acquire) != 0 || !task.bParentBodyComplete.load(std::memory_order_acquire);
+	const std::uint32_t remainingPrerequisites = task.RemainingPrerequisites.load(std::memory_order_acquire);
+	const bool bPrerequisitesPending = remainingPrerequisites != 0 || !task.bParentBodyComplete.load(std::memory_order_acquire);
 
 	if (bPrerequisitesPending)
 	{
@@ -121,7 +123,9 @@ void TaskExecutor::Implementation::ScheduledTaskExecution::TrySchedule(std::uint
 	if (task.bScheduled.compare_exchange_strong(bExpected, true, std::memory_order_acq_rel))
 	{
 		const TaskLane lane = m_graph->Nodes[index].Desc.Lane;
-		m_owner.Enqueue(ReadyTask{.Execution = shared_from_this(), .TaskIndex = index}, preferredWorker != nullptr && preferredWorker->Lane == lane ? preferredWorker : nullptr, lane);
+		TaskWorker* queueWorker = preferredWorker != nullptr && preferredWorker->Lane == lane ? preferredWorker : nullptr;
+		ReadyTask readyTask{.Execution = shared_from_this(), .TaskIndex = index};
+		m_owner.Enqueue(std::move(readyTask), queueWorker, lane);
 	}
 }
 
@@ -225,7 +229,8 @@ TaskExecutionCompletion TaskExecutor::Implementation::ScheduledTaskExecution::Bu
 
 void TaskExecutor::Implementation::ScheduledTaskExecution::Finish()
 {
-	m_execution->Publish(BuildCompletion());
+	TaskExecutionCompletion completion = BuildCompletion();
+	m_execution->Publish(std::move(completion));
 	m_owner.OnExecutionSettled();
 }
 

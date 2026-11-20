@@ -87,12 +87,12 @@ WorldEditResult EditorTransactionHistory::Execute(WorldEditCommand forward, Worl
 		return result;
 	}
 
-	const bool bCoalesceTransactionEmpty = m_bCoalescing && !coalescingKey.empty();
-	const bool bCanCoalesceTransactionUndoEmpty = bCoalesceTransactionEmpty && (!m_undo.empty());
-	const bool bCanCoalesceTransactionBack = bCanCoalesceTransactionUndoEmpty && (m_undo.back().CoalescingKey == coalescingKey);
-	const bool bCanCoalesceTransaction = bCanCoalesceTransactionBack && (AffectsSameTarget(m_undo.back().Forward.Payload, forward.Payload));
+	const bool bInteractionContinues = m_bCoalescing && !coalescingKey.empty();
+	const bool bHasPreviousInteraction = bInteractionContinues && !m_undo.empty();
+	const bool bMatchesPreviousKey = bHasPreviousInteraction && m_undo.back().CoalescingKey == coalescingKey;
+	const bool bCanCoalesce = bMatchesPreviousKey && AffectsSameTarget(m_undo.back().Forward.Payload, forward.Payload);
 
-	if (bCanCoalesceTransaction)
+	if (bCanCoalesce)
 	{
 		m_undo.back().Forward = std::move(forward);
 	}

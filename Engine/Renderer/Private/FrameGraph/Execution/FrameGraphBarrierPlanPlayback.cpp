@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <format>
+#include <string>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogFrameGraphBarrierPlayback, "Renderer.FrameGraph");
 
@@ -22,35 +23,31 @@ static std::string FormatResourceLabel(const FrameGraphResourceHandle handle) no
 
 static void FailUnresolvedAliasingBarrier(std::string_view passName, const FrameGraphAliasingBarrier& barrier, std::string_view beforeResourceName, std::string_view afterResourceName) noexcept
 {
-	Diagnostics::Fatal(
-	    LogFrameGraphBarrierPlayback,
-	    __FILE__,
-	    __LINE__,
-	    std::format(
-	        "FrameGraph aliasing barrier validation failed: pass='{}' block={} beforeHandle={} beforeResource='{}' afterHandle={} "
-	        "afterResource='{}'",
-	        passName,
-	        barrier.physicalBlockIndex,
-	        FormatResourceLabel(barrier.beforeHandle),
-	        beforeResourceName,
-	        FormatResourceLabel(barrier.afterHandle),
-	        afterResourceName));
+	const std::string message = std::format(
+	    "FrameGraph aliasing barrier validation failed: pass='{}' block={} beforeHandle={} beforeResource='{}' afterHandle={} "
+	    "afterResource='{}'",
+	    passName,
+	    barrier.physicalBlockIndex,
+	    FormatResourceLabel(barrier.beforeHandle),
+	    beforeResourceName,
+	    FormatResourceLabel(barrier.afterHandle),
+	    afterResourceName);
+
+	Diagnostics::Fatal(LogFrameGraphBarrierPlayback, __FILE__, __LINE__, message);
 }
 
 static void FailUnresolvedResourceBarrier(std::string_view passName, const FrameGraphBarrier& barrier, std::string_view resourceName) noexcept
 {
-	Diagnostics::Fatal(
-	    LogFrameGraphBarrierPlayback,
-	    __FILE__,
-	    __LINE__,
-	    std::format(
-	        "FrameGraph resource barrier failed: pass='{}' handle={} resource='{}' label='{}' beforeState={} afterState={}",
-	        passName,
-	        FormatResourceLabel(barrier.handle),
-	        resourceName,
-	        barrier.label.empty() ? "<unlabeled>" : barrier.label,
-	        ResourceStateToString(barrier.before),
-	        ResourceStateToString(barrier.after)));
+	const std::string message = std::format(
+	    "FrameGraph resource barrier failed: pass='{}' handle={} resource='{}' label='{}' beforeState={} afterState={}",
+	    passName,
+	    FormatResourceLabel(barrier.handle),
+	    resourceName,
+	    barrier.label.empty() ? "<unlabeled>" : barrier.label,
+	    ResourceStateToString(barrier.before),
+	    ResourceStateToString(barrier.after));
+
+	Diagnostics::Fatal(LogFrameGraphBarrierPlayback, __FILE__, __LINE__, message);
 }
 
 void FrameGraph::EmitTransientAliasingBarriers(RenderCommandContext& commandContext, std::string_view passName, const std::vector<FrameGraphAliasingBarrier>& barriers) const noexcept

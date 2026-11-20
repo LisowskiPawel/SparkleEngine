@@ -88,7 +88,8 @@ void GameWorld::CommitSceneLoadPackage(Assets::SceneLoadPackage package)
 
 RenderFrameSubmission GameWorld::ExtractRenderFrameSubmission(std::uint64_t frameId)
 {
-	return m_renderFrameSubmissionExtractor->Extract(*m_state, *m_resources, AcquireReadView(), m_generation, frameId);
+	const WorldReadView readView = AcquireReadView();
+	return m_renderFrameSubmissionExtractor->Extract(*m_state, *m_resources, readView, m_generation, frameId);
 }
 
 void GameWorld::FinalizeSceneLoadCommit()

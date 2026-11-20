@@ -21,7 +21,9 @@ ConsoleCommandResult ExecuteConsoleListCVars(const CVarControlExecutor& executor
 	{
 		return ConsoleCommandResult::Error("CVar control owner is unavailable.");
 	}
-	return FormatControlResult(executor({.Operation = CVarControlOperation::List, .Filter = arguments.empty() ? std::string{} : std::string(arguments.front())}));
+	CVarControlRequest request{.Operation = CVarControlOperation::List, .Filter = arguments.empty() ? std::string{} : std::string(arguments.front())};
+	CVarControlResult result = executor(std::move(request));
+	return FormatControlResult(std::move(result));
 }
 
 ConsoleCommandResult ExecuteConsoleGetCVar(const CVarControlExecutor& executor, std::span<const std::string_view> arguments)
@@ -35,7 +37,9 @@ ConsoleCommandResult ExecuteConsoleGetCVar(const CVarControlExecutor& executor, 
 	{
 		return ConsoleCommandResult::Error("CVar control owner is unavailable.");
 	}
-	return FormatControlResult(executor({.Operation = CVarControlOperation::Query, .Entries = {{std::string(arguments.front()), {}}}}));
+	CVarControlRequest request{.Operation = CVarControlOperation::Query, .Entries = {{std::string(arguments.front()), {}}}};
+	CVarControlResult result = executor(std::move(request));
+	return FormatControlResult(std::move(result));
 }
 
 ConsoleCommandResult ExecuteConsoleSetCVar(const CVarControlExecutor& executor, std::span<const std::string_view> arguments)
@@ -49,7 +53,11 @@ ConsoleCommandResult ExecuteConsoleSetCVar(const CVarControlExecutor& executor, 
 	{
 		return ConsoleCommandResult::Error("CVar control owner is unavailable.");
 	}
-	return FormatControlResult(executor({.Operation = CVarControlOperation::Set, .Entries = {{std::string(arguments.front()), Strings::Join(arguments, " ", 1)}}}));
+	std::string name(arguments.front());
+	std::string value = Strings::Join(arguments, " ", 1);
+	CVarControlRequest request{.Operation = CVarControlOperation::Set, .Entries = {{std::move(name), std::move(value)}}};
+	CVarControlResult result = executor(std::move(request));
+	return FormatControlResult(std::move(result));
 }
 
 static ConsoleCommandResult FormatControlResult(CVarControlResult result)

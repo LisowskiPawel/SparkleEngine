@@ -100,7 +100,8 @@ void TaskDispatch::State::Close() noexcept
 		CurrentPhase = Phase::Running;
 	}
 
-	Finish(Execution->Cancellation.stop_requested() ? std::move(Cancelled) : TaskResult::Success());
+	TaskResult result = Execution->Cancellation.stop_requested() ? std::move(Cancelled) : TaskResult::Success();
+	Finish(std::move(result));
 }
 
 void TaskDispatch::State::Execute() noexcept
@@ -165,8 +166,11 @@ void TaskDispatch::State::Finish(TaskResult result) noexcept
 	Function = {};
 	Context = {};
 
-	Completion.Status = result.Failed() ? TaskExecutionStatus::Failed : result.WasCancelled() ? TaskExecutionStatus::Cancelled : TaskExecutionStatus::Succeeded;
-	if (!result.Failed())
+	const bool bFailed = result.Failed();
+	const bool bCancelled = !bFailed && result.WasCancelled();
+	const TaskExecutionStatus nonFailureStatus = bCancelled ? TaskExecutionStatus::Cancelled : TaskExecutionStatus::Succeeded;
+	Completion.Status = bFailed ? TaskExecutionStatus::Failed : nonFailureStatus;
+	if (!bFailed)
 	{
 		Completion.FirstFailureTaskName.clear();
 	}

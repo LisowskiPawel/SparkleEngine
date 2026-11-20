@@ -146,8 +146,9 @@ namespace PathLighting
 		for (uint bounceIndex = 0u; bounceIndex < sanitizedBounceCount; ++bounceIndex)
 		{
 			const PathSampling::RandomSamples randomSamples = PathSampling::GenerateRandomSamples(pixelCoord, bounceIndex, sampleIndex, randomFrameIndex);
-
-			const PathSample::DirectionSample sample = PathSampling::SampleBSDF(surface, randomSamples, bounceIndex != 0u || bEvaluatePrimaryDiffuse, bounceIndex != 0u || bEvaluatePrimarySpecular);
+			const bool bEvaluateDiffuse = bounceIndex != 0u || bEvaluatePrimaryDiffuse;
+			const bool bEvaluateSpecular = bounceIndex != 0u || bEvaluatePrimarySpecular;
+			const PathSample::DirectionSample sample = PathSampling::SampleBSDF(surface, randomSamples, bEvaluateDiffuse, bEvaluateSpecular);
 
 			if (!sample.bHasSupport)
 			{

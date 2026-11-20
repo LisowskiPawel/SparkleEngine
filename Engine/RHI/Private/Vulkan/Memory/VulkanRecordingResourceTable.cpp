@@ -48,8 +48,8 @@ VulkanRecordingResourceTable::~VulkanRecordingResourceTable() noexcept = default
 
 void VulkanRecordingResourceTable::Publish(std::span<VulkanGpuAllocationRecord* const> records) noexcept
 {
-	std::shared_ptr<ReadView> readView = BuildReadView(records);
-	m_readView.store(std::shared_ptr<const ReadView>(std::move(readView)), std::memory_order_release);
+	std::shared_ptr<const ReadView> readView = BuildReadView(records);
+	m_readView.store(std::move(readView), std::memory_order_release);
 }
 
 bool VulkanRecordingResourceTable::Resolve(RhiResourceHandle resource, VulkanRecordingResource& outResource) const noexcept
@@ -197,10 +197,9 @@ const VulkanRecordingResourceTable::ResourceEntry* VulkanRecordingResourceTable:
 const VulkanRecordingResourceTable::ResourceEntry* VulkanRecordingResourceTable::FindExactAddress(const ReadView& readView, RhiGpuVirtualAddress address) noexcept
 {
 	const auto found = std::ranges::lower_bound(readView.ResourcesByExactAddress, address, {}, &AddressEntry::LookupAddress);
-
-	return found != readView.ResourcesByExactAddress.end() && found->LookupAddress == address && found->ResourceIndex < readView.ResourcesByHandle.size()
-	    ? &readView.ResourcesByHandle[found->ResourceIndex]
-	    : nullptr;
+	const bool bExactAddressFound = found != readView.ResourcesByExactAddress.end() && found->LookupAddress == address;
+	const bool bResourceIndexValid = bExactAddressFound && found->ResourceIndex < readView.ResourcesByHandle.size();
+	return bResourceIndexValid ? &readView.ResourcesByHandle[found->ResourceIndex] : nullptr;
 }
 
 const VulkanRecordingResourceTable::ResourceEntry* VulkanRecordingResourceTable::FindBufferAddress(const ReadView& readView, RhiGpuVirtualAddress address) noexcept

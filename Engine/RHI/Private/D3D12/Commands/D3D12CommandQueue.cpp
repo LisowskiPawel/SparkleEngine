@@ -203,11 +203,14 @@ void D3D12CommandQueue::WaitForSubmission(std::uint64_t submissionValue) noexcep
 #endif
 		const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - waitStart);
 
-		Diagnostics::Fatal(
-		    D3D12CommandQueuePolicy::Logger,
-		    __FILE__,
-		    __LINE__,
-		    std::format("D3D12 {} queue CPU wait failed for submission {} after {} ms (wait result 0x{:08X}).", RhiQueueTypeToString(m_queueType), submissionValue, elapsed.count(), waitResult));
+		const auto failureMessage = std::format(
+		    "D3D12 {} queue CPU wait failed for submission {} after {} ms (wait result 0x{:08X}).",
+		    RhiQueueTypeToString(m_queueType),
+		    submissionValue,
+		    elapsed.count(),
+		    waitResult);
+
+		Diagnostics::Fatal(D3D12CommandQueuePolicy::Logger, __FILE__, __LINE__, failureMessage);
 	}
 }
 

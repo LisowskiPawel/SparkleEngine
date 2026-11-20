@@ -42,14 +42,16 @@ namespace Filesystem
 
 	std::optional<std::filesystem::path> FindProcessAncestorWithMarker(std::string_view marker)
 	{
-		if (const auto executableRoot = FindAncestorWithMarker(GetExecutableDirectory(), marker))
+		const auto executableDirectory = GetExecutableDirectory();
+		if (const auto executableRoot = FindAncestorWithMarker(executableDirectory, marker))
 		{
 			return Paths::Normalize(*executableRoot);
 		}
 
 		std::error_code errorCode;
 		{
-			const auto workingRoot = FindAncestorWithMarker(std::filesystem::current_path(errorCode), marker);
+			const auto workingDirectory = std::filesystem::current_path(errorCode);
+			const auto workingRoot = FindAncestorWithMarker(workingDirectory, marker);
 
 			if (workingRoot && !errorCode)
 			{

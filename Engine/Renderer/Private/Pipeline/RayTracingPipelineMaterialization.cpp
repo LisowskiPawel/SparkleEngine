@@ -76,7 +76,8 @@ std::vector<RhiRayTracingShaderExportDesc> RayTracingPipelineRuntime::ResolveSha
 	for (ShaderTypeId selection : selections)
 	{
 		const ShaderRegistrationDesc& registration = GetRegistration(selection);
-		m_shaders.push_back(ResolvedShader::Resolve(map, library, selection, target));
+		const ResolvedShader shader = ResolvedShader::Resolve(map, library, selection, target);
+		m_shaders.push_back(shader);
 		exports.push_back(RhiRayTracingShaderExportDesc{.Shader = &m_shaders.back(), .ExportName = registration.EntryPoint});
 		PipelineMaterialization::ValidateShaderCapabilities(renderHardwareInterface, registration.ShaderName, m_shaders.back());
 	}

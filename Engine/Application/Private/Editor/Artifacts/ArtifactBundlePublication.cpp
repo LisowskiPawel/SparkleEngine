@@ -89,7 +89,8 @@ namespace ArtifactBundlePublication
 
 	static std::filesystem::path NativeArtifactPath(const std::filesystem::path& path)
 	{
-		std::wstring nativePath = std::filesystem::absolute(path).lexically_normal().native();
+		const auto absolutePath = std::filesystem::absolute(path);
+		std::wstring nativePath = absolutePath.lexically_normal().native();
 		if (!nativePath.starts_with(L"\\\\?\\"))
 		{
 			const bool bUncPath = nativePath.starts_with(L"\\\\");
@@ -100,9 +101,11 @@ namespace ArtifactBundlePublication
 
 	static std::filesystem::path PreparePublicationDirectory(const ArtifactBundlePublicationRequest& request, std::uintmax_t bytes)
 	{
-		const auto root = std::filesystem::weakly_canonical(NativeArtifactPath(request.AllowedRoot));
+		const auto nativeRoot = NativeArtifactPath(request.AllowedRoot);
+		const auto root = std::filesystem::weakly_canonical(nativeRoot);
 		std::filesystem::create_directories(root);
-		const auto directory = std::filesystem::weakly_canonical(NativeArtifactPath(request.PublicationDirectory));
+		const auto nativeDirectory = NativeArtifactPath(request.PublicationDirectory);
+		const auto directory = std::filesystem::weakly_canonical(nativeDirectory);
 		const bool bContained = directory != root && Paths::IsUnderRoot(directory, root);
 		if (!bContained || std::filesystem::exists(directory))
 		{
@@ -179,11 +182,13 @@ namespace ArtifactBundlePublication
 			if (&file != &completion)
 			{
 				CheckCancellation(token);
-				receipts.push_back(WriteVerifiedFile(staging, file));
+				ArtifactBundlePublishedFile receipt = WriteVerifiedFile(staging, file);
+				receipts.push_back(std::move(receipt));
 			}
 		}
 		CheckCancellation(token);
-		receipts.push_back(WriteVerifiedFile(staging, completion));
+		ArtifactBundlePublishedFile completionReceipt = WriteVerifiedFile(staging, completion);
+		receipts.push_back(std::move(completionReceipt));
 		return receipts;
 	}
 }

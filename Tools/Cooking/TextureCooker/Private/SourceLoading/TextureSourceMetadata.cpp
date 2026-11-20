@@ -3,6 +3,7 @@
 #include "SourceLoading/TextureSource.h"
 #include "Processing/TextureProcessor.h"
 #include "TextureCookRequestList.h"
+#include "Textures/CookedTextureAsset.h"
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <algorithm>
@@ -21,6 +22,7 @@ namespace TextureSourceAdmission
 			case DXGI_FORMAT_R8G8B8A8_UNORM:
 			case DXGI_FORMAT_B8G8R8A8_UNORM:
 			case DXGI_FORMAT_R16G16B16A16_UNORM:
+			case DXGI_FORMAT_R16G16B16A16_FLOAT:
 			case DXGI_FORMAT_R32G32B32A32_FLOAT:
 			case DXGI_FORMAT_BC1_UNORM:
 			case DXGI_FORMAT_BC2_UNORM:
@@ -39,9 +41,9 @@ namespace TextureSourceAdmission
 
 	void ValidateMetadata(const TexMetadata& metadata, const TextureCookRequest& request)
 	{
-		const bool bDimensionsInRange = metadata.width > 0 && metadata.width <= 16384;
-		const bool bHeightInRange = metadata.height > 0 && metadata.height <= 16384;
-		const bool bLayersInRange = metadata.arraySize > 0 && metadata.arraySize <= 2048;
+		const bool bDimensionsInRange = metadata.width > 0 && metadata.width <= kMaximumCookedTextureDimension;
+		const bool bHeightInRange = metadata.height > 0 && metadata.height <= kMaximumCookedTextureDimension;
+		const bool bLayersInRange = metadata.arraySize > 0 && metadata.arraySize <= kMaximumCookedTextureArraySize;
 		if (!bDimensionsInRange || !bHeightInRange || !bLayersInRange || metadata.dimension != TEX_DIMENSION_TEXTURE2D || metadata.depth != 1)
 		{
 			throw Diagnostics::Error("Texture metadata exceeds supported 2D/array dimensions.");
@@ -90,7 +92,8 @@ std::size_t MeasureTextureProcessingMemory(const TexMetadata& metadata, std::siz
 		texels += static_cast<std::uint64_t>(width) * height * metadata.arraySize;
 		std::size_t row = 0;
 		std::size_t slice = 0;
-		CheckTextureOperation(ComputePitch(metadata.format, width, height, row, slice), "measure source subresource");
+		const auto result = ComputePitch(metadata.format, width, height, row, slice);
+		CheckTextureOperation(result, "measure source subresource");
 		nativeBytes += slice * metadata.arraySize;
 		width = std::max<std::size_t>(1, width / 2);
 		height = std::max<std::size_t>(1, height / 2);

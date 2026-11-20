@@ -4,6 +4,9 @@
 #include "Shaders/ShaderMapRanges.h"
 #include "Core/Public/Diagnostics/Error.h"
 
+#include <span>
+#include <string_view>
+
 using ShaderMapRanges::ContainsRange;
 using ShaderMapRanges::ContainsString;
 
@@ -61,7 +64,8 @@ static void ValidateReflectedInputs(std::span<const CookedShaderInputElementReco
 {
 	for (const CookedShaderInputElementRecord& input : inputs)
 	{
-		if (!ContainsRange(strings.size(), input.SemanticOffsetInBytes, input.SemanticSizeInBytes) || input.SemanticSizeInBytes == 0)
+		const bool bSemanticInRange = ContainsRange(strings.size(), input.SemanticOffsetInBytes, input.SemanticSizeInBytes);
+		if (!bSemanticInRange || input.SemanticSizeInBytes == 0)
 		{
 			throw Diagnostics::Error("Global shader map contains an invalid reflected input element.");
 		}
@@ -72,7 +76,8 @@ static void ValidateReflectedSpecializationConstants(std::span<const CookedShade
 {
 	for (const CookedShaderSpecializationConstantRecord& value : specializationConstants)
 	{
-		if (!ContainsRange(strings.size(), value.NameOffsetInBytes, value.NameSizeInBytes) || value.NameSizeInBytes == 0)
+		const bool bNameInRange = ContainsRange(strings.size(), value.NameOffsetInBytes, value.NameSizeInBytes);
+		if (!bNameInRange || value.NameSizeInBytes == 0)
 		{
 			throw Diagnostics::Error("Global shader map contains an invalid reflected specialization constant.");
 		}
@@ -102,10 +107,14 @@ static void ValidateReflection(
 		throw Diagnostics::Error("Global shader map contains an out-of-range reflection record.");
 	}
 
-	ValidateReflectedResources(reflection, resources.subspan(reflection.ResourceBindingOffset, reflection.ResourceBindingCount), strings);
-	ValidateReflectedConstantBuffers(constantBuffers.subspan(reflection.ConstantBufferOffset, reflection.ConstantBufferCount), constantBufferMembers, strings);
-	ValidateReflectedInputs(inputs.subspan(reflection.InputElementOffset, reflection.InputElementCount), strings);
-	ValidateReflectedSpecializationConstants(specializationConstants.subspan(reflection.SpecializationConstantOffset, reflection.SpecializationConstantCount), strings);
+	const auto reflectedResources = resources.subspan(reflection.ResourceBindingOffset, reflection.ResourceBindingCount);
+	ValidateReflectedResources(reflection, reflectedResources, strings);
+	const auto reflectedConstantBuffers = constantBuffers.subspan(reflection.ConstantBufferOffset, reflection.ConstantBufferCount);
+	ValidateReflectedConstantBuffers(reflectedConstantBuffers, constantBufferMembers, strings);
+	const auto reflectedInputs = inputs.subspan(reflection.InputElementOffset, reflection.InputElementCount);
+	ValidateReflectedInputs(reflectedInputs, strings);
+	const auto reflectedSpecializationConstants = specializationConstants.subspan(reflection.SpecializationConstantOffset, reflection.SpecializationConstantCount);
+	ValidateReflectedSpecializationConstants(reflectedSpecializationConstants, strings);
 }
 
 static void ValidateEntryKey(const GlobalShaderMapEntry& entry, const GlobalShaderMapEntry* previous)
@@ -178,7 +187,8 @@ void GlobalShaderMap::ValidateEntryMetadata(const GlobalShaderMapEntry& entry) c
 		throw Diagnostics::Error("Global shader map entry contains an out-of-range metadata reference.");
 	}
 
-	const ShaderTypeId resolvedShaderType = BuildShaderTypeId(ResolveString(entry.ShaderName));
+	const std::string_view shaderName = ResolveString(entry.ShaderName);
+	const ShaderTypeId resolvedShaderType = BuildShaderTypeId(shaderName);
 	const bool bShaderTypeMatches = resolvedShaderType == entry.ShaderType;
 	const bool bCodegenTargetMatches = bShaderTypeMatches && ResolveString(entry.CodegenTarget) == GetShaderTargetName(entry.Target);
 
@@ -197,7 +207,9 @@ void GlobalShaderMap::ValidateEntryMetadata(const GlobalShaderMapEntry& entry) c
 	    m_specializationConstants,
 	    m_stringTable);
 
-	for (const ShaderMapBindingRecord& binding : std::span<const ShaderMapBindingRecord>(m_bindingRecords).subspan(entry.BindingRecordOffset, entry.BindingRecordCount))
+	const std::span<const ShaderMapBindingRecord> bindingRecords(m_bindingRecords);
+	const auto entryBindings = bindingRecords.subspan(entry.BindingRecordOffset, entry.BindingRecordCount);
+	for (const ShaderMapBindingRecord& binding : entryBindings)
 	{
 		if (!ContainsString(m_stringTable, binding.Name) || !binding.Name.IsValid() || binding.ArrayCount == 0)
 		{

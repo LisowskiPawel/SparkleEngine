@@ -91,23 +91,26 @@ void EditorSceneModel::RebuildEntries()
 	for (std::size_t index = 0; index < cameras.size(); ++index)
 	{
 		const auto& camera = cameras[index];
-		m_cameraEntries.push_back({camera.Name.empty() ? "Camera " + std::to_string(index + 1) : camera.Name, "Camera", SceneObjectSelection::Camera(camera.Entity), camera.bVisible});
+		std::string label = camera.Name.empty() ? "Camera " + std::to_string(index + 1) : camera.Name;
+		const SceneObjectSelection selection = SceneObjectSelection::Camera(camera.Entity);
+		m_cameraEntries.push_back({std::move(label), "Camera", selection, camera.bVisible});
 	}
 	for (std::size_t index = 0; index < lights.size(); ++index)
 	{
 		const auto& light = lights[index];
-
-		m_lightEntries.push_back(
-		    {SceneObjectPresentation::BuildLightLabel(light.Description, index),
-		        SceneObjectPresentation::GetLightTypeLabel(light.Description.GetKind()),
-		        SceneObjectSelection::Light(light.Entity),
-		        light.Description.common.bVisible,
-		        light.Description.GetKind()});
+		std::string label = SceneObjectPresentation::BuildLightLabel(light.Description, index);
+		const SceneLightKind kind = light.Description.GetKind();
+		const char* typeLabel = SceneObjectPresentation::GetLightTypeLabel(kind);
+		const SceneObjectSelection selection = SceneObjectSelection::Light(light.Entity);
+		m_lightEntries.push_back({std::move(label), typeLabel, selection, light.Description.common.bVisible, kind});
 	}
 	for (std::size_t index = 0; index < meshes.size(); ++index)
 	{
 		const auto& mesh = meshes[index];
-		m_meshEntries.push_back({"Mesh " + std::to_string(index + 1), mesh.Kind == SceneMeshKind::Skeletal ? "Skeletal Mesh" : "Static Mesh", SceneObjectSelection::Mesh(mesh.Entity), mesh.bVisible});
+		std::string label = "Mesh " + std::to_string(index + 1);
+		const char* typeLabel = mesh.Kind == SceneMeshKind::Skeletal ? "Skeletal Mesh" : "Static Mesh";
+		const SceneObjectSelection selection = SceneObjectSelection::Mesh(mesh.Entity);
+		m_meshEntries.push_back({std::move(label), typeLabel, selection, mesh.bVisible});
 	}
 	m_skyEntry = {sky ? "Sky" : "Sky (Engine Default)", "Sky", SceneObjectSelection::Sky(), !sky || sky->bEnabled};
 }

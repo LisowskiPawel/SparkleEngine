@@ -31,9 +31,11 @@ namespace ECS
 
 		Transform transform(entry.desc.position, {entry.desc.pitchRadians, entry.desc.yawRadians, 0.0f});
 		const LocalTransform local = WorldTransformConversion::ToLocal(transform);
+		const Camera camera = ToCameraData(entry.desc, 16.0f / 9.0f, bActive);
 
-		const bool bTransformsAdded = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{});
-		const bool bCameraAdded = bTransformsAdded && (m_registry.Add(entity, ToCameraData(entry.desc, 16.0f / 9.0f, bActive)));
+		const bool bLocalAdded = m_registry.Add(entity, local);
+		const bool bTransformsAdded = bLocalAdded && m_registry.Add(entity, WorldTransform{});
+		const bool bCameraAdded = bTransformsAdded && m_registry.Add(entity, camera);
 		const bool bDerivedStateAdded = bCameraAdded && (m_registry.Add(entity, CameraDerivedState{}));
 		const bool bVisibilityAdded = bDerivedStateAdded && (m_registry.Add(entity, Visibility{}));
 		const bool bNameAdded = bVisibilityAdded && (m_registry.Add(entity, Name{std::move(entry.name)}));
@@ -129,7 +131,12 @@ namespace ECS
 			return false;
 		}
 		Transform transform(desc.position, {desc.pitchRadians, desc.yawRadians, 0.0f});
-		const bool bWritten = WriteTransform(entity, transform) && m_registry.Replace(entity, ToCameraData(desc, existing->AspectRatio, existing->bActive));
+		if (!WriteTransform(entity, transform))
+		{
+			return false;
+		}
+		const Camera camera = ToCameraData(desc, existing->AspectRatio, existing->bActive);
+		const bool bWritten = m_registry.Replace(entity, camera);
 		if (bWritten)
 		{
 			RecordChange(entity);

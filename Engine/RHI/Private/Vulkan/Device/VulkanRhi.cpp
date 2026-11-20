@@ -55,7 +55,8 @@ void VulkanRhi::WaitForIdle() noexcept
 		VulkanGpuCrash::ObserveLoss(*this, ERhiQueueType::Graphics, result);
 		if (result == VK_ERROR_DEVICE_LOST)
 		{
-			Diagnostics::Fatal(g_vulkanRhiLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkDeviceWaitIdle", result));
+			const auto failureMessage = VulkanResult::FormatFailure("vkDeviceWaitIdle", result);
+			Diagnostics::Fatal(g_vulkanRhiLogger, __FILE__, __LINE__, failureMessage);
 		}
 #endif
 		if (!VulkanResult::Succeeded(result))

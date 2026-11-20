@@ -96,6 +96,7 @@ private:
 		std::optional<LoadedTextureData> Decoded;
 		std::optional<RendererTexture> Uploaded;
 		RhiResourceHandle UploadedResource;
+		std::uint64_t DecodeReservationBytes = 0;
 		bool bLoadStarted = false;
 		bool bUploadSubmitted = false;
 		bool bWanted = true;
@@ -121,8 +122,10 @@ private:
 	std::vector<RhiResourceHandle> LoadSceneTextures(RenderCommandList& commandList);
 	bool HasPendingSceneTextureUploads() const noexcept;
 	void RequestTexture(const ResolvedTexturePath& source, std::uint32_t generation);
+	void CancelRequest(TextureRequest& request) noexcept;
 	void LaunchPendingRequests();
 	void ConsumeCompletedRequests() noexcept;
+	void ValidateSceneTextureCapacity() const noexcept;
 	void UploadReadyTextures(RenderCommandList& commandList, std::vector<RhiResourceHandle>& uploadedResources);
 	TextureRequest* FindRequest(const TextureKey& cacheKey, std::uint32_t generation) noexcept;
 	const TextureRequest* FindRequest(const TextureKey& cacheKey, std::uint32_t generation) const noexcept;

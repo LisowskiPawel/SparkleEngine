@@ -14,6 +14,7 @@
 #include "Passes/Visualization/GpuSceneVisualization.h"
 
 #include <cstdint>
+#include <utility>
 
 static auto& BuildGBufferRasterParameters(FrameGraphBuilder& builder, const RenderFrame& frame, const RenderFrameGraphResources& resources)
 {
@@ -66,5 +67,6 @@ void AddRasterizedGBufferMeshPass(FrameGraphBuilder& builder, const RenderFrame&
 {
 	const RasterPassRenderState renderState = CreateGBufferRasterState();
 	auto& parameters = BuildGBufferRasterParameters(builder, frame, resources);
-	builder.Draw<GBufferVS, GBufferPS>(parameters, renderState, GBufferMeshPass(gpuMeshCache, frame.PreparedScene, frame.View));
+	GBufferMeshPass meshPass(gpuMeshCache, frame.PreparedScene, frame.View);
+	builder.Draw<GBufferVS, GBufferPS>(parameters, renderState, std::move(meshPass));
 }

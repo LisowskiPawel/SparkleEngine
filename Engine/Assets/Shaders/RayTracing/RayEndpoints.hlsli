@@ -18,10 +18,15 @@ namespace RayEndpoints
 
 	float3 TransformPosition(float3 position, row_major float4x4 transform)
 	{
+		precise float3 yzContribution;
+		yzContribution.x = mad(position.y, transform._21, position.z * transform._31);
+		yzContribution.y = mad(position.y, transform._22, position.z * transform._32);
+		yzContribution.z = mad(position.y, transform._23, position.z * transform._33);
+
 		precise float3 result;
-		result.x = transform._41 + mad(position.x, transform._11, mad(position.y, transform._21, position.z * transform._31));
-		result.y = transform._42 + mad(position.x, transform._12, mad(position.y, transform._22, position.z * transform._32));
-		result.z = transform._43 + mad(position.x, transform._13, mad(position.y, transform._23, position.z * transform._33));
+		result.x = transform._41 + mad(position.x, transform._11, yzContribution.x);
+		result.y = transform._42 + mad(position.x, transform._12, yzContribution.y);
+		result.z = transform._43 + mad(position.x, transform._13, yzContribution.z);
 		return result;
 	}
 
@@ -46,10 +51,14 @@ namespace RayEndpoints
 		const float3 transformedNormal = mul(normalObject, (float3x3)mesh.WorldInverseTranspose);
 		const float inverseNormalLength = rsqrt(dot(transformedNormal, transformedNormal));
 		const float3 normalWorld = transformedNormal * inverseNormalLength;
+		const float worldOffset = dot(abs(normalWorld), worldError);
+		const float objectOffset = inverseNormalLength * dot(abs(normalObject), objectError);
+		const float4 objectNormalMagnitude = float4(abs(normalObject), 0.0f);
+		const float4 traversalProjection = mul(abs(mesh.WorldInverseMatrix), objectNormalMagnitude);
 
 		SurfaceEndpointError result;
-		result.BaseOffset = dot(abs(normalWorld), worldError) + inverseNormalLength * dot(abs(normalObject), objectError);
-		result.TraversalSensitivity = TransformError * inverseNormalLength * mul(abs(mesh.WorldInverseMatrix), float4(abs(normalObject), 0.0f));
+		result.BaseOffset = worldOffset + objectOffset;
+		result.TraversalSensitivity = TransformError * inverseNormalLength * traversalProjection;
 		return result;
 	}
 
@@ -81,7 +90,9 @@ namespace RayEndpoints
 		const float3 semanticDirection = normalize(targetPosition - position);
 		const float3 source = OffsetSurface(position, geometricNormal, errorBound, semanticDirection);
 		precise float3 direction = targetPosition - source;
-		const float targetError = targetBaseOffset + dot(float4(abs(source) + abs(direction), 1.0f), targetTraversalSensitivity);
+		const float3 targetPositionMagnitude = abs(source) + abs(direction);
+		const float traversalError = dot(float4(targetPositionMagnitude, 1.0f), targetTraversalSensitivity);
+		const float targetError = targetBaseOffset + traversalError;
 		const float targetSide = dot(-direction, targetGeometricNormal) >= 0.0f ? 1.0f : -1.0f;
 		direction = mad(targetSide * targetError, targetGeometricNormal, direction);
 		RayDesc ray;

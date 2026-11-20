@@ -110,11 +110,13 @@ namespace SparkleLauncher
 #if SPARKLE_ENABLE_CONTENT_PIPELINE
 		if (IncludesCookScope(plan, CookWorkspaceScope::Textures))
 		{
-			AddStep(steps, "cook-textures", "Cook textures", MakeAssetCookerRequest(plan, "cook-textures", "CookTextures.txt"));
+			auto request = MakeAssetCookerRequest(plan, "cook-textures", "CookTextures.txt");
+			AddStep(steps, "cook-textures", "Cook textures", std::move(request));
 		}
 		if (IncludesCookScope(plan, CookWorkspaceScope::SceneAssets))
 		{
-			AddStep(steps, "cook-scene-assets", "Cook meshes", MakeAssetCookerRequest(plan, "cook-assets", "CookSceneAssets.txt"));
+			auto request = MakeAssetCookerRequest(plan, "cook-assets", "CookSceneAssets.txt");
+			AddStep(steps, "cook-scene-assets", "Cook meshes", std::move(request));
 		}
 #endif
 		return steps;

@@ -7,6 +7,7 @@
 #include "Core/Public/Strings/StringUtils.h"
 
 #include <system_error>
+#include <utility>
 
 namespace Filesystem
 {
@@ -17,15 +18,17 @@ namespace Filesystem
 
 	std::string InferProjectNameFromExecutableStem(std::string executableStem)
 	{
-		const bool bExecutableHasEditorSuffix = executableStem.size() > std::string_view("Editor").size() && PathFormatting::EndsWithIgnoreCase(executableStem, "Editor");
+		constexpr std::string_view editorSuffix = "Editor";
+		constexpr std::string_view gameSuffix = "Game";
+		const bool bExecutableHasEditorSuffix = executableStem.size() > editorSuffix.size() && PathFormatting::EndsWithIgnoreCase(executableStem, editorSuffix);
 
 		if (bExecutableHasEditorSuffix)
 		{
-			executableStem.resize(executableStem.size() - std::string_view("Editor").size());
+			executableStem.resize(executableStem.size() - editorSuffix.size());
 		}
-		else if (executableStem.size() > std::string_view("Game").size() && PathFormatting::EndsWithIgnoreCase(executableStem, "Game"))
+		else if (executableStem.size() > gameSuffix.size() && PathFormatting::EndsWithIgnoreCase(executableStem, gameSuffix))
 		{
-			executableStem.resize(executableStem.size() - std::string_view("Game").size());
+			executableStem.resize(executableStem.size() - gameSuffix.size());
 		}
 
 		return executableStem;
@@ -40,8 +43,9 @@ namespace Filesystem
 		}
 
 		const std::filesystem::path projectsRoot = *workspaceRoot / "Projects";
-		const std::string executableStem = InferProjectNameFromExecutableStem(GetExecutableStem());
-		if (executableStem.empty())
+		std::string executableStem = GetExecutableStem();
+		const std::string projectName = InferProjectNameFromExecutableStem(std::move(executableStem));
+		if (projectName.empty())
 		{
 			return std::nullopt;
 		}
@@ -67,7 +71,8 @@ namespace Filesystem
 				continue;
 			}
 
-			if (Strings::EqualsIgnoreCase(projectRoot.filename().string(), executableStem))
+			const std::string directoryName = projectRoot.filename().string();
+			if (Strings::EqualsIgnoreCase(directoryName, projectName))
 			{
 				return Paths::Normalize(projectRoot);
 			}

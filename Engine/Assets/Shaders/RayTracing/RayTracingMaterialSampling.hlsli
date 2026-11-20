@@ -38,7 +38,9 @@ bool ResolveRayTracingCandidateAlpha(uint instanceId, uint primitiveIndex, float
 		return false;
 	}
 
-	return PassesRayTracingMaterialAlpha(hitTriangle.Material, InterpolateRayTracingHitTexCoord0(hitTriangle), InterpolateRayTracingHitColor(hitTriangle));
+	const float2 texCoord0 = InterpolateRayTracingHitTexCoord0(hitTriangle);
+	const float4 vertexColor = InterpolateRayTracingHitColor(hitTriangle);
+	return PassesRayTracingMaterialAlpha(hitTriangle.Material, texCoord0, vertexColor);
 }
 
 struct RayTracingMaterialSample
@@ -82,7 +84,8 @@ void ApplyRayTracingMaterialNormal(RayTracingHitMaterial material, float2 uv, in
 	if (MaterialTextures::HasTexture(material.TextureFlags, MaterialTextures::TextureSlotNormal))
 	{
 		const MaterialTextureMappingData mapping = material.TextureMappings[MaterialTextures::TextureSlotNormal];
-		normalTangent = DecodeBc5TangentNormal(SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotNormal, uv).rg, mapping.Strength);
+		const float3 sampledNormal = SampleRayTracingMaterialTexture(material, MaterialTextures::TextureSlotNormal, uv).rgb;
+		normalTangent = DecodeTangentNormal(sampledNormal, mapping.Strength, material.TextureFlags);
 	}
 }
 

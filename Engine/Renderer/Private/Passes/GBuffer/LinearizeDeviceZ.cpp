@@ -15,8 +15,8 @@ void AddLinearizeDeviceZPass(FrameGraphBuilder& builder, const RenderFrame& fram
 	parameters->SceneDepth = builder.CreateUAV(resources.Transient.Scene.SceneDepth);
 	parameters->ViewCamera = frame.View.cameraUniform;
 
-	builder.Dispatch<SceneDepthCS>(
-	    parameters,
-	    ComputeDispatchDesc{MathUtils::DivideRoundUp(sceneExtent.Width, 8u), MathUtils::DivideRoundUp(sceneExtent.Height, 8u), 1u},
-	    EFrameGraphQueuePreference::AsyncCompute);
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(sceneExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(sceneExtent.Height, 8u);
+
+	builder.Dispatch<SceneDepthCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u}, EFrameGraphQueuePreference::AsyncCompute);
 }

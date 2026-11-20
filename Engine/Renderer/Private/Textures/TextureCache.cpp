@@ -35,7 +35,8 @@ TextureCache::TextureCache(
     m_textureFactory(resourceService, descriptorService, uploadService),
     m_submissions(submissions),
     m_taskExecutor(taskExecutor),
-    m_taskScope(std::make_unique<TaskScope>(TaskScopeDesc{TaskScopeKind::AssetGeneration, "Renderer texture generations"}, &parentScope))
+    m_taskScope(std::make_unique<TaskScope>(TaskScopeDesc{TaskScopeKind::AssetGeneration, "Renderer texture generations"}, &parentScope)),
+    m_residency(AssetResidencyBudget{.MaximumPendingUploadBytes = 512ull * 1024ull * 1024ull})
 {
 }
 
@@ -150,11 +151,7 @@ void TextureCache::UnloadSceneTextures() noexcept
 	const std::uint64_t nextBindingRevision = m_bindingRevision + 1u;
 	for (TextureRequest& request : m_requests)
 	{
-		request.bWanted = false;
-		if (!request.Execution.IsValid())
-		{
-			(void) m_residency.Cancel(request.Generation);
-		}
+		CancelRequest(request);
 	}
 
 	for (auto texture = m_pathTextures.begin(); texture != m_pathTextures.end();)
@@ -177,8 +174,7 @@ void TextureCache::UnloadAll() noexcept
 	const bool bHadActiveTextures = !m_pathTextures.empty() || !m_defaultTextures.empty();
 	for (TextureRequest& request : m_requests)
 	{
-		request.bWanted = false;
-		(void) m_residency.Cancel(request.Generation);
+		CancelRequest(request);
 		if (request.Uploaded)
 		{
 			m_textureFactory.Release(*request.Uploaded);

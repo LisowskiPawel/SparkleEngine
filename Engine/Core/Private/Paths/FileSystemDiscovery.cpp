@@ -64,7 +64,9 @@ namespace Filesystem
 
 		std::error_code errorCode;
 		const std::filesystem::path workingDirectory = std::filesystem::current_path(errorCode);
-		return !workingDirectory.empty() && !errorCode ? Paths::Normalize(workingDirectory) : Paths::Normalize(GetExecutableDirectory());
+		const bool bWorkingDirectoryAvailable = !workingDirectory.empty() && !errorCode;
+		const auto root = bWorkingDirectoryAvailable ? workingDirectory : GetExecutableDirectory();
+		return Paths::Normalize(root);
 	}
 
 }

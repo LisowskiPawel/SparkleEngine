@@ -35,7 +35,8 @@ template <typename TEvent> void InputSystem::State::ProcessEvent(const TEvent& e
 	}
 
 	UpdateStateFromEvent(GlobalState, event);
-	UpdateStateFromEvent(GetRoutedState(targetLayer), event);
+	InputState& targetState = GetRoutedState(targetLayer);
+	UpdateStateFromEvent(targetState, event);
 
 	// Queue before user code so nested cancellation removes this event as well.
 	Dispatcher.QueueDeferred(event, targetLayer);

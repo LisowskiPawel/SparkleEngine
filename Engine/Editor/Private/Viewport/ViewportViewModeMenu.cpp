@@ -69,8 +69,12 @@ std::optional<RenderViewMode> DrawViewportViewModeMenu(RenderViewMode currentVie
 	ImGui::BeginDisabled(bDisableInteraction);
 	const ViewModePresentation& currentPresentation = DescribeViewMode(currentViewMode);
 	const std::string previewLabel = EditorIcons::MakeIconLabel(currentPresentation.Icon, currentPresentation.Label);
-	const float previewWidth = ImGui::CalcTextSize(previewLabel.c_str()).x + ImGui::GetFrameHeight() + ImGui::GetStyle().FramePadding.x * 2.0f;
-	ImGui::SetNextItemWidth((std::clamp) (previewWidth, 100.0f, bCompact ? 145.0f : 260.0f));
+	const float labelWidth = ImGui::CalcTextSize(previewLabel.c_str()).x;
+	const float frameHeight = ImGui::GetFrameHeight();
+	const float horizontalPadding = ImGui::GetStyle().FramePadding.x * 2.0f;
+	const float previewWidth = labelWidth + frameHeight + horizontalPadding;
+	const float controlWidth = (std::clamp) (previewWidth, 100.0f, bCompact ? 145.0f : 260.0f);
+	ImGui::SetNextItemWidth(controlWidth);
 	const EditorWidgets::MenuStyleScope menuStyle;
 	if (ImGui::BeginCombo("##ViewportViewMode", previewLabel.c_str()))
 	{
@@ -89,7 +93,8 @@ std::optional<RenderViewMode> DrawViewportViewModeMenu(RenderViewMode currentVie
 			{
 				if (std::string_view(option.Category) == category)
 				{
-					childWidth = (std::max) (childWidth, EditorWidgets::MeasureMenuRow(option.Label, EditorWidgets::MenuRowKind::Toggle));
+					const float rowWidth = EditorWidgets::MeasureMenuRow(option.Label, EditorWidgets::MenuRowKind::Toggle);
+					childWidth = (std::max) (childWidth, rowWidth);
 				}
 			}
 			if (EditorWidgets::BeginMenu(category, EditorIcons::EditorIcon::ViewMode, childWidth))

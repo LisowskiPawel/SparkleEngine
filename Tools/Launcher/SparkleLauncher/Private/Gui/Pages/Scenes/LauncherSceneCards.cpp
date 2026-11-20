@@ -124,7 +124,8 @@ namespace SparkleLauncher
 		LauncherArtworkSpec artworkSpec;
 		artworkSpec.BaseColor = QColor("#0b0d0c");
 		artworkSpec.AspectRatio = 16.0 / 10.0;
-		LauncherArtworkWidget* artwork = new LauncherArtworkWidget(LoadMapArtwork(level), artworkSpec, QSize(640, 400), card);
+		auto thumbnail = LoadMapArtwork(level);
+		LauncherArtworkWidget* artwork = new LauncherArtworkWidget(std::move(thumbnail), artworkSpec, QSize(640, 400), card);
 		artwork->setObjectName("MapCardThumbnail");
 		artwork->setMinimumWidth(160);
 		cardLayout->addWidget(artwork, 2);
@@ -223,10 +224,12 @@ namespace SparkleLauncher
 		const bool bSyncAvailableCanSync = bSyncAvailableSourceReady && (level.bCanSync);
 		const bool bSyncAvailable = bSyncAvailableCanSync && (level.bGameSupported);
 		const bool bExplainBlocker = !level.bGameSupported || !level.bCanSelect;
-		button.setProperty("ActionIntent", bPreparing ? QStringLiteral("none") : bSyncAvailable ? QStringLiteral("sync") : bExplainBlocker ? QStringLiteral("details") : QStringLiteral("run"));
+		const QString actionIntent = bPreparing ? QStringLiteral("none") : bSyncAvailable ? QStringLiteral("sync") : bExplainBlocker ? QStringLiteral("details") : QStringLiteral("run");
+		button.setProperty("ActionIntent", actionIntent);
 		const bool bEditorMode = m_settings.RunMode() != QStringLiteral("game");
 		const QString actionName = bEditorMode ? QStringLiteral("Open") : QStringLiteral("Run");
-		button.setText(bPreparing ? QStringLiteral("Opening...") : bSyncAvailable ? QStringLiteral("Sync") : bExplainBlocker ? QStringLiteral("Details") : actionName);
+		const QString actionText = bPreparing ? QStringLiteral("Opening...") : bSyncAvailable ? QStringLiteral("Sync") : bExplainBlocker ? QStringLiteral("Details") : actionName;
+		button.setText(actionText);
 
 		button.setAccessibleName(
 		    bPreparing            ? QStringLiteral("Opening ") + level.DisplayName

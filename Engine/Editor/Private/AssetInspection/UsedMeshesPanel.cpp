@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include <imgui.h>
@@ -122,6 +123,11 @@ void UsedMeshesPanel::DrawToolbar()
 	    static_cast<unsigned int>(m_snapshot.GeometryInstancing.SingleInstanceBatchCount),
 	    static_cast<unsigned int>(m_snapshot.GeometryInstancing.EstimatedGBufferDrawCallsSaved));
 
+	const std::uint64_t gpuBytes = MeshDiagnosticsPresentation::SumGpuBytes(m_snapshot);
+	const std::uint64_t cpuBytes = MeshDiagnosticsPresentation::SumCpuBytes(m_snapshot);
+	const std::string gpuMemory = PanelDiagnosticsFormatting::FormatByteSize(gpuBytes);
+	const std::string cpuMemory = PanelDiagnosticsFormatting::FormatByteSize(cpuBytes);
+
 	ImGui::TextDisabled(
 	    "instances/batch %u..%u, rejected %u (gpu %u, material %u, group %u, incompatible %u), GPU %s, CPU %s estimated",
 	    static_cast<unsigned int>(m_snapshot.GeometryInstancing.MinInstancesPerBatch),
@@ -131,8 +137,8 @@ void UsedMeshesPanel::DrawToolbar()
 	    static_cast<unsigned int>(m_snapshot.GeometryInstancing.RejectedInvalidMaterialCount),
 	    static_cast<unsigned int>(m_snapshot.GeometryInstancing.RejectedInvalidInstanceGroupCount),
 	    static_cast<unsigned int>(m_snapshot.GeometryInstancing.RejectedIncompatibleGroupCount),
-	    PanelDiagnosticsFormatting::FormatByteSize(MeshDiagnosticsPresentation::SumGpuBytes(m_snapshot)).c_str(),
-	    PanelDiagnosticsFormatting::FormatByteSize(MeshDiagnosticsPresentation::SumCpuBytes(m_snapshot)).c_str());
+	    gpuMemory.c_str(),
+	    cpuMemory.c_str());
 }
 
 void UsedMeshesPanel::DrawMeshTable(bool bDisableInteraction)
@@ -293,7 +299,13 @@ bool UsedMeshesPanel::MatchesFilter(const MeshDiagnosticsRow& row) const
 	const std::string material = MeshDiagnosticsPresentation::FormatMaterial(row);
 	const std::string memory = MeshDiagnosticsPresentation::FormatMemorySummary(row);
 
-	return Strings::ContainsIgnoreCase(displayName, filter) || Strings::ContainsIgnoreCase(sourcePath, filter) || Strings::ContainsIgnoreCase(meshAssetId, filter)
-	    || Strings::ContainsIgnoreCase(meshRuntimeId, filter) || Strings::ContainsIgnoreCase(gpuRuntimeId, filter) || Strings::ContainsIgnoreCase(material, filter)
-	    || Strings::ContainsIgnoreCase(memory, filter);
+	const std::string_view searchFields[] = {displayName, sourcePath, meshAssetId, meshRuntimeId, gpuRuntimeId, material, memory};
+	for (const std::string_view field : searchFields)
+	{
+		if (Strings::ContainsIgnoreCase(field, filter))
+		{
+			return true;
+		}
+	}
+	return false;
 }

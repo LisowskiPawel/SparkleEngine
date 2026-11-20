@@ -85,16 +85,20 @@ public:
 		const aiVector3D up(source.mUp.x, source.mUp.y, -source.mUp.z);
 		WorldPose pose;
 
-		pose.Transform = kind == ImportedLightKind::Point ? AssimpNodeTransformConverter::BuildNodeAttachedTranslation(node, position)
-		                                                  : AssimpNodeTransformConverter::BuildNodeAttachedOrientation(node, position, localDirection, up);
-
+		if (kind == ImportedLightKind::Point)
+		{
+			pose.Transform = AssimpNodeTransformConverter::BuildNodeAttachedTranslation(node, position);
+		}
+		else
+		{
+			pose.Transform = AssimpNodeTransformConverter::BuildNodeAttachedOrientation(node, position, localDirection, up);
+		}
 		const DirectX::XMMATRIX lightWorld = DirectX::XMLoadFloat4x4(&pose.Transform);
 
-		const DirectX::XMVECTOR direction = DirectX::XMVector3TransformNormal(
-		    DirectX::XMVectorSet(WorldCoordinates::kForwardX, WorldCoordinates::kForwardY, WorldCoordinates::kForwardZ, 0.0f),
-		    lightWorld);
-
-		const DirectX::XMVECTOR tangent = DirectX::XMVector3TransformNormal(DirectX::XMVectorSet(WorldCoordinates::kRightX, WorldCoordinates::kRightY, WorldCoordinates::kRightZ, 0.0f), lightWorld);
+		const auto forwardAxis = DirectX::XMVectorSet(WorldCoordinates::kForwardX, WorldCoordinates::kForwardY, WorldCoordinates::kForwardZ, 0.0f);
+		const auto rightAxis = DirectX::XMVectorSet(WorldCoordinates::kRightX, WorldCoordinates::kRightY, WorldCoordinates::kRightZ, 0.0f);
+		const DirectX::XMVECTOR direction = DirectX::XMVector3TransformNormal(forwardAxis, lightWorld);
+		const DirectX::XMVECTOR tangent = DirectX::XMVector3TransformNormal(rightAxis, lightWorld);
 		DirectX::XMStoreFloat3(&pose.Direction, DirectX::XMVector3Normalize(direction));
 		DirectX::XMStoreFloat3(&pose.Tangent, DirectX::XMVector3Normalize(tangent));
 		return pose;

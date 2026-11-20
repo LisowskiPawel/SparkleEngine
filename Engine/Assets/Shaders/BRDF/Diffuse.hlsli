@@ -36,7 +36,9 @@ namespace BRDF
 			const float sinThetaV = sqrt(max(0.0f, 1.0f - NoV * NoV));
 			const float sinThetaL = sqrt(max(0.0f, 1.0f - NoL * NoL));
 			const float sinAlpha = max(sinThetaV, sinThetaL);
-			const float tanBeta = min(sinThetaV / max(NoV, EPSILON), sinThetaL / max(NoL, EPSILON));
+			const float tanThetaV = sinThetaV / max(NoV, EPSILON);
+			const float tanThetaL = sinThetaL / max(NoL, EPSILON);
+			const float tanBeta = min(tanThetaV, tanThetaL);
 
 			return albedo * INV_PI * (A + B * cosPhiDiff * sinAlpha * tanBeta);
 		}
@@ -49,10 +51,14 @@ namespace BRDF
 			const float FL = 1.0f + (f90 - 1.0f) * Pow5(1.0f - NoL);
 
 			const float Fd90 = f90;
-			const float Fd = lerp(1.0f, Fd90, FL) * lerp(1.0f, Fd90, FV);
+			const float lightDiffuseScatter = lerp(1.0f, Fd90, FL);
+			const float viewDiffuseScatter = lerp(1.0f, Fd90, FV);
+			const float Fd = lightDiffuseScatter * viewDiffuseScatter;
 
 			const float Fss90 = roughness * LoH * LoH;
-			const float Fss = lerp(1.0f, Fss90, FL) * lerp(1.0f, Fss90, FV);
+			const float lightSubsurfaceScatter = lerp(1.0f, Fss90, FL);
+			const float viewSubsurfaceScatter = lerp(1.0f, Fss90, FV);
+			const float Fss = lightSubsurfaceScatter * viewSubsurfaceScatter;
 			const float ss = 1.25f * (Fss * (1.0f / max(NoL + NoV, EPSILON) - 0.5f) + 0.5f);
 
 			return albedo * INV_PI * lerp(Fd, ss, saturate(roughness));

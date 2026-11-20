@@ -117,7 +117,8 @@ namespace RenderPassRuntimeStorage
 			std::ranges::sort(requestedKeys, [](const GraphicsPipelineKey* left, const GraphicsPipelineKey* right) { return GraphicsPipelineKeyHash{}(*left) < GraphicsPipelineKeyHash{}(*right); });
 			for (const GraphicsPipelineKey* key : requestedKeys)
 			{
-				replacement->MaterializePipeline(renderHardwareInterface, replacement->BuildKey(key->Request));
+				const GraphicsPipelineKey replacementKey = replacement->BuildKey(key->Request);
+				replacement->MaterializePipeline(renderHardwareInterface, replacementKey);
 			}
 			return replacement;
 		}
@@ -159,7 +160,8 @@ namespace RenderPassRuntimeStorage
 			debugName += L"_GraphicsKey_";
 			debugName += std::to_wstring(keyHash);
 			const GraphicsPipelineDesc desc = BuildGraphicsPipelineDesc(key.Request, *m_storage.BindingLayout, m_storage.Shaders[0], m_storage.Shaders[1], debugName.c_str());
-			m_pipelines.emplace(key, PipelineMaterialization::CreateGraphicsPipeline(renderHardwareInterface, desc));
+			auto pipeline = PipelineMaterialization::CreateGraphicsPipeline(renderHardwareInterface, desc);
+			m_pipelines.emplace(key, std::move(pipeline));
 		}
 
 		RenderPassShaderRuntimeStorage m_storage;

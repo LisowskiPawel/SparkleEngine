@@ -5,6 +5,7 @@
 
 #include "Assets/Cooked/LoadedSkeletonAsset.h"
 #include "Assets/Loaders/SkeletonAssetLoader.h"
+#include "Assets/Loaders/CookedAssetAllocationBudget.h"
 #include "Assets/Loaders/CookedAssetFileSet.h"
 #include "Core/Public/Formatting/HexFormat.h"
 #include "Core/Public/Paths/CookedAssetPaths.h"
@@ -12,21 +13,25 @@
 
 #include <filesystem>
 #include <format>
+#include <utility>
 
 namespace Assets
 {
 	void SceneAssetPayloadSkeletonAppender::AppendSkeletons(const LoadedSceneManifest& sceneManifest, CookedAssetFileSet& files, SceneAssetPayload& sceneAssetPayload)
 	{
-		files.GetAllocationBudget().ReserveArray<SkeletonResource>(sceneManifest.skeletonRefs.size());
+		CookedAssetAllocationBudget& budget = files.GetAllocationBudget();
+		budget.ReserveArray<SkeletonResource>(sceneManifest.skeletonRefs.size());
 		sceneAssetPayload.skeletons.reserve(sceneAssetPayload.skeletons.size() + sceneManifest.skeletonRefs.size());
 
 		for (const CookedSceneSkeletonRef& skeletonRef : sceneManifest.skeletonRefs)
 		{
 			const std::filesystem::path skeletonAssetPath = Paths::CookedSkeletonAsset(skeletonRef.skeletonAssetId);
-			const LoadedSkeletonAsset skeletonAsset = SkeletonAssetLoader::Decode(files.Get(skeletonAssetPath), files.GetAllocationBudget());
-			files.GetAllocationBudget().ReserveArray<SkeletonJoint>(skeletonAsset.joints.size());
-			files.GetAllocationBudget().Reserve(skeletonAsset.joints.size(), sizeof(CookedSkeletonJointRecord{}.name));
-			sceneAssetPayload.skeletons.push_back(BuildSceneAssetSkeleton(skeletonAsset, skeletonRef.skeletonAssetId, skeletonRef.sourceSkinIndex));
+			const auto bytes = files.Get(skeletonAssetPath);
+			const LoadedSkeletonAsset skeletonAsset = SkeletonAssetLoader::Decode(bytes, budget);
+			budget.ReserveArray<SkeletonJoint>(skeletonAsset.joints.size());
+			budget.Reserve(skeletonAsset.joints.size(), sizeof(CookedSkeletonJointRecord{}.name));
+			SkeletonResource skeleton = BuildSceneAssetSkeleton(skeletonAsset, skeletonRef.skeletonAssetId, skeletonRef.sourceSkinIndex);
+			sceneAssetPayload.skeletons.push_back(std::move(skeleton));
 			files.Release(skeletonAssetPath);
 		}
 	}

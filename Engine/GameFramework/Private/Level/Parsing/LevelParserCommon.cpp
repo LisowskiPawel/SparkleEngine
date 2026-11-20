@@ -45,7 +45,9 @@ namespace LevelParsing
 		std::array<float, componentCount> values{};
 		for (float& component : values)
 		{
-			if (!std::getline(stream, segment, ',') || !TryParseFloatValue(segment, component))
+			const bool bReadComponent = static_cast<bool>(std::getline(stream, segment, ','));
+			const bool bParsedComponent = bReadComponent && TryParseFloatValue(segment, component);
+			if (!bParsedComponent)
 			{
 				return false;
 			}

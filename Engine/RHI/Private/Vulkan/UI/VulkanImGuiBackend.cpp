@@ -72,15 +72,10 @@ void VulkanImGuiBackend::InitializeRendererBackend(ImGuiContext* previousContext
 	{
 		if (result != VK_SUCCESS)
 		{
-			SPDLOG_LOGGER_ERROR(g_vulkanImGuiBackendLogger, "{}", VulkanResult::FormatFailure("ImGui Vulkan backend", result));
+			const std::string failureMessage = VulkanResult::FormatFailure("ImGui Vulkan backend", result);
+			SPDLOG_LOGGER_ERROR(g_vulkanImGuiBackendLogger, "{}", failureMessage);
 		}
 	};
-
-	if (initInfo.Instance == VK_NULL_HANDLE || initInfo.PhysicalDevice == VK_NULL_HANDLE || initInfo.Device == VK_NULL_HANDLE || initInfo.Queue == VK_NULL_HANDLE || initInfo.QueueFamily == UINT32_MAX)
-	{
-		RestoreImGuiContext(previousContext);
-		Diagnostics::Fatal(g_vulkanImGuiBackendLogger, __FILE__, __LINE__, "Cannot initialize ImGui with incomplete Vulkan device state.");
-	}
 
 	if (!ImGui_ImplVulkan_Init(&initInfo))
 	{
@@ -114,10 +109,10 @@ void VulkanImGuiBackend::CreateTextureSampler(ImGuiContext* previousContext)
 	const VkResult samplerResult = vkCreateSampler(m_rhi.GetDevice(), &samplerInfo, nullptr, &m_imguiSampler);
 	if (!VulkanResult::Succeeded(samplerResult) || m_imguiSampler == VK_NULL_HANDLE)
 	{
-		SPDLOG_LOGGER_ERROR(g_vulkanImGuiBackendLogger, "{}", VulkanResult::FormatFailure("vkCreateSampler", samplerResult));
+		const std::string failureMessage = VulkanResult::FormatFailure("vkCreateSampler", samplerResult);
 		ImGui_ImplVulkan_Shutdown();
 		RestoreImGuiContext(previousContext);
-		Diagnostics::Fatal(g_vulkanImGuiBackendLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateSampler", samplerResult));
+		Diagnostics::Fatal(g_vulkanImGuiBackendLogger, __FILE__, __LINE__, failureMessage);
 	}
 }
 

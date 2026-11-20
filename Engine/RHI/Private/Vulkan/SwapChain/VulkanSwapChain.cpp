@@ -69,7 +69,8 @@ bool VulkanSwapChain::AcquireNextImage(std::uint32_t frameIndex) noexcept
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	VulkanGpuCrash::ObserveLoss(m_rhi, ERhiQueueType::Graphics, result);
 #endif
-	Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkAcquireNextImageKHR", result));
+	const auto failureMessage = VulkanResult::FormatFailure("vkAcquireNextImageKHR", result);
+	Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, failureMessage);
 	return false;
 }
 
@@ -100,7 +101,8 @@ bool VulkanSwapChain::Present(VkSemaphore renderFinishedSemaphore) noexcept
 	}
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkQueuePresentKHR", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkQueuePresentKHR", result);
+		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, failureMessage);
 	}
 	if (m_bVsyncEnabled != CVarVSync.Get())
 	{
@@ -189,7 +191,8 @@ void VulkanSwapChain::CreateSurface()
 	const VkResult result = vkCreateWin32SurfaceKHR(m_rhi.GetInstance(), &createInfo, nullptr, &m_surface);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateWin32SurfaceKHR", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkCreateWin32SurfaceKHR", result);
+		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	VkBool32 supportsPresent = VK_FALSE;
@@ -206,7 +209,8 @@ void VulkanSwapChain::CreateSwapChain(VkSwapchainKHR oldSwapChain)
 	VkResult result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_rhi.GetPhysicalDevice(), m_surface, &capabilities);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkGetPhysicalDeviceSurfaceCapabilitiesKHR", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkGetPhysicalDeviceSurfaceCapabilitiesKHR", result);
+		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	m_surfaceFormat = SelectSurfaceFormat();
@@ -239,7 +243,8 @@ void VulkanSwapChain::CreateSwapChain(VkSwapchainKHR oldSwapChain)
 	result = vkCreateSwapchainKHR(m_rhi.GetDevice(), &createInfo, nullptr, &m_swapChain);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateSwapchainKHR", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkCreateSwapchainKHR", result);
+		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, failureMessage);
 	}
 }
 
@@ -249,14 +254,16 @@ void VulkanSwapChain::CreateBackBufferImageViews()
 	VkResult result = vkGetSwapchainImagesKHR(m_rhi.GetDevice(), m_swapChain, &imageCount, nullptr);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkGetSwapchainImagesKHR", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkGetSwapchainImagesKHR", result);
+		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	std::vector<VkImage> images(imageCount);
 	result = vkGetSwapchainImagesKHR(m_rhi.GetDevice(), m_swapChain, &imageCount, images.data());
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkGetSwapchainImagesKHR", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkGetSwapchainImagesKHR", result);
+		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	m_backBuffers.clear();
@@ -268,7 +275,8 @@ void VulkanSwapChain::CreateBackBufferImageViews()
 		const VkResult semaphoreResult = vkCreateSemaphore(m_rhi.GetDevice(), &semaphoreInfo, nullptr, &record.RenderFinishedSemaphore);
 		if (!VulkanResult::Succeeded(semaphoreResult))
 		{
-			Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateSemaphore", semaphoreResult));
+			const auto failureMessage = VulkanResult::FormatFailure("vkCreateSemaphore", semaphoreResult);
+			Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, failureMessage);
 		}
 		m_backBuffers.push_back(record);
 	}
@@ -283,7 +291,8 @@ void VulkanSwapChain::CreatePresentationSemaphores()
 		const VkResult result = vkCreateSemaphore(m_rhi.GetDevice(), &createInfo, nullptr, &semaphore);
 		if (!VulkanResult::Succeeded(result))
 		{
-			Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateSemaphore(imageAvailable)", result));
+			const auto failureMessage = VulkanResult::FormatFailure("vkCreateSemaphore(imageAvailable)", result);
+			Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, failureMessage);
 		}
 	}
 }
@@ -347,7 +356,8 @@ VkSurfaceFormatKHR VulkanSwapChain::SelectSurfaceFormat() const
 	result = vkGetPhysicalDeviceSurfaceFormatsKHR(m_rhi.GetPhysicalDevice(), m_surface, &formatCount, formats.data());
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkGetPhysicalDeviceSurfaceFormatsKHR", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkGetPhysicalDeviceSurfaceFormatsKHR", result);
+		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	const VkFormat requestedFormat = VulkanTypeConversions::ToVkFormat(m_backBufferFormat);
@@ -362,7 +372,8 @@ VkSurfaceFormatKHR VulkanSwapChain::SelectSurfaceFormat() const
 		return *requestedIt;
 	}
 
-	Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, std::format("Requested Vulkan present format '{}' is not supported by the surface.", PixelFormatName(m_backBufferFormat)));
+	const auto failureMessage = std::format("Requested Vulkan present format '{}' is not supported by the surface.", PixelFormatName(m_backBufferFormat));
+	Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, failureMessage);
 }
 
 VkPresentModeKHR VulkanSwapChain::SelectPresentMode(bool bVsyncEnabled) const
@@ -383,7 +394,8 @@ VkPresentModeKHR VulkanSwapChain::SelectPresentMode(bool bVsyncEnabled) const
 	result = vkGetPhysicalDeviceSurfacePresentModesKHR(m_rhi.GetPhysicalDevice(), m_surface, &presentModeCount, presentModes.data());
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkGetPhysicalDeviceSurfacePresentModesKHR", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkGetPhysicalDeviceSurfacePresentModesKHR", result);
+		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	if (std::find(presentModes.begin(), presentModes.end(), VK_PRESENT_MODE_IMMEDIATE_KHR) != presentModes.end())
@@ -411,15 +423,13 @@ std::uint32_t VulkanSwapChain::SelectImageCount(const VkSurfaceCapabilitiesKHR& 
 	const std::uint32_t imageCount = m_configuredBackBufferCount;
 	if (imageCount < capabilities.minImageCount || (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount))
 	{
-		Diagnostics::Fatal(
-		    g_vulkanSwapChainLogger,
-		    __FILE__,
-		    __LINE__,
-		    std::format(
-		        "Vulkan surface image-count range [{}, {}] does not include the configured count {}.",
-		        capabilities.minImageCount,
-		        capabilities.maxImageCount == 0 ? std::numeric_limits<std::uint32_t>::max() : capabilities.maxImageCount,
-		        imageCount));
+		const auto failureMessage = std::format(
+		    "Vulkan surface image-count range [{}, {}] does not include the configured count {}.",
+		    capabilities.minImageCount,
+		    capabilities.maxImageCount == 0 ? std::numeric_limits<std::uint32_t>::max() : capabilities.maxImageCount,
+		    imageCount);
+
+		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, failureMessage);
 	}
 	return imageCount;
 }
@@ -440,7 +450,8 @@ VkImageView VulkanSwapChain::CreateImageView(VkImage image, VkFormat format) con
 	const VkResult result = vkCreateImageView(m_rhi.GetDevice(), &createInfo, nullptr, &imageView);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateImageView", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkCreateImageView", result);
+		Diagnostics::Fatal(g_vulkanSwapChainLogger, __FILE__, __LINE__, failureMessage);
 	}
 	return imageView;
 }

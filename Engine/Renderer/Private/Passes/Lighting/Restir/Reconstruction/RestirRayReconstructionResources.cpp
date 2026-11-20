@@ -25,8 +25,8 @@ void CreateRayReconstructionGuideRenderTargets(FrameGraphBuilder& builder, Rende
 
 RayReconstructionPassResources CreateRestirRayReconstructionResources(FrameGraphBuilder& builder, RenderViewportExtent renderExtent, const RenderFrameGraphResources& resources)
 {
-	const FrameGraphTextureHandle denoisedSceneColor = builder.CreateTexture(
-	    FrameGraphTextureDesc::CreateColor("DenoisedSceneColor", renderExtent.Width, renderExtent.Height, RenderFrameGraphFormats::SceneColor));
+	const FrameGraphTextureDesc denoisedSceneColorDesc = FrameGraphTextureDesc::CreateColor("DenoisedSceneColor", renderExtent.Width, renderExtent.Height, RenderFrameGraphFormats::SceneColor);
+	const FrameGraphTextureHandle denoisedSceneColor = builder.CreateTexture(denoisedSceneColorDesc);
 
 	return RayReconstructionPassResources{
 	    .NoisyInputColor = resources.Transient.Scene.SceneColor,

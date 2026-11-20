@@ -38,7 +38,9 @@ namespace ECS
 			{
 				return false;
 			}
-			const bool bAdded = std::get<ComponentStorage<T>>(m_components).Add(entity, std::move(component));
+
+			ComponentStorage<T>& storage = std::get<ComponentStorage<T>>(m_components);
+			const bool bAdded = storage.Add(entity, std::move(component));
 			if (bAdded)
 			{
 				AdvanceStructureVersion();
@@ -48,7 +50,14 @@ namespace ECS
 
 		template <ComponentStorageCompatible T> bool Replace(EntityId entity, T component)
 		{
-			return CanMutateStructure() && IsAlive(entity) && std::get<ComponentStorage<T>>(m_components).Replace(entity, std::move(component));
+			const bool bCanReplace = CanMutateStructure() && IsAlive(entity);
+			if (!bCanReplace)
+			{
+				return false;
+			}
+
+			ComponentStorage<T>& storage = std::get<ComponentStorage<T>>(m_components);
+			return storage.Replace(entity, std::move(component));
 		}
 
 		template <ComponentStorageCompatible T> const T* Get(EntityId entity) const noexcept { return IsAlive(entity) ? GetStorage<T>().Get(entity) : nullptr; }

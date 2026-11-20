@@ -21,13 +21,22 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 	}
 
 	const int3 pixel = int3(dispatchThreadId.xy, 0);
-	if (SceneDepthUtils::IsSkyDeviceZ(GBufferDeviceZ.Load(pixel).r))
+	const float deviceZ = GBufferDeviceZ.Load(pixel).r;
+	if (SceneDepthUtils::IsSkyDeviceZ(deviceZ))
 	{
 		return;
 	}
 
-	float3 lit = max(GBufferEmissive.Load(pixel).rgb, 0.0f);
-	lit += DirectDiffuse.Load(pixel).rgb + DirectSpecular.Load(pixel).rgb + DirectSubsurface.Load(pixel).rgb;
-	lit += IndirectDiffuse.Load(pixel).rgb + IndirectSpecular.Load(pixel).rgb;
-	SceneColor[dispatchThreadId.xy] = float4(lit, GBufferBaseColor.Load(pixel).a);
+	const float3 emissive = GBufferEmissive.Load(pixel).rgb;
+	const float3 directDiffuse = DirectDiffuse.Load(pixel).rgb;
+	const float3 directSpecular = DirectSpecular.Load(pixel).rgb;
+	const float3 directSubsurface = DirectSubsurface.Load(pixel).rgb;
+	const float3 indirectDiffuse = IndirectDiffuse.Load(pixel).rgb;
+	const float3 indirectSpecular = IndirectSpecular.Load(pixel).rgb;
+	const float alpha = GBufferBaseColor.Load(pixel).a;
+
+	float3 lit = max(emissive, 0.0f);
+	lit += directDiffuse + directSpecular + directSubsurface;
+	lit += indirectDiffuse + indirectSpecular;
+	SceneColor[dispatchThreadId.xy] = float4(lit, alpha);
 }

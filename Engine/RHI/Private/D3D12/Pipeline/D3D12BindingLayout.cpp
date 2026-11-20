@@ -55,7 +55,8 @@ static void CompileUniformBinding(
 		{
 			assert((bindingRecord.ValueSizeInBytes % sizeof(std::uint32_t)) == 0);
 
-			const std::uint32_t bindingIndex = builder.AddRootConstants(bindingRecord.ValueSizeInBytes / static_cast<std::uint32_t>(sizeof(std::uint32_t)), shaderRegister, registerSpace, visibility);
+			const std::uint32_t pushConstantCount = bindingRecord.ValueSizeInBytes / static_cast<std::uint32_t>(sizeof(std::uint32_t));
+			const std::uint32_t bindingIndex = builder.AddRootConstants(pushConstantCount, shaderRegister, registerSpace, visibility);
 
 			bindings.push_back(
 			    CompiledBinding{
@@ -65,7 +66,7 @@ static void CompileUniformBinding(
 			        .BindingIndex = bindingIndex,
 			        .BindingPoint = RhiBindingPoint{.Set = registerSpace, .Binding = shaderRegister},
 			        .VisibilityMask = reflectedLocation.VisibilityMask,
-			        .PushConstantCount = bindingRecord.ValueSizeInBytes / static_cast<std::uint32_t>(sizeof(std::uint32_t))});
+			        .PushConstantCount = pushConstantCount});
 
 			continue;
 		}
@@ -248,5 +249,6 @@ std::unique_ptr<D3D12BindingLayout> CompileD3D12BindingLayout(D3D12Rhi& rhi, con
 
 	CompileParameterBindings(builder, bindings, bindingNames, desc);
 
-	return std::make_unique<D3D12BindingLayout>(*desc.ParameterLayout, builder.Build(rhi, desc.DebugName), std::move(bindings), std::move(bindingNames));
+	auto rootSignature = builder.Build(rhi, desc.DebugName);
+	return std::make_unique<D3D12BindingLayout>(*desc.ParameterLayout, std::move(rootSignature), std::move(bindings), std::move(bindingNames));
 }

@@ -181,14 +181,16 @@ bool VulkanCaptureService::RecordReadbackCopy(PendingReadback& pending) noexcept
 
 bool VulkanCaptureService::SubmitReadback(PendingReadback& pending) noexcept
 {
-	pending.Submission = m_rhi.GetCommandQueue(ERhiQueueType::Graphics).Submit(VulkanQueueSubmission{.CommandBuffers = std::span<const VkCommandBuffer>(&pending.CommandBuffer, 1)});
+	const VulkanQueueSubmission submission{.CommandBuffers = std::span<const VkCommandBuffer>(&pending.CommandBuffer, 1)};
+	pending.Submission = m_rhi.GetCommandQueue(ERhiQueueType::Graphics).Submit(submission);
 	return pending.Submission.IsValid();
 }
 
 void VulkanCaptureService::ReadPixels(PendingReadback& pending, RhiCaptureReadback& readback) noexcept
 {
 	void* mappedData = nullptr;
-	if (vkMapMemory(pending.Device, pending.Memory, 0, pending.ByteCount, 0, &mappedData) != VK_SUCCESS || mappedData == nullptr)
+	const VkResult mapResult = vkMapMemory(pending.Device, pending.Memory, 0, pending.ByteCount, 0, &mappedData);
+	if (mapResult != VK_SUCCESS || mappedData == nullptr)
 	{
 		readback.Result = RhiCaptureResult{
 		    .Status = ERhiCaptureStatus::Failed,

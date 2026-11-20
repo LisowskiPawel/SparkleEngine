@@ -81,13 +81,16 @@ DirectX::XMFLOAT4X4 AssimpNodeTransformConverter::BuildNodeAttachedOrientation(c
 	}
 
 	DirectX::XMVECTOR determinant;
-	const DirectX::XMMATRIX localWorld = DirectX::XMMatrixInverse(&determinant, DirectX::XMMatrixLookToLH(localPosition, localDirection, localUp));
+	const DirectX::XMMATRIX localView = DirectX::XMMatrixLookToLH(localPosition, localDirection, localUp);
+	const DirectX::XMMATRIX localWorld = DirectX::XMMatrixInverse(&determinant, localView);
 	if (std::abs(DirectX::XMVectorGetX(determinant)) <= 1.0e-8f)
 	{
 		throw Diagnostics::Error("FBX node attachment orientation is singular.");
 	}
 
-	const DirectX::XMMATRIX worldTransform = localWorld * ConvertAssimpMatrixToEngine(ComputeNodeWorldTransform(node));
+	const auto assimpNodeWorld = ComputeNodeWorldTransform(node);
+	const auto nodeWorld = ConvertAssimpMatrixToEngine(assimpNodeWorld);
+	const DirectX::XMMATRIX worldTransform = localWorld * nodeWorld;
 	DirectX::XMFLOAT4X4 result;
 	DirectX::XMStoreFloat4x4(&result, worldTransform);
 	return result;

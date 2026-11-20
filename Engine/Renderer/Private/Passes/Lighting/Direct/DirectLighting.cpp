@@ -36,5 +36,8 @@ void AddDirectLightingPass(FrameGraphBuilder& builder, const RenderFrame& frame,
 	parameters->DirectLightingEvaluateSubsurface = IsDirectSubsurfaceActive(gbuffer.Subsurface, lighting.DirectSubsurface) ? 1u : 0u;
 	parameters->DirectLightingEvaluateShadows = IsDirectShadowsActive() ? 1u : 0u;
 
-	builder.Dispatch<DirectLightingCS>(parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(sceneExtent.Width, 8u), MathUtils::DivideRoundUp(sceneExtent.Height, 8u), 1u});
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(sceneExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(sceneExtent.Height, 8u);
+
+	builder.Dispatch<DirectLightingCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u});
 }

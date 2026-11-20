@@ -6,6 +6,7 @@
 #include "Tasks/Public/TaskExecutionContext.h"
 
 #include <format>
+#include <utility>
 
 namespace Assets
 {
@@ -17,13 +18,23 @@ namespace Assets
 		decodedNodes.reserve(state->Assets.size());
 		for (std::size_t index = 0; index < state->Assets.size(); ++index)
 		{
-			const TaskNodeHandle read = graph.Add(
-			    TaskDesc{std::string(std::format("Read scene asset {}", index)), TaskLane::BlockingIo},
-			    [state, index](TaskExecutionContext& context) { return state->ReadAsset(index, context); });
+			TaskDesc readTask{std::format("Read scene asset {}", index), TaskLane::BlockingIo};
 
-			const TaskNodeHandle decode = graph.Add(
-			    TaskDesc{std::string(std::format("Decode scene asset {}", index)), TaskLane::Background},
-			    [state, index](TaskExecutionContext& context) { return state->DecodeAsset(index, context); });
+			auto readAsset = [state, index](TaskExecutionContext& context)
+			{
+				return state->ReadAsset(index, context);
+			};
+
+			const TaskNodeHandle read = graph.Add(std::move(readTask), std::move(readAsset));
+
+			TaskDesc decodeTask{std::format("Decode scene asset {}", index), TaskLane::Background};
+
+			auto decodeAsset = [state, index](TaskExecutionContext& context)
+			{
+				return state->DecodeAsset(index, context);
+			};
+
+			const TaskNodeHandle decode = graph.Add(std::move(decodeTask), std::move(decodeAsset));
 
 			graph.DependsOn(decode, read);
 			if (index >= MaximumSceneAssetsInFlight)

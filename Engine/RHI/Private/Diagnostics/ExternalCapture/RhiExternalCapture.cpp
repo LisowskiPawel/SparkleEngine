@@ -115,7 +115,9 @@ static std::filesystem::path CreateCaptureArtifactPath(std::uint64_t requestId, 
 		return {};
 	}
 
-	return root / std::format("capture-{}-{}-{}", GetCurrentProcessId(), std::chrono::system_clock::now().time_since_epoch().count(), requestId);
+	const auto timestamp = std::chrono::system_clock::now().time_since_epoch().count();
+	const std::string captureName = std::format("capture-{}-{}-{}", GetCurrentProcessId(), timestamp, requestId);
+	return root / captureName;
 }
 
 RhiExternalCapture::RhiExternalCapture(ERhiBackendApi api, ExternalCaptureProvider provider) :

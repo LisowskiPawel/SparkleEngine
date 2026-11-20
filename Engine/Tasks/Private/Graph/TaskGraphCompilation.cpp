@@ -90,15 +90,18 @@ private:
 		for (std::uint32_t taskIndex = 0; taskIndex < graph.Nodes.size(); ++taskIndex)
 		{
 			const TaskGraphNode& node = graph.Nodes[taskIndex];
+			const std::uint32_t bodyEvent = BodyEvent(taskIndex);
+			const std::uint32_t completionEvent = CompletionEvent(taskIndex);
 			// Body completion precedes logical completion, which also waits for nested children.
-			adjacency[BodyEvent(taskIndex)].push_back(CompletionEvent(taskIndex));
+			adjacency[bodyEvent].push_back(completionEvent);
 			for (const std::uint32_t prerequisiteIndex : node.Prerequisites)
 			{
 				if (!ValidatePrerequisiteLane(graph, taskIndex, prerequisiteIndex))
 				{
 					return false;
 				}
-				adjacency[CompletionEvent(prerequisiteIndex)].push_back(BodyEvent(taskIndex));
+				const std::uint32_t prerequisiteCompletionEvent = CompletionEvent(prerequisiteIndex);
+				adjacency[prerequisiteCompletionEvent].push_back(bodyEvent);
 			}
 
 			if (!ValidateNestedLane(graph, taskIndex))
@@ -107,8 +110,10 @@ private:
 			}
 			if (node.Parent.has_value())
 			{
-				adjacency[BodyEvent(*node.Parent)].push_back(BodyEvent(taskIndex));
-				adjacency[CompletionEvent(taskIndex)].push_back(CompletionEvent(*node.Parent));
+				const std::uint32_t parentBodyEvent = BodyEvent(*node.Parent);
+				const std::uint32_t parentCompletionEvent = CompletionEvent(*node.Parent);
+				adjacency[parentBodyEvent].push_back(bodyEvent);
+				adjacency[completionEvent].push_back(parentCompletionEvent);
 			}
 		}
 		return true;
@@ -136,7 +141,9 @@ private:
 		}
 
 		const TaskGraphNode& parent = graph.Nodes[*node.Parent];
-		if (node.Desc.Lane == parent.Desc.Lane || (node.Desc.Lane != TaskLane::FrameCritical && parent.Desc.Lane != TaskLane::FrameCritical))
+		const bool bFrameCriticalTask = node.Desc.Lane == TaskLane::FrameCritical;
+		const bool bFrameCriticalParent = parent.Desc.Lane == TaskLane::FrameCritical;
+		if (bFrameCriticalTask == bFrameCriticalParent)
 		{
 			return true;
 		}

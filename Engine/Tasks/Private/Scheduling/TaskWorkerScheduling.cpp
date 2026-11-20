@@ -100,7 +100,8 @@ bool TaskExecutor::Implementation::TrySteal(TaskWorker& worker, ReadyTask& task)
 	const auto& laneWorkers = m_lanes[LaneIndex(worker.Lane)].Workers;
 	for (std::uint32_t offset = 1; offset < laneWorkers.size(); ++offset)
 	{
-		TaskWorker& victim = *laneWorkers[(worker.LaneWorkerIndex + offset) % laneWorkers.size()];
+		const std::size_t victimIndex = (worker.LaneWorkerIndex + offset) % laneWorkers.size();
+		TaskWorker& victim = *laneWorkers[victimIndex];
 		std::lock_guard lock(victim.QueueMutex);
 		if (!victim.ReadyQueue.empty())
 		{
@@ -119,7 +120,10 @@ bool TaskExecutor::Implementation::TryTakeWork(TaskWorker& worker, ReadyTask& ta
 		worker.bPreferDispatch = false;
 		return true;
 	}
-	if (TryPopLocal(worker, task) || TryPopInjection(worker.Lane, task) || TrySteal(worker, task))
+	const bool bLocalTaskFound = TryPopLocal(worker, task);
+	const bool bQueuedTaskFound = bLocalTaskFound || TryPopInjection(worker.Lane, task);
+	const bool bGraphTaskFound = bQueuedTaskFound || TrySteal(worker, task);
+	if (bGraphTaskFound)
 	{
 		worker.bPreferDispatch = true;
 		return true;
@@ -152,11 +156,19 @@ bool TaskExecutor::Implementation::WaitForWork(TaskWorker& worker, ReadyTask& ta
 void TaskExecutor::Implementation::WorkerMain(TaskWorker& worker)
 {
 	TaskWorkerContext::Enter(this);
-	Threading::SetCurrentThreadRole("Sparkle.Task." + std::string(LaneName(worker.Lane)) + "." + std::to_string(worker.LaneWorkerIndex));
+	const std::string workerName = "Sparkle.Task." + std::string(LaneName(worker.Lane)) + "." + std::to_string(worker.LaneWorkerIndex);
+	Threading::SetCurrentThreadRole(workerName);
 
 	ReadyTask task;
-	while (TryTakeWork(worker, task) || WaitForWork(worker, task))
+	for (;;)
 	{
+		const bool bTaskReady = TryTakeWork(worker, task);
+		const bool bWorkAvailable = bTaskReady || WaitForWork(worker, task);
+		if (!bWorkAvailable)
+		{
+			break;
+		}
+
 		if (task.Dispatch != nullptr)
 		{
 			task.Dispatch->Execute();

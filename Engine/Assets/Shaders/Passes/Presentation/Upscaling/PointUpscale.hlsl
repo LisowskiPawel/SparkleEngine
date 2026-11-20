@@ -19,6 +19,8 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 	}
 
 	const float2 uv = (float2(outputPixel) + 0.5f) / float2(outputWidth, outputHeight);
-	const uint2 inputPixel = min(uint2(uv * float2(inputWidth, inputHeight)), uint2(inputWidth - 1u, inputHeight - 1u));
+	const uint2 sampledPixel = uint2(uv * float2(inputWidth, inputHeight));
+	const uint2 lastInputPixel = uint2(inputWidth - 1u, inputHeight - 1u);
+	const uint2 inputPixel = min(sampledPixel, lastInputPixel);
 	ScalingOutputColor[outputPixel] = ScalingInputColor.Load(int3(inputPixel, 0));
 }

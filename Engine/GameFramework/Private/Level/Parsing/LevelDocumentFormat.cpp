@@ -43,10 +43,13 @@ static void ParseSceneAssetsSectionField(const LevelParsing::ParsedLevelLine& pa
 	}
 
 	SceneAssetId assetId;
-	assetId.value = Strings::TrimCopy(separator == std::string::npos ? std::string_view(value) : std::string_view(value).substr(0, separator));
+	const std::string_view reference(value);
+	const std::string_view instanceId = reference.substr(0, separator);
+	assetId.value = Strings::TrimCopy(instanceId);
 	if (separator != std::string::npos)
 	{
-		assetId.catalogValue = Strings::TrimCopy(std::string_view(value).substr(separator + 1u));
+		const std::string_view catalogId = reference.substr(separator + 1u);
+		assetId.catalogValue = Strings::TrimCopy(catalogId);
 	}
 	if (assetId.value.empty() || (separator != std::string::npos && assetId.catalogValue.empty()))
 	{

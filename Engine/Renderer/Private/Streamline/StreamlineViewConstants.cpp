@@ -105,7 +105,8 @@ void FillStreamlineViewConstants(sl::Constants& constants, const StreamlineViewC
 		const DirectX::XMMATRIX invProjection = DirectX::XMLoadFloat4x4(&input.Camera.InvProjectionMTX);
 		const DirectX::XMMATRIX invView = DirectX::XMLoadFloat4x4(&input.Camera.InvViewMTX);
 		const DirectX::XMMATRIX previousWorldToClip = DirectX::XMLoadFloat4x4(&input.Temporal.PreviousWorldToClipMatrix);
-		clipToPrevClip = DirectX::XMMatrixMultiply(DirectX::XMMatrixMultiply(invProjection, invView), previousWorldToClip);
+		const DirectX::XMMATRIX clipToWorld = DirectX::XMMatrixMultiply(invProjection, invView);
+		clipToPrevClip = DirectX::XMMatrixMultiply(clipToWorld, previousWorldToClip);
 		prevClipToClip = DirectX::XMMatrixInverse(nullptr, clipToPrevClip);
 	}
 

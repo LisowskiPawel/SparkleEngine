@@ -47,12 +47,6 @@ void D3D12ImGuiBackend::InitializeRendererBackend(ImGuiContext* previousContext)
 	initInfo.SrvDescriptorFreeFn = &D3D12ImGuiBackend::ReleaseDescriptor;
 	initInfo.UserData = &m_descriptorService;
 
-	if (initInfo.Device == nullptr || initInfo.CommandQueue == nullptr || initInfo.SrvDescriptorHeap == nullptr)
-	{
-		RestoreImGuiContext(previousContext);
-		Diagnostics::Fatal(g_d3d12ImGuiBackendLogger, __FILE__, __LINE__, "Cannot initialize ImGui with incomplete D3D12 device state.");
-	}
-
 	if (!ImGui_ImplDX12_Init(&initInfo))
 	{
 		RestoreImGuiContext(previousContext);
@@ -83,7 +77,9 @@ void D3D12ImGuiBackend::UpdateTexture(ImTextureData& texture) noexcept
 void D3D12ImGuiBackend::RenderDrawData(RenderCommandList& commandList, ImDrawData* drawData) noexcept
 {
 	ImGuiContext* previousContext = ActivateImGuiContext(m_imguiContext);
-	RenderNativeDrawData(commandList.GetNativeHandle(RhiNativeInteropRequest{.Consumer = ERhiNativeInteropConsumer::Presentation, .Reason = "Render ImGui draw data through D3D12 backend"}), drawData);
+	const RhiNativeInteropRequest request{.Consumer = ERhiNativeInteropConsumer::Presentation, .Reason = "Render ImGui draw data through D3D12 backend"};
+	const NativeGraphicsCommandListHandle nativeCommandList = commandList.GetNativeHandle(request);
+	RenderNativeDrawData(nativeCommandList, drawData);
 	RestoreImGuiContext(previousContext);
 }
 

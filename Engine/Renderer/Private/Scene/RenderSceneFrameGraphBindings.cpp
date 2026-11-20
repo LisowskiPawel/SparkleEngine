@@ -37,13 +37,9 @@ static void BindRayTracingScene(FrameGraph& frameGraph, const RenderFrameGraphRe
 static void BindSkyTexture(FrameGraph& frameGraph, const RenderFrameGraphResources& resources, const PreparedRenderScene& scene)
 {
 	const RendererTexture& skyTexture = *scene.sky.texture;
+	const FrameGraphTextureDesc desc = FrameGraphTextureDesc::CreateColor("Sky", skyTexture.Width, skyTexture.Height, skyTexture.Format);
 
-	frameGraph.BindPersistentTexture(
-	    resources.ImportedScene.Sky,
-	    skyTexture.Resource,
-	    skyTexture.ShaderResourceView,
-	    FrameGraphTextureDesc::CreateColor("Sky", skyTexture.Width, skyTexture.Height, skyTexture.Format),
-	    ResourceState::ShaderResource);
+	frameGraph.BindPersistentTexture(resources.ImportedScene.Sky, skyTexture.Resource, skyTexture.ShaderResourceView, desc, ResourceState::ShaderResource);
 }
 
 void BindRenderSceneFrameGraphResources(FrameGraph& frameGraph, const RenderFrameGraphResources& resources, const PreparedRenderScene& scene, const RenderRayTracingFrameBindings& rayTracingBindings)

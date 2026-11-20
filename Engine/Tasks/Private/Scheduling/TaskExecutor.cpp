@@ -13,7 +13,8 @@ TaskExecutor::~TaskExecutor() = default;
 
 TaskExecution TaskExecutor::Submit(const CompiledTaskGraph& graph, TaskExecutionContext& context)
 {
-	return TaskExecution(m_implementation->Submit(graph, context));
+	auto execution = m_implementation->Submit(graph, context);
+	return TaskExecution(std::move(execution));
 }
 
 TaskExecution TaskExecutor::Submit(TaskDesc desc, TaskFunction function, TaskExecutionContext& context)
@@ -24,7 +25,8 @@ TaskExecution TaskExecutor::Submit(TaskDesc desc, TaskFunction function, TaskExe
 
 TaskExecution TaskExecutor::Launch(TaskScope& scope, const CompiledTaskGraph& graph, TaskExecutionContext context)
 {
-	return TaskExecution(m_implementation->Launch(graph, std::move(context), &scope));
+	auto execution = m_implementation->Launch(graph, std::move(context), &scope);
+	return TaskExecution(std::move(execution));
 }
 
 TaskExecution TaskExecutor::Launch(TaskScope& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context)
@@ -35,7 +37,8 @@ TaskExecution TaskExecutor::Launch(TaskScope& scope, TaskDesc desc, TaskFunction
 
 TaskDispatch TaskExecutor::PrepareDispatch(TaskScope& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context)
 {
-	return TaskDispatch(m_implementation->PrepareDispatch(scope, std::move(desc), std::move(function), std::move(context)));
+	auto dispatch = m_implementation->PrepareDispatch(scope, std::move(desc), std::move(function), std::move(context));
+	return TaskDispatch(std::move(dispatch));
 }
 
 bool TaskExecutor::Shutdown(TaskExecutorShutdownMode mode) noexcept

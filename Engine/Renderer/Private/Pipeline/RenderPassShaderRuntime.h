@@ -39,8 +39,10 @@ namespace RenderPassShaderRuntime
 		const ShaderRegistrationDesc* registrations[] = {&vertexRegistration, &pixelRegistration};
 		storage.ParameterLayout = BuildShaderPipelineParameterLayout(registrations);
 		storage.Shaders = {vertexShader.GetResolvedShader(), pixelShader.GetResolvedShader()};
-		PipelineMaterialization::ValidateResolvedShader(renderHardwareInterface, vertexRegistration, storage.Shaders[0], BuildShaderParameterLayout(vertexRegistration));
-		PipelineMaterialization::ValidateResolvedShader(renderHardwareInterface, pixelRegistration, storage.Shaders[1], BuildShaderParameterLayout(pixelRegistration));
+		const PassParameterLayout vertexLayout = BuildShaderParameterLayout(vertexRegistration);
+		PipelineMaterialization::ValidateResolvedShader(renderHardwareInterface, vertexRegistration, storage.Shaders[0], vertexLayout);
+		const PassParameterLayout pixelLayout = BuildShaderParameterLayout(pixelRegistration);
+		PipelineMaterialization::ValidateResolvedShader(renderHardwareInterface, pixelRegistration, storage.Shaders[1], pixelLayout);
 		std::wstring debugName = Strings::ToWide(vertexRegistration.ShaderName);
 		storage.BindingLayout = PipelineMaterialization::CreateBindingLayout(renderHardwareInterface, storage.ParameterLayout, storage.Shaders, true, debugName.c_str());
 	}

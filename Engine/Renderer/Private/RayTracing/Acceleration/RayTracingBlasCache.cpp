@@ -147,7 +147,8 @@ RayTracingBlasCache::BlasHandle RayTracingBlasCache::EnsureSkinnedBlas(
 	Entry& entry = it->second;
 	entry.bTouchedThisFrame = true;
 
-	return BuildBlas(commandContext, BuildSkinnedGeometry(preparedScene, draw, entry), entry, diagnostics);
+	const RhiRayTracingGeometryDesc geometry = BuildSkinnedGeometry(preparedScene, draw, entry);
+	return BuildBlas(commandContext, geometry, entry, diagnostics);
 }
 
 void RayTracingBlasCache::EndFrame() noexcept

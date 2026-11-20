@@ -74,8 +74,11 @@ void ViewportToolbar::DrawFrameStats() const noexcept
 	const ImGuiIO& io = ImGui::GetIO();
 	char statsText[64] = {};
 	std::snprintf(statsText, sizeof(statsText), "%.1f FPS  %.2f ms", io.Framerate, io.DeltaTime * 1000.0f);
-	const float rightAlignedX = ImGui::GetWindowWidth() - ImGui::GetStyle().WindowPadding.x - ImGui::CalcTextSize(statsText).x;
-	if (rightAlignedX > ImGui::GetCursorPosX() + ImGui::GetStyle().ItemSpacing.x)
+	const ImGuiStyle& style = ImGui::GetStyle();
+	const float textWidth = ImGui::CalcTextSize(statsText).x;
+	const float rightAlignedX = ImGui::GetWindowWidth() - style.WindowPadding.x - textWidth;
+	const float minimumX = ImGui::GetCursorPosX() + style.ItemSpacing.x;
+	if (rightAlignedX > minimumX)
 	{
 		ImGui::SameLine(rightAlignedX);
 		ImGui::AlignTextToFramePadding();
@@ -169,7 +172,9 @@ void ViewportToolbar::DrawToolbarBorder() const noexcept
 	ImDrawList* drawList = ImGui::GetWindowDrawList();
 	const ImVec2 windowMin = ImGui::GetWindowPos();
 	const ImVec2 windowMax(windowMin.x + ImGui::GetWindowWidth(), windowMin.y + ImGui::GetWindowHeight());
-	drawList->AddLine(ImVec2(windowMin.x, windowMax.y - 1.0f), ImVec2(windowMax.x, windowMax.y - 1.0f), SparkleUiPalette::PanelHeaderBorder(), 1.0f);
+	const ImVec2 borderStart(windowMin.x, windowMax.y - 1.0f);
+	const ImVec2 borderEnd(windowMax.x, windowMax.y - 1.0f);
+	drawList->AddLine(borderStart, borderEnd, SparkleUiPalette::PanelHeaderBorder(), 1.0f);
 }
 
 void ViewportToolbar::EndToolbarWindow() const noexcept

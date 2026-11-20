@@ -185,24 +185,20 @@ namespace SparkleLauncher
 
 	void LauncherWorkspaceSetup::AddHostToolStatusRow(QVBoxLayout& layout, const ToolchainItemStatus& item)
 	{
-		AddStatusRow(
-		    layout,
-		    QString::fromStdString(item.DisplayName),
-		    ToolchainStatusText(item.State, item.bRequired),
-		    CompactToolchainDetail(item),
-		    ToolchainStatusState(item.State, item.bRequired),
-		    CreateHostToolActionButton(item));
+		const auto status = ToolchainStatusText(item.State, item.bRequired);
+		const auto detail = CompactToolchainDetail(item);
+		const auto state = ToolchainStatusState(item.State, item.bRequired);
+		auto* actionButton = CreateHostToolActionButton(item);
+		AddStatusRow(layout, QString::fromStdString(item.DisplayName), status, detail, state, actionButton);
 	}
 
 	void LauncherWorkspaceSetup::AddBuildFilesStatus(QVBoxLayout& layout, const BuildFilesFreshnessStatus& freshness, bool bOfferRefresh)
 	{
-		AddStatusRow(
-		    layout,
-		    "Build files",
-		    freshness.bCurrent ? "Ready" : "Needs refresh",
-		    CombineStatusDetail(QString::fromStdString(freshness.Summary), BuildFilesExpectedAction(freshness)),
-		    freshness.bCurrent ? "ok" : "warning",
-		    !bOfferRefresh || freshness.bCurrent ? nullptr : CreateStatusActionButton("workspace.generate-build-files", "Generate", "Generate Build Files"));
+		const auto expectedAction = BuildFilesExpectedAction(freshness);
+		const auto detail = CombineStatusDetail(QString::fromStdString(freshness.Summary), expectedAction);
+		auto* refreshButton = !bOfferRefresh || freshness.bCurrent ? nullptr : CreateStatusActionButton("workspace.generate-build-files", "Generate", "Generate Build Files");
+
+		AddStatusRow(layout, "Build files", freshness.bCurrent ? "Ready" : "Needs refresh", detail, freshness.bCurrent ? "ok" : "warning", refreshButton);
 	}
 
 	void LauncherWorkspaceSetup::AddSetupPrerequisiteStatus(QVBoxLayout& layout, const BuildWorkspaceOperationPlan& plan, bool bIsSourceSyncWorkflow)
@@ -211,17 +207,15 @@ namespace SparkleLauncher
 
 		if (!plan.Toolchain.bRequiredToolsAvailable)
 		{
-			AddStatusRow(layout, "Action needed", "Blocked", RequiredToolProblemSummary(plan.Toolchain), "bad", CreateStatusActionButton("workspace.sync-code", "Review", "Review Sync Code", true));
+			const auto detail = RequiredToolProblemSummary(plan.Toolchain);
+			auto* reviewButton = CreateStatusActionButton("workspace.sync-code", "Review", "Review Sync Code", true);
+			AddStatusRow(layout, "Action needed", "Blocked", detail, "bad", reviewButton);
 		}
 		else if (!plan.bCanRun && !configurePrerequisiteDetail.isEmpty())
 		{
-			AddStatusRow(
-			    layout,
-			    bIsSourceSyncWorkflow ? "Missing host prerequisite" : "Renderer prerequisites",
-			    "Blocked",
-			    configurePrerequisiteDetail,
-			    "bad",
-			    CreateStatusActionButton("workspace.sync-code", "Review", "Review Sync Code", true));
+			auto* reviewButton = CreateStatusActionButton("workspace.sync-code", "Review", "Review Sync Code", true);
+
+			AddStatusRow(layout, bIsSourceSyncWorkflow ? "Missing host prerequisite" : "Renderer prerequisites", "Blocked", configurePrerequisiteDetail, "bad", reviewButton);
 		}
 	}
 
@@ -250,14 +244,12 @@ namespace SparkleLauncher
 
 		addToolchainItems(true);
 
-		AddStatusRow(
-		    *machineLayout,
-		    "Selected IDE",
-		    workspaceIdeName,
-		    request.PreferredIde == WorkspaceIde::Rider
-		        ? (plan.Toolchain.RiderPath.empty() ? "Rider executable was not found." : QString::fromStdString(plan.Toolchain.RiderPath.string()))
-		        : (plan.Toolchain.VisualStudioIdePath.empty() ? "Visual Studio IDE was not found." : QString::fromStdString(plan.Toolchain.VisualStudioIdePath.string())),
-		    request.PreferredIde == WorkspaceIde::Rider ? (plan.Toolchain.RiderPath.empty() ? "warning" : "ok") : (plan.Toolchain.VisualStudioIdePath.empty() ? "warning" : "ok"));
+		const bool bRiderSelected = request.PreferredIde == WorkspaceIde::Rider;
+		const auto& idePath = bRiderSelected ? plan.Toolchain.RiderPath : plan.Toolchain.VisualStudioIdePath;
+		const QString missingIdeMessage = bRiderSelected ? "Rider executable was not found." : "Visual Studio IDE was not found.";
+		const QString ideDetail = idePath.empty() ? missingIdeMessage : QString::fromStdString(idePath.string());
+
+		AddStatusRow(*machineLayout, "Selected IDE", workspaceIdeName, ideDetail, idePath.empty() ? "warning" : "ok");
 
 		if (!bIsSourceSyncWorkflow)
 		{
@@ -326,14 +318,10 @@ namespace SparkleLauncher
 	void LauncherWorkspaceSetup::AddBuildReadinessStatus(QVBoxLayout& layout, const BuildWorkspaceOperationPlan& plan)
 	{
 		QVBoxLayout* buildLayout = AddOptionGroup(layout, "Readiness", QString());
+		const auto detail = plan.Toolchain.bRequiredToolsAvailable ? BuildGeneratorSummary(plan.Toolchain) : RequiredToolProblemSummary(plan.Toolchain);
+		auto* reviewButton = plan.Toolchain.bRequiredToolsAvailable ? nullptr : CreateStatusActionButton("workspace.sync-code", "Review", "Review Sync Code", true);
 
-		AddStatusRow(
-		    *buildLayout,
-		    "Required tools",
-		    plan.Toolchain.bRequiredToolsAvailable ? "Ready" : "Blocked",
-		    plan.Toolchain.bRequiredToolsAvailable ? BuildGeneratorSummary(plan.Toolchain) : RequiredToolProblemSummary(plan.Toolchain),
-		    plan.Toolchain.bRequiredToolsAvailable ? "ok" : "bad",
-		    plan.Toolchain.bRequiredToolsAvailable ? nullptr : CreateStatusActionButton("workspace.sync-code", "Review", "Review Sync Code", true));
+		AddStatusRow(*buildLayout, "Required tools", plan.Toolchain.bRequiredToolsAvailable ? "Ready" : "Blocked", detail, plan.Toolchain.bRequiredToolsAvailable ? "ok" : "bad", reviewButton);
 
 		AddBuildFilesStatus(*buildLayout, plan.Freshness, true);
 	}
@@ -367,7 +355,8 @@ namespace SparkleLauncher
 	void LauncherWorkspaceSetup::AddCookEnvironmentStatus(QVBoxLayout& layout, const QString& operationId)
 	{
 		const LauncherOperationRequest operationRequest = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, operationId);
-		const CookOperationPlan cookPlan = PlanCookOperation(operationId.toStdString(), std::get<CookOperationRequest>(operationRequest.Inputs));
+		const auto& cookRequest = std::get<CookOperationRequest>(operationRequest.Inputs);
+		const CookOperationPlan cookPlan = PlanCookOperation(operationId.toStdString(), cookRequest);
 		QVBoxLayout* issueLayout = nullptr;
 
 		const auto ensureIssueLayout = [&]() -> QVBoxLayout*

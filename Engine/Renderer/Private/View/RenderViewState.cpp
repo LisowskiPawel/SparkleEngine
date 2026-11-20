@@ -109,13 +109,18 @@ bool RenderViewState::HasProjectionChange(const CameraPose& previousPose, const 
 
 bool RenderViewState::IsLikelyCameraCut(const CameraPose& previousPose, const CameraPose& currentPose) noexcept
 {
-	const DirectX::XMVECTOR eyeDelta = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&currentPose.Position), DirectX::XMLoadFloat3(&previousPose.Position));
-	if (DirectX::XMVectorGetX(DirectX::XMVector3Length(eyeDelta)) > RenderViewStatePolicy::CutPositionDeltaMeters)
+	const DirectX::XMVECTOR currentPosition = DirectX::XMLoadFloat3(&currentPose.Position);
+	const DirectX::XMVECTOR previousPosition = DirectX::XMLoadFloat3(&previousPose.Position);
+	const DirectX::XMVECTOR eyeDelta = DirectX::XMVectorSubtract(currentPosition, previousPosition);
+	const float positionDeltaMeters = DirectX::XMVectorGetX(DirectX::XMVector3Length(eyeDelta));
+	if (positionDeltaMeters > RenderViewStatePolicy::CutPositionDeltaMeters)
 	{
 		return true;
 	}
 
-	const float directionDot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(DirectX::XMLoadFloat3(&previousPose.Direction), DirectX::XMLoadFloat3(&currentPose.Direction)));
+	const DirectX::XMVECTOR previousDirection = DirectX::XMLoadFloat3(&previousPose.Direction);
+	const DirectX::XMVECTOR currentDirection = DirectX::XMLoadFloat3(&currentPose.Direction);
+	const float directionDot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(previousDirection, currentDirection));
 	if (directionDot < RenderViewStatePolicy::CutViewDirectionDotThreshold)
 	{
 		return true;

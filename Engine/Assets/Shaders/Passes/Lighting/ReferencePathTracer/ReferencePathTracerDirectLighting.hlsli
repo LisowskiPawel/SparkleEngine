@@ -43,16 +43,22 @@ namespace ReferencePathTracer
 	                            SampleIdentity sampleIdentity,
 	                            uint surfaceDepth)
 	{
-		if (lightCounts.Total == 0u || (lobeMasses.Diffuse == 0.0f && (lobeMasses.Specular == 0.0f || lobeMasses.bSpecularDelta)))
+		const bool bContinuousSpecular = lobeMasses.Specular != 0.0f && !lobeMasses.bSpecularDelta;
+		const bool bContinuousLobe = lobeMasses.Diffuse != 0.0f || bContinuousSpecular;
+		if (lightCounts.Total == 0u || !bContinuousLobe)
 		{
 			return 0.0f.xxx;
 		}
 
 		const uint lightChoiceDimension = SurfaceDimension(surfaceDepth, LightChoiceOffset);
-		const LightSelection selection = SelectLight(lightCounts, RandomWord(sampleIdentity, lightChoiceDimension));
+		const uint lightChoiceWord = RandomWord(sampleIdentity, lightChoiceDimension);
+		const LightSelection selection = SelectLight(lightCounts, lightChoiceWord);
 
-		const float2 lightShapeSample = float2(CommonRandom::OpenUnitInterval(RandomWord(sampleIdentity, SurfaceDimension(surfaceDepth, LightShapeXOffset))),
-		                                       CommonRandom::OpenUnitInterval(RandomWord(sampleIdentity, SurfaceDimension(surfaceDepth, LightShapeYOffset))));
+		const uint shapeXDimension = SurfaceDimension(surfaceDepth, LightShapeXOffset);
+		const uint shapeYDimension = SurfaceDimension(surfaceDepth, LightShapeYOffset);
+		const uint shapeXWord = RandomWord(sampleIdentity, shapeXDimension);
+		const uint shapeYWord = RandomWord(sampleIdentity, shapeYDimension);
+		const float2 lightShapeSample = float2(CommonRandom::OpenUnitInterval(shapeXWord), CommonRandom::OpenUnitInterval(shapeYWord));
 
 		const LightSampling::DirectLightSample light = SampleLight(selection, surface.PositionWorld, lightShapeSample, skyTexture, skySampler);
 		if (!light.bValid)

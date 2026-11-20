@@ -5,6 +5,8 @@
 #include "Compiler/Output/ShaderDebugArtifactSet.h"
 #include "Core/Public/Files/FileSetPublication.h"
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <string_view>
 #include <cstddef>
 #include <cstdint>
@@ -49,7 +51,7 @@ private:
 
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	void RecordSourceCandidate();
-	void VerifySourceCandidateFiles(std::map<std::string, std::optional<std::string>> sourceFiles);
+	void VerifySourceCandidateFiles(const nlohmann::json& sourceFiles) const;
 	void VerifyCapturedSource(const ShaderCompileRequest& request, const ShaderSourceFile& source) const;
 #endif
 
@@ -71,7 +73,7 @@ private:
 
 	std::filesystem::path m_directory;
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
-	std::map<std::wstring, std::string> m_sourceFileHashes;
+	std::map<std::wstring, std::optional<std::string>> m_sourceFileHashes;
 #endif
 	std::map<std::string, FileReceipt> m_files;
 	std::map<std::string, std::string> m_compilerModules;

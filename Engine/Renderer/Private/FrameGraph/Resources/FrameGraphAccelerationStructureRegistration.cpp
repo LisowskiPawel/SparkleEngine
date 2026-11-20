@@ -7,6 +7,7 @@
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 
 #include <format>
+#include <string>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_frameGraphAccelerationStructureLogger, "Renderer.FrameGraph");
 
@@ -22,18 +23,16 @@ static std::string FormatHandle(FrameGraphResourceHandle handle)
 
 static void FailInvalidAccelerationStructureBinding(std::string_view operation, std::string_view resourceName, FrameGraphResourceHandle handle, ResourceState state, bool bHasResource) noexcept
 {
-	Diagnostics::Fatal(
-	    g_frameGraphAccelerationStructureLogger,
-	    __FILE__,
-	    __LINE__,
-	    std::format(
-	        "FrameGraph acceleration-structure validation failed: operation='{}' resource='{}' handle={} state={} hasResource={} "
-	        "remediation='bind acceleration structures through a valid frame-graph handle with a native backing resource'",
-	        operation,
-	        resourceName.empty() ? "<unnamed>" : resourceName,
-	        FormatHandle(handle),
-	        ResourceStateToString(state),
-	        bHasResource));
+	const std::string message = std::format(
+	    "FrameGraph acceleration-structure validation failed: operation='{}' resource='{}' handle={} state={} hasResource={} "
+	    "remediation='bind acceleration structures through a valid frame-graph handle with a native backing resource'",
+	    operation,
+	    resourceName.empty() ? "<unnamed>" : resourceName,
+	    FormatHandle(handle),
+	    ResourceStateToString(state),
+	    bHasResource);
+
+	Diagnostics::Fatal(g_frameGraphAccelerationStructureLogger, __FILE__, __LINE__, message);
 }
 
 FrameGraphAccelerationStructureHandle FrameGraph::ReservePersistentAccelerationStructure(std::string_view name, ResourceState initialState) noexcept

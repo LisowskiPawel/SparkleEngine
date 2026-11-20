@@ -30,7 +30,9 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 
 	const GBufferPathSurface surface = LoadGBufferPathSurface(pixelCoord);
 
-	IndirectReservoir::Reservoir reservoir = IndirectReservoir::UnpackReservoir(TemporalReservoirSampleTexture.Load(int3(pixelCoord, 0)), TemporalReservoirWeightTexture.Load(int3(pixelCoord, 0)));
+	const float4 samplePayload = TemporalReservoirSampleTexture.Load(int3(pixelCoord, 0));
+	const float4 weightPayload = TemporalReservoirWeightTexture.Load(int3(pixelCoord, 0));
+	IndirectReservoir::Reservoir reservoir = IndirectReservoir::UnpackReservoir(samplePayload, weightPayload);
 
 	if (surface.bValid && RestirIndirectSpatialReuse != 0u)
 	{

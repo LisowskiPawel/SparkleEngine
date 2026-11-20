@@ -124,7 +124,10 @@ namespace SparkleLauncher
 		    {
 			    if (m_gpuCrashIncident)
 			    {
-				    QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(m_gpuCrashIncident->ManifestPath.parent_path().wstring())));
+				    const auto incidentDirectory = m_gpuCrashIncident->ManifestPath.parent_path();
+				    const auto directoryPath = QString::fromStdWString(incidentDirectory.wstring());
+				    const auto directoryUrl = QUrl::fromLocalFile(directoryPath);
+				    QDesktopServices::openUrl(directoryUrl);
 			    }
 		    });
 

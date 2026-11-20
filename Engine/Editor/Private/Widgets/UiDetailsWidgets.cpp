@@ -129,7 +129,8 @@ namespace EditorWidgets
 		const ImVec2 end(start.x + size.x, start.y + size.y);
 		if (bHovered || bActive)
 		{
-			drawList->AddRectFilled(start, end, ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::ButtonBackgroundHovered()), 3.0f);
+			const ImU32 backgroundColor = ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::ButtonBackgroundHovered());
+			drawList->AddRectFilled(start, end, backgroundColor, 3.0f);
 		}
 
 		const ImVec4 iconColor = bHovered ? SparkleUiPalette::TextPrimary() : SparkleUiPalette::WithAlpha(SparkleUiPalette::TextMuted(), 0.62f);
@@ -210,7 +211,8 @@ namespace EditorWidgets
 		bool bChanged = ImGui::DragFloat("##value", &value, speed, minValue, maxValue, format);
 		if (resetValue != nullptr)
 		{
-			if (DrawDetailsResetButton(2, IsDifferentFromDefault(value, *resetValue)))
+			const bool bDirty = IsDifferentFromDefault(value, *resetValue);
+			if (DrawDetailsResetButton(2, bDirty))
 			{
 				value = *resetValue;
 				bChanged = true;
@@ -262,7 +264,8 @@ namespace EditorWidgets
 		}
 		if (resetValues != nullptr)
 		{
-			if (DrawDetailsResetButton(4, IsDifferentFromDefault(values, resetValues)))
+			const bool bDirty = IsDifferentFromDefault(values, resetValues);
+			if (DrawDetailsResetButton(4, bDirty))
 			{
 				values[0] = resetValues[0];
 				values[1] = resetValues[1];
@@ -291,7 +294,8 @@ namespace EditorWidgets
 		bool bChanged = ImGui::ColorEdit3("##value", values, ImGuiColorEditFlags_Float | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_PickerHueBar);
 		if (resetValues != nullptr)
 		{
-			if (DrawDetailsResetButton(2, IsDifferentFromDefault(values, resetValues)))
+			const bool bDirty = IsDifferentFromDefault(values, resetValues);
+			if (DrawDetailsResetButton(2, bDirty))
 			{
 				values[0] = resetValues[0];
 				values[1] = resetValues[1];
@@ -341,7 +345,8 @@ namespace EditorWidgets
 			return false;
 		}
 
-		std::vector<char> buffer((std::max) (std::size_t{1024}, value.size() + 1u), '\0');
+		const std::size_t bufferSize = (std::max) (std::size_t{1024}, value.size() + 1u);
+		std::vector<char> buffer(bufferSize, '\0');
 		std::copy(value.begin(), value.end(), buffer.begin());
 		ImGui::TableSetColumnIndex(1);
 		ImGui::SetNextItemWidth(-FLT_MIN);
@@ -370,6 +375,11 @@ namespace EditorWidgets
 
 	bool MatchesDetailsFilter(const std::string& filterText, const char* title, const char* keywords) noexcept
 	{
-		return filterText.empty() || Strings::ContainsIgnoreCase(title, filterText) || Strings::ContainsIgnoreCase(keywords, filterText);
+		if (filterText.empty())
+		{
+			return true;
+		}
+		const bool bTitleMatches = Strings::ContainsIgnoreCase(title, filterText);
+		return bTitleMatches || Strings::ContainsIgnoreCase(keywords, filterText);
 	}
 }

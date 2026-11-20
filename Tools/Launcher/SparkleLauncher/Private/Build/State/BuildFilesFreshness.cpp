@@ -28,32 +28,27 @@ namespace SparkleLauncher
 		try
 		{
 			Json::InputAdmission admission(text, text.size());
-			admission.BeginObject(0);
 			std::set<std::string> repeated;
 			const std::array<std::string_view, 9> fields{"generator", "platform", "toolset", "qtRoot", "vulkanSdkRoot", "contentPipeline", "shaderCompiler", "nvidiaStreamline", "sourceListHash"};
 
-			auto document = nlohmann::json::parse(
-			    text.begin(),
-			    text.end(),
-			    [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
-			    {
-				    using Event = nlohmann::json::parse_event_t;
-				    admission.CheckDepth(depth);
-				    if (event == Event::key)
-				    {
-					    const auto& key = value.get_ref<const std::string&>();
-					    const bool bConsumed = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
-					    if (!bConsumed)
-					    {
-						    return false;
-					    }
-					    if (!admission.TryReadKey(depth, key))
-					    {
-						    repeated.insert(key);
-					    }
-				    }
-				    return true;
-			    });
+			const auto admitValue = [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
+			{
+				admission.ReadEvent(depth, event);
+				if (event != nlohmann::json::parse_event_t::key)
+				{
+					return true;
+				}
+
+				const auto& key = value.get_ref<const std::string&>();
+				const bool bConsumed = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
+				if (bConsumed && !admission.TryReadKey(depth, key))
+				{
+					repeated.insert(key);
+				}
+				return bConsumed;
+			};
+
+			auto document = nlohmann::json::parse(text.begin(), text.end(), admitValue);
 
 			if (!document.is_object())
 			{

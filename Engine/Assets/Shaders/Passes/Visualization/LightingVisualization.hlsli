@@ -35,5 +35,6 @@ void StoreLightingVisualization(uint2 pixelCoord, uint viewMode, RWTexture2D<flo
 			outputColor = IndirectSpecular.Load(pixel).rgb;
 			break;
 	}
-	sceneColor[pixelCoord] = float4(max(outputColor, 0.0f), GBufferBaseColor.Load(pixel).a);
+	const float alpha = GBufferBaseColor.Load(pixel).a;
+	sceneColor[pixelCoord] = float4(max(outputColor, 0.0f), alpha);
 }

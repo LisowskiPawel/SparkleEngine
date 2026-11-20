@@ -17,7 +17,8 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 	}
 
 	const float4 sceneColor = SceneColor.Load(int3(pixelCoord, 0));
-	const float exposure = max(ExposureTexture.Load(int3(0, 0, 0)).r, 0.0f);
+	const float sampledExposure = ExposureTexture.Load(int3(0, 0, 0)).r;
+	const float exposure = max(sampledExposure, 0.0f);
 	const float3 displayLinear = ToneMapping::ApplyToneMapper(sceneColor.rgb * exposure, ToneMapper);
 	ToneMappedColor[pixelCoord] = float4(displayLinear, saturate(sceneColor.a));
 }

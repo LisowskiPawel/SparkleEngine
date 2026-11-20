@@ -71,7 +71,9 @@ LRESULT Window::HandleResizeHitTest(WPARAM wParam, LPARAM lParam) const
 		return DefWindowProcW(m_hWnd, WM_NCHITTEST, wParam, lParam);
 	}
 
-	POINT cursorPoint{static_cast<LONG>(static_cast<short>(LOWORD(lParam))), static_cast<LONG>(static_cast<short>(HIWORD(lParam)))};
+	const short cursorX = static_cast<short>(LOWORD(lParam));
+	const short cursorY = static_cast<short>(HIWORD(lParam));
+	const POINT cursorPoint{cursorX, cursorY};
 	RECT windowRect{};
 	if (!GetWindowRect(m_hWnd, &windowRect))
 	{
@@ -91,13 +93,14 @@ LRESULT Window::HandleResizeHitTest(WPARAM wParam, LPARAM lParam) const
 LRESULT Window::HandleTrackSizeConstraints(LPARAM lParam) const
 {
 	auto& minMaxInfo = *reinterpret_cast<MINMAXINFO*>(lParam);
-	const UINT dpi = GetDpi();
-	minMaxInfo.ptMinTrackSize.x = MulDiv(kMinWindowWidth, static_cast<int>(dpi), USER_DEFAULT_SCREEN_DPI);
-	minMaxInfo.ptMinTrackSize.y = MulDiv(kMinWindowHeight, static_cast<int>(dpi), USER_DEFAULT_SCREEN_DPI);
-	const MONITORINFO mi = GetCurrentMonitorInfo();
-	const RECT& bounds = IsFullScreen() ? mi.rcMonitor : mi.rcWork;
-	minMaxInfo.ptMaxPosition.x = bounds.left - mi.rcMonitor.left;
-	minMaxInfo.ptMaxPosition.y = bounds.top - mi.rcMonitor.top;
+	const int dpi = static_cast<int>(GetDpi());
+	minMaxInfo.ptMinTrackSize.x = MulDiv(kMinWindowWidth, dpi, USER_DEFAULT_SCREEN_DPI);
+	minMaxInfo.ptMinTrackSize.y = MulDiv(kMinWindowHeight, dpi, USER_DEFAULT_SCREEN_DPI);
+
+	const MONITORINFO monitorInfo = GetCurrentMonitorInfo();
+	const RECT& bounds = IsFullScreen() ? monitorInfo.rcMonitor : monitorInfo.rcWork;
+	minMaxInfo.ptMaxPosition.x = bounds.left - monitorInfo.rcMonitor.left;
+	minMaxInfo.ptMaxPosition.y = bounds.top - monitorInfo.rcMonitor.top;
 	minMaxInfo.ptMaxSize.x = bounds.right - bounds.left;
 	minMaxInfo.ptMaxSize.y = bounds.bottom - bounds.top;
 	return 0;
@@ -106,5 +109,7 @@ LRESULT Window::HandleTrackSizeConstraints(LPARAM lParam) const
 int Window::GetResizeBorderThickness() const noexcept
 {
 	const UINT dpi = GetDpi();
-	return GetSystemMetricsForDpi(SM_CXFRAME, dpi) + GetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
+	const int frameWidth = GetSystemMetricsForDpi(SM_CXFRAME, dpi);
+	const int framePadding = GetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
+	return frameWidth + framePadding;
 }

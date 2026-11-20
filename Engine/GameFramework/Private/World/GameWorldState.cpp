@@ -71,7 +71,8 @@ namespace ECS
 
 	void GameWorldState::CommitDerivedStateAndPublish()
 	{
-		CommitDirtyTransforms(PrepareDirtyTransforms());
+		const std::span<const EntityId> dirtyTransforms = PrepareDirtyTransforms();
+		CommitDirtyTransforms(dirtyTransforms);
 		m_dirtyTransforms.clear();
 		m_bEvaluateAllTransforms = false;
 		PublishPendingChanges();
@@ -84,7 +85,8 @@ namespace ECS
 			return m_registry.GetStorage<LocalTransform>().GetEntities();
 		}
 		std::sort(m_dirtyTransforms.begin(), m_dirtyTransforms.end());
-		m_dirtyTransforms.erase(std::unique(m_dirtyTransforms.begin(), m_dirtyTransforms.end()), m_dirtyTransforms.end());
+		const auto uniqueEnd = std::unique(m_dirtyTransforms.begin(), m_dirtyTransforms.end());
+		m_dirtyTransforms.erase(uniqueEnd, m_dirtyTransforms.end());
 		return m_dirtyTransforms;
 	}
 
@@ -119,7 +121,8 @@ namespace ECS
 		}
 		std::erase(m_pendingChanges, EntityId::Invalid());
 		std::sort(m_pendingChanges.begin(), m_pendingChanges.end());
-		m_pendingChanges.erase(std::unique(m_pendingChanges.begin(), m_pendingChanges.end()), m_pendingChanges.end());
+		const auto uniqueEnd = std::unique(m_pendingChanges.begin(), m_pendingChanges.end());
+		m_pendingChanges.erase(uniqueEnd, m_pendingChanges.end());
 		PublishReadView(m_pendingChanges, m_bForceFullPublication);
 		m_pendingChanges.clear();
 		m_bForceFullPublication = false;

@@ -72,7 +72,8 @@ namespace Assets
 
 	void SceneLoadExecutor::Launch(std::shared_ptr<SceneLoadWorkState> shared, const CompiledTaskGraph& graph)
 	{
-		m_control->Scope = std::make_unique<TaskScope>(TaskScopeDesc{TaskScopeKind::Document, std::format("Load level {}", shared->Package->Level.name)}, &m_control->ApplicationScope);
+		TaskScopeDesc scopeDesc{TaskScopeKind::Document, std::format("Load level {}", shared->Package->Level.name)};
+		m_control->Scope = std::make_unique<TaskScope>(std::move(scopeDesc), &m_control->ApplicationScope);
 		m_control->RequestId = shared->Package->RequestId;
 		m_control->Shared = shared;
 		m_control->Execution = m_control->Executor.Launch(*m_control->Scope, graph, TaskExecutionContext(shared));

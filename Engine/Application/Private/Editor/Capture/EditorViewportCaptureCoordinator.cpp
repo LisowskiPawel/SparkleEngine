@@ -29,10 +29,9 @@ std::optional<ConsoleOutputRecord> EditorViewportCaptureCoordinator::Request(Ren
 	if (admission != ViewportCaptureAdmissionStatus::Accepted)
 	{
 		m_outputPath.clear();
+		const char* message = admission == ViewportCaptureAdmissionStatus::Full ? "Viewport capture rejected: render request capacity is full." : "Viewport capture rejected: render owner is closed.";
 
-		return ConsoleOutputRecord{
-		    ConsoleCommandSeverity::Error,
-		    admission == ViewportCaptureAdmissionStatus::Full ? "Viewport capture rejected: render request capacity is full." : "Viewport capture rejected: render owner is closed."};
+		return ConsoleOutputRecord{ConsoleCommandSeverity::Error, message};
 	}
 	return std::nullopt;
 }
@@ -55,7 +54,11 @@ std::optional<ConsoleOutputRecord> EditorViewportCaptureCoordinator::Update(Rend
 		auto operationTask = [readback = std::move(readback), outputPath = m_outputPath](ViewportCaptureResult& result, TaskExecutionContext& context) mutable
 		{
 			result = ViewportCaptureWriter::Write(std::move(readback), outputPath, context.GetCancellationToken());
-			return result ? TaskResult::Success() : (context.IsCancellationRequested() ? TaskResult::Cancelled(result.FailureReason) : TaskResult::Failure(result.FailureReason));
+			if (result)
+			{
+				return TaskResult::Success();
+			}
+			return context.IsCancellationRequested() ? TaskResult::Cancelled(result.FailureReason) : TaskResult::Failure(result.FailureReason);
 		};
 
 		const bool bOperationStarted = m_writeOperation.Start(taskName, "A viewport capture is already being written.", std::move(operationTask), errorMessage);
@@ -71,11 +74,14 @@ std::optional<ConsoleOutputRecord> EditorViewportCaptureCoordinator::Update(Rend
 	{
 		if (!taskResult->Succeeded())
 		{
-			return ConsoleOutputRecord{ConsoleCommandSeverity::Error, std::format("Viewport capture {}: {}", taskResult->WasCancelled() ? "cancelled" : "failed", taskResult->GetDiagnostic())};
+			const char* status = taskResult->WasCancelled() ? "cancelled" : "failed";
+			std::string message = std::format("Viewport capture {}: {}", status, taskResult->GetDiagnostic());
+			return ConsoleOutputRecord{ConsoleCommandSeverity::Error, std::move(message)};
 		}
 		else
 		{
-			return ConsoleOutputRecord{ConsoleCommandSeverity::Info, "Viewport captured: " + Strings::ToNarrow(m_outputPath.wstring())};
+			const std::string outputPath = Strings::ToNarrow(m_outputPath.wstring());
+			return ConsoleOutputRecord{ConsoleCommandSeverity::Info, "Viewport captured: " + outputPath};
 		}
 	}
 	return std::nullopt;

@@ -92,7 +92,14 @@ namespace SparkleLauncher
 		return m_operationService->ObserveGpuCrash(
 		    std::move(incident),
 		    [this, completion = std::move(completion)](std::string state)
-		    { QMetaObject::invokeMethod(this, [completion, state = QString::fromStdString(state)]() { completion(state); }, Qt::QueuedConnection); });
+		    {
+			    const auto stateText = QString::fromStdString(state);
+			    auto notifyCompletion = [completion, stateText]()
+			    {
+				    completion(stateText);
+			    };
+			    QMetaObject::invokeMethod(this, std::move(notifyCompletion), Qt::QueuedConnection);
+		    });
 	}
 
 	bool LauncherBackend::CancelOperation(const QString& runId)
@@ -109,15 +116,15 @@ namespace SparkleLauncher
 			    m_progressDecoders[runId].Consume(
 			        outputText,
 			        [this, &runId, &operationId](std::string_view output)
-			        { emit OperationOutputReceived(runId, operationId, QString::fromUtf8(output.data(), static_cast<qsizetype>(output.size()))); },
+			        {
+				        const auto text = QString::fromUtf8(output.data(), static_cast<qsizetype>(output.size()));
+				        emit OperationOutputReceived(runId, operationId, text);
+			        },
 			        [this, &runId, &operationId](const ToolWorkProgress& progress)
 			        {
-				        emit OperationProgressReceived(
-				            runId,
-				            operationId,
-				            QString::fromUtf8(progress.phase.data(), static_cast<qsizetype>(progress.phase.size())),
-				            static_cast<quint64>(progress.completed),
-				            static_cast<quint64>(progress.total));
+				        const auto phase = QString::fromUtf8(progress.phase.data(), static_cast<qsizetype>(progress.phase.size()));
+
+				        emit OperationProgressReceived(runId, operationId, phase, static_cast<quint64>(progress.completed), static_cast<quint64>(progress.total));
 			        });
 		    },
 		    Qt::QueuedConnection);
@@ -134,8 +141,12 @@ namespace SparkleLauncher
 			    auto progressDecoder = m_progressDecoders.find(runId);
 			    if (progressDecoder != m_progressDecoders.end())
 			    {
-				    progressDecoder->Flush([this, &runId, &operationId](std::string_view output)
-				        { emit OperationOutputReceived(runId, operationId, QString::fromUtf8(output.data(), static_cast<qsizetype>(output.size()))); });
+				    progressDecoder->Flush(
+				        [this, &runId, &operationId](std::string_view output)
+				        {
+					        const auto text = QString::fromUtf8(output.data(), static_cast<qsizetype>(output.size()));
+					        emit OperationOutputReceived(runId, operationId, text);
+				        });
 				    m_progressDecoders.erase(progressDecoder);
 			    }
 			    emit OperationFinished(runId, operationId, title, result);

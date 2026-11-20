@@ -25,10 +25,12 @@ namespace GpuCrashInputVerification
 	    const std::filesystem::path& bundleRoot,
 	    const std::set<std::wstring>& files)
 	{
-		const auto information = request.at("debugInformation").get<std::string>();
+		const auto& information = request.at("debugInformation").get_ref<const std::string&>();
 		if (format == "Dxil")
 		{
-			const auto symbolPath = ResolveReceiptFile(requestPath.parent_path(), request.at("symbolName").get<std::string>());
+			const auto requestDirectory = requestPath.parent_path();
+			const auto& symbolName = request.at("symbolName").get_ref<const std::string&>();
+			const auto symbolPath = ResolveReceiptFile(requestDirectory, symbolName);
 			if (information != "full-pdb" || !files.contains(Paths::MakePathKey(symbolPath)))
 			{
 				throw Diagnostics::Error("Shader export is missing its full PDB receipt.");
@@ -75,31 +77,51 @@ namespace GpuCrashInputVerification
 			}
 
 			const auto request = ReadReceipt(requestPath, {"format", "codeSha256", "debugInformation", "symbolName", "sources", "shaderTypeId", "compileInputHash", "target"});
-			const auto format = request.at("format").get<std::string>();
+			const auto& format = request.at("format").get_ref<const std::string&>();
 			if (format.empty())
 			{
 				throw Diagnostics::Error("Shader export requires a format identity.");
 			}
-			if ((api == ERhiBackendApi::D3D12 && format == "Dxil") || (api == ERhiBackendApi::Vulkan && format == "SpirV"))
+			const bool bDxilRequest = api == ERhiBackendApi::D3D12 && format == "Dxil";
+			const bool bSpirVRequest = api == ERhiBackendApi::Vulkan && format == "SpirV";
+			if (!bDxilRequest && !bSpirVRequest)
 			{
-				const auto codePath = requestPath.parent_path() / (format == "Dxil" ? "shader.dxil" : "shader.spv");
-				if (!files.contains(Paths::MakePathKey(codePath)) || HashFile(codePath) != request.at("codeSha256").get<std::string>())
-				{
-					throw Diagnostics::Error("Shader request identity differs from its exported code.");
-				}
-				VerifyShaderDebugData(format, requestPath, request, bundleRoot, files);
-				std::uint64_t type = 0;
-				std::uint64_t input = 0;
-				const bool bShaderTypeRead = Formatting::TryParseHexUInt64(request.at("shaderTypeId").get<std::string>(), type);
-				const bool bCompileInputRead = bShaderTypeRead && Formatting::TryParseHexUInt64(request.at("compileInputHash").get<std::string>(), input);
-				const auto& target = request.at("target").get_ref<const std::string&>();
-				const bool bTargetKnown = bCompileInputRead && !target.empty();
-				const bool bJobUnique = bTargetKnown && exportedJobs.emplace(type, target, input, request.at("codeSha256").get<std::string>()).second;
+				continue;
+			}
 
-				if (!bJobUnique)
-				{
-					throw Diagnostics::Error("Shader export has invalid or duplicate permutation identity.");
-				}
+			const auto codePath = requestPath.parent_path() / (bDxilRequest ? "shader.dxil" : "shader.spv");
+			const auto codeKey = Paths::MakePathKey(codePath);
+			if (!files.contains(codeKey))
+			{
+				throw Diagnostics::Error("Shader request identity differs from its exported code.");
+			}
+
+			const std::string codeHash = HashFile(codePath);
+			const auto& expectedCodeHash = request.at("codeSha256").get_ref<const std::string&>();
+			if (codeHash != expectedCodeHash)
+			{
+				throw Diagnostics::Error("Shader request identity differs from its exported code.");
+			}
+			VerifyShaderDebugData(format, requestPath, request, bundleRoot, files);
+
+			std::uint64_t type = 0;
+			std::uint64_t input = 0;
+			const auto& shaderType = request.at("shaderTypeId").get_ref<const std::string&>();
+			const bool bShaderTypeRead = Formatting::TryParseHexUInt64(shaderType, type);
+			if (!bShaderTypeRead)
+			{
+				throw Diagnostics::Error("Shader export has invalid or duplicate permutation identity.");
+			}
+
+			const auto& compileInputHash = request.at("compileInputHash").get_ref<const std::string&>();
+			const bool bCompileInputRead = Formatting::TryParseHexUInt64(compileInputHash, input);
+			const auto& target = request.at("target").get_ref<const std::string&>();
+			const bool bTargetKnown = bCompileInputRead && !target.empty();
+			const bool bJobUnique = bTargetKnown && exportedJobs.emplace(type, target, input, expectedCodeHash).second;
+
+			if (!bJobUnique)
+			{
+				throw Diagnostics::Error("Shader export has invalid or duplicate permutation identity.");
 			}
 		}
 		return exportedJobs;
@@ -107,8 +129,10 @@ namespace GpuCrashInputVerification
 
 	static void VerifyShaderJobs(ERhiBackendApi api, const std::filesystem::path& bundleRoot, const nlohmann::json& bundle, const std::set<std::wstring>& files)
 	{
-		const auto library = CookedShaderLibrary::Open(Filesystem::GetCookedShaderLibraryPath());
-		const auto map = GlobalShaderMap::Open(Filesystem::GetGlobalShaderMapPath(), library);
+		const auto& libraryPath = Filesystem::GetCookedShaderLibraryPath();
+		const auto library = CookedShaderLibrary::Open(libraryPath);
+		const auto& mapPath = Filesystem::GetGlobalShaderMapPath();
+		const auto map = GlobalShaderMap::Open(mapPath, library);
 		const auto exportedJobs = ReadExportedShaderJobs(api, bundleRoot, bundle, files);
 		std::size_t matched = 0;
 		for (const auto& entry : map.GetEntries())
@@ -125,12 +149,17 @@ namespace GpuCrashInputVerification
 			}
 
 			const auto bytes = library.GetBytecode(*code);
+			const std::span bytecode(static_cast<const std::byte*>(bytes.Data), bytes.Size);
 			std::string hash;
 			std::string error;
-			const bool bCodeHashed = Hash::TrySha256Hex(std::span(static_cast<const std::byte*>(bytes.Data), bytes.Size), hash, error);
-			const bool bJobExported = bCodeHashed && exportedJobs.contains({entry.ShaderType, GetShaderTargetName(entry.Target), entry.CompileInputHash, hash});
+			const bool bCodeHashed = Hash::TrySha256Hex(bytecode, hash, error);
+			if (!bCodeHashed)
+			{
+				throw Diagnostics::Error("Export omits an active shader or permutation; perform a complete diagnostic shader cook.");
+			}
 
-			if (!bJobExported)
+			const ExportedShaderJobs::key_type job{entry.ShaderType, GetShaderTargetName(entry.Target), entry.CompileInputHash, hash};
+			if (!exportedJobs.contains(job))
 			{
 				throw Diagnostics::Error("Export omits an active shader or permutation; perform a complete diagnostic shader cook.");
 			}
@@ -145,7 +174,7 @@ namespace GpuCrashInputVerification
 	nlohmann::json VerifyShaderBundle(const std::filesystem::path& exportPath, const nlohmann::json& product, ERhiBackendApi api)
 	{
 		const auto bundle = ReadReceipt(exportPath, {"scope", "files", "jobs", "shaderCompilerExecutableSha256", "globalShaderMapSha256", "cookedShaderLibrarySha256"});
-		if (bundle.at("scope").get<std::string>() != "registered-catalog")
+		if (bundle.at("scope").get_ref<const std::string&>() != "registered-catalog")
 		{
 			throw Diagnostics::Error("Aftermath requires a complete registered-catalog export, not a selective shader cook.");
 		}
@@ -168,15 +197,28 @@ namespace GpuCrashInputVerification
 			}
 		}
 
-		const bool bCompilerMatches = compiler.at("product").get<std::string>() == "ShaderCompiler";
-		const bool bVariantMatches = bCompilerMatches && compiler.at("variant").get<std::string>() == "gpu-crash";
+		const bool bCompilerMatches = compiler.at("product").get_ref<const std::string&>() == "ShaderCompiler";
+		const bool bVariantMatches = bCompilerMatches && compiler.at("variant").get_ref<const std::string&>() == "gpu-crash";
 		const auto& compilerHash = compiler.at("executableSha256").get_ref<const std::string&>();
 		const bool bCompilerIdentity = bVariantMatches && !compilerHash.empty();
 		const bool bCompilerHashMatches = bCompilerIdentity && compilerHash == bundle.at("shaderCompilerExecutableSha256").get_ref<const std::string&>();
-		const bool bMapMatches = bCompilerHashMatches && bundle.at("globalShaderMapSha256").get<std::string>() == HashFile(Filesystem::GetGlobalShaderMapPath());
-		const bool bLibraryMatches = bMapMatches && bundle.at("cookedShaderLibrarySha256").get<std::string>() == HashFile(Filesystem::GetCookedShaderLibraryPath());
+		if (!bCompilerHashMatches)
+		{
+			throw Diagnostics::Error("Shader export does not match the active cooked publication.");
+		}
 
-		if (!bLibraryMatches)
+		const auto& expectedMapHash = bundle.at("globalShaderMapSha256").get_ref<const std::string&>();
+		const auto& mapPath = Filesystem::GetGlobalShaderMapPath();
+		const std::string mapHash = HashFile(mapPath);
+		if (expectedMapHash != mapHash)
+		{
+			throw Diagnostics::Error("Shader export does not match the active cooked publication.");
+		}
+
+		const auto& expectedLibraryHash = bundle.at("cookedShaderLibrarySha256").get_ref<const std::string&>();
+		const auto& libraryPath = Filesystem::GetCookedShaderLibraryPath();
+		const std::string libraryHash = HashFile(libraryPath);
+		if (expectedLibraryHash != libraryHash)
 		{
 			throw Diagnostics::Error("Shader export does not match the active cooked publication.");
 		}

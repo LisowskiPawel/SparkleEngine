@@ -27,9 +27,10 @@ namespace ECS
 				continue;
 			}
 
-			const bool bAnimationAdded = m_registry.Add(entity, AnimationState{.Resource = resource, .AnimationAssetId = animationAssetId}) && m_registry.Add(entity, Name{name});
+			const bool bAnimationAdded = m_registry.Add(entity, AnimationState{.Resource = resource, .AnimationAssetId = animationAssetId});
+			const bool bNameAdded = bAnimationAdded && m_registry.Add(entity, Name{name});
 
-			const bool bIdentityAdded = bAnimationAdded
+			const bool bIdentityAdded = bNameAdded
 			    && (m_registry.Add(
 			        entity,
 			        AuthoredIdentity{.SourceAssetId = animationAssetId, .SourceInstanceId = sourceInstanceId, .SourceObjectId = sourceAnimationIndex, .Kind = AuthoredObjectKind::Animation}));
@@ -45,8 +46,8 @@ namespace ECS
 
 	bool GameWorldState::PrepareSystemResources(GameWorldResourceStores& resources)
 	{
-		const bool bAnimationPrepared = resources.AnimationClips.ResolveTargets(resources.Skeletons, resources.Generation)
-		    && m_animationEvaluation.Prepare(m_registry, resources.AnimationClips, resources.Skeletons, m_morphWeights, resources.Generation);
+		const bool bTargetsResolved = resources.AnimationClips.ResolveTargets(resources.Skeletons, resources.Generation);
+		const bool bAnimationPrepared = bTargetsResolved && m_animationEvaluation.Prepare(m_registry, resources.AnimationClips, resources.Skeletons, m_morphWeights, resources.Generation);
 
 		if (!bAnimationPrepared)
 		{

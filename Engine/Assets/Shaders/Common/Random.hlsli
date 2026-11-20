@@ -21,7 +21,9 @@ namespace CommonRandom
 
 	float2 Random02(inout uint state)
 	{
-		return float2(Random01(state), Random01(state));
+		const float x = Random01(state);
+		const float y = Random01(state);
+		return float2(x, y);
 	}
 
 	uint2 MultiplyHighLow(uint lhs, uint rhs)

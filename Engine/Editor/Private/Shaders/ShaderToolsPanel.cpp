@@ -7,6 +7,7 @@
 
 #include <imgui.h>
 
+#include <string_view>
 #include <utility>
 
 void ShaderToolsPanel::SetOpen(bool bOpen) noexcept
@@ -35,7 +36,8 @@ void ShaderToolsPanel::SetCompileStatus(bool bBusy, std::string_view message)
 	m_bCompiling = bBusy;
 	if (!message.empty())
 	{
-		m_compileStatus = message.substr(0, message.find('\n'));
+		const std::size_t lineEnd = message.find('\n');
+		m_compileStatus = message.substr(0, lineEnd);
 		m_bHasRows = false;
 		m_exportInspection.Invalidate();
 	}
@@ -221,7 +223,8 @@ void ShaderToolsPanel::DrawSelectedShaderExport()
 		return;
 	}
 
-	ImGui::TextDisabled("%s", m_exportInspection.GetDirectory().generic_string().c_str());
+	const std::string exportDirectory = m_exportInspection.GetDirectory().generic_string();
+	ImGui::TextDisabled("%s", exportDirectory.c_str());
 	if (ImGui::BeginTabBar("##SelectedShaderExportTabs"))
 	{
 		const std::string sourceLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::SourceFile, "Source");
@@ -273,5 +276,17 @@ const RegisteredShaderRow* ShaderToolsPanel::GetSelectedRow() const noexcept
 bool ShaderToolsPanel::MatchesFilter(const RegisteredShaderRow& row) const noexcept
 {
 	const std::string_view filter(m_filterBuffer.data());
-	return filter.empty() || Strings::ContainsIgnoreCase(row.ShaderName, filter) || Strings::ContainsIgnoreCase(row.SourcePath, filter) || Strings::ContainsIgnoreCase(row.Stage, filter);
+	if (filter.empty())
+	{
+		return true;
+	}
+	const std::string_view searchFields[] = {row.ShaderName, row.SourcePath, row.Stage};
+	for (const std::string_view field : searchFields)
+	{
+		if (Strings::ContainsIgnoreCase(field, filter))
+		{
+			return true;
+		}
+	}
+	return false;
 }

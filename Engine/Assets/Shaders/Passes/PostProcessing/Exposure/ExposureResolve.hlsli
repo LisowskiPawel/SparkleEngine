@@ -10,7 +10,10 @@ float ResolveExposureTarget(float averageLuminance, float sampleCount, bool bHis
 	if (ExposureMode == Exposure::ExposureModeAutomatic && sampleCount <= 0.0f)
 	{
 		// An invalid HDR frame cannot drive adaptation; the first frame uses neutral exposure.
-		targetExposure = clamp(bHistoryValid && isfinite(previousExposure) && previousExposure > 0.0f ? previousExposure : 1.0f, ExposureMin, ExposureMax);
+		const bool bPreviousExposureFinite = bHistoryValid && isfinite(previousExposure);
+		const bool bPreviousExposureUsable = bPreviousExposureFinite && previousExposure > 0.0f;
+		const float fallbackExposure = bPreviousExposureUsable ? previousExposure : 1.0f;
+		targetExposure = clamp(fallbackExposure, ExposureMin, ExposureMax);
 	}
 
 	return targetExposure;
@@ -22,9 +25,9 @@ float4 ResolveExposurePayload(float averageLuminance, float sampleCount, float4 
 
 	const float targetExposure = ResolveExposureTarget(averageLuminance, sampleCount, bHistoryValid, previousPayload.r);
 
-	const float exposure = clamp(Exposure::AdaptExposure(ExposureMode, bHistoryValid, previousPayload.r, targetExposure, DeltaTimeSeconds, ExposureAdaptationSpeedUp, ExposureAdaptationSpeedDown),
-	                             ExposureMin,
-	                             ExposureMax);
+	const float adaptedExposure = Exposure::AdaptExposure(ExposureMode, bHistoryValid, previousPayload.r, targetExposure, DeltaTimeSeconds, ExposureAdaptationSpeedUp, ExposureAdaptationSpeedDown);
+
+	const float exposure = clamp(adaptedExposure, ExposureMin, ExposureMax);
 
 	return float4(exposure, averageLuminance, targetExposure, float(ExposureMode));
 }

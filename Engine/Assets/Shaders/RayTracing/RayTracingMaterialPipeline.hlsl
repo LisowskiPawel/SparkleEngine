@@ -21,7 +21,10 @@ void RayTracingMaterialClosestHit(inout RayTracingMaterialPayload payload, Built
 [shader("anyhit")]
 void RayTracingMaterialAnyHit(inout RayTracingMaterialPayload payload, BuiltInTriangleIntersectionAttributes attributes)
 {
-	const bool bCandidateAlphaRejected = !ResolveRayTracingCandidateAlpha(InstanceID(), PrimitiveIndex(), attributes.barycentrics, HitKind() == HIT_KIND_TRIANGLE_FRONT_FACE);
+	const uint instanceId = InstanceID();
+	const uint primitiveIndex = PrimitiveIndex();
+	const bool bFrontFace = HitKind() == HIT_KIND_TRIANGLE_FRONT_FACE;
+	const bool bCandidateAlphaRejected = !ResolveRayTracingCandidateAlpha(instanceId, primitiveIndex, attributes.barycentrics, bFrontFace);
 
 	if (bCandidateAlphaRejected)
 	{

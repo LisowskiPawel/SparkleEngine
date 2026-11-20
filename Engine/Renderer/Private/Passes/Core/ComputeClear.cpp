@@ -8,5 +8,9 @@ void AddComputeClearPass(FrameGraphBuilder& builder, std::string_view label, Fra
 {
 	auto& parameters = builder.AllocParameters<ComputeClearCS>();
 	parameters->Output = builder.CreateUAV(outputTexture);
-	builder.Dispatch<ComputeClearCS>(label, parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(outputExtent.Width, 8u), MathUtils::DivideRoundUp(outputExtent.Height, 8u), 1u});
+
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(outputExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(outputExtent.Height, 8u);
+
+	builder.Dispatch<ComputeClearCS>(label, parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u});
 }

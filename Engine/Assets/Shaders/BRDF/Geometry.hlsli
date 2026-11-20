@@ -28,12 +28,16 @@ namespace BRDF
 		{
 			const float r = roughness + 1.0f;
 			const float k = (r * r) / 8.0f;
-			return SmithG1_SchlickGGX(NoV, k) * SmithG1_SchlickGGX(NoL, k);
+			const float viewMasking = SmithG1_SchlickGGX(NoV, k);
+			const float lightMasking = SmithG1_SchlickGGX(NoL, k);
+			return viewMasking * lightMasking;
 		}
 
 		float Smith_Uncorrelated_GGX(float NoV, float NoL, float alpha)
 		{
-			return SmithG1_GGX(NoV, alpha) * SmithG1_GGX(NoL, alpha);
+			const float viewMasking = SmithG1_GGX(NoV, alpha);
+			const float lightMasking = SmithG1_GGX(NoL, alpha);
+			return viewMasking * lightMasking;
 		}
 
 		float Smith_HeightCorrelated_GGX(float NoV, float NoL, float alpha)
@@ -83,7 +87,9 @@ namespace BRDF
 		{
 #if BRDF_GEOMETRY_MODEL == BRDF_GEOMETRY_SMITH_GGX
 			const float k = (alpha * alpha) / 2.0f;
-			return SmithG1_SchlickGGX(NoV, k) * SmithG1_SchlickGGX(NoL, k);
+			const float viewMasking = SmithG1_SchlickGGX(NoV, k);
+			const float lightMasking = SmithG1_SchlickGGX(NoL, k);
+			return viewMasking * lightMasking;
 #elif BRDF_GEOMETRY_MODEL == BRDF_GEOMETRY_SMITH_GGX_CORRELATED
 			return Smith_HeightCorrelated_GGX(NoV, NoL, alpha);
 #elif BRDF_GEOMETRY_MODEL == BRDF_GEOMETRY_SMITH_GGX_CORRELATED_FAST

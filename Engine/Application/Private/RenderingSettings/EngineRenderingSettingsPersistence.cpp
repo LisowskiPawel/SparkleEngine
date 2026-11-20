@@ -199,7 +199,15 @@ namespace EngineRenderingSettingsPersistence
 	{
 		std::vector<std::string> lines;
 		lines.emplace_back("[" + std::string(SettingsSection) + "]");
-		VisitPersistedSettings([&](std::string_view key, auto member) { lines.emplace_back(std::string(key) + "=" + EncodeConfigValue(state.*member)); });
+
+		VisitPersistedSettings(
+		    [&](std::string_view key, auto member)
+		    {
+			    const std::string value = EncodeConfigValue(state.*member);
+			    std::string assignment = std::string(key) + "=" + value;
+			    lines.push_back(std::move(assignment));
+		    });
+
 		return lines;
 	}
 
@@ -211,7 +219,8 @@ namespace EngineRenderingSettingsPersistence
 		{
 			return lines;
 		}
-		std::istringstream input(ReadConfigText(path));
+		std::string text = ReadConfigText(path);
+		std::istringstream input(std::move(text));
 		for (std::string line; std::getline(input, line);)
 		{
 			lines.push_back(std::move(line));
@@ -221,16 +230,19 @@ namespace EngineRenderingSettingsPersistence
 
 	static std::pair<std::size_t, std::size_t> FindSettingsSection(const std::vector<std::string>& lines)
 	{
+		const std::string sectionHeader = "[" + std::string(SettingsSection) + "]";
 		for (std::size_t begin = 0; begin < lines.size(); ++begin)
 		{
-			if (Strings::TrimCopy(lines[begin]) != "[" + std::string(SettingsSection) + "]")
+			const std::string trimmed = Strings::TrimCopy(lines[begin]);
+			if (trimmed != sectionHeader)
 			{
 				continue;
 			}
 			std::size_t end = begin + 1;
 			while (end < lines.size())
 			{
-				if (IsSectionHeader(Strings::TrimCopy(lines[end])))
+				const std::string nextLine = Strings::TrimCopy(lines[end]);
+				if (IsSectionHeader(nextLine))
 				{
 					break;
 				}
@@ -246,8 +258,10 @@ namespace EngineRenderingSettingsPersistence
 		const auto [begin, end] = FindSettingsSection(lines);
 		if (begin < lines.size())
 		{
-			lines.erase(lines.begin() + static_cast<std::ptrdiff_t>(begin), lines.begin() + static_cast<std::ptrdiff_t>(end));
-			lines.insert(lines.begin() + static_cast<std::ptrdiff_t>(begin), section.begin(), section.end());
+			const auto firstLine = lines.begin() + static_cast<std::ptrdiff_t>(begin);
+			const auto lastLine = lines.begin() + static_cast<std::ptrdiff_t>(end);
+			const auto insertion = lines.erase(firstLine, lastLine);
+			lines.insert(insertion, section.begin(), section.end());
 			return;
 		}
 		if (!lines.empty() && !Strings::TrimCopy(lines.back()).empty())
@@ -268,7 +282,6 @@ namespace EngineRenderingSettingsPersistence
 		std::string failure;
 		if (!Files::TryWriteAllTextAtomic(path, output, failure))
 		{
-			Files::CleanupTemporaryFile(Files::BuildTemporaryPath(path));
 			throw Diagnostics::Error(failure);
 		}
 	}
@@ -276,8 +289,10 @@ namespace EngineRenderingSettingsPersistence
 
 void EngineRenderingSettingsPersistence::Apply()
 {
-	ApplyFile(GetDefaultConfigPath());
-	ApplyFile(GetUserConfigPath());
+	const auto defaultPath = GetDefaultConfigPath();
+	ApplyFile(defaultPath);
+	const auto userPath = GetUserConfigPath();
+	ApplyFile(userPath);
 }
 
 void EngineRenderingSettingsPersistence::Write(const EngineRenderingSettingsState& state)

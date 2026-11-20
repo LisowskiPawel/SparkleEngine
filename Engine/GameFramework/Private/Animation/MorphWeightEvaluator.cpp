@@ -15,8 +15,9 @@ namespace MorphWeightEvaluator
 		{
 			return false;
 		}
+		const DirectX::XMVECTOR weights = AnimationSampler::SampleVectorChannel(clip, clip.channels[channelIndex], playbackTimeSeconds);
 		DirectX::XMFLOAT4 sampled{};
-		DirectX::XMStoreFloat4(&sampled, AnimationSampler::SampleVectorChannel(clip, clip.channels[channelIndex], playbackTimeSeconds));
+		DirectX::XMStoreFloat4(&sampled, weights);
 		outputWeights[0] = sampled.x;
 		outputWeights[1] = sampled.y;
 		outputWeights[2] = sampled.z;

@@ -255,10 +255,13 @@ void GpuCrashSession::ShaderIdentity(std::span<const std::byte> code, std::uint6
 
 		if (debugName != nullptr)
 		{
-			json["nativeDebugName"] = std::string_view(debugName->name, strnlen(debugName->name, sizeof(debugName->name)));
+			const std::size_t debugNameLength = strnlen(debugName->name, sizeof(debugName->name));
+			json["nativeDebugName"] = std::string_view(debugName->name, debugNameLength);
 		}
 		const auto text = json.dump();
-		Enqueue({RhiGpuCrashArtifactKind::ShaderIdentity, m_shaderSequence.fetch_add(1), 0}, std::as_bytes(std::span(text)));
+		const RhiGpuCrashArtifactId artifact{RhiGpuCrashArtifactKind::ShaderIdentity, m_shaderSequence.fetch_add(1), 0};
+		const auto payload = std::as_bytes(std::span(text));
+		Enqueue(artifact, payload);
 	}
 	catch (...)
 	{
@@ -320,7 +323,8 @@ void GpuCrashSession::Settle(bool bLoss, std::int64_t nativeFailure) noexcept
 		while (std::chrono::steady_clock::now() < deadline)
 		{
 			GFSDK_Aftermath_CrashDump_Status status;
-			if (m_status(&status) != GFSDK_Aftermath_Result_Success || status == GFSDK_Aftermath_CrashDump_Status_CollectingDataFailed)
+			const GFSDK_Aftermath_Result statusResult = m_status(&status);
+			if (statusResult != GFSDK_Aftermath_Result_Success || status == GFSDK_Aftermath_CrashDump_Status_CollectingDataFailed)
 			{
 				break;
 			}

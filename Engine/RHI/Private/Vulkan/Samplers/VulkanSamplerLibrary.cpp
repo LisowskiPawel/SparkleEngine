@@ -122,7 +122,8 @@ VkSampler VulkanSamplerLibrary::CreateSampler(const RhiSamplerDesc& desc) const
 	const VkResult result = vkCreateSampler(m_rhi.GetDevice(), &createInfo, nullptr, &sampler);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanSamplerLibraryLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateSampler", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkCreateSampler", result);
+		Diagnostics::Fatal(g_vulkanSamplerLibraryLogger, __FILE__, __LINE__, failureMessage);
 	}
 	return sampler;
 }

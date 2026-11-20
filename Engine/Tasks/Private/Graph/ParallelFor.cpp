@@ -16,7 +16,12 @@ TaskNodeHandle ParallelFor(TaskGraphBuilder& graph, TaskDesc desc, std::uint32_t
 
 	if (itemCount <= policy.SerialThreshold || itemCount <= policy.GrainSize)
 	{
-		return graph.Add(std::move(desc), [itemCount, function = std::move(function)](TaskExecutionContext& context) { return function ? function(0, itemCount, context) : TaskResult::Success(); });
+		auto serialTask = [itemCount, function = std::move(function)](TaskExecutionContext& context)
+		{
+			return function ? function(0, itemCount, context) : TaskResult::Success();
+		};
+
+		return graph.Add(std::move(desc), std::move(serialTask));
 	}
 
 	TaskDesc groupDesc = desc;
@@ -32,7 +37,8 @@ TaskNodeHandle ParallelFor(TaskGraphBuilder& graph, TaskDesc desc, std::uint32_t
 		return static_cast<std::uint32_t>((static_cast<std::uint64_t>(value) + divisor - 1u) / divisor);
 	};
 
-	const std::uint32_t partitionCount = std::min(policy.MaximumPartitions, divideRoundUp(itemCount, policy.GrainSize));
+	const std::uint32_t grainPartitionCount = divideRoundUp(itemCount, policy.GrainSize);
+	const std::uint32_t partitionCount = std::min(policy.MaximumPartitions, grainPartitionCount);
 	for (std::uint32_t partition = 0; partition < partitionCount; ++partition)
 	{
 		const std::uint32_t begin = static_cast<std::uint32_t>(static_cast<std::uint64_t>(itemCount) * partition / partitionCount);

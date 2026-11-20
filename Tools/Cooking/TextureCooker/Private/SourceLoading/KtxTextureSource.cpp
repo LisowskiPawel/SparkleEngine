@@ -123,7 +123,8 @@ namespace KtxSourceLoading
 		}
 		InitializeTextureWicApartment();
 		ScratchImage oriented;
-		CheckTextureOperation(FlipRotate(images.GetImages(), images.GetImageCount(), images.GetMetadata(), flags, oriented), "orient imported KTX pixels");
+		const auto result = FlipRotate(images.GetImages(), images.GetImageCount(), images.GetMetadata(), flags, oriented);
+		CheckTextureOperation(result, "orient imported KTX pixels");
 		images = std::move(oriented);
 	}
 }
@@ -148,7 +149,8 @@ TextureSource LoadKtxTextureSource(std::span<const std::uint8_t> bytes, const Te
 
 	const auto metadata = ReadMetadata(*texture);
 	TextureSource source;
-	source.ProcessingMemory = processingMemory.Acquire(MeasureTextureProcessingMemory(metadata, bytes.size(), request));
+	const auto requiredMemory = MeasureTextureProcessingMemory(metadata, bytes.size(), request);
+	source.ProcessingMemory = processingMemory.Acquire(requiredMemory);
 	const bool bFlipX = texture->orientation.x == KTX_ORIENT_X_LEFT;
 	const bool bFlipY = texture->orientation.y == KTX_ORIENT_Y_UP;
 	if (IsCompressed(metadata.format) && (bFlipX || bFlipY))

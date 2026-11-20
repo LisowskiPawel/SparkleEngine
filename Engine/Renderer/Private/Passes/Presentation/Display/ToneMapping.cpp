@@ -12,8 +12,8 @@
 
 FrameGraphTextureHandle AddToneMappingPass(FrameGraphBuilder& builder, const RenderFrame& frame, RenderViewportExtent outputExtent, const RenderFrameGraphResources& resources)
 {
-	const FrameGraphTextureHandle toneMappedColor = builder.CreateTexture(
-	    FrameGraphTextureDesc::CreateColor("ToneMappedSceneColor", outputExtent.Width, outputExtent.Height, RenderFrameGraphFormats::SceneColor));
+	const FrameGraphTextureDesc toneMappedColorDesc = FrameGraphTextureDesc::CreateColor("ToneMappedSceneColor", outputExtent.Width, outputExtent.Height, RenderFrameGraphFormats::SceneColor);
+	const FrameGraphTextureHandle toneMappedColor = builder.CreateTexture(toneMappedColorDesc);
 
 	auto& parameters = builder.AllocParameters<ToneMappingCS>();
 	parameters->SceneColor = builder.CreateSRV(resources.Presentation.ResolvedSceneColor);
@@ -22,7 +22,10 @@ FrameGraphTextureHandle AddToneMappingPass(FrameGraphBuilder& builder, const Ren
 
 	parameters->ToneMapper = static_cast<std::uint32_t>(frame.View.displaySettings.ToneMapper);
 
-	builder.Dispatch<ToneMappingCS>(parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(outputExtent.Width, 8u), MathUtils::DivideRoundUp(outputExtent.Height, 8u), 1u});
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(outputExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(outputExtent.Height, 8u);
+
+	builder.Dispatch<ToneMappingCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u});
 
 	return toneMappedColor;
 }

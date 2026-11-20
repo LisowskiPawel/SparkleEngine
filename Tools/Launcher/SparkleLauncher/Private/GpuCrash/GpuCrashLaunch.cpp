@@ -103,20 +103,13 @@ namespace SparkleLauncher
 		    [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
 		    {
 			    using Event = nlohmann::json::parse_event_t;
+			    admission.ReadEvent(depth, event);
 			    const bool bContainerStart = event == Event::object_start || event == Event::array_start;
 			    const bool bEntryStart = bContainerStart || event == Event::value;
 			    const bool bFileDepth = bFiles && depth == 2;
 			    if (bFileDepth && bEntryStart && ++fileCount > 65'535)
 			    {
 				    throw Diagnostics::Error("GPU crash incident exceeds its file limit.");
-			    }
-			    if (event == Event::object_start)
-			    {
-				    admission.BeginObject(depth);
-			    }
-			    if (event == Event::array_start || event == Event::value)
-			    {
-				    admission.CheckDepth(depth);
 			    }
 			    if (event == Event::key)
 			    {
@@ -136,15 +129,8 @@ namespace SparkleLauncher
 					    fileCount = 0;
 				    }
 				    const bool bIdentityField = bRootField || bCandidateField;
-				    if (!bIdentityField && !bFileField)
-				    {
-					    return false;
-				    }
-				    admission.ReadKey(depth, key);
-			    }
-			    if (event == Event::object_end)
-			    {
-				    admission.EndObject(depth);
+				    const bool bConsumed = bIdentityField || bFileField;
+				    return bConsumed && admission.ReadKey(depth, key);
 			    }
 			    return true;
 		    });

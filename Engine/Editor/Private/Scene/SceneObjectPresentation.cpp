@@ -25,10 +25,18 @@ namespace SceneObjectPresentation
 		const ImVec2 end(start.x + width, start.y + kHeaderHeight);
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-		drawList->AddRectFilled(start, end, ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::HeaderBackgroundActive()));
-		drawList->AddRectFilled(start, ImVec2(start.x + 3.0f, end.y), ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::Accent()));
-		drawList->AddLine(ImVec2(start.x, start.y), ImVec2(end.x, start.y), SparkleUiPalette::WithAlphaU32(SparkleUiPalette::Border(), 0.52f));
-		drawList->AddLine(ImVec2(start.x, end.y - 1.0f), ImVec2(end.x, end.y - 1.0f), SparkleUiPalette::WithAlphaU32(SparkleUiPalette::Border(), 0.58f));
+		const ImU32 backgroundColor = ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::HeaderBackgroundActive());
+		drawList->AddRectFilled(start, end, backgroundColor);
+		const ImVec2 accentEnd(start.x + 3.0f, end.y);
+		const ImU32 accentColor = ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::Accent());
+		drawList->AddRectFilled(start, accentEnd, accentColor);
+		const ImVec2 topBorderEnd(end.x, start.y);
+		const ImU32 topBorderColor = SparkleUiPalette::WithAlphaU32(SparkleUiPalette::Border(), 0.52f);
+		drawList->AddLine(start, topBorderEnd, topBorderColor);
+		const ImVec2 bottomBorderStart(start.x, end.y - 1.0f);
+		const ImVec2 bottomBorderEnd(end.x, end.y - 1.0f);
+		const ImU32 bottomBorderColor = SparkleUiPalette::WithAlphaU32(SparkleUiPalette::Border(), 0.58f);
+		drawList->AddLine(bottomBorderStart, bottomBorderEnd, bottomBorderColor);
 
 		ImGui::InvisibleButton("##DetailsSelectionHeader", ImVec2(width, kHeaderHeight));
 

@@ -159,27 +159,27 @@ void VulkanDescriptorWrites::Write(VkDevice device, VkDescriptorSet descriptorSe
 	const char* const bindingName = binding.Name != nullptr ? binding.Name : "<unnamed>";
 	if (descriptorSet == VK_NULL_HANDLE || entries.empty())
 	{
-		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, std::format("Vulkan binding '{}' requires a descriptor set and at least one descriptor.", bindingName));
+		const auto failureMessage = std::format("Vulkan binding '{}' requires a descriptor set and at least one descriptor.", bindingName);
+		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, failureMessage);
 	}
 	if (entries.size() > binding.DescriptorCount)
 	{
-		Diagnostics::Fatal(
-		    g_vulkanDescriptorWriterLogger,
-		    __FILE__,
-		    __LINE__,
-		    std::format("Vulkan binding '{}' received {} descriptors; its capacity is {}.", bindingName, entries.size(), binding.DescriptorCount));
+		const auto failureMessage = std::format("Vulkan binding '{}' received {} descriptors; its capacity is {}.", bindingName, entries.size(), binding.DescriptorCount);
+		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	const VulkanDescriptorEntryKind entryKind = entries.front().Kind;
 	const VkDescriptorType descriptorType = ToDescriptorType(entryKind);
 	if (descriptorType == VK_DESCRIPTOR_TYPE_MAX_ENUM)
 	{
-		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, std::format("Vulkan binding '{}' references an empty or released descriptor.", bindingName));
+		const auto failureMessage = std::format("Vulkan binding '{}' references an empty or released descriptor.", bindingName);
+		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	if (!EntryKindMatchesBinding(binding, entryKind))
 	{
-		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, std::format("Vulkan descriptor kind does not match binding '{}'.", bindingName));
+		const auto failureMessage = std::format("Vulkan descriptor kind does not match binding '{}'.", bindingName);
+		Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	std::size_t firstDescriptor = 0;
@@ -191,7 +191,8 @@ void VulkanDescriptorWrites::Write(VkDevice device, VkDescriptorSet descriptorSe
 		DescriptorWriteChunk chunk{};
 		if (!BuildWriteChunk(entryChunk, entryKind, chunk))
 		{
-			Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, std::format("Vulkan binding '{}' contains inconsistent descriptor entries.", bindingName));
+			const auto failureMessage = std::format("Vulkan binding '{}' contains inconsistent descriptor entries.", bindingName);
+			Diagnostics::Fatal(g_vulkanDescriptorWriterLogger, __FILE__, __LINE__, failureMessage);
 		}
 
 		CommitWriteChunk(device, descriptorSet, binding, entryKind, descriptorType, static_cast<std::uint32_t>(firstDescriptor), chunk);

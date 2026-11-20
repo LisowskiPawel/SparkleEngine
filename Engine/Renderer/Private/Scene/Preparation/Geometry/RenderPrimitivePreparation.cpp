@@ -20,8 +20,10 @@ static std::array<DirectX::XMFLOAT3, 8> BuildBoundsCorners(const MeshDrawGeometr
 
 static DirectX::XMFLOAT3 TransformPoint(const DirectX::XMFLOAT3& point, DirectX::FXMMATRIX worldMatrix) noexcept
 {
+	const DirectX::XMVECTOR localPoint = DirectX::XMLoadFloat3(&point);
+	const DirectX::XMVECTOR worldPoint = DirectX::XMVector3TransformCoord(localPoint, worldMatrix);
 	DirectX::XMFLOAT3 transformed;
-	DirectX::XMStoreFloat3(&transformed, DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&point), worldMatrix));
+	DirectX::XMStoreFloat3(&transformed, worldPoint);
 	return transformed;
 }
 
@@ -57,7 +59,8 @@ static RenderMeshWorldBounds TransformBounds(const MeshDrawGeometry& geometry, c
 	RenderMeshWorldBounds bounds;
 	for (const DirectX::XMFLOAT3& corner : corners)
 	{
-		ExpandBounds(TransformPoint(corner, world), bounds);
+		const DirectX::XMFLOAT3 worldCorner = TransformPoint(corner, world);
+		ExpandBounds(worldCorner, bounds);
 	}
 	return bounds;
 }

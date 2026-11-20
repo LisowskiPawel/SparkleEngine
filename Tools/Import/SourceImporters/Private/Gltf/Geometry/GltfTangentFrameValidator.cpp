@@ -52,7 +52,8 @@ void GltfTangentFrameValidator::ValidateBaseFrame(const ImportedVertex& vertex, 
 	{
 		throw Diagnostics::Error(std::format("Normal-mapped glTF vertex {} has invalid tangent handedness.", vertexIndex));
 	}
-	ValidateDirections(vertex.normal, tangent, std::format("Normal-mapped glTF vertex {}", vertexIndex));
+	const auto frameLabel = std::format("Normal-mapped glTF vertex {}", vertexIndex);
+	ValidateDirections(vertex.normal, tangent, frameLabel);
 
 	const float normalLengthSquared = vertex.normal.x * vertex.normal.x + vertex.normal.y * vertex.normal.y + vertex.normal.z * vertex.normal.z;
 	const float tangentLengthSquared = tangent.x * tangent.x + tangent.y * tangent.y + tangent.z * tangent.z;
@@ -70,7 +71,8 @@ void GltfTangentFrameValidator::ValidateMorphFrame(const ImportedVertex& vertex,
 {
 	const DirectX::XMFLOAT3 normal{vertex.normal.x + delta.normal.x, vertex.normal.y + delta.normal.y, vertex.normal.z + delta.normal.z};
 	const DirectX::XMFLOAT3 tangent{vertex.tangent.x + delta.tangent.x, vertex.tangent.y + delta.tangent.y, vertex.tangent.z + delta.tangent.z};
-	ValidateDirections(normal, tangent, std::format("Normal-mapped glTF morph target {}, vertex {}", targetIndex, vertexIndex));
+	const auto frameLabel = std::format("Normal-mapped glTF morph target {}, vertex {}", targetIndex, vertexIndex);
+	ValidateDirections(normal, tangent, frameLabel);
 }
 
 void GltfTangentFrameValidator::ValidateDirections(const DirectX::XMFLOAT3& normal, const DirectX::XMFLOAT3& tangent, std::string_view frameLabel)

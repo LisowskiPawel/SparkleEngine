@@ -184,10 +184,10 @@ private:
 	    const RayTracingDispatchDimensions& dimensions)
 	{
 		const std::uint64_t tableSize = GetRayTracingShaderTableSize(*shaderTable);
+		const std::string bufferName = std::string(tableKey) + ".ShaderTable";
+		const FrameGraphBufferDesc bufferDesc = FrameGraphBufferDesc::Create(bufferName, tableSize);
 
-		FrameGraphBufferHandle shaderTableBuffer = m_frameGraph.ReservePersistentBuffer(
-		    FrameGraphBufferDesc::Create(std::string(tableKey) + ".ShaderTable", tableSize),
-		    ResourceState::RayTracingShaderTable);
+		FrameGraphBufferHandle shaderTableBuffer = m_frameGraph.ReservePersistentBuffer(bufferDesc, ResourceState::RayTracingShaderTable);
 
 		m_frameGraph.BindPersistentBuffer(shaderTableBuffer, shaderTable->GetResource(), ResourceState::RayTracingShaderTable);
 		const std::string diagnosticLabel(label);

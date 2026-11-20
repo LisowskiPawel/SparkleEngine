@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <format>
+#include <string>
 #include <utility>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_textureCacheLogger, "Renderer.TextureCache");
@@ -27,7 +28,9 @@ void TextureCache::LoadDefaultTextures(RenderCommandList& commandList, std::vect
 		const std::optional<ResolvedTexturePath> source = ResolveTexturePath(texturePath);
 		if (!source)
 		{
-			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, std::format("Default texture '{}' could not be resolved.", texturePath.string()));
+			const std::string message = std::format("Default texture '{}' could not be resolved.", texturePath.string());
+
+			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, message);
 		}
 
 		if (m_defaultTextures.contains(source->CacheKey))
@@ -38,11 +41,15 @@ void TextureCache::LoadDefaultTextures(RenderCommandList& commandList, std::vect
 		LoadedTextureData decodedTexture;
 		try
 		{
-			decodedTexture = DecodeCookedTexture(ReadCookedTexturePayload(source->Path));
+			const auto maximumDecodedBytes = m_residency.GetBudget().MaximumDecodedBytes;
+			const CookedTextureFilePayload payload = ReadCookedTexturePayload(source->Path, maximumDecodedBytes);
+			decodedTexture = DecodeCookedTexture(payload, maximumDecodedBytes);
 		}
 		catch (const Diagnostics::Error& error)
 		{
-			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, std::format("Default texture '{}' failed to load: {}", source->Path.string(), error.what()));
+			const std::string message = std::format("Default texture '{}' failed to load: {}", source->Path.string(), error.what());
+
+			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, message);
 		}
 
 		RendererTexture texture = m_textureFactory.Create(source->Path, decodedTexture, commandList);
@@ -78,6 +85,9 @@ void TextureCache::RequestTexture(const ResolvedTexturePath& source, std::uint32
 		return;
 	}
 
+	const auto& budget = m_residency.GetBudget();
+	const auto maximumDecodedBytes = std::min(budget.MaximumDecodedBytes, budget.MaximumPendingUploadBytes);
+	const auto decodeReservationBytes = GetCookedTextureDecodeReservation(source.Path, maximumDecodedBytes);
 	const std::optional<AssetGenerationHandle> handle = m_residency.BeginGeneration(MakeAssetKey(source.CacheKey), generation);
 	if (!handle)
 	{
@@ -91,9 +101,22 @@ void TextureCache::RequestTexture(const ResolvedTexturePath& source, std::uint32
 	TextureRequest request;
 	request.Source = source;
 	request.Generation = *handle;
+	request.DecodeReservationBytes = decodeReservationBytes;
 	request.Payload = std::make_shared<CookedTextureLoadPayload>();
 	m_requests.push_back(std::move(request));
 	LaunchPendingRequests();
+}
+
+void TextureCache::CancelRequest(TextureRequest& request) noexcept
+{
+	request.bWanted = false;
+	if (request.Execution.IsValid())
+	{
+		return;
+	}
+	(void) m_residency.Cancel(request.Generation);
+	request.Decoded.reset();
+	request.Payload.reset();
 }
 
 void TextureCache::SynchronizeSceneTextures(const RenderTextureTable& textures)
@@ -109,7 +132,9 @@ void TextureCache::SynchronizeSceneTextures(const RenderTextureTable& textures)
 		const std::optional<ResolvedTexturePath> source = ResolveTexturePath(texture.Path);
 		if (!source)
 		{
-			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, std::format("Cooked scene texture '{}' could not be resolved.", texture.Path.string()));
+			const std::string message = std::format("Cooked scene texture '{}' could not be resolved.", texture.Path.string());
+
+			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, message);
 		}
 
 		m_wantedPathTextureKeys.insert(source->CacheKey);
@@ -119,9 +144,9 @@ void TextureCache::SynchronizeSceneTextures(const RenderTextureTable& textures)
 	for (TextureRequest& request : m_requests)
 	{
 		request.bWanted = request.Generation.Generation == generation && m_wantedPathTextureKeys.contains(request.Source.CacheKey);
-		if (!request.bWanted && !request.Execution.IsValid())
+		if (!request.bWanted)
 		{
-			(void) m_residency.Cancel(request.Generation);
+			CancelRequest(request);
 		}
 	}
 
@@ -129,7 +154,8 @@ void TextureCache::SynchronizeSceneTextures(const RenderTextureTable& textures)
 	const std::uint64_t nextBindingRevision = m_bindingRevision + 1u;
 	for (auto texture = m_pathTextures.begin(); texture != m_pathTextures.end();)
 	{
-		if (m_wantedPathTextureKeys.contains(texture->first))
+		const bool bCurrentGeneration = texture->second.Generation.Generation == generation;
+		if (bCurrentGeneration && m_wantedPathTextureKeys.contains(texture->first))
 		{
 			++texture;
 			continue;
@@ -153,9 +179,6 @@ void TextureCache::LaunchPendingRequests()
 	    std::count_if(m_requests.begin(), m_requests.end(), [](const TextureRequest& request) noexcept { return request.bLoadStarted && request.Execution.IsValid(); }));
 
 	std::size_t availableSlots = activeLoadCount < kMaximumConcurrentLoads ? kMaximumConcurrentLoads - activeLoadCount : 0;
-	const AssetResidencyBudget& budget = m_residency.GetBudget();
-	// Reserve a full single-upload allowance before a worker can allocate decoded pixels.
-	const std::uint64_t maximumDecodedBytes = std::min(budget.MaximumDecodedBytes, budget.MaximumPendingUploadBytes);
 	for (TextureRequest& request : m_requests)
 	{
 		if (availableSlots == 0)
@@ -167,11 +190,11 @@ void TextureCache::LaunchPendingRequests()
 			continue;
 		}
 
-		if (!m_residency.BeginDecoding(request.Generation, maximumDecodedBytes))
+		if (!m_residency.BeginDecoding(request.Generation, request.DecodeReservationBytes))
 		{
-			return;
+			continue;
 		}
-		request.Execution = LaunchCookedTextureLoad(m_taskExecutor, *m_taskScope, request.Source.Path, request.Payload, maximumDecodedBytes);
+		request.Execution = LaunchCookedTextureLoad(m_taskExecutor, *m_taskScope, request.Source.Path, request.Payload, request.DecodeReservationBytes);
 		request.bLoadStarted = true;
 		--availableSlots;
 	}
@@ -179,6 +202,7 @@ void TextureCache::LaunchPendingRequests()
 
 void TextureCache::ConsumeCompletedRequests() noexcept
 {
+	bool bAcceptedPayload = false;
 	for (TextureRequest& request : m_requests)
 	{
 		if (!request.Execution.IsValid() || !request.Execution.IsSettled())
@@ -197,11 +221,9 @@ void TextureCache::ConsumeCompletedRequests() noexcept
 		}
 		if (executionStatus != TaskExecutionStatus::Succeeded)
 		{
-			Diagnostics::Fatal(
-			    g_textureCacheLogger,
-			    __FILE__,
-			    __LINE__,
-			    std::format("Texture generation {} for '{}' failed: {}", request.Generation.Generation, request.Source.Path.string(), executionResult.GetDiagnostic()));
+			const std::string message = std::format("Texture generation {} for '{}' failed: {}", request.Generation.Generation, request.Source.Path.string(), executionResult.GetDiagnostic());
+
+			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, message);
 		}
 		if (request.Payload == nullptr)
 		{
@@ -216,6 +238,11 @@ void TextureCache::ConsumeCompletedRequests() noexcept
 
 		request.Decoded.emplace(std::move(request.Payload->Texture));
 		request.Payload.reset();
+		bAcceptedPayload = true;
+	}
+	if (bAcceptedPayload)
+	{
+		ValidateSceneTextureCapacity();
 	}
 
 	m_requests.erase(
@@ -228,4 +255,36 @@ void TextureCache::ConsumeCompletedRequests() noexcept
 		        return !request.Execution.IsValid() && !request.Decoded && !request.Uploaded && state == AssetResidencyState::Retired;
 	        }),
 	    m_requests.end());
+}
+
+void TextureCache::ValidateSceneTextureCapacity() const noexcept
+{
+	std::uint64_t wantedBytes = 0;
+	for (const auto& [key, texture] : m_pathTextures)
+	{
+		if (texture.Generation.Generation == m_sceneTextureGeneration && m_wantedPathTextureKeys.contains(key))
+		{
+			wantedBytes += texture.Texture.EstimatedByteSize;
+		}
+	}
+	for (const TextureRequest& request : m_requests)
+	{
+		if (request.bWanted)
+		{
+			if (const auto* generation = m_residency.Find(request.Generation))
+			{
+				wantedBytes += generation->UploadBytes;
+			}
+		}
+	}
+	const auto capacity = m_residency.GetBudget().MaximumResidentBytes;
+	if (wantedBytes > capacity)
+	{
+		const auto message = std::format(
+		    "Scene texture generation {} requires at least {} bytes, exceeding its {}-byte residency budget. Reduce texture storage or resolution.",
+		    m_sceneTextureGeneration,
+		    wantedBytes,
+		    capacity);
+		Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, message);
+	}
 }

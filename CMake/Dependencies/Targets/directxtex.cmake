@@ -22,7 +22,7 @@ function(sparkle_add_directxtex)
     set(ENABLE_LIBPNG_SUPPORT OFF)
     sparkle_add_dependency_subdirectory(${directxtex_SOURCE_DIR} ${directxtex_BINARY_DIR} EXCLUDE_FROM_ALL)
     set_target_properties(DirectXTex PROPERTIES FOLDER "ThirdParty/DirectXTex")
-    set_property(TARGET DirectXTex PROPERTY SPARKLE_SOURCE_PACKAGE
-        "{\"name\":\"DirectXTex\",\"versionInfo\":\"may2026\",\"licenseDeclared\":\"MIT\",\"downloadLocation\":\"https://github.com/microsoft/DirectXTex/tree/${SPARKLE_DIRECTXTEX_REVISION}\"}")
+    sparkle_set_source_package(DirectXTex "DirectXTex" "may2026"
+        "MIT" "https://github.com/microsoft/DirectXTex/tree/${SPARKLE_DIRECTXTEX_REVISION}")
 endfunction()
 sparkle_add_directxtex()

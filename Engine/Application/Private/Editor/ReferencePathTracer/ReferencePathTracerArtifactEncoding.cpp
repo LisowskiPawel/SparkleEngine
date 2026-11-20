@@ -21,18 +21,13 @@ static bool EncodeCheckpoint(const LinearRgbImage& mean, const LinearRgbImage& m
 		return false;
 	}
 
-	std::array<std::vector<std::uint8_t>, 3> planes;
-	const auto meanBytes = std::as_bytes(std::span<const float>(mean.Pixels.data(), mean.Pixels.size()));
-	const auto moment2Bytes = std::as_bytes(std::span<const float>(moment2.Pixels.data(), moment2.Pixels.size()));
-	planes[0].assign(reinterpret_cast<const std::uint8_t*>(meanBytes.data()), reinterpret_cast<const std::uint8_t*>(meanBytes.data() + meanBytes.size()));
-	planes[1].assign(reinterpret_cast<const std::uint8_t*>(moment2Bytes.data()), reinterpret_cast<const std::uint8_t*>(moment2Bytes.data() + moment2Bytes.size()));
 	const std::size_t pixelCount = static_cast<std::size_t>(mean.Width) * mean.Height;
-	planes[2].resize(pixelCount * sizeof(std::uint32_t));
 	const std::uint32_t committed = static_cast<std::uint32_t>(source.SamplePrefix.SampleCount);
-	for (std::size_t pixel = 0; pixel < pixelCount; ++pixel)
-	{
-		std::memcpy(planes[2].data() + pixel * sizeof(committed), &committed, sizeof(committed));
-	}
+	const std::vector<std::uint32_t> committedCounts(pixelCount, committed);
+	const auto meanBytes = std::as_bytes(std::span(mean.Pixels));
+	const auto moment2Bytes = std::as_bytes(std::span(moment2.Pixels));
+	const auto countBytes = std::as_bytes(std::span(committedCounts));
+	const std::array planes{meanBytes, moment2Bytes, countBytes};
 
 	std::array<Hash::Sha256Digest, 3> planeHashes{};
 	for (std::size_t plane = 0; plane < planes.size(); ++plane)
@@ -72,9 +67,9 @@ static bool EncodeCheckpoint(const LinearRgbImage& mean, const LinearRgbImage& m
 	}
 	std::memcpy(bytes.data() + headerHashOffset, headerHash.data(), headerHash.size());
 
-	for (const std::vector<std::uint8_t>& plane : planes)
+	for (const std::span<const std::byte> plane : planes)
 	{
-		writer.WriteBytes(plane);
+		writer.WriteArray(plane);
 	}
 	writer.WriteValue<std::uint32_t>(3u);
 	for (std::size_t plane = 0; plane < planes.size(); ++plane)
@@ -83,7 +78,8 @@ static bool EncodeCheckpoint(const LinearRgbImage& mean, const LinearRgbImage& m
 		writer.WriteValue<std::uint64_t>(planes[plane].size());
 		writer.WriteArray(std::span<const std::byte>(planeHashes[plane]));
 	}
-	checkpoint.assign(reinterpret_cast<const std::byte*>(bytes.data()), reinterpret_cast<const std::byte*>(bytes.data() + bytes.size()));
+	const auto checkpointBytes = std::as_bytes(std::span(bytes));
+	checkpoint.assign(checkpointBytes.begin(), checkpointBytes.end());
 	return true;
 }
 
@@ -137,7 +133,8 @@ std::string ReferencePathTracerArtifactEncoding::BuildManifest(
     std::string_view beautyHash,
     std::string_view checkpointHash)
 {
-	const char* status = request.Kind == ReferencePathTracerArtifactKind::Complete ? "Complete" : (request.Kind == ReferencePathTracerArtifactKind::Checkpoint ? "Checkpoint" : "PartialPrefix");
+	const char* prefixStatus = request.Kind == ReferencePathTracerArtifactKind::Checkpoint ? "Checkpoint" : "PartialPrefix";
+	const char* status = request.Kind == ReferencePathTracerArtifactKind::Complete ? "Complete" : prefixStatus;
 
 	nlohmann::json manifest{
 	    {"beauty", "beauty.exr"},

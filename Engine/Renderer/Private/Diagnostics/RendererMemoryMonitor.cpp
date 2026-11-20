@@ -105,11 +105,16 @@ TextureStreamingMemoryPolicySnapshot RendererMemoryMonitor::BuildTextureStreamin
 		}
 	}
 
+	const bool bTextureAtWatch = IsAtLeast(texturePressure, RendererMemoryPressureLevel::Watch);
+	const bool bConserveTextureMemory = bTextureAtWatch || IsAtLeast(overallPressure, RendererMemoryPressureLevel::Pressure);
+	const bool bTextureAtPressure = IsAtLeast(texturePressure, RendererMemoryPressureLevel::Pressure);
+	const bool bPreferMipDemotion = bTextureAtPressure || IsAtLeast(overallPressure, RendererMemoryPressureLevel::Critical);
+
 	return TextureStreamingMemoryPolicySnapshot{
 	    .OverallPressure = overallPressure,
 	    .TexturePressure = texturePressure,
-	    .bShouldConserveTextureMemory = IsAtLeast(texturePressure, RendererMemoryPressureLevel::Watch) || IsAtLeast(overallPressure, RendererMemoryPressureLevel::Pressure),
-	    .bShouldPreferMipDemotion = IsAtLeast(texturePressure, RendererMemoryPressureLevel::Pressure) || IsAtLeast(overallPressure, RendererMemoryPressureLevel::Critical),
+	    .bShouldConserveTextureMemory = bConserveTextureMemory,
+	    .bShouldPreferMipDemotion = bPreferMipDemotion,
 	    .bShouldBlockMipPromotion = IsAtLeast(texturePressure, RendererMemoryPressureLevel::Critical)};
 }
 

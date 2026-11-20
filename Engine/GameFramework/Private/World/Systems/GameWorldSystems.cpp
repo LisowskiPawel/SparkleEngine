@@ -9,7 +9,9 @@
 #include "Tasks/Public/TaskExecutor.h"
 #include "Tasks/Public/ParallelFor.h"
 
+#include <string>
 #include <string_view>
+#include <utility>
 
 namespace ECS
 {
@@ -28,24 +30,30 @@ namespace ECS
 			return TaskResult::Cancelled("World update cancelled at the owner boundary.");
 		}
 		auto* systems = context.TryGet<GameWorldSystemExecution>();
-		return systems != nullptr && execute(*systems) ? TaskResult::Success() : TaskResult::Failure("World update failed to evaluate its assigned work.");
+		const bool bSucceeded = systems != nullptr && execute(*systems);
+		return bSucceeded ? TaskResult::Success() : TaskResult::Failure("World update failed to evaluate its assigned work.");
 	}
 
 	template <typename Execute> static TaskNodeHandle AddSystemRange(TaskGraphBuilder& tasks, std::string_view name, std::uint32_t count, ParallelForPolicy policy, Execute execute)
 	{
-		return ParallelFor(
-		    tasks,
-		    TaskDesc{std::string(name), TaskLane::FrameCritical},
-		    count,
-		    policy,
-		    [execute](std::uint32_t begin, std::uint32_t end, TaskExecutionContext& context)
-		    {
-			    if (begin == end)
-			    {
-				    return TaskResult::Success();
-			    }
-			    return ExecuteSystemTask(context, [=](GameWorldSystemExecution& systems) { return execute(systems, begin, end); });
-		    });
+		TaskDesc task{std::string(name), TaskLane::FrameCritical};
+
+		auto executePartition = [execute](std::uint32_t begin, std::uint32_t end, TaskExecutionContext& context)
+		{
+			if (begin == end)
+			{
+				return TaskResult::Success();
+			}
+
+			auto executeRange = [execute, begin, end](GameWorldSystemExecution& systems)
+			{
+				return execute(systems, begin, end);
+			};
+
+			return ExecuteSystemTask(context, std::move(executeRange));
+		};
+
+		return ParallelFor(tasks, std::move(task), count, policy, std::move(executePartition));
 	}
 
 	static bool ExecuteSystemTasks(const CompiledTaskGraph& tasks, TaskExecutor& executor, GameWorldSystemExecution& systems)
@@ -76,18 +84,18 @@ namespace ECS
 		    TaskDesc{"Game.CameraMovement", TaskLane::FrameCritical},
 		    [](TaskExecutionContext& context)
 		    {
-			    return ExecuteSystemTask(
-			        context,
-			        [](GameWorldSystemExecution& systems)
-			        {
-				        const EntityId changed = systems.m_camera.Update();
-				        if (changed.IsValid())
-				        {
-					        systems.m_state.MarkTransformDirty(changed);
-					        systems.m_state.RecordChange(changed);
-				        }
-				        return true;
-			        });
+			    const auto moveCamera = [](GameWorldSystemExecution& systems)
+			    {
+				    const EntityId changed = systems.m_camera.Update();
+				    if (changed.IsValid())
+				    {
+					    systems.m_state.MarkTransformDirty(changed);
+					    systems.m_state.RecordChange(changed);
+				    }
+				    return true;
+			    };
+
+			    return ExecuteSystemTask(context, moveCamera);
 		    });
 
 		const auto playback = AddSystemRange(
@@ -120,19 +128,27 @@ namespace ECS
 
 		const auto morphCommit = tasks.Add(
 		    TaskDesc{"Game.MorphOutputCommit", TaskLane::FrameCritical},
-		    [](TaskExecutionContext& context) { return ExecuteSystemTask(context, [](GameWorldSystemExecution& systems) { return systems.m_animation.CommitMorphOutputs(); }); });
+		    [](TaskExecutionContext& context)
+		    {
+			    const auto commitMorphOutputs = [](GameWorldSystemExecution& systems)
+			    {
+				    return systems.m_animation.CommitMorphOutputs();
+			    };
+
+			    return ExecuteSystemTask(context, commitMorphOutputs);
+		    });
 
 		const auto transformPreparation = tasks.Add(
 		    TaskDesc{"Game.PrepareTransforms", TaskLane::FrameCritical},
 		    [](TaskExecutionContext& context)
 		    {
-			    return ExecuteSystemTask(
-			        context,
-			        [](GameWorldSystemExecution& systems)
-			        {
-				        systems.m_state.PrepareTransformWork();
-				        return true;
-			        });
+			    const auto prepareTransforms = [](GameWorldSystemExecution& systems)
+			    {
+				    systems.m_state.PrepareTransformWork();
+				    return true;
+			    };
+
+			    return ExecuteSystemTask(context, prepareTransforms);
 		    });
 
 		tasks.DependsOn(playback, camera);
@@ -184,13 +200,13 @@ namespace ECS
 		    TaskDesc{"Game.ExtractionCommit", TaskLane::FrameCritical},
 		    [](TaskExecutionContext& context)
 		    {
-			    return ExecuteSystemTask(
-			        context,
-			        [](GameWorldSystemExecution& systems)
-			        {
-				        systems.m_state.CommitExtraction();
-				        return true;
-			        });
+			    const auto commitExtraction = [](GameWorldSystemExecution& systems)
+			    {
+				    systems.m_state.CommitExtraction();
+				    return true;
+			    };
+
+			    return ExecuteSystemTask(context, commitExtraction);
 		    });
 
 		tasks.DependsOn(commit, meshes);

@@ -257,7 +257,8 @@ void ProjectLevelCatalogReader::ParseAssetPackField(std::string_view key, std::s
 	}
 	else if (key == "Required")
 	{
-		m_currentPack->requiredRelativePath = std::filesystem::path(Strings::UnquoteCopy(value)).lexically_normal();
+		const std::filesystem::path requiredPath(Strings::UnquoteCopy(value));
+		m_currentPack->requiredRelativePath = requiredPath.lexically_normal();
 	}
 	else if (key == "SourceFiles")
 	{

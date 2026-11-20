@@ -32,10 +32,14 @@ public:
 		{
 			m_result = std::make_shared<TResult>();
 			const auto result = m_result;
-			m_execution = m_executor.Launch(
-			    m_scope,
-			    TaskDesc{std::move(taskName), TaskLane::BlockingIo},
-			    [operation = std::move(operation), result](TaskExecutionContext& context) mutable { return operation(*result, context); });
+
+			auto executeOperation = [operation = std::move(operation), result](TaskExecutionContext& context) mutable
+			{
+				return operation(*result, context);
+			};
+
+			TaskDesc task{std::move(taskName), TaskLane::BlockingIo};
+			m_execution = m_executor.Launch(m_scope, std::move(task), std::move(executeOperation));
 			errorMessage.clear();
 			return true;
 		}

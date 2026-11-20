@@ -90,7 +90,9 @@ RhiSubmissionToken FrameGraphSubmissionExecutor::RecordAndSubmitBatch(const Fram
 		return {};
 	}
 
-	return m_submissionService.SubmitCommandRecordingBatch(m_recordingExecutor.Aggregate(), std::span<const RhiSubmissionToken>(waits.Values.data(), waits.Count));
+	const std::span<RhiCommandRecordingLease> recordings = m_recordingExecutor.Aggregate();
+	const std::span<const RhiSubmissionToken> waitTokens(waits.Values.data(), waits.Count);
+	return m_submissionService.SubmitCommandRecordingBatch(recordings, waitTokens);
 }
 
 bool FrameGraphSubmissionExecutor::UsesNonGraphicsQueue() const noexcept

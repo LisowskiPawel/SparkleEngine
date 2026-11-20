@@ -2,6 +2,7 @@
 #include "Core/Public/Paths/FileSystemPaths.h"
 
 #include "Core/Public/Paths/PathUtils.h"
+#include "Core/Public/Paths/PathFormatting.h"
 
 #include <algorithm>
 #include <cwctype>
@@ -101,19 +102,13 @@ namespace Paths
 
 	std::string MakeSafePathComponent(std::string_view value)
 	{
+		constexpr std::string_view allowedPunctuation = "_-.";
 		std::string result;
 		result.reserve(value.size());
 		for (const char character : value)
 		{
-			const bool bAllowedCharacter = character >= 'a' && character <= 'z';
-			const bool bUppercase = character >= 'A' && character <= 'Z';
-			const bool bLetter = bAllowedCharacter || bUppercase;
-			const bool bDigit = character >= '0' && character <= '9';
-			const bool bAlphanumeric = bLetter || bDigit;
-			const bool bAllowsUnderscore = bAlphanumeric || (character == '_');
-			const bool bAllowsDash = bAllowsUnderscore || (character == '-');
-			const bool bAllowed = bAllowsDash || (character == '.');
-
+			const bool bAlphanumeric = PathFormatting::IsAsciiAlphaNumeric(character);
+			const bool bAllowed = bAlphanumeric || allowedPunctuation.find(character) != std::string_view::npos;
 			result.push_back(bAllowed ? character : '_');
 		}
 		return result;

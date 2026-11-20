@@ -80,7 +80,8 @@ bool UiFrameRenderer::BeginViewportPresentation(FrameGraph& frameGraph, Viewport
 
 	TransitionViewportProduct(frameGraph, viewportProducts, ResourceState::ShaderResource);
 	const FrameGraphResourceHandle resource = ToFrameGraphResourceHandle(product->Handle);
-	const std::uint64_t textureId = m_deviceServices.GetImGuiRenderer().ResolveTextureId(frameGraph.ResolveShaderResourceView(FrameGraphTextureHandle{resource}));
+	const RhiGpuDescriptorHandle shaderResourceView = frameGraph.ResolveShaderResourceView(FrameGraphTextureHandle{resource});
+	const std::uint64_t textureId = m_deviceServices.GetImGuiRenderer().ResolveTextureId(shaderResourceView);
 	if (textureId == 0u)
 	{
 		m_viewportTexture = {};

@@ -77,7 +77,9 @@ void UsedTexturesPanel::DrawToolbar()
 	const std::string filterHint = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Search, "Filter texture/path/format");
 	ImGui::InputTextWithHint("##UsedTexturesFilter", filterHint.c_str(), m_filterBuffer.data(), m_filterBuffer.size());
 	ImGui::SameLine();
-	ImGui::TextDisabled("%zu texture(s), %s estimated", m_snapshot.size(), PanelDiagnosticsFormatting::FormatByteSize(TextureDiagnosticsPresentation::SumEstimatedTextureBytes(m_snapshot)).c_str());
+	const std::uint64_t estimatedBytes = TextureDiagnosticsPresentation::SumEstimatedTextureBytes(m_snapshot);
+	const std::string memory = PanelDiagnosticsFormatting::FormatByteSize(estimatedBytes);
+	ImGui::TextDisabled("%zu texture(s), %s estimated", m_snapshot.size(), memory.c_str());
 }
 
 void UsedTexturesPanel::DrawTextureTable(bool bDisableInteraction)
@@ -168,7 +170,8 @@ void UsedTexturesPanel::DrawPreview(const TextureDiagnosticsRow& row) const
 	}
 
 	ImGui::BeginChild("##TexturePreview", ImVec2(0.0f, availableRegion.y), ImGuiChildFlags_Borders);
-	const ImVec2 imageSize = TextureDiagnosticsPresentation::ComputePreviewImageSize(ImGui::GetContentRegionAvail(), row.Width, row.Height);
+	const ImVec2 previewRegion = ImGui::GetContentRegionAvail();
+	const ImVec2 imageSize = TextureDiagnosticsPresentation::ComputePreviewImageSize(previewRegion, row.Width, row.Height);
 	const ImVec2 start = ImGui::GetCursorPos();
 	const ImVec2 childRegion = ImGui::GetContentRegionAvail();
 	if (childRegion.x > imageSize.x)
@@ -219,8 +222,21 @@ const TextureDiagnosticsRow* UsedTexturesPanel::GetSelectedRow() const noexcept
 bool UsedTexturesPanel::MatchesFilter(const TextureDiagnosticsRow& row) const noexcept
 {
 	const std::string_view filter(m_filterBuffer.data());
+	if (filter.empty())
+	{
+		return true;
+	}
+	const std::string displayName = TextureDiagnosticsPresentation::FormatTextureDisplayName(row);
+	if (Strings::ContainsIgnoreCase(displayName, filter) || Strings::ContainsIgnoreCase(row.Key, filter))
+	{
+		return true;
+	}
 
-	return filter.empty() || Strings::ContainsIgnoreCase(TextureDiagnosticsPresentation::FormatTextureDisplayName(row), filter) || Strings::ContainsIgnoreCase(row.Key, filter)
-	    || Strings::ContainsIgnoreCase(TextureDiagnosticsPresentation::FormatTextureFormat(row.Format), filter)
-	    || Strings::ContainsIgnoreCase(TextureDiagnosticsPresentation::FormatTextureKind(row.Kind), filter);
+	const char* format = TextureDiagnosticsPresentation::FormatTextureFormat(row.Format);
+	if (Strings::ContainsIgnoreCase(format, filter))
+	{
+		return true;
+	}
+	const char* kind = TextureDiagnosticsPresentation::FormatTextureKind(row.Kind);
+	return Strings::ContainsIgnoreCase(kind, filter);
 }

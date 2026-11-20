@@ -50,7 +50,10 @@ void AddDirectLightReservoirTemporalPass(FrameGraphBuilder& builder, const Rende
 		parameters->ViewTemporal = temporal;
 	}
 
-	builder.Dispatch<DirectLightReservoirTemporalCS>(parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(sceneExtent.Width, 8u), MathUtils::DivideRoundUp(sceneExtent.Height, 8u), 1u});
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(sceneExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(sceneExtent.Height, 8u);
+
+	builder.Dispatch<DirectLightReservoirTemporalCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u});
 }
 
 void AddDirectLightReservoirSpatialPass(FrameGraphBuilder& builder, const RenderFrame& frame, RenderViewportExtent sceneExtent, const RenderFrameGraphResources& resources)
@@ -64,5 +67,8 @@ void AddDirectLightReservoirSpatialPass(FrameGraphBuilder& builder, const Render
 
 	BindDirectLightReservoirSurface(builder, frame, parameters, resources);
 
-	builder.Dispatch<DirectLightReservoirSpatialCS>(parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(sceneExtent.Width, 8u), MathUtils::DivideRoundUp(sceneExtent.Height, 8u), 1u});
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(sceneExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(sceneExtent.Height, 8u);
+
+	builder.Dispatch<DirectLightReservoirSpatialCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u});
 }

@@ -61,7 +61,9 @@ namespace Assets
 		const HANDLE fileHandle = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
 		if (fileHandle == INVALID_HANDLE_VALUE)
 		{
-			throw Diagnostics::Error(std::format("Could not open cooked asset '{}': {}", path.generic_string(), FormatSystemError(GetLastError())));
+			const unsigned long error = GetLastError();
+			const std::string errorMessage = FormatSystemError(error);
+			throw Diagnostics::Error(std::format("Could not open cooked asset '{}': {}", path.generic_string(), errorMessage));
 		}
 
 		LARGE_INTEGER fileSize{};
@@ -69,7 +71,8 @@ namespace Assets
 		{
 			const unsigned long error = GetLastError();
 			CloseHandle(fileHandle);
-			throw Diagnostics::Error(std::format("Could not determine the size of cooked asset '{}': {}", path.generic_string(), FormatSystemError(error)));
+			const std::string errorMessage = FormatSystemError(error);
+			throw Diagnostics::Error(std::format("Could not determine the size of cooked asset '{}': {}", path.generic_string(), errorMessage));
 		}
 		if (fileSize.QuadPart <= 0 || static_cast<unsigned long long>(fileSize.QuadPart) > (std::numeric_limits<std::size_t>::max)())
 		{
@@ -82,7 +85,8 @@ namespace Assets
 		{
 			const unsigned long error = GetLastError();
 			CloseHandle(fileHandle);
-			throw Diagnostics::Error(std::format("Could not map cooked asset '{}': {}", path.generic_string(), FormatSystemError(error)));
+			const std::string errorMessage = FormatSystemError(error);
+			throw Diagnostics::Error(std::format("Could not map cooked asset '{}': {}", path.generic_string(), errorMessage));
 		}
 
 		void* const data = MapViewOfFile(mappingHandle, FILE_MAP_READ, 0, 0, 0);
@@ -91,7 +95,8 @@ namespace Assets
 		CloseHandle(fileHandle);
 		if (data == nullptr)
 		{
-			throw Diagnostics::Error(std::format("Could not map cooked asset '{}': {}", path.generic_string(), FormatSystemError(mapError)));
+			const std::string errorMessage = FormatSystemError(mapError);
+			throw Diagnostics::Error(std::format("Could not map cooked asset '{}': {}", path.generic_string(), errorMessage));
 		}
 
 		mappedFile->Data = data;
@@ -101,7 +106,9 @@ namespace Assets
 		const int descriptor = open(path.c_str(), O_RDONLY);
 		if (descriptor < 0)
 		{
-			throw Diagnostics::Error(std::format("Could not open cooked asset '{}': {}", path.generic_string(), std::generic_category().message(errno)));
+			const int error = errno;
+			const std::string errorMessage = std::generic_category().message(error);
+			throw Diagnostics::Error(std::format("Could not open cooked asset '{}': {}", path.generic_string(), errorMessage));
 		}
 
 		struct stat status{};
@@ -109,7 +116,8 @@ namespace Assets
 		{
 			const int error = errno;
 			close(descriptor);
-			throw Diagnostics::Error(std::format("Could not determine the size of cooked asset '{}': {}", path.generic_string(), std::generic_category().message(error)));
+			const std::string errorMessage = std::generic_category().message(error);
+			throw Diagnostics::Error(std::format("Could not determine the size of cooked asset '{}': {}", path.generic_string(), errorMessage));
 		}
 		if (status.st_size <= 0 || static_cast<unsigned long long>(status.st_size) > (std::numeric_limits<std::size_t>::max)())
 		{
@@ -123,7 +131,8 @@ namespace Assets
 		close(descriptor);
 		if (data == MAP_FAILED)
 		{
-			throw Diagnostics::Error(std::format("Could not map cooked asset '{}': {}", path.generic_string(), std::generic_category().message(mapError)));
+			const std::string errorMessage = std::generic_category().message(mapError);
+			throw Diagnostics::Error(std::format("Could not map cooked asset '{}': {}", path.generic_string(), errorMessage));
 		}
 
 		mappedFile->Data = data;

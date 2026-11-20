@@ -19,6 +19,7 @@
 #include <limits>
 #include <string>
 #include <string_view>
+#include <utility>
 
 class CookedMeshAssetTranslation final
 {
@@ -51,7 +52,11 @@ public:
 	}
 
 private:
-	static Assets::CookedAssetId BuildMeshAssetId(std::string_view sceneAssetId, std::size_t meshIndex) { return Hash::Fnv1a64(std::string(sceneAssetId) + "#mesh#" + std::to_string(meshIndex)); }
+	static Assets::CookedAssetId BuildMeshAssetId(std::string_view sceneAssetId, std::size_t meshIndex)
+	{
+		const std::string sourceKey = std::string(sceneAssetId) + "#mesh#" + std::to_string(meshIndex);
+		return Hash::Fnv1a64(sourceKey);
+	}
 
 	static void ValidateGeometry(const ImportedMeshGeometry& geometry, std::size_t primitiveIndex)
 	{
@@ -152,7 +157,8 @@ std::vector<CookedMeshAssetBuild> CookedMeshAssetBuilder::BuildMeshAssets(const 
 	for (std::size_t primitiveIndex = 0; primitiveIndex < importOutput.scene.meshPrimitives.size(); ++primitiveIndex)
 	{
 		const ImportedMeshPrimitive& importedPrimitive = importOutput.scene.meshPrimitives[primitiveIndex];
-		assets.push_back(CookedMeshAssetTranslation::BuildAsset(importedPrimitive, primitiveIndex, sceneAssetId, importOutput.GetSourcePath()));
+		auto asset = CookedMeshAssetTranslation::BuildAsset(importedPrimitive, primitiveIndex, sceneAssetId, importOutput.GetSourcePath());
+		assets.push_back(std::move(asset));
 	}
 
 	return assets;

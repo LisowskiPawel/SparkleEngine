@@ -204,12 +204,9 @@ void GBufferMeshPass::MaterializePipelines(const RenderPassRuntimeCache& runtime
 			continue;
 		}
 
-		const GraphicsPipelineRequest pipelineRequest = BuildGraphicsPipelineRequest(
-		    renderState,
-		    ResolveRasterizerState(material, *gpuMesh, bWireframe),
-		    gpuMesh->GetPrimitiveTopology(),
-		    gpuMesh->GetVertexInputDeclaration(),
-		    attachments);
+		const auto rasterizerState = ResolveRasterizerState(material, *gpuMesh, bWireframe);
+
+		const GraphicsPipelineRequest pipelineRequest = BuildGraphicsPipelineRequest(renderState, rasterizerState, gpuMesh->GetPrimitiveTopology(), gpuMesh->GetVertexInputDeclaration(), attachments);
 
 		runtimeCache.MaterializeGraphicsShaderRuntime<GBufferVS, GBufferPS>(pipelineRequest);
 		const RasterPassRuntime pipeline = runtimeCache.GetGraphicsShaderRuntime<GBufferVS, GBufferPS>(pipelineRequest);

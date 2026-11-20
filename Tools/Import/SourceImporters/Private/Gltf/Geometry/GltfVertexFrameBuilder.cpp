@@ -43,7 +43,9 @@ DirectX::XMFLOAT4 GltfVertexFrameBuilder::BuildAuthoredTangent(const DirectX::XM
 	{
 		throw Diagnostics::Error("glTF primitive contains a zero-length vertex tangent.");
 	}
-	const DirectX::XMVECTOR projected = DirectX::XMVectorSubtract(direction, DirectX::XMVectorMultiply(normal, DirectX::XMVector3Dot(normal, direction)));
+	const auto normalAlignment = DirectX::XMVector3Dot(normal, direction);
+	const auto normalComponent = DirectX::XMVectorMultiply(normal, normalAlignment);
+	const DirectX::XMVECTOR projected = DirectX::XMVectorSubtract(direction, normalComponent);
 	const float projectedLengthSquared = DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(projected));
 	if (projectedLengthSquared <= kMinimumDirectionLengthSquared)
 	{

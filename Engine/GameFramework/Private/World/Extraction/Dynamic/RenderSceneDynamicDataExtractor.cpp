@@ -59,8 +59,12 @@ namespace ECS
 
 	bool RenderSceneDynamicDataExtractor::HasSameObjectData(const RenderObjectDynamicData& left, const RenderObjectDynamicData& right) noexcept
 	{
-		return left.bVisible == right.bVisible && std::memcmp(&left.WorldMatrix, &right.WorldMatrix, sizeof(left.WorldMatrix)) == 0
-		    && std::memcmp(&left.WorldInverseTranspose, &right.WorldInverseTranspose, sizeof(left.WorldInverseTranspose)) == 0;
+		if (left.bVisible != right.bVisible)
+		{
+			return false;
+		}
+		const bool bSameWorldMatrix = std::memcmp(&left.WorldMatrix, &right.WorldMatrix, sizeof(left.WorldMatrix)) == 0;
+		return bSameWorldMatrix && std::memcmp(&left.WorldInverseTranspose, &right.WorldInverseTranspose, sizeof(left.WorldInverseTranspose)) == 0;
 	}
 
 	void RenderSceneDynamicDataExtractor::ExtractSkinning(
@@ -163,7 +167,8 @@ namespace ECS
 			    entities[index],
 			    [](EntityId entity, const MorphMetadata& metadata) { return entity < metadata.Entity; });
 
-			const MorphMetadata* metadata = metadataEnd != m_morphMetadata.begin() && (metadataEnd - 1)->Entity == entities[index] ? &*(metadataEnd - 1) : nullptr;
+			const MorphMetadata* candidate = metadataEnd != m_morphMetadata.begin() ? &*(metadataEnd - 1) : nullptr;
+			const MorphMetadata* metadata = candidate != nullptr && candidate->Entity == entities[index] ? candidate : nullptr;
 			const std::uint32_t weightOffset = static_cast<std::uint32_t>(dynamic.MorphWeights.size());
 			dynamic.MorphWeights.insert(dynamic.MorphWeights.end(), values.begin(), values.end());
 

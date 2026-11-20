@@ -101,9 +101,14 @@ namespace SparkleLauncher
 
 		const std::filesystem::path previewPath = ResolveCleanScopePreviewPath(workspaceRoot, contentId, scope.Value);
 
-		const QString previewText = scope.Value == "cooked" ? QStringLiteral("Generated content - ") + FormatDirectoryInventory(previewPath)
-		                                                    : (scope.Preview.isEmpty() ? ToDisplayPath(workspaceRoot, previewPath) + " - " + FormatDirectoryInventory(previewPath) : scope.Preview);
-
+		const bool bCookedScope = scope.Value == "cooked";
+		QString previewText = scope.Preview;
+		if (bCookedScope || previewText.isEmpty())
+		{
+			const auto displayPath = bCookedScope ? QStringLiteral("Generated content") : ToDisplayPath(workspaceRoot, previewPath);
+			const auto inventory = FormatDirectoryInventory(previewPath);
+			previewText = displayPath + " - " + inventory;
+		}
 		ElidedLabel* scopeDetail = new ElidedLabel(previewText, scopeRow);
 		scopeDetail->setObjectName("CleanScopePreview");
 		scopeDetail->setAlignment(Qt::AlignRight | Qt::AlignVCenter);

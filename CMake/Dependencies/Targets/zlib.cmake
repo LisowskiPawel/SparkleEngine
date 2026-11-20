@@ -20,8 +20,8 @@ endif()
 
 set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 sparkle_add_dependency_subdirectory(${zlib_SOURCE_DIR} ${zlib_BINARY_DIR} EXCLUDE_FROM_ALL)
-set_property(TARGET zlibstatic PROPERTY SPARKLE_SOURCE_PACKAGE
-    "{\"name\":\"zlib\",\"versionInfo\":\"1.3.1\",\"licenseDeclared\":\"Zlib\",\"downloadLocation\":\"https://github.com/madler/zlib/tree/${_sparkle_zlib_revision}\"}")
+sparkle_set_source_package(zlibstatic "zlib" "1.3.1"
+    "Zlib" "https://github.com/madler/zlib/tree/${_sparkle_zlib_revision}")
 
 if(TARGET zlibstatic AND NOT TARGET ZLIB::ZLIB)
     add_library(ZLIB::ZLIB ALIAS zlibstatic)

@@ -1,6 +1,7 @@
+set(_sparkle_spdlog_revision 27cb4c76708608465c413f6d0e6b8d99a4d84302)
 sparkle_declare_git_dependency(spdlog
     https://github.com/gabime/spdlog.git
-    27cb4c76708608465c413f6d0e6b8d99a4d84302)
+    ${_sparkle_spdlog_revision})
 FetchContent_Populate(spdlog)
 
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
@@ -24,3 +25,5 @@ function(sparkle_add_spdlog)
     target_compile_definitions(spdlog PUBLIC FMT_CONSTEVAL=constexpr)
 endfunction()
 sparkle_add_spdlog()
+sparkle_set_source_package(spdlog "spdlog" "1.14.1"
+    "MIT" "https://github.com/gabime/spdlog/tree/${_sparkle_spdlog_revision}")

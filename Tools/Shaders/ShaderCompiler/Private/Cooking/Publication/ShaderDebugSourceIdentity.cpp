@@ -15,127 +15,82 @@
 #include <optional>
 #include <utility>
 
-static nlohmann::json ParseSourceCandidateReceipt(std::string_view receipt, std::map<std::string, std::optional<std::string>>& sourceFiles)
+static nlohmann::json ParseSourceCandidateReceipt(std::string_view receipt, std::map<std::wstring, std::optional<std::string>>& sourceFiles)
 {
 	Json::InputAdmission admission(receipt, 32u * 1024u * 1024u);
 	const std::array<std::string_view, 8> fields{"product", "profile", "variant", "revision", "sourceInputsSha256", "dirtyPatchSha256", "executableSha256", "sourceFiles"};
 	std::size_t fileCount = 0;
 	bool bSourceFiles = false;
-	bool bIdentityField = false;
-	bool bRecordField = false;
+	bool bScalarField = false;
 
-	auto document = nlohmann::json::parse(
-	    receipt.begin(),
-	    receipt.end(),
-	    [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
-	    {
-		    using Event = nlohmann::json::parse_event_t;
-		    const bool bContainerStart = event == Event::object_start || event == Event::array_start;
-		    const bool bIdentityContainer = depth == 1 && bIdentityField;
-		    const bool bInRecord = depth == 3 && bSourceFiles;
-		    const bool bRecordContainer = bInRecord && bRecordField;
-		    if (bContainerStart && (bIdentityContainer || bRecordContainer))
-		    {
-			    throw Diagnostics::Error("Source receipt identity and file fields require scalar values.");
-		    }
-		    if (bSourceFiles && depth == 1 && event == Event::object_start)
-		    {
-			    throw Diagnostics::Error("Source receipt membership must be an array.");
-		    }
-		    if (event == Event::object_start)
-		    {
-			    admission.BeginObject(depth);
-			    if (bSourceFiles && depth == 2 && ++fileCount > 65'536)
-			    {
-				    throw Diagnostics::Error("Source receipt exceeds its membership limit.");
-			    }
-		    }
-		    if (event == Event::array_start || event == Event::value)
-		    {
-			    admission.CheckDepth(depth);
-			    if (bSourceFiles && depth == 2)
-			    {
-				    throw Diagnostics::Error("Source receipt member must be an object.");
-			    }
-		    }
-		    if (event == Event::key)
-		    {
-			    const auto& key = value.get_ref<const std::string&>();
-			    if (depth == 1)
-			    {
-				    bSourceFiles = key == "sourceFiles";
-				    const bool bConsumed = std::find(fields.begin(), fields.end(), key) != fields.end();
-				    bIdentityField = bConsumed && !bSourceFiles;
-				    if (!bConsumed)
-				    {
-					    return false;
-				    }
-			    }
-			    else
-			    {
-				    const bool bFileKey = depth == 3 && bSourceFiles;
-				    const bool bConsumed = key == "Path" || key == "Sha256";
-				    bRecordField = bFileKey && bConsumed;
-				    if (!bRecordField)
-				    {
-					    return false;
-				    }
-			    }
-			    admission.ReadKey(depth, key);
-		    }
-		    if (event == Event::object_end)
-		    {
-			    admission.EndObject(depth);
-			    if (bSourceFiles && depth == 2)
-			    {
-				    const auto& name = value.at("Path").get_ref<const std::string&>();
-				    const auto& hash = value.at("Sha256");
-				    std::optional<std::string> expected;
-				    if (!hash.is_null())
-				    {
-					    expected = hash.get<std::string>();
-				    }
-				    if (!sourceFiles.emplace(name, std::move(expected)).second)
-				    {
-					    throw Diagnostics::Error("Source receipt repeats a path.");
-				    }
-				    return false;
-			    }
-		    }
-		    return true;
-	    });
+	const auto admitValue = [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
+	{
+		using Event = nlohmann::json::parse_event_t;
+		admission.ReadEvent(depth, event);
+		const bool bContainerStart = event == Event::object_start || event == Event::array_start;
+		const bool bRecordDepth = bSourceFiles && depth == 3;
+		const bool bScalarDepth = depth == 1 || bRecordDepth;
+		const bool bScalarValue = bScalarDepth && bScalarField;
+		if (bContainerStart && bScalarValue)
+		{
+			throw Diagnostics::Error("Source receipt identity and file fields require scalar values.");
+		}
+		if (bSourceFiles && depth == 1 && event == Event::object_start)
+		{
+			throw Diagnostics::Error("Source receipt membership must be an array.");
+		}
+		const bool bEntryStart = bContainerStart || event == Event::value;
+		if (bSourceFiles && depth == 2 && bEntryStart)
+		{
+			if (event != Event::object_start)
+			{
+				throw Diagnostics::Error("Source receipt member must be an object.");
+			}
+			if (++fileCount > 65'536)
+			{
+				throw Diagnostics::Error("Source receipt exceeds its membership limit.");
+			}
+		}
+		if (event != Event::key)
+		{
+			return true;
+		}
 
-	// Finish complete syntax/schema/count admission before touching member files.
+		const auto& key = value.get_ref<const std::string&>();
+		if (depth == 1)
+		{
+			bSourceFiles = key == "sourceFiles";
+			const bool bConsumed = std::find(fields.begin(), fields.end(), key) != fields.end();
+			bScalarField = bConsumed && !bSourceFiles;
+			return bConsumed && admission.ReadKey(depth, key);
+		}
+		const bool bFileKey = key == "Path" || key == "Sha256";
+		bScalarField = bRecordDepth && bFileKey;
+		return bScalarField && admission.ReadKey(depth, key);
+	};
+
+	auto document = nlohmann::json::parse(receipt.begin(), receipt.end(), admitValue);
 	if (!document.is_object() || !document.at("sourceFiles").is_array() || fileCount == 0)
 	{
 		throw Diagnostics::Error("Compiler source receipt has no bounded membership array.");
 	}
-
 	for (const auto key : fields)
 	{
 		if (key == "sourceFiles")
 		{
 			continue;
 		}
-		const auto& value = document.at(std::string(key));
-		if (!value.is_string() || value.get_ref<const std::string&>().empty())
+		const auto* value = document.at(std::string(key)).get_ptr<const std::string*>();
+		if (value == nullptr || value->empty())
 		{
 			throw Diagnostics::Error("Compiler source identity is incomplete.");
 		}
 	}
 
-	document.erase("sourceFiles");
-	return document;
-}
-
-void ShaderDebugArtifactWriter::VerifySourceCandidateFiles(std::map<std::string, std::optional<std::string>> sourceFiles)
-{
 	const auto& root = Filesystem::GetWorkspaceRootPath();
-	while (!sourceFiles.empty())
+	for (const auto& file : document.at("sourceFiles"))
 	{
-		auto file = sourceFiles.extract(sourceFiles.begin());
-		const auto& relative = file.key();
-		const auto& expected = file.mapped();
+		const auto& relative = file.at("Path").get_ref<const std::string&>();
 		const std::filesystem::path relativePath = Strings::ToWide(relative);
 		const auto source = root / relativePath;
 		const bool bInvalidRoot = relativePath.has_root_path() || relative.empty();
@@ -145,19 +100,35 @@ void ShaderDebugArtifactWriter::VerifySourceCandidateFiles(std::map<std::string,
 		{
 			throw Diagnostics::Error("Source receipt escapes the workspace.");
 		}
+		const auto& hash = file.at("Sha256");
+		std::optional<std::string> expected;
+		if (!hash.is_null())
+		{
+			expected = hash.get<std::string>();
+		}
+		if (!sourceFiles.emplace(Paths::MakePathKey(source), std::move(expected)).second)
+		{
+			throw Diagnostics::Error("Source receipt repeats a path.");
+		}
+	}
+	return document;
+}
 
+void ShaderDebugArtifactWriter::VerifySourceCandidateFiles(const nlohmann::json& sourceFiles) const
+{
+	const auto& root = Filesystem::GetWorkspaceRootPath();
+	for (const auto& file : sourceFiles)
+	{
+		const auto source = root / Strings::ToWide(file.at("Path").get_ref<const std::string&>());
+		const auto& expected = m_sourceFileHashes.at(Paths::MakePathKey(source));
 		if (!expected.has_value())
 		{
 			if (std::filesystem::exists(source))
 			{
 				throw Diagnostics::Error("A deleted build input has reappeared; rebuild the diagnostic candidate.");
 			}
-			continue;
 		}
-
-		const bool bHashMatches = HashFile(source) == *expected;
-		const bool bUnique = bHashMatches && m_sourceFileHashes.emplace(Paths::MakePathKey(source), std::move(*file.mapped())).second;
-		if (!bUnique)
+		else if (HashFile(source) != *expected)
 		{
 			throw Diagnostics::Error("Source changed since the diagnostic compiler build; rebuild the candidate.");
 		}
@@ -176,14 +147,17 @@ void ShaderDebugArtifactWriter::RecordSourceCandidate()
 
 	try
 	{
-		std::map<std::string, std::optional<std::string>> sourceFiles;
-		const auto identity = ParseSourceCandidateReceipt(receipt, sourceFiles);
-		if (identity.at("executableSha256").get_ref<const std::string&>() != HashFile(Filesystem::GetExecutablePath()))
+		auto identity = ParseSourceCandidateReceipt(receipt, m_sourceFileHashes);
+		const auto& expectedExecutableHash = identity.at("executableSha256").get_ref<const std::string&>();
+		const auto executablePath = Filesystem::GetExecutablePath();
+		const auto executableHash = HashFile(executablePath);
+		if (expectedExecutableHash != executableHash)
 		{
 			throw Diagnostics::Error("Compiler source receipt does not identify this executable.");
 		}
 
-		VerifySourceCandidateFiles(std::move(sourceFiles));
+		VerifySourceCandidateFiles(identity.at("sourceFiles"));
+		identity.erase("sourceFiles");
 
 		WriteText("product-receipt.json", identity.dump());
 	}

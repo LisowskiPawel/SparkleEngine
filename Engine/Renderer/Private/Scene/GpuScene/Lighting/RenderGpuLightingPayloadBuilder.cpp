@@ -6,6 +6,7 @@
 #include "ShaderData/SceneLightingUniformData.h"
 
 #include <format>
+#include <string>
 #include <string_view>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_renderGpuLightingPayloadBuilderLogger, "Renderer.RenderGpuLightingPayloadBuilder");
@@ -14,7 +15,9 @@ static void ValidateLightCount(std::string_view lightKind, std::size_t count, st
 {
 	if (count > limit)
 	{
-		Diagnostics::Fatal(g_renderGpuLightingPayloadBuilderLogger, __FILE__, __LINE__, std::format("Scene contains {} {} lights, exceeding the renderer limit of {}.", count, lightKind, limit));
+		const std::string message = std::format("Scene contains {} {} lights, exceeding the renderer limit of {}.", count, lightKind, limit);
+
+		Diagnostics::Fatal(g_renderGpuLightingPayloadBuilderLogger, __FILE__, __LINE__, message);
 	}
 }
 

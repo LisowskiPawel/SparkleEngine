@@ -72,7 +72,9 @@ bool TaskEvent::Signal(TaskEventToken token, TaskResult result) noexcept
 {
 	{
 		std::lock_guard lock(m_state->Mutex);
-		if (!token || token.m_identity != m_state->Identity || token.m_generation != m_state->Generation || m_state->bSignalled)
+		const bool bEventMatches = token && token.m_identity == m_state->Identity;
+		const bool bTokenCurrent = bEventMatches && token.m_generation == m_state->Generation;
+		if (!bTokenCurrent || m_state->bSignalled)
 		{
 			return false;
 		}
@@ -86,7 +88,9 @@ bool TaskEvent::Signal(TaskEventToken token, TaskResult result) noexcept
 TaskEventToken TaskEvent::Reset() noexcept
 {
 	std::lock_guard lock(m_state->Mutex);
-	if (!m_state->bSignalled || m_state->WaiterCount != 0 || m_state->Generation == std::numeric_limits<std::uint64_t>::max())
+	const bool bWaitersSettled = m_state->bSignalled && m_state->WaiterCount == 0;
+	const bool bCanReset = bWaitersSettled && m_state->Generation != std::numeric_limits<std::uint64_t>::max();
+	if (!bCanReset)
 	{
 		return {};
 	}
@@ -104,22 +108,35 @@ TaskResult TaskEvent::Wait(TaskEventToken token, TaskExecutionContext& context)
 	}
 
 	const std::shared_ptr state = m_state;
-	std::stop_callback cancellationWake(
-	    context.GetCancellationToken(),
-	    [state]
-	    {
-		    std::lock_guard lock(state->Mutex);
-		    state->Condition.notify_all();
-	    });
+	auto wakeOnCancellation = [state]
+	{
+		std::lock_guard lock(state->Mutex);
+		state->Condition.notify_all();
+	};
+
+	std::stop_callback cancellationWake(context.GetCancellationToken(), std::move(wakeOnCancellation));
 	std::unique_lock lock(state->Mutex);
 	State::WaitRegistration waiterRegistration(*state);
-	state->Condition.wait(lock, [&] { return context.IsCancellationRequested() || token.m_identity != state->Identity || token.m_generation != state->Generation || state->bSignalled; });
+	const auto isReady = [&]
+	{
+		if (context.IsCancellationRequested())
+		{
+			return true;
+		}
+
+		const bool bTokenStale = token.m_identity != state->Identity || token.m_generation != state->Generation;
+		return bTokenStale || state->bSignalled;
+	};
+
+	state->Condition.wait(lock, isReady);
 
 	if (context.IsCancellationRequested())
 	{
 		return TaskResult::Cancelled("TaskEvent wait was cancelled.");
 	}
-	if (!token || token.m_identity != state->Identity || token.m_generation != state->Generation)
+	const bool bEventMatches = token && token.m_identity == state->Identity;
+	const bool bTokenCurrent = bEventMatches && token.m_generation == state->Generation;
+	if (!bTokenCurrent)
 	{
 		return TaskResult::Failure("TaskEvent token is stale or belongs to another event.");
 	}

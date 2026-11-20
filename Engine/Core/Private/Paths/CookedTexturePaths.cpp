@@ -21,7 +21,8 @@ namespace Filesystem
 
 	std::optional<std::filesystem::path> ResolveCookedTexturePath(const std::filesystem::path& inputPath)
 	{
-		if (!Strings::EqualsIgnoreCase(inputPath.extension().string(), ".stex"))
+		const std::string extension = inputPath.extension().string();
+		if (!Strings::EqualsIgnoreCase(extension, ".stex"))
 		{
 			return std::nullopt;
 		}
@@ -29,18 +30,22 @@ namespace Filesystem
 		{
 			return ResolveTextureFile(inputPath);
 		}
-		if (const auto path = ResolveTextureFile(GetCookedTextureRootPath() / inputPath))
+		const auto texturePath = GetCookedTextureRootPath() / inputPath;
+		if (const auto path = ResolveTextureFile(texturePath))
 		{
 			return path;
 		}
-		return ResolveTextureFile(GetCookedAssetRootPath() / inputPath);
+		const auto assetPath = GetCookedAssetRootPath() / inputPath;
+		return ResolveTextureFile(assetPath);
 	}
 
 	void AppendCookedTexturePaths(std::span<const std::filesystem::path> inputPaths, std::vector<std::filesystem::path>& destination)
 	{
 		for (const std::filesystem::path& inputPath : inputPaths)
 		{
-			std::filesystem::path normalizedPath = ResolveCookedTexturePath(inputPath).value_or(Paths::Normalize(inputPath));
+			auto cookedPath = ResolveCookedTexturePath(inputPath);
+			auto fallbackPath = Paths::Normalize(inputPath);
+			std::filesystem::path normalizedPath = std::move(cookedPath).value_or(std::move(fallbackPath));
 			if (!normalizedPath.empty())
 			{
 				destination.push_back(std::move(normalizedPath));

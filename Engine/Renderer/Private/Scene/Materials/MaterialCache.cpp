@@ -13,8 +13,10 @@
 #include "Scene/Preparation/PreparedRenderScene.h"
 #include "Textures/RendererTexture.h"
 #include "Textures/TextureCache.h"
+#include "Assets/Shaders/Material/MaterialTextureFlags.hlsli"
 
 #include <array>
+#include <cstddef>
 #include <format>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_materialCacheLogger, "Renderer.MaterialCache");
@@ -84,6 +86,46 @@ void MaterialCache::BuildMaterial(const MaterialDesc& desc, std::uint32_t materi
 	    m_textureCache.ResolveTextureReferenceOrSemanticDefault(desc.FindTextureReference(TextureGroup::Emissive), DefaultTexture::Black),
 	    m_textureCache.ResolveTextureReferenceOrSemanticDefault(desc.FindTextureReference(TextureGroup::SubsurfaceColor), DefaultTexture::Black),
 	    m_textureCache.ResolveTextureReferenceOrSemanticDefault(desc.FindTextureReference(TextureGroup::SubsurfaceStrength), DefaultTexture::Black)};
+	for (std::size_t slot = 0; slot < textures.size(); ++slot)
+	{
+		const RendererTexture* texture = textures[slot];
+		if (texture == nullptr)
+		{
+			continue;
+		}
+		const bool bSingle2DImage = texture->Dimension == TextureResourceDimension::Texture2D && texture->ArraySize == 1;
+		if (!bSingle2DImage || texture->Format == PixelFormat::R32_UInt)
+		{
+			const auto message = std::format(
+			    "Material {} texture slot {} binds {} layers with dimension {} and format {}. Material shaders require one 2D image sampled as floating-point values.",
+			    materialIndex,
+			    slot,
+			    texture->ArraySize,
+			    static_cast<std::uint32_t>(texture->Dimension),
+			    PixelFormatName(texture->Format));
+			Diagnostics::Fatal(g_materialCacheLogger, __FILE__, __LINE__, message);
+		}
+	}
+	if (const RendererTexture* normal = textures[MaterialTextureSlots::Normal])
+	{
+		switch (PixelFormatToLinear(normal->Format))
+		{
+			case PixelFormat::BC5_UNorm:
+				break;
+			case PixelFormat::R8G8B8A8_UNorm:
+			case PixelFormat::B8G8R8A8_UNorm:
+			case PixelFormat::R16G16B16A16_Float:
+			case PixelFormat::R32G32B32A32_Float:
+			case PixelFormat::BC1_UNorm:
+			case PixelFormat::BC2_UNorm:
+			case PixelFormat::BC3_UNorm:
+			case PixelFormat::BC7_UNorm:
+				material.textureFlags |= MaterialTextureFlags::RgbNormal;
+				break;
+			default:
+				Diagnostics::Fatal(g_materialCacheLogger, __FILE__, __LINE__, "Material normal textures require unsigned BC5 XY or RGB normal samples.");
+		}
+	}
 
 	auto textureBindingSet = m_renderHardwareInterface.GetDescriptorService().CreateBindingSet(
 	    RenderBindingSetDesc{.DescriptorType = ERhiDescriptorAllocatorType::ShaderResource, .DescriptorCount = MaterialTextureSlots::Count});

@@ -19,7 +19,8 @@ namespace Filesystem
 	{
 #if defined(_WIN32)
 		PWSTR knownFolderPath = nullptr;
-		if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &knownFolderPath)))
+		const HRESULT folderResult = SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &knownFolderPath);
+		if (SUCCEEDED(folderResult))
 		{
 			const std::filesystem::path result(knownFolderPath);
 			CoTaskMemFree(knownFolderPath);

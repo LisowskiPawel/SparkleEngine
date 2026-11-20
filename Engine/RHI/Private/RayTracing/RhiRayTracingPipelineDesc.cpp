@@ -79,11 +79,12 @@ void RhiContract::ValidateTraceRaysDesc(const TraceRaysDesc& desc, ERhiQueueType
 	}
 	if (!desc.ShaderTable->MatchesPipeline(*desc.Pipeline))
 	{
-		Diagnostics::Fatal(
-		    g_rayTracingLogger,
-		    __FILE__,
-		    __LINE__,
-		    std::format("TraceRays shader table belongs to a different pipeline or generation (table={}, pipeline={}).", desc.ShaderTable->GetGeneration(), desc.Pipeline->GetGeneration()));
+		const auto failureMessage = std::format(
+		    "TraceRays shader table belongs to a different pipeline or generation (table={}, pipeline={}).",
+		    desc.ShaderTable->GetGeneration(),
+		    desc.Pipeline->GetGeneration());
+
+		Diagnostics::Fatal(g_rayTracingLogger, __FILE__, __LINE__, failureMessage);
 	}
 	const bool bGeneralRegionsMatch = desc.RayGeneration == desc.ShaderTable->GetRayGenerationRegion() && desc.Miss == desc.ShaderTable->GetMissRegion();
 	const bool bOtherRegionsMatch = desc.HitGroup == desc.ShaderTable->GetHitGroupRegion() && desc.Callable == desc.ShaderTable->GetCallableRegion();

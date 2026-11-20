@@ -17,9 +17,16 @@ RayTracingTraceResult TraceSceneRay(RaytracingAccelerationStructure sceneTlas, f
 	while (query.Proceed())
 	{
 		const bool bNonOpaqueCandidate = query.CandidateType() == CANDIDATE_NON_OPAQUE_TRIANGLE;
+		if (!bNonOpaqueCandidate)
+		{
+			continue;
+		}
 
-		const bool bCandidateAlphaAccepted = bNonOpaqueCandidate
-		    && ResolveRayTracingCandidateAlpha(query.CandidateInstanceID(), query.CandidatePrimitiveIndex(), query.CandidateTriangleBarycentrics(), query.CandidateTriangleFrontFace());
+		const uint instanceId = query.CandidateInstanceID();
+		const uint primitiveIndex = query.CandidatePrimitiveIndex();
+		const float2 barycentrics = query.CandidateTriangleBarycentrics();
+		const bool bFrontFace = query.CandidateTriangleFrontFace();
+		const bool bCandidateAlphaAccepted = ResolveRayTracingCandidateAlpha(instanceId, primitiveIndex, barycentrics, bFrontFace);
 
 		if (bCandidateAlphaAccepted)
 		{

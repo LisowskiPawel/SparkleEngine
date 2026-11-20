@@ -29,7 +29,9 @@ public:
 		m_artifact = path;
 		m_artifact += L".wpix";
 
-		if (FAILED(PIXSetTargetWindow(static_cast<HWND>(target.Window))) || FAILED(PIXGpuCaptureNextFrames(m_artifact.c_str(), 1)))
+		const HRESULT targetResult = PIXSetTargetWindow(static_cast<HWND>(target.Window));
+		const bool bCaptureRequested = SUCCEEDED(targetResult) && SUCCEEDED(PIXGpuCaptureNextFrames(m_artifact.c_str(), 1));
+		if (!bCaptureRequested)
 		{
 			error = "PIX rejected the native target or capture request.";
 			return false;

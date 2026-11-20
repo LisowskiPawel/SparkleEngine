@@ -6,6 +6,8 @@
 
 #include <algorithm>
 #include <limits>
+#include <memory>
+#include <utility>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_renderCoordinatorLogger, "Renderer.Coordinator");
 
@@ -26,7 +28,9 @@ void RenderCoordinator::ReloadShaders()
 {
 	m_producerOwner.AssertAccess();
 
-	(void) ExtractControlResult<std::monostate>(ExecuteSynchronousControl(RenderReloadShadersCommand{std::make_shared<RenderControlCompletion>()}));
+	RenderReloadShadersCommand command{std::make_shared<RenderControlCompletion>()};
+	RenderControlResult result = ExecuteSynchronousControl(std::move(command));
+	(void) ExtractControlResult<std::monostate>(std::move(result));
 }
 
 std::uint64_t RenderCoordinator::GetShaderGeneration() const noexcept
@@ -38,39 +42,45 @@ std::uint64_t RenderCoordinator::GetShaderGeneration() const noexcept
 ShaderDiagnosticsSnapshot RenderCoordinator::CaptureShaderDiagnostics()
 {
 	m_producerOwner.AssertAccess();
-	return ExtractControlResult<ShaderDiagnosticsSnapshot>(ExecuteSynchronousControl(RenderDiagnosticsCommand{RenderDiagnosticsRequestKind::Shaders, 0, std::make_shared<RenderControlCompletion>()}));
+	RenderDiagnosticsCommand command{RenderDiagnosticsRequestKind::Shaders, 0, std::make_shared<RenderControlCompletion>()};
+	RenderControlResult result = ExecuteSynchronousControl(std::move(command));
+	return ExtractControlResult<ShaderDiagnosticsSnapshot>(std::move(result));
 }
 
 MeshDiagnosticsSnapshot RenderCoordinator::CaptureMeshDiagnostics()
 {
 	m_producerOwner.AssertAccess();
-	auto completion = std::make_shared<RenderControlCompletion>();
 
-	return ExtractControlResult<MeshDiagnosticsSnapshot>(ExecuteSynchronousControl(RenderDiagnosticsCommand{RenderDiagnosticsRequestKind::Meshes, 0, completion}));
+	RenderDiagnosticsCommand command{RenderDiagnosticsRequestKind::Meshes, 0, std::make_shared<RenderControlCompletion>()};
+	RenderControlResult result = ExecuteSynchronousControl(std::move(command));
+	return ExtractControlResult<MeshDiagnosticsSnapshot>(std::move(result));
 }
 
 MeshPreviewGeometry RenderCoordinator::CaptureMeshPreview(std::uintptr_t meshRuntimeId)
 {
 	m_producerOwner.AssertAccess();
-	auto completion = std::make_shared<RenderControlCompletion>();
 
-	return ExtractControlResult<MeshPreviewGeometry>(ExecuteSynchronousControl(RenderDiagnosticsCommand{RenderDiagnosticsRequestKind::MeshPreview, meshRuntimeId, completion}));
+	RenderDiagnosticsCommand command{RenderDiagnosticsRequestKind::MeshPreview, meshRuntimeId, std::make_shared<RenderControlCompletion>()};
+	RenderControlResult result = ExecuteSynchronousControl(std::move(command));
+	return ExtractControlResult<MeshPreviewGeometry>(std::move(result));
 }
 
 TextureDiagnosticsSnapshot RenderCoordinator::CaptureTextureDiagnostics()
 {
 	m_producerOwner.AssertAccess();
-	auto completion = std::make_shared<RenderControlCompletion>();
 
-	return ExtractControlResult<TextureDiagnosticsSnapshot>(ExecuteSynchronousControl(RenderDiagnosticsCommand{RenderDiagnosticsRequestKind::Textures, 0, completion}));
+	RenderDiagnosticsCommand command{RenderDiagnosticsRequestKind::Textures, 0, std::make_shared<RenderControlCompletion>()};
+	RenderControlResult result = ExecuteSynchronousControl(std::move(command));
+	return ExtractControlResult<TextureDiagnosticsSnapshot>(std::move(result));
 }
 
 RendererMemoryDiagnosticsSnapshot RenderCoordinator::CaptureMemoryDiagnostics()
 {
 	m_producerOwner.AssertAccess();
-	auto completion = std::make_shared<RenderControlCompletion>();
 
-	return ExtractControlResult<RendererMemoryDiagnosticsSnapshot>(ExecuteSynchronousControl(RenderDiagnosticsCommand{RenderDiagnosticsRequestKind::Memory, 0, completion}));
+	RenderDiagnosticsCommand command{RenderDiagnosticsRequestKind::Memory, 0, std::make_shared<RenderControlCompletion>()};
+	RenderControlResult result = ExecuteSynchronousControl(std::move(command));
+	return ExtractControlResult<RendererMemoryDiagnosticsSnapshot>(std::move(result));
 }
 
 ViewportCaptureAdmission RenderCoordinator::RequestViewportCapture(ViewportCaptureRequest request)
@@ -91,8 +101,10 @@ ViewportCaptureAdmission RenderCoordinator::RequestViewportCapture(ViewportCaptu
 	const ViewportCaptureId id{m_nextViewportCaptureId};
 	if (m_config.IsThreaded())
 	{
-		const RenderThreadCommandAdmission admission = m_threadCommandQueue->TryPush(
-		    RenderThreadCommand{IssueThreadCommandSequence(), RendererExecutionControl{RenderCaptureCommand{id, std::move(request)}}});
+		const std::uint64_t sequenceNumber = IssueThreadCommandSequence();
+		RenderCaptureCommand captureCommand{id, std::move(request)};
+		RenderThreadCommand threadCommand{sequenceNumber, RendererExecutionControl{std::move(captureCommand)}};
+		const RenderThreadCommandAdmission admission = m_threadCommandQueue->TryPush(std::move(threadCommand));
 
 		if (admission == RenderThreadCommandAdmission::Full)
 		{
@@ -244,7 +256,8 @@ CVarControlResult RenderCoordinator::ExecuteConsoleVariables(CVarControlRequest 
 {
 	m_producerOwner.AssertAccess();
 
-	RenderControlResult result = ExecuteSynchronousControl(RenderCVarCommand{std::move(request), std::make_shared<RenderControlCompletion>()});
+	RenderCVarCommand command{std::move(request), std::make_shared<RenderControlCompletion>()};
+	RenderControlResult result = ExecuteSynchronousControl(std::move(command));
 
 	if (auto* error = std::get_if<RenderControlError>(&result))
 	{
@@ -257,7 +270,9 @@ EngineRenderingSettingsState RenderCoordinator::CaptureRenderingSettings()
 {
 	m_producerOwner.AssertAccess();
 
-	return ExtractControlResult<EngineRenderingSettingsState>(ExecuteSynchronousControl(RenderSettingsCaptureCommand{std::make_shared<RenderControlCompletion>()}));
+	RenderSettingsCaptureCommand command{std::make_shared<RenderControlCompletion>()};
+	RenderControlResult result = ExecuteSynchronousControl(std::move(command));
+	return ExtractControlResult<EngineRenderingSettingsState>(std::move(result));
 }
 
 void RenderCoordinator::SubmitThreadCommand(RenderThreadCommandPayload payload)
@@ -277,7 +292,8 @@ void RenderCoordinator::SubmitThreadCommand(RenderThreadCommandPayload payload)
 		    },
 		    *control);
 	}
-	if (!m_threadCommandQueue->WaitPush(RenderThreadCommand{sequenceNumber, std::move(payload)}))
+	RenderThreadCommand command{sequenceNumber, std::move(payload)};
+	if (!m_threadCommandQueue->WaitPush(std::move(command)))
 	{
 		if (completion)
 		{
@@ -330,7 +346,9 @@ ExternalCaptureAdmission RenderCoordinator::RequestExternalCapture(std::uint64_t
 	RenderExternalCaptureCommand command{admission.RequestId};
 	if (m_config.IsThreaded())
 	{
-		const auto result = m_threadCommandQueue->TryPush(RenderThreadCommand{IssueThreadCommandSequence(), RendererExecutionControl{command}});
+		const std::uint64_t sequenceNumber = IssueThreadCommandSequence();
+		RenderThreadCommand threadCommand{sequenceNumber, RendererExecutionControl{command}};
+		const auto result = m_threadCommandQueue->TryPush(std::move(threadCommand));
 
 		if (result != RenderThreadCommandAdmission::Accepted)
 		{

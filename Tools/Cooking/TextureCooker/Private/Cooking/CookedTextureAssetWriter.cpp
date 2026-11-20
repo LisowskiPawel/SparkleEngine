@@ -1,10 +1,11 @@
 #include "PCH.h"
 #include "Cooking/CookedTextureAssetWriter.h"
-#include "Processing/TextureProcessor.h"
 #include "Textures/CookedTextureAsset.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/BinaryStreamWriter.h"
 #include "Core/Public/Files/FileUtils.h"
+
+#include <DirectXTex.h>
 
 #include <fstream>
 #include <limits>
@@ -27,18 +28,11 @@ namespace CookedTextureWriting
 				{
 					throw Diagnostics::Error("Native output contains an invalid or oversized subresource.");
 				}
-				std::size_t row = 0;
-				std::size_t slice = 0;
-				CheckTextureOperation(DirectX::ComputePitch(metadata.format, image->width, image->height, row, slice), "measure output subresource");
-				if (image->rowPitch != row || image->slicePitch != slice)
-				{
-					throw Diagnostics::Error("Cooked textures require canonical tightly packed native rows.");
-				}
 				CookedTextureMipHeader header{};
 				header.width = static_cast<std::uint32_t>(image->width);
 				header.height = static_cast<std::uint32_t>(image->height);
-				header.rowPitch = static_cast<std::uint32_t>(row);
-				header.slicePitch = header.dataSize = static_cast<std::uint32_t>(slice);
+				header.rowPitch = static_cast<std::uint32_t>(image->rowPitch);
+				header.slicePitch = header.dataSize = static_cast<std::uint32_t>(image->slicePitch);
 				mipHeaders.push_back(header);
 			}
 		}

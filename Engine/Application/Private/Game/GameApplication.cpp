@@ -184,11 +184,14 @@ void GameApplication::InitializeInput()
 void GameApplication::InitializeGameWorld()
 {
 	m_taskRuntime = std::make_unique<ApplicationTaskRuntime>();
-	m_gameWorld = std::make_unique<GameWorld>(m_taskRuntime->GetExecutor());
+	TaskExecutor& executor = m_taskRuntime->GetExecutor();
+	m_gameWorld = std::make_unique<GameWorld>(executor);
 	m_cameraInputIntentCollector = std::make_unique<CameraInputIntentCollector>(*m_inputSystem, *m_window);
 
-	m_levelSession = std::make_unique<LevelSession>(*m_gameWorld, m_taskRuntime->GetExecutor(), m_taskRuntime->GetApplicationScope());
-	m_levelSession->GetLevelChangeEvents().OnLevelChanged.Add([this](const LevelChangedEventArgs& event) { SignalLevelReadiness(event.activeLevelName); });
+	TaskScope& applicationScope = m_taskRuntime->GetApplicationScope();
+	m_levelSession = std::make_unique<LevelSession>(*m_gameWorld, executor, applicationScope);
+	auto& levelChangeEvents = m_levelSession->GetLevelChangeEvents();
+	levelChangeEvents.OnLevelChanged.Add([this](const LevelChangedEventArgs& event) { SignalLevelReadiness(event.activeLevelName); });
 }
 
 void GameApplication::InitializeRenderer()

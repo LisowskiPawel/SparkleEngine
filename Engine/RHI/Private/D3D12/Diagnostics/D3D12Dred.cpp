@@ -200,24 +200,15 @@ namespace D3D12DredDiagnostics
 		const TAllocationNode* currentNode = node;
 		for (; currentNode != nullptr && reportedAllocations < kMaxAllocationNodes; currentNode = currentNode->pNext, ++reportedAllocations)
 		{
-			AppendDiagnosticMessage(
-			    messages,
-			    ERhiDiagnosticMessageSeverity::Error,
-			    ERhiDiagnosticMessageCategory::Driver,
-			    std::format(
-			        "DRED {} allocation type='{}' name='{}'",
-			        allocationListName,
-			        GetAllocationTypeName(currentNode->AllocationType),
-			        ResolveDebugName(currentNode->ObjectNameA, currentNode->ObjectNameW, "UnnamedObject")));
+			const std::string objectName = ResolveDebugName(currentNode->ObjectNameA, currentNode->ObjectNameW, "UnnamedObject");
+			std::string message = std::format("DRED {} allocation type='{}' name='{}'", allocationListName, GetAllocationTypeName(currentNode->AllocationType), objectName);
+			AppendDiagnosticMessage(messages, ERhiDiagnosticMessageSeverity::Error, ERhiDiagnosticMessageCategory::Driver, std::move(message));
 		}
 
 		if (currentNode != nullptr)
 		{
-			AppendDiagnosticMessage(
-			    messages,
-			    ERhiDiagnosticMessageSeverity::Warning,
-			    ERhiDiagnosticMessageCategory::Driver,
-			    std::format("DRED {} allocation list truncated after 8 nodes; remaining count unavailable.", allocationListName));
+			std::string message = std::format("DRED {} allocation list truncated after 8 nodes; remaining count unavailable.", allocationListName);
+			AppendDiagnosticMessage(messages, ERhiDiagnosticMessageSeverity::Warning, ERhiDiagnosticMessageCategory::Driver, std::move(message));
 		}
 	}
 }
@@ -236,27 +227,25 @@ static void AppendBreadcrumbMessages(std::deque<RhiDiagnosticMessage>& messages,
 		const D3D12_AUTO_BREADCRUMB_OP lastOperation = currentNode->pCommandHistory != nullptr && currentNode->BreadcrumbCount > 0 ? currentNode->pCommandHistory[historyIndex]
 		                                                                                                                           : D3D12_AUTO_BREADCRUMB_OP_BEGINSUBMISSION;
 
-		AppendDiagnosticMessage(
-		    messages,
-		    ERhiDiagnosticMessageSeverity::Error,
-		    ERhiDiagnosticMessageCategory::Driver,
-		    std::format(
-		        "DRED breadcrumb queue='{}' commandList='{}' completedOps={}/{} lastOp='{}'",
-		        ResolveDebugName(currentNode->pCommandQueueDebugNameA, currentNode->pCommandQueueDebugNameW, "UnnamedCommandQueue"),
-		        ResolveDebugName(currentNode->pCommandListDebugNameA, currentNode->pCommandListDebugNameW, "UnnamedCommandList"),
-		        completedOperations,
-		        currentNode->BreadcrumbCount,
-		        GetBreadcrumbOperationName(lastOperation)));
+		const std::string commandQueueName = ResolveDebugName(currentNode->pCommandQueueDebugNameA, currentNode->pCommandQueueDebugNameW, "UnnamedCommandQueue");
+		const std::string commandListName = ResolveDebugName(currentNode->pCommandListDebugNameA, currentNode->pCommandListDebugNameW, "UnnamedCommandList");
+
+		std::string message = std::format(
+		    "DRED breadcrumb queue='{}' commandList='{}' completedOps={}/{} lastOp='{}'",
+		    commandQueueName,
+		    commandListName,
+		    completedOperations,
+		    currentNode->BreadcrumbCount,
+		    GetBreadcrumbOperationName(lastOperation));
+
+		AppendDiagnosticMessage(messages, ERhiDiagnosticMessageSeverity::Error, ERhiDiagnosticMessageCategory::Driver, std::move(message));
 	}
 }
 
 template <typename TPageFaultOutput> static void AppendPageFaultMessages(std::deque<RhiDiagnosticMessage>& messages, const TPageFaultOutput& pageFaultOutput)
 {
-	AppendDiagnosticMessage(
-	    messages,
-	    ERhiDiagnosticMessageSeverity::Fatal,
-	    ERhiDiagnosticMessageCategory::Driver,
-	    std::format("DRED page fault at GPU VA {}", Formatting::FormatPrefixedHexUInt64(pageFaultOutput.PageFaultVA)));
+	std::string message = std::format("DRED page fault at GPU VA {}", Formatting::FormatPrefixedHexUInt64(pageFaultOutput.PageFaultVA));
+	AppendDiagnosticMessage(messages, ERhiDiagnosticMessageSeverity::Fatal, ERhiDiagnosticMessageCategory::Driver, std::move(message));
 
 	AppendAllocationMessages(messages, pageFaultOutput.pHeadExistingAllocationNode, "existing");
 	AppendAllocationMessages(messages, pageFaultOutput.pHeadRecentFreedAllocationNode, "recent-freed");
@@ -318,11 +307,9 @@ void D3D12DebugLayer::CollectCrashDiagnostics(ID3D12Device* device)
 
 	DrainStoredMessages();
 
-	AppendDiagnosticMessage(
-	    m_messages,
-	    ERhiDiagnosticMessageSeverity::Fatal,
-	    ERhiDiagnosticMessageCategory::Driver,
-	    std::format("D3D12 device removal detected with HRESULT {}", Formatting::FormatPrefixedHexUInt32(static_cast<std::uint32_t>(deviceRemovedReason))));
+	const std::string reason = Formatting::FormatPrefixedHexUInt32(static_cast<std::uint32_t>(deviceRemovedReason));
+	std::string message = std::format("D3D12 device removal detected with HRESULT {}", reason);
+	AppendDiagnosticMessage(m_messages, ERhiDiagnosticMessageSeverity::Fatal, ERhiDiagnosticMessageCategory::Driver, std::move(message));
 
 	if (!CollectDred1Messages(device, m_messages))
 	{

@@ -14,7 +14,8 @@
 
 template <typename TValue> static FrameGraphBufferHandle DeclareRenderSceneGpuBuffer(FrameGraphBuilder& builder, const char* name)
 {
-	return builder.ReservePersistentBuffer(FrameGraphBufferDesc::Create(name, sizeof(TValue), static_cast<std::uint32_t>(sizeof(TValue))), ResourceState::ShaderResource);
+	const FrameGraphBufferDesc desc = FrameGraphBufferDesc::Create(name, sizeof(TValue), static_cast<std::uint32_t>(sizeof(TValue)));
+	return builder.ReservePersistentBuffer(desc, ResourceState::ShaderResource);
 }
 
 static void BindRenderSceneGpuBuffer(FrameGraph& graph, FrameGraphBufferHandle handle, const RenderSceneGpuBufferBinding& buffer, const char* name) noexcept
@@ -25,7 +26,8 @@ static void BindRenderSceneGpuBuffer(FrameGraph& graph, FrameGraphBufferHandle h
 		Diagnostics::Fatal(logger, __FILE__, __LINE__, "Render-scene GPU buffer publication is incomplete.");
 	}
 
-	graph.BindPersistentBuffer(handle, buffer.Resource, FrameGraphBufferDesc::Create(name, buffer.SizeInBytes, buffer.StrideInBytes), ResourceState::ShaderResource);
+	const FrameGraphBufferDesc desc = FrameGraphBufferDesc::Create(name, buffer.SizeInBytes, buffer.StrideInBytes);
+	graph.BindPersistentBuffer(handle, buffer.Resource, desc, ResourceState::ShaderResource);
 }
 
 RenderSceneGpuResources DeclareRenderSceneGpuResources(FrameGraphBuilder& builder)

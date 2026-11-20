@@ -28,11 +28,8 @@ D3D12DescriptorHandle D3D12DescriptorHeap::GetHandleAt(UINT index) const
 {
 	if (index >= m_desc.NumDescriptors)
 	{
-		Diagnostics::Fatal(
-		    g_descriptorHeapLogger,
-		    __FILE__,
-		    __LINE__,
-		    std::format("D3D12 descriptor index {} exceeds heap capacity {} (type {}).", index, m_desc.NumDescriptors, static_cast<unsigned>(m_desc.Type)));
+		const auto failureMessage = std::format("D3D12 descriptor index {} exceeds heap capacity {} (type {}).", index, m_desc.NumDescriptors, static_cast<unsigned>(m_desc.Type));
+		Diagnostics::Fatal(g_descriptorHeapLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = {0};

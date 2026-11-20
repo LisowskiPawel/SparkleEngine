@@ -39,13 +39,14 @@ CameraInputIntent CameraInputIntentCollector::Collect() noexcept
 
 CameraInputIntent CameraInputIntentCollector::Collect(float aspectRatio) noexcept
 {
-	const bool bCameraInputBlocked = !m_inputSystem.GetState(InputLayer::Gameplay).IsMouseButtonDown(MouseButton::Right);
+	const InputState& inputState = m_inputSystem.GetState(InputLayer::Gameplay);
+	const bool bCameraInputBlocked = !inputState.IsMouseButtonDown(MouseButton::Right);
 
 	if (bCameraInputBlocked)
 	{
 		EndMouseLook();
 	}
-	const InputState& inputState = m_inputSystem.GetState(InputLayer::Gameplay);
+
 	const bool bForwardHeld = inputState.IsKeyDown(Key::W) || inputState.IsKeyDown(Key::Up);
 	const bool bBackwardHeld = inputState.IsKeyDown(Key::S) || inputState.IsKeyDown(Key::Down);
 	const bool bRightHeld = inputState.IsKeyDown(Key::D) || inputState.IsKeyDown(Key::Right);

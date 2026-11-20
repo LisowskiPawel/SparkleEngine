@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <span>
 
-inline constexpr std::size_t MaximumTextureSourceBytes = 64ull * 1024ull * 1024ull;
+inline constexpr std::size_t MaximumTextureSourceBytes = 128ull * 1024ull * 1024ull;
 
 struct TextureSource final
 {

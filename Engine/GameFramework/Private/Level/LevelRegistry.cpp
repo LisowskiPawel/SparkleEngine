@@ -24,7 +24,9 @@ void LevelRegistry::DiscoverLevels(const std::filesystem::path& projectRoot)
 	while (!error && iterator != end)
 	{
 		const auto& entry = *iterator;
-		if (entry.is_regular_file(error) && entry.path().extension() == ".level")
+		const bool bRegularFile = entry.is_regular_file(error);
+		const bool bLevelDocument = bRegularFile && entry.path().extension() == ".level";
+		if (bLevelDocument)
 		{
 			LoadLevelFile(entry.path());
 		}
@@ -46,9 +48,10 @@ void LevelRegistry::LoadLevelFile(const std::filesystem::path& path)
 	{
 		auto loadedLevel = LevelParser::LoadFromFile(path);
 		const std::string loadedLevelName(loadedLevel->GetName());
-		if (loadedLevelName != path.stem().string())
+		const std::string fileLevelName = path.stem().string();
+		if (loadedLevelName != fileLevelName)
 		{
-			throw Diagnostics::Error(std::format("Level filename identity '{}' does not match authored level name '{}'.", path.stem().string(), loadedLevelName));
+			throw Diagnostics::Error(std::format("Level filename identity '{}' does not match authored level name '{}'.", fileLevelName, loadedLevelName));
 		}
 		Register(std::move(loadedLevel));
 	}
@@ -75,7 +78,8 @@ void LevelRegistry::Register(std::unique_ptr<LevelAsset> level)
 	auto name = level->GetName();
 	std::string nameKey(name);
 
-	if (!m_levels.try_emplace(std::move(nameKey), std::move(level)).second)
+	const bool bInserted = m_levels.try_emplace(std::move(nameKey), std::move(level)).second;
+	if (!bInserted)
 	{
 		throw Diagnostics::Error(std::format("Duplicate level name '{}'.", name));
 	}

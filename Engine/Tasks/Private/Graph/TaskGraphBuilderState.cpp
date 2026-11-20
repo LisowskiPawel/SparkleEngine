@@ -24,7 +24,8 @@ std::uint64_t TaskGraphBuilder::State::AcquireBuilderIdentity() noexcept
 
 bool TaskGraphBuilder::State::AreValidLimits(TaskGraphLimits limits) noexcept
 {
-	return limits.MaximumTasks > 0 && limits.MaximumTasks <= TaskGraphLimits::HardMaximumTasks && limits.MaximumEdges <= TaskGraphLimits::HardMaximumEdges;
+	const bool bTaskCountValid = limits.MaximumTasks > 0 && limits.MaximumTasks <= TaskGraphLimits::HardMaximumTasks;
+	return bTaskCountValid && limits.MaximumEdges <= TaskGraphLimits::HardMaximumEdges;
 }
 
 bool TaskGraphBuilder::State::IsValidTaskLane(TaskLane lane) noexcept
@@ -47,7 +48,9 @@ void TaskGraphBuilder::State::RecordError(TaskGraphErrorCode code, std::string m
 
 bool TaskGraphBuilder::State::ResolveHandle(TaskNodeHandle handle, std::uint32_t& outIndex)
 {
-	if (!TaskGraphAccess::Decode(handle, BuilderIdentity, BuilderGeneration, static_cast<std::uint32_t>(Nodes.size()), outIndex))
+	const std::uint32_t taskCount = static_cast<std::uint32_t>(Nodes.size());
+	const bool bHandleValid = TaskGraphAccess::Decode(handle, BuilderIdentity, BuilderGeneration, taskCount, outIndex);
+	if (!bHandleValid)
 	{
 		RecordError(TaskGraphErrorCode::InvalidHandle, "Task handle is invalid, stale, or belongs to another builder.");
 		return false;

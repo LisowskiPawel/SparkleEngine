@@ -104,7 +104,9 @@ namespace Process
 	static void CollectChildProcessOutput(const ChildProcessRequest& request, const WindowsOwnedProcess& child, const WindowsProcessHandle& readPipe, std::ofstream& log, ChildProcessResult& result)
 	{
 		WindowsChildOutputReader outputReader(readPipe.Get());
-		WindowsProcessHandle cancelEvent(CreateEventW(nullptr, TRUE, request.Cancellation.stop_requested(), nullptr));
+		const bool bCancellationRequested = request.Cancellation.stop_requested();
+		const HANDLE cancelEventHandle = CreateEventW(nullptr, TRUE, bCancellationRequested, nullptr);
+		WindowsProcessHandle cancelEvent(cancelEventHandle);
 		if (!outputReader.IsValid() || !cancelEvent)
 		{
 			const DWORD eventError = GetLastError();

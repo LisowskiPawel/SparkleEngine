@@ -93,24 +93,27 @@ public:
 	GlobalShaderAutoRegister(std::string_view shaderName, std::string_view sourcePath, std::string_view entryPoint, ShaderStage stage)
 	{
 		const std::string_view resolvedName = GlobalShader<TShader>::GetShaderName(shaderName);
-		GlobalShaderRegistry::Register(
-		    ShaderRegistrationDesc{
-		        .ShaderType = &typeid(TShader),
-		        .TypeId = BuildShaderTypeId(resolvedName),
-		        .ShaderName = resolvedName,
-		        .SourcePath = sourcePath,
-		        .EntryPoint = entryPoint,
-		        .Stage = stage,
-		        .Features = GlobalShader<TShader>::GetFeatures(),
-		        .RayTracing = GlobalShader<TShader>::GetRayTracingMetadata(),
-		        .BuildParameterStructDescriptor = []() -> ShaderParameterStructDescriptor (*)()
-		        {
-			        if constexpr (requires { typename TShader::Parameters; })
-			        {
-				        return &GlobalShader<TShader>::GetParameterStructDescriptor;
-			        }
-			        return nullptr;
-		        }()});
+		const auto buildParameterStructDescriptor = []() -> ShaderParameterStructDescriptor (*)()
+		{
+			if constexpr (requires { typename TShader::Parameters; })
+			{
+				return &GlobalShader<TShader>::GetParameterStructDescriptor;
+			}
+			return nullptr;
+		}();
+
+		const ShaderRegistrationDesc registration{
+		    .ShaderType = &typeid(TShader),
+		    .TypeId = BuildShaderTypeId(resolvedName),
+		    .ShaderName = resolvedName,
+		    .SourcePath = sourcePath,
+		    .EntryPoint = entryPoint,
+		    .Stage = stage,
+		    .Features = GlobalShader<TShader>::GetFeatures(),
+		    .RayTracing = GlobalShader<TShader>::GetRayTracingMetadata(),
+		    .BuildParameterStructDescriptor = buildParameterStructDescriptor};
+
+		GlobalShaderRegistry::Register(registration);
 	}
 };
 

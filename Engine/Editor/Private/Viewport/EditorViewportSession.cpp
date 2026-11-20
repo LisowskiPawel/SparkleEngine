@@ -44,8 +44,13 @@ RenderViewCameraData EditorViewportSession::UpdateCamera(const CameraInputIntent
 	if (intent.SpeedStepCount != 0.0f)
 	{
 		const CameraNavigationSettings& navigation = m_settings.GetState().Navigation;
-		(void) m_settings.SetMoveSpeed(
-		    CameraNavigation::ApplySpeedSteps(navigation.MoveSpeedMetersPerSecond, intent.SpeedStepCount, navigation.MinimumMoveSpeedMetersPerSecond, navigation.MaximumMoveSpeedMetersPerSecond));
+		const float moveSpeed = CameraNavigation::ApplySpeedSteps(
+		    navigation.MoveSpeedMetersPerSecond,
+		    intent.SpeedStepCount,
+		    navigation.MinimumMoveSpeedMetersPerSecond,
+		    navigation.MaximumMoveSpeedMetersPerSecond);
+
+		(void) m_settings.SetMoveSpeed(moveSpeed);
 	}
 
 	(void) CameraNavigation::Apply(intent, m_settings.GetState().Navigation, deltaSeconds, m_navigationState);

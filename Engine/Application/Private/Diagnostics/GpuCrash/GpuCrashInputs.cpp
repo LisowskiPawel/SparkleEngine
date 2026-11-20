@@ -14,9 +14,11 @@ namespace GpuCrashInputVerification
 	static nlohmann::json VerifyProductReceipt(const std::filesystem::path& executable)
 	{
 		std::string productBytes;
+		const auto executableDirectory = executable.parent_path();
+		const auto receiptPath = executableDirectory / "gpu-crash-product.json";
 
 		const auto product = ReadReceipt(
-		    executable.parent_path() / "gpu-crash-product.json",
+		    receiptPath,
 		    {"profile",
 		        "revision",
 		        "sourceInputsSha256",
@@ -32,10 +34,10 @@ namespace GpuCrashInputVerification
 		        "cpuPdbAge"},
 		    &productBytes);
 
-		const auto profile = product.at("profile").get<std::string>();
+		const auto& profile = product.at("profile").get_ref<const std::string&>();
 		for (const auto key : {"revision", "sourceInputsSha256", "dirtyPatchSha256"})
 		{
-			const auto value = product.at(key).get<std::string>();
+			const auto& value = product.at(key).get_ref<const std::string&>();
 			const auto expectedDigestLength = std::string_view(key) == "revision" ? 40u : 64u;
 			const bool bInvalidCandidateDigest = value.size() != expectedDigestLength || value.find_first_not_of("0123456789abcdef") != std::string::npos;
 
@@ -45,21 +47,39 @@ namespace GpuCrashInputVerification
 			}
 		}
 
-		const bool bProfileKnownProfile = profile == "DevelopmentEditor" || profile == "DevelopmentGame";
-		const bool bKnownEditorProfile = bProfileKnownProfile || (profile == "ShippingEditor");
-		const bool bProfileKnown = bKnownEditorProfile || (profile == "ShippingGame");
-		const bool bDirectoryMatches = bProfileKnown && profile == Strings::ToNarrow(executable.parent_path().filename().wstring());
-		const bool bVariantMatches = bDirectoryMatches && product.at("variant").get<std::string>() == "gpu-crash";
-		const bool bProductKindMatches = bVariantMatches && Strings::ToNarrow(executable.stem().wstring()).ends_with("Editor") == profile.ends_with("Editor");
-		const bool bProductNameMatches = bProductKindMatches && product.at("product").get<std::string>() == Strings::ToNarrow(executable.stem().wstring());
-		const bool bExecutableMatches = bProductNameMatches && product.at("executableSha256").get<std::string>() == HashFile(executable);
-
-		if (!bExecutableMatches)
+		const bool bDevelopmentProfile = profile == "DevelopmentEditor" || profile == "DevelopmentGame";
+		const bool bShippingProfile = profile == "ShippingEditor" || profile == "ShippingGame";
+		const bool bProfileKnown = bDevelopmentProfile || bShippingProfile;
+		if (!bProfileKnown)
 		{
 			throw Diagnostics::Error("GPU crash product/profile receipt does not match this executable.");
 		}
 
-		const std::filesystem::path retainedReceipt = Strings::ToWide(product.at("retainedReceiptPath").get<std::string>());
+		const std::string directoryProfile = Strings::ToNarrow(executableDirectory.filename().wstring());
+		const bool bDirectoryMatches = profile == directoryProfile;
+		const bool bVariantMatches = bDirectoryMatches && product.at("variant").get_ref<const std::string&>() == "gpu-crash";
+		if (!bVariantMatches)
+		{
+			throw Diagnostics::Error("GPU crash product/profile receipt does not match this executable.");
+		}
+
+		const std::string executableName = Strings::ToNarrow(executable.stem().wstring());
+		const bool bProductKindMatches = executableName.ends_with("Editor") == profile.ends_with("Editor");
+		const bool bProductNameMatches = bProductKindMatches && product.at("product").get_ref<const std::string&>() == executableName;
+		if (!bProductNameMatches)
+		{
+			throw Diagnostics::Error("GPU crash product/profile receipt does not match this executable.");
+		}
+
+		const auto& expectedExecutableHash = product.at("executableSha256").get_ref<const std::string&>();
+		const std::string executableHash = HashFile(executable);
+		if (expectedExecutableHash != executableHash)
+		{
+			throw Diagnostics::Error("GPU crash product/profile receipt does not match this executable.");
+		}
+
+		const auto& retainedReceiptName = product.at("retainedReceiptPath").get_ref<const std::string&>();
+		const std::filesystem::path retainedReceipt = Strings::ToWide(retainedReceiptName);
 		CheckLocalPath(retainedReceipt);
 		std::string retainedBytes;
 		std::string error;
@@ -68,9 +88,11 @@ namespace GpuCrashInputVerification
 		{
 			throw Diagnostics::Error("Retained product receipt differs from this build's startup receipt.");
 		}
-		VerifyReceiptFiles(executable.parent_path(), product.at("runtimeFiles"), false);
-		const std::filesystem::path pdb = Strings::ToWide(product.at("cpuPdbPath").get<std::string>());
-		if (HashFile(pdb) != product.at("cpuPdbSha256").get<std::string>())
+		VerifyReceiptFiles(executableDirectory, product.at("runtimeFiles"), false);
+		const auto& pdbName = product.at("cpuPdbPath").get_ref<const std::string&>();
+		const std::filesystem::path pdb = Strings::ToWide(pdbName);
+		const std::string pdbHash = HashFile(pdb);
+		if (pdbHash != product.at("cpuPdbSha256").get_ref<const std::string&>())
 		{
 			throw Diagnostics::Error("Matching CPU symbols are missing or changed.");
 		}
@@ -84,9 +106,11 @@ static nlohmann::json VerifyGpuCrashInputs(const GpuCrashStartup& startup, ERhiB
 	using namespace GpuCrashInputVerification;
 	const auto executable = Filesystem::GetExecutablePath();
 	const auto product = VerifyProductReceipt(executable);
-	const std::filesystem::path productPath = Strings::ToWide(product.at("retainedReceiptPath").get<std::string>());
+	const auto& productReceiptName = product.at("retainedReceiptPath").get_ref<const std::string&>();
+	const std::filesystem::path productPath = Strings::ToWide(productReceiptName);
 	const auto bundle = VerifyShaderBundle(startup.ShaderExport, product, api);
-	const std::filesystem::path pdb = Strings::ToWide(product.at("cpuPdbPath").get<std::string>());
+	const auto& pdbName = product.at("cpuPdbPath").get_ref<const std::string&>();
+	const std::filesystem::path pdb = Strings::ToWide(pdbName);
 	nlohmann::json identity = nlohmann::json::object();
 	for (const auto key : {"product", "profile", "revision", "sourceInputsSha256", "dirtyPatchSha256", "cpuPdbGuid", "cpuPdbSha256"})
 	{
@@ -106,9 +130,10 @@ static nlohmann::json VerifyGpuCrashInputs(const GpuCrashStartup& startup, ERhiB
 	identity["graphicsApi"] = RhiBackendApiToString(api);
 	identity["productReceiptSha256"] = HashFile(productPath);
 	identity["shaderExportSha256"] = HashFile(startup.ShaderExport);
-	identity["globalShaderMapSha256"] = bundle.at("globalShaderMapSha256").get<std::string>();
-	identity["cookedShaderLibrarySha256"] = bundle.at("cookedShaderLibrarySha256").get<std::string>();
-	identity["aftermathRuntimeSha256"] = HashFile(ResolveAftermathLibraryPath());
+	identity["globalShaderMapSha256"] = bundle.at("globalShaderMapSha256").get_ref<const std::string&>();
+	identity["cookedShaderLibrarySha256"] = bundle.at("cookedShaderLibrarySha256").get_ref<const std::string&>();
+	const auto aftermathPath = ResolveAftermathLibraryPath();
+	identity["aftermathRuntimeSha256"] = HashFile(aftermathPath);
 	// These references are private, never projected into the default export.
 	identity["shaderExportPath"] = Strings::ToNarrow(startup.ShaderExport.wstring());
 	identity["productReceiptPath"] = Strings::ToNarrow(productPath.wstring());
@@ -162,8 +187,11 @@ std::filesystem::path ResolveAftermathLibraryPath()
 {
 	// Both local and staged products use Projects/<project>/Binaries/<profile>.
 	const auto directory = Filesystem::GetExecutableDirectory();
-	const auto productRoot = directory.parent_path().parent_path().parent_path().parent_path();
-	const bool bInvalidProductLocation = directory.parent_path().filename() != "Binaries" || directory.parent_path().parent_path().parent_path().filename() != "Projects";
+	const auto binariesDirectory = directory.parent_path();
+	const auto projectDirectory = binariesDirectory.parent_path();
+	const auto projectsDirectory = projectDirectory.parent_path();
+	const auto productRoot = projectsDirectory.parent_path();
+	const bool bInvalidProductLocation = binariesDirectory.filename() != "Binaries" || projectsDirectory.filename() != "Projects";
 
 	if (bInvalidProductLocation)
 	{

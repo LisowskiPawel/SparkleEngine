@@ -120,7 +120,8 @@ namespace Assets
 		targets.reserve(records.size());
 		for (const auto& record : records)
 		{
-			targets.push_back(DecodeMorphTarget(record, deltas, header, budget));
+			MeshMorphTarget target = DecodeMorphTarget(record, deltas, header, budget);
+			targets.push_back(std::move(target));
 		}
 		return targets;
 	}
@@ -158,7 +159,9 @@ namespace Assets
 		MeshMorphData morphs = DecodeMorphTargets(morphRecords, morphDeltas, header, budget);
 		if (header.assetKind == CookedMeshAssetKind::Skeletal)
 		{
-			return LoadedMeshAsset{.payload = SkeletalMeshData{std::move(geometry), std::move(morphs), DecodeSkinInfluences(skin, header.skinInfluenceCount, budget)}};
+			std::vector<VertexSkinInfluence> skinInfluences = DecodeSkinInfluences(skin, header.skinInfluenceCount, budget);
+			SkeletalMeshData mesh{std::move(geometry), std::move(morphs), std::move(skinInfluences)};
+			return LoadedMeshAsset{.payload = std::move(mesh)};
 		}
 		return LoadedMeshAsset{.payload = std::move(geometry)};
 	}

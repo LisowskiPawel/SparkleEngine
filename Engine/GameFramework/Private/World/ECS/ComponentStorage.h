@@ -115,7 +115,8 @@ namespace ECS
 			{
 				const std::size_t growth = (std::max) (std::size_t{1}, capacity / 2);
 				const std::size_t available = InvalidDenseIndex - capacity;
-				const std::size_t nextCapacity = (std::max) (denseCapacity, capacity + (std::min) (growth, available));
+				const std::size_t boundedGrowth = (std::min) (growth, available);
+				const std::size_t nextCapacity = (std::max) (denseCapacity, capacity + boundedGrowth);
 				m_entities.reserve(nextCapacity);
 				m_components.reserve(nextCapacity);
 			}

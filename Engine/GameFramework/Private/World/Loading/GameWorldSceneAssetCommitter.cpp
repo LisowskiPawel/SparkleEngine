@@ -48,13 +48,15 @@ static void AppendMeshes(
 	std::vector<ECS::SceneMeshInstanceData> meshInstances = SceneAssetMeshInstanceBuilder::BuildInstances(sceneAssetPayload, materials, materialBaseHandle, sceneGroupBaseIndex);
 	for (ECS::SceneMeshInstanceData& meshInstance : meshInstances)
 	{
-		if (!state.AddMesh(std::move(meshInstance)).IsValid())
+		const EntityId entity = state.AddMesh(std::move(meshInstance));
+		if (!entity.IsValid())
 		{
 			Diagnostics::Fatal(g_sceneAssetCommitterLogger, __FILE__, __LINE__, "The staged world rejected a mesh instance.");
 		}
 	}
 
-	state.AppendMeshInstanceGroups(SceneAssetMeshInstanceBuilder::BuildGroups(sceneAssetPayload, materialBaseHandle, sceneMeshBaseIndex));
+	std::vector<SceneMeshInstanceGroupData> groups = SceneAssetMeshInstanceBuilder::BuildGroups(sceneAssetPayload, materialBaseHandle, sceneMeshBaseIndex);
+	state.AppendMeshInstanceGroups(std::move(groups));
 }
 
 static void AppendMaterialVariants(
@@ -64,9 +66,10 @@ static void AppendMaterialVariants(
     MaterialHandle materialBaseHandle,
     SceneMeshInstanceIndex sceneMeshBaseIndex)
 {
-	variants.Append(
-	    SceneMaterialVariantTranslator::BuildDescriptions(sceneAssetPayload),
-	    SceneMaterialVariantTranslator::BuildBindings(sceneAssetPayload, materialBaseHandle, state.GetMeshEntities().subspan(sceneMeshBaseIndex)));
+	std::vector<MaterialVariantDesc> descriptions = SceneMaterialVariantTranslator::BuildDescriptions(sceneAssetPayload);
+	const auto meshEntities = state.GetMeshEntities().subspan(sceneMeshBaseIndex);
+	std::vector<MaterialVariantBinding> bindings = SceneMaterialVariantTranslator::BuildBindings(sceneAssetPayload, materialBaseHandle, meshEntities);
+	variants.Append(std::move(descriptions), std::move(bindings));
 }
 
 static void AppendCameras(ECS::GameWorldState& state, SceneAssetPayload& sceneAssetPayload)
@@ -76,7 +79,8 @@ static void AppendCameras(ECS::GameWorldState& state, SceneAssetPayload& sceneAs
 		SceneCameraEntry sceneCamera;
 		sceneCamera.name = std::move(camera.name);
 		sceneCamera.desc = camera.desc;
-		if (!state.AddCamera(std::move(sceneCamera)).IsValid())
+		const EntityId entity = state.AddCamera(std::move(sceneCamera));
+		if (!entity.IsValid())
 		{
 			Diagnostics::Fatal(g_sceneAssetCommitterLogger, __FILE__, __LINE__, "The staged world rejected a scene camera.");
 		}
@@ -87,7 +91,8 @@ static void AppendLights(ECS::GameWorldState& state, SceneAssetPayload& sceneAss
 {
 	for (SceneLightDesc& light : sceneAssetPayload.lights)
 	{
-		if (!state.AddLight(std::move(light)).IsValid())
+		const EntityId entity = state.AddLight(std::move(light));
+		if (!entity.IsValid())
 		{
 			Diagnostics::Fatal(g_sceneAssetCommitterLogger, __FILE__, __LINE__, "The staged world rejected a scene light.");
 		}

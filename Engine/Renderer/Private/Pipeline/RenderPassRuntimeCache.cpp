@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <array>
 #include <format>
+#include <string>
 #include <unordered_set>
 
 RenderPassRuntimeStorage::Holder::~Holder() noexcept = default;
@@ -89,7 +90,8 @@ std::unique_ptr<RenderPassRuntimeStorage::ShaderGeneration> RenderPassRuntimeCac
 		{
 			HandleRuntimeCreationFailure("Shader runtime cache contains an empty shader holder.");
 		}
-		replacement->RuntimeStorageByType.emplace(storageType, activeHolder->CreateReplacement(*m_renderHardwareInterface, *replacement));
+		auto holder = activeHolder->CreateReplacement(*m_renderHardwareInterface, *replacement);
+		replacement->RuntimeStorageByType.emplace(storageType, std::move(holder));
 	}
 	return replacement;
 }
@@ -146,12 +148,13 @@ void RenderPassRuntimeCache::ValidateGenerationContracts(const RenderPassRuntime
 
 		if (!bParameterSignatureMatches)
 		{
-			throw Diagnostics::Error(
-			    std::format(
-			        "Shader '{}' map entry does not match its registered contract (parameter signature map={:016X}, runtime={:016X}).",
-			        registration.ShaderName,
-			        entry->ParameterSignature,
-			        expectedParameterSignature));
+			const std::string message = std::format(
+			    "Shader '{}' map entry does not match its registered contract (parameter signature map={:016X}, runtime={:016X}).",
+			    registration.ShaderName,
+			    entry->ParameterSignature,
+			    expectedParameterSignature);
+
+			throw Diagnostics::Error(message);
 		}
 	}
 }

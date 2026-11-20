@@ -19,7 +19,9 @@ namespace PathSampling
 
 	RandomSamples GenerateRandomSamples(uint2 pixelCoord, uint bounceIndex, uint sampleIndex, uint randomFrameIndex)
 	{
-		const uint4 words = CommonRandom::Philox4x32(uint4(pixelCoord, randomFrameIndex, sampleIndex), uint2(bounceIndex, 0x4C495450u));
+		const uint4 counter = uint4(pixelCoord, randomFrameIndex, sampleIndex);
+		const uint2 key = uint2(bounceIndex, 0x4C495450u);
+		const uint4 words = CommonRandom::Philox4x32(counter, key);
 
 		RandomSamples result;
 		result.Lobe = CommonRandom::OpenUnitInterval(words.x);

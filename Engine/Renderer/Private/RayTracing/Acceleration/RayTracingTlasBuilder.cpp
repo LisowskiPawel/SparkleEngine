@@ -195,7 +195,9 @@ void RayTracingTlasBuilder::PrepareBuild(BuildState& state) noexcept
 	const bool bCanRefitInstances = bCanRefitAllowUpdate && (m_builtInstanceCount == state.Instances.size());
 	const bool bCanRefit = bCanRefitInstances && (state.PrebuildInfo.UpdateScratchDataSizeInBytes > 0);
 
-	state.Mode = bCanRefit ? ERhiTlasBuildMode::Update : (HasFlag(state.RequestedFlags, ERhiTlasBuildFlags::AllowUpdate) ? ERhiTlasBuildMode::BuildAllowUpdate : ERhiTlasBuildMode::Build);
+	const bool bBuildWithUpdate = !bCanRefit && HasFlag(state.RequestedFlags, ERhiTlasBuildFlags::AllowUpdate);
+	const ERhiTlasBuildMode buildMode = bBuildWithUpdate ? ERhiTlasBuildMode::BuildAllowUpdate : ERhiTlasBuildMode::Build;
+	state.Mode = bCanRefit ? ERhiTlasBuildMode::Update : buildMode;
 
 	state.EventName = bCanRefit ? "TLAS Refit" : "TLAS Build";
 }

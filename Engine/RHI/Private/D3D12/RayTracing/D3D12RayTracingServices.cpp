@@ -131,13 +131,14 @@ RhiOwnedResourceHandle D3D12RayTracingServices::CreateScratchBuffer(std::uint64_
 	}
 
 	const D3D12_RESOURCE_DESC resourceDesc = D3D12TypeConversions::BuildBufferResourceDesc(RhiBufferResourceDesc{.SizeInBytes = sizeInBytes, .bAllowUnorderedAccess = true});
+	const std::wstring ownedDebugName = D3D12RayTracingText::MakeDebugName(debugName, L"RayTracingScratch");
 
 	std::unique_ptr<D3D12GpuAllocationRecord> ownedRecord = m_memoryAllocator->CreateBuffer(
 	    resourceDesc,
 	    D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
 	    RhiMemoryCategory::RayTracing,
 	    RhiMemoryResidencyClass::DeviceLocal,
-	    D3D12RayTracingText::MakeDebugName(debugName, L"RayTracingScratch"));
+	    ownedDebugName);
 
 	return ownedRecord != nullptr ? MakeD3D12OwnedResourceHandle(std::move(ownedRecord)) : RhiOwnedResourceHandle{};
 }
@@ -150,19 +151,22 @@ RhiOwnedResourceHandle D3D12RayTracingServices::CreateRayTracingScratchBuffer(st
 RhiOwnedResourceHandle D3D12RayTracingServices::CreateAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType, std::wstring_view debugName)
 {
 	const std::uint64_t asAlignment = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities().AccelerationStructureByteAlignment : 0;
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || !RhiContract::IsRayTracingBufferSizeUsable(sizeInBytes, asAlignment))
+	const bool bAllocatorAvailable = m_rhi != nullptr && m_memoryAllocator != nullptr;
+	const bool bSizeUsable = bAllocatorAvailable && RhiContract::IsRayTracingBufferSizeUsable(sizeInBytes, asAlignment);
+	if (!bSizeUsable)
 	{
 		return {};
 	}
 
 	const D3D12_RESOURCE_DESC resourceDesc = D3D12TypeConversions::BuildBufferResourceDesc(RhiBufferResourceDesc{.SizeInBytes = sizeInBytes, .bAllowUnorderedAccess = true});
+	const std::wstring ownedDebugName = D3D12RayTracingText::MakeDebugName(debugName, L"RayTracingAccelerationStructure");
 
 	std::unique_ptr<D3D12GpuAllocationRecord> ownedRecord = m_memoryAllocator->CreateBuffer(
 	    resourceDesc,
 	    D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE,
 	    RhiMemoryCategory::RayTracing,
 	    RhiMemoryResidencyClass::DeviceLocal,
-	    D3D12RayTracingText::MakeDebugName(debugName, L"RayTracingAccelerationStructure"));
+	    ownedDebugName);
 
 	return ownedRecord != nullptr ? MakeD3D12OwnedResourceHandle(std::move(ownedRecord)) : RhiOwnedResourceHandle{};
 }

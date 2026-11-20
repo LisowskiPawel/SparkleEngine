@@ -32,7 +32,8 @@ RayTracingHitSurfaceData ReconstructRayTracingHitSurface(RayTracingTraceResult t
 	BuildRayTracingShadingFrame(evaluatedTriangle, mesh, outwardGeometricNormal, vertexNormal, tangentWorld, bitangentWorld);
 
 	const float2 texCoord0 = InterpolateRayTracingTexCoord0(evaluatedTriangle);
-	const RayTracingMaterialSample material = SampleRayTracingMaterial(evaluatedTriangle.Material, texCoord0, InterpolateRayTracingColor(evaluatedTriangle), EmissiveEnabled != 0u);
+	const float4 vertexColor = InterpolateRayTracingColor(evaluatedTriangle);
+	const RayTracingMaterialSample material = SampleRayTracingMaterial(evaluatedTriangle.Material, texCoord0, vertexColor, EmissiveEnabled != 0u);
 
 	float3 shadingNormal = TransformTangentNormalToWorld(material.NormalTangent, vertexNormal, tangentWorld, bitangentWorld);
 	shadingNormal *= faceSign;

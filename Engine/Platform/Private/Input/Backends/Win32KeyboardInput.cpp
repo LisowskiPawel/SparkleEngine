@@ -4,6 +4,7 @@
 #include <Windows.h>
 
 #include <array>
+#include <utility>
 
 static constexpr auto s_virtualKeys = []
 {
@@ -72,7 +73,8 @@ static Key TranslateVirtualKey(std::uintptr_t virtualKey, std::intptr_t flags) n
 	if (virtualKey == VK_SHIFT)
 	{
 		const UINT scanCode = (static_cast<std::uintptr_t>(flags) >> 16) & 0xff;
-		return MapVirtualKeyW(scanCode, MAPVK_VSC_TO_VK_EX) == VK_RSHIFT ? Key::RightShift : Key::LeftShift;
+		const UINT mappedVirtualKey = MapVirtualKeyW(scanCode, MAPVK_VSC_TO_VK_EX);
+		return mappedVirtualKey == VK_RSHIFT ? Key::RightShift : Key::LeftShift;
 	}
 
 	const bool bExtendedKey = (flags & (std::intptr_t{1} << 24)) != 0;
@@ -104,7 +106,9 @@ ModifierFlags GetWin32InputModifiers() noexcept
 
 	for (const auto& [virtualKey, flag] : bindings)
 	{
-		if ((GetKeyState(virtualKey) & 0x8000) != 0)
+		const SHORT keyState = GetKeyState(virtualKey);
+		const bool bPressed = (keyState & 0x8000) != 0;
+		if (bPressed)
 		{
 			modifiers = modifiers | flag;
 		}
@@ -127,10 +131,11 @@ ModifierFlags GetWin32InputModifiers() noexcept
 
 KeyboardEvent DecodeWin32Keyboard(std::uintptr_t virtualKey, std::intptr_t flags, bool bPressed) noexcept
 {
+	const bool bPreviouslyDown = (flags & (std::intptr_t{1} << 30)) != 0;
 	KeyboardEvent event{};
 	event.KeyCode = TranslateVirtualKey(virtualKey, flags);
 	event.Modifiers = GetWin32InputModifiers();
 	event.bPressed = bPressed;
-	event.bRepeat = bPressed && (flags & (std::intptr_t{1} << 30)) != 0;
+	event.bRepeat = bPressed && bPreviouslyDown;
 	return event;
 }

@@ -88,15 +88,22 @@ namespace ReferencePathTracer
 
 	float EnvironmentPdfW(LightCounts counts)
 	{
-		return counts.Environment == 0u ? 0.0f : CommonRandom::CategoricalProbabilityMass(counts.Analytic + counts.EmissiveTriangle, counts.Total) * 0.07957747154594766788f;
+		if (counts.Environment == 0u)
+		{
+			return 0.0f;
+		}
+
+		const uint environmentOrdinal = counts.Analytic + counts.EmissiveTriangle;
+		const float selectionProbability = CommonRandom::CategoricalProbabilityMass(environmentOrdinal, counts.Total);
+		return selectionProbability * 0.07957747154594766788f;
 	}
 
 	float EmissiveTrianglePdfW(LightCounts counts, float3 previousPositionWorld, RayTracingPathSurface surface)
 	{
 		const uint ordinal = PathLightSampling::GetEmissiveOrdinal(surface.InstanceId, surface.PrimitiveIndex);
-
-		return CommonRandom::CategoricalProbabilityMass(counts.Analytic + ordinal, counts.Total)
-		    * PathLightSampling::EmissiveTrianglePdfW(previousPositionWorld, surface.PositionWorld, surface.InstanceId, surface.PrimitiveIndex);
+		const float selectionProbability = CommonRandom::CategoricalProbabilityMass(counts.Analytic + ordinal, counts.Total);
+		const float conditionalPdfW = PathLightSampling::EmissiveTrianglePdfW(previousPositionWorld, surface.PositionWorld, surface.InstanceId, surface.PrimitiveIndex);
+		return selectionProbability * conditionalPdfW;
 	}
 }
 

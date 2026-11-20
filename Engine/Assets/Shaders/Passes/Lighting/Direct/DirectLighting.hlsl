@@ -43,12 +43,15 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	const DirectReservoir::Reservoir reservoir = DirectReservoir::UnpackReservoir(CurrentReservoirSample.Load(int3(pixelCoord, 0)), CurrentReservoirWeight.Load(int3(pixelCoord, 0)));
+	const float4 samplePayload = CurrentReservoirSample.Load(int3(pixelCoord, 0));
+	const float4 weightPayload = CurrentReservoirWeight.Load(int3(pixelCoord, 0));
+	const DirectReservoir::Reservoir reservoir = DirectReservoir::UnpackReservoir(samplePayload, weightPayload);
 
 	float visibility = 1.0f;
 	if (DirectLightingEvaluateShadows != 0u)
 	{
-		visibility = UnpackShadowSignal(ShadowVisibilitySignal.Load(int3(pixelCoord, 0))).Visibility;
+		const float4 shadowSignal = ShadowVisibilitySignal.Load(int3(pixelCoord, 0));
+		visibility = UnpackShadowSignal(shadowSignal).Visibility;
 	}
 
 	const SurfaceLighting::Contribution directLighting = DirectReservoir::EvaluateSelectedLighting(pixelCoord, gBuffer, reservoir, visibility);

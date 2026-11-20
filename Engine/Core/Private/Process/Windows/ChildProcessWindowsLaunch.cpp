@@ -94,7 +94,8 @@ namespace Process
 
 	static bool EstablishWindowsChildOwnership(WindowsOwnedProcess& outProcess, ChildProcessResult& result)
 	{
-		outProcess.Job.Reset(CreateJobObjectW(nullptr, nullptr));
+		const HANDLE jobHandle = CreateJobObjectW(nullptr, nullptr);
+		outProcess.Job.Reset(jobHandle);
 		JOBOBJECT_EXTENDED_LIMIT_INFORMATION jobLimits{};
 		jobLimits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 		const bool bJobConfigured = outProcess.Job && SetInformationJobObject(outProcess.Job.Get(), JobObjectExtendedLimitInformation, &jobLimits, static_cast<DWORD>(sizeof(jobLimits)));

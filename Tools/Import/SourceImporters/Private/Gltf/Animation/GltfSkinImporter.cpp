@@ -135,7 +135,8 @@ namespace GltfSkinImporter
 
 		DirectX::XMVECTOR determinant;
 		DirectX::XMMatrixInverse(&determinant, skinReferenceToWorld);
-		if (!std::isfinite(DirectX::XMVectorGetX(determinant)) || std::abs(DirectX::XMVectorGetX(determinant)) <= 1.0e-8f)
+		const float determinantValue = DirectX::XMVectorGetX(determinant);
+		if (!std::isfinite(determinantValue) || std::abs(determinantValue) <= 1.0e-8f)
 		{
 			throw Diagnostics::Error("glTF skin has a non-invertible SkinReferenceSpace-to-WorldSpace transform.");
 		}

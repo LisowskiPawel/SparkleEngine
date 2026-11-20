@@ -13,7 +13,8 @@ Win32InputEvent ProcessWin32InputMessage(const WindowMessageEvent& event)
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 		{
-			const auto keyboard = DecodeWin32Keyboard(event.wParam, event.lParam, event.msg == WM_KEYDOWN || event.msg == WM_SYSKEYDOWN);
+			const bool bPressed = event.msg == WM_KEYDOWN || event.msg == WM_SYSKEYDOWN;
+			const auto keyboard = DecodeWin32Keyboard(event.wParam, event.lParam, bPressed);
 			if (keyboard.KeyCode == Key::Unknown)
 			{
 				return {};

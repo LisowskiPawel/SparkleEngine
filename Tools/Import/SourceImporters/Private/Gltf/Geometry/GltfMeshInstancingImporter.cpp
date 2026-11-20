@@ -105,8 +105,9 @@ DirectX::XMMATRIX GltfMeshInstancingImporter::BuildMeshGpuInstancingTransform(co
 		scale = GltfAccessorReader::ReadFloat3(transforms.scales, instanceIndex);
 	}
 
-	const DirectX::XMMATRIX authoredTransform = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z) * DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&rotation))
-	    * DirectX::XMMatrixTranslation(translation.x, translation.y, translation.z);
-
+	const auto scaling = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+	const auto orientation = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&rotation));
+	const auto position = DirectX::XMMatrixTranslation(translation.x, translation.y, translation.z);
+	const DirectX::XMMATRIX authoredTransform = scaling * orientation * position;
 	return GltfCoordinateConverter::ConvertMatrix(authoredTransform);
 }

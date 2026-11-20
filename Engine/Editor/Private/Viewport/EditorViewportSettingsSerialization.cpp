@@ -113,7 +113,10 @@ void EditorViewportSettingsSerialization::Read(std::istream& input, EditorViewpo
 		const std::size_t separator = trimmed.find('=');
 		if (separator != std::string::npos)
 		{
-			ApplySetting(std::string_view(trimmed).substr(0, separator), std::string_view(trimmed).substr(separator + 1), state);
+			const std::string_view setting(trimmed);
+			const std::string_view key = setting.substr(0, separator);
+			const std::string_view value = setting.substr(separator + 1);
+			ApplySetting(key, value, state);
 		}
 	}
 }

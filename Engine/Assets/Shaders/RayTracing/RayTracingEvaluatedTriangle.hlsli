@@ -65,9 +65,10 @@ RayTracingEvaluatedTriangle EvaluateRayTracingTriangle(uint instanceId, uint pri
 
 float3 InterpolateRayTracingPosition(RayTracingEvaluatedTriangle evaluatedTriangle)
 {
+	const float3 weights = evaluatedTriangle.BarycentricWeights;
 	precise float3 edge1 = evaluatedTriangle.V1.Position - evaluatedTriangle.V0.Position;
 	precise float3 edge2 = evaluatedTriangle.V2.Position - evaluatedTriangle.V0.Position;
-	precise float3 position = evaluatedTriangle.V0.Position + mad(evaluatedTriangle.BarycentricWeights.y, edge1, evaluatedTriangle.BarycentricWeights.z * edge2);
+	precise float3 position = evaluatedTriangle.V0.Position + mad(weights.y, edge1, weights.z * edge2);
 	return position;
 }
 
@@ -84,14 +85,14 @@ float3 EvaluatePreviousRayTracingPosition(RayTracingHitTriangle hitTriangle, Mes
 
 float2 InterpolateRayTracingTexCoord0(RayTracingEvaluatedTriangle evaluatedTriangle)
 {
-	return evaluatedTriangle.V0.TexCoord0 * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.TexCoord0 * evaluatedTriangle.BarycentricWeights.y
-	    + evaluatedTriangle.V2.TexCoord0 * evaluatedTriangle.BarycentricWeights.z;
+	const float3 weights = evaluatedTriangle.BarycentricWeights;
+	return evaluatedTriangle.V0.TexCoord0 * weights.x + evaluatedTriangle.V1.TexCoord0 * weights.y + evaluatedTriangle.V2.TexCoord0 * weights.z;
 }
 
 float4 InterpolateRayTracingColor(RayTracingEvaluatedTriangle evaluatedTriangle)
 {
-	return evaluatedTriangle.V0.Color * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.Color * evaluatedTriangle.BarycentricWeights.y
-	    + evaluatedTriangle.V2.Color * evaluatedTriangle.BarycentricWeights.z;
+	const float3 weights = evaluatedTriangle.BarycentricWeights;
+	return evaluatedTriangle.V0.Color * weights.x + evaluatedTriangle.V1.Color * weights.y + evaluatedTriangle.V2.Color * weights.z;
 }
 
 void BuildRayTracingShadingFrame(RayTracingEvaluatedTriangle evaluatedTriangle,
@@ -101,15 +102,10 @@ void BuildRayTracingShadingFrame(RayTracingEvaluatedTriangle evaluatedTriangle,
                                  out float3 tangentWorld,
                                  out float3 bitangentWorld)
 {
-	const float3 localNormal = evaluatedTriangle.V0.Normal * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.Normal * evaluatedTriangle.BarycentricWeights.y
-	    + evaluatedTriangle.V2.Normal * evaluatedTriangle.BarycentricWeights.z;
-
-	const float3 localTangent = evaluatedTriangle.V0.Tangent * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.Tangent * evaluatedTriangle.BarycentricWeights.y
-	    + evaluatedTriangle.V2.Tangent * evaluatedTriangle.BarycentricWeights.z;
-
-	const float interpolatedTangentSign = evaluatedTriangle.V0.TangentSign * evaluatedTriangle.BarycentricWeights.x + evaluatedTriangle.V1.TangentSign * evaluatedTriangle.BarycentricWeights.y
-	    + evaluatedTriangle.V2.TangentSign * evaluatedTriangle.BarycentricWeights.z;
-
+	const float3 weights = evaluatedTriangle.BarycentricWeights;
+	const float3 localNormal = evaluatedTriangle.V0.Normal * weights.x + evaluatedTriangle.V1.Normal * weights.y + evaluatedTriangle.V2.Normal * weights.z;
+	const float3 localTangent = evaluatedTriangle.V0.Tangent * weights.x + evaluatedTriangle.V1.Tangent * weights.y + evaluatedTriangle.V2.Tangent * weights.z;
+	const float interpolatedTangentSign = evaluatedTriangle.V0.TangentSign * weights.x + evaluatedTriangle.V1.TangentSign * weights.y + evaluatedTriangle.V2.TangentSign * weights.z;
 	const float tangentSign = interpolatedTangentSign >= 0.0f ? 1.0f : -1.0f;
 
 	vertexNormal = normalize(mul(localNormal, (float3x3)mesh.WorldInverseTranspose));

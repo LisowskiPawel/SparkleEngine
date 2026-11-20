@@ -22,24 +22,13 @@ namespace Json
 		}
 	}
 
-	void InputAdmission::BeginObject(int depth)
-	{
-		CheckDepth(depth);
-		m_keys.resize(static_cast<std::size_t>(depth) + 1);
-		m_keys.back().clear();
-	}
-
-	void InputAdmission::EndObject(int depth)
-	{
-		m_keys.resize(static_cast<std::size_t>(depth));
-	}
-
-	void InputAdmission::ReadKey(int depth, const std::string& key)
+	bool InputAdmission::ReadKey(int depth, const std::string& key)
 	{
 		if (!TryReadKey(depth, key))
 		{
 			throw Diagnostics::Error("JSON input repeats a consumed member.");
 		}
+		return true;
 	}
 
 	bool InputAdmission::TryReadKey(int depth, const std::string& key)

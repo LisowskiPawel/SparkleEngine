@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>
+#include <stop_token>
 #include <utility>
 
 std::shared_ptr<TaskDispatch::State> TaskExecutor::Implementation::PrepareDispatch(TaskScope& scope, TaskDesc desc, TaskFunction function, TaskExecutionContext context)
@@ -42,7 +43,8 @@ std::shared_ptr<TaskDispatch::State> TaskExecutor::Implementation::CreateDispatc
 {
 	auto execution = CreateExecution(scope);
 	auto dispatch = std::make_shared<TaskDispatch::State>(std::move(execution), std::move(desc), std::move(function), std::move(context));
-	dispatch->Cancellation.emplace(dispatch->Execution->Cancellation.get_token(), TaskDispatch::State::CancellationHook{dispatch});
+	const std::stop_token cancellation = dispatch->Execution->Cancellation.get_token();
+	dispatch->Cancellation.emplace(cancellation, TaskDispatch::State::CancellationHook{dispatch});
 	return dispatch;
 }
 

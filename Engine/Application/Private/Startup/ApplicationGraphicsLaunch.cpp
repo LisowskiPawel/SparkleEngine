@@ -46,7 +46,8 @@ namespace ApplicationGraphicsLaunch
 			{
 				if (Strings::StartsWithIgnoreCase(token, prefix))
 				{
-					api = ParseSelection(std::string_view(token).substr(prefix.size()));
+					const std::string_view value = std::string_view(token).substr(prefix.size());
+					api = ParseSelection(value);
 					return true;
 				}
 			}
@@ -56,7 +57,9 @@ namespace ApplicationGraphicsLaunch
 
 			if (bIsGraphicsApiSwitch)
 			{
-				api = ParseSelection(Strings::ToNarrow(CommandLine::ReadToken(commandLine, offset)));
+				const std::wstring_view wideValue = CommandLine::ReadToken(commandLine, offset);
+				const std::string value = Strings::ToNarrow(wideValue);
+				api = ParseSelection(value);
 				return true;
 			}
 		}
@@ -79,7 +82,8 @@ RendererGraphicsLaunch ResolveApplicationGraphicsLaunch() noexcept
 	}
 	if (!IsRhiBackendApiCompiled(api))
 	{
-		Diagnostics::Fatal(g_applicationGraphicsLogger, __FILE__, __LINE__, std::string("Graphics backend '") + RhiBackendApiToString(api) + "' is not compiled into this product.");
+		const std::string message = std::string("Graphics backend '") + RhiBackendApiToString(api) + "' is not compiled into this product.";
+		Diagnostics::Fatal(g_applicationGraphicsLogger, __FILE__, __LINE__, message);
 	}
 
 	RendererGraphicsLaunch launch{.BackendApi = api};

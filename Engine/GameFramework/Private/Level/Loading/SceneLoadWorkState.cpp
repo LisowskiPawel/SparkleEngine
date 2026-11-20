@@ -37,9 +37,12 @@ namespace Assets
 		std::unordered_set<std::string> identities;
 		for (const SceneAssetId& id : Package->Level.sceneAssetIds)
 		{
-			if (id.IsEmpty() || !identities.insert(id.value).second)
+			const bool bEmptyIdentity = id.IsEmpty();
+			const bool bUniqueIdentity = !bEmptyIdentity && identities.insert(id.value).second;
+			if (!bUniqueIdentity)
 			{
-				throw Diagnostics::Error(id.IsEmpty() ? "Level contains an empty scene asset identity." : std::format("Level contains duplicate scene asset identity '{}'.", id.value));
+				const std::string errorMessage = bEmptyIdentity ? "Level contains an empty scene asset identity." : std::format("Level contains duplicate scene asset identity '{}'.", id.value);
+				throw Diagnostics::Error(errorMessage);
 			}
 			const std::optional<std::filesystem::path> manifest = catalog.Resolve(id.GetCatalogValue());
 			if (!manifest)

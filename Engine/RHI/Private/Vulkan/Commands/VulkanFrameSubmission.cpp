@@ -45,8 +45,9 @@ RhiSubmissionToken VulkanFrameSubmission::Submit(RhiCommandRecordingLease&& leas
 	std::array<RhiSubmissionToken, RhiQueueTypeCount> resolvedWaitTokens{};
 	const std::size_t resolvedWaitCount = resolvedWaits.CopyTokens(resolvedWaitTokens);
 
-	return m_commandContext
-	    .Submit(std::move(lease), std::span<const RhiSubmissionToken>(resolvedWaitTokens.data(), resolvedWaitCount), ConsumeAcquireSemaphore(queueType), VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+	const std::span<const RhiSubmissionToken> waits(resolvedWaitTokens.data(), resolvedWaitCount);
+	const VkSemaphore acquireSemaphore = ConsumeAcquireSemaphore(queueType);
+	return m_commandContext.Submit(std::move(lease), waits, acquireSemaphore, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
 }
 
 RhiSubmissionToken VulkanFrameSubmission::SubmitBatch(std::span<RhiCommandRecordingLease> leases, std::span<const RhiSubmissionToken> waitTokens) noexcept
@@ -61,8 +62,9 @@ RhiSubmissionToken VulkanFrameSubmission::SubmitBatch(std::span<RhiCommandRecord
 	std::array<RhiSubmissionToken, RhiQueueTypeCount> resolvedWaitTokens{};
 	const std::size_t resolvedWaitCount = resolvedWaits.CopyTokens(resolvedWaitTokens);
 
-	return m_commandContext
-	    .SubmitBatch(leases, std::span<const RhiSubmissionToken>(resolvedWaitTokens.data(), resolvedWaitCount), ConsumeAcquireSemaphore(queueType), VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+	const std::span<const RhiSubmissionToken> waits(resolvedWaitTokens.data(), resolvedWaitCount);
+	const VkSemaphore acquireSemaphore = ConsumeAcquireSemaphore(queueType);
+	return m_commandContext.SubmitBatch(leases, waits, acquireSemaphore, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
 }
 
 RhiSubmissionState VulkanFrameSubmission::ConsumeQueueWaits(ERhiQueueType queueType, std::span<const RhiSubmissionToken> waitTokens) noexcept
@@ -146,10 +148,9 @@ RhiSubmissionToken VulkanFrameSubmission::SubmitCurrentGraphicsCommandList(std::
 	std::array<RhiSubmissionToken, RhiQueueTypeCount> resolvedWaitTokens{};
 	const std::size_t resolvedWaitCount = resolvedWaits.CopyTokens(resolvedWaitTokens);
 
-	return m_commandContext.SubmitCurrentGraphicsCommandList(
-	    m_currentFrameIndex,
-	    std::span<const RhiSubmissionToken>(resolvedWaitTokens.data(), resolvedWaitCount),
-	    ConsumeAcquireSemaphore(ERhiQueueType::Graphics));
+	const std::span<const RhiSubmissionToken> waits(resolvedWaitTokens.data(), resolvedWaitCount);
+	const VkSemaphore acquireSemaphore = ConsumeAcquireSemaphore(ERhiQueueType::Graphics);
+	return m_commandContext.SubmitCurrentGraphicsCommandList(m_currentFrameIndex, waits, acquireSemaphore);
 }
 
 bool VulkanFrameSubmission::SubmitAndPresent() noexcept

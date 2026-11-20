@@ -101,7 +101,8 @@ namespace SparkleLauncher
 		}
 		if (HasSelectedBuildScope(plan.Request, BuildWorkspaceScope::Game))
 		{
-			AddBuildStep(steps, plan, plan.Request.GameProfile, RequireBuildTargets(plan, BuildWorkspaceScope::Game));
+			const auto targets = RequireBuildTargets(plan, BuildWorkspaceScope::Game);
+			AddBuildStep(steps, plan, plan.Request.GameProfile, targets);
 		}
 	}
 
@@ -164,7 +165,8 @@ namespace SparkleLauncher
 			}
 			case BuildWorkspaceOperationKind::BuildCookTools:
 			{
-				AddBuildStep(steps, plan, plan.Request.EditorProfile, RequireBuildTargets(plan, BuildWorkspaceScope::CookTools));
+				const auto targets = RequireBuildTargets(plan, BuildWorkspaceScope::CookTools);
+				AddBuildStep(steps, plan, plan.Request.EditorProfile, targets);
 				return steps;
 			}
 			case BuildWorkspaceOperationKind::InstallHostTool:

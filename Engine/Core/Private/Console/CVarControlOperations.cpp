@@ -7,6 +7,8 @@
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Core/Public/Strings/StringUtils.h"
 
+#include <utility>
+
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogCoreCVarControl, "Core.Console.Control");
 
 static bool MatchesCVarFilter(const ConsoleVariableBase& variable, std::string_view filter)
@@ -86,7 +88,11 @@ static bool ResolveNamedCVarBatch(ConsoleVariableRegistry& registry, const CVarC
 
 bool ResolveCVarControlVariables(ConsoleVariableRegistry& registry, const CVarControlRequest& request, std::vector<ConsoleVariableBase*>& variables, std::string& outError)
 {
-	return request.Operation == CVarControlOperation::List ? CollectFilteredCVars(registry, request, variables, outError) : ResolveNamedCVarBatch(registry, request, variables, outError);
+	if (request.Operation == CVarControlOperation::List)
+	{
+		return CollectFilteredCVars(registry, request, variables, outError);
+	}
+	return ResolveNamedCVarBatch(registry, request, variables, outError);
 }
 
 void CommitCVarControlValues(const CVarControlRequest& request, const std::vector<ConsoleVariableBase*>& variables)
@@ -108,6 +114,12 @@ void ReadCVarControlValues(const std::vector<ConsoleVariableBase*>& variables, C
 	result.Values.reserve(variables.size());
 	for (const ConsoleVariableBase* variable : variables)
 	{
-		result.Values.push_back({std::string(variable->GetName()), variable->GetValueAsString(), variable->GetValueTypeName(), std::string(variable->GetDescription())});
+		CVarControlValue value{
+		    .Name = std::string(variable->GetName()),
+		    .Value = variable->GetValueAsString(),
+		    .Type = variable->GetValueTypeName(),
+		    .Description = std::string(variable->GetDescription())};
+
+		result.Values.push_back(std::move(value));
 	}
 }

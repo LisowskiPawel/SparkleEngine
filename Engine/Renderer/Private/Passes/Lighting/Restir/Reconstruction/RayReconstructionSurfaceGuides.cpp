@@ -31,5 +31,8 @@ void AddRayReconstructionSurfaceGuidesPass(FrameGraphBuilder& builder, const Ren
 	parameters->RayReconstructionSpecularHitDistance = builder.CreateUAV(guides.SpecularHitDistance);
 	BindSceneShaderParameters(builder, frame, parameters, resources);
 
-	builder.Dispatch<RayReconstructionSurfaceGuidesCS>(parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(sceneExtent.Width, 8u), MathUtils::DivideRoundUp(sceneExtent.Height, 8u), 1u});
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(sceneExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(sceneExtent.Height, 8u);
+
+	builder.Dispatch<RayReconstructionSurfaceGuidesCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u});
 }

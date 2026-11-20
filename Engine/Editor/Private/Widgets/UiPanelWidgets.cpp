@@ -36,7 +36,9 @@ namespace EditorWidgets
 		const ImVec2 end = ImVec2(start.x + width, start.y + height);
 
 		drawList->AddRectFilled(start, end, backgroundColor);
-		drawList->AddLine(ImVec2(start.x, end.y - 1.0f), ImVec2(end.x, end.y - 1.0f), borderColor, 1.0f);
+		const ImVec2 borderStart(start.x, end.y - 1.0f);
+		const ImVec2 borderEnd(end.x, end.y - 1.0f);
+		drawList->AddLine(borderStart, borderEnd, borderColor, 1.0f);
 
 		ImGui::InvisibleButton("##header_bar", ImVec2(width, height));
 		ImGui::SetCursorScreenPos(ImVec2(start.x + padding.x, start.y + padding.y));

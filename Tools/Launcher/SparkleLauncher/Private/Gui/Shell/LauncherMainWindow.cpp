@@ -395,10 +395,13 @@ namespace SparkleLauncher
 			return;
 		}
 
-		const std::vector<MaintenanceCleanPathSpec> cleanTargets = SupportsActionSpecificClean(m_selectedOperationId.toStdString())
-		    ? BuildActionCleanPaths(
-		          BuildActionCleanTargetRequest(m_workspaceRoot, m_contentModel, m_settings, std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()), m_selectedOperationId))
-		    : std::vector<MaintenanceCleanPathSpec>();
+		std::vector<MaintenanceCleanPathSpec> cleanTargets;
+		if (SupportsActionSpecificClean(m_selectedOperationId.toStdString()))
+		{
+			const std::filesystem::path launcherPath(QCoreApplication::applicationFilePath().toStdString());
+			const auto cleanRequest = BuildActionCleanTargetRequest(m_workspaceRoot, m_contentModel, m_settings, launcherPath, m_selectedOperationId);
+			cleanTargets = BuildActionCleanPaths(cleanRequest);
+		}
 
 		const bool bCleanWorkspaceSelected = m_selectedOperationId == "workspace.clean";
 		const QString cleanScopeError = bCleanWorkspaceSelected ? CleanScopeSelectionError(m_settings.CleanScope()) : QString();
@@ -437,7 +440,8 @@ namespace SparkleLauncher
 		if (FindCookOperationDefinition(m_selectedOperationId.toStdString()).has_value())
 		{
 			const LauncherOperationRequest operationRequest = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, m_selectedOperationId);
-			const CookOperationPlan plan = PlanCookOperation(m_selectedOperationId.toStdString(), std::get<CookOperationRequest>(operationRequest.Inputs));
+			const auto& cookRequest = std::get<CookOperationRequest>(operationRequest.Inputs);
+			const CookOperationPlan plan = PlanCookOperation(m_selectedOperationId.toStdString(), cookRequest);
 
 			const QString reason = plan.bCanRun
 			    ? "Run " + DisplayNameForOperation(m_selectedOperationId) + ". Existing runs keep going."
@@ -481,8 +485,10 @@ namespace SparkleLauncher
 				actionIcon = LauncherIcon::Clean;
 			}
 			m_runButton->setProperty("ActionTone", bDestructive ? "destructive" : "primary");
-			m_runButton->setIcon(m_icons.Icon(actionIcon, QColor(bDestructive ? "#ffffff" : "#071006")));
-			m_runButton->setText(operationId == LauncherScenesOperationId() ? "Sync All" : operationId == "workspace.clean" ? "Clean" : PrimaryActionLabelForOperationId(operationId));
+			const QColor actionColor(bDestructive ? "#ffffff" : "#071006");
+			m_runButton->setIcon(m_icons.Icon(actionIcon, actionColor));
+			const QString actionText = operationId == LauncherScenesOperationId() ? "Sync All" : bDestructive ? "Clean" : PrimaryActionLabelForOperationId(operationId);
+			m_runButton->setText(actionText);
 
 			m_runButton->setAccessibleName(
 			    operationId == LauncherScenesOperationId() ? "Sync all available levels"

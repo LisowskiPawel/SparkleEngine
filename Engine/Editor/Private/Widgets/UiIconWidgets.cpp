@@ -84,12 +84,15 @@ namespace EditorWidgets
 		const ImVec2 end(start.x + size.x, start.y + size.y);
 		if (bHovered || bActive)
 		{
-			drawList->AddRectFilled(start, end, ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::ButtonBackgroundHovered()), 3.0f);
+			const ImU32 backgroundColor = ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::ButtonBackgroundHovered());
+			drawList->AddRectFilled(start, end, backgroundColor, 3.0f);
 		}
 
 		const ImVec4 iconColor = bVisible ? SparkleUiPalette::WithAlpha(SparkleUiPalette::TextMuted(), 0.58f) : SparkleUiPalette::AccentStrong();
 		const ImU32 iconColorU32 = ImGui::ColorConvertFloat4ToU32(iconColor);
-		DrawCenteredGlyph(drawList, start, size, EditorIcons::GetEditorIconGlyph(bVisible ? EditorIcons::EditorIcon::EyeVisible : EditorIcons::EditorIcon::EyeHidden), iconColorU32);
+		const EditorIcons::EditorIcon icon = bVisible ? EditorIcons::EditorIcon::EyeVisible : EditorIcons::EditorIcon::EyeHidden;
+		const char* glyph = EditorIcons::GetEditorIconGlyph(icon);
+		DrawCenteredGlyph(drawList, start, size, glyph, iconColorU32);
 
 		if (bHovered)
 		{

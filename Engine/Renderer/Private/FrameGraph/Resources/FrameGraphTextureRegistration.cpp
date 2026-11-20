@@ -8,6 +8,7 @@
 #include "Window/Window.h"
 
 #include <format>
+#include <string>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_frameGraphTextureLogger, "Renderer.FrameGraph");
 
@@ -44,36 +45,32 @@ namespace FrameGraphTextureRegistration
 
 	void FailInvalidPersistentBufferBinding(std::string_view operation, std::string_view resourceName, FrameGraphResourceHandle handle, ResourceState state, bool bHasResource) noexcept
 	{
-		Diagnostics::Fatal(
-		    g_frameGraphTextureLogger,
-		    __FILE__,
-		    __LINE__,
-		    std::format(
-		        "FrameGraph persistent-buffer validation failed: operation='{}' resource='{}' handle={} state={} hasResource={} "
-		        "remediation='bind persistent buffers through a valid frame-graph buffer handle with a native backing resource before "
-		        "declaring the pass resource use'",
-		        operation,
-		        resourceName.empty() ? "<unnamed>" : resourceName,
-		        FormatResourceHandle(handle),
-		        ResourceStateToString(state),
-		        bHasResource));
+		const std::string message = std::format(
+		    "FrameGraph persistent-buffer validation failed: operation='{}' resource='{}' handle={} state={} hasResource={} "
+		    "remediation='bind persistent buffers through a valid frame-graph buffer handle with a native backing resource before "
+		    "declaring the pass resource use'",
+		    operation,
+		    resourceName.empty() ? "<unnamed>" : resourceName,
+		    FormatResourceHandle(handle),
+		    ResourceStateToString(state),
+		    bHasResource);
+
+		Diagnostics::Fatal(g_frameGraphTextureLogger, __FILE__, __LINE__, message);
 	}
 
 	void FailInvalidPersistentTextureBinding(std::string_view operation, std::string_view resourceName, FrameGraphResourceHandle handle, ResourceState state, bool bHasResource) noexcept
 	{
-		Diagnostics::Fatal(
-		    g_frameGraphTextureLogger,
-		    __FILE__,
-		    __LINE__,
-		    std::format(
-		        "FrameGraph persistent-texture validation failed: operation='{}' resource='{}' handle={} state={} hasResource={} "
-		        "remediation='bind persistent textures through a valid frame-graph texture handle with a native backing resource before "
-		        "declaring the pass resource use'",
-		        operation,
-		        resourceName.empty() ? "<unnamed>" : resourceName,
-		        FormatResourceHandle(handle),
-		        ResourceStateToString(state),
-		        bHasResource));
+		const std::string message = std::format(
+		    "FrameGraph persistent-texture validation failed: operation='{}' resource='{}' handle={} state={} hasResource={} "
+		    "remediation='bind persistent textures through a valid frame-graph texture handle with a native backing resource before "
+		    "declaring the pass resource use'",
+		    operation,
+		    resourceName.empty() ? "<unnamed>" : resourceName,
+		    FormatResourceHandle(handle),
+		    ResourceStateToString(state),
+		    bHasResource);
+
+		Diagnostics::Fatal(g_frameGraphTextureLogger, __FILE__, __LINE__, message);
 	}
 }
 

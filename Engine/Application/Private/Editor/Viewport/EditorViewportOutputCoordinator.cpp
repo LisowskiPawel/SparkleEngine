@@ -21,7 +21,8 @@ void EditorViewportOutputCoordinator::Update(UI& ui, Renderer& renderer)
 	{
 		ui.AppendConsoleOutput(std::move(*status), true);
 	}
-	m_referenceArtifacts.Update(renderer, renderer.GetViewportPresentation().Products);
+	const auto presentation = renderer.GetViewportPresentation();
+	m_referenceArtifacts.Update(renderer, presentation.Products);
 	ReportReferencePathTracerArtifactResult(ui, m_referenceArtifacts.TakeResult());
 }
 
@@ -37,6 +38,7 @@ void EditorViewportOutputCoordinator::HandleAction(UI& ui, Renderer& renderer, s
 		return;
 	}
 
-	ApplyReferencePathTracerArtifactAction(action, m_referenceArtifacts, renderer, renderer.GetViewportPresentation().Products);
+	const auto presentation = renderer.GetViewportPresentation();
+	ApplyReferencePathTracerArtifactAction(action, m_referenceArtifacts, renderer, presentation.Products);
 	ReportReferencePathTracerArtifactResult(ui, m_referenceArtifacts.TakeResult());
 }

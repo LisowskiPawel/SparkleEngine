@@ -58,7 +58,8 @@ namespace ECS
 		    .InstanceGroupIndex = instance.InstanceGroupIndex,
 		    .SourceNodeIndex = instance.SourceNodeIndex};
 
-		const bool bTransformsAdded = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{});
+		const bool bLocalAdded = m_registry.Add(entity, local);
+		const bool bTransformsAdded = bLocalAdded && m_registry.Add(entity, WorldTransform{});
 		const bool bMeshStored = bTransformsAdded && (m_registry.Add(entity, mesh));
 		const bool bVisibilityAdded = bMeshStored && (m_registry.Add(entity, Visibility{}));
 

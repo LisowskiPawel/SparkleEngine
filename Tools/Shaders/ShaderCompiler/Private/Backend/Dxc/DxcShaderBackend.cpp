@@ -52,7 +52,8 @@ ShaderBackendCapabilities DxcShaderBackend::GetStaticCapabilities() noexcept
 std::uint64_t DxcShaderBackend::QueryBackendVersion()
 {
 	Microsoft::WRL::ComPtr<IDxcCompiler3> compiler;
-	if (FAILED(DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(compiler.ReleaseAndGetAddressOf()))) || !compiler)
+	const HRESULT createStatus = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(compiler.ReleaseAndGetAddressOf()));
+	if (FAILED(createStatus) || !compiler)
 	{
 		return 0;
 	}
@@ -62,7 +63,8 @@ std::uint64_t DxcShaderBackend::QueryBackendVersion()
 std::uint64_t DxcShaderBackend::QueryBackendVersion(IDxcCompiler3& compiler)
 {
 	Microsoft::WRL::ComPtr<IDxcVersionInfo> versionInfo;
-	if (FAILED(compiler.QueryInterface(IID_PPV_ARGS(versionInfo.ReleaseAndGetAddressOf()))) || !versionInfo)
+	const HRESULT queryStatus = compiler.QueryInterface(IID_PPV_ARGS(versionInfo.ReleaseAndGetAddressOf()));
+	if (FAILED(queryStatus) || !versionInfo)
 	{
 		return 0;
 	}
@@ -110,7 +112,8 @@ CompiledShader DxcShaderBackend::Compile(const ShaderCompileRequest& request)
 
 	std::wstring wSourcePath = Strings::ToWide(request.VirtualSourcePath);
 	std::wstring wEntryPoint = Strings::ToWide(request.EntryPoint);
-	std::wstring wTargetProfile = Strings::ToWide(BuildShaderTargetProfile(request));
+	const auto targetProfile = BuildShaderTargetProfile(request);
+	std::wstring wTargetProfile = Strings::ToWide(targetProfile);
 	std::vector<std::wstring> wDefines;
 	std::vector<LPCWSTR> args;
 
@@ -129,9 +132,19 @@ CompiledShader DxcShaderBackend::Compile(const ShaderCompileRequest& request)
 		NormalizeSpirVBindings(bytecode, request.DescriptorBindingRemaps);
 	}
 
-	ShaderReflection reflection = IsSpirVTarget(request.Target) ? ExtractSpirVReflection(bytecode, request.Stage)
-	    : request.UnitKind == ShaderCompileUnitKind::Library    ? ExtractDxilLibraryReflection(*m_utils.Get(), result.Get(), request.EntryPoint)
-	                                                            : ExtractDxilReflection(*m_utils.Get(), result.Get(), request.Stage);
+	ShaderReflection reflection;
+	if (IsSpirVTarget(request.Target))
+	{
+		reflection = ExtractSpirVReflection(bytecode, request.Stage);
+	}
+	else if (request.UnitKind == ShaderCompileUnitKind::Library)
+	{
+		reflection = ExtractDxilLibraryReflection(*m_utils.Get(), result.Get(), request.EntryPoint);
+	}
+	else
+	{
+		reflection = ExtractDxilReflection(*m_utils.Get(), result.Get(), request.Stage);
+	}
 
 	ShaderDebugArtifactSet debugArtifacts;
 	if (request.bCaptureDebugArtifacts)
@@ -210,15 +223,18 @@ std::string DxcShaderBackend::ExtractErrorMessage(IDxcResult* result)
 std::string DxcShaderBackend::ExtractTextOutput(IDxcResult* result, DXC_OUT_KIND kind)
 {
 	Microsoft::WRL::ComPtr<IDxcBlobUtf8> textBlob;
-	if (SUCCEEDED(result->GetOutput(kind, IID_PPV_ARGS(textBlob.ReleaseAndGetAddressOf()), nullptr)) && textBlob)
+	const HRESULT textStatus = result->GetOutput(kind, IID_PPV_ARGS(textBlob.ReleaseAndGetAddressOf()), nullptr);
+	if (SUCCEEDED(textStatus) && textBlob)
 	{
 		return std::string(textBlob->GetStringPointer(), textBlob->GetStringLength());
 	}
 
 	Microsoft::WRL::ComPtr<IDxcBlobWide> wideBlob;
-	if (SUCCEEDED(result->GetOutput(kind, IID_PPV_ARGS(wideBlob.ReleaseAndGetAddressOf()), nullptr)) && wideBlob)
+	const HRESULT wideStatus = result->GetOutput(kind, IID_PPV_ARGS(wideBlob.ReleaseAndGetAddressOf()), nullptr);
+	if (SUCCEEDED(wideStatus) && wideBlob)
 	{
-		return Strings::ToNarrow(std::wstring_view(wideBlob->GetStringPointer(), wideBlob->GetStringLength()));
+		const std::wstring_view wideText(wideBlob->GetStringPointer(), wideBlob->GetStringLength());
+		return Strings::ToNarrow(wideText);
 	}
 
 	return {};
@@ -274,7 +290,8 @@ std::string DxcShaderBackend::ExtractDisassembly(IDxcUtils& utils, IDxcCompiler3
 	}
 
 	Microsoft::WRL::ComPtr<IDxcCompiler> disassemblyCompiler;
-	if (FAILED(compiler.QueryInterface(IID_PPV_ARGS(disassemblyCompiler.ReleaseAndGetAddressOf()))) || !disassemblyCompiler)
+	const HRESULT queryStatus = compiler.QueryInterface(IID_PPV_ARGS(disassemblyCompiler.ReleaseAndGetAddressOf()));
+	if (FAILED(queryStatus) || !disassemblyCompiler)
 	{
 		return {};
 	}
@@ -288,7 +305,8 @@ std::string DxcShaderBackend::ExtractDisassembly(IDxcUtils& utils, IDxcCompiler3
 	}
 
 	Microsoft::WRL::ComPtr<IDxcBlobEncoding> disassemblyBlob;
-	if (FAILED(disassemblyCompiler->Disassemble(objectBlob.Get(), disassemblyBlob.ReleaseAndGetAddressOf())) || !disassemblyBlob)
+	const HRESULT fallbackStatus = disassemblyCompiler->Disassemble(objectBlob.Get(), disassemblyBlob.ReleaseAndGetAddressOf());
+	if (FAILED(fallbackStatus) || !disassemblyBlob)
 	{
 		return {};
 	}
@@ -349,7 +367,8 @@ void DxcShaderBackend::ExtractSymbols(IDxcResult& result, ShaderDebugArtifactSet
 
 	const auto* pdbBytes = static_cast<const std::uint8_t*>(pdbBlob->GetBufferPointer());
 	artifacts.Symbols.assign(pdbBytes, pdbBytes + pdbBlob->GetBufferSize());
-	artifacts.SymbolName = Strings::ToNarrow(std::wstring_view(pdbNameBlob->GetStringPointer(), pdbNameBlob->GetStringLength()));
+	const std::wstring_view symbolName(pdbNameBlob->GetStringPointer(), pdbNameBlob->GetStringLength());
+	artifacts.SymbolName = Strings::ToNarrow(symbolName);
 	Microsoft::WRL::ComPtr<IDxcBlob> hashBlob;
 	const HRESULT hashStatus = result.GetOutput(DXC_OUT_SHADER_HASH, IID_PPV_ARGS(hashBlob.ReleaseAndGetAddressOf()), nullptr);
 

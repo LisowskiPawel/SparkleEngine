@@ -45,7 +45,8 @@ TextureSource LoadExrTextureSource(std::span<const std::uint8_t> bytes, const Te
 {
 	const auto metadata = ExrSourceLoading::ReadMetadata(bytes);
 	TextureSource source;
-	source.ProcessingMemory = processingMemory.Acquire(MeasureTextureProcessingMemory(metadata, bytes.size(), request));
+	const auto requiredMemory = MeasureTextureProcessingMemory(metadata, bytes.size(), request);
+	source.ProcessingMemory = processingMemory.Acquire(requiredMemory);
 
 	int width = 0;
 	int height = 0;

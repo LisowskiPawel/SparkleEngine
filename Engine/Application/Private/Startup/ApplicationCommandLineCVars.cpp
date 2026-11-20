@@ -50,14 +50,16 @@ namespace ApplicationCommandLineCVars
 			constexpr std::string_view cvarEqualsPrefix = "--cvar=";
 			if (Strings::StartsWithIgnoreCase(token, cvarEqualsPrefix))
 			{
-				ApplyAssignment(std::string_view(token).substr(cvarEqualsPrefix.size()));
+				const std::string_view assignment = std::string_view(token).substr(cvarEqualsPrefix.size());
+				ApplyAssignment(assignment);
 				continue;
 			}
 
 			if (Strings::EqualsIgnoreCase(token, "--cvar") || Strings::EqualsIgnoreCase(token, "--set-cvar"))
 			{
 				const std::wstring_view wideValue = CommandLine::ReadToken(commandLine, offset);
-				ApplyAssignment(Strings::ToNarrow(wideValue));
+				const std::string assignment = Strings::ToNarrow(wideValue);
+				ApplyAssignment(assignment);
 			}
 		}
 	}

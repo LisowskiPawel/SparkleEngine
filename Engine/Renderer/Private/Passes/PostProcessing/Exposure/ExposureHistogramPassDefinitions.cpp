@@ -19,10 +19,10 @@ void AddExposureHistogramBuildPass(FrameGraphBuilder& builder, FrameGraphTexture
 	parameters->SceneColor = builder.CreateSRV(sceneColor);
 	parameters->HistogramCounts = builder.CreateUAV(histogram);
 
-	builder.Dispatch<ExposureHistogramBuildCS>(
-	    parameters,
-	    ComputeDispatchDesc{MathUtils::DivideRoundUp(extent.Width, 16u), MathUtils::DivideRoundUp(extent.Height, 16u), 1u},
-	    EFrameGraphQueuePreference::AsyncCompute);
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(extent.Width, 16u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(extent.Height, 16u);
+
+	builder.Dispatch<ExposureHistogramBuildCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u}, EFrameGraphQueuePreference::AsyncCompute);
 }
 
 void AddExposureHistogramResolvePass(FrameGraphBuilder& builder, FrameGraphBufferHandle histogram, const ExposureMomentTexture& output)

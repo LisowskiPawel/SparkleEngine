@@ -18,6 +18,7 @@ namespace PS
 	void PrepareInput(inout Input input)
 	{
 		input.NormalWorld = normalize(input.NormalWorld);
-		input.TangentWorld = float4(OrthonormalizeTangent(input.TangentWorld.xyz, input.NormalWorld), input.TangentWorld.w);
+		const float3 tangentWorld = OrthonormalizeTangent(input.TangentWorld.xyz, input.NormalWorld);
+		input.TangentWorld = float4(tangentWorld, input.TangentWorld.w);
 	}
 }

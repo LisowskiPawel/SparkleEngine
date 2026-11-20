@@ -108,7 +108,10 @@ template <typename Callback> static void ForEachProjectedTriangle(const MeshPrev
 			continue;
 		}
 
-		callback(std::array{ProjectVertex(geometry.Vertices[index0], projection), ProjectVertex(geometry.Vertices[index1], projection), ProjectVertex(geometry.Vertices[index2], projection)});
+		const ImVec2 point0 = ProjectVertex(geometry.Vertices[index0], projection);
+		const ImVec2 point1 = ProjectVertex(geometry.Vertices[index1], projection);
+		const ImVec2 point2 = ProjectVertex(geometry.Vertices[index2], projection);
+		callback(std::array{point0, point1, point2});
 	}
 }
 
@@ -120,8 +123,16 @@ static void DrawSolidTriangles(ImDrawList& drawList, const MeshPreviewGeometry& 
 		drawList.Flags &= ~ImDrawListFlags_AntiAliasedFill;
 	}
 
-	const ImU32 color = bGpuResident ? (bDrawWire ? IM_COL32(89, 142, 199, 84) : IM_COL32(89, 142, 199, 230)) : (bDrawWire ? IM_COL32(128, 128, 128, 72) : IM_COL32(128, 128, 128, 220));
-	ForEachProjectedTriangle(geometry, projection, triangleCount, [&](const std::array<ImVec2, 3>& triangle) { drawList.AddTriangleFilled(triangle[0], triangle[1], triangle[2], color); });
+	const ImU32 residentColor = IM_COL32(89, 142, 199, bDrawWire ? 84 : 230);
+	const ImU32 nonResidentColor = IM_COL32(128, 128, 128, bDrawWire ? 72 : 220);
+	const ImU32 color = bGpuResident ? residentColor : nonResidentColor;
+
+	const auto drawTriangle = [&](const std::array<ImVec2, 3>& triangle)
+	{
+		drawList.AddTriangleFilled(triangle[0], triangle[1], triangle[2], color);
+	};
+
+	ForEachProjectedTriangle(geometry, projection, triangleCount, drawTriangle);
 	drawList.Flags = previousFlags;
 }
 
@@ -206,11 +217,15 @@ void MeshPreview::DrawGeometry(bool bGpuResident) const
 	ImGui::InvisibleButton("##MeshPreviewCanvas", canvasSize);
 	ImDrawList& drawList = *ImGui::GetWindowDrawList();
 	const ImVec2 canvasMax(canvasMin.x + canvasSize.x, canvasMin.y + canvasSize.y);
-	drawList.AddRectFilled(canvasMin, canvasMax, IM_COL32(18, 20, 24, 255));
-	drawList.AddRect(canvasMin, canvasMax, IM_COL32(68, 74, 84, 255));
+	const ImU32 backgroundColor = IM_COL32(18, 20, 24, 255);
+	const ImU32 borderColor = IM_COL32(68, 74, 84, 255);
+	drawList.AddRectFilled(canvasMin, canvasMax, backgroundColor);
+	drawList.AddRect(canvasMin, canvasMax, borderColor);
 	if (!m_geometry.IsValid())
 	{
-		drawList.AddText(ImVec2(canvasMin.x + 12.0f, canvasMin.y + 12.0f), IM_COL32(160, 166, 176, 255), "Preview geometry is unavailable.");
+		const ImVec2 messagePosition(canvasMin.x + 12.0f, canvasMin.y + 12.0f);
+		const ImU32 messageColor = IM_COL32(160, 166, 176, 255);
+		drawList.AddText(messagePosition, messageColor, "Preview geometry is unavailable.");
 		ImGui::EndChild();
 		return;
 	}
@@ -237,7 +252,9 @@ void MeshPreview::DrawGeometry(bool bGpuResident) const
 	}
 	if (triangleCount > previewTriangleCount)
 	{
-		drawList.AddText(ImVec2(canvasMin.x + 12.0f, canvasMin.y + 12.0f), IM_COL32(192, 196, 204, 255), "Preview truncated for large mesh.");
+		const ImVec2 messagePosition(canvasMin.x + 12.0f, canvasMin.y + 12.0f);
+		const ImU32 messageColor = IM_COL32(192, 196, 204, 255);
+		drawList.AddText(messagePosition, messageColor, "Preview truncated for large mesh.");
 	}
 	ImGui::EndChild();
 }

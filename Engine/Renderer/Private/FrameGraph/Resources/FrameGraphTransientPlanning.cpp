@@ -8,6 +8,7 @@
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 
 #include <cassert>
+#include <utility>
 
 static bool RequiresUnorderedAccess(const FrameGraphPlan& plan, FrameGraphResourceHandle handle) noexcept
 {
@@ -106,7 +107,8 @@ void FrameGraph::BuildTransientMaterializationPlan(FrameGraphPlan& plan) const n
 			continue;
 		}
 
-		plan.transients.resources.push_back(BuildTransientResourcePlan(transientResource, resourceMetadata, plan));
+		FrameGraphTransientResourcePlan resourcePlan = BuildTransientResourcePlan(transientResource, resourceMetadata, plan);
+		plan.transients.resources.push_back(std::move(resourcePlan));
 	}
 }
 
@@ -126,8 +128,10 @@ FrameGraphTransientResourcePlan FrameGraph::BuildTransientResourcePlan(
 	const RhiTextureResourceDesc textureResourceDesc = bIsBuffer ? RhiTextureResourceDesc{}
 	                                                             : BuildTransientResourceDesc(transientResource.textureDesc, resourceMetadata.kind, bRequiresRenderTarget, bRequiresUnorderedAccess);
 
-	const RhiResourceAllocationInfo allocationInfo = bIsBuffer ? m_renderHardwareInterface.GetResourceService().GetBufferAllocationInfo(bufferResourceDesc)
-	                                                           : m_renderHardwareInterface.GetResourceService().GetTextureAllocationInfo(textureResourceDesc);
+	RhiResourceService& resources = m_renderHardwareInterface.GetResourceService();
+	const RhiResourceAllocationInfo allocationInfo = bIsBuffer ? resources.GetBufferAllocationInfo(bufferResourceDesc) : resources.GetTextureAllocationInfo(textureResourceDesc);
+
+	const RhiOptimizedClearValue clearValue = bHasOptimizedClearValue ? BuildTransientOptimizedClearValue(transientResource.textureDesc, resourceMetadata.kind) : RhiOptimizedClearValue{};
 
 	return FrameGraphTransientResourcePlan{
 	    .handle = transientResource.handle,
@@ -143,7 +147,7 @@ FrameGraphTransientResourcePlan FrameGraph::BuildTransientResourcePlan(
 	        .memoryBlockOffset = 0,
 	        .textureResourceDesc = textureResourceDesc,
 	        .bufferResourceDesc = bufferResourceDesc,
-	        .optimizedClearValue = bHasOptimizedClearValue ? BuildTransientOptimizedClearValue(transientResource.textureDesc, resourceMetadata.kind) : RhiOptimizedClearValue{},
+	        .optimizedClearValue = clearValue,
 	        .bHasOptimizedClearValue = bHasOptimizedClearValue,
 	        .initialState = resourceMetadata.initialState}};
 }
@@ -166,6 +170,7 @@ void FrameGraph::EnsureTransientResourcesMaterialized(const FrameGraphPlan& plan
 {
 	for (const FrameGraphTransientResourcePlan& transientPlan : plan.transients.resources)
 	{
-		m_resourceResolver.SetResolvedAccess(transientPlan.handle, m_transientAllocator->Materialize(transientPlan));
+		const FrameGraphResourceAccess& access = m_transientAllocator->Materialize(transientPlan);
+		m_resourceResolver.SetResolvedAccess(transientPlan.handle, access);
 	}
 }

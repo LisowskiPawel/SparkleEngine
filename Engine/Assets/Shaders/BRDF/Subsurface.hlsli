@@ -22,7 +22,9 @@ namespace BRDF
 			const float FV = Pow5(1.0f - NoV);
 
 			const float Fss90 = roughness * LoH * LoH;
-			const float Fss = lerp(1.0f, Fss90, FL) * lerp(1.0f, Fss90, FV);
+			const float lightScatter = lerp(1.0f, Fss90, FL);
+			const float viewScatter = lerp(1.0f, Fss90, FV);
+			const float Fss = lightScatter * viewScatter;
 			const float ss = 1.25f * (Fss * (1.0f / max(NoL + NoV, EPSILON) - 0.5f) + 0.5f);
 
 			return albedo * subsurfaceColor * INV_PI * ss;

@@ -126,17 +126,19 @@ void UiRenderPacketPlayer::ApplyTextureUpload(const UiRenderPacket& packet, cons
 		return;
 	}
 
+	const int uploadWidth = static_cast<int>(upload.Width);
+	const int uploadHeight = static_cast<int>(upload.Height);
 	ImTextureData* texture = FindTexture(upload.Texture);
 	const bool bIsNewTexture = texture == nullptr;
 	if (bIsNewTexture)
 	{
 		auto data = std::make_unique<ImTextureData>();
 		data->UniqueID = static_cast<int>(upload.Texture.Generation);
-		data->Create(ImTextureFormat_RGBA32, static_cast<int>(upload.Width), static_cast<int>(upload.Height));
+		data->Create(ImTextureFormat_RGBA32, uploadWidth, uploadHeight);
 		texture = data.get();
 		m_storage->Textures.push_back(PlaybackStorage::Texture{.Handle = upload.Texture, .Data = std::move(data)});
 	}
-	else if (texture->WantDestroyNextFrame || texture->Width != static_cast<int>(upload.Width) || texture->Height != static_cast<int>(upload.Height))
+	else if (texture->WantDestroyNextFrame || texture->Width != uploadWidth || texture->Height != uploadHeight)
 	{
 		return;
 	}

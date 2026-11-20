@@ -6,9 +6,10 @@
 #
 # Target:  cgltf (INTERFACE)
 # Usage:   target_link_libraries(YourTarget PRIVATE cgltf)
+set(_sparkle_cgltf_revision 360db1a95480fe102ae9c69b27c5d101167ff5ba)
 sparkle_declare_git_dependency(cgltf
     https://github.com/jkuhlmann/cgltf.git
-    360db1a95480fe102ae9c69b27c5d101167ff5ba)
+    ${_sparkle_cgltf_revision})
 FetchContent_Populate(cgltf)
 
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
@@ -17,6 +18,8 @@ endif()
 
 add_library(cgltf INTERFACE)
 target_include_directories(cgltf INTERFACE ${cgltf_SOURCE_DIR})
+sparkle_set_source_package(cgltf "cgltf" "${_sparkle_cgltf_revision}"
+    "MIT" "https://github.com/jkuhlmann/cgltf")
 
 # Silence MSVC CRT deprecation warnings in cgltf implementation code.
 if(MSVC)

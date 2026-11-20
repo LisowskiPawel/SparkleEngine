@@ -17,7 +17,9 @@ namespace Exposure
 			return 0.0f.xx;
 		}
 
-		const float luminance = max(CommonColor::LuminanceRec709(CommonColor::ClampPositive(linearHdrColor)), MinimumMeteredLuminance);
+		const float3 positiveColor = CommonColor::ClampPositive(linearHdrColor);
+		const float sceneLuminance = CommonColor::LuminanceRec709(positiveColor);
+		const float luminance = max(sceneLuminance, MinimumMeteredLuminance);
 		return float2(log(luminance), 1.0f);
 	}
 
@@ -29,10 +31,12 @@ namespace Exposure
 
 	float ComputeExposure(uint exposureMode, float manualExposure, float exposureCompensation, float targetLuminance, float minExposure, float maxExposure, float sceneAverageLuminance)
 	{
-		const float compensation = exp2(clamp(exposureCompensation, -16.0f, 16.0f));
+		const float compensationEv = clamp(exposureCompensation, -16.0f, 16.0f);
+		const float compensation = exp2(compensationEv);
+		const float safeTargetLuminance = max(targetLuminance, MinimumMeteredLuminance);
+		const float safeAverageLuminance = max(sceneAverageLuminance, MinimumMeteredLuminance);
 
-		const float unclampedExposure = exposureMode == ExposureModeManual ? max(manualExposure, 0.0f) * compensation
-		                                                                   : (max(targetLuminance, MinimumMeteredLuminance) / max(sceneAverageLuminance, MinimumMeteredLuminance)) * compensation;
+		const float unclampedExposure = exposureMode == ExposureModeManual ? max(manualExposure, 0.0f) * compensation : (safeTargetLuminance / safeAverageLuminance) * compensation;
 
 		const float safeMinExposure = max(minExposure, 0.0f);
 		const float safeMaxExposure = max(maxExposure, safeMinExposure);
@@ -53,11 +57,15 @@ namespace Exposure
 
 		const float safePreviousExposure = previousExposure;
 		const float safeTargetExposure = max(targetExposure, 1.0e-20f);
-		const float adaptationSpeed = max(safeTargetExposure > safePreviousExposure ? adaptationSpeedUp : adaptationSpeedDown, 0.0f);
-		const float adaptationT = saturate(1.0f - exp(-max(frameDeltaSeconds, 0.0f) * adaptationSpeed));
+		const float selectedSpeed = safeTargetExposure > safePreviousExposure ? adaptationSpeedUp : adaptationSpeedDown;
+		const float adaptationSpeed = max(selectedSpeed, 0.0f);
+		const float elapsedSeconds = max(frameDeltaSeconds, 0.0f);
+		const float decay = exp(-elapsedSeconds * adaptationSpeed);
+		const float adaptationT = saturate(1.0f - decay);
 		const float previousExposureEv = log2(safePreviousExposure);
 		const float targetExposureEv = log2(safeTargetExposure);
-		return exp2(lerp(previousExposureEv, targetExposureEv, adaptationT));
+		const float adaptedExposureEv = lerp(previousExposureEv, targetExposureEv, adaptationT);
+		return exp2(adaptedExposureEv);
 	}
 }
 

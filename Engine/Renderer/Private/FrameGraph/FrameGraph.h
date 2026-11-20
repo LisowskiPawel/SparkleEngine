@@ -260,21 +260,19 @@ private:
 	{
 		auto* parameterBindings = &parameters;
 
-		m_passes.push_back(
-		    RegisteredPass{
-		        .name = std::string(name),
-		        .kind = kind,
-		        .queuePreference = queuePreference,
-		        .executionModel = FrameGraphPassExecutionModel::TypedShader,
-		        .setupCallback =
-		            [parameterBindings, setupFn = std::forward<SetupFn>(setupFn)](PassResourceBuilder& builder) mutable
-		        {
-			        setupFn(builder, *parameterBindings);
-			        return true;
-		        },
-		        .executeCallback = MakeParameterizedExecuteCallback(
-		            parameterBindings,
-		            [executeFn = std::forward<ExecuteFn>(executeFn)](PassCommandContext& context, TParameterBindings& typedParameters) mutable { executeFn(context, typedParameters); })});
+		RegisteredPass pass{
+		    .name = std::string(name),
+		    .kind = kind,
+		    .queuePreference = queuePreference,
+		    .executionModel = FrameGraphPassExecutionModel::TypedShader,
+		    .setupCallback = [parameterBindings, setupFn = std::forward<SetupFn>(setupFn)](PassResourceBuilder& builder) mutable
+		    {
+			    setupFn(builder, *parameterBindings);
+			    return true;
+		    }};
+
+		pass.executeCallback = MakeParameterizedExecuteCallback(parameterBindings, std::forward<ExecuteFn>(executeFn));
+		m_passes.push_back(std::move(pass));
 	}
 
 	RhiGpuDescriptorHandle ResolveShaderResourceView(FrameGraphResourceHandle handle) const noexcept;

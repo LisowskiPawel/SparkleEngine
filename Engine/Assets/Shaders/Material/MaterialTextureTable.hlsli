@@ -45,12 +45,21 @@ namespace MaterialTextures
 		const float2 weight = frac(texelPosition);
 		const uint addressU = addressModes & 3u;
 		const uint addressV = (addressModes >> 2u) & 3u;
-		const int2 p00 = int2(AddressTexel(first.x, width, addressU), AddressTexel(first.y, height, addressV));
-		const int2 p10 = int2(AddressTexel(first.x + 1, width, addressU), p00.y);
-		const int2 p01 = int2(p00.x, AddressTexel(first.y + 1, height, addressV));
+		const int firstU = AddressTexel(first.x, width, addressU);
+		const int firstV = AddressTexel(first.y, height, addressV);
+		const int nextU = AddressTexel(first.x + 1, width, addressU);
+		const int nextV = AddressTexel(first.y + 1, height, addressV);
+		const int2 p00 = int2(firstU, firstV);
+		const int2 p10 = int2(nextU, firstV);
+		const int2 p01 = int2(firstU, nextV);
 		const int2 p11 = int2(p10.x, p01.y);
-		const float4 row0 = lerp(table[NonUniformResourceIndex(textureIndex)].Load(int3(p00, 0)), table[NonUniformResourceIndex(textureIndex)].Load(int3(p10, 0)), weight.x);
-		const float4 row1 = lerp(table[NonUniformResourceIndex(textureIndex)].Load(int3(p01, 0)), table[NonUniformResourceIndex(textureIndex)].Load(int3(p11, 0)), weight.x);
+
+		const float4 texel00 = table[NonUniformResourceIndex(textureIndex)].Load(int3(p00, 0));
+		const float4 texel10 = table[NonUniformResourceIndex(textureIndex)].Load(int3(p10, 0));
+		const float4 texel01 = table[NonUniformResourceIndex(textureIndex)].Load(int3(p01, 0));
+		const float4 texel11 = table[NonUniformResourceIndex(textureIndex)].Load(int3(p11, 0));
+		const float4 row0 = lerp(texel00, texel10, weight.x);
+		const float4 row1 = lerp(texel01, texel11, weight.x);
 		return lerp(row0, row1, weight.y);
 	}
 }

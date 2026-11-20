@@ -26,16 +26,17 @@ ReferencePathTracerResources::~ReferencePathTracerResources() noexcept
 
 void ReferencePathTracerResources::ReserveGraphResources(FrameGraphBuilder& builder, RenderViewportExtent extent)
 {
-	m_graphResources.WorkingMean = builder.ReservePersistentTexture(
-	    FrameGraphTextureDesc::CreateColor("ReferencePathTracer.WorkingMean", extent.Width, extent.Height, PixelFormat::R32G32B32A32_Float));
+	const FrameGraphTextureDesc workingMeanDesc = FrameGraphTextureDesc::CreateColor("ReferencePathTracer.WorkingMean", extent.Width, extent.Height, PixelFormat::R32G32B32A32_Float);
+	m_graphResources.WorkingMean = builder.ReservePersistentTexture(workingMeanDesc);
 
-	m_graphResources.WorkingM2 = builder.ReservePersistentTexture(FrameGraphTextureDesc::CreateColor("ReferencePathTracer.WorkingM2", extent.Width, extent.Height, PixelFormat::R32G32B32A32_Float));
+	const FrameGraphTextureDesc workingM2Desc = FrameGraphTextureDesc::CreateColor("ReferencePathTracer.WorkingM2", extent.Width, extent.Height, PixelFormat::R32G32B32A32_Float);
+	m_graphResources.WorkingM2 = builder.ReservePersistentTexture(workingM2Desc);
 
-	m_graphResources.CommittedMean = builder.ReservePersistentTexture(
-	    FrameGraphTextureDesc::CreateColor("ReferencePathTracer.CommittedMean", extent.Width, extent.Height, PixelFormat::R32G32B32A32_Float));
+	const FrameGraphTextureDesc committedMeanDesc = FrameGraphTextureDesc::CreateColor("ReferencePathTracer.CommittedMean", extent.Width, extent.Height, PixelFormat::R32G32B32A32_Float);
+	m_graphResources.CommittedMean = builder.ReservePersistentTexture(committedMeanDesc);
 
-	m_graphResources.CommittedM2 = builder.ReservePersistentTexture(
-	    FrameGraphTextureDesc::CreateColor("ReferencePathTracer.CommittedM2", extent.Width, extent.Height, PixelFormat::R32G32B32A32_Float));
+	const FrameGraphTextureDesc committedM2Desc = FrameGraphTextureDesc::CreateColor("ReferencePathTracer.CommittedM2", extent.Width, extent.Height, PixelFormat::R32G32B32A32_Float);
+	m_graphResources.CommittedM2 = builder.ReservePersistentTexture(committedM2Desc);
 }
 
 void ReferencePathTracerResources::Allocate(RenderViewportExtent extent)

@@ -223,7 +223,9 @@ void MainMenuBarPanel::BuildLevelStatus() noexcept
 		const ImGuiViewport* viewport = ImGui::GetMainViewport();
 		const ImVec2 center(viewport->WorkPos.x + viewport->WorkSize.x * 0.5f, viewport->WorkPos.y + viewport->WorkSize.y * 0.5f);
 		ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-		ImGui::SetNextWindowSize(ImVec2((std::min) (560.0f * ImGui::GetStyle().FontScaleDpi, viewport->WorkSize.x), 0.0f), ImGuiCond_Always);
+		const float preferredWidth = 560.0f * ImGui::GetStyle().FontScaleDpi;
+		const float windowWidth = (std::min) (preferredWidth, viewport->WorkSize.x);
+		ImGui::SetNextWindowSize(ImVec2(windowWidth, 0.0f), ImGuiCond_Always);
 		ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, 0.0f), viewport->WorkSize);
 		if (bFocusFailure)
 		{
@@ -242,7 +244,8 @@ void MainMenuBarPanel::BuildLevelStatus() noexcept
 			{
 				ImGui::TextUnformatted("Loading selected level. The previous level remains active until loading succeeds.");
 			}
-			ImGui::TextWrapped("%s", std::string(m_levelSession->GetLastLoadDiagnostic()).c_str());
+			const std::string diagnostic(m_levelSession->GetLastLoadDiagnostic());
+			ImGui::TextWrapped("%s", diagnostic.c_str());
 			ImGui::TextUnformatted("Use File > Open Level to retry or select another level. Sync/cook missing content through Sparkle Launcher.");
 			if (ImGui::Button("Quit Editor") && m_window)
 			{

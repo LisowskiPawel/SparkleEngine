@@ -67,6 +67,6 @@ if(TARGET ktx_read)
             set_property(TARGET ktx_read PROPERTY ${_property} ${_options})
         endif()
     endforeach()
-    set_property(TARGET ktx_read PROPERTY SPARKLE_SOURCE_PACKAGE
-        "{\"name\":\"KTX-Software\",\"versionInfo\":\"4.3.2\",\"licenseDeclared\":\"Apache-2.0 AND BSD-1-Clause AND BSD-3-Clause AND LicenseRef-ETCSLA\",\"downloadLocation\":\"https://github.com/KhronosGroup/KTX-Software/tree/${SPARKLE_KTX_REVISION}\"}")
+    sparkle_set_source_package(ktx_read "KTX-Software" "4.3.2"
+        "Apache-2.0 AND BSD-1-Clause AND BSD-3-Clause AND LicenseRef-ETCSLA" "https://github.com/KhronosGroup/KTX-Software/tree/${SPARKLE_KTX_REVISION}")
 endif()

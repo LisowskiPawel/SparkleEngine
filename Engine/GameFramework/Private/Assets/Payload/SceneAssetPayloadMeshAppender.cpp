@@ -49,15 +49,17 @@ namespace Assets
 
 	void SceneAssetPayloadMeshAppender::AppendMeshAssets(const LoadedSceneManifest& sceneManifest, CookedAssetFileSet& files, SceneAssetPayload& sceneAssetPayload)
 	{
-		files.GetAllocationBudget().ReserveArray<SceneAssetPayload::StaticMeshAsset>(sceneManifest.meshAssetReferences.size());
-		files.GetAllocationBudget().ReserveArray<SceneAssetPayload::SkeletalMeshAsset>(sceneManifest.meshAssetReferences.size());
+		CookedAssetAllocationBudget& budget = files.GetAllocationBudget();
+		budget.ReserveArray<SceneAssetPayload::StaticMeshAsset>(sceneManifest.meshAssetReferences.size());
+		budget.ReserveArray<SceneAssetPayload::SkeletalMeshAsset>(sceneManifest.meshAssetReferences.size());
 		sceneAssetPayload.staticMeshAssets.reserve(sceneAssetPayload.staticMeshAssets.size() + sceneManifest.meshAssetReferences.size());
 		sceneAssetPayload.skeletalMeshAssets.reserve(sceneAssetPayload.skeletalMeshAssets.size() + sceneManifest.meshAssetReferences.size());
 
 		for (const CookedSceneMeshAssetRef& meshReference : sceneManifest.meshAssetReferences)
 		{
 			const std::filesystem::path meshAssetPath = Paths::CookedMeshAsset(meshReference.meshAssetId);
-			LoadedMeshAsset loadedMesh = MeshAssetLoader::Decode(files.Get(meshAssetPath), files.GetAllocationBudget());
+			const auto bytes = files.Get(meshAssetPath);
+			LoadedMeshAsset loadedMesh = MeshAssetLoader::Decode(bytes, budget);
 
 			if (loadedMesh.GetAssetKind() != meshReference.meshAssetKind)
 			{

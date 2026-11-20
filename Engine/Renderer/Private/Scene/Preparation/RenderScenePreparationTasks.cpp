@@ -17,9 +17,9 @@ TaskResult RenderScenePreparationTasks::TransformPrimitives(std::uint32_t begin,
 	const std::size_t rangeBegin = (std::min<std::size_t>) (begin, run.ResolvedPrimitives.size());
 	const std::size_t rangeEnd = (std::min<std::size_t>) (end, run.ResolvedPrimitives.size());
 
-	PrepareRenderPrimitives(
-	    std::span<const ResolvedRenderPrimitive>{run.ResolvedPrimitives}.subspan(rangeBegin, rangeEnd - rangeBegin),
-	    std::span<PreparedRenderPrimitive>{run.PreparedPrimitives}.subspan(rangeBegin, rangeEnd - rangeBegin));
+	const auto primitives = std::span<const ResolvedRenderPrimitive>{run.ResolvedPrimitives}.subspan(rangeBegin, rangeEnd - rangeBegin);
+	const auto preparedPrimitives = std::span<PreparedRenderPrimitive>{run.PreparedPrimitives}.subspan(rangeBegin, rangeEnd - rangeBegin);
+	PrepareRenderPrimitives(primitives, preparedPrimitives);
 
 	return TaskResult::Success();
 }
@@ -30,10 +30,8 @@ TaskResult RenderScenePreparationTasks::CopyJointMatrices(std::uint32_t begin, s
 	const std::size_t rangeBegin = (std::min<std::size_t>) (begin, run.Deformation.JointMatrixCopyRanges.size());
 	const std::size_t rangeEnd = (std::min<std::size_t>) (end, run.Deformation.JointMatrixCopyRanges.size());
 
-	CopyRenderJointMatrixRanges(
-	    std::span<const RenderJointMatrixCopyRange>{run.Deformation.JointMatrixCopyRanges}.subspan(rangeBegin, rangeEnd - rangeBegin),
-	    run.Deformation.JointMatrices,
-	    run.Deformation.PreviousJointMatrices);
+	const auto copyRanges = std::span<const RenderJointMatrixCopyRange>{run.Deformation.JointMatrixCopyRanges}.subspan(rangeBegin, rangeEnd - rangeBegin);
+	CopyRenderJointMatrixRanges(copyRanges, run.Deformation.JointMatrices, run.Deformation.PreviousJointMatrices);
 
 	return TaskResult::Success();
 }
@@ -44,10 +42,8 @@ TaskResult RenderScenePreparationTasks::CopyMorphWeights(std::uint32_t begin, st
 	const std::size_t rangeBegin = (std::min<std::size_t>) (begin, run.Deformation.MorphWeightCopyRanges.size());
 	const std::size_t rangeEnd = (std::min<std::size_t>) (end, run.Deformation.MorphWeightCopyRanges.size());
 
-	CopyRenderMorphWeightRanges(
-	    std::span<const RenderMorphWeightCopyRange>{run.Deformation.MorphWeightCopyRanges}.subspan(rangeBegin, rangeEnd - rangeBegin),
-	    run.Deformation.MorphWeights,
-	    run.Deformation.PreviousMorphWeights);
+	const auto copyRanges = std::span<const RenderMorphWeightCopyRange>{run.Deformation.MorphWeightCopyRanges}.subspan(rangeBegin, rangeEnd - rangeBegin);
+	CopyRenderMorphWeightRanges(copyRanges, run.Deformation.MorphWeights, run.Deformation.PreviousMorphWeights);
 
 	return TaskResult::Success();
 }
@@ -57,6 +53,8 @@ TaskResult RenderScenePreparationTasks::PrepareLights(std::uint32_t begin, std::
 	RenderScenePreparationRun& run = *context.TryGet<RenderScenePreparationRun>();
 	const std::size_t rangeBegin = (std::min<std::size_t>) (begin, run.PreparedLights.size());
 	const std::size_t rangeEnd = (std::min<std::size_t>) (end, run.PreparedLights.size());
-	PrepareRenderLights(run.Lights.subspan(rangeBegin, rangeEnd - rangeBegin), std::span<PreparedRenderLight>{run.PreparedLights}.subspan(rangeBegin, rangeEnd - rangeBegin));
+	const auto lights = run.Lights.subspan(rangeBegin, rangeEnd - rangeBegin);
+	const auto preparedLights = std::span<PreparedRenderLight>{run.PreparedLights}.subspan(rangeBegin, rangeEnd - rangeBegin);
+	PrepareRenderLights(lights, preparedLights);
 	return TaskResult::Success();
 }

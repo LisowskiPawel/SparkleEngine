@@ -85,7 +85,9 @@ bool VulkanResourceService::CreateVertexBuffer(
 	    RhiMemoryResidencyClass::HostUpload,
 	    debugName.empty() ? L"VertexBuffer" : debugName);
 
-	if (record == nullptr || record->Buffer == VK_NULL_HANDLE || !m_memoryAllocator->WriteAllocation(*record, data, sizeInBytes))
+	const bool bBufferAvailable = record != nullptr && record->Buffer != VK_NULL_HANDLE;
+	const bool bDataWritten = bBufferAvailable && m_memoryAllocator->WriteAllocation(*record, data, sizeInBytes);
+	if (!bDataWritten)
 	{
 		return false;
 	}
@@ -116,7 +118,9 @@ bool VulkanResourceService::CreateStructuredBufferResource(const void* data, std
 	    RhiMemoryResidencyClass::HostUpload,
 	    debugName.empty() ? L"StructuredBuffer" : debugName);
 
-	if (record == nullptr || record->Buffer == VK_NULL_HANDLE || !m_memoryAllocator->WriteAllocation(*record, data, sizeInBytes))
+	const bool bBufferAvailable = record != nullptr && record->Buffer != VK_NULL_HANDLE;
+	const bool bDataWritten = bBufferAvailable && m_memoryAllocator->WriteAllocation(*record, data, sizeInBytes);
+	if (!bDataWritten)
 	{
 		return false;
 	}
@@ -128,7 +132,8 @@ bool VulkanResourceService::CreateStructuredBufferResource(const void* data, std
 bool VulkanResourceService::WriteBufferResource(RhiOwnedResourceHandle resource, std::size_t destinationOffsetInBytes, const void* data, std::size_t sizeInBytes) noexcept
 {
 	VulkanGpuAllocationRecord* const record = GetVulkanGpuAllocationRecord(resource);
-	return record != nullptr && m_memoryAllocator != nullptr && m_memoryAllocator->WriteAllocation(*record, data, sizeInBytes, destinationOffsetInBytes);
+	const bool bWriterAvailable = record != nullptr && m_memoryAllocator != nullptr;
+	return bWriterAvailable && m_memoryAllocator->WriteAllocation(*record, data, sizeInBytes, destinationOffsetInBytes);
 }
 
 bool VulkanResourceService::CreateIndexBuffer(
@@ -158,7 +163,9 @@ bool VulkanResourceService::CreateIndexBuffer(
 	    RhiMemoryResidencyClass::HostUpload,
 	    debugName.empty() ? L"IndexBuffer" : debugName);
 
-	if (record == nullptr || record->Buffer == VK_NULL_HANDLE || !m_memoryAllocator->WriteAllocation(*record, data, sizeInBytes))
+	const bool bBufferAvailable = record != nullptr && record->Buffer != VK_NULL_HANDLE;
+	const bool bDataWritten = bBufferAvailable && m_memoryAllocator->WriteAllocation(*record, data, sizeInBytes);
+	if (!bDataWritten)
 	{
 		return false;
 	}

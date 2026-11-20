@@ -123,7 +123,8 @@ static void DrawShowControlGroup(
 	float menuWidth = EditorWidgets::MeasureMenuRow("All", EditorWidgets::MenuRowKind::Toggle);
 	for (const ShowControl& leaf : leaves)
 	{
-		menuWidth = (std::max) (menuWidth, EditorWidgets::MeasureMenuRow(leaf.Label, EditorWidgets::MenuRowKind::Toggle));
+		const float rowWidth = EditorWidgets::MeasureMenuRow(leaf.Label, EditorWidgets::MenuRowKind::Toggle);
+		menuWidth = (std::max) (menuWidth, rowWidth);
 	}
 	if (!EditorWidgets::BeginMenu(label, icon, menuWidth))
 	{
@@ -165,10 +166,12 @@ static float MeasureShowMenuWidth()
 		const bool bIsSubmenu = group.LeafCount > 1;
 		const char* label = bIsSubmenu ? group.Label : showControls[group.FirstLeaf].Label;
 		const auto kind = bIsSubmenu ? EditorWidgets::MenuRowKind::Submenu : EditorWidgets::MenuRowKind::Toggle;
-		menuWidth = (std::max) (menuWidth, EditorWidgets::MeasureMenuRow(label, kind));
+		const float rowWidth = EditorWidgets::MeasureMenuRow(label, kind);
+		menuWidth = (std::max) (menuWidth, rowWidth);
 		if (group.Section != nullptr)
 		{
-			menuWidth = (std::max) (menuWidth, EditorWidgets::MeasureMenuSection(group.Section));
+			const float sectionWidth = EditorWidgets::MeasureMenuSection(group.Section);
+			menuWidth = (std::max) (menuWidth, sectionWidth);
 		}
 	}
 	return menuWidth;
@@ -205,13 +208,9 @@ static void DrawShowMenuContents(const CVarControlExecutor* executor, bool bDisa
 				continue;
 			}
 
-			DrawShowControlGroup(
-			    group.Label,
-			    group.Icon,
-			    std::span(showControls).subspan(group.FirstLeaf, group.LeafCount),
-			    std::span(intent).subspan(group.FirstLeaf, group.LeafCount),
-			    *executor,
-			    error);
+			const auto leaves = std::span(showControls).subspan(group.FirstLeaf, group.LeafCount);
+			const auto groupIntent = std::span(intent).subspan(group.FirstLeaf, group.LeafCount);
+			DrawShowControlGroup(group.Label, group.Icon, leaves, groupIntent, *executor, error);
 		}
 		ImGui::EndDisabled();
 	}
@@ -236,8 +235,8 @@ void DrawViewportShowMenu(const CVarControlExecutor* executor, bool bDisableInte
 		return;
 	}
 	const EditorWidgets::MenuStyleScope menuStyle;
-
-	if (!EditorWidgets::BeginMenuPopup("ViewportShowMenu", popupPosition, MeasureShowMenuWidth()))
+	const float menuWidth = MeasureShowMenuWidth();
+	if (!EditorWidgets::BeginMenuPopup("ViewportShowMenu", popupPosition, menuWidth))
 	{
 		return;
 	}

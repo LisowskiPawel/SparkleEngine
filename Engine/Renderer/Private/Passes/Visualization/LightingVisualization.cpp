@@ -20,5 +20,9 @@ void AddLightingVisualizationPass(FrameGraphBuilder& builder, const RenderFrame&
 	parameters->IndirectDiffuse = builder.CreateSRV(lighting.IndirectDiffuse);
 	parameters->IndirectSpecular = builder.CreateSRV(lighting.IndirectSpecular);
 	BindSceneShaderParameters(builder, frame, parameters, resources);
-	builder.Dispatch<LightingVisualizationCS>(parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(sceneExtent.Width, 8u), MathUtils::DivideRoundUp(sceneExtent.Height, 8u), 1u});
+
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(sceneExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(sceneExtent.Height, 8u);
+
+	builder.Dispatch<LightingVisualizationCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u});
 }

@@ -26,7 +26,9 @@ void PassResourceBuilder::DeclareParameterUsages(const PassParameterSet& paramet
 		const PassParameterBinding* binding = parameterSet.GetBinding(index);
 		if (binding == nullptr || !binding->IsBound())
 		{
-			Diagnostics::Fatal(g_passResourceBuilderLogger, __FILE__, __LINE__, std::format("Graph pass '{}' has no binding for '{}'.", layout.GetDebugName(), parameter.Name));
+			const std::string message = std::format("Graph pass '{}' has no binding for '{}'.", layout.GetDebugName(), parameter.Name);
+
+			Diagnostics::Fatal(g_passResourceBuilderLogger, __FILE__, __LINE__, message);
 		}
 
 		if (binding->AsDescriptorTableData() != nullptr)

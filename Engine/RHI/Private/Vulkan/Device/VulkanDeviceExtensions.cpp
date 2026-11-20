@@ -13,13 +13,15 @@ namespace VulkanDeviceExtensions
 	bool IsAvailable(VkPhysicalDevice device, const char* extensionName) noexcept
 	{
 		std::uint32_t extensionCount = 0;
-		if (!VulkanResult::Succeeded(vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr)))
+		const VkResult countResult = vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+		if (!VulkanResult::Succeeded(countResult))
 		{
 			return false;
 		}
 
 		std::vector<VkExtensionProperties> extensions(extensionCount);
-		if (!VulkanResult::Succeeded(vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, extensions.data())))
+		const VkResult propertiesResult = vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, extensions.data());
+		if (!VulkanResult::Succeeded(propertiesResult))
 		{
 			return false;
 		}

@@ -71,7 +71,8 @@ static VkSampler CreateImmutableSampler(VulkanRhi& rhi) noexcept
 	const VkResult result = vkCreateSampler(rhi.GetDevice(), &createInfo, nullptr, &sampler);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanBindingLayoutLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateSampler", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkCreateSampler", result);
+		Diagnostics::Fatal(g_vulkanBindingLayoutLogger, __FILE__, __LINE__, failureMessage);
 	}
 	return sampler;
 }
@@ -190,11 +191,8 @@ static void CompileParameterBindings(
 		const std::vector<RhiReflectedBindingLocation> reflectedLocations = ResolveShaderBindingLocations(desc.Shaders, *desc.ParameterLayout, bindingName, bindingRecord.Kind);
 		if (reflectedLocations.size() != 1u)
 		{
-			Diagnostics::Fatal(
-			    g_vulkanBindingLayoutLogger,
-			    __FILE__,
-			    __LINE__,
-			    std::format("Vulkan shader parameter '{}' resolves to {} distinct descriptor locations.", bindingName, reflectedLocations.size()));
+			const auto failureMessage = std::format("Vulkan shader parameter '{}' resolves to {} distinct descriptor locations.", bindingName, reflectedLocations.size());
+			Diagnostics::Fatal(g_vulkanBindingLayoutLogger, __FILE__, __LINE__, failureMessage);
 		}
 		const RhiBindingPoint bindingPoint = reflectedLocations.front().BindingPoint;
 		bindingNames.emplace_back(bindingName);
@@ -227,19 +225,18 @@ static void CompileParameterBindings(
 		const bool bPartiallyBound = compiledBinding.DescriptorCount > 1u;
 		if (bPartiallyBound && !rhi.GetFeatureStatus().bEnabledPartiallyBoundDescriptorArrays)
 		{
-			Diagnostics::Fatal(g_vulkanBindingLayoutLogger, __FILE__, __LINE__, std::format("Vulkan shader descriptor array '{}' cannot be partially bound on this device.", bindingName));
+			const auto failureMessage = std::format("Vulkan shader descriptor array '{}' cannot be partially bound on this device.", bindingName);
+			Diagnostics::Fatal(g_vulkanBindingLayoutLogger, __FILE__, __LINE__, failureMessage);
 		}
 
-		UpsertDescriptorBinding(
-		    rhi,
-		    descriptorBindingsBySet[bindingPoint.Set],
-		    VkDescriptorSetLayoutBinding{
-		        .binding = bindingPoint.Binding,
-		        .descriptorType = descriptorType,
-		        .descriptorCount = std::max(1u, bindingRecord.ArrayCount),
-		        .stageFlags = VulkanTypeConversions::ToVkShaderStages(compiledBinding.VisibilityMask),
-		        .pImmutableSamplers = nullptr},
-		    bPartiallyBound ? VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT : 0u);
+		const VkDescriptorSetLayoutBinding nativeBinding{
+		    .binding = bindingPoint.Binding,
+		    .descriptorType = descriptorType,
+		    .descriptorCount = compiledBinding.DescriptorCount,
+		    .stageFlags = VulkanTypeConversions::ToVkShaderStages(compiledBinding.VisibilityMask),
+		    .pImmutableSamplers = nullptr};
+
+		UpsertDescriptorBinding(rhi, descriptorBindingsBySet[bindingPoint.Set], nativeBinding, bPartiallyBound ? VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT : 0u);
 	}
 }
 
@@ -305,7 +302,8 @@ static void CreateDescriptorSetLayouts(
 		const VkResult result = vkCreateDescriptorSetLayout(rhi.GetDevice(), &createInfo, nullptr, &descriptorSetLayout);
 		if (!VulkanResult::Succeeded(result))
 		{
-			Diagnostics::Fatal(g_vulkanBindingLayoutLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateDescriptorSetLayout", result));
+			const auto failureMessage = VulkanResult::FormatFailure("vkCreateDescriptorSetLayout", result);
+			Diagnostics::Fatal(g_vulkanBindingLayoutLogger, __FILE__, __LINE__, failureMessage);
 		}
 		for (VkSampler sampler : nativeImmutableSamplers)
 		{
@@ -328,7 +326,8 @@ static void CreateMissingDescriptorSetLayouts(VulkanRhi& rhi, std::vector<VkDesc
 		const VkResult result = vkCreateDescriptorSetLayout(rhi.GetDevice(), &createInfo, nullptr, &descriptorSetLayout);
 		if (!VulkanResult::Succeeded(result))
 		{
-			Diagnostics::Fatal(g_vulkanBindingLayoutLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateDescriptorSetLayout", result));
+			const auto failureMessage = VulkanResult::FormatFailure("vkCreateDescriptorSetLayout", result);
+			Diagnostics::Fatal(g_vulkanBindingLayoutLogger, __FILE__, __LINE__, failureMessage);
 		}
 	}
 }

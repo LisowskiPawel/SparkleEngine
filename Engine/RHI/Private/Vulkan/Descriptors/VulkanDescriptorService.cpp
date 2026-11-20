@@ -85,9 +85,9 @@ void VulkanDescriptorService::PublishRecordingReadView() noexcept
 		}
 
 		const RhiResourceViewDesc viewDesc{.Kind = record.Kind, .Resource = RhiResourceHandle{record.Image}, .Format = record.Format, .Texture = record.Texture};
+		const VkImageAspectFlags aspectMask = ResolveViewAspectMask(viewDesc);
 
-		readView->ImageViews.push_back(
-		    RecordingImageView{.ImageViewValue = reinterpret_cast<std::uintptr_t>(record.ImageView), .Format = record.Format, .AspectMask = ResolveViewAspectMask(viewDesc)});
+		readView->ImageViews.push_back(RecordingImageView{.ImageViewValue = reinterpret_cast<std::uintptr_t>(record.ImageView), .Format = record.Format, .AspectMask = aspectMask});
 
 		if (record.Image != VK_NULL_HANDLE)
 		{
@@ -99,13 +99,14 @@ void VulkanDescriptorService::PublishRecordingReadView() noexcept
 			        .Image = record.Image,
 			        .Format = allocation != nullptr ? allocation->Format : VulkanTypeConversions::ToVkFormat(record.Format),
 			        .Extent = allocation != nullptr ? allocation->Extent : record.Extent,
-			        .AspectMask = ResolveViewAspectMask(viewDesc),
+			        .AspectMask = aspectMask,
 			        .Usage = allocation != nullptr ? allocation->Usage : record.Usage});
 		}
 	}
 	std::ranges::sort(readView->ImageViews, {}, &RecordingImageView::ImageViewValue);
 	std::ranges::sort(readView->ImageResources, {}, &RecordingImageResource::ResourceHandleValue);
-	m_recordingReadView.store(std::shared_ptr<const RecordingReadView>(std::move(readView)), std::memory_order_release);
+	std::shared_ptr<const RecordingReadView> publishedReadView = std::move(readView);
+	m_recordingReadView.store(std::move(publishedReadView), std::memory_order_release);
 
 	m_allocator.PublishRecordingReadView();
 }
@@ -406,15 +407,17 @@ void VulkanDescriptorService::RebuildSwapChainBackBufferViews(const VulkanSwapCh
 	m_swapChainBackBufferViews.reserve(backBufferCount);
 	for (std::uint32_t backBufferIndex = 0; backBufferIndex < backBufferCount; ++backBufferIndex)
 	{
-		m_swapChainBackBufferViews.push_back(AddResourceView(
-		    ResourceViewRecord{
-		        .Kind = ERhiResourceViewKind::RenderTarget,
-		        .Image = swapChain.GetBackBufferImage(backBufferIndex),
-		        .ImageView = swapChain.GetBackBufferImageView(backBufferIndex),
-		        .Format = swapChain.GetBackBufferFormat(),
-		        .Extent = swapChain.GetBackBufferExtent(),
-		        .Usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-		        .bOwnsImageView = false}));
+		const ResourceViewRecord record{
+		    .Kind = ERhiResourceViewKind::RenderTarget,
+		    .Image = swapChain.GetBackBufferImage(backBufferIndex),
+		    .ImageView = swapChain.GetBackBufferImageView(backBufferIndex),
+		    .Format = swapChain.GetBackBufferFormat(),
+		    .Extent = swapChain.GetBackBufferExtent(),
+		    .Usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+		    .bOwnsImageView = false};
+
+		const RhiResourceViewHandle view = AddResourceView(record);
+		m_swapChainBackBufferViews.push_back(view);
 	}
 }
 
@@ -533,7 +536,8 @@ VkImageView VulkanDescriptorService::CreateImageView(const RhiResourceViewDesc& 
 	const VkResult result = vkCreateImageView(m_rhi.GetDevice(), &createInfo, nullptr, &imageView);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanDescriptorServiceLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateImageView", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkCreateImageView", result);
+		Diagnostics::Fatal(g_vulkanDescriptorServiceLogger, __FILE__, __LINE__, failureMessage);
 	}
 	return imageView;
 }

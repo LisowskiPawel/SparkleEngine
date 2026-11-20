@@ -31,7 +31,8 @@ void main(in VS::Input Input, out VS::Output Output)
 	const float4 positionWorld = mul(float4(localVertex.Position, 1.0f), worldMatrix);
 	const float4 previousPositionWorld = mul(float4(previousLocalVertex.Position, 1.0f), previousWorldMatrix);
 	const float3 normalWorld = normalize(mul(localVertex.Normal, worldInverseTranspose));
-	const float3 tangentWorld = OrthonormalizeTangent(mul(localVertex.Tangent, (float3x3)worldMatrix), normalWorld);
+	const float3 transformedTangent = mul(localVertex.Tangent, (float3x3)worldMatrix);
+	const float3 tangentWorld = OrthonormalizeTangent(transformedTangent, normalWorld);
 
 	const float4 positionClip = PositionWorldToClip(positionWorld);
 	const float4 previousClipPosition = mul(previousPositionWorld, PreviousWorldToClipMatrix);

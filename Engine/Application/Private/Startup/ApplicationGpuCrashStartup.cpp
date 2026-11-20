@@ -16,6 +16,7 @@
 
 #include <map>
 #include <string_view>
+#include <utility>
 
 GpuCrashStartup ResolveGpuCrashStartup()
 {
@@ -39,7 +40,9 @@ GpuCrashStartup ResolveGpuCrashStartup()
 		{
 			value = arguments[index];
 		}
-		if (value.empty() || value.starts_with("--") || !options.emplace(name, std::move(value)).second)
+		const bool bInvalidValue = value.empty() || value.starts_with("--");
+		const bool bOptionAdded = !bInvalidValue && options.emplace(name, std::move(value)).second;
+		if (!bOptionAdded)
 		{
 			throw Diagnostics::Error("GPU crash startup options require one nonempty value each; duplicates are rejected.");
 		}
@@ -60,11 +63,12 @@ GpuCrashStartup ResolveGpuCrashStartup()
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	GpuCrashStartup startup;
 	startup.ShaderExport = Strings::ToWide(options.at("--shader-export"));
-	startup.SessionId = options.contains("--gpu-crash-session") ? options.at("--gpu-crash-session") : Identifiers::CreateUuidV4String();
-	const bool bInvalidCrashStartupShaderExport = !startup.ShaderExport.is_absolute() || startup.ShaderExport.filename() != "shader-export.json";
-	const bool bInvalidGpuCrashStartup = bInvalidCrashStartupShaderExport || (!Identifiers::IsUuidV4String(startup.SessionId));
+	const auto session = options.find("--gpu-crash-session");
+	startup.SessionId = session != options.end() ? session->second : Identifiers::CreateUuidV4String();
+	const bool bInvalidShaderExport = !startup.ShaderExport.is_absolute() || startup.ShaderExport.filename() != "shader-export.json";
+	const bool bInvalidStartup = bInvalidShaderExport || !Identifiers::IsUuidV4String(startup.SessionId);
 
-	if (bInvalidGpuCrashStartup)
+	if (bInvalidStartup)
 	{
 		throw Diagnostics::Error("Aftermath requires an absolute shader-export.json path and a valid fresh session UUID.");
 	}

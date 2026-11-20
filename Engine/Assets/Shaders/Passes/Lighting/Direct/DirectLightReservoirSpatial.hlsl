@@ -29,7 +29,9 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		return;
 	}
 
-	DirectReservoir::Reservoir reservoir = DirectReservoir::UnpackReservoir(TemporalReservoirSample.Load(int3(pixelCoord, 0)), TemporalReservoirWeight.Load(int3(pixelCoord, 0)));
+	const float4 samplePayload = TemporalReservoirSample.Load(int3(pixelCoord, 0));
+	const float4 weightPayload = TemporalReservoirWeight.Load(int3(pixelCoord, 0));
+	DirectReservoir::Reservoir reservoir = DirectReservoir::UnpackReservoir(samplePayload, weightPayload);
 
 	DirectReservoir::ReuseSpatial(pixelCoord, uint2(width, height), surface, TemporalReservoirSample, TemporalReservoirWeight, reservoir);
 

@@ -116,7 +116,10 @@ int CookTextureRequestFile(const std::filesystem::path& requestFilePath)
 		    publication,
 		    textureCookMemoryBudget,
 		    [&progress, &requests, totalWork](std::size_t requestIndex, std::size_t completed)
-		    { progress.Report("Cooked texture", Strings::ToNarrow(requests[requestIndex].sourcePath.filename().wstring()), completed, totalWork); });
+		    {
+			    const auto sourceName = Strings::ToNarrow(requests[requestIndex].sourcePath.filename().wstring());
+			    progress.Report("Cooked texture", sourceName, completed, totalWork);
+		    });
 		const std::vector<TaskResult>& results = executor.Execute();
 
 		if (ReportFailures(requests, results) != 0)

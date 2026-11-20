@@ -281,7 +281,8 @@ void VulkanCommandRecordingContext::CreateCommandPool(CommandSlot& slot)
 	const VkResult result = vkCreateCommandPool(m_rhi->GetDevice(), &createInfo, nullptr, &slot.CommandPool);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanCommandRecordingLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateCommandPool", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkCreateCommandPool", result);
+		Diagnostics::Fatal(g_vulkanCommandRecordingLogger, __FILE__, __LINE__, failureMessage);
 	}
 }
 
@@ -297,7 +298,8 @@ void VulkanCommandRecordingContext::AllocateCommandBuffer(CommandSlot& slot)
 	const VkResult result = vkAllocateCommandBuffers(m_rhi->GetDevice(), &allocateInfo, &slot.CommandBuffer);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanCommandRecordingLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkAllocateCommandBuffers", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkAllocateCommandBuffers", result);
+		Diagnostics::Fatal(g_vulkanCommandRecordingLogger, __FILE__, __LINE__, failureMessage);
 	}
 }
 
@@ -380,7 +382,8 @@ void VulkanCommandRecordingContext::ResetCommandPool(CommandSlot& slot) noexcept
 	const VkResult result = vkResetCommandPool(m_rhi->GetDevice(), slot.CommandPool, 0);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanCommandRecordingLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkResetCommandPool", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkResetCommandPool", result);
+		Diagnostics::Fatal(g_vulkanCommandRecordingLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	slot.bRequiresPoolReset = false;
@@ -409,7 +412,8 @@ void VulkanCommandRecordingContext::BeginSlot(CommandSlot& slot) noexcept
 	const VkResult result = vkBeginCommandBuffer(slot.CommandBuffer, &beginInfo);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanCommandRecordingLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkBeginCommandBuffer", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkBeginCommandBuffer", result);
+		Diagnostics::Fatal(g_vulkanCommandRecordingLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	slot.RecordingThread = thread;
@@ -433,7 +437,8 @@ void VulkanCommandRecordingContext::CloseSlot(CommandSlot& slot) noexcept
 	const VkResult result = vkEndCommandBuffer(slot.CommandBuffer);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanCommandRecordingLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkEndCommandBuffer", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkEndCommandBuffer", result);
+		Diagnostics::Fatal(g_vulkanCommandRecordingLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	slot.CommandList->SetRecording(false);

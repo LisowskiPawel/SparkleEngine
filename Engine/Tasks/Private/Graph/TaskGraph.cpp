@@ -148,7 +148,9 @@ bool TaskGraphBuilder::DependsOn(TaskNodeHandle task, TaskNodeHandle prerequisit
 	}
 	std::uint32_t taskIndex = 0;
 	std::uint32_t prerequisiteIndex = 0;
-	if (!m_state->ResolveHandle(task, taskIndex) || !m_state->ResolveHandle(prerequisite, prerequisiteIndex))
+	const bool bTaskValid = m_state->ResolveHandle(task, taskIndex);
+	const bool bHandlesValid = bTaskValid && m_state->ResolveHandle(prerequisite, prerequisiteIndex);
+	if (!bHandlesValid)
 	{
 		return false;
 	}

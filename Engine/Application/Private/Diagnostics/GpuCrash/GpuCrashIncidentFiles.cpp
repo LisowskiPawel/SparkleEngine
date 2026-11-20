@@ -33,14 +33,20 @@ namespace GpuCrashIncidentFiles
 		{
 			current /= component;
 			const DWORD attributes = GetFileAttributesW(current.c_str());
-			const bool bAttributeLookupFailedLastError = attributes == INVALID_FILE_ATTRIBUTES && GetLastError() != ERROR_FILE_NOT_FOUND;
-			const bool bAttributeLookupFailed = bAttributeLookupFailedLastError && (GetLastError() != ERROR_PATH_NOT_FOUND);
-
-			if (bAttributeLookupFailed)
+			if (attributes == INVALID_FILE_ATTRIBUTES)
 			{
-				throw Diagnostics::Error("Cannot inspect GPU crash storage.");
+				const DWORD errorCode = GetLastError();
+				const bool bMissing = errorCode == ERROR_FILE_NOT_FOUND || errorCode == ERROR_PATH_NOT_FOUND;
+				if (!bMissing)
+				{
+					throw Diagnostics::Error("Cannot inspect GPU crash storage.");
+				}
+				continue;
 			}
-			if (attributes != INVALID_FILE_ATTRIBUTES && ((attributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0 || (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0))
+
+			const bool bReparsePoint = (attributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
+			const bool bDirectory = (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+			if (bReparsePoint || !bDirectory)
 			{
 				throw Diagnostics::Error("GPU crash storage cannot traverse a reparse point or a non-directory.");
 			}
@@ -122,7 +128,9 @@ void GpuCrashIncidentSink::WritePayload(const Payload& payload)
 		}
 		return;
 	}
-	if (m_files.size() + 2 >= MaximumFiles || payload.Bytes.size() > MaximumIncidentBytes - MetadataAllowance - m_writtenBytes)
+	const bool bFileLimitReached = m_files.size() + 2 >= MaximumFiles;
+	const bool bByteLimitExceeded = payload.Bytes.size() > MaximumIncidentBytes - MetadataAllowance - m_writtenBytes;
+	if (bFileLimitReached || bByteLimitExceeded)
 	{
 		MarkIncomplete();
 		return;
@@ -132,7 +140,9 @@ void GpuCrashIncidentSink::WritePayload(const Payload& payload)
 	const auto path = m_directory / name;
 	WriteDurableFile(path, payload.Bytes);
 	Hash::Sha256Digest writtenHash;
-	if (!Hash::TrySha256File(path, writtenHash, error) || Hash::Sha256ToHex(writtenHash) != hash)
+	const bool bFileHashed = Hash::TrySha256File(path, writtenHash, error);
+	const bool bHashMatches = bFileHashed && Hash::Sha256ToHex(writtenHash) == hash;
+	if (!bHashMatches)
 	{
 		throw Diagnostics::Error("GPU crash artifact did not match its written bytes.");
 	}
@@ -180,7 +190,8 @@ void GpuCrashIncidentSink::WriteManifest(std::string_view state)
 
 	const auto destination = m_directory / "incident.json";
 	const auto temporary = Files::BuildTemporaryPath(destination, ".pending");
-	WriteDurableFile(temporary, std::as_bytes(std::span(json)));
+	const auto manifestBytes = std::as_bytes(std::span(json));
+	WriteDurableFile(temporary, manifestBytes);
 	std::string error;
 	if (!Files::TryFinalizeTemporaryFile(temporary, destination, error))
 	{

@@ -8,7 +8,8 @@ namespace ECS
 {
 	bool GameWorldState::WriteTransform(EntityId entity, const Transform& transform) noexcept
 	{
-		const bool bWritten = m_registry.Replace(entity, WorldTransformConversion::ToLocal(transform));
+		const LocalTransform local = WorldTransformConversion::ToLocal(transform);
+		const bool bWritten = m_registry.Replace(entity, local);
 		if (bWritten)
 		{
 			MarkTransformDirty(entity);

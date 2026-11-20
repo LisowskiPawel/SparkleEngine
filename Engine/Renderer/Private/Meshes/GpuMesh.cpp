@@ -62,13 +62,9 @@ void GpuMesh::CreateGeometryBuffers(RenderCommandList& commandList, const MeshDa
 void GpuMesh::CreateVertexBuffer(RenderCommandList& commandList, const MeshData& meshData)
 {
 	RhiResourceService& resources = m_renderHardwareInterface->GetResourceService();
+	const RhiBufferResourceDesc bufferDesc{.SizeInBytes = meshData.GetVertexBufferSize(), .StrideInBytes = sizeof(VertexData), .Kind = RhiBufferKind::Vertex, .bAllowRayTracingBuildInput = true};
 
-	m_vertexBuffer = resources.CreateBufferResource(
-	    RhiBufferResourceDesc{.SizeInBytes = meshData.GetVertexBufferSize(), .StrideInBytes = sizeof(VertexData), .Kind = RhiBufferKind::Vertex, .bAllowRayTracingBuildInput = true},
-	    ResourceState::CopyDest,
-	    RhiMemoryCategory::Mesh,
-	    RhiMemoryResidencyClass::DeviceLocal,
-	    L"GpuMesh_VertexBuffer");
+	m_vertexBuffer = resources.CreateBufferResource(bufferDesc, ResourceState::CopyDest, RhiMemoryCategory::Mesh, RhiMemoryResidencyClass::DeviceLocal, L"GpuMesh_VertexBuffer");
 
 	if (!m_vertexBuffer)
 	{
@@ -99,13 +95,9 @@ void GpuMesh::CreateVertexBuffer(RenderCommandList& commandList, const MeshData&
 void GpuMesh::CreateIndexBuffer(RenderCommandList& commandList, const MeshData& meshData)
 {
 	RhiResourceService& resources = m_renderHardwareInterface->GetResourceService();
+	const RhiBufferResourceDesc bufferDesc{.SizeInBytes = meshData.GetIndexBufferSize(), .Kind = RhiBufferKind::Index, .bAllowRayTracingBuildInput = true};
 
-	m_indexBuffer = resources.CreateBufferResource(
-	    RhiBufferResourceDesc{.SizeInBytes = meshData.GetIndexBufferSize(), .Kind = RhiBufferKind::Index, .bAllowRayTracingBuildInput = true},
-	    ResourceState::CopyDest,
-	    RhiMemoryCategory::Mesh,
-	    RhiMemoryResidencyClass::DeviceLocal,
-	    L"GpuMesh_IndexBuffer");
+	m_indexBuffer = resources.CreateBufferResource(bufferDesc, ResourceState::CopyDest, RhiMemoryCategory::Mesh, RhiMemoryResidencyClass::DeviceLocal, L"GpuMesh_IndexBuffer");
 
 	if (!m_indexBuffer)
 	{

@@ -81,11 +81,12 @@ private:
 			m_closestHitNames.push_back(Strings::ToWide(hitGroup.ClosestHitExport));
 			m_anyHitNames.push_back(Strings::ToWide(hitGroup.AnyHitExport));
 			m_intersectionNames.push_back(Strings::ToWide(hitGroup.IntersectionExport));
+			const D3D12_HIT_GROUP_TYPE groupType = hitGroup.Kind == ERhiRayTracingHitGroupKind::Triangles ? D3D12_HIT_GROUP_TYPE_TRIANGLES : D3D12_HIT_GROUP_TYPE_PROCEDURAL_PRIMITIVE;
 
 			m_hitGroupDescs.push_back(
 			    D3D12_HIT_GROUP_DESC{
 			        .HitGroupExport = m_hitGroupNames.back().c_str(),
-			        .Type = hitGroup.Kind == ERhiRayTracingHitGroupKind::Triangles ? D3D12_HIT_GROUP_TYPE_TRIANGLES : D3D12_HIT_GROUP_TYPE_PROCEDURAL_PRIMITIVE,
+			        .Type = groupType,
 			        .AnyHitShaderImport = hitGroup.AnyHitExport.empty() ? nullptr : m_anyHitNames.back().c_str(),
 			        .ClosestHitShaderImport = hitGroup.ClosestHitExport.empty() ? nullptr : m_closestHitNames.back().c_str(),
 			        .IntersectionShaderImport = hitGroup.IntersectionExport.empty() ? nullptr : m_intersectionNames.back().c_str()});
@@ -132,7 +133,10 @@ void CreateD3D12RayTracingPipeline(
 	D3D12RayTracingPipelineAssembly assembly(desc);
 	const D3D12_STATE_OBJECT_DESC stateObjectDesc = assembly.BuildDesc();
 	const HRESULT result = rhi.GetDevice()->CreateStateObject(&stateObjectDesc, IID_PPV_ARGS(stateObject.ReleaseAndGetAddressOf()));
-	if (FAILED(result) || !stateObject || FAILED(stateObject.As(&properties)) || !properties)
+	const bool bStateObjectCreated = SUCCEEDED(result) && stateObject;
+	const bool bPropertiesResolved = bStateObjectCreated && SUCCEEDED(stateObject.As(&properties));
+	const bool bPropertiesAvailable = bPropertiesResolved && properties;
+	if (!bPropertiesAvailable)
 	{
 		throw Diagnostics::Error(std::format("D3D12 ray-tracing state-object creation failed: 0x{:08X}.", static_cast<unsigned>(result)));
 	}

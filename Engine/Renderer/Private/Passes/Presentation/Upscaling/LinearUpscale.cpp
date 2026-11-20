@@ -17,5 +17,8 @@ void AddLinearUpscalePass(FrameGraphBuilder& builder, FrameGraphTextureHandle in
 	    .MipFilter = RhiSamplerMipFilter::Linear,
 	    .Address = MakeRhiSamplerAddressModes(RhiSamplerAddressMode::Clamp)};
 
-	builder.Dispatch<LinearUpscaleCS>(parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(outputExtent.Width, 8u), MathUtils::DivideRoundUp(outputExtent.Height, 8u), 1u});
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(outputExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(outputExtent.Height, 8u);
+
+	builder.Dispatch<LinearUpscaleCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u});
 }

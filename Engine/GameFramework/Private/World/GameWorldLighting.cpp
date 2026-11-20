@@ -100,9 +100,11 @@ namespace ECS
 		}
 		const Transform transform(DirectX::XMLoadFloat4x4(&desc.common.worldTransform));
 		const LocalTransform local = WorldTransformConversion::ToLocal(transform);
+		const Light light = ToLightComponent(desc);
 
-		const bool bTransformsAdded = m_registry.Add(entity, local) && m_registry.Add(entity, WorldTransform{});
-		const bool bLightAdded = bTransformsAdded && (m_registry.Add(entity, ToLightComponent(desc)));
+		const bool bLocalAdded = m_registry.Add(entity, local);
+		const bool bTransformsAdded = bLocalAdded && m_registry.Add(entity, WorldTransform{});
+		const bool bLightAdded = bTransformsAdded && m_registry.Add(entity, light);
 		const bool bVisibilityAdded = bLightAdded && (m_registry.Add(entity, Visibility{.bVisible = desc.common.bVisible}));
 		const bool bNameAdded = bVisibilityAdded && (m_registry.Add(entity, Name{std::move(desc.common.name)}));
 		const bool bIdentityAdded = bNameAdded && (m_registry.Add(entity, AuthoredIdentity{.SourceObjectId = ++m_nextLightIdentity, .Kind = AuthoredObjectKind::Light}));
@@ -146,8 +148,13 @@ namespace ECS
 			return false;
 		}
 		const Transform transform(DirectX::XMLoadFloat4x4(&desc.common.worldTransform));
+		if (!WriteTransform(entity, transform))
+		{
+			return false;
+		}
+		const Light light = ToLightComponent(desc);
 
-		const bool bLightWritten = WriteTransform(entity, transform) && m_registry.Replace(entity, ToLightComponent(desc));
+		const bool bLightWritten = m_registry.Replace(entity, light);
 		const bool bNameWritten = bLightWritten && (m_registry.Replace(entity, Name{std::move(desc.common.name)}));
 		const bool bWritten = bNameWritten && (WriteVisibility(entity, desc.common.bVisible));
 

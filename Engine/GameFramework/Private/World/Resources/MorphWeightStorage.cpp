@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <utility>
 
 namespace ECS
 {
@@ -23,7 +24,10 @@ namespace ECS
 			return {};
 		}
 		const auto slot = static_cast<std::uint32_t>(m_entries.size());
-		m_entries.push_back(Entry{.Weights = std::vector<float>(weights.begin(), weights.end()), .bOccupied = true});
+		Entry entry;
+		entry.Weights.assign(weights.begin(), weights.end());
+		entry.bOccupied = true;
+		m_entries.push_back(std::move(entry));
 		return {slot, m_entries.back().Generation};
 	}
 

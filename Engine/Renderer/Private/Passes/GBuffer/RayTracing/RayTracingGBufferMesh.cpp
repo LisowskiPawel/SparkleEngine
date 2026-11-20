@@ -42,11 +42,14 @@ void AddRayTracingGBufferMeshPass(
     RenderRayTracingScene& rayTracingScene,
     const RenderFrameGraphResources& resources)
 {
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(sceneExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(sceneExtent.Height, 8u);
+
 	AddRayTracingMaterialPass<RayTracingGBufferInlineCS, RayTracingGBufferRGS>(
 	    builder,
 	    "RayTracingGBuffer",
 	    rayTracingScene,
-	    ComputeDispatchDesc{MathUtils::DivideRoundUp(sceneExtent.Width, 8u), MathUtils::DivideRoundUp(sceneExtent.Height, 8u), 1u},
+	    ComputeDispatchDesc{groupCountX, groupCountY, 1u},
 	    RayTracingDispatchDimensions{.Width = sceneExtent.Width, .Height = sceneExtent.Height, .Depth = 1u},
 	    [&]<typename TShader>() -> auto& { return BuildRayTracingGBufferParameters<TShader>(builder, frame, resources); });
 }

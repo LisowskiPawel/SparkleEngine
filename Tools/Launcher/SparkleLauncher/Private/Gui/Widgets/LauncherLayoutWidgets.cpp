@@ -213,9 +213,13 @@ namespace SparkleLauncher
 		const int top = static_cast<int>(std::round(sceneRect.top() + LauncherUi::Hero::CopyTop * scale));
 		const int bottom = static_cast<int>(std::round(LauncherUi::Hero::CopyBottom * scale));
 		const int desiredPaneWidth = static_cast<int>(std::round(LauncherUi::Hero::CopyWidth * scale));
-		const int maximumPaneWidth = std::max(300, static_cast<int>(std::round((LauncherUi::Hero::CopyDividerX - LauncherUi::Hero::CopyLeft - 54) * scale)));
-		const int paneWidth = std::clamp(desiredPaneWidth, 300, std::min(460, maximumPaneWidth));
-		const int paneHeight = std::max(140, static_cast<int>(std::round(sceneRect.height())) - static_cast<int>(std::round(LauncherUi::Hero::CopyTop * scale)) - bottom);
+		const double availableCopyWidth = (LauncherUi::Hero::CopyDividerX - LauncherUi::Hero::CopyLeft - 54) * scale;
+		const int maximumPaneWidth = std::max(300, static_cast<int>(std::round(availableCopyWidth)));
+		const int paneWidthLimit = std::min(460, maximumPaneWidth);
+		const int paneWidth = std::clamp(desiredPaneWidth, 300, paneWidthLimit);
+		const int sceneHeight = static_cast<int>(std::round(sceneRect.height()));
+		const int topInset = static_cast<int>(std::round(LauncherUi::Hero::CopyTop * scale));
+		const int paneHeight = std::max(140, sceneHeight - topInset - bottom);
 
 		if (QLayout* copyLayout = m_copyPane->layout())
 		{
@@ -289,7 +293,10 @@ namespace SparkleLauncher
 	QSize ResponsiveCardGridWidget::sizeHint() const
 	{
 		const QSize layoutHint = m_layout != nullptr ? m_layout->sizeHint() : QWidget::sizeHint();
-		return QSize(std::min(m_maximumCardWidth, std::max(m_minimumCardWidth, AvailableLayoutWidth())), std::max(1, layoutHint.height()));
+		const int availableWidth = std::max(m_minimumCardWidth, AvailableLayoutWidth());
+		const int cardWidth = std::min(m_maximumCardWidth, availableWidth);
+		const int cardHeight = std::max(1, layoutHint.height());
+		return QSize(cardWidth, cardHeight);
 	}
 
 	void ResponsiveCardGridWidget::resizeEvent(QResizeEvent* event)
@@ -305,7 +312,8 @@ namespace SparkleLauncher
 		{
 			if (const QScrollArea* scrollArea = qobject_cast<const QScrollArea*>(ancestor))
 			{
-				availableWidth = std::min(availableWidth, std::max(1, scrollArea->viewport()->contentsRect().width()));
+				const int viewportWidth = std::max(1, scrollArea->viewport()->contentsRect().width());
+				availableWidth = std::min(availableWidth, viewportWidth);
 				break;
 			}
 		}
@@ -317,15 +325,18 @@ namespace SparkleLauncher
 		const int spacing = std::max(0, m_layout->horizontalSpacing());
 		const int availableWidth = AvailableLayoutWidth();
 		const int columnsByWidth = std::max(1, (availableWidth + spacing) / (m_minimumCardWidth + spacing));
-		return std::clamp(columnsByWidth, 1, std::min(m_maximumColumns, std::max(1, static_cast<int>(m_cards.size()))));
+		const int cardCount = std::max(1, static_cast<int>(m_cards.size()));
+		const int columnLimit = std::min(m_maximumColumns, cardCount);
+		return std::clamp(columnsByWidth, 1, columnLimit);
 	}
 
 	int ResponsiveCardGridWidget::DesiredCardWidth(int columns) const
 	{
 		const int spacing = std::max(0, m_layout->horizontalSpacing());
 		const int availableWidth = AvailableLayoutWidth();
-		const int availableForCards = std::max(1, availableWidth - (std::max(1, columns) - 1) * spacing);
-		const int proportionalWidth = std::max(1, availableForCards / std::max(1, columns));
+		const int columnCount = std::max(1, columns);
+		const int availableForCards = std::max(1, availableWidth - (columnCount - 1) * spacing);
+		const int proportionalWidth = std::max(1, availableForCards / columnCount);
 		const int lowerBound = std::min(m_minimumCardWidth, proportionalWidth);
 		return std::clamp(proportionalWidth, lowerBound, m_maximumCardWidth);
 	}

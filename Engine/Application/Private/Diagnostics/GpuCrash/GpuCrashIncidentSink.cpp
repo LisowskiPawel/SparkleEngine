@@ -26,20 +26,28 @@ GpuCrashIncidentSink::GpuCrashIncidentSink(ApplicationTaskRuntime& runtime, cons
 	{
 		Hash::Sha256Digest executableHash;
 		std::string error;
-		if (!Hash::TrySha256File(Filesystem::GetExecutablePath(), executableHash, error))
+		const auto executablePath = Filesystem::GetExecutablePath();
+		if (!Hash::TrySha256File(executablePath, executableHash, error))
 		{
 			throw Diagnostics::Error(error);
 		}
 		m_executableHash = Hash::Sha256ToHex(executableHash);
 		m_identity = startup.SessionId;
 		ReserveSlot();
-		const auto manifestPath = Strings::ToNarrow((m_directory / "incident.json").wstring());
+		const auto manifestFile = m_directory / "incident.json";
+		const auto manifestPath = Strings::ToNarrow(manifestFile.wstring());
 		const auto quotedManifest = nlohmann::json(manifestPath).dump();
 		std::cout << "SPARKLE_GPU_CRASH_INCIDENT " << quotedManifest << std::endl;
 		m_inputs = std::make_unique<GpuCrashInputs>(startup, api);
 		WriteManifest("Preparing");
 
-		m_dispatch = runtime.GetExecutor().PrepareDispatch(m_scope, TaskDesc{"Write GPU crash artifacts", TaskLane::BlockingIo}, [this](TaskExecutionContext& context) { return Drain(context); });
+		auto writeArtifacts = [this](TaskExecutionContext& context)
+		{
+			return Drain(context);
+		};
+
+		TaskDesc task{"Write GPU crash artifacts", TaskLane::BlockingIo};
+		m_dispatch = runtime.GetExecutor().PrepareDispatch(m_scope, std::move(task), std::move(writeArtifacts));
 	}
 	catch (...)
 	{
@@ -65,12 +73,12 @@ GpuCrashIncidentSink::GpuCrashIncidentSink(ApplicationTaskRuntime& runtime, cons
 bool GpuCrashIncidentSink::IsReadyPublished() const
 {
 	std::lock_guard lock(m_mutex);
-	const bool bCanInspect = m_nativeFailure == 0 && !m_bFinalizing;
-	const bool bIncomplete = bCanInspect && m_bIncomplete.load(std::memory_order_relaxed);
-	const bool bCheckWrite = bCanInspect && !bIncomplete;
-	const bool bWriteFailed = bCheckWrite && m_bWriteFailed.load(std::memory_order_relaxed);
-	const bool bCollectionFailed = bIncomplete || bWriteFailed;
+	if (m_nativeFailure != 0 || m_bFinalizing)
+	{
+		return m_bReadyPublished;
+	}
 
+	const bool bCollectionFailed = m_bIncomplete.load(std::memory_order_relaxed) || m_bWriteFailed.load(std::memory_order_relaxed);
 	if (bCollectionFailed)
 	{
 		throw Diagnostics::Error("GPU crash startup publication failed; this child cannot confirm diagnostic readiness.");
@@ -112,11 +120,10 @@ bool GpuCrashIncidentSink::Enqueue(RhiGpuCrashArtifactId id, std::span<const std
 		{
 			std::lock_guard lock(m_mutex);
 			const bool bWriterUnavailable = m_bFinalizing || m_bWriteFailed.load(std::memory_order_relaxed);
-			const bool bPayloadRejected = bWriterUnavailable || (bytes.empty());
-			const bool bQueueRejected = bPayloadRejected || (m_outstandingCount == MaximumPayloads);
-			const bool bAdmissionRejected = bQueueRejected || (bytes.size() > MaximumQueuedBytes - m_outstandingBytes);
+			const bool bPayloadRejected = bWriterUnavailable || bytes.empty();
+			const bool bQueueFull = m_outstandingCount == MaximumPayloads || bytes.size() > MaximumQueuedBytes - m_outstandingBytes;
 
-			if (bAdmissionRejected)
+			if (bPayloadRejected || bQueueFull)
 			{
 				MarkIncomplete();
 				return false;
@@ -315,7 +322,13 @@ TaskResult GpuCrashIncidentSink::Drain(TaskExecutionContext& context)
 	{
 		try
 		{
-			const char* state = m_bTimedOut ? "Timed out" : m_bSdkFinished && m_bHasDump && !m_bIncomplete.load(std::memory_order_relaxed) ? "Collected" : "Partial";
+			const char* state = "Timed out";
+			if (!m_bTimedOut)
+			{
+				const bool bDumpFinished = m_bSdkFinished && m_bHasDump;
+				const bool bCollected = bDumpFinished && !m_bIncomplete.load(std::memory_order_relaxed);
+				state = bCollected ? "Collected" : "Partial";
+			}
 			WriteManifest(state);
 		}
 		catch (...)

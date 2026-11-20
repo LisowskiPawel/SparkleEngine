@@ -14,7 +14,8 @@ static ECS::AnimationJointTransform DecomposeLocalTransform(const SkeletonResour
 	if (DirectX::XMMatrixDecompose(&scale, &rotation, &translation, local))
 	{
 		DirectX::XMStoreFloat3(&result.Translation, translation);
-		DirectX::XMStoreFloat4(&result.Rotation, DirectX::XMQuaternionNormalize(rotation));
+		const DirectX::XMVECTOR normalizedRotation = DirectX::XMQuaternionNormalize(rotation);
+		DirectX::XMStoreFloat4(&result.Rotation, normalizedRotation);
 		DirectX::XMStoreFloat3(&result.Scale, scale);
 	}
 	return result;
@@ -33,7 +34,8 @@ void SkeletonResourceStore::Append(std::vector<SkeletonResource> skeletons)
 		entry.BindLocalTransforms.reserve(skeleton.joints.size());
 		for (std::size_t jointIndex = 0; jointIndex < skeleton.joints.size(); ++jointIndex)
 		{
-			entry.BindLocalTransforms.push_back(DecomposeLocalTransform(skeleton, jointIndex));
+			const ECS::AnimationJointTransform local = DecomposeLocalTransform(skeleton, jointIndex);
+			entry.BindLocalTransforms.push_back(local);
 		}
 		if (!SkeletonTransformContract::BuildEvaluationOrder(skeleton.joints, entry.EvaluationOrder))
 		{

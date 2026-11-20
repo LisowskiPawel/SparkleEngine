@@ -21,9 +21,15 @@ static FrameGraphTextureHandle CreateGBufferDeviceZ(FrameGraphBuilder& builder, 
 	switch (algorithm)
 	{
 		case GBufferAlgorithm::RayTracing:
-			return builder.CreateTexture(FrameGraphTextureDesc::CreateColor("GBufferDeviceZ", sceneExtent.Width, sceneExtent.Height, GBufferFormats::RayTracingDeviceZ));
+		{
+			const FrameGraphTextureDesc desc = FrameGraphTextureDesc::CreateColor("GBufferDeviceZ", sceneExtent.Width, sceneExtent.Height, GBufferFormats::RayTracingDeviceZ);
+			return builder.CreateTexture(desc);
+		}
 		case GBufferAlgorithm::Rasterized:
-			return builder.CreateTexture(FrameGraphTextureDesc::CreateDepthTarget("GBufferDeviceZ", sceneExtent.Width, sceneExtent.Height, GBufferFormats::RasterizedDeviceZ));
+		{
+			const FrameGraphTextureDesc desc = FrameGraphTextureDesc::CreateDepthTarget("GBufferDeviceZ", sceneExtent.Width, sceneExtent.Height, GBufferFormats::RasterizedDeviceZ);
+			return builder.CreateTexture(desc);
+		}
 		default:
 			throw Diagnostics::Error("GBuffer target creation received an invalid algorithm.");
 	}

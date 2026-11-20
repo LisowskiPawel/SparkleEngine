@@ -20,5 +20,5 @@ set(JSON_Diagnostics OFF CACHE BOOL "" FORCE)
 set(JSON_Diagnostic_Positions OFF CACHE BOOL "" FORCE)
 set(JSON_LegacyDiscardedValueComparison OFF CACHE BOOL "" FORCE)
 sparkle_add_dependency_subdirectory(${nlohmann_json_SOURCE_DIR} ${nlohmann_json_BINARY_DIR})
-set_property(TARGET nlohmann_json PROPERTY SPARKLE_SOURCE_PACKAGE
-    "{\"name\":\"nlohmann/json\",\"versionInfo\":\"${SPARKLE_NLOHMANN_JSON_VERSION}\",\"licenseDeclared\":\"MIT\",\"downloadLocation\":\"https://github.com/nlohmann/json/archive/${SPARKLE_NLOHMANN_JSON_REVISION}.tar.gz\"}")
+sparkle_set_source_package(nlohmann_json "nlohmann/json" "${SPARKLE_NLOHMANN_JSON_VERSION}"
+    "MIT" "https://github.com/nlohmann/json/archive/${SPARKLE_NLOHMANN_JSON_REVISION}.tar.gz")

@@ -30,7 +30,9 @@ namespace BRDF
 
 		float SpecularOcclusion_LagardeApprox(float NoV, float ao, float roughness)
 		{
-			return saturate(pow(NoV + ao, exp2(-16.0f * roughness - 1.0f)) - 1.0f + ao);
+			const float exponent = exp2(-16.0f * roughness - 1.0f);
+			const float visibleFraction = pow(NoV + ao, exponent);
+			return saturate(visibleFraction - 1.0f + ao);
 		}
 
 		float SpecularOcclusion_GTAO(float NoV, float ao, float roughness)

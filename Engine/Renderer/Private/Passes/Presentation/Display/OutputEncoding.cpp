@@ -35,8 +35,9 @@ static std::uint32_t ResolveOutputColorEncoding() noexcept
 
 FrameGraphTextureHandle AddOutputEncodingPass(FrameGraphBuilder& builder, const RenderFrameGraphSettings& settings, FrameGraphTextureHandle displayLinearColor)
 {
-	const FrameGraphTextureHandle encodedColor = builder.CreateTexture(
-	    FrameGraphTextureDesc::CreateColor("EncodedSceneColor", settings.OutputExtent.Width, settings.OutputExtent.Height, PixelFormatToLinear(settings.OutputFormat)));
+	const PixelFormat outputFormat = PixelFormatToLinear(settings.OutputFormat);
+	const FrameGraphTextureDesc encodedColorDesc = FrameGraphTextureDesc::CreateColor("EncodedSceneColor", settings.OutputExtent.Width, settings.OutputExtent.Height, outputFormat);
+	const FrameGraphTextureHandle encodedColor = builder.CreateTexture(encodedColorDesc);
 
 	auto& parameters = builder.AllocParameters<OutputEncodingCS>();
 	parameters->DisplayLinearColor = builder.CreateSRV(displayLinearColor);
@@ -44,7 +45,10 @@ FrameGraphTextureHandle AddOutputEncodingPass(FrameGraphBuilder& builder, const 
 
 	parameters->OutputColorEncoding = ResolveOutputColorEncoding();
 
-	builder.Dispatch<OutputEncodingCS>(parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(settings.OutputExtent.Width, 8u), MathUtils::DivideRoundUp(settings.OutputExtent.Height, 8u), 1u});
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(settings.OutputExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(settings.OutputExtent.Height, 8u);
+
+	builder.Dispatch<OutputEncodingCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u});
 
 	return encodedColor;
 }

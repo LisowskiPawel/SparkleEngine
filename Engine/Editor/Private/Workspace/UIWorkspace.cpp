@@ -107,7 +107,9 @@ void UI::Implementation::BuildCenterWorkspace(bool bDisableInteraction, float ma
 
 	m_viewportToolbar->SetGeometry(outlinerWidth, mainMenuBarHeight, viewportWidth);
 	const std::string_view activeLevelName = m_levelSession != nullptr ? m_levelSession->GetActiveLevelName() : std::string_view{};
-	const auto selectedMode = m_viewportToolbar->Draw(activeLevelName.empty() ? "<None>" : activeLevelName, GetViewportRenderRequest().ViewMode, bDisableInteraction);
+	const std::string_view displayLevelName = activeLevelName.empty() ? "<None>" : activeLevelName;
+	const RenderViewMode viewMode = GetViewportRenderRequest().ViewMode;
+	const auto selectedMode = m_viewportToolbar->Draw(displayLevelName, viewMode, bDisableInteraction);
 	if (selectedMode)
 	{
 		m_viewportPanel->SetViewMode(*selectedMode);

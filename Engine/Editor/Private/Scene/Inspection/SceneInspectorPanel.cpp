@@ -39,7 +39,8 @@ void SceneInspectorPanel::BuildDetailsToolbar() noexcept
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.055f, 0.058f, 0.064f, 1.0f));
 	ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.075f, 0.080f, 0.090f, 1.0f));
 	ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.070f, 0.095f, 0.130f, 1.0f));
-	ImGui::PushStyleColor(ImGuiCol_Border, SparkleUiPalette::WithAlphaU32(SparkleUiPalette::Border(), 0.70f));
+	const ImU32 borderColor = SparkleUiPalette::WithAlphaU32(SparkleUiPalette::Border(), 0.70f);
+	ImGui::PushStyleColor(ImGuiCol_Border, borderColor);
 	ImGui::SetNextItemWidth(-1.0f);
 	const std::string searchHint = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Search, "Search");
 	if (ImGui::InputTextWithHint("##DetailsFilter", searchHint.c_str(), filterBuffer, sizeof(filterBuffer)))

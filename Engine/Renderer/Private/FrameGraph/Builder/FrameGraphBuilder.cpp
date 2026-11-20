@@ -72,7 +72,10 @@ ShaderDepthTarget FrameGraphBuilder::CreateDepthTarget(FrameGraphTextureHandle h
 
 std::string FrameGraphBuilder::BuildRayTracingShaderTableKey(std::string_view label, const RayTracingPassPipelineRuntime& runtime, std::uint64_t recordLayoutGeneration)
 {
-	return std::string(label) + "." + std::to_string(reinterpret_cast<std::uintptr_t>(&runtime.Pipeline)) + "." + std::to_string(runtime.Generation) + "." + std::to_string(recordLayoutGeneration);
+	const std::string pipelineIdentity = std::to_string(reinterpret_cast<std::uintptr_t>(&runtime.Pipeline));
+	const std::string shaderGeneration = std::to_string(runtime.Generation);
+	const std::string layoutGeneration = std::to_string(recordLayoutGeneration);
+	return std::string(label) + "." + pipelineIdentity + "." + shaderGeneration + "." + layoutGeneration;
 }
 
 std::uint64_t FrameGraphBuilder::GetRayTracingShaderTableSize(const RayTracingShaderTable& shaderTable)
@@ -87,5 +90,9 @@ std::uint64_t FrameGraphBuilder::GetRayTracingShaderTableSize(const RayTracingSh
 		return region.OffsetInBytes + region.SizeInBytes;
 	};
 
-	return std::max({regionEnd(shaderTable.GetRayGenerationRegion()), regionEnd(shaderTable.GetMissRegion()), regionEnd(shaderTable.GetHitGroupRegion()), regionEnd(shaderTable.GetCallableRegion())});
+	const std::uint64_t rayGenerationEnd = regionEnd(shaderTable.GetRayGenerationRegion());
+	const std::uint64_t missEnd = regionEnd(shaderTable.GetMissRegion());
+	const std::uint64_t hitGroupEnd = regionEnd(shaderTable.GetHitGroupRegion());
+	const std::uint64_t callableEnd = regionEnd(shaderTable.GetCallableRegion());
+	return std::max({rayGenerationEnd, missEnd, hitGroupEnd, callableEnd});
 }

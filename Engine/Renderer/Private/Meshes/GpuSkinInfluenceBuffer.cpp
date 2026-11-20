@@ -27,13 +27,9 @@ void GpuSkinInfluenceBuffer::Upload(RenderHardwareInterface& renderHardwareInter
 	}
 
 	RhiResourceService& resources = m_renderHardwareInterface->GetResourceService();
+	const RhiBufferResourceDesc bufferDesc{.SizeInBytes = skinInfluences.size_bytes(), .StrideInBytes = sizeof(VertexSkinInfluenceData), .Kind = RhiBufferKind::Structured};
 
-	m_buffer = resources.CreateBufferResource(
-	    RhiBufferResourceDesc{.SizeInBytes = skinInfluences.size_bytes(), .StrideInBytes = sizeof(VertexSkinInfluenceData), .Kind = RhiBufferKind::Structured},
-	    ResourceState::CopyDest,
-	    RhiMemoryCategory::Mesh,
-	    RhiMemoryResidencyClass::DeviceLocal,
-	    L"GpuMesh_SkinInfluences");
+	m_buffer = resources.CreateBufferResource(bufferDesc, ResourceState::CopyDest, RhiMemoryCategory::Mesh, RhiMemoryResidencyClass::DeviceLocal, L"GpuMesh_SkinInfluences");
 
 	const bool bSkinInfluencesUploaded = m_buffer
 	    && m_renderHardwareInterface->GetUploadService().UploadBuffer(commandList, m_buffer, std::as_bytes(skinInfluences), ResourceState::ShaderResource, L"GpuMesh_SkinInfluencesUpload");
@@ -44,8 +40,8 @@ void GpuSkinInfluenceBuffer::Upload(RenderHardwareInterface& renderHardwareInter
 		Diagnostics::Fatal(g_gpuSkinInfluenceBufferLogger, __FILE__, __LINE__, "GPU skin influence upload failed.");
 	}
 
-	m_view = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(
-	    RhiResourceViewDesc::BufferShaderResource(resources.GetResourceHandle(m_buffer), skinInfluences.size_bytes(), sizeof(VertexSkinInfluenceData)));
+	const RhiResourceViewDesc shaderResourceViewDesc = RhiResourceViewDesc::BufferShaderResource(resources.GetResourceHandle(m_buffer), skinInfluences.size_bytes(), sizeof(VertexSkinInfluenceData));
+	m_view = m_renderHardwareInterface->GetDescriptorService().CreateResourceView(shaderResourceViewDesc);
 
 	m_shaderResourceView = m_renderHardwareInterface->GetDescriptorService().GetResourceViewGpuHandle(m_view);
 	if (!m_shaderResourceView)

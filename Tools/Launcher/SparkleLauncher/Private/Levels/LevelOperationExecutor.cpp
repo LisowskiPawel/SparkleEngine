@@ -127,12 +127,14 @@ namespace SparkleLauncher
 			return operation;
 		}
 
-		const bool bSelectionCommitted = !plan.Request.bSelectAvailableLevels
-		    || CommitLevelSelection(ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId), plan.Request.RequestedLevelIds, true, operation);
-
-		if (!bSelectionCommitted)
+		if (plan.Request.bSelectAvailableLevels)
 		{
-			return operation;
+			const auto projectRoot = ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId);
+			const bool bSelectionCommitted = CommitLevelSelection(projectRoot, plan.Request.RequestedLevelIds, true, operation);
+			if (!bSelectionCommitted)
+			{
+				return operation;
+			}
 		}
 
 		MarkOperationFinished(operation, OperationStatus::Succeeded, 0);

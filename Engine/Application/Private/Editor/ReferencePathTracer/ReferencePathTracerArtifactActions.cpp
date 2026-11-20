@@ -35,8 +35,16 @@ void ReportReferencePathTracerArtifactResult(UI& ui, std::optional<ReferencePath
 	}
 	const ConsoleCommandSeverity severity = result->bSucceeded ? ConsoleCommandSeverity::Info : ConsoleCommandSeverity::Error;
 
-	std::string message = result->bSucceeded ? "Reference artifact saved: " + Strings::ToNarrow(result->PublicationDirectory.wstring())
-	                                         : "Reference artifact failed: " + std::move(result->ErrorMessage);
+	std::string message;
+	if (result->bSucceeded)
+	{
+		const std::string directory = Strings::ToNarrow(result->PublicationDirectory.wstring());
+		message = "Reference artifact saved: " + directory;
+	}
+	else
+	{
+		message = "Reference artifact failed: " + std::move(result->ErrorMessage);
+	}
 
 	ui.AppendConsoleOutput({severity, std::move(message)}, true);
 }

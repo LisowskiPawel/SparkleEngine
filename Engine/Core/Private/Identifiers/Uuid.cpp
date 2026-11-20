@@ -36,16 +36,26 @@ namespace Identifiers
 
 	bool IsUuidV4String(std::string_view value) noexcept
 	{
-		if (value.size() != 36 || value[14] != '4' || std::string_view("89ab").find(value[19]) == std::string_view::npos)
+		constexpr std::string_view variantDigits = "89ab";
+		constexpr std::string_view hexadecimalDigits = "0123456789abcdef";
+		if (value.size() != 36 || value[14] != '4')
 		{
 			return false;
 		}
+		const bool bValidVariant = variantDigits.find(value[19]) != std::string_view::npos;
+		if (!bValidVariant)
+		{
+			return false;
+		}
+
 		for (std::size_t index = 0; index < value.size(); ++index)
 		{
-			const bool bSeparatorIndex = index == 8 || index == 13;
-			const bool bEarlierSeparator = bSeparatorIndex || (index == 18);
-			const bool bSeparator = bEarlierSeparator || (index == 23);
-			if (bSeparator ? value[index] != '-' : std::string_view("0123456789abcdef").find(value[index]) == std::string_view::npos)
+			const bool bFirstSeparatorPair = index == 8 || index == 13;
+			const bool bSecondSeparatorPair = index == 18 || index == 23;
+			const bool bSeparator = bFirstSeparatorPair || bSecondSeparatorPair;
+			const char character = value[index];
+			const bool bValidCharacter = bSeparator ? character == '-' : hexadecimalDigits.find(character) != std::string_view::npos;
+			if (!bValidCharacter)
 			{
 				return false;
 			}

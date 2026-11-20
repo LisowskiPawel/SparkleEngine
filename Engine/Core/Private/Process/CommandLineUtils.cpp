@@ -17,7 +17,9 @@ namespace CommandLine
 	{
 #if defined(_WIN32)
 		int count = 0;
-		std::unique_ptr<wchar_t*, decltype(&LocalFree)> arguments(CommandLineToArgvW(GetCommandLineW(), &count), &LocalFree);
+		const wchar_t* commandLine = GetCommandLineW();
+		wchar_t** parsedArguments = CommandLineToArgvW(commandLine, &count);
+		std::unique_ptr<wchar_t*, decltype(&LocalFree)> arguments(parsedArguments, &LocalFree);
 		if (!arguments)
 		{
 			throw Diagnostics::Error("Cannot read process arguments.");
@@ -95,6 +97,7 @@ namespace CommandLine
 
 	std::string QuotePath(const std::filesystem::path& path)
 	{
-		return QuoteArgument(Strings::ToNarrow(path.wstring()));
+		const std::string pathText = Strings::ToNarrow(path.wstring());
+		return QuoteArgument(pathText);
 	}
 }

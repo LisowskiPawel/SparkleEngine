@@ -14,10 +14,13 @@ void D3D12RootSignature::Create(const RootSignatureDesc& desc)
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
 	rootSignatureDesc.Init(desc.ParameterCount, desc.Parameters, desc.StaticSamplerCount, desc.StaticSamplers, desc.Flags);
 
-	ID3DBlob* signature = nullptr;
-	ID3DBlob* error = nullptr;
-	CHECK(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error));
-	CHECK(m_rhi.GetDevice()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(m_rootSignature.ReleaseAndGetAddressOf())));
+	ComPtr<ID3DBlob> signature;
+	ComPtr<ID3DBlob> error;
+	const HRESULT serializeResult = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, signature.GetAddressOf(), error.GetAddressOf());
+	CHECK(serializeResult);
+
+	const HRESULT createResult = m_rhi.GetDevice()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(m_rootSignature.ReleaseAndGetAddressOf()));
+	CHECK(createResult);
 	m_rootSignature->SetName(desc.DebugName);
 }
 

@@ -139,7 +139,8 @@ NativeTextureViewInfo FrameGraphResourceCommands::ResolveNativeTextureView(Frame
 		return {};
 	}
 
-	NativeTextureViewInfo nativeView = m_frameGraph.m_renderHardwareInterface.GetInteropService().GetNativeTextureViewInfo(view, m_frameGraph.ResolveResource(resourceHandle), state, request);
+	const RhiResourceHandle resource = m_frameGraph.ResolveResource(resourceHandle);
+	NativeTextureViewInfo nativeView = m_frameGraph.m_renderHardwareInterface.GetInteropService().GetNativeTextureViewInfo(view, resource, state, request);
 	if (nativeView.Width == 0u || nativeView.Height == 0u)
 	{
 		nativeView.Width = metadata.textureDesc.width;

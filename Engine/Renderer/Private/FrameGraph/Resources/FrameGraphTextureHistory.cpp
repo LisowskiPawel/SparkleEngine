@@ -41,7 +41,9 @@ FrameGraphTextureHistory FrameGraph::CreateTextureHistory(const FrameGraphTextur
 	FrameGraphTextureDesc currentDesc = desc;
 	currentDesc.name = "Current" + desc.name + "History";
 
-	const FrameGraphTextureHistory handles{.Previous = ReservePersistentTexture(previousDesc, ResourceState::Undefined), .Current = ReservePersistentTexture(currentDesc, ResourceState::Undefined)};
+	const FrameGraphTextureHandle previous = ReservePersistentTexture(previousDesc, ResourceState::Undefined);
+	const FrameGraphTextureHandle current = ReservePersistentTexture(currentDesc, ResourceState::Undefined);
+	const FrameGraphTextureHistory handles{.Previous = previous, .Current = current};
 	m_textureHistories.push_back(TextureHistoryRecord{.handles = handles, .desc = desc});
 	return handles;
 }

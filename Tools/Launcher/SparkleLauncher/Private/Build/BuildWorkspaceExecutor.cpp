@@ -218,7 +218,9 @@ namespace SparkleLauncher
 			}
 			else
 			{
-				SetProcessOperationFailure(operation, result.StartFailure, MakeBuildWorkspaceFailureSummary(step, result), BuildWorkspaceRecoveryAction(step));
+				const auto summary = MakeBuildWorkspaceFailureSummary(step, result);
+				const auto recoveryAction = BuildWorkspaceRecoveryAction(step);
+				SetProcessOperationFailure(operation, result.StartFailure, summary, recoveryAction);
 			}
 			MarkOperationFinished(operation, result.bCancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
 			return false;

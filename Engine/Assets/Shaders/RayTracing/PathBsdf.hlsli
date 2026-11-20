@@ -137,7 +137,10 @@ namespace PathBsdf
 		const CommonSampling::OrthonormalBasis basis = CommonSampling::BuildOrthonormalBasis(surface.NormalWorld);
 
 		const float alpha = surface.Roughness * surface.Roughness;
-		const float3 localView = float3(dot(surface.ViewDirWorld, basis.Tangent), dot(surface.ViewDirWorld, basis.Bitangent), dot(surface.ViewDirWorld, surface.NormalWorld));
+		const float viewTangent = dot(surface.ViewDirWorld, basis.Tangent);
+		const float viewBitangent = dot(surface.ViewDirWorld, basis.Bitangent);
+		const float viewNormal = dot(surface.ViewDirWorld, surface.NormalWorld);
+		const float3 localView = float3(viewTangent, viewBitangent, viewNormal);
 		const float3 stretchedView = normalize(float3(alpha * localView.xy, localView.z));
 		const float length2 = dot(stretchedView.xy, stretchedView.xy);
 		const float3 orthogonalView = float3(-stretchedView.y, stretchedView.x, 0.0f);

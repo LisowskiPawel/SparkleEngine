@@ -59,9 +59,17 @@ namespace SparkleLauncher
 			return;
 		}
 
-		LauncherOperationRequest request = m_selectedOperationId == "workspace.clean"
-		    ? BuildScopedCleanOperationRequest(m_workspaceRoot, m_contentModel, m_settings, m_settings.CleanScope(), std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()))
-		    : BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, m_selectedOperationId);
+		LauncherOperationRequest request;
+		if (m_selectedOperationId == "workspace.clean")
+		{
+			const std::filesystem::path launcherPath(QCoreApplication::applicationFilePath().toStdString());
+			const auto cleanScope = m_settings.CleanScope();
+			request = BuildScopedCleanOperationRequest(m_workspaceRoot, m_contentModel, m_settings, cleanScope, launcherPath);
+		}
+		else
+		{
+			request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, m_selectedOperationId);
+		}
 
 		if (!ConfirmLauncherRunRequest(*this, request))
 		{
@@ -89,12 +97,8 @@ namespace SparkleLauncher
 			return;
 		}
 
-		LauncherOperationRequest request = BuildActionCleanOperationRequest(
-		    m_workspaceRoot,
-		    m_contentModel,
-		    m_settings,
-		    std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()),
-		    m_selectedOperationId);
+		const std::filesystem::path launcherPath(QCoreApplication::applicationFilePath().toStdString());
+		LauncherOperationRequest request = BuildActionCleanOperationRequest(m_workspaceRoot, m_contentModel, m_settings, launcherPath, m_selectedOperationId);
 
 		if (std::get<MaintenanceOperationRequest>(request.Inputs).RequestedCleanTargets.empty())
 		{

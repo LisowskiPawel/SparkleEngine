@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_d3d12RenderDiagnosticsLogger, "RHI.D3D12.Diagnostics");
@@ -128,8 +129,9 @@ public:
 			Diagnostics::Fatal(g_d3d12RenderDiagnosticsLogger, __FILE__, __LINE__, "D3D12 timestamp query was written on a different queue than it was allocated for.");
 		}
 
-		ID3D12GraphicsCommandList* const nativeCommandList = D3D12TypeConversions::ToGraphicsCommandList(
-		    commandList.GetNativeHandle(RhiNativeInteropRequest{.Consumer = ERhiNativeInteropConsumer::Diagnostics, .Reason = "Write D3D12 timestamp query"}));
+		const RhiNativeInteropRequest request{.Consumer = ERhiNativeInteropConsumer::Diagnostics, .Reason = "Write D3D12 timestamp query"};
+		const NativeGraphicsCommandListHandle nativeHandle = commandList.GetNativeHandle(request);
+		ID3D12GraphicsCommandList* const nativeCommandList = D3D12TypeConversions::ToGraphicsCommandList(nativeHandle);
 
 		if (nativeCommandList == nullptr)
 		{
@@ -309,11 +311,17 @@ private:
 
 std::unique_ptr<RenderDiagnostics> CreateD3D12RenderDiagnostics(D3D12Rhi& rhi, std::uint32_t maximumFramesInFlight)
 {
+	auto objectDiagnostics = std::make_unique<D3D12RenderObjectDiagnostics>();
+	auto timingDiagnostics = std::make_unique<D3D12RenderTimingDiagnostics>(rhi, maximumFramesInFlight);
+	auto messageDiagnostics = std::make_unique<D3D12RenderMessageDiagnostics>(rhi);
+	auto failureDiagnostics = std::make_unique<D3D12RenderFailureDiagnostics>(rhi);
+	auto memoryDiagnostics = std::make_unique<D3D12RenderMemoryDiagnostics>(rhi.GetMemoryAllocator());
+
 	return CreateRhiDiagnosticsComposition(
-	    std::make_unique<D3D12RenderObjectDiagnostics>(),
-	    std::make_unique<D3D12RenderTimingDiagnostics>(rhi, maximumFramesInFlight),
-	    std::make_unique<D3D12RenderMessageDiagnostics>(rhi),
-	    std::make_unique<D3D12RenderFailureDiagnostics>(rhi),
-	    std::make_unique<D3D12RenderMemoryDiagnostics>(rhi.GetMemoryAllocator()),
+	    std::move(objectDiagnostics),
+	    std::move(timingDiagnostics),
+	    std::move(messageDiagnostics),
+	    std::move(failureDiagnostics),
+	    std::move(memoryDiagnostics),
 	    SPARKLE_RHI_WITH_D3D12_PIX_EVENTS != 0);
 }

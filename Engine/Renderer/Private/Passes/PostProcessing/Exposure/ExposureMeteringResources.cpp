@@ -12,11 +12,14 @@ FrameGraphBufferHandle CreateExposureHistogramBuffer(FrameGraphBuilder& builder)
 {
 	// Matches the fixed bin layout in ExposureHistogram.hlsli.
 	constexpr std::uint32_t histogramBinCount = 512u;
-	return builder.CreateBuffer(FrameGraphBufferDesc::Create("ExposureHistogram", histogramBinCount * sizeof(std::uint32_t), sizeof(std::uint32_t)));
+	const FrameGraphBufferDesc desc = FrameGraphBufferDesc::Create("ExposureHistogram", histogramBinCount * sizeof(std::uint32_t), sizeof(std::uint32_t));
+	return builder.CreateBuffer(desc);
 }
 
 ExposureMomentTexture CreateExposureMomentTexture(FrameGraphBuilder& builder, const char* prefix, std::uint32_t level, std::uint32_t width, std::uint32_t height)
 {
 	const std::string name = std::string(prefix) + std::to_string(level);
-	return ExposureMomentTexture{.Handle = builder.CreateTexture(FrameGraphTextureDesc::CreateColor(name, width, height, PixelFormat::R32G32B32A32_Float)), .Width = width, .Height = height};
+	const FrameGraphTextureDesc desc = FrameGraphTextureDesc::CreateColor(name, width, height, PixelFormat::R32G32B32A32_Float);
+	const FrameGraphTextureHandle handle = builder.CreateTexture(desc);
+	return ExposureMomentTexture{.Handle = handle, .Width = width, .Height = height};
 }

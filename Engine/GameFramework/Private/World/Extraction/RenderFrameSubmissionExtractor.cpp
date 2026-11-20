@@ -19,7 +19,9 @@ namespace ECS
 
 		const auto meshes = state.GetExtractedMeshes();
 		m_objectExtractor.Extract(meshes, m_identities, submission.Scene.Structural);
-		m_resourcePublisher.Publish(state.GetExtractedMeshGroups(), state.ReadSkyEnvironment(), resources.Materials, resources.Textures, submission.Scene.Structural);
+		const auto meshGroups = state.GetExtractedMeshGroups();
+		const auto sky = state.ReadSkyEnvironment();
+		m_resourcePublisher.Publish(meshGroups, sky, resources.Materials, resources.Textures, submission.Scene.Structural);
 		m_dynamicExtractor.ExtractObjects(meshes, m_objectExtractor, submission.Scene.Dynamic);
 
 		m_dynamicExtractor.ExtractSkinning(

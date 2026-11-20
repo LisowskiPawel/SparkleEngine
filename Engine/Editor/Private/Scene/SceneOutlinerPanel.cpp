@@ -126,8 +126,16 @@ bool SceneOutlinerPanel::PassesActiveFilter(const SceneObjectSelection& selectio
 
 bool SceneOutlinerPanel::MatchesFilter(const EditorSceneEntry& entry) const noexcept
 {
-	return PassesActiveFilter(entry.Selection)
-	    && (m_filterText.empty() || Strings::ContainsIgnoreCase(entry.Label.c_str(), m_filterText) || Strings::ContainsIgnoreCase(entry.TypeLabel.c_str(), m_filterText));
+	if (!PassesActiveFilter(entry.Selection))
+	{
+		return false;
+	}
+	if (m_filterText.empty())
+	{
+		return true;
+	}
+	const bool bLabelMatches = Strings::ContainsIgnoreCase(entry.Label.c_str(), m_filterText);
+	return bLabelMatches || Strings::ContainsIgnoreCase(entry.TypeLabel.c_str(), m_filterText);
 }
 
 std::size_t SceneOutlinerPanel::CountVisibleEntries() const noexcept
@@ -192,7 +200,8 @@ void SceneOutlinerPanel::DrawSelectionCell(const char* label, const SceneObjectS
 		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
 		ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
 	}
-	if (ImGui::Selectable(label, false, flags, ImVec2(ImGui::GetContentRegionAvail().x, 0.0f)))
+	const ImVec2 selectionSize(ImGui::GetContentRegionAvail().x, 0.0f);
+	if (ImGui::Selectable(label, false, flags, selectionSize))
 	{
 		m_scene.Select(selection);
 	}
@@ -209,8 +218,9 @@ void SceneOutlinerPanel::DrawSelectionEntry(const char* label, const char* typeL
 	ImGui::TableNextRow();
 	if (bIsSelected)
 	{
-		ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::SelectionOverlay()));
-		ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::SelectionOverlay()));
+		const ImU32 selectionColor = ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::SelectionOverlay());
+		ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, selectionColor);
+		ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, selectionColor);
 	}
 	ImGui::PushID(label);
 	ImGui::TableSetColumnIndex(0);
@@ -222,7 +232,9 @@ void SceneOutlinerPanel::DrawSelectionEntry(const char* label, const char* typeL
 	ImGui::TableSetColumnIndex(1);
 	ImGui::Indent(16.0f);
 	const EditorSceneEntry* entry = m_scene.GetModel()->FindEntry(selection);
-	EditorWidgets::DrawEditorIcon(SceneObjectPresentation::BuildSelectionIcon(selection, entry ? entry->LightKind : SceneLightKind::Unknown), typeLabel, !bIsSelected);
+	const SceneLightKind lightKind = entry ? entry->LightKind : SceneLightKind::Unknown;
+	const EditorIcons::EditorIcon icon = SceneObjectPresentation::BuildSelectionIcon(selection, lightKind);
+	EditorWidgets::DrawEditorIcon(icon, typeLabel, !bIsSelected);
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
 	{
 		m_scene.Select(selection);

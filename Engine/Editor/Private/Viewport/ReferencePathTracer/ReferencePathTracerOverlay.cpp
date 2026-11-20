@@ -84,7 +84,8 @@ static void DrawAccumulationProgress(const ViewportRenderProgress& progress) noe
 	const bool bComplete = progress.State == ViewportRenderProgressState::Complete;
 	const char* stateLabel = GetStateLabel(progress.State);
 	const char* reasonLabel = GetReasonLabel(progress.Reason);
-	const float fraction = progress.TargetSamples == 0 ? 0.0f : (std::min) (1.0f, static_cast<float>(progress.CompletedSamples) / static_cast<float>(progress.TargetSamples));
+	const float sampleFraction = progress.TargetSamples == 0 ? 0.0f : static_cast<float>(progress.CompletedSamples) / static_cast<float>(progress.TargetSamples);
+	const float fraction = (std::min) (1.0f, sampleFraction);
 	char sampleLabel[64] = {};
 	std::snprintf(sampleLabel, sizeof(sampleLabel), "%llu / %llu SPP", static_cast<unsigned long long>(progress.CompletedSamples), static_cast<unsigned long long>(progress.TargetSamples));
 	ImGui::Text("%s%s", stateLabel, bComplete ? " - target prefix reached" : "");

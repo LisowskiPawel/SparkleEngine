@@ -15,7 +15,9 @@ namespace SkinningMatrixEvaluator
 		}
 		for (std::size_t jointIndex = 0; jointIndex < skeleton.Resource->joints.size(); ++jointIndex)
 		{
-			const DirectX::XMMATRIX skinningMatrix = DirectX::XMLoadFloat4x4(&skeleton.Resource->joints[jointIndex].inverseBindMatrix) * DirectX::XMLoadFloat4x4(&modelSpaceTransforms[jointIndex]);
+			const DirectX::XMMATRIX inverseBind = DirectX::XMLoadFloat4x4(&skeleton.Resource->joints[jointIndex].inverseBindMatrix);
+			const DirectX::XMMATRIX model = DirectX::XMLoadFloat4x4(&modelSpaceTransforms[jointIndex]);
+			const DirectX::XMMATRIX skinningMatrix = inverseBind * model;
 			DirectX::XMStoreFloat4x4(&jointMatrices[jointIndex], skinningMatrix);
 		}
 		return true;

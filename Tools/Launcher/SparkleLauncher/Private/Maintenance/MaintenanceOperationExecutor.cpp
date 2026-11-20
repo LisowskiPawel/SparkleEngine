@@ -66,10 +66,14 @@ namespace SparkleLauncher
 			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex + 1, steps.size());
 		}
 
-		const bool bSelectionCommitted = !plan.Request.bCleanLevelContent || ClearLevelSelection(ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId), operation);
-		if (!bSelectionCommitted)
+		if (plan.Request.bCleanLevelContent)
 		{
-			return operation;
+			const auto projectRoot = ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId);
+			const bool bSelectionCommitted = ClearLevelSelection(projectRoot, operation);
+			if (!bSelectionCommitted)
+			{
+				return operation;
+			}
 		}
 
 		MarkOperationFinished(operation, OperationStatus::Succeeded, 0);

@@ -92,9 +92,13 @@ bool SettingsPanel::BeginWindow()
 
 	const ImVec2 windowSize = ImGui::GetWindowSize();
 	const ImVec2 windowPosition = ImGui::GetWindowPos();
-	const ImVec2 constrainedPosition(
-	    std::clamp(windowPosition.x, viewport->WorkPos.x, (std::max) (viewport->WorkPos.x, viewport->WorkPos.x + viewport->WorkSize.x - windowSize.x)),
-	    std::clamp(windowPosition.y, viewport->WorkPos.y, (std::max) (viewport->WorkPos.y, viewport->WorkPos.y + viewport->WorkSize.y - windowSize.y)));
+	const float rightAlignedX = viewport->WorkPos.x + viewport->WorkSize.x - windowSize.x;
+	const float bottomAlignedY = viewport->WorkPos.y + viewport->WorkSize.y - windowSize.y;
+	const float maximumX = (std::max) (viewport->WorkPos.x, rightAlignedX);
+	const float maximumY = (std::max) (viewport->WorkPos.y, bottomAlignedY);
+	const float constrainedX = std::clamp(windowPosition.x, viewport->WorkPos.x, maximumX);
+	const float constrainedY = std::clamp(windowPosition.y, viewport->WorkPos.y, maximumY);
+	const ImVec2 constrainedPosition(constrainedX, constrainedY);
 	if (constrainedPosition.x != windowPosition.x || constrainedPosition.y != windowPosition.y)
 	{
 		ImGui::SetWindowPos(constrainedPosition);
@@ -110,7 +114,9 @@ void SettingsPanel::DrawRestartBar(float restartBarHeight)
 	ImGui::BeginChild("##SettingsFooter", ImVec2(0.0f, restartBarHeight - 6.0f));
 	ImGui::BeginDisabled(!m_restartHandler);
 	const float buttonWidth = 96.0f;
-	ImGui::SetCursorPosX((std::max) (0.0f, ImGui::GetContentRegionAvail().x - buttonWidth));
+	const float availableWidth = ImGui::GetContentRegionAvail().x;
+	const float buttonX = (std::max) (0.0f, availableWidth - buttonWidth);
+	ImGui::SetCursorPosX(buttonX);
 	if (ImGui::Button("Restart", ImVec2(buttonWidth, 0.0f)) && m_restartHandler)
 	{
 		m_restartHandler();

@@ -76,9 +76,13 @@ Build the [three portfolio cases](Goals.md#the-three-cases) from the completed t
 
 ## Supporting-system simplification
 
-These changes support rendering and add no first-release prerequisites. Start with [JSON](ThirdPartyMigration.md#candidates-and-expected-benefit). Investigate task execution and cooked metadata next, followed by texture cooking and native window/input. The migration guide records candidate benefits and requirements; other candidates remain deferred.
+These changes support rendering and add no first-release prerequisites. Start with [JSON](ThirdPartyMigration.md#candidates-and-expected-benefit). Investigate task execution and cooked metadata next, followed by native window/input. The migration guide records candidate benefits and requirements; other candidates remain deferred.
 
-DirectXTex is selected for texture processing. The [active plans](Implementation) own migration progress and remaining qualification; library integration alone does not close runtime or delivery acceptance.
+**Texture cooking implementation is done.** DirectXTex owns processing, RGBA32F is the HDR default, explicit BC6H enforces quality limits, and the replaced pipeline and Kaiser helpers are removed. The [migration guide](ThirdPartyMigration.md#texture-cooking) owns the lasting contract.
+
+Product acceptance remains open under the release work above: finish material/reference images and interactive rendering on both APIs; test the final combined package with notices, SBOM, provenance and reproduction; and run admitted sources on prepared Windows without optional codecs or processing SDK installation. DamagedHelmet renders, resizes and closes on D3D12, with the real RGBA32F sky. Full-frame Vulkan startup on the private desktop fails at swapchain creation with `VK_ERROR_OUT_OF_DEVICE_MEMORY`; diagnostic texture sampling passes. Keep that failure open rather than treating sampling or cooker-package tests as full-product acceptance.
+
+Raster material parity remains open: its shaders do not receive per-texture UV transforms, independent U/V address modes or occlusion strength, while the ray path uses them. Include those consumers in material/reference qualification before calling texture handling complete.
 
 ## Choosing the next task
 

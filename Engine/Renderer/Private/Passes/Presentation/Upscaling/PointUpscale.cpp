@@ -11,5 +11,8 @@ void AddPointUpscalePass(FrameGraphBuilder& builder, FrameGraphTextureHandle inp
 	parameters->ScalingInputColor = builder.CreateSRV(inputColor);
 	parameters->ScalingOutputColor = builder.CreateUAV(outputColor);
 
-	builder.Dispatch<PointUpscaleCS>(parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(outputExtent.Width, 8u), MathUtils::DivideRoundUp(outputExtent.Height, 8u), 1u});
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(outputExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(outputExtent.Height, 8u);
+
+	builder.Dispatch<PointUpscaleCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u});
 }

@@ -22,7 +22,7 @@ struct TextureSourceLocation final
 	std::filesystem::path relativePath;
 };
 
-static TextureColorSpace ResolveColorSpace(TextureGroup textureGroup) noexcept;
+static TextureColorSpace ResolveColorSpace(TextureGroup textureGroup, const std::filesystem::path& sourcePath);
 static TextureMipPolicy ResolveMipPolicy(const std::filesystem::path& sourceTexturePath);
 static std::filesystem::path NormalizeSourceTexturePath(const std::filesystem::path& sourceTexturePath);
 static TextureSourceLocation ResolveSourceLocation(const std::filesystem::path& sourcePath);
@@ -45,7 +45,7 @@ TextureCookRequest BuildTextureCookRequest(const std::filesystem::path& sourceTe
 {
 	TextureCookRequest request;
 	request.sourcePath = NormalizeSourceTexturePath(sourceTexturePath);
-	request.policy.colorSpace = ResolveColorSpace(textureGroup);
+	request.policy.colorSpace = ResolveColorSpace(textureGroup, request.sourcePath);
 	request.policy.mipPolicy = ResolveMipPolicy(request.sourcePath);
 	request.policy.colorProcessingPolicy = request.IsSrgb() ? TextureColorProcessingPolicy::SrgbLinearize : TextureColorProcessingPolicy::Linear;
 	request.policy.textureGroup = textureGroup;
@@ -74,14 +74,19 @@ void MaterialCooker::AppendTextureCookRequests(const SourceImportOutput& importO
 	}
 }
 
-static TextureColorSpace ResolveColorSpace(TextureGroup textureGroup) noexcept
+static TextureColorSpace ResolveColorSpace(TextureGroup textureGroup, const std::filesystem::path& sourcePath)
 {
 	switch (textureGroup)
 	{
 		case TextureGroup::Diffuse:
 		case TextureGroup::Emissive:
 		case TextureGroup::SubsurfaceColor:
-			return TextureColorSpace::Srgb;
+		{
+			const auto extension = Paths::GetLowercaseExtension(sourcePath);
+			const bool bRadiance = extension == L".hdr" || extension == L".hdri";
+			const bool bLinearHdr = extension == L".exr" || bRadiance;
+			return bLinearHdr ? TextureColorSpace::Linear : TextureColorSpace::Srgb;
+		}
 
 		case TextureGroup::Default:
 		case TextureGroup::NormalMap:

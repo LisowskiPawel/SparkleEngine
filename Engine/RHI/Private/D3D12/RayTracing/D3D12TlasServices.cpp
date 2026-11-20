@@ -101,12 +101,14 @@ RhiOwnedResourceHandle D3D12TlasServices::CreateTlasInstanceBuffer(const RhiRayT
 	const std::uint64_t sizeInBytes = sizeof(D3D12_RAYTRACING_INSTANCE_DESC) * static_cast<std::uint64_t>(nativeInstances.size());
 	const D3D12_RESOURCE_DESC resourceDesc = D3D12TypeConversions::BuildBufferResourceDesc(RhiBufferResourceDesc{.SizeInBytes = sizeInBytes});
 
+	const std::wstring ownedDebugName = D3D12TlasTranslation::MakeDebugName(debugName, L"RayTracingTlasInstanceBuffer");
+
 	std::unique_ptr<D3D12GpuAllocationRecord> ownedRecord = m_memoryAllocator->CreateBuffer(
 	    resourceDesc,
 	    D3D12_RESOURCE_STATE_GENERIC_READ,
 	    RhiMemoryCategory::RayTracing,
 	    RhiMemoryResidencyClass::HostUpload,
-	    D3D12TlasTranslation::MakeDebugName(debugName, L"RayTracingTlasInstanceBuffer"));
+	    ownedDebugName);
 
 	if (ownedRecord == nullptr || ownedRecord->Resource == nullptr)
 	{

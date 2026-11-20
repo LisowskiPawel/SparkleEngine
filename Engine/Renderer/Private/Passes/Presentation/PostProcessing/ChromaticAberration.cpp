@@ -22,12 +22,16 @@ FrameGraphTextureHandle AddChromaticAberrationPass(FrameGraphBuilder& builder, R
 		return input;
 	}
 
-	const FrameGraphTextureHandle output = builder.CreateTexture(
-	    FrameGraphTextureDesc::CreateColor("ChromaticAberrationColor", outputExtent.Width, outputExtent.Height, RenderFrameGraphFormats::SceneColor));
+	const FrameGraphTextureDesc outputDesc = FrameGraphTextureDesc::CreateColor("ChromaticAberrationColor", outputExtent.Width, outputExtent.Height, RenderFrameGraphFormats::SceneColor);
+	const FrameGraphTextureHandle output = builder.CreateTexture(outputDesc);
 
 	auto& parameters = builder.AllocParameters<ChromaticAberrationCS>();
 	parameters->DisplayLinearColor = builder.CreateSRV(input);
 	parameters->OutputColor = builder.CreateUAV(output);
-	builder.Dispatch<ChromaticAberrationCS>(parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(outputExtent.Width, 8u), MathUtils::DivideRoundUp(outputExtent.Height, 8u), 1u});
+
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(outputExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(outputExtent.Height, 8u);
+
+	builder.Dispatch<ChromaticAberrationCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u});
 	return output;
 }

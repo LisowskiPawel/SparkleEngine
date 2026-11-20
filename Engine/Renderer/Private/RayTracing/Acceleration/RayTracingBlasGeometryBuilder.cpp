@@ -55,11 +55,9 @@ void ComputeRayTracingSkinnedPositions(const PreparedRenderScene& preparedScene,
 	outPositions.reserve(vertices.size());
 	for (std::size_t vertexIndex = 0; vertexIndex < vertices.size(); ++vertexIndex)
 	{
-		outPositions.push_back(TransformSkinnedPosition(
-		    ApplyMorphPosition(vertices[vertexIndex].Position, vertexIndex, preparedScene, draw, mesh),
-		    skinInfluences[vertexIndex],
-		    draw.Skinning.JointMatrixOffset,
-		    preparedScene.jointMatrices));
+		const DirectX::XMFLOAT3 morphedPosition = ApplyMorphPosition(vertices[vertexIndex].Position, vertexIndex, preparedScene, draw, mesh);
+		const DirectX::XMFLOAT3 skinnedPosition = TransformSkinnedPosition(morphedPosition, skinInfluences[vertexIndex], draw.Skinning.JointMatrixOffset, preparedScene.jointMatrices);
+		outPositions.push_back(skinnedPosition);
 	}
 }
 
@@ -87,7 +85,9 @@ static DirectX::XMFLOAT3 TransformSkinnedPosition(
 			Diagnostics::Fatal(g_rayTracingBlasGeometryBuilderLogger, __FILE__, __LINE__, "Skinned BLAS vertex references a joint matrix outside the render scene.");
 		}
 		const DirectX::XMMATRIX skinningMatrix = DirectX::XMLoadFloat4x4(&jointMatrices[jointMatrixIndex]);
-		skinnedPosition = DirectX::XMVectorAdd(skinnedPosition, DirectX::XMVectorScale(DirectX::XMVector3Transform(sourcePosition, skinningMatrix), weight));
+		const DirectX::XMVECTOR transformedPosition = DirectX::XMVector3Transform(sourcePosition, skinningMatrix);
+		const DirectX::XMVECTOR weightedPosition = DirectX::XMVectorScale(transformedPosition, weight);
+		skinnedPosition = DirectX::XMVectorAdd(skinnedPosition, weightedPosition);
 		totalWeight += weight;
 	}
 

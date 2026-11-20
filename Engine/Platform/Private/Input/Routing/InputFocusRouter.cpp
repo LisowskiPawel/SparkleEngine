@@ -107,14 +107,17 @@ void InputFocusRouter::ResetFocus() noexcept
 bool InputFocusRouter::TargetRegion::IsValid() const noexcept
 {
 	const bool bRoutedLayer = TargetLayer == InputLayer::Gameplay || TargetLayer == InputLayer::UI;
-	return bRoutedLayer && Right > Left && Bottom > Top;
+	const bool bNonEmptyBounds = Right > Left && Bottom > Top;
+	return bRoutedLayer && bNonEmptyBounds;
 }
 
 bool InputFocusRouter::TargetRegion::Contains(MousePosition position) const noexcept
 {
 	const float x = static_cast<float>(position.X);
 	const float y = static_cast<float>(position.Y);
-	return x >= Left && x < Right && y >= Top && y < Bottom;
+	const bool bWithinX = x >= Left && x < Right;
+	const bool bWithinY = y >= Top && y < Bottom;
+	return bWithinX && bWithinY;
 }
 
 InputLayer InputFocusRouter::ResolvePointTarget(MousePosition position) const noexcept

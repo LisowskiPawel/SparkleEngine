@@ -17,6 +17,12 @@ namespace PathAccumulation
 
 	float3 StandardError(float3 m2, uint count)
 	{
-		return count > 1u ? sqrt(max(SampleVariance(m2, count), 0.0f.xxx) / (float)count) : 0.0f.xxx;
+		if (count <= 1u)
+		{
+			return 0.0f.xxx;
+		}
+
+		const float3 variance = SampleVariance(m2, count);
+		return sqrt(max(variance, 0.0f.xxx) / (float)count);
 	}
 }

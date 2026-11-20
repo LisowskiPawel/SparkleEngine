@@ -24,7 +24,8 @@ struct SlangShaderBackend::SymbolSelection final
 
 SlangShaderBackend::SlangShaderBackend()
 {
-	if (SLANG_FAILED(slang::createGlobalSession(m_globalSession.writeRef())) || !m_globalSession)
+	const SlangResult createStatus = slang::createGlobalSession(m_globalSession.writeRef());
+	if (SLANG_FAILED(createStatus) || !m_globalSession)
 	{
 		throw Diagnostics::Error("Slang global session is unavailable.");
 	}
@@ -42,7 +43,8 @@ ShaderBackendCapabilities SlangShaderBackend::GetStaticCapabilities() noexcept
 std::uint64_t SlangShaderBackend::QueryBackendVersion()
 {
 	Slang::ComPtr<slang::IGlobalSession> globalSession;
-	if (SLANG_FAILED(slang::createGlobalSession(globalSession.writeRef())) || !globalSession)
+	const SlangResult createStatus = slang::createGlobalSession(globalSession.writeRef());
+	if (SLANG_FAILED(createStatus) || !globalSession)
 	{
 		return Hash::Fnv1a64("slang-unavailable");
 	}
@@ -154,7 +156,8 @@ Slang::ComPtr<slang::ISession> SlangShaderBackend::CreateSession(const ShaderCom
 	}
 
 	Slang::ComPtr<slang::ISession> session;
-	if (SLANG_FAILED(m_globalSession->createSession(sessionDesc, session.writeRef())) || !session)
+	const SlangResult createStatus = m_globalSession->createSession(sessionDesc, session.writeRef());
+	if (SLANG_FAILED(createStatus) || !session)
 	{
 		throw Diagnostics::Error("Slang failed to create compile session");
 	}
@@ -385,7 +388,8 @@ ShaderDebugArtifactSet SlangShaderBackend::CaptureDebugArtifacts(
 void SlangShaderBackend::ExtractSymbols(slang::IComponentType& program, ShaderDebugArtifactSet& artifacts)
 {
 	Slang::ComPtr<ISlangMutableFileSystem> outputs;
-	if (SLANG_FAILED(program.getResultAsFileSystem(0, 0, outputs.writeRef())) || !outputs)
+	const SlangResult outputStatus = program.getResultAsFileSystem(0, 0, outputs.writeRef());
+	if (SLANG_FAILED(outputStatus) || !outputs)
 	{
 		throw Diagnostics::Error("Slang did not return the requested compiler debug outputs.");
 	}
@@ -412,12 +416,14 @@ void SlangShaderBackend::ExtractSymbols(slang::IComponentType& program, ShaderDe
 		}
 	};
 
-	if (SLANG_FAILED(outputs->enumeratePathContents(".", select, &selection)) || selection.bFailed || selection.Name.empty())
+	const SlangResult enumerateStatus = outputs->enumeratePathContents(".", select, &selection);
+	if (SLANG_FAILED(enumerateStatus) || selection.bFailed || selection.Name.empty())
 	{
 		throw Diagnostics::Error("Slang did not return one unambiguous full shader PDB.");
 	}
 	Slang::ComPtr<ISlangBlob> pdb;
-	if (SLANG_FAILED(outputs->loadFile(selection.Name.c_str(), pdb.writeRef())) || !pdb || pdb->getBufferSize() == 0)
+	const SlangResult loadStatus = outputs->loadFile(selection.Name.c_str(), pdb.writeRef());
+	if (SLANG_FAILED(loadStatus) || !pdb || pdb->getBufferSize() == 0)
 	{
 		throw Diagnostics::Error("Slang returned an unreadable shader PDB.");
 	}

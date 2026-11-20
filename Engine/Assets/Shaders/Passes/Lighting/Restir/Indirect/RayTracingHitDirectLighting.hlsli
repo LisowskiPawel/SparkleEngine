@@ -44,13 +44,16 @@ void AccumulateRayTracingHitDirectionalLights(RaytracingAccelerationStructure sc
                                               bool bTraceShadows,
                                               inout float3 incidentRadiance)
 {
+	const uint dimensionTag = 10u + bounceIndex * 4u;
+	const uint sampleFrameIndex = randomFrameIndex + pathSampleIndex * 4099u;
 	[loop]
 	for (uint lightIndex = 0u; lightIndex < SceneLighting.DirectionalLightCount; ++lightIndex)
 	{
-		const float2 shapeSample = LightSampling::StableLightSample2D(surface.PositionWorld, lightIndex, 10u + bounceIndex * 4u, randomFrameIndex + pathSampleIndex * 4099u);
+		const float2 shapeSample = LightSampling::StableLightSample2D(surface.PositionWorld, lightIndex, dimensionTag, sampleFrameIndex);
 		const LightSampling::DirectLightSample lightSample = AreaLights::SampleDirectionalLight(lightIndex, shapeSample);
+		const bool bCastsShadow = DirectionalLights[lightIndex].CastShadow != 0u;
 
-		AccumulateRayTracingHitDirectLightSample(sceneTlas, surface, viewDirWorld, lightSample, DirectionalLights[lightIndex].CastShadow != 0u, bTraceShadows, incidentRadiance);
+		AccumulateRayTracingHitDirectLightSample(sceneTlas, surface, viewDirWorld, lightSample, bCastsShadow, bTraceShadows, incidentRadiance);
 	}
 }
 
@@ -63,13 +66,16 @@ void AccumulateRayTracingHitPointLights(RaytracingAccelerationStructure sceneTla
                                         bool bTraceShadows,
                                         inout float3 incidentRadiance)
 {
+	const uint dimensionTag = 11u + bounceIndex * 4u;
+	const uint sampleFrameIndex = randomFrameIndex + pathSampleIndex * 4099u;
 	[loop]
 	for (uint lightIndex = 0u; lightIndex < SceneLighting.PointLightCount; ++lightIndex)
 	{
-		const float2 shapeSample = LightSampling::StableLightSample2D(surface.PositionWorld, lightIndex, 11u + bounceIndex * 4u, randomFrameIndex + pathSampleIndex * 4099u);
+		const float2 shapeSample = LightSampling::StableLightSample2D(surface.PositionWorld, lightIndex, dimensionTag, sampleFrameIndex);
 		const LightSampling::DirectLightSample lightSample = AreaLights::SamplePointLight(surface.PositionWorld, lightIndex, shapeSample);
+		const bool bCastsShadow = PointLights[lightIndex].CastShadow != 0u;
 
-		AccumulateRayTracingHitDirectLightSample(sceneTlas, surface, viewDirWorld, lightSample, PointLights[lightIndex].CastShadow != 0u, bTraceShadows, incidentRadiance);
+		AccumulateRayTracingHitDirectLightSample(sceneTlas, surface, viewDirWorld, lightSample, bCastsShadow, bTraceShadows, incidentRadiance);
 	}
 }
 
@@ -82,13 +88,16 @@ void AccumulateRayTracingHitSpotLights(RaytracingAccelerationStructure sceneTlas
                                        bool bTraceShadows,
                                        inout float3 incidentRadiance)
 {
+	const uint dimensionTag = 12u + bounceIndex * 4u;
+	const uint sampleFrameIndex = randomFrameIndex + pathSampleIndex * 4099u;
 	[loop]
 	for (uint lightIndex = 0u; lightIndex < SceneLighting.SpotLightCount; ++lightIndex)
 	{
-		const float2 shapeSample = LightSampling::StableLightSample2D(surface.PositionWorld, lightIndex, 12u + bounceIndex * 4u, randomFrameIndex + pathSampleIndex * 4099u);
+		const float2 shapeSample = LightSampling::StableLightSample2D(surface.PositionWorld, lightIndex, dimensionTag, sampleFrameIndex);
 		const LightSampling::DirectLightSample lightSample = AreaLights::SampleSpotLight(surface.PositionWorld, lightIndex, shapeSample);
+		const bool bCastsShadow = SpotLights[lightIndex].CastShadow != 0u;
 
-		AccumulateRayTracingHitDirectLightSample(sceneTlas, surface, viewDirWorld, lightSample, SpotLights[lightIndex].CastShadow != 0u, bTraceShadows, incidentRadiance);
+		AccumulateRayTracingHitDirectLightSample(sceneTlas, surface, viewDirWorld, lightSample, bCastsShadow, bTraceShadows, incidentRadiance);
 	}
 }
 
@@ -101,12 +110,15 @@ void AccumulateRayTracingHitRectLights(RaytracingAccelerationStructure sceneTlas
                                        bool bTraceShadows,
                                        inout float3 incidentRadiance)
 {
+	const uint dimensionTag = 13u + bounceIndex * 4u;
+	const uint sampleFrameIndex = randomFrameIndex + pathSampleIndex * 4099u;
 	[loop]
 	for (uint lightIndex = 0u; lightIndex < SceneLighting.RectLightCount; ++lightIndex)
 	{
-		const float2 shapeSample = LightSampling::StableLightSample2D(surface.PositionWorld, lightIndex, 13u + bounceIndex * 4u, randomFrameIndex + pathSampleIndex * 4099u);
+		const float2 shapeSample = LightSampling::StableLightSample2D(surface.PositionWorld, lightIndex, dimensionTag, sampleFrameIndex);
 		const LightSampling::DirectLightSample lightSample = AreaLights::SampleRectLight(surface.PositionWorld, lightIndex, shapeSample);
+		const bool bCastsShadow = RectLights[lightIndex].CastShadow != 0u;
 
-		AccumulateRayTracingHitDirectLightSample(sceneTlas, surface, viewDirWorld, lightSample, RectLights[lightIndex].CastShadow != 0u, bTraceShadows, incidentRadiance);
+		AccumulateRayTracingHitDirectLightSample(sceneTlas, surface, viewDirWorld, lightSample, bCastsShadow, bTraceShadows, incidentRadiance);
 	}
 }

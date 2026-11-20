@@ -148,7 +148,10 @@ VulkanRenderCommandList& VulkanBackBufferPresentation::PrepareBackBufferRenderin
 void VulkanBackBufferPresentation::BeginCurrentBackBufferRendering(const float* clearColor, bool bClear) noexcept
 {
 	VulkanRenderCommandList& commandList = PrepareBackBufferRendering();
-	RecordBackBufferRendering(commandList.GetVulkanCommandBuffer(), m_swapChain->GetCurrentBackBufferImageView(), GetBackBufferScissorRect(), clearColor, bClear);
+	const VkCommandBuffer commandBuffer = commandList.GetVulkanCommandBuffer();
+	const VkImageView imageView = m_swapChain->GetCurrentBackBufferImageView();
+	const RhiRect scissorRect = GetBackBufferScissorRect();
+	RecordBackBufferRendering(commandBuffer, imageView, scissorRect, clearColor, bClear);
 }
 
 void VulkanBackBufferPresentation::EndCurrentBackBufferRendering() noexcept

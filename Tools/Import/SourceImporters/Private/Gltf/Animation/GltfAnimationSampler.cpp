@@ -146,15 +146,21 @@ namespace GltfAnimationSampler
 			throw Diagnostics::Error("glTF animation contains a zero-length rotation keyframe.");
 		}
 		rotation = DirectX::XMQuaternionNormalize(rotation);
-		const bool bRotationSignNeedsFlip = previousRotation != nullptr && DirectX::XMVectorGetX(DirectX::XMVector4Dot(DirectX::XMLoadFloat4(previousRotation), rotation)) < 0.0f;
-
-		if (bRotationSignNeedsFlip)
+		if (previousRotation != nullptr)
 		{
-			rotation = DirectX::XMVectorNegate(rotation);
-			if (bCubicSpline)
+			const auto previous = DirectX::XMLoadFloat4(previousRotation);
+			const auto alignment = DirectX::XMVector4Dot(previous, rotation);
+			const bool bRotationSignNeedsFlip = DirectX::XMVectorGetX(alignment) < 0.0f;
+			if (bRotationSignNeedsFlip)
 			{
-				DirectX::XMStoreFloat4(&keyframe.inTangent, DirectX::XMVectorNegate(DirectX::XMLoadFloat4(&keyframe.inTangent)));
-				DirectX::XMStoreFloat4(&keyframe.outTangent, DirectX::XMVectorNegate(DirectX::XMLoadFloat4(&keyframe.outTangent)));
+				rotation = DirectX::XMVectorNegate(rotation);
+				if (bCubicSpline)
+				{
+					const auto inTangent = DirectX::XMLoadFloat4(&keyframe.inTangent);
+					const auto outTangent = DirectX::XMLoadFloat4(&keyframe.outTangent);
+					DirectX::XMStoreFloat4(&keyframe.inTangent, DirectX::XMVectorNegate(inTangent));
+					DirectX::XMStoreFloat4(&keyframe.outTangent, DirectX::XMVectorNegate(outTangent));
+				}
 			}
 		}
 		DirectX::XMStoreFloat4(&keyframe.value, rotation);

@@ -80,7 +80,8 @@ ConsoleCommandResult ExecuteConsoleLine(const ConsoleCommandActions& actions, st
 	{
 		return ConsoleCommandResult::Error("unknown command: " + parsed.CommandName);
 	}
-	return command->Execute(actions, BuildArgumentViews(parsed.Arguments));
+	const std::vector<std::string_view> arguments = BuildArgumentViews(parsed.Arguments);
+	return command->Execute(actions, arguments);
 }
 
 std::vector<std::string> CompleteConsoleLine(std::string_view input)
@@ -103,7 +104,8 @@ std::vector<std::string> CompleteConsoleLine(std::string_view input)
 	{
 		return {};
 	}
-	return CompleteConsoleCVarName(ConsoleVariableRegistry::Get(), parsed.Arguments.empty() ? std::string_view{} : std::string_view(parsed.Arguments.back()));
+	const std::string_view prefix = parsed.Arguments.empty() ? std::string_view{} : std::string_view(parsed.Arguments.back());
+	return CompleteConsoleCVarName(ConsoleVariableRegistry::Get(), prefix);
 }
 
 static ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandActions&, std::span<const std::string_view> arguments)

@@ -19,7 +19,8 @@ std::unique_ptr<LevelAsset> LevelParser::LoadFromFile(const std::filesystem::pat
 		throw Diagnostics::Error(std::format("Failed to open level file '{}'.", filePath.string()));
 	}
 
-	return std::make_unique<LevelAsset>(LevelParsing::ReadLevelDescription(input, filePath), filePath);
+	LevelDesc description = LevelParsing::ReadLevelDescription(input, filePath);
+	return std::make_unique<LevelAsset>(std::move(description), filePath);
 }
 
 void LevelParser::SaveToFile(const LevelDesc& description, const std::filesystem::path& sourcePath)
@@ -36,8 +37,9 @@ void LevelParser::SaveToFile(const LevelDesc& description, const std::filesystem
 		throw Diagnostics::Error(std::format("Failed to serialize level '{}'.", description.name));
 	}
 
+	const std::string serializedLevel = std::move(output).str();
 	std::string errorMessage;
-	if (!Files::TryWriteAllTextAtomic(sourcePath, std::move(output).str(), errorMessage))
+	if (!Files::TryWriteAllTextAtomic(sourcePath, serializedLevel, errorMessage))
 	{
 		throw Diagnostics::Error(errorMessage);
 	}

@@ -47,11 +47,14 @@ void AddReferencePathTracerTransportPass(
     RenderRayTracingScene& rayTracingScene,
     const RenderFrameGraphResources& resources)
 {
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(extent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(ReferencePathTracerSession::WorkRowsPerDispatch, 8u);
+
 	AddRayTracingMaterialPass<ReferencePathTracerInlineCS, ReferencePathTracerRGS>(
 	    builder,
 	    "ReferencePathTracer.SurfaceTransportReference",
 	    rayTracingScene,
-	    ComputeDispatchDesc{MathUtils::DivideRoundUp(extent.Width, 8u), MathUtils::DivideRoundUp(ReferencePathTracerSession::WorkRowsPerDispatch, 8u), 1u},
+	    ComputeDispatchDesc{groupCountX, groupCountY, 1u},
 	    RayTracingDispatchDimensions{.Width = extent.Width, .Height = ReferencePathTracerSession::WorkRowsPerDispatch, .Depth = 1u},
 	    [&]<typename TShader>() -> auto& { return BuildReferencePathTracerParameters<TShader>(builder, frame, resources, graphResources, work); });
 }

@@ -30,8 +30,16 @@ namespace ExternalCaptureStartupPolicy
 		constexpr std::string_view providerOption = "--capture-provider";
 		if (Strings::EqualsIgnoreCase(token, providerOption) || Strings::StartsWithIgnoreCase(token, "--capture-provider="))
 		{
-			const std::string value = Strings::EqualsIgnoreCase(token, providerOption) ? Strings::ToNarrow(CommandLine::ReadToken(commandLine, offset))
-			                                                                           : std::string(token.substr(providerOption.size() + 1));
+			std::string value;
+			if (Strings::EqualsIgnoreCase(token, providerOption))
+			{
+				const std::wstring_view wideValue = CommandLine::ReadToken(commandLine, offset);
+				value = Strings::ToNarrow(wideValue);
+			}
+			else
+			{
+				value = token.substr(providerOption.size() + 1);
+			}
 
 			ExternalCaptureProvider provider = ExternalCaptureProvider::None;
 			if (!TryParseExternalCaptureProvider(value, provider))
@@ -57,7 +65,8 @@ namespace ExternalCaptureStartupPolicy
 		std::optional<ExternalCaptureProvider> selected;
 		while (offset < commandLine.size())
 		{
-			const std::string token = Strings::ToNarrow(CommandLine::ReadToken(commandLine, offset));
+			const std::wstring_view wideToken = CommandLine::ReadToken(commandLine, offset);
+			const std::string token = Strings::ToNarrow(wideToken);
 			const auto requested = ParseAttachmentToken(token, commandLine, offset);
 			if (!requested.has_value())
 			{

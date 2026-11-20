@@ -34,7 +34,8 @@ namespace Process
 		    0,
 		    nullptr);
 
-		std::string message = length != 0 && raw != nullptr ? WideToUtf8(std::wstring_view(raw, length)) : "Unknown Windows error";
+		const std::wstring_view systemMessage = raw != nullptr ? std::wstring_view(raw, length) : std::wstring_view{};
+		std::string message = systemMessage.empty() ? "Unknown Windows error" : WideToUtf8(systemMessage);
 		if (raw != nullptr)
 		{
 			LocalFree(raw);

@@ -19,7 +19,9 @@ namespace ECS
 	    MorphWeightStorage& morphWeights,
 	    std::uint32_t targetGeneration)
 	{
-		if (targetGeneration != 0 && m_targetGeneration == targetGeneration && m_structureVersion == registry.GetStructureVersion())
+		const bool bCurrentTarget = targetGeneration != 0 && m_targetGeneration == targetGeneration;
+		const bool bPrepared = bCurrentTarget && m_structureVersion == registry.GetStructureVersion();
+		if (bPrepared)
 		{
 			return true;
 		}
@@ -120,7 +122,8 @@ namespace ECS
 				}
 
 				const MorphState* morph = registry.Get<MorphState>(targetEntity);
-				if (morph == nullptr || !morphWeights.PrepareWriteSize(morph->Weights, 4))
+				const bool bWeightsPrepared = morph != nullptr && morphWeights.PrepareWriteSize(morph->Weights, 4);
+				if (!bWeightsPrepared)
 				{
 					continue;
 				}
@@ -132,7 +135,12 @@ namespace ECS
 		std::sort(
 		    m_morphBindings.begin(),
 		    m_morphBindings.end(),
-		    [](const MorphTargetBinding& lhs, const MorphTargetBinding& rhs) { return std::tie(lhs.SampleIndex, lhs.TargetEntity) < std::tie(rhs.SampleIndex, rhs.TargetEntity); });
+		    [](const MorphTargetBinding& lhs, const MorphTargetBinding& rhs)
+		    {
+			    const auto lhsKey = std::tie(lhs.SampleIndex, lhs.TargetEntity);
+			    const auto rhsKey = std::tie(rhs.SampleIndex, rhs.TargetEntity);
+			    return lhsKey < rhsKey;
+		    });
 	}
 
 	void AnimationEvaluationStorage::BindSkinningOutputs(EntityRegistry& registry, const SkeletonResourceStore& skeletons, std::uint32_t targetGeneration)

@@ -54,9 +54,12 @@ ImFontAtlasRect EditorIconService::Implementation::Resolve(const EditorIconAsset
 	const ImFontAtlasRectId rectangleId = m_atlas->AddCustomRect(asset.Extent, asset.Extent, &rectangle);
 	IM_ASSERT(rectangleId != ImFontAtlasRectId_Invalid && m_atlas->TexData->Format == ImTextureFormat_RGBA32);
 	m_atlas->TexPixelsUseColors = true;
+	const std::size_t rowByteSize = static_cast<std::size_t>(asset.Extent) * 4;
 	for (int row = 0; row < asset.Extent; ++row)
 	{
-		std::memcpy(m_atlas->TexData->GetPixelsAt(rectangle.x, rectangle.y + row), asset.Pixels.data() + static_cast<std::size_t>(row) * asset.Extent * 4, static_cast<std::size_t>(asset.Extent) * 4);
+		const auto* source = asset.Pixels.data() + static_cast<std::size_t>(row) * rowByteSize;
+		void* destination = m_atlas->TexData->GetPixelsAt(rectangle.x, rectangle.y + row);
+		std::memcpy(destination, source, rowByteSize);
 	}
 	if (found != m_icons.end())
 	{

@@ -25,8 +25,8 @@ void AddReferencePathTracerDisplayPass(
 	parameters->PriorSampleCount = work.PriorSampleCount;
 	parameters->WorkFlags = work.WorkFlags;
 
-	builder.Dispatch<ReferencePathTracerDisplayCS>(
-	    "ReferencePathTracer.CommittedDisplay",
-	    parameters,
-	    ComputeDispatchDesc{MathUtils::DivideRoundUp(extent.Width, 8u), MathUtils::DivideRoundUp(extent.Height, 8u), 1u});
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(extent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(extent.Height, 8u);
+
+	builder.Dispatch<ReferencePathTracerDisplayCS>("ReferencePathTracer.CommittedDisplay", parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u});
 }

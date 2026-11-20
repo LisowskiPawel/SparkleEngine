@@ -91,7 +91,8 @@ void VulkanRhi::CreateInstance() noexcept
 	const VkResult result = vkCreateInstance(&createInfo, nullptr, &m_instance);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanRhiLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateInstance", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkCreateInstance", result);
+		Diagnostics::Fatal(g_vulkanRhiLogger, __FILE__, __LINE__, failureMessage);
 	}
 }
 
@@ -145,7 +146,8 @@ static std::vector<VkPhysicalDevice> EnumeratePhysicalDevices(VkInstance instanc
 	result = vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanRhiLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkEnumeratePhysicalDevices", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkEnumeratePhysicalDevices", result);
+		Diagnostics::Fatal(g_vulkanRhiLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	return devices;
@@ -248,13 +250,15 @@ void VulkanRhi::CreateLogicalDevice() noexcept
 bool VulkanRhi::IsLayerAvailable(const char* layerName) noexcept
 {
 	std::uint32_t layerCount = 0;
-	if (!VulkanResult::Succeeded(vkEnumerateInstanceLayerProperties(&layerCount, nullptr)))
+	const VkResult countResult = vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+	if (!VulkanResult::Succeeded(countResult))
 	{
 		return false;
 	}
 
 	std::vector<VkLayerProperties> layers(layerCount);
-	if (!VulkanResult::Succeeded(vkEnumerateInstanceLayerProperties(&layerCount, layers.data())))
+	const VkResult propertiesResult = vkEnumerateInstanceLayerProperties(&layerCount, layers.data());
+	if (!VulkanResult::Succeeded(propertiesResult))
 	{
 		return false;
 	}
@@ -265,13 +269,15 @@ bool VulkanRhi::IsLayerAvailable(const char* layerName) noexcept
 bool VulkanRhi::IsInstanceExtensionAvailable(const char* extensionName) noexcept
 {
 	std::uint32_t extensionCount = 0;
-	if (!VulkanResult::Succeeded(vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr)))
+	const VkResult countResult = vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+	if (!VulkanResult::Succeeded(countResult))
 	{
 		return false;
 	}
 
 	std::vector<VkExtensionProperties> extensions(extensionCount);
-	if (!VulkanResult::Succeeded(vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data())))
+	const VkResult propertiesResult = vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
+	if (!VulkanResult::Succeeded(propertiesResult))
 	{
 		return false;
 	}

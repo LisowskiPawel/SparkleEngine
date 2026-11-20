@@ -422,16 +422,14 @@ const wchar_t* D3D12CommandRecordingContext::QueueTypeName(ERhiQueueType queueTy
 		SPDLOG_LOGGER_ERROR(logger, "D3D12 validation while closing {} command list: {}", RhiQueueTypeToString(slot.QueueType), diagnosticMessage.Text);
 	}
 
-	Diagnostics::Fatal(
-	    logger,
-	    __FILE__,
-	    __LINE__,
-	    std::format(
-	        "Failed to close {} command list for frame {} context {} (HRESULT=0x{:08X})",
-	        RhiQueueTypeToString(slot.QueueType),
-	        slot.FrameSlot,
-	        slot.ContextIndex,
-	        static_cast<std::uint32_t>(result)));
+	const auto failureMessage = std::format(
+	    "Failed to close {} command list for frame {} context {} (HRESULT=0x{:08X})",
+	    RhiQueueTypeToString(slot.QueueType),
+	    slot.FrameSlot,
+	    slot.ContextIndex,
+	    static_cast<std::uint32_t>(result));
+
+	Diagnostics::Fatal(logger, __FILE__, __LINE__, failureMessage);
 
 	std::terminate();
 }
@@ -440,11 +438,8 @@ const wchar_t* D3D12CommandRecordingContext::QueueTypeName(ERhiQueueType queueTy
 {
 	SPARKLE_DEFINE_LOG_CATEGORY_STATIC(logger, "RHI.D3D12.Commands");
 
-	Diagnostics::Fatal(
-	    logger,
-	    __FILE__,
-	    __LINE__,
-	    std::format("D3D12 command-recording contexts exhausted for {} queue frame {} (limit {}).", RhiQueueTypeToString(queueType), frameIndex, MaximumContextsPerFrameQueue));
+	const auto failureMessage = std::format("D3D12 command-recording contexts exhausted for {} queue frame {} (limit {}).", RhiQueueTypeToString(queueType), frameIndex, MaximumContextsPerFrameQueue);
+	Diagnostics::Fatal(logger, __FILE__, __LINE__, failureMessage);
 
 	std::terminate();
 }

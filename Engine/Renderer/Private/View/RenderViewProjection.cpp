@@ -47,8 +47,10 @@ void BuildRenderViewCamera(RenderView& view, RenderViewportExtent projectionExte
 	DirectX::XMStoreFloat4x4(&view.cameraUniform.ViewMTX, worldToView);
 	DirectX::XMStoreFloat4x4(&view.cameraUniform.ProjectionMTX, viewToClip);
 	DirectX::XMStoreFloat4x4(&view.cameraUniform.ViewProjMTX, worldToClip);
-	DirectX::XMStoreFloat4x4(&view.cameraUniform.InvViewMTX, DirectX::XMMatrixInverse(nullptr, worldToView));
-	DirectX::XMStoreFloat4x4(&view.cameraUniform.InvProjectionMTX, DirectX::XMMatrixInverse(nullptr, viewToClip));
+	const DirectX::XMMATRIX viewToWorld = DirectX::XMMatrixInverse(nullptr, worldToView);
+	DirectX::XMStoreFloat4x4(&view.cameraUniform.InvViewMTX, viewToWorld);
+	const DirectX::XMMATRIX clipToView = DirectX::XMMatrixInverse(nullptr, viewToClip);
+	DirectX::XMStoreFloat4x4(&view.cameraUniform.InvProjectionMTX, clipToView);
 	view.cameraUniform.Position = view.camera.Position;
 	view.cameraUniform.NearZ = nearZ;
 	view.cameraUniform.FarZ = farZ;

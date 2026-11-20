@@ -29,7 +29,8 @@ void main(uint3 dispatchThreadId : SV_DispatchThreadID)
 		display = WorkingMean[pixelCoord];
 		const float3 m2 = WorkingM2[pixelCoord].rgb;
 		const float3 standardError = PathAccumulation::StandardError(m2, PriorSampleCount + 1u);
-		CommittedM2[pixelCoord] = float4(m2, max(standardError.x, max(standardError.y, standardError.z)));
+		const float maximumStandardError = max(standardError.x, max(standardError.y, standardError.z));
+		CommittedM2[pixelCoord] = float4(m2, maximumStandardError);
 	}
 	CommittedMean[pixelCoord] = display;
 	SceneColor[pixelCoord] = display;

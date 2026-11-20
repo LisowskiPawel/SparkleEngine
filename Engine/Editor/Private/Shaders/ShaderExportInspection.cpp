@@ -69,7 +69,9 @@ void ShaderExportInspection::InspectExport(const std::filesystem::path& director
 
 	try
 	{
-		const Files::FileSetReadScope publication(directory.parent_path().parent_path());
+		const auto cookDirectory = directory.parent_path();
+		const auto exportRoot = cookDirectory.parent_path();
+		const Files::FileSetReadScope publication(exportRoot);
 		if (!IsShaderExportDirectory(directory, publication))
 		{
 			m_directory = directory;

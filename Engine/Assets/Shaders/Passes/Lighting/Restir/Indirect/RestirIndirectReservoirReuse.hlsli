@@ -21,17 +21,24 @@ namespace IndirectReservoir
 		const float2 motionPixels = motionVectors.Load(int3(pixelCoord, 0)).xy;
 		const float2 previousPixel = MotionVectors::ReprojectToPreviousPixelCenter(pixelCoord, motionPixels, float2(extent.x, extent.y));
 		const int2 previousPixelCoord = int2(floor(previousPixel));
-		const bool bPreviousNonnegative = previousPixelCoord.x >= 0 && previousPixelCoord.y >= 0;
-		const bool bPreviousWidthValid = bPreviousNonnegative && (previousPixelCoord.x < int(extent.x));
-		const bool bPreviousPixelInBounds = bPreviousWidthValid && (previousPixelCoord.y < int(extent.y));
-		const bool bPreviousSurfaceCompatible = bPreviousPixelInBounds && AreSurfacesCompatible(surface, previousSurfaceTexture.Load(int3(previousPixelCoord, 0)));
+		const bool bPreviousXInBounds = previousPixelCoord.x >= 0 && previousPixelCoord.x < int(extent.x);
+		const bool bPreviousYInBounds = previousPixelCoord.y >= 0 && previousPixelCoord.y < int(extent.y);
+		if (!bPreviousXInBounds || !bPreviousYInBounds)
+		{
+			return;
+		}
 
+		const float4 previousSurface = previousSurfaceTexture.Load(int3(previousPixelCoord, 0));
+		const bool bPreviousSurfaceCompatible = AreSurfacesCompatible(surface, previousSurface);
 		if (bPreviousSurfaceCompatible)
 		{
-			const Reservoir previous = UnpackReservoir(previousSamples.Load(int3(previousPixelCoord, 0)), previousWeights.Load(int3(previousPixelCoord, 0)));
+			const float4 samplePayload = previousSamples.Load(int3(previousPixelCoord, 0));
+			const float4 weightPayload = previousWeights.Load(int3(previousPixelCoord, 0));
+			const Reservoir previous = UnpackReservoir(samplePayload, weightPayload);
 
 			uint rng = RestirReservoirCommon::BuildSeed(pixelCoord, 0x7E4F0A1u);
-			CombineReservoir(sceneTlas, reservoir, previous, surface, skyTexture, skySampler, RestirReservoirCommon::MaxTemporalM, CommonRandom::Random01(rng));
+			const float selectionSample = CommonRandom::Random01(rng);
+			CombineReservoir(sceneTlas, reservoir, previous, surface, skyTexture, skySampler, RestirReservoirCommon::MaxTemporalM, selectionSample);
 		}
 	}
 
@@ -51,20 +58,26 @@ namespace IndirectReservoir
 		for (uint sampleIndex = 0u; sampleIndex < RestirReservoirCommon::SpatialNeighborCount; ++sampleIndex)
 		{
 			const int2 neighborCoord = int2(pixelCoord) + RestirReservoirCommon::SpatialOffsets[(offsetStart + sampleIndex * 2u) & 7u];
-			if (neighborCoord.x < 0 || neighborCoord.y < 0 || neighborCoord.x >= int(extent.x) || neighborCoord.y >= int(extent.y))
+			const bool bNeighborXInBounds = neighborCoord.x >= 0 && neighborCoord.x < int(extent.x);
+			const bool bNeighborYInBounds = neighborCoord.y >= 0 && neighborCoord.y < int(extent.y);
+			if (!bNeighborXInBounds || !bNeighborYInBounds)
 			{
 				continue;
 			}
 
 			const GBufferPathSurface neighborSurface = LoadGBufferPathSurface(uint2(neighborCoord));
-			if (!AreSurfacesCompatible(surface, PackSurface(neighborSurface)))
+			const float4 packedNeighborSurface = PackSurface(neighborSurface);
+			if (!AreSurfacesCompatible(surface, packedNeighborSurface))
 			{
 				continue;
 			}
 
-			const Reservoir neighbor = UnpackReservoir(temporalSamples.Load(int3(neighborCoord, 0)), temporalWeights.Load(int3(neighborCoord, 0)));
+			const float4 samplePayload = temporalSamples.Load(int3(neighborCoord, 0));
+			const float4 weightPayload = temporalWeights.Load(int3(neighborCoord, 0));
+			const Reservoir neighbor = UnpackReservoir(samplePayload, weightPayload);
 
-			CombineReservoir(sceneTlas, reservoir, neighbor, surface, skyTexture, skySampler, RestirReservoirCommon::MaxSpatialM, CommonRandom::Random01(rng));
+			const float selectionSample = CommonRandom::Random01(rng);
+			CombineReservoir(sceneTlas, reservoir, neighbor, surface, skyTexture, skySampler, RestirReservoirCommon::MaxSpatialM, selectionSample);
 		}
 	}
 }

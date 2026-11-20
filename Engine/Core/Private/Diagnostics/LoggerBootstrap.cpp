@@ -33,8 +33,10 @@ namespace Logging
 			}
 		}
 
-		const std::string executableStem = PathFormatting::SanitizePathSegment(Filesystem::GetExecutablePath().stem().string());
-		return userState.LogsRoot / PathFormatting::TimestampedFileName(executableStem, ".log");
+		const std::filesystem::path executablePath = Filesystem::GetExecutablePath();
+		const std::string executableStem = executablePath.stem().string();
+		const std::string fileStem = PathFormatting::SanitizePathSegment(executableStem);
+		return userState.LogsRoot / PathFormatting::TimestampedFileName(fileStem, ".log");
 	}
 
 	spdlog::level::level_enum ReadConfiguredLoggerLevel() noexcept

@@ -124,7 +124,8 @@ static Microsoft::WRL::ComPtr<ID3D12LibraryReflection> OpenLibraryReflection(IDx
 
 	const DxcBuffer reflectionBuffer{.Ptr = reflectionBlob->GetBufferPointer(), .Size = reflectionBlob->GetBufferSize(), .Encoding = 0};
 	Microsoft::WRL::ComPtr<ID3D12LibraryReflection> library;
-	if (FAILED(utils.CreateReflection(&reflectionBuffer, IID_PPV_ARGS(library.ReleaseAndGetAddressOf()))) || !library)
+	const HRESULT createStatus = utils.CreateReflection(&reflectionBuffer, IID_PPV_ARGS(library.ReleaseAndGetAddressOf()));
+	if (FAILED(createStatus) || !library)
 	{
 		throw Diagnostics::Error("DXIL library reflection: CreateReflection failed.");
 	}

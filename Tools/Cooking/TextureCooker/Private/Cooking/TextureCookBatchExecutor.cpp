@@ -62,7 +62,8 @@ const std::vector<TaskResult>& TextureCookBatchExecutor::Execute()
 	TaskExecutor executor(BuildExecutorConfig());
 	TaskExecutionContext context;
 	std::vector<TaskNodeHandle> taskHandles;
-	const TaskExecution execution = executor.Submit(BuildTaskGraph(taskHandles), context);
+	const auto graph = BuildTaskGraph(taskHandles);
+	const TaskExecution execution = executor.Submit(graph, context);
 
 	for (std::size_t index = 0; index < taskHandles.size(); ++index)
 	{
@@ -98,7 +99,8 @@ CompiledTaskGraph TextureCookBatchExecutor::BuildTaskGraph(std::vector<TaskNodeH
 
 	for (std::uint32_t index = 0; index < m_requests.size(); ++index)
 	{
-		outTaskHandles.push_back(graph.Add(TaskDesc{.Name = "Cook texture request", .Lane = TaskLane::Background}, [this, index](TaskExecutionContext&) { return CookRequest(index); }));
+		const auto task = graph.Add(TaskDesc{.Name = "Cook texture request", .Lane = TaskLane::Background}, [this, index](TaskExecutionContext&) { return CookRequest(index); });
+		outTaskHandles.push_back(task);
 	}
 
 	return graph.Compile();

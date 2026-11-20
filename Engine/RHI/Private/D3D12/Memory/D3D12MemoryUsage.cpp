@@ -28,7 +28,8 @@ static D3D12MemoryCategoryAggregation& FindOrCreateAggregation(
     const D3D12MA::Budget& localBudget,
     const D3D12MA::Budget& nonLocalBudget)
 {
-	return RhiMemoryCategoryAggregationPolicy::FindOrCreate(aggregations, category, residencyClass, GetBudgetBytesForResidency(residencyClass, localBudget, nonLocalBudget));
+	const std::uint64_t budgetBytes = GetBudgetBytesForResidency(residencyClass, localBudget, nonLocalBudget);
+	return RhiMemoryCategoryAggregationPolicy::FindOrCreate(aggregations, category, residencyClass, budgetBytes);
 }
 
 static void AddBlockReference(D3D12MemoryCategoryAggregation& aggregation, D3D12MA::Allocation* allocation) noexcept

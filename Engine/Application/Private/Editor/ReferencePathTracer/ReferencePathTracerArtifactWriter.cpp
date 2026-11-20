@@ -8,6 +8,7 @@
 
 #include <utility>
 #include <exception>
+#include <span>
 
 namespace ReferencePathTracerArtifactWriter
 {
@@ -34,10 +35,9 @@ namespace ReferencePathTracerArtifactWriter
 			publication.Files.push_back(ArtifactBundleFile{.RelativePath = "checkpoint.bin", .Bytes = std::move(*artifact.Checkpoint)});
 		}
 
-		publication.Files.push_back(
-		    ArtifactBundleFile{
-		        .RelativePath = "manifest.json",
-		        .Bytes = std::vector<std::byte>(reinterpret_cast<const std::byte*>(manifest.data()), reinterpret_cast<const std::byte*>(manifest.data() + manifest.size()))});
+		const auto manifestBytes = std::as_bytes(std::span(manifest));
+		ArtifactBundleFile manifestFile{.RelativePath = "manifest.json", .Bytes = std::vector<std::byte>(manifestBytes.begin(), manifestBytes.end())};
+		publication.Files.push_back(std::move(manifestFile));
 
 		return publication;
 	}

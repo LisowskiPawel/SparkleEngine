@@ -146,7 +146,8 @@ TextureSource LoadTextureSource(const TextureCookRequest& request, TextureCookMe
 
 	const auto metadata = ReadNativeMetadata(bytes, extension);
 	TextureSource source;
-	source.ProcessingMemory = processingMemory.Acquire(MeasureTextureProcessingMemory(metadata, bytes.size(), request));
+	const auto requiredMemory = MeasureTextureProcessingMemory(metadata, bytes.size(), request);
+	source.ProcessingMemory = processingMemory.Acquire(requiredMemory);
 	source.Images = DecodeNativeSource(bytes, extension, metadata);
 	return source;
 }

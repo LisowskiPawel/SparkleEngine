@@ -64,9 +64,8 @@ void RhiContract::ValidateGraphicsPipelineDesc(const GraphicsPipelineDesc& desc)
 
 	for (std::uint32_t index = 0; index < desc.VertexInput.ElementCount; ++index)
 	{
-		RhiPipelineDescValidation::Require(
-		    RhiPipelineDescValidation::HasVertexBinding(desc.VertexInput, desc.VertexInput.Elements[index].Binding),
-		    "Graphics pipeline vertex input references a missing binding.");
+		const bool bHasVertexBinding = RhiPipelineDescValidation::HasVertexBinding(desc.VertexInput, desc.VertexInput.Elements[index].Binding);
+		RhiPipelineDescValidation::Require(bHasVertexBinding, "Graphics pipeline vertex input references a missing binding.");
 	}
 
 	const bool bHasDepthStencilFormat = desc.DepthStencilAttachmentFormat != PixelFormat::Unknown;
@@ -113,13 +112,14 @@ void RhiContract::ValidateRayTracingPipelineDesc(const RayTracingPipelineDesc& d
 	std::uint32_t rayGenerationCount = 0;
 	for (const RhiRayTracingShaderExportDesc& shaderExport : desc.ShaderExports)
 	{
-		RhiPipelineDescValidation::Require(
-		    shaderExport.Shader != nullptr && shaderExport.Shader->IsValid() && !shaderExport.ExportName.empty(),
-		    "Ray-tracing pipeline contains an invalid shader export.");
+		const bool bShaderValid = shaderExport.Shader != nullptr && shaderExport.Shader->IsValid();
+		const bool bExportValid = bShaderValid && !shaderExport.ExportName.empty();
+		RhiPipelineDescValidation::Require(bExportValid, "Ray-tracing pipeline contains an invalid shader export.");
 
 		const ShaderStage stage = shaderExport.Shader->Entry->Stage;
 		RhiPipelineDescValidation::Require(IsRayTracingShaderStage(stage), "Ray-tracing pipeline contains a non-RT shader stage.");
-		RhiPipelineDescValidation::Require(exportStages.emplace(shaderExport.ExportName, stage).second, "Ray-tracing pipeline contains a duplicate shader export.");
+		const bool bExportInserted = exportStages.emplace(shaderExport.ExportName, stage).second;
+		RhiPipelineDescValidation::Require(bExportInserted, "Ray-tracing pipeline contains a duplicate shader export.");
 
 		const bool bSharedContractMatchesStage = stage != ShaderStage::RayGeneration;
 		const bool bSharedContractMatchesInBytes = !bSharedContractMatchesStage && (shaderExport.Shader->Entry->RayPayloadSizeInBytes == desc.MaxPayloadSizeInBytes);
@@ -136,9 +136,9 @@ void RhiContract::ValidateRayTracingPipelineDesc(const RayTracingPipelineDesc& d
 	std::unordered_set<std::string_view> hitGroupNames;
 	for (const RhiRayTracingHitGroupDesc& group : desc.HitGroups)
 	{
-		RhiPipelineDescValidation::Require(
-		    !group.ExportName.empty() && exportStages.find(group.ExportName) == exportStages.end() && hitGroupNames.insert(group.ExportName).second,
-		    "Ray-tracing pipeline contains a missing or duplicate hit-group export.");
+		const bool bExportNameAvailable = !group.ExportName.empty() && exportStages.find(group.ExportName) == exportStages.end();
+		const bool bHitGroupInserted = bExportNameAvailable && hitGroupNames.insert(group.ExportName).second;
+		RhiPipelineDescValidation::Require(bHitGroupInserted, "Ray-tracing pipeline contains a missing or duplicate hit-group export.");
 
 		const auto hasStage = [&exportStages](std::string_view name, ShaderStage stage)
 		{
@@ -146,15 +146,18 @@ void RhiContract::ValidateRayTracingPipelineDesc(const RayTracingPipelineDesc& d
 			return found != exportStages.end() && found->second == stage;
 		};
 
-		RhiPipelineDescValidation::Require(hasStage(group.ClosestHitExport, ShaderStage::ClosestHit), "Ray-tracing hit group requires a valid closest-hit export.");
-		RhiPipelineDescValidation::Require(group.AnyHitExport.empty() || hasStage(group.AnyHitExport, ShaderStage::AnyHit), "Ray-tracing hit group references an invalid any-hit export.");
+		const bool bValidClosestHitExport = hasStage(group.ClosestHitExport, ShaderStage::ClosestHit);
+		RhiPipelineDescValidation::Require(bValidClosestHitExport, "Ray-tracing hit group requires a valid closest-hit export.");
+		const bool bValidAnyHitExport = group.AnyHitExport.empty() || hasStage(group.AnyHitExport, ShaderStage::AnyHit);
+		RhiPipelineDescValidation::Require(bValidAnyHitExport, "Ray-tracing hit group references an invalid any-hit export.");
 		if (group.Kind == ERhiRayTracingHitGroupKind::Triangles)
 		{
 			RhiPipelineDescValidation::Require(group.IntersectionExport.empty(), "Triangle hit group cannot contain an intersection export.");
 		}
 		else
 		{
-			RhiPipelineDescValidation::Require(hasStage(group.IntersectionExport, ShaderStage::Intersection), "Procedural hit group requires a valid intersection export.");
+			const bool bValidIntersectionExport = hasStage(group.IntersectionExport, ShaderStage::Intersection);
+			RhiPipelineDescValidation::Require(bValidIntersectionExport, "Procedural hit group requires a valid intersection export.");
 		}
 	}
 }

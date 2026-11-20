@@ -84,7 +84,9 @@ bool TaskExecution::WaitFor(std::chrono::milliseconds timeout) const
 	{
 		return false;
 	}
-	if (TaskWorkerContext::IsWorkerFor(m_state->ExecutorIdentity) || std::this_thread::get_id() != m_state->JoinThread)
+	const bool bCallerIsWorker = TaskWorkerContext::IsWorkerFor(m_state->ExecutorIdentity);
+	const bool bCanWait = !bCallerIsWorker && std::this_thread::get_id() == m_state->JoinThread;
+	if (!bCanWait)
 	{
 		return false;
 	}
@@ -137,7 +139,9 @@ std::optional<TaskResult> TaskExecution::GetTaskResult(TaskNodeHandle handle) co
 	}
 	const auto& data = m_state->Data;
 	std::uint32_t index = 0;
-	if (!TaskGraphAccess::Decode(handle, data.BuilderIdentity, data.BuilderGeneration, static_cast<std::uint32_t>(data.TaskResults.size()), index))
+	const std::uint32_t taskCount = static_cast<std::uint32_t>(data.TaskResults.size());
+	const bool bHandleValid = TaskGraphAccess::Decode(handle, data.BuilderIdentity, data.BuilderGeneration, taskCount, index);
+	if (!bHandleValid)
 	{
 		return std::nullopt;
 	}

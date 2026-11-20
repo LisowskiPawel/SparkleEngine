@@ -40,8 +40,11 @@ namespace Process
 	static bool CreateChildReadinessEvent(WindowsProcessHandle& readinessEvent, std::wstring& eventName, ChildProcessResult& result)
 	{
 		static std::atomic_uint64_t nextReadinessIdentity{1};
-		eventName = L"Local\\Sparkle.ProcessReadiness." + std::to_wstring(GetCurrentProcessId()) + L"." + std::to_wstring(nextReadinessIdentity.fetch_add(1, std::memory_order_relaxed));
-		readinessEvent.Reset(CreateEventW(nullptr, TRUE, FALSE, eventName.c_str()));
+		const DWORD processId = GetCurrentProcessId();
+		const auto readinessIdentity = nextReadinessIdentity.fetch_add(1, std::memory_order_relaxed);
+		eventName = L"Local\\Sparkle.ProcessReadiness." + std::to_wstring(processId) + L"." + std::to_wstring(readinessIdentity);
+		const HANDLE eventHandle = CreateEventW(nullptr, TRUE, FALSE, eventName.c_str());
+		readinessEvent.Reset(eventHandle);
 		if (!readinessEvent)
 		{
 			result.FailureReason = "Failed to create the child readiness event: " + FormatWindowsProcessError(GetLastError());
@@ -53,7 +56,8 @@ namespace Process
 	static bool OpenChildReadinessLog(const std::filesystem::path& logPath, WindowsProcessHandle& outputFile, ChildProcessResult& result)
 	{
 		SECURITY_ATTRIBUTES security{sizeof(SECURITY_ATTRIBUTES), nullptr, TRUE};
-		outputFile.Reset(CreateFileW(logPath.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, &security, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr));
+		const HANDLE logHandle = CreateFileW(logPath.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, &security, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+		outputFile.Reset(logHandle);
 		if (!outputFile)
 		{
 			result.FailureReason = "Failed to open the child process log: " + FormatWindowsProcessError(GetLastError());
@@ -146,7 +150,9 @@ namespace Process
 
 	static void WaitForChildReadiness(const ChildProcessRequest& request, const WindowsOwnedProcess& child, const WindowsProcessHandle& readinessEvent, ChildProcessResult& result)
 	{
-		WindowsProcessHandle cancelEvent(CreateEventW(nullptr, TRUE, request.Cancellation.stop_requested(), nullptr));
+		const bool bCancellationRequested = request.Cancellation.stop_requested();
+		const HANDLE cancelEventHandle = CreateEventW(nullptr, TRUE, bCancellationRequested, nullptr);
+		WindowsProcessHandle cancelEvent(cancelEventHandle);
 		if (!cancelEvent)
 		{
 			const DWORD eventError = GetLastError();

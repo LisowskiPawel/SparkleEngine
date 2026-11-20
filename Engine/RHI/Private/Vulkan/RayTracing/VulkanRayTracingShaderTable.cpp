@@ -115,30 +115,16 @@ VulkanRayTracingShaderTable::VulkanRayTracingShaderTable(VulkanRhi& rhi, VulkanG
 	    .MaximumRecordStrideInBytes = capabilities.MaxShaderTableRecordStrideInBytes};
 
 	std::vector<std::byte> bytes;
+	const auto appendRegion = [&](std::span<const RhiRayTracingShaderRecord> records)
+	{
+		const std::vector<std::byte> identifiers = CollectShaderIdentifiers(*pipeline, records, groupHandles, capabilities.ShaderGroupHandleSizeInBytes);
+		return RhiRayTracingShaderTablePacking::AppendRegion(records, identifiers, packingRules, bytes);
+	};
 
-	m_rayGeneration = RhiRayTracingShaderTablePacking::AppendRegion(
-	    desc.RayGenerationRecords,
-	    CollectShaderIdentifiers(*pipeline, desc.RayGenerationRecords, groupHandles, capabilities.ShaderGroupHandleSizeInBytes),
-	    packingRules,
-	    bytes);
-
-	m_miss = RhiRayTracingShaderTablePacking::AppendRegion(
-	    desc.MissRecords,
-	    CollectShaderIdentifiers(*pipeline, desc.MissRecords, groupHandles, capabilities.ShaderGroupHandleSizeInBytes),
-	    packingRules,
-	    bytes);
-
-	m_hitGroup = RhiRayTracingShaderTablePacking::AppendRegion(
-	    desc.HitGroupRecords,
-	    CollectShaderIdentifiers(*pipeline, desc.HitGroupRecords, groupHandles, capabilities.ShaderGroupHandleSizeInBytes),
-	    packingRules,
-	    bytes);
-
-	m_callable = RhiRayTracingShaderTablePacking::AppendRegion(
-	    desc.CallableRecords,
-	    CollectShaderIdentifiers(*pipeline, desc.CallableRecords, groupHandles, capabilities.ShaderGroupHandleSizeInBytes),
-	    packingRules,
-	    bytes);
+	m_rayGeneration = appendRegion(desc.RayGenerationRecords);
+	m_miss = appendRegion(desc.MissRecords);
+	m_hitGroup = appendRegion(desc.HitGroupRecords);
+	m_callable = appendRegion(desc.CallableRecords);
 
 	m_allocation = UploadShaderTable(memoryAllocator, bytes, capabilities, desc.DebugName);
 }

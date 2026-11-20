@@ -224,7 +224,8 @@ VkDevice CreateVulkanLogicalDevice(
 	const VkResult result = vkCreateDevice(physicalDevice, &createInfo, nullptr, &device);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(g_vulkanDeviceLogger, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateDevice", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkCreateDevice", result);
+		Diagnostics::Fatal(g_vulkanDeviceLogger, __FILE__, __LINE__, failureMessage);
 	}
 
 	return device;

@@ -24,13 +24,13 @@ TaskExecution LaunchCookedTextureLoad(
 
 	const TaskNodeHandle read = graph.Add(
 	    TaskDesc{.Name = "Read cooked texture generation", .Lane = TaskLane::BlockingIo},
-	    [path, payload](TaskExecutionContext& context)
+	    [path, payload, maximumDecodedBytes](TaskExecutionContext& context)
 	    {
 		    if (context.IsCancellationRequested())
 		    {
 			    return TaskResult::Cancelled("Texture read cancelled.");
 		    }
-		    payload->File = ReadCookedTexturePayload(path);
+		    payload->File = ReadCookedTexturePayload(path, maximumDecodedBytes);
 		    return TaskResult::Success();
 	    });
 

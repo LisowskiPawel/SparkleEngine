@@ -28,7 +28,8 @@ namespace GBufferPacking
 
 	float4 PackMaterial(float metallic, float roughness, float ambientOcclusion, float dielectricF0)
 	{
-		return float4(saturate(metallic), saturate(roughness), saturate(ambientOcclusion), saturate(dielectricF0));
+		const float4 material = float4(metallic, roughness, ambientOcclusion, dielectricF0);
+		return saturate(material);
 	}
 
 	float4 PackEmissive(float3 emissive)
@@ -38,7 +39,7 @@ namespace GBufferPacking
 
 	float4 PackSubsurface(float3 subsurfaceColor, float subsurfaceStrength)
 	{
-		return float4(saturate(subsurfaceColor), saturate(subsurfaceStrength));
+		return saturate(float4(subsurfaceColor, subsurfaceStrength));
 	}
 
 	float PackSkyDeviceZ()

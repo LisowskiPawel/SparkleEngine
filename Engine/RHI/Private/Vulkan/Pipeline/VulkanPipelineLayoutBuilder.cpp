@@ -81,14 +81,13 @@ std::unique_ptr<VulkanPipelineLayout> VulkanPipelineLayoutBuilder::Build(VulkanR
 	const VkResult result = vkCreatePipelineLayout(rhi.GetDevice(), &createInfo, nullptr, &layout);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(
-		    g_vulkanPipelineLayoutBuilderLogger,
-		    __FILE__,
-		    __LINE__,
-		    std::format("Failed to create Vulkan pipeline layout '{}': {}", debugName, VulkanResult::FormatFailure("vkCreatePipelineLayout", result)));
+		const std::string nativeFailure = VulkanResult::FormatFailure("vkCreatePipelineLayout", result);
+		const auto failureMessage = std::format("Failed to create Vulkan pipeline layout '{}': {}", debugName, nativeFailure);
+		Diagnostics::Fatal(g_vulkanPipelineLayoutBuilderLogger, __FILE__, __LINE__, failureMessage);
 	}
 
-	VulkanDebugNames::SetObjectName(rhi.GetSetDebugUtilsObjectName(), rhi.GetDevice(), VK_OBJECT_TYPE_PIPELINE_LAYOUT, reinterpret_cast<std::uint64_t>(layout), std::format("{} Layout", debugName));
+	const std::string layoutName = std::format("{} Layout", debugName);
+	VulkanDebugNames::SetObjectName(rhi.GetSetDebugUtilsObjectName(), rhi.GetDevice(), VK_OBJECT_TYPE_PIPELINE_LAYOUT, reinterpret_cast<std::uint64_t>(layout), layoutName);
 
 	return std::make_unique<VulkanPipelineLayout>(rhi.GetDevice(), layout);
 }

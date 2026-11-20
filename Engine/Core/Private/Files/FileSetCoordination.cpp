@@ -9,6 +9,7 @@
 
 #include <format>
 #include <unordered_set>
+#include <utility>
 
 namespace Files
 {
@@ -19,7 +20,8 @@ namespace Files
 			throw Diagnostics::Error("Publication root is empty.");
 		}
 		std::error_code error;
-		auto normalized = std::filesystem::weakly_canonical(std::filesystem::absolute(root), error);
+		const auto absoluteRoot = std::filesystem::absolute(root);
+		auto normalized = std::filesystem::weakly_canonical(absoluteRoot, error);
 		if (error || normalized == normalized.root_path())
 		{
 			throw Diagnostics::Error("Publication root must be a named output directory.");
@@ -36,11 +38,14 @@ namespace Files
 		}
 		if (error)
 		{
-			throw Diagnostics::Error(std::format("Could not create publication directory '{}': {}", root.string(), error.message()));
+			const std::string message = std::format("Could not create publication directory '{}': {}", root.string(), error.message());
+			throw Diagnostics::Error(message);
 		}
 
+		const auto lockPath = root / ".publication-lock";
+
 		m_file = CreateFileW(
-		    (root / ".publication-lock").c_str(),
+		    lockPath.c_str(),
 		    GENERIC_READ | (bWriting ? GENERIC_WRITE : 0),
 		    FILE_SHARE_READ | FILE_SHARE_WRITE,
 		    nullptr,
@@ -51,14 +56,16 @@ namespace Files
 		if (m_file != INVALID_HANDLE_VALUE)
 		{
 			OVERLAPPED offset{};
-			if (LockFileEx(m_file, LOCKFILE_FAIL_IMMEDIATELY | (bWriting ? LOCKFILE_EXCLUSIVE_LOCK : 0), 0, 1, 0, &offset))
+			const DWORD lockFlags = LOCKFILE_FAIL_IMMEDIATELY | (bWriting ? LOCKFILE_EXCLUSIVE_LOCK : 0);
+			if (LockFileEx(m_file, lockFlags, 0, 1, 0, &offset))
 			{
 				return;
 			}
 			CloseHandle(m_file);
 			m_file = INVALID_HANDLE_VALUE;
 		}
-		throw Diagnostics::Error(std::format("Publication directory '{}' is unavailable or in use; retry after its reader or writer settles.", root.string()));
+		const std::string message = std::format("Publication directory '{}' is unavailable or in use; retry after its reader or writer settles.", root.string());
+		throw Diagnostics::Error(message);
 	}
 
 	FileSetLock::~FileSetLock()
@@ -76,7 +83,8 @@ namespace Files
 		for (const auto& root : roots)
 		{
 			const auto normalized = PublicationRoot(root);
-			const bool bInserted = keys.insert(Paths::MakePathKey(normalized)).second;
+			auto key = Paths::MakePathKey(normalized);
+			const bool bInserted = keys.insert(std::move(key)).second;
 			if (bInserted)
 			{
 				result.push_back(normalized);
@@ -90,7 +98,8 @@ namespace Files
 		std::error_code error;
 		if (std::filesystem::exists(root / ".publication-incomplete", error) || error)
 		{
-			throw Diagnostics::Error(std::format("Incomplete publication at '{}'. Clean this generated output and cook again.", root.string()));
+			const std::string message = std::format("Incomplete publication at '{}'. Clean this generated output and cook again.", root.string());
+			throw Diagnostics::Error(message);
 		}
 	}
 
@@ -111,7 +120,8 @@ namespace Files
 			std::filesystem::remove(marker, error);
 			if (error)
 			{
-				throw Diagnostics::Error(std::format("Could not remove publication file '{}': {}", marker.string(), error.message()));
+				const std::string message = std::format("Could not remove publication file '{}': {}", marker.string(), error.message());
+				throw Diagnostics::Error(message);
 			}
 		}
 	}
@@ -123,7 +133,8 @@ namespace Files
 			std::string error;
 			if (!TryWriteNewFileDurable(root / ".publication-incomplete", {}, error))
 			{
-				throw Diagnostics::Error(std::format("Could not mark publication at '{}': {}", root.string(), error));
+				const std::string message = std::format("Could not mark publication at '{}': {}", root.string(), error);
+				throw Diagnostics::Error(message);
 			}
 		}
 	}

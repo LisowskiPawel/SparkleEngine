@@ -74,7 +74,9 @@ namespace SparkleLauncher
 			return;
 		}
 		const std::string role = profile->Target == BuildProfileTarget::Game ? "game" : "editor";
-		AppendTargetFiles(paths, outputs.ProjectTargetOutputs(request.ContentId, role, profileName), BuildProjectTargetName(request.ContentId, *profile), detail);
+		const auto targetOutputs = outputs.ProjectTargetOutputs(request.ContentId, role, profileName);
+		const auto targetName = BuildProjectTargetName(request.ContentId, *profile);
+		AppendTargetFiles(paths, targetOutputs, targetName, detail);
 	}
 
 	static void AppendCookToolCleanPaths(const ActionCleanTargetRequest& request, const SparkleTools::ToolOutputPaths& outputs, std::vector<MaintenanceCleanPathSpec>& paths)
@@ -84,11 +86,14 @@ namespace SparkleLauncher
 			return;
 		}
 #if SPARKLE_ENABLE_CONTENT_PIPELINE
-		AppendTargetFiles(paths, outputs.ToolTargetOutputs("AssetCooker", request.EditorProfile), "AssetCooker", "AssetCooker executable outputs.");
-		AppendTargetFiles(paths, outputs.ToolTargetOutputs("TextureCooker", request.EditorProfile), "TextureCooker", "TextureCooker executable outputs.");
+		const auto assetCookerOutputs = outputs.ToolTargetOutputs("AssetCooker", request.EditorProfile);
+		AppendTargetFiles(paths, assetCookerOutputs, "AssetCooker", "AssetCooker executable outputs.");
+		const auto textureCookerOutputs = outputs.ToolTargetOutputs("TextureCooker", request.EditorProfile);
+		AppendTargetFiles(paths, textureCookerOutputs, "TextureCooker", "TextureCooker executable outputs.");
 #endif
 #if SPARKLE_ENABLE_SHADER_COMPILER
-		AppendTargetFiles(paths, outputs.ToolTargetOutputs("ShaderCompiler", request.EditorProfile), "ShaderCompiler", "ShaderCompiler executable outputs.");
+		const auto shaderCompilerOutputs = outputs.ToolTargetOutputs("ShaderCompiler", request.EditorProfile);
+		AppendTargetFiles(paths, shaderCompilerOutputs, "ShaderCompiler", "ShaderCompiler executable outputs.");
 #endif
 	}
 

@@ -79,16 +79,22 @@ private:
 
 		for (const RhiRayTracingHitGroupDesc& hitGroup : desc.HitGroups)
 		{
+			const VkRayTracingShaderGroupTypeKHR groupType = hitGroup.Kind == ERhiRayTracingHitGroupKind::Triangles ? VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR
+			                                                                                                        : VK_RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_KHR;
+
+			const std::uint32_t closestHitShader = stageIndex(hitGroup.ClosestHitExport);
+			const std::uint32_t anyHitShader = stageIndex(hitGroup.AnyHitExport);
+			const std::uint32_t intersectionShader = stageIndex(hitGroup.IntersectionExport);
+
 			m_groups.push_back(
 			    VkRayTracingShaderGroupCreateInfoKHR{
 			        .sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR,
 			        .pNext = nullptr,
-			        .type = hitGroup.Kind == ERhiRayTracingHitGroupKind::Triangles ? VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR
-			                                                                       : VK_RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_KHR,
+			        .type = groupType,
 			        .generalShader = VK_SHADER_UNUSED_KHR,
-			        .closestHitShader = stageIndex(hitGroup.ClosestHitExport),
-			        .anyHitShader = stageIndex(hitGroup.AnyHitExport),
-			        .intersectionShader = stageIndex(hitGroup.IntersectionExport),
+			        .closestHitShader = closestHitShader,
+			        .anyHitShader = anyHitShader,
+			        .intersectionShader = intersectionShader,
 			        .pShaderGroupCaptureReplayHandle = nullptr});
 
 			groupNames.emplace_back(hitGroup.ExportName);

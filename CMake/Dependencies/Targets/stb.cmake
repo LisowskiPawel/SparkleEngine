@@ -17,6 +17,6 @@ if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
 endif()
 
 add_library(stb INTERFACE)
-set_property(TARGET stb PROPERTY SPARKLE_SOURCE_PACKAGE
-    "{\"name\":\"stb\",\"versionInfo\":\"${_sparkle_stb_revision}\",\"licenseDeclared\":\"MIT\",\"downloadLocation\":\"https://github.com/nothings/stb/tree/${_sparkle_stb_revision}\"}")
+sparkle_set_source_package(stb "stb" "${_sparkle_stb_revision}"
+    "MIT" "https://github.com/nothings/stb/tree/${_sparkle_stb_revision}")
 target_include_directories(stb INTERFACE ${stb_SOURCE_DIR})

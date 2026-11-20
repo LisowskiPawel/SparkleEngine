@@ -67,8 +67,10 @@ DirectX::XMFLOAT4 GltfMikkTangentContext::BuildFallbackTangent(const DirectX::XM
 {
 	const DirectX::XMVECTOR normalVector = DirectX::XMLoadFloat3(&normal);
 	const DirectX::XMVECTOR reference = std::abs(normal.z) < 0.999f ? DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f) : DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	const auto perpendicular = DirectX::XMVector3Cross(reference, normalVector);
+	const auto direction = DirectX::XMVector3Normalize(perpendicular);
 	DirectX::XMFLOAT3 tangent;
-	DirectX::XMStoreFloat3(&tangent, DirectX::XMVector3Normalize(DirectX::XMVector3Cross(reference, normalVector)));
+	DirectX::XMStoreFloat3(&tangent, direction);
 	return {tangent.x, tangent.y, tangent.z, 1.0f};
 }
 

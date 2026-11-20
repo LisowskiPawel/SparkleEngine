@@ -67,7 +67,8 @@ namespace Assets
 			        manifest.materialAssetReferences.size()));
 		}
 
-		if (instance.groupIndex != kInvalidCookedSceneInstanceGroupIndex && instance.groupIndex >= manifest.instanceGroups.size())
+		const bool bInvalidInstanceGroup = instance.groupIndex != kInvalidCookedSceneInstanceGroupIndex && instance.groupIndex >= manifest.instanceGroups.size();
+		if (bInvalidInstanceGroup)
 		{
 			Invalid(std::format("Cooked scene instance {} references instance group index {} but only {} groups exist", instanceIndex, instance.groupIndex, manifest.instanceGroups.size()));
 		}

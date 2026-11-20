@@ -15,6 +15,7 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+#include <utility>
 
 namespace Filesystem
 {
@@ -30,7 +31,8 @@ namespace Filesystem
 #endif
 		const std::uint64_t hash = Hash::Fnv1a64(pathKey);
 
-		std::string workspaceName = Paths::MakeSafePathComponent(Strings::ToNarrow(normalizedRoot.filename().wstring()));
+		const std::string directoryName = Strings::ToNarrow(normalizedRoot.filename().wstring());
+		std::string workspaceName = Paths::MakeSafePathComponent(directoryName);
 		if (workspaceName.empty())
 		{
 			workspaceName = "Workspace";
@@ -47,7 +49,8 @@ namespace Filesystem
 		{
 			return projectRoot.filename().string();
 		}
-		const std::string inferredName = InferProjectNameFromExecutableStem(GetExecutableStem());
+		std::string executableStem = GetExecutableStem();
+		const std::string inferredName = InferProjectNameFromExecutableStem(std::move(executableStem));
 		return inferredName.empty() ? "Sparkle" : inferredName;
 	}
 
@@ -86,6 +89,8 @@ namespace Filesystem
 	{
 		const std::filesystem::path workspaceRoot = ResolveWorkspaceRootPath();
 		const auto projectRoot = DiscoverProjectRoot();
-		return ResolveDevelopmentProductUserStatePaths(workspaceRoot, ResolveProductName(projectRoot.value_or(std::filesystem::path{})));
+		const auto resolvedProjectRoot = projectRoot.value_or(std::filesystem::path{});
+		const std::string productName = ResolveProductName(resolvedProjectRoot);
+		return ResolveDevelopmentProductUserStatePaths(workspaceRoot, productName);
 	}
 }

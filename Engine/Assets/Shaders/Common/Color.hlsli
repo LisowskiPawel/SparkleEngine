@@ -20,7 +20,8 @@ namespace CommonColor
 		const float3 color = saturate(linearColor);
 		const float3 low = color * 12.92f;
 		const float3 high = 1.055f * pow(color, 1.0f.xxx / 2.4f.xxx) - 0.055f.xxx;
-		return lerp(low, high, step(0.0031308f.xxx, color));
+		const float3 highRangeWeight = step(0.0031308f.xxx, color);
+		return lerp(low, high, highRangeWeight);
 	}
 }
 

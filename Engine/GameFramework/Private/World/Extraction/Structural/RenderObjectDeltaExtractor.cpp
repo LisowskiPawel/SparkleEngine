@@ -5,6 +5,7 @@
 #include "World/Extraction/WorldExtractionStorage.h"
 
 #include <algorithm>
+#include <utility>
 
 namespace ECS
 {
@@ -23,7 +24,8 @@ namespace ECS
 		for (const WorldExtractionStorage::MeshSlot& mesh : meshes)
 		{
 			RetirePublishedBefore(mesh.Entity, publishedIndex, delta);
-			m_current.push_back(ResolveObject(mesh, identities, publishedIndex, delta));
+			PublishedObject published = ResolveObject(mesh, identities, publishedIndex, delta);
+			m_current.push_back(std::move(published));
 		}
 
 		RetireRemaining(publishedIndex, delta);

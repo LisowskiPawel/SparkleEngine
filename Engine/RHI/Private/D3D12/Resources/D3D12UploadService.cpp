@@ -109,14 +109,31 @@ bool D3D12UploadService::ValidateBufferUploadRequest(const RenderCommandList& co
 {
 	const auto* d3dCommandList = commandList.GetBackendApi() == ERhiBackendApi::D3D12 ? static_cast<const D3D12RenderCommandList*>(&commandList) : nullptr;
 
-	return m_rhi != nullptr && m_memoryAllocator != nullptr && destination != nullptr && destination->Resource != nullptr && !data.empty() && data.size() <= destination->Resource->GetDesc().Width
-	    && d3dCommandList != nullptr && d3dCommandList->GetD3D12CommandList() != nullptr && d3dCommandList->IsCoordinatorRecording();
+	if (m_rhi == nullptr || m_memoryAllocator == nullptr)
+	{
+		return false;
+	}
+	if (destination == nullptr || destination->Resource == nullptr)
+	{
+		return false;
+	}
+
+	const bool bDataFits = !data.empty() && data.size() <= destination->Resource->GetDesc().Width;
+	if (!bDataFits)
+	{
+		return false;
+	}
+
+	const bool bCommandListAvailable = d3dCommandList != nullptr && d3dCommandList->GetD3D12CommandList() != nullptr;
+	return bCommandListAvailable && d3dCommandList->IsCoordinatorRecording();
 }
 
 std::unique_ptr<D3D12GpuAllocationRecord> D3D12UploadService::CreateBufferStagingResource(std::span<const std::byte> data, std::wstring_view debugName)
 {
+	const D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(data.size());
+
 	auto stagingResource = m_memoryAllocator->CreateBuffer(
-	    CD3DX12_RESOURCE_DESC::Buffer(data.size()),
+	    resourceDesc,
 	    D3D12_RESOURCE_STATE_GENERIC_READ,
 	    RhiMemoryCategory::Upload,
 	    RhiMemoryResidencyClass::HostUpload,
@@ -162,8 +179,17 @@ void D3D12UploadService::RecordBufferUpload(
 
 bool D3D12UploadService::ValidateTextureUploadRequest(const RenderCommandList& commandList, const D3D12GpuAllocationRecord* destination, const RhiTextureUploadDesc& textureUpload) const noexcept
 {
-	return m_rhi != nullptr && m_memoryAllocator != nullptr && destination != nullptr && destination->Resource != nullptr && textureUpload.IsValid()
-	    && commandList.GetBackendApi() == ERhiBackendApi::D3D12;
+	if (m_rhi == nullptr || m_memoryAllocator == nullptr)
+	{
+		return false;
+	}
+	if (destination == nullptr || destination->Resource == nullptr)
+	{
+		return false;
+	}
+
+	const bool bTextureValid = textureUpload.IsValid();
+	return bTextureValid && commandList.GetBackendApi() == ERhiBackendApi::D3D12;
 }
 
 std::unique_ptr<D3D12GpuAllocationRecord> D3D12UploadService::CreateTextureStagingResource(const D3D12GpuAllocationRecord& destination, std::uint32_t subresourceCount, std::wstring_view debugName)
@@ -174,8 +200,10 @@ std::unique_ptr<D3D12GpuAllocationRecord> D3D12UploadService::CreateTextureStagi
 		return {};
 	}
 
+	const D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize);
+
 	std::unique_ptr<D3D12GpuAllocationRecord> stagingResource = m_memoryAllocator->CreateBuffer(
-	    CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize),
+	    resourceDesc,
 	    D3D12_RESOURCE_STATE_GENERIC_READ,
 	    RhiMemoryCategory::Upload,
 	    RhiMemoryResidencyClass::HostUpload,
@@ -252,7 +280,15 @@ void D3D12UploadService::DrainCompletedUploads() noexcept
 	    m_pendingUploads.begin(),
 	    m_pendingUploads.end(),
 	    [&completedValues](const std::unique_ptr<D3D12GpuAllocationRecord>& stagingResource)
-	    { return stagingResource == nullptr || (stagingResource->RecordingReferenceCount.load(std::memory_order_relaxed) == 0 && stagingResource->LastUse.IsComplete(completedValues)); });
+	    {
+		    if (stagingResource == nullptr)
+		    {
+			    return true;
+		    }
+
+		    const bool bNoRecordingReferences = stagingResource->RecordingReferenceCount.load(std::memory_order_relaxed) == 0;
+		    return bNoRecordingReferences && stagingResource->LastUse.IsComplete(completedValues);
+	    });
 
 	m_pendingUploads.erase(firstPending, m_pendingUploads.end());
 }

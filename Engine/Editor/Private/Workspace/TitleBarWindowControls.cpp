@@ -25,7 +25,9 @@ static void DrawMinimizeIcon() noexcept
 	const ImVec2 max = ImGui::GetItemRectMax();
 	const float y = min.y + ((max.y - min.y) * 0.68f);
 	const float padding = (max.x - min.x) * 0.30f;
-	drawList->AddLine(ImVec2(min.x + padding, y), ImVec2(max.x - padding, y), iconColor, 1.6f);
+	const ImVec2 lineStart(min.x + padding, y);
+	const ImVec2 lineEnd(max.x - padding, y);
+	drawList->AddLine(lineStart, lineEnd, iconColor, 1.6f);
 }
 
 static void DrawMaximizeIcon(const Window& window) noexcept
@@ -46,8 +48,12 @@ static void DrawMaximizeIcon(const Window& window) noexcept
 	}
 
 	const float offset = width * 0.14f;
-	drawList->AddRect(ImVec2(topLeft.x + offset, topLeft.y), ImVec2(bottomRight.x, bottomRight.y - offset), iconColor, 0.0f, 0, 1.2f);
-	drawList->AddRect(ImVec2(topLeft.x, topLeft.y + offset), ImVec2(bottomRight.x - offset, bottomRight.y), iconColor, 0.0f, 0, 1.2f);
+	const ImVec2 rearTopLeft(topLeft.x + offset, topLeft.y);
+	const ImVec2 rearBottomRight(bottomRight.x, bottomRight.y - offset);
+	drawList->AddRect(rearTopLeft, rearBottomRight, iconColor, 0.0f, 0, 1.2f);
+	const ImVec2 frontTopLeft(topLeft.x, topLeft.y + offset);
+	const ImVec2 frontBottomRight(bottomRight.x - offset, bottomRight.y);
+	drawList->AddRect(frontTopLeft, frontBottomRight, iconColor, 0.0f, 0, 1.2f);
 }
 
 static void DrawCloseIcon() noexcept
@@ -57,8 +63,12 @@ static void DrawCloseIcon() noexcept
 	const ImVec2 min = ImGui::GetItemRectMin();
 	const ImVec2 max = ImGui::GetItemRectMax();
 	const float padding = (max.x - min.x) * 0.30f;
-	drawList->AddLine(ImVec2(min.x + padding, min.y + padding), ImVec2(max.x - padding, max.y - padding), iconColor, 1.6f);
-	drawList->AddLine(ImVec2(max.x - padding, min.y + padding), ImVec2(min.x + padding, max.y - padding), iconColor, 1.6f);
+	const ImVec2 topLeft(min.x + padding, min.y + padding);
+	const ImVec2 bottomRight(max.x - padding, max.y - padding);
+	const ImVec2 topRight(max.x - padding, min.y + padding);
+	const ImVec2 bottomLeft(min.x + padding, max.y - padding);
+	drawList->AddLine(topLeft, bottomRight, iconColor, 1.6f);
+	drawList->AddLine(topRight, bottomLeft, iconColor, 1.6f);
 }
 
 void DrawTitleBarWindowControls(Window* window) noexcept

@@ -162,8 +162,11 @@ void CopyRenderMorphWeightRanges(std::span<const RenderMorphWeightCopyRange> ran
 		{
 			continue;
 		}
-		CopyMorphWeightSpan(range.Current, current.subspan(begin, count));
-		CopyMorphWeightSpan(range.Previous.empty() ? range.Current : range.Previous, previous.subspan(begin, count));
+		const std::span<float> currentOutput = current.subspan(begin, count);
+		CopyMorphWeightSpan(range.Current, currentOutput);
+		const std::span<const float> previousInput = range.Previous.empty() ? range.Current : range.Previous;
+		const std::span<float> previousOutput = previous.subspan(begin, count);
+		CopyMorphWeightSpan(previousInput, previousOutput);
 	}
 }
 

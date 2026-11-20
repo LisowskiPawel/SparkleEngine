@@ -36,7 +36,8 @@ void D3D12RenderCommandList::BindGraphicsDescriptorTable(std::uint32_t bindingIn
 		return;
 	}
 
-	m_commandList->SetGraphicsRootDescriptorTable(bindingIndex, m_owner.ResolveDescriptorTableGpuHandle(tableBinding.Table, tableBinding.DescriptorIndex));
+	const D3D12_GPU_DESCRIPTOR_HANDLE descriptor = m_owner.ResolveDescriptorTableGpuHandle(tableBinding.Table, tableBinding.DescriptorIndex);
+	m_commandList->SetGraphicsRootDescriptorTable(bindingIndex, descriptor);
 }
 
 void D3D12RenderCommandList::BindGraphicsDescriptorTable(std::uint32_t bindingIndex, RhiGpuDescriptorHandle baseDescriptor) noexcept
@@ -80,7 +81,8 @@ void D3D12RenderCommandList::BindComputeDescriptorTable(std::uint32_t bindingInd
 		return;
 	}
 
-	m_commandList->SetComputeRootDescriptorTable(bindingIndex, m_owner.ResolveDescriptorTableGpuHandle(tableBinding.Table, tableBinding.DescriptorIndex));
+	const D3D12_GPU_DESCRIPTOR_HANDLE descriptor = m_owner.ResolveDescriptorTableGpuHandle(tableBinding.Table, tableBinding.DescriptorIndex);
+	m_commandList->SetComputeRootDescriptorTable(bindingIndex, descriptor);
 }
 
 void D3D12RenderCommandList::BindComputeDescriptorTable(std::uint32_t bindingIndex, RhiGpuDescriptorHandle baseDescriptor) noexcept
@@ -121,7 +123,8 @@ void D3D12RenderCommandList::BindRayTracingDescriptorTable(std::uint32_t binding
 {
 	if (tableBinding)
 	{
-		m_commandList->SetComputeRootDescriptorTable(bindingIndex, m_owner.ResolveDescriptorTableGpuHandle(tableBinding.Table, tableBinding.DescriptorIndex));
+		const D3D12_GPU_DESCRIPTOR_HANDLE descriptor = m_owner.ResolveDescriptorTableGpuHandle(tableBinding.Table, tableBinding.DescriptorIndex);
+		m_commandList->SetComputeRootDescriptorTable(bindingIndex, descriptor);
 	}
 }
 

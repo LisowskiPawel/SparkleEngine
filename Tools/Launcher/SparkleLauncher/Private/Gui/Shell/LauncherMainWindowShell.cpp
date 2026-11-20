@@ -227,12 +227,10 @@ namespace SparkleLauncher
 		PopulateBoundContextCombo(m_graphicsApiCombo, model.GraphicsApis, m_settings.GraphicsApi(), m_settings, &LauncherSettings::SetGraphicsApi);
 		const QString profile = m_settings.RunMode() == "editor" ? m_settings.EditorProfile() : m_settings.GameProfile();
 
-		PopulateBoundContextCombo(
-		    m_captureProviderCombo,
-		    BuildExternalCaptureOptions(m_settings.GraphicsApi().toStdString(), profile.toStdString()),
-		    QString::fromUtf8(ExternalCaptureProviderToString(m_settings.CaptureProvider()).data()),
-		    m_settings,
-		    &LauncherSettings::SetCaptureProvider);
+		const auto captureOptions = BuildExternalCaptureOptions(m_settings.GraphicsApi().toStdString(), profile.toStdString());
+		const auto providerName = ExternalCaptureProviderToString(m_settings.CaptureProvider());
+		const QString selectedProvider = QString::fromUtf8(providerName.data());
+		PopulateBoundContextCombo(m_captureProviderCombo, captureOptions, selectedProvider, m_settings, &LauncherSettings::SetCaptureProvider);
 
 		PopulateBoundContextCombo(m_shaderBackendCombo, model.ShaderBackends, m_settings.ShaderBackend(), m_settings, &LauncherSettings::SetShaderBackend);
 		PopulateBoundContextCombo(m_buildConfigurationCombo, model.BuildConfigurations, m_settings.BuildConfiguration(), m_settings, &LauncherSettings::SetBuildConfiguration);

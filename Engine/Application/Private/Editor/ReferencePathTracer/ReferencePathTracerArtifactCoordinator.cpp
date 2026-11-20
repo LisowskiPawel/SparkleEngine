@@ -70,8 +70,11 @@ void ReferencePathTracerArtifactCoordinator::Begin(ReferencePathTracerArtifactKi
 	m_kind = kind;
 	m_outputRoot = outputRoot;
 	const std::string digest = Hash::Sha256ToHex(mean->SamplePrefix.RenderIdentitySha256);
-	const char* label = kind == ReferencePathTracerArtifactKind::Complete ? "Complete" : (kind == ReferencePathTracerArtifactKind::Checkpoint ? "Checkpoint" : "PartialPrefix");
-	m_publicationDirectory = m_outputRoot / digest / (Identifiers::CreateUuidV4String() + "-" + label + "-" + std::to_string(mean->SamplePrefix.SampleCount));
+	const char* prefixLabel = kind == ReferencePathTracerArtifactKind::Checkpoint ? "Checkpoint" : "PartialPrefix";
+	const char* label = kind == ReferencePathTracerArtifactKind::Complete ? "Complete" : prefixLabel;
+	const std::string publicationId = Identifiers::CreateUuidV4String();
+	const std::string directoryName = publicationId + "-" + label + "-" + std::to_string(mean->SamplePrefix.SampleCount);
+	m_publicationDirectory = m_outputRoot / digest / directoryName;
 	m_lastResult.reset();
 	m_mean.reset();
 	m_moment2.reset();
@@ -124,12 +127,17 @@ void ReferencePathTracerArtifactCoordinator::PublishIfReady()
 	{
 		return;
 	}
-	if (m_moment2
-	    && (m_mean->Result.SamplePrefix.RenderIdentitySha256 != m_moment2->Result.SamplePrefix.RenderIdentitySha256
-	        || m_mean->Result.SamplePrefix.SampleCount != m_moment2->Result.SamplePrefix.SampleCount || m_mean->Width != m_moment2->Width || m_mean->Height != m_moment2->Height))
+	if (m_moment2)
 	{
-		Fail("Checkpoint planes do not describe the same immutable session prefix.");
-		return;
+		const auto& meanPrefix = m_mean->Result.SamplePrefix;
+		const auto& moment2Prefix = m_moment2->Result.SamplePrefix;
+		const bool bSamePrefix = meanPrefix.RenderIdentitySha256 == moment2Prefix.RenderIdentitySha256 && meanPrefix.SampleCount == moment2Prefix.SampleCount;
+		const bool bSameExtent = m_mean->Width == m_moment2->Width && m_mean->Height == m_moment2->Height;
+		if (!bSamePrefix || !bSameExtent)
+		{
+			Fail("Checkpoint planes do not describe the same immutable session prefix.");
+			return;
+		}
 	}
 
 	ReferencePathTracerArtifactWriteRequest request{
@@ -157,7 +165,11 @@ void ReferencePathTracerArtifactCoordinator::StartPublication(ReferencePathTrace
 			return TaskResult::Cancelled("Reference Path Tracer artifact publication was cancelled.");
 		}
 		result = ReferencePathTracerArtifactWriter::Write(std::move(request), context.GetCancellationToken());
-		return result.bSucceeded ? TaskResult::Success() : (context.IsCancellationRequested() ? TaskResult::Cancelled(result.ErrorMessage) : TaskResult::Failure(result.ErrorMessage));
+		if (result.bSucceeded)
+		{
+			return TaskResult::Success();
+		}
+		return context.IsCancellationRequested() ? TaskResult::Cancelled(result.ErrorMessage) : TaskResult::Failure(result.ErrorMessage);
 	};
 
 	const bool bOperationStarted = m_writeOperation.Start(taskName, "A Reference Path Tracer artifact is already being written.", std::move(operationTask), errorMessage);
@@ -180,27 +192,31 @@ void ReferencePathTracerArtifactCoordinator::Update(Renderer& renderer, const Vi
 
 void ReferencePathTracerArtifactCoordinator::BeginPendingCapture(Renderer& renderer, const ViewportRenderProducts& products)
 {
-	if (m_pendingKind)
+	if (!m_pendingKind)
 	{
-		const RenderProduct* mean = products.FindProduct(RenderOutputFlags::Radiance);
-		if (mean == nullptr || mean->SamplePrefix.RenderIdentitySha256 != m_pendingPrefix.RenderIdentitySha256 || mean->SamplePrefix.TargetSampleCount != m_pendingPrefix.TargetSampleCount)
-		{
-			Fail("The output intent was cancelled because the session identity changed before its prefix settled.");
-			return;
-		}
+		return;
+	}
 
-		const ViewportRenderProgressState state = products.GetProgress().State;
-		if (state == ViewportRenderProgressState::Unavailable)
-		{
-			Fail("The output intent could not settle because the session became unavailable.");
-			return;
-		}
-		if (state == ViewportRenderProgressState::Paused || state == ViewportRenderProgressState::Complete)
-		{
-			const ReferencePathTracerArtifactKind kind = *m_pendingKind;
-			m_pendingKind.reset();
-			Begin(kind, renderer, products, m_outputRoot);
-		}
+	const RenderProduct* mean = products.FindProduct(RenderOutputFlags::Radiance);
+	const bool bSameIdentity = mean != nullptr && mean->SamplePrefix.RenderIdentitySha256 == m_pendingPrefix.RenderIdentitySha256;
+	const bool bSameTarget = bSameIdentity && mean->SamplePrefix.TargetSampleCount == m_pendingPrefix.TargetSampleCount;
+	if (!bSameTarget)
+	{
+		Fail("The output intent was cancelled because the session identity changed before its prefix settled.");
+		return;
+	}
+
+	const ViewportRenderProgressState state = products.GetProgress().State;
+	if (state == ViewportRenderProgressState::Unavailable)
+	{
+		Fail("The output intent could not settle because the session became unavailable.");
+		return;
+	}
+	if (state == ViewportRenderProgressState::Paused || state == ViewportRenderProgressState::Complete)
+	{
+		const ReferencePathTracerArtifactKind kind = *m_pendingKind;
+		m_pendingKind.reset();
+		Begin(kind, renderer, products, m_outputRoot);
 	}
 }
 
@@ -223,7 +239,12 @@ void ReferencePathTracerArtifactCoordinator::CollectPublicationResult()
 
 bool ReferencePathTracerArtifactCoordinator::IsSettled() const noexcept
 {
-	return !m_pendingKind && m_meanCapture.IsSettled() && m_moment2Capture.IsSettled() && !m_writeOperation.IsOccupied();
+	if (m_pendingKind)
+	{
+		return false;
+	}
+	const bool bReadbacksSettled = m_meanCapture.IsSettled() && m_moment2Capture.IsSettled();
+	return bReadbacksSettled && !m_writeOperation.IsOccupied();
 }
 
 std::optional<ReferencePathTracerArtifactWriteResult> ReferencePathTracerArtifactCoordinator::TakeResult() noexcept

@@ -56,7 +56,9 @@ namespace ExposureHistogram
 		for (uint bin = 0u; bin < BinCount; ++bin)
 		{
 			const float nextCount = cumulativeCount + float(histogramCounts[bin]);
-			const float weight = max(min(nextCount, highCount) - max(cumulativeCount, lowCount), 0.0f);
+			const float retainedBegin = max(cumulativeCount, lowCount);
+			const float retainedEnd = min(nextCount, highCount);
+			const float weight = max(retainedEnd - retainedBegin, 0.0f);
 			weightedLuminance += BinLuminance(bin) * weight;
 			retainedCount += weight;
 			cumulativeCount = nextCount;

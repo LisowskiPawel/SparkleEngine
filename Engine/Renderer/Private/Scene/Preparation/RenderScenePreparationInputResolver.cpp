@@ -76,7 +76,8 @@ static void ResolvePrimitives(const RenderScene& scene, const GpuMeshCache& gpuM
 		{
 			continue;
 		}
-		run.ResolvedPrimitives.push_back(ResolvePrimitive(scene, gpuMeshCache, primitive, scene.GetMaterials().Generation, run.PreparedScene));
+		const ResolvedRenderPrimitive resolved = ResolvePrimitive(scene, gpuMeshCache, primitive, scene.GetMaterials().Generation, run.PreparedScene);
+		run.ResolvedPrimitives.push_back(resolved);
 	}
 }
 

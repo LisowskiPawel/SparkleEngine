@@ -31,13 +31,13 @@ namespace ShadowRays
 			return false;
 		}
 
-		const bool bSupportedIsDirectional = lightSample.bIsDirectional;
-		const bool bSupportedShadowsEnabled = bSupportedIsDirectional && (RayTracedDirectionalShadowsEnabled != 0u);
-		const bool bLocalShadowsEnabled = !bSupportedIsDirectional && (RayTracedLocalLightShadowsEnabled != 0u);
-		const bool bSupported = bSupportedShadowsEnabled || bLocalShadowsEnabled;
+		const bool bDirectionalShadowsEnabled = lightSample.bIsDirectional && (RayTracedDirectionalShadowsEnabled != 0u);
+		const bool bLocalShadowsEnabled = !lightSample.bIsDirectional && (RayTracedLocalLightShadowsEnabled != 0u);
+		const bool bShadowsEnabled = bDirectionalShadowsEnabled || bLocalShadowsEnabled;
+		const bool bLocalLightTooClose = !lightSample.bIsDirectional && lightSample.VisibilityDistance <= MinimumShadowTMin;
 		const float maxDistance = lightSample.bIsDirectional ? RayTracedShadowMaxDistance : lightSample.VisibilityDistance;
 		immediateSignal = BuildUnshadowedSignal(maxDistance);
-		if (!bCastsShadow || !bSupported || (!lightSample.bIsDirectional && lightSample.VisibilityDistance <= MinimumShadowTMin))
+		if (!bCastsShadow || !bShadowsEnabled || bLocalLightTooClose)
 		{
 			return false;
 		}

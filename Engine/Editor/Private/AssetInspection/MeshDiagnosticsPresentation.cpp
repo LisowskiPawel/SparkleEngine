@@ -40,7 +40,9 @@ namespace MeshDiagnosticsPresentation
 
 	std::string FormatMemorySummary(const MeshDiagnosticsRow& row)
 	{
-		return std::format("GPU {} / CPU {}", PanelDiagnosticsFormatting::FormatByteSize(row.EstimatedGpuByteSize), PanelDiagnosticsFormatting::FormatByteSize(row.EstimatedCpuByteSize));
+		const std::string gpuMemory = PanelDiagnosticsFormatting::FormatByteSize(row.EstimatedGpuByteSize);
+		const std::string cpuMemory = PanelDiagnosticsFormatting::FormatByteSize(row.EstimatedCpuByteSize);
+		return std::format("GPU {} / CPU {}", gpuMemory, cpuMemory);
 	}
 
 	std::string FormatMaterial(const MeshDiagnosticsRow& row)

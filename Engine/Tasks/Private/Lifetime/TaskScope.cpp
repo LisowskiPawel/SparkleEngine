@@ -21,18 +21,19 @@ bool TaskScope::State::RegisterExecution(const std::shared_ptr<TaskExecution::St
 		return false;
 	}
 
-	std::erase_if(
-	    Executions,
-	    [](const auto& item)
-	    {
-		    const auto state = item.lock();
-		    if (!state)
-		    {
-			    return true;
-		    }
-		    std::lock_guard lock(state->Mutex);
-		    return state->bSettled;
-	    });
+	const auto isExpiredOrSettled = [](const auto& item)
+	{
+		const auto execution = item.lock();
+		if (!execution)
+		{
+			return true;
+		}
+
+		std::lock_guard lock(execution->Mutex);
+		return execution->bSettled;
+	};
+
+	std::erase_if(Executions, isExpiredOrSettled);
 
 	std::function<void()> onSettled = [scope = weak_from_this()]
 	{

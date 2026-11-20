@@ -47,7 +47,8 @@ namespace RasterMaterial
 
 	float4 SampleBaseColor(float2 uv)
 	{
-		return MaterialTextures::HasTexture(TextureFlags, MaterialTextures::TextureSlotBaseColor) ? TextureBaseColor.Sample(SamplerAniso16xWrap, uv) * BaseColor : BaseColor;
+		const bool bHasBaseColorTexture = MaterialTextures::HasTexture(TextureFlags, MaterialTextures::TextureSlotBaseColor);
+		return bHasBaseColorTexture ? TextureBaseColor.Sample(SamplerAniso16xWrap, uv) * BaseColor : BaseColor;
 	}
 
 	float3 SampleNormalTangent(float2 uv)
@@ -57,7 +58,8 @@ namespace RasterMaterial
 			return float3(0.0f, 0.0f, 1.0f);
 		}
 
-		return DecodeBc5TangentNormal(TextureNormal.Sample(SamplerAniso16xWrap, uv).rg, NormalScale);
+		const float3 sampledNormal = TextureNormal.Sample(SamplerAniso16xWrap, uv).rgb;
+		return DecodeTangentNormal(sampledNormal, NormalScale, TextureFlags);
 	}
 
 	float SampleRoughness(float2 uv)

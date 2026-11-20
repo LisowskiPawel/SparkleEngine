@@ -183,7 +183,10 @@ void ViewportPanel::BuildOverlay(EditorIconService& icons, bool bDisableInteract
 	const float margin = ImGui::GetFontSize() * 0.75f;
 	const ImVec2 origin = ImGui::GetWindowPos();
 	const float width = m_overlay->MeasureWidth();
-	ImGui::SetCursorScreenPos(ImVec2(origin.x + (std::max) (margin, ImGui::GetWindowWidth() - width - margin), origin.y + margin));
+	const float rightAlignedOffset = ImGui::GetWindowWidth() - width - margin;
+	const float horizontalOffset = (std::max) (margin, rightAlignedOffset);
+	const ImVec2 overlayPosition(origin.x + horizontalOffset, origin.y + margin);
+	ImGui::SetCursorScreenPos(overlayPosition);
 	m_overlay->Draw(icons, bDisableInteraction);
 	if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
 	{

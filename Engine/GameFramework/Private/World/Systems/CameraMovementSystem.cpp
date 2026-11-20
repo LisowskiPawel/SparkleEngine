@@ -58,7 +58,8 @@ namespace ECS
 		if (CameraNavigation::Apply(m_intent, m_navigationSettings, m_deltaSeconds, navigationState))
 		{
 			transform.Translation = navigationState.Position;
-			DirectX::XMStoreFloat4(&transform.Rotation, DirectX::XMQuaternionRotationRollPitchYaw(navigationState.PitchRadians, navigationState.YawRadians, 0.0f));
+			const DirectX::XMVECTOR rotation = DirectX::XMQuaternionRotationRollPitchYaw(navigationState.PitchRadians, navigationState.YawRadians, 0.0f);
+			DirectX::XMStoreFloat4(&transform.Rotation, rotation);
 			bChanged = true;
 		}
 		return bChanged;

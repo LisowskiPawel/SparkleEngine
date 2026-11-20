@@ -45,7 +45,8 @@ VulkanCommandQueue::VulkanCommandQueue(VulkanRhi& rhi, ERhiQueueType queueType, 
 	const VkResult result = vkCreateSemaphore(rhi.GetDevice(), &semaphoreInfo, nullptr, &m_timelineSemaphore);
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(LogVulkanCommandQueue, __FILE__, __LINE__, VulkanResult::FormatFailure("vkCreateSemaphore(timeline)", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkCreateSemaphore(timeline)", result);
+		Diagnostics::Fatal(LogVulkanCommandQueue, __FILE__, __LINE__, failureMessage);
 	}
 }
 
@@ -84,7 +85,8 @@ RhiSubmissionToken VulkanCommandQueue::Submit(const VulkanQueueSubmission& submi
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 		VulkanGpuCrash::ObserveLoss(m_rhi, m_queueType, submitResult);
 #endif
-		Diagnostics::Fatal(LogVulkanCommandQueue, __FILE__, __LINE__, VulkanResult::FormatFailure("vkQueueSubmit", submitResult));
+		const auto failureMessage = VulkanResult::FormatFailure("vkQueueSubmit", submitResult);
+		Diagnostics::Fatal(LogVulkanCommandQueue, __FILE__, __LINE__, failureMessage);
 		return {};
 	}
 
@@ -196,7 +198,8 @@ void VulkanCommandQueue::DrainForSwapChainRecreation() noexcept
 
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(LogVulkanCommandQueue, __FILE__, __LINE__, VulkanResult::FormatFailure("vkQueueWaitIdle", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkQueueWaitIdle", result);
+		Diagnostics::Fatal(LogVulkanCommandQueue, __FILE__, __LINE__, failureMessage);
 	}
 }
 
@@ -226,11 +229,9 @@ void VulkanCommandQueue::WaitForSubmission(std::uint64_t submissionValue) noexce
 #endif
 	if (!VulkanResult::Succeeded(result))
 	{
-		Diagnostics::Fatal(
-		    LogVulkanCommandQueue,
-		    __FILE__,
-		    __LINE__,
-		    std::format("{} while waiting for Vulkan {} queue submission {}.", VulkanResult::FormatFailure("vkWaitSemaphores", result), static_cast<std::uint32_t>(m_queueType), submissionValue));
+		const std::string nativeFailure = VulkanResult::FormatFailure("vkWaitSemaphores", result);
+		const auto failureMessage = std::format("{} while waiting for Vulkan {} queue submission {}.", nativeFailure, static_cast<std::uint32_t>(m_queueType), submissionValue);
+		Diagnostics::Fatal(LogVulkanCommandQueue, __FILE__, __LINE__, failureMessage);
 	}
 }
 
@@ -269,7 +270,8 @@ std::uint64_t VulkanCommandQueue::GetCompletedSubmissionValue() const noexcept
 	VulkanGpuCrash::ObserveLoss(m_rhi, m_queueType, result);
 	if (result == VK_ERROR_DEVICE_LOST)
 	{
-		Diagnostics::Fatal(LogVulkanCommandQueue, __FILE__, __LINE__, VulkanResult::FormatFailure("vkGetSemaphoreCounterValue", result));
+		const auto failureMessage = VulkanResult::FormatFailure("vkGetSemaphoreCounterValue", result);
+		Diagnostics::Fatal(LogVulkanCommandQueue, __FILE__, __LINE__, failureMessage);
 	}
 #endif
 	return VulkanResult::Succeeded(result) ? completedValue : 0;

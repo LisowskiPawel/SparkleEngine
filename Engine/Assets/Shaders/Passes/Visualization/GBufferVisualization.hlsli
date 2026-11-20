@@ -33,8 +33,11 @@ void StoreGBufferVisualization(uint2 pixelCoord, uint viewMode, RWTexture2D<floa
 			break;
 
 		case RenderViewMode::GBufferWorldNormal:
-			outputColor = VisualizeWorldDirection(GBufferWorldNormal.Load(pixel).xyz);
+		{
+			const float3 normalWorld = GBufferWorldNormal.Load(pixel).xyz;
+			outputColor = VisualizeWorldDirection(normalWorld);
 			break;
+		}
 		case RenderViewMode::GBufferWorldTangent:
 		{
 			const float4 tangent = GBufferWorldTangent.Load(pixel);
@@ -43,28 +46,46 @@ void StoreGBufferVisualization(uint2 pixelCoord, uint viewMode, RWTexture2D<floa
 		}
 
 		case RenderViewMode::GBufferRoughness:
-			outputColor = VisualizeScalar(GBufferMaterial.Load(pixel).g);
+		{
+			const float roughness = GBufferMaterial.Load(pixel).g;
+			outputColor = VisualizeScalar(roughness);
 			break;
+		}
 
 		case RenderViewMode::GBufferMetallic:
-			outputColor = VisualizeScalar(GBufferMaterial.Load(pixel).r);
+		{
+			const float metallic = GBufferMaterial.Load(pixel).r;
+			outputColor = VisualizeScalar(metallic);
 			break;
+		}
 
 		case RenderViewMode::GBufferEmissive:
-			outputColor = max(GBufferEmissive.Load(pixel).rgb, 0.0f);
+		{
+			const float3 emissive = GBufferEmissive.Load(pixel).rgb;
+			outputColor = max(emissive, 0.0f);
 			break;
+		}
 
 		case RenderViewMode::GBufferAmbientOcclusion:
-			outputColor = VisualizeScalar(GBufferMaterial.Load(pixel).b);
+		{
+			const float ambientOcclusion = GBufferMaterial.Load(pixel).b;
+			outputColor = VisualizeScalar(ambientOcclusion);
 			break;
+		}
 
 		case RenderViewMode::GBufferSubsurfaceColor:
-			outputColor = saturate(GBufferSubsurface.Load(pixel).rgb);
+		{
+			const float3 subsurfaceColor = GBufferSubsurface.Load(pixel).rgb;
+			outputColor = saturate(subsurfaceColor);
 			break;
+		}
 
 		case RenderViewMode::GBufferSubsurfaceStrength:
-			outputColor = VisualizeScalar(GBufferSubsurface.Load(pixel).a);
+		{
+			const float subsurfaceStrength = GBufferSubsurface.Load(pixel).a;
+			outputColor = VisualizeScalar(subsurfaceStrength);
 			break;
+		}
 		default:
 			return;
 	}

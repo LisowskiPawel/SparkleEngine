@@ -21,5 +21,8 @@ void AddSkyPass(FrameGraphBuilder& builder, const RenderFrame& frame, RenderView
 	parameters->SceneDepth = builder.CreateSRV(resources.Transient.Scene.SceneDepth);
 	BindSceneShaderParameters(builder, frame, parameters, resources);
 
-	builder.Dispatch<SkyCS>(parameters, ComputeDispatchDesc{MathUtils::DivideRoundUp(sceneExtent.Width, 8u), MathUtils::DivideRoundUp(sceneExtent.Height, 8u), 1u});
+	const std::uint32_t groupCountX = MathUtils::DivideRoundUp(sceneExtent.Width, 8u);
+	const std::uint32_t groupCountY = MathUtils::DivideRoundUp(sceneExtent.Height, 8u);
+
+	builder.Dispatch<SkyCS>(parameters, ComputeDispatchDesc{groupCountX, groupCountY, 1u});
 }

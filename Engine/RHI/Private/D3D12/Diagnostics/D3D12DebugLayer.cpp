@@ -231,11 +231,11 @@ void D3D12DebugLayer::DrainStoredMessages()
 		auto* message = reinterpret_cast<D3D12_MESSAGE*>(messageData.data());
 		if (SUCCEEDED(m_infoQueue->GetMessage(messageIndex, message, &messageLength)))
 		{
-			m_messages.push_back(
-			    RhiDiagnosticMessage{
-			        .Severity = ToDiagnosticSeverity(message->Severity),
-			        .Category = ToDiagnosticCategory(message->Category),
-			        .Text = message->pDescription != nullptr ? std::string(message->pDescription, strnlen(message->pDescription, messageLength)) : ""});
+			const char* const description = message->pDescription;
+			const std::size_t descriptionLength = description != nullptr ? strnlen(description, messageLength) : 0;
+			std::string text = description != nullptr ? std::string(description, descriptionLength) : "";
+
+			m_messages.push_back(RhiDiagnosticMessage{.Severity = ToDiagnosticSeverity(message->Severity), .Category = ToDiagnosticCategory(message->Category), .Text = std::move(text)});
 		}
 	}
 	if (bTruncated)

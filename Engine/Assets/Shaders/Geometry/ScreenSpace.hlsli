@@ -22,7 +22,8 @@ float3 ComputeSkyViewDirectionWorld(uint2 pixelCoord)
 	const float4 positionClip = float4(ndc, 1.0f, 1.0f);
 	const float4 positionView = mul(positionClip, InvProjectionMTX);
 	const float3 viewDirection = normalize(positionView.xyz / max(positionView.w, 1.0e-6f));
-	return normalize(mul(float4(viewDirection, 0.0f), InvViewMTX).xyz);
+	const float3 directionWorld = mul(float4(viewDirection, 0.0f), InvViewMTX).xyz;
+	return normalize(directionWorld);
 }
 
 #endif

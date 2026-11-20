@@ -22,61 +22,39 @@ static nlohmann::json ReadExportDocument(std::string_view text, std::initializer
 	bool bJobs = false;
 	std::size_t jobCount = 0;
 
-	auto document = nlohmann::json::parse(
-	    text.begin(),
-	    text.end(),
-	    [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
-	    {
-		    using Event = nlohmann::json::parse_event_t;
-		    const bool bContainerStart = event == Event::object_start || event == Event::array_start;
-		    const bool bEntryStart = bContainerStart || event == Event::value;
-		    if (bJobs && depth == 2 && bEntryStart)
-		    {
-			    if (event != Event::value || !value.is_string())
-			    {
-				    throw Diagnostics::Error("Shader export jobs require path strings.");
-			    }
-			    if (++jobCount > 65'536)
-			    {
-				    throw Diagnostics::Error("Shader export exceeds its job limit.");
-			    }
-		    }
-		    if (event == Event::object_start)
-		    {
-			    admission.BeginObject(depth);
-		    }
-		    if (event == Event::array_start || event == Event::value)
-		    {
-			    admission.CheckDepth(depth);
-		    }
-		    if (event == Event::key)
-		    {
-			    const auto& key = value.get_ref<const std::string&>();
-			    const bool bConsumed = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
-			    if (depth == 1)
-			    {
-				    bJobs = bConsumed && key == "jobs";
-			    }
-			    if (!bConsumed)
-			    {
-				    return false;
-			    }
-			    admission.ReadKey(depth, key);
-		    }
-		    if (event == Event::object_end)
-		    {
-			    admission.EndObject(depth);
-			    if (depth > 0)
-			    {
-				    return false;
-			    }
-		    }
-		    if (event == Event::array_end && depth > 1)
-		    {
-			    return false;
-		    }
-		    return true;
-	    });
+	const auto admitValue = [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
+	{
+		using Event = nlohmann::json::parse_event_t;
+		admission.ReadEvent(depth, event);
+		const bool bContainerStart = event == Event::object_start || event == Event::array_start;
+		const bool bEntryStart = bContainerStart || event == Event::value;
+		if (bJobs && depth == 2 && bEntryStart)
+		{
+			if (event != Event::value || !value.is_string())
+			{
+				throw Diagnostics::Error("Shader export jobs require path strings.");
+			}
+			if (++jobCount > 65'536)
+			{
+				throw Diagnostics::Error("Shader export exceeds its job limit.");
+			}
+		}
+		if (event == Event::key)
+		{
+			const auto& key = value.get_ref<const std::string&>();
+			const bool bConsumed = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
+			if (depth == 1)
+			{
+				bJobs = bConsumed && key == "jobs";
+			}
+			return bConsumed && admission.ReadKey(depth, key);
+		}
+		const bool bNestedObject = event == Event::object_end && depth > 0;
+		const bool bNestedArray = event == Event::array_end && depth > 1;
+		return !bNestedObject && !bNestedArray;
+	};
+
+	auto document = nlohmann::json::parse(text.begin(), text.end(), admitValue);
 
 	if (!document.is_object())
 	{
@@ -99,8 +77,9 @@ static bool ReadExportShader(std::string_view text, ShaderTarget target, ShaderD
 		const auto document = ReadExportDocument(text, {"shaderTypeId", "compileInputHash", "target", "backend"});
 		const auto& exportTarget = document.at("target").get_ref<const std::string&>();
 		shader.Backend = document.at("backend").get<std::string>();
-		const bool bIdentity = ReadExportIdentity(document, "shaderTypeId", shader.ShaderType) && ReadExportIdentity(document, "compileInputHash", shader.CompileInputHash);
-		return bIdentity && exportTarget == GetShaderTargetName(target);
+		const bool bShaderTypeRead = ReadExportIdentity(document, "shaderTypeId", shader.ShaderType);
+		const bool bCompileInputRead = bShaderTypeRead && ReadExportIdentity(document, "compileInputHash", shader.CompileInputHash);
+		return bCompileInputRead && exportTarget == GetShaderTargetName(target);
 	}
 	catch (const std::exception&)
 	{
@@ -191,7 +170,8 @@ static void InspectPublishedCook(
 		for (const auto& job : jobs)
 		{
 			std::filesystem::path request;
-			if (ResolveExportRequest(cookDirectory, job.get_ref<const std::string&>(), request))
+			const auto& requestName = job.get_ref<const std::string&>();
+			if (ResolveExportRequest(cookDirectory, requestName, request))
 			{
 				InspectPublishedShaderRequest(request, publication, diagnostics, selected);
 			}
@@ -212,12 +192,18 @@ static std::vector<std::filesystem::path> FindMatchingShaderExports(const std::f
 		std::error_code error;
 		for (std::filesystem::directory_iterator cook(root, error), end; cook != end && !error; cook.increment(error))
 		{
-			if (!cook->is_directory(error) || error || !publication.Contains(cook->path()))
+			const bool bDirectory = cook->is_directory(error) && !error;
+			if (!bDirectory)
 			{
 				error.clear();
 				continue;
 			}
-			InspectPublishedCook(cook->path(), publication, diagnostics, selected);
+			const std::filesystem::path& directory = cook->path();
+			if (!publication.Contains(directory))
+			{
+				continue;
+			}
+			InspectPublishedCook(directory, publication, diagnostics, selected);
 		}
 	}
 	catch (const Diagnostics::Error&)
@@ -234,6 +220,9 @@ std::vector<std::filesystem::path> FindShaderExportDirectories(const ShaderDiagn
 		return {};
 	}
 
-	const auto root = Filesystem::ResolveArtifactRootPath(Filesystem::GetWorkspaceRootPath()) / "symbols" / "shaders" / Filesystem::GetProjectPath().filename();
-	return FindMatchingShaderExports(root, diagnostics);
+	const std::filesystem::path& workspaceRoot = Filesystem::GetWorkspaceRootPath();
+	const auto artifactRoot = Filesystem::ResolveArtifactRootPath(workspaceRoot);
+	const auto projectName = Filesystem::GetProjectPath().filename();
+	const auto exportRoot = artifactRoot / "symbols" / "shaders" / projectName;
+	return FindMatchingShaderExports(exportRoot, diagnostics);
 }

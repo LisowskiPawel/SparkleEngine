@@ -32,8 +32,10 @@ public:
 			return {};
 		}
 
-		EventHandle handle{m_nextCallbackId++};
-		GetCallbacks<TEvent>().push_back({std::make_shared<Callback<TEvent>>(std::move(callback)), handle, layer, mode});
+		const EventHandle handle{m_nextCallbackId++};
+		auto& callbacks = GetCallbacks<TEvent>();
+		auto function = std::make_shared<Callback<TEvent>>(std::move(callback));
+		callbacks.push_back({std::move(function), handle, layer, mode});
 		return handle;
 	}
 
@@ -45,7 +47,7 @@ public:
 	{
 		for (const auto& entry : GetCallbacks<TEvent>())
 		{
-			if (entry.Mode == DispatchMode::Deferred && ShouldDispatchToLayer(entry.Layer, targetLayer))
+			if (entry.MatchesRoute(DispatchMode::Deferred, targetLayer))
 			{
 				m_deferredEvents.push_back({event, targetLayer});
 				return;
@@ -59,7 +61,7 @@ public:
 		const auto callbacks = SnapshotCallbacks<TEvent>([targetLayer](const auto& entry) { return entry.Layer == targetLayer; });
 		for (const auto& invocation : callbacks)
 		{
-			(*invocation.first)(event);
+			(*invocation.Function)(event);
 		}
 	}
 
@@ -78,6 +80,20 @@ private:
 		EventHandle Handle;
 		InputLayer Layer = InputLayer::Gameplay;
 		DispatchMode Mode = DispatchMode::Immediate;
+
+		bool MatchesRoute(DispatchMode mode, InputLayer targetLayer) const noexcept
+		{
+			const bool bLayerMatches = Layer == InputLayer::System || Layer == targetLayer;
+			return Mode == mode && bLayerMatches;
+		}
+	};
+
+	template <typename TEvent> using CallbackList = std::vector<CallbackEntry<TEvent>>;
+
+	template <typename TEvent> struct CallbackInvocation final
+	{
+		std::shared_ptr<Callback<TEvent>> Function;
+		InputLayer Layer;
 	};
 
 	struct RoutedInputEvent final
@@ -86,22 +102,19 @@ private:
 		InputLayer TargetLayer = InputLayer::System;
 	};
 
-	using CallbackTuple = std::
-	    tuple<std::vector<CallbackEntry<KeyboardEvent>>, std::vector<CallbackEntry<MouseButtonEvent>>, std::vector<CallbackEntry<MouseMoveEvent>>, std::vector<CallbackEntry<MouseWheelEvent>>>;
+	using CallbackLists = std::tuple<CallbackList<KeyboardEvent>, CallbackList<MouseButtonEvent>, CallbackList<MouseMoveEvent>, CallbackList<MouseWheelEvent>>;
 
-	static bool ShouldDispatchToLayer(InputLayer registeredLayer, InputLayer targetLayer) noexcept;
-
-	template <typename TEvent> std::vector<CallbackEntry<TEvent>>& GetCallbacks() { return std::get<std::vector<CallbackEntry<TEvent>>>(m_callbacks); }
+	template <typename TEvent> CallbackList<TEvent>& GetCallbacks() { return std::get<CallbackList<TEvent>>(m_callbacks); }
 
 	template <typename TEvent, typename TPredicate> auto SnapshotCallbacks(TPredicate&& select)
 	{
 		// Invocation handles keep the registered callable alive without copying its mutable target.
-		std::vector<std::pair<std::shared_ptr<Callback<TEvent>>, InputLayer>> callbacks;
+		std::vector<CallbackInvocation<TEvent>> callbacks;
 		for (const auto& entry : GetCallbacks<TEvent>())
 		{
 			if (select(entry))
 			{
-				callbacks.emplace_back(entry.Function, entry.Layer);
+				callbacks.push_back({.Function = entry.Function, .Layer = entry.Layer});
 			}
 		}
 		return callbacks;
@@ -111,7 +124,11 @@ private:
 	{
 		const auto layerEpochs = m_layerEpochs;
 		const auto pointerEpoch = m_pointerEpoch;
-		const auto callbacks = SnapshotCallbacks<TEvent>([mode, targetLayer](const auto& entry) { return entry.Mode == mode && ShouldDispatchToLayer(entry.Layer, targetLayer); });
+		const auto matchesRoute = [mode, targetLayer](const auto& entry)
+		{
+			return entry.MatchesRoute(mode, targetLayer);
+		};
+		const auto callbacks = SnapshotCallbacks<TEvent>(matchesRoute);
 		for (const auto& [callback, layer] : callbacks)
 		{
 			const auto index = static_cast<std::size_t>(layer);
@@ -124,7 +141,7 @@ private:
 		}
 	}
 
-	CallbackTuple m_callbacks;
+	CallbackLists m_callbacks;
 	std::deque<RoutedInputEvent> m_deferredEvents;
 	std::array<std::uint64_t, LayerCount> m_layerEpochs{};
 	std::uint64_t m_pointerEpoch = 0;

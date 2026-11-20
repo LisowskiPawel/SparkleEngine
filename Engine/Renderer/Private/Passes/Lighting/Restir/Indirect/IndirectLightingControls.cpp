@@ -3,6 +3,7 @@
 #include "Core/Public/Console/CVar.h"
 #include "Core/Public/Hash/HashUtils.h"
 #include <format>
+#include <string>
 
 ConsoleVariable<bool> CVarIndirectDiffuse("r.Lighting.Indirect.Diffuse", true, "Evaluate primary indirect diffuse lighting.");
 ConsoleVariable<bool> CVarIndirectSpecular("r.Lighting.Indirect.Specular", true, "Evaluate primary indirect specular lighting.");
@@ -23,7 +24,9 @@ static void RequireIndirectLightingProduct(FrameGraphTextureHandle input, FrameG
 	if (!input.IsValid() || !output.IsValid())
 	{
 		SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogIndirectLighting, "Renderer.IndirectLighting");
-		Diagnostics::Fatal(LogIndirectLighting, __FILE__, __LINE__, std::format("Enabled indirect {} requires its GBuffer input and lighting output.", lobe));
+		const std::string message = std::format("Enabled indirect {} requires its GBuffer input and lighting output.", lobe);
+
+		Diagnostics::Fatal(LogIndirectLighting, __FILE__, __LINE__, message);
 	}
 }
 

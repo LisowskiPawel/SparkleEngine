@@ -61,7 +61,8 @@ void D3D12SamplerLibrary::CreateSharedSamplers()
 {
 	const auto createSampler = [this](Slot slot, RhiSamplerMinMagFilter minMagFilter, RhiSamplerMipFilter mipFilter, RhiSamplerAddressMode addressMode, RhiSamplerAnisotropy maxAnisotropy)
 	{
-		CreateSampler(slot, MakeSamplerDesc(minMagFilter, mipFilter, addressMode, maxAnisotropy));
+		const RhiSamplerDesc desc = MakeSamplerDesc(minMagFilter, mipFilter, addressMode, maxAnisotropy);
+		CreateSampler(slot, desc);
 	};
 
 	createSampler(Slot::PointMipPointWrap, RhiSamplerMinMagFilter::Point, RhiSamplerMipFilter::Point, RhiSamplerAddressMode::Wrap, RhiSamplerAnisotropy::X1);
@@ -134,7 +135,8 @@ void D3D12SamplerLibrary::CreateSampler(Slot slot, const RhiSamplerDesc& sampler
 	desc.MinLOD = 0.0f;
 	desc.MaxLOD = samplerDesc.MipFilter == RhiSamplerMipFilter::None ? 0.0f : D3D12_FLOAT32_MAX;
 
-	const D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = D3D12TypeConversions::ToCpuDescriptor(m_descriptorService->GetDescriptorTableCpuHandle(m_tableHandle, static_cast<uint32_t>(slot)));
+	const RhiCpuDescriptorHandle descriptor = m_descriptorService->GetDescriptorTableCpuHandle(m_tableHandle, static_cast<uint32_t>(slot));
+	const D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = D3D12TypeConversions::ToCpuDescriptor(descriptor);
 
 	m_rhi->GetDevice()->CreateSampler(&desc, cpuHandle);
 }
@@ -184,7 +186,9 @@ bool D3D12SamplerLibrary::TryGetFilteredSlot(RhiSamplerMinMagFilter minMagFilter
 	const std::uint32_t filterIndex = static_cast<std::uint32_t>(minMagFilter);
 	const std::uint32_t mipIndex = static_cast<std::uint32_t>(mipFilter);
 	std::uint32_t addressOffset = 0;
-	if (filterIndex >= baseSlots.size() || mipIndex >= baseSlots[0].size() || !TryGetAddressOffset(addressMode, addressOffset))
+	const bool bIndicesValid = filterIndex < baseSlots.size() && mipIndex < baseSlots[0].size();
+	const bool bAddressSupported = bIndicesValid && TryGetAddressOffset(addressMode, addressOffset);
+	if (!bAddressSupported)
 	{
 		return false;
 	}

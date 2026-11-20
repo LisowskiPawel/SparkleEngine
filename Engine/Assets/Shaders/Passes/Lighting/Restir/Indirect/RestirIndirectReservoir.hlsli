@@ -105,7 +105,9 @@ namespace IndirectReservoir
 
 	float EvaluateTarget(PathLighting::Result path)
 	{
-		return max(CommonColor::LuminanceRec709(max(path.DiffuseContribution + path.SpecularContribution, 0.0f.xxx)), 0.0f);
+		const float3 contribution = max(path.DiffuseContribution + path.SpecularContribution, 0.0f.xxx);
+		const float luminance = CommonColor::LuminanceRec709(contribution);
+		return max(luminance, 0.0f);
 	}
 
 	bool StreamCandidate(inout Reservoir reservoir, Candidate candidate, float target, float random)
@@ -186,8 +188,10 @@ namespace IndirectReservoir
 			candidate.RandomPixel = pixelCoord;
 			candidate.SampleIndex = candidateIndex;
 			candidate.RandomFrameIndex = FrameIndex;
-			const float target = EvaluateTarget(EvaluateCandidate(sceneTlas, surface, candidate, skyTexture, skySampler));
-			StreamCandidate(reservoir, candidate, target, CommonRandom::Random01(rng));
+			const PathLighting::Result path = EvaluateCandidate(sceneTlas, surface, candidate, skyTexture, skySampler);
+			const float target = EvaluateTarget(path);
+			const float selectionSample = CommonRandom::Random01(rng);
+			StreamCandidate(reservoir, candidate, target, selectionSample);
 		}
 		return reservoir;
 	}

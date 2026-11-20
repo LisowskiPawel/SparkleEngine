@@ -74,7 +74,8 @@ void RendererExecutionContext::ExecuteControl(RendererExecutionControl control) 
 		    }
 		    else if constexpr (std::is_same_v<TCommand, RenderCVarCommand>)
 		    {
-			    command.Completion->Complete(ExecuteCVarControl(ConsoleVariableRegistry::Get(), std::move(command.Request)));
+			    CVarControlResult result = ExecuteCVarControl(ConsoleVariableRegistry::Get(), std::move(command.Request));
+			    command.Completion->Complete(std::move(result));
 		    }
 		    else if constexpr (std::is_same_v<TCommand, RenderSettingsCaptureCommand>)
 		    {

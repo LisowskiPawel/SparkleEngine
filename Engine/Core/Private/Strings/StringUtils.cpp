@@ -56,7 +56,9 @@ namespace Strings
 
 	std::string UnquoteCopy(std::string_view str)
 	{
-		return std::string(Unquote(TrimAsciiWhitespace(str)));
+		const std::string_view trimmed = TrimAsciiWhitespace(str);
+		const std::string_view unquoted = Unquote(trimmed);
+		return std::string(unquoted);
 	}
 
 	std::vector<std::string_view> Split(std::string_view str, char separator, bool bKeepEmptyFields)
@@ -111,7 +113,13 @@ namespace Strings
 
 	bool StartsWithIgnoreCase(std::string_view value, std::string_view prefix) noexcept
 	{
-		return prefix.size() <= value.size() && EqualsIgnoreCase(value.substr(0, prefix.size()), prefix);
+		if (prefix.size() > value.size())
+		{
+			return false;
+		}
+
+		const std::string_view valuePrefix = value.substr(0, prefix.size());
+		return EqualsIgnoreCase(valuePrefix, prefix);
 	}
 
 	bool ContainsIgnoreCase(std::string_view haystack, std::string_view needle) noexcept
@@ -129,7 +137,8 @@ namespace Strings
 		const std::size_t finalStartIndex = haystack.size() - needle.size();
 		for (std::size_t startIndex = 0; startIndex <= finalStartIndex; ++startIndex)
 		{
-			if (EqualsIgnoreCase(haystack.substr(startIndex, needle.size()), needle))
+			const std::string_view candidate = haystack.substr(startIndex, needle.size());
+			if (EqualsIgnoreCase(candidate, needle))
 			{
 				return true;
 			}

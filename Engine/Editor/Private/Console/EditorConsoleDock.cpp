@@ -71,7 +71,9 @@ bool EditorConsolePanel::BeginDockWindow(float left, float bottom, float width, 
 	const float minDockHeight = (std::min) (MinimumDockHeight, maxDockHeight);
 	ImGui::SetNextWindowPos(ImVec2(left, bottom - height), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Always);
-	ImGui::SetNextWindowSizeConstraints(ImVec2(width, m_bIsOpen ? minDockHeight : height), ImVec2(width, m_bIsOpen ? maxDockHeight : height));
+	const ImVec2 minimumSize(width, m_bIsOpen ? minDockHeight : height);
+	const ImVec2 maximumSize(width, m_bIsOpen ? maxDockHeight : height);
+	ImGui::SetNextWindowSizeConstraints(minimumSize, maximumSize);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 6.0f));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(6.0f, 4.0f));
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, SparkleUiPalette::WindowBackground());

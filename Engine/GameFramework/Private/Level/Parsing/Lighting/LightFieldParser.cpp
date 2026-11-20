@@ -139,7 +139,8 @@ namespace LevelParsing
 		}
 		if (field == "Position")
 		{
-			SetLightPosition(common, ParseFloat3(line.value, "light position"));
+			const DirectX::XMFLOAT3 position = ParseFloat3(line.value, "light position");
+			SetLightPosition(common, position);
 			return;
 		}
 	}

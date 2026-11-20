@@ -128,7 +128,8 @@ bool AssetCookerSceneBatch::BuildProducts(const std::vector<AssetCookerSceneEntr
 
 	TaskExecutor executor(BuildExecutorConfig(taskCapacity));
 	TaskExecutionContext context;
-	const TaskExecution execution = executor.Submit(BuildTaskGraph(sceneEntries, items, taskCapacity, itemCompleted), context);
+	const auto graph = BuildTaskGraph(sceneEntries, items, taskCapacity, itemCompleted);
+	const TaskExecution execution = executor.Submit(graph, context);
 	return execution.GetStatus() == TaskExecutionStatus::Succeeded;
 }
 

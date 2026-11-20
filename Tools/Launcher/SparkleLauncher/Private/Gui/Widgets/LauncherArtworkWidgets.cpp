@@ -86,9 +86,13 @@ namespace SparkleLauncher
 			return;
 		}
 
-		const QSize targetSize(std::max(1, static_cast<int>(std::ceil(targetRect.width()))), std::max(1, static_cast<int>(std::ceil(targetRect.height()))));
+		const int targetWidth = std::max(1, static_cast<int>(std::ceil(targetRect.width())));
+		const int targetHeight = std::max(1, static_cast<int>(std::ceil(targetRect.height())));
+		const QSize targetSize(targetWidth, targetHeight);
 		const QPixmap scaled = source.scaled(targetSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-		const QRect cropRect(std::max(0, (scaled.width() - targetSize.width()) / 2), std::max(0, (scaled.height() - targetSize.height()) / 2), targetSize.width(), targetSize.height());
+		const int cropLeft = std::max(0, (scaled.width() - targetWidth) / 2);
+		const int cropTop = std::max(0, (scaled.height() - targetHeight) / 2);
+		const QRect cropRect(cropLeft, cropTop, targetWidth, targetHeight);
 		painter.drawPixmap(targetRect.toRect(), scaled, cropRect);
 	}
 

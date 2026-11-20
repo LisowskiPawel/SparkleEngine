@@ -68,8 +68,9 @@ DirectX::XMFLOAT3 RayTracingPtlasPartitionPlanner::TransformPoint(const DirectX:
 {
 	const DirectX::XMVECTOR localPoint = DirectX::XMLoadFloat3(&point);
 	const DirectX::XMMATRIX world = DirectX::XMLoadFloat4x4(&worldMatrix);
+	const DirectX::XMVECTOR worldPoint = DirectX::XMVector3TransformCoord(localPoint, world);
 	DirectX::XMFLOAT3 transformed{};
-	DirectX::XMStoreFloat3(&transformed, DirectX::XMVector3TransformCoord(localPoint, world));
+	DirectX::XMStoreFloat3(&transformed, worldPoint);
 	return transformed;
 }
 
@@ -157,7 +158,8 @@ std::uint32_t RayTracingPtlasPartitionPlanner::QuantizeAxis(float value, float m
 	}
 
 	const float normalized = (value - minValue) / extent;
-	const float scaled = std::floor(std::clamp(normalized, 0.0f, 0.999999f) * static_cast<float>(partitionsPerAxis));
+	const float clamped = std::clamp(normalized, 0.0f, 0.999999f);
+	const float scaled = std::floor(clamped * static_cast<float>(partitionsPerAxis));
 	return static_cast<std::uint32_t>(scaled);
 }
 

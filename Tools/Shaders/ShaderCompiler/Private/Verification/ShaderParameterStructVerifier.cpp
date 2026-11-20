@@ -192,11 +192,8 @@ void VerifyCookedShaderParameters(const ShaderCompileJob& job, const CookedStage
 	const auto mismatch = FindShaderParameterMismatch(*job.Request.ParameterStruct, compiledStage.reflection, job.Request.UnitKind == ShaderCompileUnitKind::Library);
 	if (mismatch)
 	{
-		throw Diagnostics::Error(
-		    std::format(
-		        "SC2001 {} parameter-struct '{}' verification failed: {}",
-		        FormatShaderCompileJob(job, compiledStage.backendName, job.Request.Target),
-		        job.Request.ParameterStruct->Name,
-		        *mismatch));
+		const auto jobDescription = FormatShaderCompileJob(job, compiledStage.backendName, job.Request.Target);
+		const auto diagnostic = std::format("SC2001 {} parameter-struct '{}' verification failed: {}", jobDescription, job.Request.ParameterStruct->Name, *mismatch);
+		throw Diagnostics::Error(diagnostic);
 	}
 }

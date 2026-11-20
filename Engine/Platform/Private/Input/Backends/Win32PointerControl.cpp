@@ -48,7 +48,8 @@ std::optional<MousePosition> CenterWin32Cursor(void* windowHandle)
 	}
 
 	RECT rect;
-	if (!GetClientRect(hWnd, &rect) || IsRectEmpty(&rect))
+	const bool bClientRectRead = GetClientRect(hWnd, &rect);
+	if (!bClientRectRead || IsRectEmpty(&rect))
 	{
 		return std::nullopt;
 	}
@@ -56,12 +57,19 @@ std::optional<MousePosition> CenterWin32Cursor(void* windowHandle)
 	POINT position;
 	position.x = (rect.right - rect.left) / 2;
 	position.y = (rect.bottom - rect.top) / 2;
-	const bool bScreenPositionResolved = ClientToScreen(hWnd, &position);
-	const bool bCursorCentered = bScreenPositionResolved && SetCursorPos(position.x, position.y);
-	const bool bCursorPositionRead = bCursorCentered && GetCursorPos(&position);
-	const bool bClientPositionResolved = bCursorPositionRead && ScreenToClient(hWnd, &position);
-
-	if (!bClientPositionResolved)
+	if (!ClientToScreen(hWnd, &position))
+	{
+		return std::nullopt;
+	}
+	if (!SetCursorPos(position.x, position.y))
+	{
+		return std::nullopt;
+	}
+	if (!GetCursorPos(&position))
+	{
+		return std::nullopt;
+	}
+	if (!ScreenToClient(hWnd, &position))
 	{
 		return std::nullopt;
 	}

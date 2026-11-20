@@ -8,8 +8,10 @@
 
 static inline DirectX::XMMATRIX ComposeJointTransform(const ECS::AnimationJointTransform& transform) noexcept
 {
-	return DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&transform.Scale)) * DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&transform.Rotation))
-	    * DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&transform.Translation));
+	const DirectX::XMMATRIX scale = DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&transform.Scale));
+	const DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&transform.Rotation));
+	const DirectX::XMMATRIX translation = DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&transform.Translation));
+	return scale * rotation * translation;
 }
 
 namespace AnimationPoseEvaluator
@@ -39,14 +41,23 @@ namespace AnimationPoseEvaluator
 			switch (channel.targetPath)
 			{
 				case Assets::CookedAnimationTargetPath::Translation:
-					DirectX::XMStoreFloat3(&transform.Translation, AnimationSampler::SampleVectorChannel(clip, channel, playbackTimeSeconds));
+				{
+					const DirectX::XMVECTOR translation = AnimationSampler::SampleVectorChannel(clip, channel, playbackTimeSeconds);
+					DirectX::XMStoreFloat3(&transform.Translation, translation);
 					break;
+				}
 				case Assets::CookedAnimationTargetPath::Rotation:
-					DirectX::XMStoreFloat4(&transform.Rotation, AnimationSampler::SampleRotationChannel(clip, channel, playbackTimeSeconds));
+				{
+					const DirectX::XMVECTOR rotation = AnimationSampler::SampleRotationChannel(clip, channel, playbackTimeSeconds);
+					DirectX::XMStoreFloat4(&transform.Rotation, rotation);
 					break;
+				}
 				case Assets::CookedAnimationTargetPath::Scale:
-					DirectX::XMStoreFloat3(&transform.Scale, AnimationSampler::SampleVectorChannel(clip, channel, playbackTimeSeconds));
+				{
+					const DirectX::XMVECTOR scale = AnimationSampler::SampleVectorChannel(clip, channel, playbackTimeSeconds);
+					DirectX::XMStoreFloat3(&transform.Scale, scale);
 					break;
+				}
 				case Assets::CookedAnimationTargetPath::Weights:
 				case Assets::CookedAnimationTargetPath::Unknown:
 				default:
@@ -55,7 +66,9 @@ namespace AnimationPoseEvaluator
 		}
 		for (const std::uint32_t jointIndex : skeleton.EvaluationOrder)
 		{
-			DirectX::XMMATRIX model = ComposeJointTransform(localTransforms[jointIndex]) * DirectX::XMLoadFloat4x4(&skeleton.Resource->joints[jointIndex].parentSpaceTransform);
+			const DirectX::XMMATRIX local = ComposeJointTransform(localTransforms[jointIndex]);
+			const DirectX::XMMATRIX parentSpace = DirectX::XMLoadFloat4x4(&skeleton.Resource->joints[jointIndex].parentSpaceTransform);
+			DirectX::XMMATRIX model = local * parentSpace;
 			const std::uint32_t parent = skeleton.Resource->joints[jointIndex].parentJointIndex;
 			if (parent < modelSpaceTransforms.size())
 			{

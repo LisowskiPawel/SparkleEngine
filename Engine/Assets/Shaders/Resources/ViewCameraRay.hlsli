@@ -8,7 +8,9 @@ RayDesc BuildPerspectiveViewCameraRay(uint2 pixelCoord, uint2 extent, float2 fil
 	const float2 rasterUv = (float2(pixelCoord) + filmSample) / float2(extent);
 	const float2 ndc = float2(2.0f * rasterUv.x - 1.0f, 1.0f - 2.0f * rasterUv.y);
 	const float4 nearView = mul(float4(ndc, 1.0f, 1.0f), InvProjectionMTX);
-	const float3 directionWorld = normalize(mul(float4(nearView.xyz / nearView.w, 0.0f), InvViewMTX).xyz);
+	const float3 directionView = nearView.xyz / nearView.w;
+	const float3 unnormalizedDirectionWorld = mul(float4(directionView, 0.0f), InvViewMTX).xyz;
+	const float3 directionWorld = normalize(unnormalizedDirectionWorld);
 	const float forwardDistanceScale = dot(directionWorld, Direction);
 	RayDesc ray;
 	ray.Origin = Position;

@@ -28,15 +28,19 @@ bool PrepareDirectShadowSignal(uint2 pixelCoord, out RayTracedShadowRequest requ
 	}
 
 	const float3 positionWorld = ReconstructGBufferWorldPosition(pixelCoord, sceneDepth, InvViewMTX, InvProjectionMTX);
-	const float3 normalWorld = GBufferPacking::DecodeWorldNormal(GBufferWorldNormal.Load(int3(pixelCoord, 0)).xyz);
-	const DirectReservoir::Reservoir reservoir = DirectReservoir::UnpackReservoir(CurrentReservoirSample.Load(int3(pixelCoord, 0)), CurrentReservoirWeight.Load(int3(pixelCoord, 0)));
+	const float3 packedNormal = GBufferWorldNormal.Load(int3(pixelCoord, 0)).xyz;
+	const float3 normalWorld = GBufferPacking::DecodeWorldNormal(packedNormal);
+	const float4 samplePayload = CurrentReservoirSample.Load(int3(pixelCoord, 0));
+	const float4 weightPayload = CurrentReservoirWeight.Load(int3(pixelCoord, 0));
+	const DirectReservoir::Reservoir reservoir = DirectReservoir::UnpackReservoir(samplePayload, weightPayload);
 	if (!DirectReservoir::IsValid(reservoir))
 	{
 		return false;
 	}
 
 	const LightSampling::DirectLightSample lightSample = DirectReservoir::ReplayLightSample(reservoir.Candidate, reservoir.ShapeSample, positionWorld);
-	return ShadowRays::PrepareDirectLightShadow(positionWorld, normalWorld, lightSample, DirectLightSampling::CastsShadow(reservoir.Candidate.Light), request, immediateSignal);
+	const bool bCastsShadow = DirectLightSampling::CastsShadow(reservoir.Candidate.Light);
+	return ShadowRays::PrepareDirectLightShadow(positionWorld, normalWorld, lightSample, bCastsShadow, request, immediateSignal);
 }
 
 void TraceAndStoreDirectShadowSignal(uint2 pixelCoord)
