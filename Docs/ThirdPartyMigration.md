@@ -68,7 +68,7 @@ Keep **Sparkle RHI, frame graph and independent Reference renderer**. Own device
 
 ## Candidates and expected benefit
 
-1. **Largest named native target:** prove enkiTS against the [task-runtime plan](Implementation/TaskRuntime.md), then retire Tasks completely. The inspected oneTBB/Taskflow mappings are excluded; enkiTS remains unproved.
+1. **Largest named native target:** Tasks retirement remains conditional on a supported runtime passing the [task-runtime plan](Implementation/TaskRuntime.md). The inspected oneTBB/Taskflow mappings and pinned enkiTS preparation/worker-lifetime mapping are excluded; keep the working implementation.
 2. **Next platform trial:** SDL3 window/input after the runtime decision. Compiler preprocessing reuse can proceed independently. Prefer bounded reuse of existing Qt, CMake, vswhere and allocation facilities before adding another tool/framework dependency. Process, ECS and animation replacements remain conditional on the complete caller/format cost.
 
 [Roadmap](Roadmap.md#supporting-system-simplification) owns delivery order and release blockers. The catalogue includes deferred options for comparison, not additional commitments.
@@ -145,7 +145,7 @@ The four `≤` bars are reviewed ceilings before replacement code. The enkiTS ba
 | D / RTXDI DI | 0 identified / 0 | unmeasured | [Direct-light passes](../Engine/Renderer/Private/Passes/Lighting/Direct) contain 439 native host lines; 512 shader lines are separate. RTXDI replaces sampling math, while bindings, resources and dispatch remain application-owned. Identify actual native retirements before claiming savings; charge the full bridge. GI/PT need separate decisions. |
 | **Combined distinct gross scope** | **6,093 / 5,227** | **unmeasured** | Union of 15 scopes, with one runtime/window choice. I2, F and D add zero credit. |
 
-*T is conditional arithmetic: full retirement minus the existing 2,065-line added/relocated infrastructure target gives 1,501 native lines. It is unproved and does not change the plan's separate 1,528-line all-infrastructure review target. Inspected oneTBB/Taskflow mappings have zero eligible credit until successfully reopened with new supported public-API evidence.*
+*T is conditional arithmetic: full retirement minus the existing 2,065-line added/relocated infrastructure target gives 1,501 native lines. It is unproved and does not change the plan's separate 1,528-line all-infrastructure review target. Inspected oneTBB/Taskflow and pinned enkiTS mappings have zero eligible credit until successfully reopened with new supported public-API evidence.*
 
 The [combined total](#total-native-removal) uses distinct source-line identities, not a sum of catalogue rows. Proposal counts are ceilings/targets; retained code and replacement costs still reduce the result.
 
@@ -200,7 +200,7 @@ Vendor groups identify provenance; hardware and API support are component-specif
 | --- | --- | --- |
 | [oneTBB](https://github.com/uxlfoundation/oneTBB), Intel-origin / UXL | 0 eligible / unproved [T](#native-removal-estimates) | **Excluded mapping.** Worker/range/dependency scheduling; reopen only with new supported public-API proof. Shared Tasks scope earns no current credit. |
 | [Taskflow](https://github.com/taskflow/taskflow) | 0 eligible / unproved [T](#native-removal-estimates) | **Excluded mapping.** DAG/range scheduling; reopen with supported admission/lifetime proof. No second scheduler. |
-| **[enkiTS](https://github.com/dougbinks/enkiTS)** | **3,566** / ≥1,501* [T](#native-removal-estimates) | **Remaining fit candidate.** Range/dependency scheduling; prove actual owners after baseline gates. No runtime adopted. |
+| **[enkiTS](https://github.com/dougbinks/enkiTS)** | 0 eligible / unproved [T](#native-removal-estimates) | **Excluded pinned mapping.** Executable preparation/worker rollback failed; see the [task-runtime result](Implementation/TaskRuntime.md#2-prove-executable-runtime-fit). No runtime adopted. |
 | [nlohmann/json](https://github.com/nlohmann/json) | 0 new / no claimed saving | **Adopted.** JSON grammar/values/serialization; [the JSON contract](#json) owns the integration boundary. |
 | [simdjson](https://github.com/simdjson/simdjson) | 0 identified / unproved | **Alternative.** [C++20 writing](https://github.com/simdjson/simdjson/blob/v5.0.4/doc/builder.md) supports standard containers and custom serializers; automatic record reflection needs C++26. Whole-backend policy/lifetime and reduction fit remain unproved. |
 | [toml++](https://github.com/marzer/tomlplusplus) | 0 eligible / unproved [F](#native-removal-estimates) | **Conditional.** Commented configuration parsing; convert a retained format end to end, preserving editing. |
@@ -246,7 +246,7 @@ Vendor groups identify provenance; hardware and API support are component-specif
 
 | Project | Native G / N | Role and decision |
 | --- | --- | --- |
-| **[SDL3](https://github.com/libsdl-org/SDL)** | **≤868** / unproved [W](#native-removal-estimates) | **Trial.** [Window/input implementation study and GLFW comparison](Implementation/WindowInput.md): delegate native mechanics and ImGui platform backend; preserve UI/input behavior and D3D12/Vulkan RHI/viewport routing. |
+| **[SDL3](https://github.com/libsdl-org/SDL)** | **≤868** / unproved [W](#native-removal-estimates) | **Trial.** [Staged window/input plan and GLFW comparison](Implementation/WindowInput.md): study integration shape first, then delegate native mechanics and ImGui platform backend; preserve UI/input behavior and D3D12/Vulkan RHI/viewport routing. |
 | **[GLFW](https://github.com/glfw/glfw)** | **≤868** / unproved [W](#native-removal-estimates) | **Alternative.** Narrower window/input/surface helper; satisfy the complete SDL3 preservation boundary with less glue. |
 | [Qt item views](https://doc.qt.io/qt-6.11/qlistview.html) | ≤160 / unproved [Q](#native-removal-estimates) | **Conditional reuse, Launcher only.** Replace custom card reflow with model/view/delegate ownership; preserve sizing, DPI, focus/actions and readiness. Count the complete UI change. |
 | [D3D12MA virtual allocator](https://gpuopen-librariesandsdks.github.io/D3D12MemoryAllocator/html/virtual_allocator.html), AMD | ≤153 / unproved [V](#native-removal-estimates) | **Conditional reuse.** Descriptor range allocation only; retain native RHI/retirement and external synchronization. Token tracking must not erase the saving. |
@@ -387,7 +387,7 @@ Vendor groups identify provenance; hardware and API support are component-specif
 | [RPS](https://github.com/GPUOpen-LibrariesAndSDKs/RenderPipelineShaders), AMD | 0 / 0 (protected/study) | **Study only.** Frame scheduling/barriers/aliasing; retain these owned graphics mechanisms. |
 | [SDL_GPU](https://wiki.libsdl.org/SDL3/CategoryGPU) | 0 / 0 (protected/study) | **Excluded from SDL3 trial.** Portable rendering layer replaces the retained RHI boundary. |
 | [Donut](https://github.com/NVIDIA-RTX/Donut), NVIDIA | 0 / 0 (protected/study) | **Study only.** Scene/application/rendering framework; no second scene, task or application stack. |
-| [ShaderMake](https://github.com/NVIDIA-RTX/ShaderMake), NVIDIA | 0 / 0 (protected/study) | **Deferred replacement.** [Implementation study](Implementation/ShaderMake.md) proposes batch/invocation retirement; reflection, exact debug output, publication and reload remain Sparkle contracts. Fit and net benefit are unproved. |
+| [ShaderMake](https://github.com/NVIDIA-RTX/ShaderMake), NVIDIA | 0 / 0 (protected/study) | **Deferred replacement.** [Staged implementation plan](Implementation/ShaderMake.md) starts with integration research and architecture selection before a batch/invocation trial; reflection, exact debug output, publication and reload remain Sparkle contracts. Fit and net benefit are unproved. |
 | [RTXPT](https://github.com/NVIDIA-RTX/RTXPT), NVIDIA | 0 / 0 (external use) | **External study.** Rendering/integration/optimization; match assumptions, attribute upstream and isolate findings. |
 | [Capsaicin](https://github.com/GPUOpen-LibrariesAndSDKs/Capsaicin), AMD | 0 / 0 (external use) | **External study.** Research-renderer integration/performance; retain the owned renderer/API path. |
 

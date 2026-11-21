@@ -1,4 +1,4 @@
-# SDL3 window and input implementation study
+# SDL3 window and input implementation plan
 
 [Third-party migration](../ThirdPartyMigration.md#native-removal-estimates) | [Ownership and dependencies](../ThirdPartyMigration.md#ownership-and-dependency-workflow) | [Engineering](../Engineering.md)
 
@@ -6,7 +6,9 @@
 
 **D3D12 and Vulkan remain the only rendering backends. Neither candidate requires OpenGL.** SDL's GPU and 2D rendering APIs are outside this proposal. SDL3 remains a trial; this document adds no dependency or implementation and establishes no accepted savings.
 
-Repository inspection: **2026-11-21**, HEAD `58143b2a4fe5cff080377b1fc524454c534ade61`, with existing documentation edits. The source paths below were inspected in that working tree. This is a source study, not an executable baseline. The catalogue's reviewed scope is **752 code / at most 868 physical lines in 13 files**, before retained policy and all replacement costs.
+**Start with [stage 0: integration design deep dive](#stage-0-integration-design-deep-dive).** Every stage has positive/negative guidelines, failure modes, acceptance criteria and a copyable prompt. All stages are **NOT STARTED**; the research below is input to stage 0, not its completed design decision.
+
+Initial source inspection: **2026-11-21**, HEAD `58143b2a4fe5cff080377b1fc524454c534ade61`. Staged-plan review: **2026-11-21**, HEAD `293e2b209f215926eb952dcd277a95177368e831`, with an unrelated Animation-plan edit. The mapped Platform/input, Editor, presentation and dependency sources are unchanged between those revisions. Recheck live owners before execution. This is a source study, not an executable baseline. The catalogue's reviewed scope is **752 code / at most 868 physical lines in 13 files**, before retained policy and all replacement costs.
 
 ## What SDL3 and GLFW actually do
 
@@ -186,31 +188,193 @@ For the SDL trial, propose **one shared SDL3 runtime** used by Platform and the 
 
 Build video/events/keyboard/mouse support; disable unused audio, GPU, 2D render, camera, joystick/haptic/sensor and other optional subsystems where the stock ImGui backend still builds and behaves correctly. Set `SDL_OPENGL=OFF` and `SDL_OPENGLES=OFF`. For the chosen native-HWND Vulkan path, SDL's own Vulkan helper support is unnecessary; Sparkle's Vulkan target remains enabled independently. Do not confuse disabling SDL GPU/Direct3D render drivers with disabling Sparkle D3D12. Verify actual option names/dependencies against the pin. [SDL CMake source](https://github.com/libsdl-org/SDL/blob/release-3.4.20/CMakeLists.txt), [CMake integration](https://wiki.libsdl.org/SDL3/README-cmake).
 
-Replace `imgui_impl_win32.cpp` with `imgui_impl_sdl3.cpp` at the existing ImGui revision first. The inspected backend offers `InitForD3D`, `InitForVulkan` and `InitForOther`; select the platform initialization appropriate to the retained renderer without adding an upstream ImGui graphics backend. Its gamepad-related calls must remain linkable with the selected SDL options. Keep dependency links private where no public contract requires them. Regenerate the recursive Platform target after deleting/adding files.
+Use `imgui_impl_sdl3.cpp` at the existing ImGui revision first. **Stage 0 must decide its target placement:** today's static `imgui` target includes the Win32 backend and is linked by Editor and RHI. Blindly replacing that source can spread SDL linkage beyond its consumers. Compare keeping that composition with linking the stock platform-backend source only into its actual Editor/host owner, using a focused target if needed. Preserve the existing ImGui context/thread contract; add no forwarding backend class or second implementation. See the [recipe](../../CMake/Dependencies/Targets/imgui.cmake), [context configuration](../../CMake/Dependencies/ImGui/SparkleImGuiConfig.h) and [RHI target graph](../../Engine/RHI/CMakeLists.txt).
 
-## Implementation sequence and evidence
+The inspected backend offers `InitForD3D`, `InitForVulkan` and `InitForOther`; select appropriate platform initialization without adding an upstream ImGui graphics backend. Its gamepad-related calls must remain linkable with the selected SDL options. Keep dependencies private where public use does not require them, and verify the link graph as well as legal includes. Regenerate recursive source membership after file changes.
 
-The catalogue currently orders the SDL trial after the task-runtime decision. This study does not change that order. When implementation starts, use the bounded [code-delivery policy](../ThirdPartyMigration.md#code-delivery-and-qualification): decisive fit first, actual caller conversion next, broader qualification recorded separately.
+## Staged execution contract
 
-| Stage | Work and exit |
+The [Roadmap](../Roadmap.md#supporting-system-simplification) places this trial after the task-runtime decision and adds no first-release prerequisite. Design research can proceed without starting a code migration. Follow [code delivery and qualification](../ThirdPartyMigration.md#code-delivery-and-qualification): prove decisive fit early, finish connected owners and retirement, then close the bounded code initiative. Wider qualification remains distinct.
+
+| Stage | Deliverable / exit | Status |
+| --- | --- | --- |
+| [0](#stage-0-integration-design-deep-dive) | Source-backed integration design, ownership/target graph and decisive experiment | NOT STARTED |
+| [1](#stage-1-bind-the-baseline-and-checks) | Frozen source/behavior identities, runnable checks and comparison limits | NOT STARTED |
+| [2](#stage-2-prove-the-real-integration-fit) | One SDL-backed vertical path using real D3D12/Vulkan and Editor owners | NOT STARTED |
+| [3](#stage-3-complete-window-and-presentation-integration) | Complete window/DPI/native-handle/lifetime conversion | NOT STARTED |
+| [4](#stage-4-complete-input-camera-and-editor-integration) | Complete input, camera and ImGui conversion with policy preserved | NOT STARTED |
+| [5](#stage-5-retire-the-backend-and-close-code-delivery) | Old backend removed; source/build/delivery inputs and focused checks complete | NOT STARTED |
+
+Every prompt below runs only its named stage. Verify the previous exit against matching inputs; reuse valid evidence and recheck affected inputs when they change. Keep raw reports/probes in ignored `build/validation/window-input/`. Update this plan's existing status, decisions, failures and next action **before each handoff**; do not append progress blankets to main guides. Record source hashes/local edits, upstream pin/options, commands, expected result/tolerance, observation and coverage limits. An interrupted run is not PASS.
+
+Stages 0–1 change analysis/evidence only. Stages 2–4 form one isolated implementation candidate, with one window/event provider per executable; they are not separately shippable partial migrations. Include directly required caller conversions to keep each candidate build coherent, record later checks still owed and avoid temporary compatibility shims merely to enforce stage boundaries. Preserve the baseline and unrelated edits. Wait for builds sharing an output root or use isolated outputs. Keep new probes/test-only source local and remove it before handoff; preserve existing tests. A prompt is a future execution instruction, not evidence that the stage has run.
+
+### Stage 0: integration design deep dive
+
+**Purpose:** choose the smallest coherent integration that serves the rendering goals. Read full affected functions and trace construction, calls, mutable state, callbacks, dependencies and destruction. Do not start production or prototype implementation in this stage.
+
+Translate every named guide into design decisions:
+
+| Guide | Consequence for this integration |
 | --- | --- |
-| 1. Freeze the comparison | Record relevant source hashes/dirty edits, current window/input behavior and selected upstream pin/options. Name repeatable API/profile/capture inputs and cost tolerances before trials. Preserve the 13-file ceiling and measure connected callers separately. Full benchmarking is not a prerequisite to the first prototype. |
-| 2. Prove decisive fit | Exercise one real engine window with existing D3D12 and Vulkan presentation, custom title-bar/resize behavior, ImGui coexistence, relative camera motion and interruption recovery. Resolve capture notification and cursor authority early. If SDL needs substantial native reimplementation, stop and assess GLFW against these same contracts. |
-| 3. Convert the owners | Replace Window internals and input acquisition; adapt Core motion values, camera collector, Editor platform backend, title-bar regions, host lifetime and native-handle consumers. Retain one pump and existing routing/cancellation. Use the stock upstream implementation. |
-| 4. Retire and close code delivery | Delete superseded Win32 files/messages, unused members/options/link dependencies and obsolete ImGui backend membership. Finish pin/notices/staging/package inputs, affected builds and focused behavior/failure/lifetime checks. No fallback backend or temporary validation source is submitted. Report net cost honestly. |
+| [Goals](../Goals.md#north-star) | Transfer support maintenance so the two-API rendering case is easier to deliver. Retain explicit graphics reasoning, reproducible failures and personal rendering ownership. No general multimedia/game framework expansion. |
+| [CodeStyle](../CodeStyle.md#c-structure) | Direct typed operations, meaningful locals, readable orchestration and cohesive lifetimes. Review real names/files/API shape; no helper bags, one-field forwarding wrappers or generic backend machinery. |
+| [Engineering](../Engineering.md#module-boundaries) | One owner per mutable fact; necessary public/interop boundaries; private SDL implementation; explicit callback, CPU/GPU and destruction lifetimes. |
+| [README](../README.md#guides) | Runtime/Editor are the consumers; Launcher remains Qt. This file owns temporary stages; existing guides own durable decisions and release results. |
+| [References](../References.md#integration-precedents) | Study actual pinned source and record what transfers and what does not. Adoption and brand names are not local fit evidence. |
+| [Rendering](../Rendering.md#source-map) | Preserve RHI/Renderer/UI packet ownership, reference independence, immutable frame inputs and API/resource lifetime. Window replacement must not change shading or render settings. |
+| [RepositoryFootprint](../RepositoryFootprint.md#cuts-before-expansion) | Delete a maintained mechanism and count every adapter/caller. The 868 physical / 752 code lines are a gross ceiling; no net forecast or Core/file-count quota. Preserve necessary cancellation and verification. |
+| [Roadmap](../Roadmap.md#supporting-system-simplification) | Respect delivery order and keep existing image/Vulkan/package blockers separate. No new release scope, hardware campaign or acceptance shortcut. |
+| [ThirdPartyMigration](../ThirdPartyMigration.md#requirements-for-adoption) | One selected upstream provider, complete retirement, exact-pin trust/dependency review, offline delivery and honest cost accounting. |
 
-Focused checks below are proposed and **UNVERIFIED**. A build can establish linkage; it cannot pass a GUI, GPU, input-feel or package check.
+Study existing local integrations before choosing target shape:
 
-| Check | Required observation |
+1. Trace `GameApplication`/`EditorApplication` startup, main-thread pump, minimized wait, Editor frame timing and reverse destruction through the [mapped owners](#what-would-be-replaced-in-this-repository). Trace both normal and external-capture presentation paths.
+2. Inspect the current [ImGui recipe](../../CMake/Dependencies/Targets/imgui.cmake), [context bridge](../../CMake/Dependencies/ImGui/SparkleImGuiContext.cpp), Editor context and RHI/Renderer UI consumers. Identify actual DLL/static-link and thread-context boundaries before deciding where the stock SDL platform backend compiles.
+3. Follow [CLI11](../../CMake/Dependencies/Targets/cli11.cmake) and [JSON](../../CMake/Dependencies/Targets/nlohmann_json.cmake) recipes for verified source acquisition, required files, unused-option suppression and source-package identity. Inspect fetch order/allowlists, [Launcher metadata](../../Tools/Launcher/SparkleLauncher/Private/Dependencies/SourceDependencyState.cpp) and [package graph traversal](../../CMake/Packaging/ReleaseProducts.cmake). A header-only recipe is not proof that a runtime DLL will be staged correctly.
+4. Audit Core input producers/consumers, side-specific modifiers, integer motion, synthetic releases and immediate/deferred cancellation. Separate existing guarantees, observed baseline behavior, proposed contract changes and optional capability additions. The English keyboard/mouse release scope does not authorize removing existing exposed behavior or adding controllers/extra platforms.
+
+Inspect these upstream integration precedents, recording revision, useful pattern and incompatible assumptions:
+
+| Primary source | Question it must answer |
 | --- | --- |
-| D3D12 and Vulkan, separately | Existing scene presents; resize/minimize/restore/fullscreen work; zero extent does not trigger invalid presentation; surface/handle lifetime is correct. Exercise both ordinary and external capture paths when affected. |
-| Borderless window | Correct startup/maximize/work area/minimum size, edge/corner resize, menu/button exclusions, drag and double-click behavior; restore returns to the intended monitor/placement. |
-| Focus/capture/cancellation | Hold movement and right-button look, then Alt+Tab, interrupt capture, open a modal, change viewport target, minimize and close. No stuck buttons, stale deferred input, duplicate logical releases, hidden cursor or unexpected look jump. Include reentrant cancellation. |
-| Camera/input fidelity | Slow/fast and edge-crossing motion, fractional deltas, repeat keys, left/right modifiers, Caps/Num/Scroll lock, keyboard layouts, text/IME/clipboard and both wheel axes preserve required behavior. |
-| DPI | 100/150/200% and mixed-monitor moves: correct pixel extent, UI scale, pointer/viewport alignment, minimum size and no repeated scaling. |
-| Minimized wait / failure / shutdown | A single wake event is retained; close wakes idle application; mode/window/backend initialization failures unwind safely; subscriptions/backend are gone before the window; presentation is settled before native destruction. |
+| Pinned ImGui [SDL3 platform backend](https://github.com/ocornut/imgui/blob/6d910d5487d11ca567b61c7824b0c78c569d62f0/backends/imgui_impl_sdl3.cpp) and [SDL3/Vulkan example](https://github.com/ocornut/imgui/blob/6d910d5487d11ca567b61c7824b0c78c569d62f0/examples/example_sdl3_vulkan/main.cpp) | How do event forwarding, text/cursor/capture updates, initialization and shutdown compose? Identify sample-owned Vulkan helpers that Sparkle must not adopt. |
+| Pinned ImGui [Win32/D3D12 example](https://github.com/ocornut/imgui/blob/6d910d5487d11ca567b61c7824b0c78c569d62f0/examples/example_win32_directx12/main.cpp), with SDL native-window properties | How does a borrowed HWND connect to DXGI while preserving Sparkle's own rendering path? The inspected ImGui pin has no combined SDL3/D3D12 example; do not invent one or substitute D3D11. |
+| Donut [window composition](https://github.com/NVIDIA-RTX/Donut/blob/e50042f4bbd762971cc90431261e967404855b81/src/app/DeviceManager.cpp), [D3D12](https://github.com/NVIDIA-RTX/Donut/blob/e50042f4bbd762971cc90431261e967404855b81/src/app/dx12/DeviceManager_DX12.cpp) and [Vulkan](https://github.com/NVIDIA-RTX/Donut/blob/e50042f4bbd762971cc90431261e967404855b81/src/app/vulkan/DeviceManager_VK.cpp) | This GLFW integration uses `GLFW_NO_API`, HWND-based DXGI and Vulkan surface helpers. Which boundaries are useful, and which DeviceManager/NVRHI responsibilities must remain Sparkle-owned? Study the alternative without importing its framework. |
+| Selected SDL release's Windows event/mouse/window sources and CMake, linked above | Does public SDL behavior cover hit testing, relative mode, cancellation observation, DPI and disabled subsystems? Check exact-pin support, tests/fixes/advisories, license and runtime closure; document unresolved behavior instead of assuming it. |
 
-After the code exit, wider profile/hardware runs, frame-time/input-latency distributions, cold-start/binary costs, visual comparisons and relocated package/clean-machine campaigns remain with their existing qualification owners. Record PASS, FAIL, INCONCLUSIVE and UNVERIFIED against the actual candidate; do not turn source or build checks into release acceptance. At closure, fold lasting decisions into the catalogue and remove this temporary implementation plan.
+Resolve these design choices in this document, with source evidence and rejected alternatives:
+
+- **Lifetime and threading:** SDL subsystem/window initialization owner, main-thread operations, subscription teardown and all-queue GPU settlement. Keep useful existing `Window`/host lifetimes; justify any new RAII owner by an actual independent lifetime.
+- **Target graph:** SDL shared versus a single static implementation owner; stock ImGui backend placement; SDL-before-ImGui dependency order; private/public links, exports and runtime staging. Avoid unintentionally pulling SDL platform code through the ImGui core into RHI consumers.
+- **Interop and events:** prefer the proposed HWND path for both native APIs unless a current consumer justifies surface helpers. Define one pump, subscriber order, mandatory state updates, synchronous borrowed events and owned deferred values; no translated native-message mirror.
+- **Capture authority:** choose normal UI versus camera ownership, relative mode, cursor restoration and an observable cancellation path. Check ImGui's capture calls separately from cursor-shape flags; keep one logical engine authority rather than shadowing SDL state.
+- **Value semantics and chrome:** choose motion units/precision, key/layout/modifier mapping, pixel versus UI scale and a title-bar region contract. Name the actual Core/header/ABI and Editor caller changes.
+- **Retirement and cost:** name removed functions/files, retained policy and every new/changed caller. Sketch final folders/APIs and count mutable authorities, not just lines. Prefer direct cohesive operations over renamed Win32 machinery, god classes or artificial file fragmentation.
+
+**Positive guidelines:** explain why the chosen graph/lifetime is simpler for the actual consumers; use source-backed comparisons and deliberate, narrow interop. **Negative guidelines:** no implementation, dependency adoption, copied sample renderer, blanket SDL service wrappers, compatibility switches, speculative platform abstraction or unsupported savings claims. **Failure modes:** source-only API matching misses capture interruption; an ImGui target swap broadens dependencies; a new manager mirrors window/input state; a sample silently replaces the owned RHI.
+
+**Acceptance criteria:**
+
+- [ ] All nine guide consequences, local call paths and precedent lessons are reconciled; contradictions and existing defects are explicit.
+- [ ] The selected design names producer/consumer, state authority, thread, borrowing and teardown for each boundary, including the CMake/DLL graph. Retained and rejected alternatives have reasons.
+- [ ] Every unresolved fit question has a decisive stage-2 experiment and expected outcome. No unresolved design choice is hidden behind an interface or fallback.
+- [ ] Update the relevant existing design sections, not only an appended report. Record a ready-for-baseline decision or a concrete unsupported requirement. This accepts design readiness only; runtime fit remains unproved.
+
+Ready-to-use prompt:
+
+```text
+Execute stage 0 only in Docs/Implementation/WindowInput.md. Do not implement SDL3 or add production/prototype code. Read all nine guides under Docs/: CodeStyle.md, Engineering.md, Goals.md, README.md, References.md, Rendering.md, RepositoryFootprint.md, Roadmap.md and ThirdPartyMigration.md. Deep-dive the current host/window/input/ImGui/RHI, dependency and package integrations and the pinned upstream precedents in the plan. Choose the smallest coherent integration: owners, state, threads, lifetime, events, capture, units, native handles, target/DLL graph and complete retirement. Explain rejected alternatives and decisive fit experiments. Preserve concurrent work. Revise this plan in place, record evidence/limits, check links and report stage-0 acceptance and the next action. Do not treat this research as runtime qualification.
+```
+
+### Stage 1: bind the baseline and checks
+
+**Positive guidelines:** freeze relevant revision/diff/per-file hashes, upstream pin/options, toolchain/profile and scene/camera/settings. Capture existing behavior on the current Win32 owner and define positive/negative checks A1–A9 below. Set explicit camera-response/coordinate tolerances and startup, build, binary/package, memory and frame-cost comparison limits before measuring those claims. Run only the focused baseline needed for the decisive prototype; wider distributions can remain unmeasured.
+
+**Negative guidelines:** no production edits, moving limits after results, full baseline campaign before a first trial, duplicated evidence where inputs still match, or equating baseline failures with SDL failures. **Failure modes:** concurrent code changes invalidate controls; an existing Vulkan/presentation defect prevents the relevant comparison; mixed scene/settings obscure input or image differences. Isolate the smallest useful control, retain the failure and mark unavailable comparisons INCONCLUSIVE/UNVERIFIED; continue independent checks without inventing a pass or weakening graphics requirements.
+
+**Acceptance criteria:**
+
+- [ ] Baseline source, inputs, supported behavior and prototype pin/options are bound; every check has a runnable journey/command and expected outcome.
+- [ ] Current API failures and unsupported/unobserved cases are separated from candidate expectations; numerical comparison limits are frozen wherever a measurement is planned.
+- [ ] The focused baseline permits the stage-2 fit decision without restarting unrelated qualification. Required unavailable observations remain explicit.
+
+Ready-to-use prompt:
+
+```text
+Execute stage 1 only in Docs/Implementation/WindowInput.md after verifying stage-0 design readiness. Follow the staged execution contract. Bind the actual source/local edits, tools, selected SDL pin/options and rendering inputs. Capture the focused Win32 controls and define executable positive/negative checks A1–A9 with expected outcomes and frozen comparison tolerances. Preserve baseline failures and matching prior evidence; do not change production code or require a full benchmark campaign. Update this plan and ignored evidence with results, limitations and the exact stage-2 experiment.
+```
+
+### Stage 2: prove the real integration fit
+
+**Positive guidelines:** use an isolated candidate with the selected SDL recipe/options and stock ImGui backend. Exercise one real engine window, existing D3D12 and Vulkan presentation, custom drag/resize regions, routed camera motion and ImGui coexistence. Resolve capture-interruption observation and cursor authority early. Drive the actual host/input/RHI owners sufficiently to falsify the proposed boundary; a standalone SDL window alone is insufficient.
+
+**Negative guidelines:** no alternate shipping backend, local SDL fork, OpenGL, SDL renderer/GPU, copied sample graphics framework, dummy input or success-only demonstration. **Failure modes:** native capture loss cannot reach engine cancellation; ImGui overrides camera capture/visibility; relative-mode transitions jump; native-handle/loader assumptions fail; a second runtime copy appears. Revisit a narrow supported composition once; if it needs comparable native machinery, record SDL no-fit and evaluate GLFW under the same boundary before conversion.
+
+**Acceptance criteria:**
+
+- [ ] A1–A4 and the decisive portions of A5–A8 pass on real owners for both APIs; untested broader cells remain explicit. No demonstrated unsafe cancellation/lifetime or required-fit gap is carried as a pass.
+- [ ] Native chrome, input and UI coexist without a fork/parallel mechanism; source and loaded-runtime identities match the design.
+- [ ] Record supported fit or the precise rejection/inconclusive condition and revise the design sections accordingly. Fit is not production adoption or code completion.
+
+Ready-to-use prompt:
+
+```text
+Execute stage 2 only in Docs/Implementation/WindowInput.md using the stage-0 design and stage-1 controls. Build the isolated real-owner SDL3 trial and prove D3D12/Vulkan native presentation, custom chrome, ImGui, relative camera input, interruption recovery and teardown. Run the decisive positive and negative checks; keep baseline defects and unavailable observations separate. Do not add a graphics abstraction, SDL fork, permanent probe or second shipping backend. Record the exact candidate and fit decision, update this plan and report whether full conversion is justified.
+```
+
+### Stage 3: complete window and presentation integration
+
+**Positive guidelines:** promote the proven window path into its final owners within the same candidate. Complete creation/state, startup maximization, borderless fullscreen restoration, title-bar hit testing, minimum/work-area constraints, DPI/pixel extent and minimized waiting. Convert native-handle/capture bindings and teardown. Preserve atomic dimension publication and the existing Renderer/RHI resource-retirement model. Revisit filenames, placement, exports and build membership as responsibilities change.
+
+**Negative guidelines:** no WndProc reconstruction, raw-message facade, duplicate window placement/state authority, Vulkan loader in a neutral window owner or GPU work inside hit-test callbacks. Do not change rendering settings to hide failures. **Failure modes:** UI buttons become drag regions; wrong DPI units resize the swapchain; wait consumes the sole restore/close event; stale HWND use survives window destruction; resize destroys in-flight GPU resources.
+
+**Acceptance criteria:**
+
+- [ ] A1, A2, A4, A6 and window-related A7 pass on the connected candidate; both native presentation owners and external-capture bindings remain coherent.
+- [ ] Window/native-message machinery superseded by this conversion is removed, actual shared consumers compile/link, and regenerated membership contains only the intended sources.
+- [ ] Remaining input/Editor conversion work is explicitly assigned to stage 4; the combined candidate remains non-shippable until stage 5.
+
+Ready-to-use prompt:
+
+```text
+Execute stage 3 only in Docs/Implementation/WindowInput.md after verifying the recorded SDL fit. Finish the window, DPI, title-bar, minimized-wait, native-handle and presentation-lifetime conversion on the same candidate. Keep D3D12/Vulkan GPU ownership and behavior. Remove replaced window/native-message machinery, update structure/exports/CMake and run the mapped positive/negative checks through actual consumers. Preserve concurrent edits and record candidate-bound results and the remaining stage-4 work in this plan.
+```
+
+### Stage 4: complete input, camera and Editor integration
+
+**Positive guidelines:** finish SDL-to-Core value mapping, precision/units and mode transitions. Convert InputSystem subscriptions/pointer operations, camera collector and Editor platform input/shortcuts. Preserve layer routing, state-before-callback ordering, queued-before-immediate delivery, reentrant cancellation, pointer-only versus full cancellation and synthetic releases. Keep command keys separate from text; use the stock UI platform backend. Rebuild all consumers affected by the Core delta/ABI change.
+
+**Negative guidelines:** no new native-state registry alongside the existing Core frame snapshots/routed state, camera policy in SDL acquisition, global suppression based solely on ImGui consumption, per-move warping, per-event fractional truncation or Core dependency on SDL/Editor. Do not remove safeguards to reduce line count. **Failure modes:** stuck movement after Alt+Tab; duplicate releases after nested cancellation; stale deferred events after a modal; UI/camera cursor conflict; layout/modifier or wheel-direction regression; mixed DLL layouts.
+
+**Acceptance criteria:**
+
+- [ ] A3–A5 and input-related A6–A7 pass through the actual InputSystem, camera and Editor owners, including negative/reentrant journeys.
+- [ ] Camera look uses the agreed delta contract without recurring recentering, and failure/exit restores the pointer. SDL state and engine logical capture remain coherent.
+- [ ] Superseded Win32 decoders/pointer helpers, message subscriptions and obsolete public operations are removed with callers; real shared-module consumers pass and Core remains SDL-free.
+
+Ready-to-use prompt:
+
+```text
+Execute stage 4 only in Docs/Implementation/WindowInput.md on the current implementation candidate. Complete input acquisition/value precision, cursor modes, camera intent and Editor/ImGui platform conversion. Preserve existing routing, immediate/deferred dispatch, modifiers, text/shortcuts and cancellation ordering under failure/reentrancy. Delete replaced Win32 input/pointer APIs and recurring camera warps; rebuild real ABI consumers. Run the mapped positive/negative journeys, retain exact evidence/limits and update this plan before handoff.
+```
+
+### Stage 5: retire the backend and close code delivery
+
+**Positive guidelines:** audit the entire connected change, including public headers, target graph, upstream acquisition, Launcher metadata, runtime staging, notices and package inputs. Remove every superseded mechanism, compatibility path, unused dependency and temporary probe; preserve existing tests and legitimate Win32 graphics interop. Run scoped CodeStyle plus manual ownership/readability review, regenerate/build affected targets in clean candidate outputs and execute focused A1–A9. Check source and prebuilt consumption boundaries, including offline use and feature-specific dependency selection.
+
+**Negative guidelines:** no filename-based ban on Windows graphics code, new source-text policy framework, two-provider selector, stale-output-assisted build, unrequested permanent tests or broad unrelated refactor. **Failure modes:** stale objects hide old references; SDL DLL is absent/wrong/duplicated; standalone Launcher gains an unwanted SDL dependency; package metadata omits the new runtime; a claimed reduction excludes callers.
+
+**Acceptance criteria:**
+
+- [ ] One supported SDL implementation owns native mechanisms; every retirement row and new/changed caller is reconciled. Affected builds, exports, source membership and focused correctness/failure/lifetime checks pass.
+- [ ] Runtime/source identity, notices, dependency sync/filtering and staged/package inputs are correct. A8–A9 and affected offline/staging checks pass; broader clean-machine/package qualification is explicitly separate.
+- [ ] Report native gross/net and non-native/build/runtime/package costs, public surface and state-authority changes. Review a missed cost target once; fix defects/material regressions, without indefinite line-count experiments or invented savings.
+- [ ] Close the code initiative only when its required exit passes. Move lasting decisions and unresolved qualification limits to their existing owners, remove incoming plan links and delete this temporary plan under Engineering. Preserve failures and raw evidence in ignored output; do not create a replacement acceptance plan.
+
+Ready-to-use prompt:
+
+```text
+Execute stage 5 only in Docs/Implementation/WindowInput.md. Audit and finish the entire SDL3 candidate: retire superseded backend/facades, reconcile all callers/exports/CMake, verify one runtime plus dependency/Launcher/notices/staging/package inputs, and remove local probes. Run scoped style/manual structural review, regenerated affected builds and focused positive/negative checks A1–A9. Measure the complete retirement ledger honestly. If the bounded code exit passes, reconcile lasting guidance and open qualification limits with existing owners and remove this plan/incoming links; otherwise record concrete remaining defects. Do not claim release readiness from code/build evidence.
+```
+
+## Focused positive and negative acceptance checks
+
+All replacement checks are **UNVERIFIED**. Stages select the relevant checks; stage 5 reconciles the complete focused set. Stage 1 binds expected outcomes/tolerances and supported cases. Existing baseline/API failures must remain visible, and builds establish linkage rather than GUI/GPU/input-feel acceptance.
+
+| Check | Positive path | Negative/failure path and required outcome |
+| --- | --- | --- |
+| A1 — native presentation | Existing scene presents on D3D12 and Vulkan separately; normal resize/fullscreen and affected external capture work. | Zero extent, resize with delayed GPU completion and close during presentation: skip invalid work, settle GPU references and destroy surface/swapchain before the native window. No new native validation errors. |
+| A2 — window/chrome | Correct initial maximize, work area, minimum size, drag, edge/corner resize, double-click and windowed/fullscreen restoration. | Click menus/buttons instead of the drag region; drag from maximized; interrupt native drag: controls remain usable and no false camera capture or stuck mouse state survives. |
+| A3 — focus/cancellation | UI/Gameplay/System routing and capture ownership remain correct for immediate/deferred subscribers. | Hold movement/look then Alt+Tab, interrupt same-focus capture, open a modal, change target, minimize or close; reenter cancellation callbacks. Clear state first, cancel stale queued input, deliver each logical release once; pointer-only cancellation preserves keyboard state. |
+| A4 — event lifetime/wait | One pump, deterministic subscriber order, mandatory native state updates and owned deferred values. | A consumed UI event still updates required state; a single close/release/restore event wakes a minimized app without loss. No queued reference to borrowed SDL text/event storage survives delivery. |
+| A5 — input values | Agreed camera response, fractional motion, full exposed key/modifier/repeat behavior, both wheel axes and existing text/clipboard workflows. | Slow/fast/edge-crossing motion, mode-entry failure, focus recovery, AltGr/layout cases where applicable: no jump/truncation, wrong key/wheel direction or hidden cursor. Unestablished IME/layout capabilities remain labelled rather than silently added as release requirements. |
+| A6 — DPI/coordinates | 100/150/200% UI scale with exact queried drawable extent and aligned viewport input. | Move across mixed-DPI monitors, resize/minimize/maximize and restore: no double scaling, wrong minimum/work area or mismatch between pointer and rendered viewport. |
+| A7 — failure/teardown/ABI | Actual Game/Editor/shared-module consumers use coherent values and the same runtime. | Fail SDL/window/backend/mode initialization, repeat startup/teardown, close while active: truthful state, useful owning error and safe unwinding; no dangling subscriber, stale handle, wrong-thread SDL call or callback into retired state. |
+| A8 — dependency/delivery | Correct pin/required files/options, one loaded runtime, target-driven staging, notices and supported offline consumption. | Missing/wrong runtime or source revision: fail clearly and preserve inspection state; no silent provider fallback or unattended download. Feature-disabled/standalone-Launcher configurations gain no unnecessary SDL consumer. |
+| A9 — structural retirement | Existing useful contracts remain, code reads in domain steps and complete caller/adapter costs are accounted. | Fresh regenerated outputs expose stale references: none may be satisfied by old objects/backends. No duplicate owner, compatibility facade, copied upstream implementation, permanent probe or deleted existing test masks the change. |
+
+After the code exit, wider profile/hardware runs, frame-time/input-latency distributions, cold-start/binary costs, visual comparisons and relocated package/clean-machine campaigns remain with their existing qualification owners. Record PASS, FAIL, INCONCLUSIVE and UNVERIFIED against the actual candidate; only an explicit waiver is WAIVED / UNVERIFIED. Preserve existing product blockers, including the Roadmap's Vulkan swapchain issue. Required fit, implementation, unsafe lifetime/cancellation and demonstrated behavior defects block code completion; a pending broader campaign does not extend a completed code initiative.
 
 ## What makes this migration worth keeping
 

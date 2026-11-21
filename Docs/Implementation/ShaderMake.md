@@ -1,8 +1,10 @@
-# ShaderMake implementation study
+# ShaderMake integration study and implementation plan
 
 [Third-party migration](../ThirdPartyMigration.md) | [Goals](../Goals.md) | [Rendering](../Rendering.md) | [References](../References.md) | [Engineering](../Engineering.md#module-boundaries)
 
-**Status: researched proposal, 2026-11-21. No compiler integration, prototype cook or retirement has been performed.** This document supports a decision and describes the implementation if the decisive fit checks pass. It does not adopt a dependency or change delivery priorities.
+**Status: plan prepared, 2026-11-21. Stages 0-5 are NOT STARTED.** Source research informs this proposal; no stage gate, prototype cook, production integration or retirement has passed. This plan does not adopt a dependency or change delivery priorities.
+
+[Responsibility split](#high-level-responsibility-split-after-full-integration) | [Governing guides](#fit-with-the-project-and-your-development-goals) | [Target architecture](#target-architecture-and-structural-review) | [Stages and prompts](#implementation-stages-and-exits) | [Failure modes](#failure-modes-and-required-responses)
 
 **Recommendation:** ShaderMake is compatible with the documented graphics systems and DevTech direction as a bounded support-code replacement. Trial it as the owner of offline compile batches and compiler invocation. Keep Sparkle's typed shader contracts, reflection validation, cooked publication and runtime reload. Adoption requires the [target architecture and structural review](#target-architecture-and-structural-review) as well as reflection/debug fit; compiling successfully alone is insufficient.
 
@@ -50,14 +52,19 @@ ShaderMake supports configuration-driven permutations, bounded parallel compilat
 
 ## Fit with the project and your development goals
 
-**The four guides support delegating this mechanism.** Their recurring requirement is to understand, own and prove the rendering result while keeping supporting systems small. The fit is conditional on retiring local machinery without losing the information needed to explain executed shaders.
+**The nine governing guides support investigating this bounded delegation.** Their recurring requirement is to understand, own and prove the rendering result while keeping supporting systems small. Stage 0 must challenge the proposed shape against every guide below; fit is conditional on retiring local machinery without losing the information needed to explain executed shaders.
 
 | Governing guide | How the proposed introduction supports it | Boundary the migration must preserve |
 | --- | --- | --- |
+| [Code style](../CodeStyle.md) | Keep changed C++20/shaders cohesive, readable and consistent with the actual owner. | Apply naming, logical paragraphs, meaningful locals, header/include rules and private SDK boundaries. Review responsibility before running the per-file checker; do not add forwarding wrappers to satisfy style rules. |
+| [Engineering](../Engineering.md) | Move complete batch/invocation mechanisms upstream behind the existing offline tool boundary. | One compilation owner; narrow private adaptation; immutable inputs; settled processes; accepted-output preservation; qualified tools and offline delivery. Include all adapters/package costs and preserve the documented interruption/recovery limits. |
 | [Goals: target persona and North Star](../Goals.md#target-persona) | Selecting and integrating an upstream tool can demonstrate technical direction, usable delivery and removal of unnecessary maintenance. | Keep fluency in HLSL/Slang, DXIL/SPIR-V, reflection, host/shader layout, explicit APIs and numerical/performance reasoning. Tool adoption alone does not verify these capabilities. |
+| [README: documentation ownership](../README.md#guides) | Keep this active plan as the single implementation owner and route readers to existing subject guides. | Update current decisions instead of appending competing plans or duplicating stage history into the main guides. |
+| [References: roles and production studies](../References.md#role-sources) | Graphics/DevTech and research-productization roles emphasize useful shaders, systems analysis, debugging and integration. Reproducible compiler invocations can support that work. | Study pinned producer/consumer code, not feature lists. Preserve source-to-executed-code correlation. The [archived compiler-engineer role](../References.md#employer-role-study) separately requires compiler internals/code-generation work; this integration supplies no such evidence. |
 | [Rendering: features and source ownership](../Rendering.md#source-map) | A smaller compiler boundary can support the same authored passes, materials, research kernels and compile/reload workflows. | Keep RHI/frame-graph ownership, raw-lighting checks, production/Reference separation and the owned neural path. No estimator, rendering feature or target requirement is delegated to ShaderMake. |
-| [Engineering: module boundaries and delivery](../Engineering.md#module-boundaries) | Move complete batch/invocation mechanisms upstream behind the existing offline tool boundary. | One compilation owner; narrow private adaptation; immutable inputs; settled workers/processes; accepted-output preservation; qualified tools and offline delivery. Include all adapters and package costs when judging simplification. |
-| [References: roles and production studies](../References.md#role-sources) | Graphics/DevTech and research-productization roles emphasize useful shaders, systems analysis, debugging and integration. Reproducible compiler invocations can support that work. | Preserve source-to-executed-code correlation and useful profiling evidence. The [archived compiler-engineer role](../References.md#employer-role-study) separately requires compiler internals/code-generation work; this integration supplies no such evidence. |
+| [Repository footprint](../RepositoryFootprint.md#shader-preprocessing) | Target an identified support mechanism with an honest complete-change ledger. | Frozen owner totals and the preprocessing gross scope are not current net savings. Count adapters, relocated code, scripts/build/package costs and overlapping C retirement once; peer ratios are not acceptance quotas. |
+| [Roadmap](../Roadmap.md#supporting-system-simplification) | Keep the investigation useful to rendering/reproduction and coordinate overlapping task-runtime work. | Current rendering repairs and delivery order remain authoritative. This plan creates no new first-release prerequisite or new rendering/ML program. |
+| [Third-party migration](../ThirdPartyMigration.md#requirements-for-adoption) | Apply exact-input adoption, complete retirement and dependency ownership rules. | Resolve pin eligibility, preserve supported workflows, remove superseded paths and separate bounded code completion from broader qualification. No authorization for a different unreleased library pin is implied. |
 
 The role comparison uses the dated descriptions already archived in References. It does not reassess current vacancies, qualifications or employment history.
 
@@ -84,6 +91,8 @@ Retain one concise decision record with the retired mechanism, complete maintena
 Repository references below were inspected in the working checkout at `719f89ec1b52968abaa139b8b9b70867b90df254`, including existing uncommitted shader debug-publication changes. This is a source map, not a frozen executable baseline. Recheck changed owners before implementation.
 
 The goals review used `References.md`, `Rendering.md`, `Engineering.md` and `Goals.md` from the working checkout at `58143b2a4fe5cff080377b1fc524454c534ade61` on 2026-11-21. The assessment above is a proposal checked against those guides, not implementation or qualification evidence. The guides remain the authority for requirements.
+
+The staged-plan revision reviewed the nine governing guides at `293e2b209f215926eb952dcd277a95177368e831` and read the pinned integration sources listed in Stage 0. Those desk-research inputs do not close Stage 0: its complete live owner trace, design comparison, cost boundaries and recorded decision remain to be executed.
 
 The inspected ShaderMake revision is [`4f1ffd56dac27fc3d620ad7efeee42b4dd71fa72`](https://github.com/NVIDIA-RTX/ShaderMake/commit/4f1ffd56dac27fc3d620ad7efeee42b4dd71fa72), committed 2026-11-11. GitHub's [tags](https://api.github.com/repos/NVIDIA-RTX/ShaderMake/tags) and [releases](https://api.github.com/repos/NVIDIA-RTX/ShaderMake/releases) endpoints returned empty lists during this study. This is an inspection reference, not an approved production pin; the existing dependency-adoption rules apply to an unreleased revision.
 
@@ -203,7 +212,7 @@ ShaderMake writes only into invocation staging. On compilation, metadata, verifi
 
 ## Target architecture and structural review
 
-This is the required end state if the fit trial passes. Follow [module ownership](../Engineering.md#module-boundaries), [data/lifetime rules](../Engineering.md#data-and-lifetime) and [code structure](../CodeStyle.md#c-structure). Review the complete planning-to-publication path, its CLI/host callers and build/package membership. The integration is incomplete while old compilation owners survive behind new wrappers.
+This is the proposed end state for Stage 0 to evaluate and refine. Once Stage 0 records its design decision, that shape governs the fit trial and conversion. Follow [module ownership](../Engineering.md#module-boundaries), [data/lifetime rules](../Engineering.md#data-and-lifetime) and [code structure](../CodeStyle.md#c-structure). Review the complete planning-to-publication path, its CLI/host callers and build/package membership. The integration is incomplete while old compilation owners survive behind new wrappers.
 
 ```mermaid
 flowchart TD
@@ -274,32 +283,215 @@ Run the existing applicable architecture/style checks during implementation and 
 
 ## Implementation stages and exits
 
-Keep evidence in ignored `build/validation/shadermake/`. Temporary comparison tools/probes stay local and are removed before handoff. Preserve the existing validation target. These stages describe future work; none has run.
+### Execution rules and stage state
 
-| Stage | Concrete work and exit |
+Run stages in order through Stage 3. **Stage 0 is research/design only and must pass before any prototype or production implementation.** Stage 1 is an isolated fit trial, not adoption. Stage 2 converts the actual owner; Stage 3 is the bounded code-completion exit. Stage 4 records broader product qualification separately. Stage 5 can close code after Stage 3 while transferring unrun Stage 4 work to its existing qualification owner, following [code delivery and qualification](../ThirdPartyMigration.md#code-delivery-and-qualification).
+
+Start each stage with live status/revision, applicable `AGENTS.md` instructions if present, the nine governing guides and this plan. Preserve concurrent edits. Bind evidence to relevant per-file hashes, tools and products; do not restart unrelated passed work just because HEAD changes. Wait for another session using the same build output instead of starting a competing build or cancelling its work.
+
+Keep raw source traces, commands, results and measurements in ignored `build/validation/shadermake/stage-N/`. Record the exact temporary probe paths and remove test-only source/executables/build trees before handoff; retain useful reports and existing repository validation. Do not add a permanent test framework or project-wide policy scanner.
+
+After every stage, update the row below and the relevant design text **before handoff**. Record candidate/scope, passed and missing criteria, verdict, command/artifact references, evidence invalidation triggers, remaining work and exact next action. Use `NOT STARTED`, `IN PROGRESS`, `PASS`, `BLOCKED` or `NO-GO`; individual unrun qualification cells stay `UNVERIFIED`, uncertain comparisons `INCONCLUSIVE`, and waivers require explicit authorization. A blocked row names the failed/missing cell and next discriminating action. A design NO-GO closes the investigation without enabling later implementation prompts.
+
+| Stage | State | Required predecessor / exit | Evidence / next action |
+| --- | --- | --- | --- |
+| [0: deep dive and design](#stage-0-deep-dive-and-integration-design) | NOT STARTED | No predecessor; documented design decision permits isolated trial. | None. Next: execute Stage 0 only. |
+| [1: isolated fit](#stage-1-isolated-fit-and-baseline) | NOT STARTED | Stage 0 PASS; prove decisive compiler/output/lifetime fit. | None; gated by Stage 0. |
+| [2: production conversion](#stage-2-production-boundary-and-retirement) | NOT STARTED | Stage 1 PASS and eligible pin; one production compile owner. | None; gated by Stage 1. |
+| [3: code acceptance](#stage-3-caller-build-and-code-acceptance) | NOT STARTED | Stage 2 PASS; structural/build/focused behavior exit. | None; gated by Stage 2. |
+| [4: product qualification](#stage-4-product-qualification-and-cost) | NOT STARTED | Stage 3 PASS; report each exercised/unrun product cell. | None; separate from code completion. |
+| [5: handoff and closure](#stage-5-handoff-and-plan-closure) | NOT STARTED | Stage 3 PASS plus Stage 4 results/transfer, or documented Stage 0/1 NO-GO closure. | None; no release claim follows automatically. |
+
+### Positive and negative guidelines
+
+These apply to every stage alongside its specific instructions.
+
+| Do | Avoid |
 | --- | --- |
-| **1. Freeze the decision inputs** | Confirm the target owner/data-lifetime map and named retirements before implementation. Record relevant source hashes/dirty state, upstream revision, qualified compiler executables/DLLs/modules, actual catalog and supported target/backend combinations. Capture current full/selected/debug cooks and failure preservation. Choose comparison workload and cost limits before measuring. Refresh advisory/license/toolchain checks and resolve revision eligibility before production adoption. |
-| **2. Prove the hard fit in isolation** | Use real compute, raster and ray-library jobs, including generated parameters and both default targets. Include a shader from the current rendering case and its Reference/control path. Prove final-bytecode reflection, exact sources, symbols/lookup keys, flag/layout agreement and process-tree cancellation. Include current supported Slang cases. Stop here if any required output needs a parallel legacy compile path or a substantial fork. |
-| **3. Convert the actual batch owner** | Convert planning to immutable toolchain facts, then generate config from producers, call ShaderMake through Core, ingest outputs, normalize/verify and publish through existing owners. Preserve CLI/settings/backend semantics and progress. Delete the superseded pool/interface/session/dispatch implementation and update file ownership in the same bounded conversion; keep baseline comparison binaries only in ignored evidence. |
-| **4. Complete code delivery** | Pass the structural review exit, reconcile all callers/targets/tool admission/dependency/notices/package inputs, and check regenerated membership. Build affected tools/consumers and pass focused normal/failure/lifetime checks below. Record the complete before/after maintenance ledger, including sidecars and source staging. Report missed benefit/cost targets honestly. |
-| **5. Qualify product workflows** | Exercise interactive Launcher/Editor compile and reload on D3D12/Vulkan, debugger/source lookup, representative rendered outputs and relocated offline packages with developer SDK/PATH unavailable. Broader performance/API/profile coverage stays with the existing qualification owners; unrun checks remain UNVERIFIED. |
+| Trace a real producer, consumer, invariant, lifetime and failure before choosing an abstraction. | Copying a sample framework, adding a compiler service bag, or forcing the existing single-job interface around a batch tool. |
+| Derive config, arguments and identity from the same admitted inputs; retain one domain authority. | Duplicate authored shader lists, option/hash models, timestamp caches, status mirrors or a renamed local dispatcher. |
+| Reuse Core process/publication and existing reflection mechanisms with explicit private dependencies. | Moving process policy into Renderer/Editor, exposing SDK types in runtime contracts, or implementing a second publisher. |
+| Keep orchestration readable, meaningful locals/paragraphs, cohesive files and purpose-based names under CodeStyle. | Mechanical function/file splitting, forwarding-only classes, generic helper folders or weakening checks to meet a line target. |
+| Compare like-for-like inputs and identify compiler/flag differences before interpreting outputs. | Attributing compiler upgrades to ShaderMake, accepting visual differences because both paths compile, or equating DXIL/SPIR-V with native ISA. |
+| Remove superseded code with converted callers and report the entire added/retained surface. | Production fallback compilers, hidden feature cuts, permanent implementation switches or counting relocated/overlapping code as savings. |
+| Run the smallest check that can falsify the stage's claim, then update current plan state. | Repeated full campaigns without changed inputs, new infrastructure for hypothetical cases, or promoting source/build checks to GPU/package/release proof. |
 
-For stage 2, reject demonstrated shader/ABI regressions and any second compilation owner. For the maintenance decision, require fewer owned mechanisms and positive measured net retirement across the connected infrastructure; do not invent a line-saving forecast. Before timing, record explicit numerical limits for full/selected cook time, startup/cancellation latency, peak memory and tool/package growth, following [Engineering](../Engineering.md#performance-and-images). This study has no measured speedup, size or memory claim.
+### Stage 0: deep dive and integration design
 
-### Focused checks
+**Purpose:** decide the best integration shape for Sparkle's graphics systems/DevTech target before implementation. Study the existing integrations deeply enough to explain why their choices do or do not fit Sparkle. The architecture above is a proposal to challenge, not a predetermined answer.
 
-| Claim | Check that could disprove it |
-| --- | --- |
-| Existing CLI and selection survive | Reuse [`ShaderCompilerCliValidation`](../../Tools/Shaders/ShaderCompiler/ValidateShaderCompilerCli.cmake): catalog, full cook, inspection, changed-source selection, repeated operations and accepted map/library preservation on rejection. Also check current option/exit-code behavior, explicit backend/target combinations, Windows paths with spaces/non-ASCII characters and long generated commands. |
-| Input identity remains complete | Change only generated parameter layout, an included file, compiler executable/runtime, ShaderMake revision or effective flags. Each relevant change must invalidate identity. Test content edits with restored timestamps. |
-| Output association is safe | Same source basename in different mounts, multiple entries/targets, duplicate compiler inputs, reordered completion, missing/stale/extra sidecars and forced partial failure. Preserve equality-checked deduplication and typed fan-out. |
-| ABI and features survive | Compare canonical reflection and parameter signatures against the existing owner, including 16-bit-sensitive layouts, arrays, matrices, push constants, descriptor names and ray exports. Validate final SPIR-V for the actual Vulkan/layout contract; create real pipelines in API qualification. |
-| Debugging still identifies executed code | Check code and manifest hashes, compiler lookup keys, external full DXIL PDBs, captured source bytes and original virtual filenames/line mappings. Open actual affected debugger/source workflows during qualification; file existence alone is insufficient. |
-| Failure keeps accepted output | Syntax error, missing include/compiler/runtime, rejected path, corrupt metadata, ABI mismatch, disk/write failure and cancellation after partial compilation. Hash all accepted products before/after; retry repaired input successfully. |
-| Shutdown settles all work | Cancel/close during active ShaderMake and compiler subprocesses. Verify no descendants keep writing after cleanup and no reload occurs on failure/cancellation. |
-| Delivery is self-contained | Start tools and cook from relocated source/prebuilt layouts without global compiler discovery or network access. Verify exact tools/modules/notices and that render-only products do not acquire the dependency. |
+**Required investigation:**
 
-Build/cook success proves only the checked source/tool/artifact behavior. It does not establish GUI interaction, GPU image correctness, debugger usability, package portability or release readiness.
+1. **Translate all nine guides into decisions.** Use the governing table to connect each rule to an owner/interface choice, a prohibited outcome and a check. Select one existing rendering case as the concrete consumer: identify its shaders, runtime lookup, debug/reproduction path and intended maintenance benefit. Preserve the other two cases without inventing new model/rendering work.
+2. **Trace the entire live Sparkle path.** Follow typed registration/object-target membership, selection, source/parameter preparation, hash/dedup, compiler selection/session construction, flags, reflection/binding normalization, debug capture, verification, publication, CLI/Launcher/Editor operation lifetime and runtime reload. Inspect `CookGlobalShaders`, plan/job builders, `ShaderCompileBatch`, factory/pool, both backends, debug writer, RHI consumers and CMake/package admission. Record owners, input/output types, mutable state, copies, failure boundaries, supported/rejected target combinations and existing failing cases. In particular, identify the planner's live-backend dependency and parent-process compiler-DLL provenance assumptions.
+3. **Trace upstream production and consumption.** Read the pinned source families below, including actual compiler options/configs, output readers, error handling and deployment. Record each dependency's own ShaderMake/compiler pin; these precedents do not necessarily use the candidate revision. Donut and RTXPT share a stack and are not independent corroboration. Include NRD's different output model and the current direct compiler API path as contrasts.
+
+| Pinned source family | Trace and observed starting point | Sparkle decision to extract |
+| --- | --- | --- |
+| Donut `52efbe37d7f550ea1c5c7ee02b75404ec7c72c09`: [batch CMake](https://github.com/NVIDIA-RTX/Donut/blob/52efbe37d7f550ea1c5c7ee02b75404ec7c72c09/compileshaders.cmake), [runtime ShaderFactory](https://github.com/NVIDIA-RTX/Donut/blob/52efbe37d7f550ea1c5c7ee02b75404ec7c72c09/src/engine/ShaderFactory.cpp) | Follow config/options into per-platform commands and outputs, then blob permutation lookup into native shader creation. Its normal binary mode uses ShaderMake blobs. | Reuse explicit batch/compiler separation. Explain why Sparkle keeps raw staged binaries, its typed map/library and its cook-command publication boundary instead of importing the blob reader or build-triggered output model. |
+| RTXPT `303b408ab81790a5051abd7573830b7a4112eb8e`: [shader build and tool deployment](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/Rtxpt/CMakeLists.txt), [shader config](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/Rtxpt/shaders.cfg) | Trace Donut invocation, stage/define variants, embedded-symbol options and compiler/source copying for dynamic compilation. The source explicitly protects combined options from being dropped. | Derive flag-preservation and tool-staleness checks. Do not copy its shader-model, embedded-debug or runtime recompilation policy as Sparkle defaults. Follow the downstream consumer, not just the CMake call. |
+| NRD `e06852bd545973cb224eb28820b891205cfc1624`: [shader target/dependency configuration](https://github.com/NVIDIA-RTX/NRD/blob/e06852bd545973cb224eb28820b891205cfc1624/CMakeLists.txt), [permutation config](https://github.com/NVIDIA-RTX/NRD/blob/e06852bd545973cb224eb28820b891205cfc1624/Shaders/Shaders.cfg) | Follow its pinned ShaderMake acquisition, per-platform commands, generated header blobs, reflection stripping and register shifts into the embedded-shader consumer. | Distinguish a library's fixed embedded layout from Sparkle's dynamic typed catalog, canonical bindings and runtime asset publication. That integration does not establish Sparkle reflection/debug fit. |
+| ShaderMake `4f1ffd56dac27fc3d620ad7efeee42b4dd71fa72`: [implementation](https://github.com/NVIDIA-RTX/ShaderMake/blob/4f1ffd56dac27fc3d620ad7efeee42b4dd71fa72/ShaderMake/ShaderMake.cpp), [build](https://github.com/NVIDIA-RTX/ShaderMake/blob/4f1ffd56dac27fc3d620ad7efeee42b4dd71fa72/CMakeLists.txt), plus DXC/Slang API guides linked below | Trace effective command construction, scanner/build signatures, worker bounds, retries, signals, outputs and debug restrictions; contrast with direct API result access. | Separate upstream guarantees, Sparkle policy, observed limitations and unknowns requiring a Stage 1 probe. Resolve the documented Slang symbol gap and flag/library concerns explicitly. |
+
+4. **Compare shapes, not just libraries.** Evaluate the alternatives below against the same consumer: retain direct APIs and reuse compiler preprocessing; use ShaderMake batches over sealed prepared inputs; use ShaderMake with compiler-owned include/filesystem preparation; or reject the migration. Compare semantic ownership, interface/state/copy surface, exact metadata/debug access, cancellation, publication, offline delivery and total integration cost. Document what is adopted/adapted/rejected from each precedent and why. Separate the optional preprocessing C retirement from the batch decision; do not rebuild a parser or switch both authorities casually.
+5. **Resolve the boundary design.** Specify the toolchain facts consumed by planning, single effective-option identity, prepared-source/original-source capture, config/output naming, producer equality/fan-out, exact reflection/symbol/lookup-key acquisition without legacy recompilation, final SPIR-V normalization/hash order, concurrency/cancellation/progress ownership, staged-result lifetime, publication/recovery and feature-gated distribution. Map each unknown to one discriminating Stage 1 check and an owner. Required outputs need a credible supported acquisition path, not an unexplained adapter box.
+6. **Freeze scope, comparisons and retirement.** Record the proposed file/interface/dependency shape and exact obsolete callers/files/targets; preserve real domain/ABI/lifetime contracts. Define code versus physical-line units, the connected before/after scope and C overlap, compiler/flag-equal comparison workloads and numerical cost review limits before measurement. Include full/selected cook time, cancellation, build/startup, peak memory and tool/package growth where affected. This does not require a full cold/performance campaign before a fit prototype. The aim is fewer maintained mechanisms and positive net retirement; do not invent savings from frozen owner totals.
+7. **Challenge the design and decide.** Review failure modes below against each boundary and compare the proposal with the simpler direct-API alternative. Record a concise decision, rejected alternative, remaining hypotheses and exact next action. If another reviewer participates, identify that review honestly; self-review is not independent validation.
+
+**Positive guidance:** use exact source links and real call/data flow; optimize for a compact rendering/evidence platform, useful shader debugging and fewer owned mechanisms. Revise the existing architecture/replacement sections when findings change them.
+
+**Negative guidance:** no prototype, engine/dependency/build/package changes, broad benchmarks, invented savings or new rendering features in this stage. Do not justify a design by vendor branding, peer file ratios or a sample's default flags. Do not mark the stage passed with unresolved ownership or an unexplained metadata/symbol path.
+
+**Acceptance criteria:**
+
+- **S0-A:** all nine guide implications and the concrete rendering consumer are recorded; delivery order and retained graphics ownership remain intact.
+- **S0-B:** the live producer-to-consumer map and pinned Donut/RTXPT/NRD traces identify output readers, option/tool identities and adopt/adapt/reject decisions.
+- **S0-C:** one justified target shape and its simpler alternative are compared; data/authority/lifetime, file/build/package placement and named retirements are explicit.
+- **S0-D:** every decisive fit unknown has a credible output path and a specific Stage 1 check; failure modes and comparison/cost boundaries are fixed before implementation.
+- **S0-E:** the plan records PASS with a GO decision for the isolated trial, or BLOCKED/NO-GO with the missing fact/reason and next action. No production-adoption or runtime claim follows from research.
+
+**Failure/stop conditions:** unsupported required debug/reflection acquisition, a necessary second compiler owner, major fork, unclear source identity or no plausible complete retirement. Resolve the design or record NO-GO; do not move those questions into production glue.
+
+**Copy-ready prompt:**
+
+```text
+Work in C:\Users\stole\Documents\GitHub\SparkleEngine. Execute only Stage 0 of Docs/Implementation/ShaderMake.md. Read its execution rules, all nine governing guides and applicable AGENTS.md instructions. This is research/design and documentation only: do not prototype, build, add dependencies or change production code.
+
+Deeply trace the live shader pipeline from typed registration through planning, DXC/Slang, reflection/debug capture, publication and Launcher/Editor/runtime consumers. Read the pinned Donut, RTXPT, NRD and ShaderMake source families in Stage 0, following each output into its actual consumer. Record exact dependency/tool pins and distinguish source guarantees from untested assumptions.
+
+Compare integration shapes against the graphics systems/DevTech goals, complete maintenance cost and simpler compiler-preprocessing reuse. Explain which upstream practices to adopt, adapt or reject. Resolve ownership, interfaces, effective options/identity, input snapshots, metadata/symbol acquisition, process lifetime, publication, files/build/package boundaries and exact retirements. Map remaining empirical questions to focused Stage 1 checks; define comparison scope and cost limits before measurement.
+
+Revise the existing plan sections around the chosen shape. Apply S0-A through S0-E and record PASS, BLOCKED or NO-GO honestly. Before handoff update the stage row with candidate/scope, evidence, passed/missing criteria, invalidation triggers, remaining work and exact next action; reconcile affected dependency/roadmap pointers only if their state changed. Do not start Stage 1 in this turn.
+```
+
+### Stage 1: isolated fit and baseline
+
+**Entry:** Stage 0 PASS. Acquire/build the studied candidate only in isolated ignored output with automatic compiler downloads disabled; use identified qualified compilers. This research does not grant production-pin eligibility.
+
+**Work:** freeze matching baseline source/tool/option identities and accepted artifact hashes. Probe real compute, raster and ray-library jobs with generated parameters, both default targets and currently supported Slang cases. Obtain all metadata/debug outputs from the candidate route, normalize final SPIR-V and compare typed results. Exercise source/case/include/flag risks, equivalent-input dedup, one-job/bounded-parallel execution and active-child cancellation. Record pre-existing failures separately. Full performance qualification is not a prerequisite.
+
+**Do:** test the hardest reflection/symbol/library/source questions first; keep exact replay commands and final-code hashes. **Avoid:** production switches, accepted-output mutation, building a permanent adapter, hiding a failing baseline, or recompiling through the old backend to fill candidate metadata gaps.
+
+**Acceptance:** **S1-A** every required output/capability path has executable evidence or its existing supported rejection; **S1-B** canonical layout/bindings, code/debug/source identity and options agree within the frozen contract; explain any changed binary bytes rather than assuming semantic equivalence; **S1-C** bounded execution and cancellation settle before input/staging destruction; **S1-D** repair/retry and failure preservation pass, probe code is removed, and a specific GO/BLOCKED/NO-GO decision updates the design. Missing mandatory fit blocks Stage 2.
+
+**Failure focus:** F01-F08 below. An unresolved compiler regression, symbol gap or need for a substantial fork is a fit failure, not permission to cut a supported workflow.
+
+**Copy-ready prompt:**
+
+```text
+Work in C:\Users\stole\Documents\GitHub\SparkleEngine. Execute only Stage 1 of Docs/Implementation/ShaderMake.md after verifying Stage 0 PASS and its input identities. Read the plan's execution rules and governing guides; preserve unrelated work and avoid shared-build conflicts.
+
+Use isolated ignored inputs/outputs and the recorded candidate/qualified compilers. Capture a matching baseline, then test the decisive source, flags, raster/compute/ray-library, reflection, binding, symbol/lookup-key and original-source contracts on both default targets and supported Slang paths. Prove bounded concurrency, active-child cancellation, failure preservation and repaired retry. Do not alter production ownership or fill missing output through legacy recompilation. Apply S1-A through S1-D and the relevant failure matrix.
+
+Keep replay commands and reports, remove temporary test-only code/binaries, and update this plan before handoff with candidate/scope, passed/missing criteria, verdict, evidence, invalidation triggers, design corrections and exact next action. Preserve existing failures as failures. Do not start Stage 2.
+```
+
+### Stage 2: production boundary and retirement
+
+**Entry:** Stage 1 PASS, design still matches live owners, and the exact production pin/acquisition/license/toolchain policy is resolved. A new unreleased pin needs its own eligibility decision; the unrelated JSON exception is not authorization.
+
+**Work:** integrate the private dependency through existing CMake/cache/inventory owners. Replace planning's live compiler pool with immutable toolchain facts. Convert the real compile batch to generated inputs/config, Core-managed process execution, typed output ingestion, normalization/verification and existing publication. Update CLI identity/capability consumers and compiler provenance. Retire the old pool/interface/sessions/job executor/dispatcher and update file placement, includes and generated membership together. Reuse Stage 1 findings rather than grow a second adapter system.
+
+**Do:** deliver one cohesive production path with serial execution through the same mechanism, private SDK readers and typed results. **Avoid:** fallback compilation, dual implementation flags, one ShaderMake process per old worker, second publication/cache/options authority or a broad RHI/Renderer redesign. An unfinished slice remains IN PROGRESS, not an accepted dual architecture.
+
+**Acceptance:** **S2-A** every supported compile request uses the chosen upstream batch mechanism and all obsolete compilation consumers are converted/retired; **S2-B** canonical config/options/identity and immutable sources/results match the design; **S2-C** metadata/source/debug and final-code verification precede existing publication, with accepted-output and process lifetime protection; **S2-D** the owning tool builds and focused normal/failure/retry cases pass, while dependency/notices/tool-admission/package inputs and disabled-feature enclosure match the new boundary. No GUI/GPU/release qualification is implied.
+
+**Failure focus:** F01-F12. Fix broken ownership and behavior in the actual owner. Do not call a wrapper around the old path a completed stage.
+
+**Copy-ready prompt:**
+
+```text
+Work in C:\Users\stole\Documents\GitHub\SparkleEngine. Execute only Stage 2 of Docs/Implementation/ShaderMake.md. Verify Stage 1 PASS, current matching design/evidence and exact dependency-pin eligibility before production changes. Follow the execution rules, nine guides and applicable local instructions.
+
+Implement the chosen private batch boundary through existing dependency/process/publication owners. Convert planning to immutable toolchain facts, preserve effective-option/source identity, ingest exact metadata/debug outputs, normalize/verify final code and retain typed publication. Convert all old compiler-interface/pool/executor/CLI callers and remove their superseded implementation, task dispatch, dead files/targets and redundant transfer wrappers. Update names/includes/CMake membership, tool admission, provenance, notices and package inputs with the actual owner change. Add no fallback, duplicate authority or permanent probe framework.
+
+Build the affected owning tool and run the focused success/failure/lifetime checks required by S2-A through S2-D. Wait for competing shared builds. Before handoff update the plan's state, candidate/scope, evidence, passed/missing criteria, invalidation triggers, remaining work and exact next action; reconcile changed dependency/roadmap state. Do not start Stage 3 or claim runtime qualification.
+```
+
+### Stage 3: caller, build and code acceptance
+
+**Entry:** Stage 2 PASS. Review the entire connected final diff against the architecture and CodeStyle, including filenames, data copies, native SDK exposure, factory/pool remnants, generated target membership and feature-disabled/package boundaries.
+
+**Work:** run affected tool/host builds, the existing [`ShaderCompilerCliValidation`](../../Tools/Shaders/ShaderCompiler/ValidateShaderCompilerCli.cmake), full/selected/repeated/changed-source cooks and supported backend/target cases. Check `list-backends`, inspection, option/exit semantics, debug export and Windows path/argument cases. Exercise F01-F12 at the real owner boundaries, including publication handled failure and interruption refusal/recovery. Complete the whole-change maintenance ledger and review cost misses once under the migration policy.
+
+**Do:** fix concrete architectural findings and retain protections for input, ABI, cancellation and publication. **Avoid:** source-text scans as sole architectural proof, weakening validation to obtain a green result, or delaying code closure for unrun broad cost/GUI/GPU campaigns. Named missing implementation, unsafe lifetime, duplicate scheduling or demonstrated regression still blocks completion.
+
+**Acceptance:** **S3-A** the structural review exit and all named retirements pass; **S3-B** applicable owner builds, per-file style/manual readability, generated membership and existing CLI validation pass; **S3-C** focused success/failure/identity/cancellation/publication checks pass against frozen inputs; **S3-D** dependency/notices/tool/distribution inputs are reconciled, the native/non-native/dependency cost ledger is honest, temporary test-only additions are removed and broader unverified work is explicitly assigned. This is the bounded code-completion milestone, not product/release acceptance.
+
+**Copy-ready prompt:**
+
+```text
+Work in C:\Users\stole\Documents\GitHub\SparkleEngine. Execute only Stage 3 of Docs/Implementation/ShaderMake.md after verifying Stage 2 PASS. Read the execution rules, all governing guides and the complete connected final diff.
+
+Audit and fix ownership, interfaces, files/includes, copies, lifetime, superseded compiler machinery, target membership and feature/distribution boundaries. Build affected owners; run existing ShaderCompilerCliValidation and focused real-owner full/selected/changed/repeated/debug, explicit backend/target, CLI/Windows-path, identity, failure, cancellation, repair/retry and publication checks. Apply F01-F12 and S3-A through S3-D. Do not equate build/cook success with GUI/GPU/package qualification or start a broad benchmark campaign solely to meet a line count.
+
+Before handoff update the plan with the exact code-completion verdict, candidate/scope, evidence, passed/missing criteria, invalidation triggers, complete maintenance ledger, remaining qualification owners and next action. Remove temporary test-only additions, preserve existing tests and unrelated edits, and reconcile dependency/roadmap state only where changed. Do not start Stage 4 automatically.
+```
+
+### Stage 4: product qualification and cost
+
+**Entry:** Stage 3 PASS. Qualify the actual changed products/inputs; reuse matching evidence and coordinate with existing image/package/release owners. This stage can remain partially UNVERIFIED without reversing a valid bounded code exit.
+
+**Work:** exercise Launcher Cook and Editor Recompile Shaders / `CompileShaders [symbols]`, successful reload, failed/cancelled compilation and close/retry on D3D12 and Vulkan. Confirm executed-code/source/symbol lookup with applicable tools. Compare matched raw outputs and real pipeline creation against valid controls; report pre-existing scene/Reference defects rather than fixing them by changing compiler policy. Exercise relocated offline tool/prebuilt/matching-source layouts without global SDK/PATH/network discovery. Measure the frozen cost comparisons and report cold/warm and per-backend results separately. Keep source/private-symbol sharing and public rights/signing with their existing owners.
+
+**Do:** report configuration, actual toolchain/artifact hashes, machine/driver, tolerances, uncertainty and observed failure. **Avoid:** assuming a common compiler proves Reference correctness, replacing raw comparisons with tone-mapped screenshots, inferring frame-time gains from cook time, or claiming support from package file presence alone.
+
+**Acceptance:** **S4-A** every planned GUI/API/debug/offline cell has a candidate-bound result or explicit UNVERIFIED/BLOCKED owner; **S4-B** observed new correctness/lifetime/delivery regressions are fixed and affected checks rerun; **S4-C** cost comparisons use predeclared limits with PASS/FAIL/INCONCLUSIVE observations and no fabricated savings/speedup. A full Stage 4 PASS needs required product criteria to pass, not merely be observed. Unrun or failed mandatory cells stay open; broader unrun coverage transfers honestly at closure, and reviewed benefit-target misses remain visible.
+
+**Failure focus:** F05, F08-F14. A new unsafe implementation defect reopens its affected code criterion; an unavailable GPU/tool or unrelated existing release blocker remains a scoped qualification gap.
+
+**Copy-ready prompt:**
+
+```text
+Work in C:\Users\stole\Documents\GitHub\SparkleEngine. Execute only Stage 4 of Docs/Implementation/ShaderMake.md after verifying Stage 3 PASS and exact current product/input identities. Follow its execution rules and governing guides; coordinate with existing qualification owners.
+
+Exercise the declared Launcher/Editor compile-symbols-reload/failure/cancel/close/retry workflows on D3D12 and Vulkan. Verify executed-code/debug/source correlation and matched raw output/native pipeline behavior. Check relocated offline tools/prebuilt/matching-source delivery without global SDK/PATH/network discovery and measure only the frozen cost workloads/limits. Use F05 and F08-F14, preserving existing rendering/release defects as separately identified limitations. Do not publish or upload anything.
+
+Apply S4-A through S4-C. Before handoff update the plan and owning qualification pointers with candidate/scope/configuration, observed and unrun cells, evidence, regressions/fixes, invalidation triggers, cost conclusions, remaining owners and exact next action. Do not label unavailable or inconclusive work PASS. Do not start closure automatically.
+```
+
+### Stage 5: handoff and plan closure
+
+**Entry:** Stage 3 PASS and Stage 4 evidence or an explicit record transferring its unrun cells. If a required code/architecture defect remains, keep the plan open; this stage cannot waive it.
+
+**Work:** verify the final code/retirement verdict against the actual diff and matching evidence. Reconcile the existing ThirdPartyMigration ShaderMake row, code/dependency metadata and any affected footprint/roadmap statements without rewriting frozen totals or claiming unmeasured removal. Retain one concise decision/maintenance/reproduction account with correct attribution. Transfer broader qualification/cost gaps to the existing subject/release owner with actionable evidence pointers. Remove local probe artifacts and retire this active plan after lasting guidance and incoming links are reconciled, as Engineering requires. A Stage 0/1 NO-GO instead closes the study with the justified rejection and retained working architecture; do not pretend later stages passed.
+
+**Do:** separate code delivered, product verified and release readiness; preserve measured requirements and evidence provenance. **Avoid:** duplicating stage history into the nine main guides, leaving stale plan links or continuing experiments solely to make a metric green.
+
+**Acceptance:** **S5-A** current owners/decisions and accepted/missing claims agree; **S5-B** no superseded production/test-only residue or stale links remains; **S5-C** the user receives exact delivered scope, verification limits, maintenance result and remaining qualification owner/action. Plan removal records closure rather than loss of unresolved work.
+
+**Copy-ready prompt:**
+
+```text
+Work in C:\Users\stole\Documents\GitHub\SparkleEngine. Execute Stage 5 of Docs/Implementation/ShaderMake.md using its execution rules and nine governing guides. Require Stage 3 PASS plus Stage 4 results or a precise transfer of unrun product cells; otherwise report the exact open code criterion. For a recorded Stage 0/1 NO-GO, close only that investigation without implementing or marking later stages passed.
+
+Verify current code/retirement and evidence identities, reconcile existing migration/dependency/footprint/roadmap statements only where changed, preserve frozen counts and numerical limits, and retain concise lasting ownership/reproduction guidance with correct attribution. Transfer unresolved qualification to its existing owner, remove local test-only residue, repair incoming links and retire the active plan only when its required code work is complete or the investigation is explicitly rejected. Do not fabricate runtime/release acceptance or duplicate stage history.
+
+Before removing the plan, record the final candidate/scope, passed/missing criteria, verdict, evidence, invalidation triggers and remaining owner/next action in the durable owner. Apply S5-A through S5-C and run the final applicable diff/docs checks. Report the final delivered scope and validation limits.
+```
+
+## Failure modes and required responses
+
+These are checks to execute during the assigned stages, not failures observed in this planning revision. Keep one compact result matrix in ignored evidence and reference it from stage state; do not create another progress registry.
+
+| ID / failure mode | Required behavior and discriminating check | Earliest owner/stage |
+| --- | --- | --- |
+| **F01: wrong/unqualified/missing tool** | Reject missing compiler/runtime/modules or changed identity; identify the exact path/version/hash. Check both normal and GPU-crash toolchains. No automatic compiler download, receipt alteration or parent-DLL identity substituted for the executing tool. | Toolchain design/fit, 0-1; admission, 2-3. |
+| **F02: effective flags or library contract changes** | Compare full options, SM/target, optimization/debug/warnings, matrix/16-bit layout, storage-image/extensions, exports and Slang entry behavior. Preserve required capabilities and existing rejections; investigate unexplained code/ABI differences. | Design/fit, 0-1; full requests, 3. |
+| **F03: hidden or mutable source dependency** | Test conditional/macro/repeated/cyclic includes, generated parameters, virtual roots/case/traversal and files changed during capture; content edits with restored timestamps invalidate identity. Compilers read admitted captured inputs; scanner timestamps are not the content authority. | Input design/fit, 0-1; real jobs, 3. |
+| **F04: missing/corrupt/wrong reflection** | Reject incomplete sidecars, resource/member/type/offset/size/count, vertex/group/push-constant or library-export mismatches. Normalize SPIR-V before final reflection/hash and verify every logical consumer after dedup. No legacy second compilation to obtain metadata. | Metadata fit, 1; verification, 2-3. |
+| **F05: symbols/source identify different code** | Require matching published code/hash, full requested DXIL PDB/name/lookup key, SPIR-V line/source data and original captured bytes. Detect missing/ambiguous symbols and subprocess provenance mismatch; exercise actual tool lookup during product qualification. | Debug fit, 1; export, 3; tools, 4. |
+| **F06: stale/colliding/misassociated outputs** | Repeated basenames, multiple entries/targets, reordered completion, equal-hash unequal-input producers, duplicate/missing/empty/stale/extra sidecars cannot substitute for the expected producer. Validate current-invocation association and typed fan-out before publication. | Batch fit, 1; actual owner, 2-3. |
+| **F07: duplicate scheduling or unbounded work** | One compile dispatcher respects the invocation allowance across groups; serial and bounded-parallel results agree. No old outer task graph multiplied by ShaderMake workers, local fallback dispatcher or unbounded staging/workspace growth. | Lifetime design/fit, 0-1; dispatch, 2-3. |
+| **F08: failure/cancellation leaves active children** | Syntax failure, child crash/nonzero exit, cancellation/close after partial compile and repaired retry settle descendants before inputs/results/staging retire. No accepted publication or runtime reload on failed/cancelled compile; retained storage outlives missed settlement. | Process fit, 1; owner checks, 3; host workflow, 4. |
+| **F09: publication fails or is interrupted** | Returned write/verification/publication failure preserves accepted hashes through the existing supported rollback. A killed publication may leave an incomplete set: readers refuse it and documented cleanup/recook applies. Do not claim restart-safe atomic recovery or introduce a second publisher. | Publication, 2-3; recovery workflow, 4. |
+| **F10: architectural retirement is incomplete** | Detect live factory/pool/interface/executor/dispatch remnants, forwarding facades, dual catalogs/options/caches/status or SDK exposure into runtime contracts. Compare final owners/callers/build membership to named retirements; reject comparable replacement machinery even if LOC drops. | Design, 0; conversion/review, 2-3. |
+| **F11: tool builds but offline delivery fails** | Verify feature-disabled enclosure, executables/DLLs/modules, source-cache metadata, notices and inventories. Test relocated prebuilt/matching-source tool use without global discovery/network; render-only products do not require ShaderMake. | Dependency inputs, 2-3; relocation, 4. |
+| **F12: CLI/UI behavior or accepted output regresses** | Existing CLI validation plus full/selected/changed/repeated/debug requests, explicit targets/backends, option/exit behavior, Windows spaces/non-ASCII/long commands and progress must work. Failure keeps accepted products; Application reload occurs only on successful cook. | CLI/tool, 3; interactive host, 4. |
+| **F13: compile success masks GPU/image regression** | Create actual pipelines and compare matched raw signals/numerics against independent controls on each API. Preserve shader/material/Reference conventions. A shared compiler or tone-mapped agreement cannot establish reference correctness or higher FPS. | Product qualification, 4. |
+| **F14: stale evidence or misleading benefit** | Bind results to actual relevant source/tool/flags/products; rerun only affected checks. Report first-party native, shader, script/build, generated/upstream and package/runtime costs separately; charge C overlap once. Predeclared cost misses/inconclusive runs remain visible and do not become invented savings. | Baseline, 0-1; ledger, 3; costs/handoff, 4-5. |
+
+Build/cook success proves only the checked source/tool/artifact behavior. It does not establish GUI interaction, GPU image correctness, debugger usability, package portability or release readiness. Preserve the separate meanings at every stage exit.
 
 ## Alternatives and the decision
 
@@ -314,4 +506,4 @@ Build/cook success proves only the checked source/tool/artifact behavior. It doe
 
 **Decision in the full project context:** the bounded trial supports the existing graphics systems and DevTech goals if it reduces maintenance while preserving the information needed to explain and debug executed shaders. It remains a supporting-system investment with no first-release prerequisite; the [roadmap](../Roadmap.md#supporting-system-simplification) still prioritizes current rendering defects and sets delivery order. It cannot repair Sponza lighting, establish Reference accuracy, finish neural rendering or qualify either API by itself.
 
-**Next actionable step:** stage 1 followed by a short stage-2 trial centered on reflection and symbols. Adopt ShaderMake only if it can own the complete proposed invocation/batch mechanism with fewer local responsibilities and support the case's source-to-output reproduction. Otherwise pursue compiler-preprocessing reuse under C and retain the current rich result boundary. A failed fit is a useful outcome; it prevents a second compiler framework from becoming permanent maintenance.
+**Next actionable step:** execute Stage 0's source/integration deep dive and design decision. Only its PASS permits the isolated Stage 1 reflection/symbol/lifetime trial; production conversion begins at Stage 2 after fit and pin eligibility pass. Adopt ShaderMake only if it can own the complete proposed invocation/batch mechanism with fewer local responsibilities and support the case's source-to-output reproduction. Otherwise pursue compiler-preprocessing reuse under C and retain the current rich result boundary. A failed fit is a useful outcome; it prevents a second compiler framework from becoming permanent maintenance.
