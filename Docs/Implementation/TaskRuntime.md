@@ -6,11 +6,10 @@ Temporary code-delivery plan. Remove completed actions as their evidence passes;
 
 The deliverable is less task infrastructure to maintain so Sparkle can focus on its [three rendering cases](../Goals.md#the-three-cases). Follow the footprint study's [first retirement priority](../RepositoryFootprint.md#cuts-before-expansion): transfer the complete execution mechanism upstream and simplify its real callers. Its frozen scope is **3,017 code / 3,566 physical lines in 42 native files**, including the scene-preparation adapters; this is a gross retirement target, not measured net savings. Keep that denominator separate from later source freezes and all-infrastructure accounting. Graphics-share checkpoints are investigation context, not migration quotas.
 
-**Next action:** freeze the inputs needed for a decisive executable enkiTS fit check, then proceed to conversion if its supported ownership/capacity/lifetime design passes. Outstanding baseline distributions and package measurements do not block that prototype. Executable runtime qualification and production conversion remain unexecuted; `Engine/Tasks` and its consumers still exist.
+**Next action — stage 2:** run the decisive executable enkiTS fit check on the frozen Launcher/incident owners, then convert callers if its supported ownership/capacity/lifetime design passes. Focused baseline binding is complete; outstanding distributions and package measurements do not block the prototype. Executable runtime qualification and production conversion remain unexecuted; `Engine/Tasks` and its consumers still exist.
 
 | Stage | Work remaining |
 | --- | --- |
-| 1 — Focused baseline | Bind the inputs, owner behavior and fixtures needed for the first decisive comparison; retain broader unmeasured costs explicitly. |
 | 2 — Runtime fit | Prove the remaining enkiTS mapping on actual operation/incident owners, including I/O capacity and physical settlement; review the complete integration and select one winner. |
 | 3 — Dependency/composition | Integrate the winner through existing dependency, staging and package owners; implement supported linkage/offline inputs and verify the actual loaded runtime in focused host checks. |
 | 4 — Frame/world conversion | Convert world, preparation, visibility and recording directly, preserving rendering ownership and deterministic caller-thread execution. |
@@ -18,7 +17,7 @@ The deliverable is less task infrastructure to maintain so Sparkle can focus on 
 | 6 — Operations/removal | Convert Editor/Launcher/incident lifetimes; delete Tasks, its API/target/DLL and all replaced caller/build/package plumbing. |
 | 7 — Code completion | Finish affected builds, focused correctness checks and ownership/removal review; record remaining qualification separately, fold lasting guidance and delete this plan. |
 
-Continue current-source qualification in `build/validation/task-runtime/current-20261121/REPORT.md`; its source freeze, consumer map, `CALLER-LEDGER.md` and receipts identify the active isolated baseline and proposed ownership. Reuse earlier `current-20261118/REPORT.md` evidence only for matching inputs. The sequential source preflight and excluded mappings remain in `build/validation/task-runtime/fit-20261116/REPORT.md`. Source research does not qualify executable behavior or authorize dependent conversion.
+The repeated focused baseline check passed in `build/validation/task-runtime/focused-baseline-20261121/REPORT.md` / `manifest.json`: source/toolchain/configuration, five owner fixture binaries, held-I/O frame fixture and 89 input files are bound to the existing observations. Its source archive distinguishes the corrected isolated baseline from current primary bytes, including 19 recorded baseline corrections and the newer JSON pin; reconcile differences and rerun affected owner checks before accepting the candidate. The original `current-20261121/REPORT.md`, `CALLER-LEDGER.md`, failures, unsupported cases and broader comparisons remain preserved. Use these matching fixtures for stage 2; do not restart the full baseline campaign. The sequential source preflight and excluded mappings remain in `build/validation/task-runtime/fit-20261116/REPORT.md`. Baseline behavior and source research do not qualify the replacement.
 
 ## Delivery constraints and fixed budgets
 
@@ -59,7 +58,7 @@ Search existing counterparts before adding or relocating a function, type, state
 
 Exclude unchanged domain kernels and upstream source from added integration, reporting upstream build/package costs separately. Use the same formatting and counting scope before/after; do not compress code or remove necessary checks to meet a budget. A smaller line count cannot excuse a local scheduler, readiness engine, state mirror or unnecessary abstraction.
 
-Keep APIs/runs/machines separate. Use paired run-level differences and correlated-frame 95% intervals; crossing a limit is inconclusive. CPU improvement claims require both >=5% and >=0.2 ms. Preserve equal sample counts for worst-frame comparisons. Follow [performance and image rules](../Engineering.md#performance-and-images); worker/task residence, CPU work, GPU execution and presented latency are different measurements, as are logical bytes, allocator storage and process high-water.
+Keep APIs/runs/machines separate. Before a performance claim, bind the bottleneck, inputs, warm-up/repeats and sample method; the retained extended protocol is 600 warm-up frames, 3,000 measured frames and five fresh processes per fixed API/config/input. It is separate qualification, not a prerequisite to stage 2. Use paired run-level differences and correlated-frame 95% intervals; crossing a limit is inconclusive. CPU improvement claims require both >=5% and >=0.2 ms. Preserve equal sample counts for worst-frame comparisons. Follow [performance and image rules](../Engineering.md#performance-and-images); worker/task residence, CPU work, GPU execution and presented latency are different measurements, as are logical bytes, allocator storage and process high-water.
 
 ## Remaining caller conversions
 
@@ -131,18 +130,6 @@ Preparation failure rolls back before callback enablement. Failed notify marks c
 Work in isolated source/build/artifact roots and preserve concurrent edits. Prepare stages 3–6 as one candidate; temporary mixed implementation cannot ship. Follow the [dependency workflow](../ThirdPartyMigration.md#ownership-and-dependency-workflow), existing checks and engineering rules; preserve existing tests and keep new probes local, removing them before submission.
 
 Keep one ignored report tying each required code claim to its owner, actual upstream call/source contract, deterministic proving case, observed branch/counter, source/product/config/input identity, command and child exit. Record expected/actual outputs, diagnostics, thread IDs, task order, admission/parallel counters, cancellation, join duration and shutdown; distinguish callback completion, scope settlement and admission release. Use latches/barriers at admission, body start, result publication and final release; stress supplements controlled races. Catch hangs with an external deadline, release controlled work so storage settles, and retain the failure. Separate source guarantees, implementation observations and assumptions. An unproved safety/correctness contract blocks its dependent conversion; an outstanding broad benchmark or release observation does not. Reuse matching evidence and repeat only checks affected by changed inputs, failures or unresolved concerns.
-
-### 1. Freeze the focused baseline
-
-```text
-Freeze only the baseline inputs and owner fixtures needed for the decisive stage-2 fit check.
-Reuse matching evidence; record broader unmeasured comparisons without delaying the executable prototype.
-```
-
-- [ ] Bind source, runtime/toolchain/configuration and actual owner fixtures for the first executable fit checks. Preserve the existing baseline, failures and deletion/retention map; refresh only affected bindings when inputs change.
-- [ ] Preserve captured workload/build/memory/package comparisons. Before making a performance claim, fix the bottleneck, inputs, warm-up/repeats and sample method. The existing extended protocol is 600 warm-up frames, 3,000 measured frames and five fresh processes per fixed API/config/input; its raster/loading/Reference and clean/incremental/package sweeps are separate qualification, not prerequisites to stage 2.
-
-**Exit:** the decisive fit fixtures and baseline owner behavior are source-bound and reproducible. Record absent broader costs as unverified and proceed; do not recapture the full matrix before trying the runtime.
 
 ### 2. Prove executable runtime fit
 
