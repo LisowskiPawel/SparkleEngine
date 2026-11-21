@@ -28,15 +28,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-nlohmann/json 3.12.0
+nlohmann/json 3.13.0-dev.d732d616 (unreleased)
 Source: build/_deps/nlohmann_json-src/LICENSE.MIT
-Revision: 55f93686c01528224f448c19128836e7df245f72
+Revision: d732d616badc771ab1e85876b3a9eb8191fdf4c0
 License: MIT
-SHA-256: b9715282b2f1db1359a919bb3a542dd4362fd9e38ae72d421367eb11abe62eec
+SHA-256: 9756d15550eb16ca4b44b68e62150bbf1627114f0f8277bb6479d2d0aac566ea
 
 MIT License 
 
-Copyright (c) 2013-2025 Niels Lohmann
+Copyright (c) 2013-2026 Niels Lohmann
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

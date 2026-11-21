@@ -1,0 +1,191 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" width="1065.6pt" height="489.6pt" viewBox="0 0 1065.6 489.6" version="1.1" role="img" aria-labelledby="cut-only-title cut-only-description">
+ <title id="cut-only-title">Cut-only code footprint scenarios with fixed graphics source</title><desc id="cut-only-description">Graphics stays at 71017 code lines. Baseline: total 150112, graphics share 47.3 percent. Supporting portion of three scopes removed with zero integration cost: 3872 gross lines, total 146240, share 48.6 percent. The 58 Renderer adapter lines are excluded. A proposed 50 percent investigation checkpoint requires 8078 net lines removed, total 142034. A proposed 52 percent peer-context checkpoint requires 13541 net lines removed, total 136571. The supporting-only gross scope leaves 9669 more lines before replacement costs. Net savings and feasibility are unproved; existing migration and release gates remain authoritative.</desc><title>Cut-only code footprint scenarios with fixed graphics source</title>
+ <metadata>
+  <rdf:RDF>
+   <ns2:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+    <dc:title>Cut-only code footprint scenarios with fixed graphics source</dc:title>
+    <dc:description>Graphics stays at 71017 code lines. Baseline: total 150112, graphics share 47.3 percent. Supporting portion of three scopes removed with zero integration cost: 3872 gross lines, total 146240, share 48.6 percent. The 58 Renderer adapter lines are excluded. A proposed 50 percent investigation checkpoint requires 8078 net lines removed, total 142034. A proposed 52 percent peer-context checkpoint requires 13541 net lines removed, total 136571. The supporting-only gross scope leaves 9669 more lines before replacement costs. Net savings and feasibility are unproved; existing migration and release gates remain authoritative.</dc:description>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <ns2:Agent>
+      <dc:title>Matplotlib v3.10.7, https://matplotlib.org/</dc:title>
+     </ns2:Agent>
+    </dc:creator>
+   </ns2:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 489.6  L 1065.6 489.6  L 1065.6 0  L 0 0  z " style="fill: #ffffff" />
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 287.712 158.6304  L 509.528475 158.6304  L 509.528475 121.4208  L 287.712 121.4208  z " clip-path="url(#p02efd47bae)" style="fill: #24679a; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_3">
+    <path d="M 509.528475 158.6304  L 756.576 158.6304  L 756.576 121.4208  L 509.528475 121.4208  z " clip-path="url(#p02efd47bae)" style="fill: #64768e; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_4">
+    <path d="M 287.712 229.6224  L 509.528475 229.6224  L 509.528475 192.4128  L 287.712 192.4128  z " clip-path="url(#p02efd47bae)" style="fill: #24679a; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_5">
+    <path d="M 509.528475 229.6224  L 744.482087 229.6224  L 744.482087 192.4128  L 509.528475 192.4128  z " clip-path="url(#p02efd47bae)" style="fill: #64768e; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_6">
+    <path d="M 744.482087 229.6224  L 756.576 229.6224  L 756.576 192.4128  L 744.482087 192.4128  z " clip-path="url(#p02efd47bae)" style="fill: url(#had2fffe38c); stroke: #a8563e; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_7">
+    <path d="M 21.312 309.9168  L 1044.288 309.9168  L 1044.288 254.1024  L 21.312 254.1024  z " clip-path="url(#p02efd47bae)" style="fill: #f0f5fa" />
+   </g>
+   <g id="patch_8">
+    <path d="M 287.712 300.6144  L 509.528475 300.6144  L 509.528475 263.4048  L 287.712 263.4048  z " clip-path="url(#p02efd47bae)" style="fill: #24679a; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_9">
+    <path d="M 509.528475 300.6144  L 731.34495 300.6144  L 731.34495 263.4048  L 509.528475 263.4048  z " clip-path="url(#p02efd47bae)" style="fill: #64768e; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_10">
+    <path d="M 731.34495 300.6144  L 756.576 300.6144  L 756.576 263.4048  L 731.34495 263.4048  z " clip-path="url(#p02efd47bae)" style="fill: url(#had2fffe38c); stroke: #a8563e; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_11">
+    <path d="M 287.712 371.6064  L 509.528475 371.6064  L 509.528475 334.3968  L 287.712 334.3968  z " clip-path="url(#p02efd47bae)" style="fill: #24679a; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_12">
+    <path d="M 509.528475 371.6064  L 714.281664 371.6064  L 714.281664 334.3968  L 509.528475 334.3968  z " clip-path="url(#p02efd47bae)" style="fill: #64768e; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_13">
+    <path d="M 714.281664 371.6064  L 756.576 371.6064  L 756.576 334.3968  L 714.281664 334.3968  z " clip-path="url(#p02efd47bae)" style="fill: url(#had2fffe38c); stroke: #a8563e; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_14">
+    <path d="M 42.624 409.3056  L 59.6736 409.3056  L 59.6736 397.5552  L 42.624 397.5552  z " clip-path="url(#p02efd47bae)" style="fill: #24679a; stroke: #24679a; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_15">
+    <path d="M 330.336 409.3056  L 347.3856 409.3056  L 347.3856 397.5552  L 330.336 397.5552  z " clip-path="url(#p02efd47bae)" style="fill: #64768e; stroke: #64768e; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_16">
+    <path d="M 628.704 409.3056  L 645.7536 409.3056  L 645.7536 397.5552  L 628.704 397.5552  z " clip-path="url(#p02efd47bae)" style="fill: url(#had2fffe38c); stroke: #a8563e; stroke-linejoin: miter" />
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 500; font-size: 22px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="37.296" y="30.550625" transform="rotate(-0 37.296 30.550625)">How cuts change the code balance</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #516278" x="37.296" y="53.74005" transform="rotate(-0 37.296 53.74005)">Graphics stays at 71,017 code lines. Each bar partitions the original 150,112-line footprint.</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="42.624" y="92.142513" transform="rotate(-0 42.624 92.142513)">SCENARIO</text>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #21324b" x="506.16" y="92.142513" transform="rotate(-0 506.16 92.142513)">RETAINED SOURCE</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #21324b" x="873.792" y="92.142513" transform="rotate(-0 873.792 92.142513)">LINES REMOVED</text>
+   </g>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; fill: #21324b" transform="translate(952.106188 85.127903)">GRAPHICS SHARE</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; fill: #21324b" transform="translate(967.22025 98.605247)">AFTER CUTS</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="42.624" y="136.48245" transform="rotate(-0 42.624 136.48245)">Snapshot</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #516278" x="42.624" y="153.556175" transform="rotate(-0 42.624 153.556175)">Measured baseline</text>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="398.620237" y="143.060912" transform="rotate(-0 398.620237 143.060912)">71,017</text>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="633.052237" y="143.060912" transform="rotate(-0 633.052237 143.060912)">79,095</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #516278" x="873.792" y="143.612788" transform="rotate(-0 873.792 143.612788)">0</text>
+   </g>
+   <g id="text_12">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #24679a" x="1001.664" y="143.888725" transform="rotate(-0 1001.664 143.888725)">47.3%</text>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="42.624" y="207.47445" transform="rotate(-0 42.624 207.47445)">Three supporting owners</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #516278" x="42.624" y="224.548175" transform="rotate(-0 42.624 224.548175)">Zero integration cost assumed</text>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="398.620237" y="214.052912" transform="rotate(-0 398.620237 214.052912)">71,017</text>
+   </g>
+   <g id="text_16">
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="627.005281" y="214.052912" transform="rotate(-0 627.005281 214.052912)">75,223</text>
+   </g>
+   <g id="text_17">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #a8563e" x="873.792" y="214.604788" transform="rotate(-0 873.792 214.604788)">3,872</text>
+   </g>
+   <g id="text_18">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #24679a" x="1001.664" y="214.880725" transform="rotate(-0 1001.664 214.880725)">48.6%</text>
+   </g>
+   <g id="text_19">
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="42.624" y="278.46645" transform="rotate(-0 42.624 278.46645)">50% checkpoint</text>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #516278" x="42.624" y="295.540175" transform="rotate(-0 42.624 295.540175)">Investigation target</text>
+   </g>
+   <g id="text_21">
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="398.620237" y="285.044913" transform="rotate(-0 398.620237 285.044913)">71,017</text>
+   </g>
+   <g id="text_22">
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="620.436712" y="285.044913" transform="rotate(-0 620.436712 285.044913)">71,017</text>
+   </g>
+   <g id="text_23">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #a8563e" x="873.792" y="285.596788" transform="rotate(-0 873.792 285.596788)">8,078</text>
+   </g>
+   <g id="text_24">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #24679a" x="1001.664" y="285.872725" transform="rotate(-0 1001.664 285.872725)">50.0%</text>
+   </g>
+   <g id="text_25">
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="42.624" y="349.45845" transform="rotate(-0 42.624 349.45845)">52% peer context</text>
+   </g>
+   <g id="text_26">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #516278" x="42.624" y="366.532175" transform="rotate(-0 42.624 366.532175)">Feasibility unproved</text>
+   </g>
+   <g id="text_27">
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="398.620237" y="356.036912" transform="rotate(-0 398.620237 356.036912)">71,017</text>
+   </g>
+   <g id="text_28">
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="611.905069" y="356.036912" transform="rotate(-0 611.905069 356.036912)">65,554</text>
+   </g>
+   <g id="text_29">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #a8563e" x="873.792" y="356.588787" transform="rotate(-0 873.792 356.588787)">13,541</text>
+   </g>
+   <g id="text_30">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #24679a" x="1001.664" y="356.864725" transform="rotate(-0 1001.664 356.864725)">52.0%</text>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="70.3296" y="406.465712" transform="rotate(-0 70.3296 406.465712)">Retained graphics</text>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="358.0416" y="406.465712" transform="rotate(-0 358.0416 406.465712)">Retained support</text>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="656.4096" y="406.465712" transform="rotate(-0 656.4096 406.465712)">Removed from original footprint</text>
+   </g>
+   <g id="text_34">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #516278" x="42.624" y="441.227312" transform="rotate(-0 42.624 441.227312)">The support-only row excludes 58 Renderer adapter lines and assumes zero replacement cost.</text>
+   </g>
+   <g id="text_35">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #516278" x="42.624" y="462.983375" transform="rotate(-0 42.624 462.983375)">50% is an initial review checkpoint; 52% is peer context. Both remain proposals, not release requirements.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p02efd47bae">
+   <rect x="0" y="0" width="1065.6" height="489.6" />
+  </clipPath>
+ </defs>
+ <defs>
+  <pattern id="had2fffe38c" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+   <rect x="0" y="0" width="73" height="73" fill="#f6e4dd" />
+   <path d="M -36 36  L 36 -36  M -32 40  L 40 -32  M -28 44  L 44 -28  M -24 48  L 48 -24  M -20 52  L 52 -20  M -16 56  L 56 -16  M -12 60  L 60 -12  M -8 64  L 64 -8  M -4 68  L 68 -4  M 0 72  L 72 0  M 4 76  L 76 4  M 8 80  L 80 8  M 12 84  L 84 12  M 16 88  L 88 16  M 20 92  L 92 20  M 24 96  L 96 24  M 28 100  L 100 28  M 32 104  L 104 32  M 36 108  L 108 36  " style="fill: #a8563e; stroke: #a8563e; stroke-width: 1.0; stroke-linecap: butt; stroke-linejoin: miter" />
+  </pattern>
+ </defs>
+</svg>

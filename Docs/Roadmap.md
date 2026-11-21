@@ -17,9 +17,7 @@ Reuse earlier design decisions and shader-identity results when their inputs sti
 5. **Publish.** Complete rights/notices/provenance, Windows signing/timestamping, review of signed files and verification after download.
 6. **Close the release.** Resolve blockers and finish the maintainer review before starting the next program.
 
-Create a needed scene export or unsigned test archive when its inputs are available. Feature testing can use it before publication approval; final package review must identify the actual tested files. Later RELAX and renderer extensions are not release prerequisites.
-
-The earlier unsigned package has a known scene-publication interruption defect. Source changes need focused checks and a newly tested archive. Package removal was excluded from the earlier result. Image, performance, native-API, reproduction and publication work remains open.
+Scene exports and unsigned archives may support feature testing before publication approval; qualify the final package's actual files separately. The earlier package has a scene-publication interruption defect; package removal was outside its tested scope. Repairs need a newly tested archive; image, performance, native-API, reproduction and publication gates remain open. Later RELAX and renderer extensions are not release prerequisites.
 
 ## Release requirements
 
@@ -29,7 +27,7 @@ The first benchmark system is the Ryzen 9 8940HX / GeForce RTX 5070 Ti Laptop ma
 
 General prerequisites are Windows 11 x64 24H2 or newer, four physical cores/eight threads with SSE4.1, 16 GiB RAM and 8 GiB GPU memory. These floors do not establish support for a lower-end machine.
 
-D3D12 requires feature level 12_1, Shader Model 6.6 and DXR 1.1. Vulkan requires 1.3 and the rendering/RT, descriptor-indexing, buffer-address and synchronization features used by the frame. Report missing requirements before attempting the unsupported path.
+D3D12 requires feature level 12_1, Shader Model 6.6 and DXR 1.1. Vulkan requires 1.3 and the full rendering/RT, layout, descriptor, address and synchronization feature set used by the frame. The [device selector](../Engine/RHI/Private/Vulkan/Device/VulkanDeviceBootstrap.cpp) owns detailed admission checks; version support alone does not qualify the full frame. Report missing requirements before attempting the unsupported path.
 
 ### Time, memory and storage
 
@@ -66,8 +64,8 @@ Model production starts after the classical-study technical results are ready. F
 
 The renderer work follows this order:
 
-1. Direct/indirect estimators and selected light/path improvements; base, anisotropic and coated materials.
-2. Super Resolution/Ray Reconstruction and one RELAX path, then the affected lighting/material guides, temporal behavior, native APIs and delivery checks. The owned model is independent of this step.
+1. Select one production sampling owner per path, including the bounded RTXDI replacement investigation; finish selected direct/indirect light/path improvements and base, anisotropic and coated materials. Keep Reference and focused owned research independent.
+2. Qualify the existing DLSS path, integrate one NRD/RELAX path and the selected AMD FSR upscaler, then check affected guides, temporal behavior, native APIs and delivery. XeSS remains a deferred comparison; the owned model is independent of this step.
 3. PTLAS, bounded volumetrics, SHaRC, NRC and neural texture compression as their inputs become ready. **Finish SHaRC, including package and reproduction results, before NRC production.** Neural texture compression requires the classical-study results and does not wait for NRC.
 
 A PTLAS hardware blocker does not prevent independent work. Test features individually before the selected combined configuration.
@@ -76,13 +74,9 @@ Build the [three portfolio cases](Goals.md#the-three-cases) from the completed t
 
 ## Supporting-system simplification
 
-These changes support rendering and add no first-release prerequisites. Start with [JSON](ThirdPartyMigration.md#candidates-and-expected-benefit). Investigate task execution and cooked metadata next, followed by native window/input. The migration guide records candidate benefits and requirements; other candidates remain deferred.
+Reduce maintained native support code before adding optional rendering SDK capabilities. Prioritize the [task-runtime replacement](Implementation/TaskRuntime.md), then the SDL3 window/input trial; compiler preprocessing reuse can proceed independently. Other replacements require a demonstrated net win. The [migration guide](ThirdPartyMigration.md) owns decisions and retirement boundaries. These simplifications add no new first-release prerequisites.
 
-**Texture cooking implementation is done.** DirectXTex owns processing, RGBA32F is the HDR default, explicit BC6H enforces quality limits, and the replaced pipeline and Kaiser helpers are removed. The [migration guide](ThirdPartyMigration.md#texture-cooking) owns the lasting contract.
-
-Product acceptance remains open under the release work above: finish material/reference images and interactive rendering on both APIs; test the final combined package with notices, SBOM, provenance and reproduction; and run admitted sources on prepared Windows without optional codecs or processing SDK installation. DamagedHelmet renders, resizes and closes on D3D12, with the real RGBA32F sky. Full-frame Vulkan startup on the private desktop fails at swapchain creation with `VK_ERROR_OUT_OF_DEVICE_MEMORY`; diagnostic texture sampling passes. Keep that failure open rather than treating sampling or cooker-package tests as full-product acceptance.
-
-Raster material parity remains open: its shaders do not receive per-texture UV transforms, independent U/V address modes or occlusion strength, while the ray path uses them. Include those consumers in material/reference qualification before calling texture handling complete.
+Keep product blockers open through final qualification: raster/ray material parity for UV transforms, address modes and occlusion strength; the unresolved Vulkan swapchain allocation failure; and full image/package/reproduction checks on both APIs. Isolated cooker or sampling results do not close those gates. See the lasting [texture contract](Rendering.md#texture-cooking).
 
 ## Choosing the next task
 

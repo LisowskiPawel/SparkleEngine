@@ -3,6 +3,7 @@
 #include "SparkleLauncher/SourceDependencyState.h"
 
 #include <string_view>
+#include <system_error>
 
 namespace SparkleLauncher
 {
@@ -57,6 +58,9 @@ namespace SparkleLauncher
 		const SourceDependencyValidation validation = ValidateDependency(dependency, dependencyCachePath);
 		const QString description = dependency.Purpose.isEmpty() ? dependency.Version : QStringLiteral("%1 · %2").arg(dependency.Version, dependency.Purpose);
 		const QString detail = validation.IdentityFailure.empty() ? description : ToQString(validation.IdentityFailure);
-		return validation.bReady ? ThirdPartyDependencyUiStatus{"Synced", detail, "ok", true} : ThirdPartyDependencyUiStatus{"Missing", detail, "warning", false};
+		std::error_code errorCode;
+		const bool bHasCache = std::filesystem::exists(validation.CachePath, errorCode);
+		const QString unavailableState = bHasCache ? "Invalid" : "Missing";
+		return validation.bReady ? ThirdPartyDependencyUiStatus{"Synced", detail, "ok", bHasCache} : ThirdPartyDependencyUiStatus{unavailableState, detail, "warning", bHasCache};
 	}
 }

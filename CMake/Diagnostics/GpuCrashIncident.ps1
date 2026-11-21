@@ -60,6 +60,7 @@ function Assert-GpuCrashJsonMembers
             {
                 $scope = 'root'
                 $rootField = $name
+                if ($isIncident -and $name -ceq 'candidate' -and $type -cnotin @('object','null')) { throw 'Incident candidate requires an object or null.' }
                 if ($isIncident -and $name -ceq 'files')
                 {
                     if ($type -cne 'array') { throw 'Incident requires a file array.' }
@@ -73,12 +74,16 @@ function Assert-GpuCrashJsonMembers
                 $seen.file.Clear()
             }
             elseif ($isIncident -and $rootField -ceq 'files' -and $depth -eq 3) { $scope = 'file' }
-            if ($scope -ne '' -and $members[$scope] -contains $name -and $members[$scope] -cnotcontains $name) { throw 'GPU crash receipt field names require exact casing.' }
-            if ($scope -ne '' -and $members[$scope] -ccontains $name -and !$seen[$scope].Add($name)) { throw 'Incident repeats a consumed member.' }
+            $consumed = $scope -ne '' -and $members[$scope] -ccontains $name
+            if ($scope -ne '' -and !$consumed -and $members[$scope] -contains $name) { throw 'GPU crash receipt field names require exact casing.' }
+            if ($consumed -and !$seen[$scope].Add($name)) { throw 'Incident repeats a consumed member.' }
+            $unsignedField = ($scope -ceq 'file' -and $name -ceq 'bytes') -or ($scope -ceq 'candidate' -and $name -ceq 'cpuPdbAge') -or
+                ($Kind -ceq 'Product' -and $scope -ceq 'root' -and $name -ceq 'cpuPdbAge')
+            $collectionField = $isIncident -and $scope -ceq 'root' -and $name -cin @('candidate','files','childPid','nativeFailure','sdkFinished')
+            if ($consumed -and !$unsignedField -and !$collectionField -and $type -cne 'string') { throw 'GPU crash identity and path fields require string tokens.' }
             if ($type -cin @('object','array'))
             {
-                if (($scope -ceq 'file' -and $name -ceq 'bytes') -or ($scope -ceq 'candidate' -and $name -ceq 'cpuPdbAge') -or
-                    ($Kind -ceq 'Product' -and $scope -ceq 'root' -and $name -ceq 'cpuPdbAge'))
+                if ($unsignedField)
                 {
                     throw 'Incident byte counts and CPU PDB age require unsigned integer tokens.'
                 }
@@ -108,8 +113,7 @@ function Assert-GpuCrashJsonMembers
                 if ($type -cne 'boolean') { throw 'Incident sdkFinished requires a boolean token.' }
                 [void] $required.Add('sdkFinished')
             }
-            elseif (($scope -ceq 'file' -and $name -ceq 'bytes') -or ($scope -ceq 'candidate' -and $name -ceq 'cpuPdbAge') -or
-                    ($Kind -ceq 'Product' -and $scope -ceq 'root' -and $name -ceq 'cpuPdbAge'))
+            elseif ($unsignedField)
             {
                 $unsigned = [uint64] 0
                 if ($type -cne 'number' -or ![uint64]::TryParse($value, [Globalization.NumberStyles]::None, [Globalization.CultureInfo]::InvariantCulture, [ref] $unsigned))

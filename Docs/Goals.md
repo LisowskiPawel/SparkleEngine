@@ -25,15 +25,17 @@ The [role sources](References.md#role-sources) explain this choice. Compiler eng
 
 Launcher selects scenes, reports readiness and runs build, cook and launch operations. Editor provides inspection, supported edits and developer controls. Game presents the rendered scene with camera input. All three target Windows, with separate D3D12 and Vulkan validation.
 
-The release is a complete prebuilt bundle with approved cooked content. Matching source can reuse that bundle's outputs and replace them through the normal build/cook path. Public package validation and redistribution rights remain open.
+The release target is a complete prebuilt bundle with approved cooked content. Matching source can reuse that bundle's outputs and replace them through the normal build/cook path. Public package validation and redistribution rights remain open.
 
 The first release uses English keyboard/mouse input on one windowed or borderless display. Check UI at 100%, 150% and 200% DPI. The user's display resolution is independent of the benchmark resolution. Controllers, exclusive fullscreen and VR are outside this release.
 
-Packaged use works offline after extraction, without accounts, telemetry, unattended downloads or crash uploads. Source and content acquisition are explicit. No ongoing support service or response deadline is promised.
+Packaged use must work offline after extraction, without accounts, telemetry, unattended downloads or crash uploads. Source and content acquisition are explicit. No ongoing support service or response deadline is promised.
 
-The [level catalog](../Projects/Showcase/Levels.catalog) lists ModernSponza, Sponza, ABeautifulGame, LPSHead, CornellBox, DiffuseTransmissionPlant and CesiumMan, plus Empty. Release selection does not grant asset rights; see [distribution requirements](Engineering.md#build-and-delivery).
+The [level catalog](../Projects/Showcase/Levels.catalog) identifies intended release scenes and previews. Catalog flags establish neither qualification nor asset rights; see [distribution requirements](Engineering.md#build-and-delivery).
 
 After release, Bistro exterior/interior becomes the flagship, with San Miguel 2.0 providing a second scene and Sponza remaining the short regression loop. Their [test roles](Rendering.md#test-scenes) are different.
+
+Keep ownership of the RHI, frame graph, graphics API/resource lifetime and independent Reference renderer. Simplify support code and delegate selected production algorithms through the [migration decisions](ThirdPartyMigration.md), focusing personal research on the three cases and crediting upstream work. [Roadmap](Roadmap.md#supporting-system-simplification) sets priorities.
 
 Keep supporting systems as small as the rendering and reproduction workflows allow. General gameplay, physics, networking, audio, scripting, plugin SDKs, installers/updaters, Linux, extra hardware campaigns, geometry caches, frame generation, GPU-driven geometry, atmosphere/clouds/imported volumes, broad authoring or diagnostics tools and general ML runtimes are outside the selected work.
 
@@ -79,7 +81,7 @@ Develop these capabilities through the same three cases where possible. Each nee
 
 - **Technical direction.** Choose high-value problems and finish repeated substantial work under real constraints. Lead uncertain investigations, challenge designs, review constructively, teach reasoning and remove complexity. Demonstrate decisions improved through feedback and second-context use, alongside credible professional evidence of shipped impact, mentoring, stewardship or partner trust.
 
-The [selected rendering work](Rendering.md#later-rendering-work) develops these capabilities through transport, materials, reconstruction, caches, texture compression, PTLAS and volumetrics. [Roadmap](Roadmap.md#after-release) sets the delivery order.
+The [rendering guide](Rendering.md#later-rendering-work) selects feature scope; [Roadmap](Roadmap.md#after-release) sets delivery order.
 
 ### Professional qualifications
 
@@ -93,7 +95,7 @@ Track degree subject/level, employment duration, shipped-product contribution, p
 2. **One measured frame, two APIs.** Combine CPU preparation, shader and resource-lifetime studies with a difficult incident and whole-frame results. Include relevant lighting, reconstruction, cache and acceleration-structure comparisons, plus a rejected or inconclusive alternative.
 3. **Owned model to shader.** Connect reference labels, data, training, checked GPU operators, runtime behavior and held-out evaluation. Separate personally owned model work from vendor cache/texture integration.
 
-Start each case with the result, problem, constraints, personal contribution, baseline and measured configuration. Follow with mathematics/API choices, alternatives, failures, limitations, reproduction and simplification. Credit papers, libraries and collaborators.
+Open each case with the result, problem, constraints, personal contribution, baseline and measured configuration. Link owned code, native captures and a reproduction command. Explain mathematics/API choices, alternatives, failures, limitations and simplification; credit papers, libraries and collaborators. Integration cases also explain SDK selection, signal/lifetime decisions and maintenance removed.
 
 | Reader | Time | What they should find |
 | --- | --- | --- |
@@ -102,7 +104,7 @@ Start each case with the result, problem, constraints, personal contribution, ba
 | Graphics specialist | 45–60 minutes | Mathematics, code, native captures, experiments and failure cases |
 | Developer reproducing the work | 30 minutes plus build time | Supported setup, commands, expected output and troubleshooting |
 
-The package contains one landing page, three case narratives, links to shareable original files, commands and expected results, and a short paper/talk/demo outline.
+Portfolio delivery requires one landing page, three case narratives, links to shareable original files, commands and expected results, and a short paper/talk/demo outline.
 
 ## Review and transfer
 

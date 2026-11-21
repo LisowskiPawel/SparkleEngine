@@ -23,7 +23,7 @@ namespace SparkleLauncher
 		QString Text;
 		QString Detail;
 		QString State;
-		bool bSynced = false;
+		bool bHasCache = false;
 	};
 
 	const std::vector<ThirdPartyDependencyUiEntry>& GetTrackedThirdPartyDependencies();

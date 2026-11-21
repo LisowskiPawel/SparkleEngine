@@ -13,9 +13,8 @@
 #include <algorithm>
 #include <array>
 #include <optional>
-#include <utility>
 
-static nlohmann::json ParseSourceCandidateReceipt(std::string_view receipt, std::map<std::wstring, std::optional<std::string>>& sourceFiles)
+static nlohmann::json ParseSourceCandidateReceipt(std::string_view receipt)
 {
 	Json::InputAdmission admission(receipt, 32u * 1024u * 1024u);
 	const std::array<std::string_view, 8> fields{"product", "profile", "variant", "revision", "sourceInputsSha256", "dirtyPatchSha256", "executableSha256", "sourceFiles"};
@@ -87,40 +86,44 @@ static nlohmann::json ParseSourceCandidateReceipt(std::string_view receipt, std:
 		}
 	}
 
-	const auto& root = Filesystem::GetWorkspaceRootPath();
 	for (const auto& file : document.at("sourceFiles"))
 	{
 		const auto& relative = file.at("Path").get_ref<const std::string&>();
 		const std::filesystem::path relativePath = Strings::ToWide(relative);
-		const auto source = root / relativePath;
+		const auto normalized = relativePath.lexically_normal();
 		const bool bInvalidRoot = relativePath.has_root_path() || relative.empty();
 		const bool bInvalidName = relative.find(':') != std::string::npos || relative.find('\0') != std::string::npos;
 		const bool bInvalidPath = bInvalidRoot || bInvalidName;
-		if (bInvalidPath || !Paths::IsUnderRoot(source, root))
+		if (bInvalidPath || *normalized.begin() == "..")
 		{
 			throw Diagnostics::Error("Source receipt escapes the workspace.");
 		}
 		const auto& hash = file.at("Sha256");
-		std::optional<std::string> expected;
-		if (!hash.is_null())
+		const bool bValidHashType = hash.is_null() || hash.is_string();
+		if (!bValidHashType)
 		{
-			expected = hash.get<std::string>();
-		}
-		if (!sourceFiles.emplace(Paths::MakePathKey(source), std::move(expected)).second)
-		{
-			throw Diagnostics::Error("Source receipt repeats a path.");
+			throw Diagnostics::Error("Compiler source receipt has invalid JSON, member types or numeric range.");
 		}
 	}
 	return document;
 }
 
-void ShaderDebugArtifactWriter::VerifySourceCandidateFiles(const nlohmann::json& sourceFiles) const
+void ShaderDebugArtifactWriter::VerifySourceCandidateFiles(const nlohmann::json& sourceFiles)
 {
 	const auto& root = Filesystem::GetWorkspaceRootPath();
 	for (const auto& file : sourceFiles)
 	{
 		const auto source = root / Strings::ToWide(file.at("Path").get_ref<const std::string&>());
-		const auto& expected = m_sourceFileHashes.at(Paths::MakePathKey(source));
+		if (!Paths::IsUnderRoot(source, root))
+		{
+			throw Diagnostics::Error("Source receipt escapes the workspace.");
+		}
+		const auto& hash = file.at("Sha256");
+		const auto expected = hash.is_null() ? std::nullopt : std::make_optional(hash.get<std::string>());
+		if (!m_sourceFileHashes.emplace(Paths::MakePathKey(source), expected).second)
+		{
+			throw Diagnostics::Error("Source receipt repeats a path.");
+		}
 		if (!expected.has_value())
 		{
 			if (std::filesystem::exists(source))
@@ -147,7 +150,7 @@ void ShaderDebugArtifactWriter::RecordSourceCandidate()
 
 	try
 	{
-		auto identity = ParseSourceCandidateReceipt(receipt, m_sourceFileHashes);
+		auto identity = ParseSourceCandidateReceipt(receipt);
 		const auto& expectedExecutableHash = identity.at("executableSha256").get_ref<const std::string&>();
 		const auto executablePath = Filesystem::GetExecutablePath();
 		const auto executableHash = HashFile(executablePath);

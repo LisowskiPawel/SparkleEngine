@@ -168,8 +168,12 @@ namespace SparkleLauncher
 			totalBytes += bytes;
 		}
 		const auto candidate = document.find("candidate");
-		if (candidate != document.end() && candidate->is_object())
+		if (candidate != document.end() && !candidate->is_null())
 		{
+			if (!candidate->is_object())
+			{
+				return false;
+			}
 			const auto age = candidate->find("cpuPdbAge");
 			if (age != candidate->end() && !age->is_number_unsigned())
 			{

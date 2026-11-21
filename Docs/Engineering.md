@@ -20,7 +20,7 @@ The recorded Windows toolchain is:
 
 Other combinations need separate testing. These versions describe the recorded setup, not the latest available releases.
 
-Source builds require CMake 3.27 or newer. Launcher requests four parallel build jobs; direct builds can choose the count with `--parallel`. Private PCHs speed compilation but do not replace explicit includes.
+The project minimum is CMake 3.27; the [Visual Studio 18 2026 generator](https://cmake.org/cmake/help/latest/generator/Visual%20Studio%2018%202026.html) below requires 4.2+. Launcher uses four build jobs; direct builds select `--parallel`. Private PCHs do not replace explicit includes.
 
 ### Build Launcher
 
@@ -36,7 +36,7 @@ Launcher selects content and builds, cooks and runs Editor or Game. Select scene
 
 ### Command-line example
 
-To prepare and run an Empty Game:
+With only Empty selected in `Projects/Showcase/Levels.catalog`, prepare and run an Empty Game. Stop if any command fails:
 
 ```powershell
 $launcher = './artifacts/dev/Tools/SparkleLauncher/Binaries/DevelopmentEditor/SparkleLauncher.exe'
@@ -52,15 +52,9 @@ $profiles = '--editor-profile', 'ShippingEditor', '--game-profile', 'ShippingGam
 
 Build and dependency files are under `build/`; binaries and cooked content are under `artifacts/dev/`. [SparkleArtifactContract.cmake](../CMake/SparkleArtifactContract.cmake) defines the paths. Source and extracted products use the same workspace layout.
 
-The root [CMakeLists.txt](../CMakeLists.txt) composes dependencies, Engine, Tools and projects. Shared build policy lives under `CMake/`; target-specific backend, SDK and deployment rules stay beside their module. [EngineModule.cmake](../Engine/CMake/EngineModule.cmake) owns shared linkage/export rules; each module declares its sources and dependencies.
+The root [CMakeLists.txt](../CMakeLists.txt) composes the project. Shared policy lives under `CMake/`; [EngineModule.cmake](../Engine/CMake/EngineModule.cmake) owns module linkage/exports. Modules declare sources, dependencies and SDK/deployment rules. Runtime inventories follow linked targets, including private transitive dependencies; owners explicitly stage dynamic plugins/data. Keep one artifact layout and dependency inventory.
 
-[Artifact helpers](../CMake/Artifacts/TargetArtifacts.cmake) assign output and symbol paths. Module and product composition select runtime staging explicitly.
-
-Linked targets own runtime dependencies. Staging and release inventories derive DLL membership from that graph, including private transitive dependencies and imported SDK targets. Dynamically loaded plugins and data files use their owner's deployment rules. Keep one artifact layout and dependency inventory.
-
-Streamline's imported SDK target owns its DLL and notice lists; its Renderer integration stages them. RHI owns PIX and native capture deployment.
-
-Cleaning a cook action removes its selected outputs; scene cleanup includes its dependent assets and registry. Clean Cook All and the Cooked Outputs scope remove all cooked content.
+Cook cleanup affects the current project's selected output categories. Scenes And Meshes includes dependent scene assets and the registry; textures and shaders have separate scopes. Clean Cook All and Cooked Outputs remove the project's entire cooked tree.
 
 ## Making a change
 
@@ -68,7 +62,7 @@ Cleaning a cook action removes its selected outputs; scene cleanup includes its 
 2. Read the affected code, build configuration and callers. Search for existing equivalents with `rg` before adding or renaming a concept.
 3. Explain the intended result, user, owner, important risks and useful check in the issue or change description. Choose numerical thresholds before measuring.
 4. Work in reviewable batches. Read complete affected functions, fix review findings and remove replaced code as the change lands.
-5. Recheck the final diff, run applicable checks and `git diff --check`, and record commands, results, limitations and the next step. Update affected build files and docs.
+5. Recheck the final diff, run applicable checks and `git diff --check`, and record commands, results, limitations and the next step. Update affected build files; apply the [documentation rules](#writing-documentation) to guide changes.
 
 Reuse earlier results when their inputs still match. Changed inputs need the affected checks again; an unrelated revision does not require restarting the work.
 
@@ -76,126 +70,122 @@ Reuse earlier results when their inputs still match. Changed inputs need the aff
 
 A system owns its algorithms, state, validation, cancellation and lifetime. Callers use focused interfaces; Application and other composition code connect implementations. Core behavior must not depend on an Editor panel or Launcher operation.
 
-Put stable cross-module contracts in `Public` and implementation in `Private`. New public APIs need two real module consumers or one necessary host/module boundary. Review existing foundation contracts by purpose and semantics before removal; a lack of current callers alone does not make them obsolete.
+Put stable contracts in `Public` and implementation in `Private`. New public APIs need two real module consumers or one necessary host/module boundary. Judge existing foundation contracts by purpose and semantics, including when they have no current callers.
 
 Core is the base dependency. GameFramework does not depend on Renderer or RHI; RHI does not depend on Renderer. Native types remain inside the backend or an explicit interop interface. Dependencies follow actual public use, not convenient transitive includes.
 
-For external libraries, use the existing [dependency workflow](ThirdPartyMigration.md#ownership-and-dependency-workflow) for source separation, pinning, Launcher sync and distribution metadata.
+Use the [dependency workflow](ThirdPartyMigration.md#ownership-and-dependency-workflow) for external source separation, pinning, sync and distribution metadata.
 
-Orchestration should show what happens and in what order. Keep cohesive algorithms/state machines with their owner and split independently changing responsibilities. Avoid god classes, numbered fragments, forwarding-only collaborators, helper bags and service locators. Review public surface, repeated logic, callers, dependency direction and removal of the old path; fewer lines or files alone do not establish an improvement.
+For replacements, name the mechanism being retired and the policy retained. Assess the complete producer-to-consumer change, including callers and adapters. Moving code earns no removal credit; report non-native, generated, dependency and build/runtime costs separately. Keep capability additions distinct from simplification.
 
-Keep a feature's state and mechanism in one predictable location. Changes elsewhere need an integration reason and a check. A new cache, queue, layer, flag or API needs a current user and a reason simpler code is insufficient. Prefer direct code or a closed enum switch to speculative extensibility.
+Orchestration shows what happens and in what order. Keep cohesive algorithms/state machines together and split independently changing responsibilities. Avoid god classes, numbered fragments, forwarding-only collaborators, helper bags and service locators. Assess public surface, repetition and dependencies as well as size.
+
+Keep feature state and mechanism in one predictable location. New caches, queues, layers, flags or APIs need a current user and a reason simpler code is insufficient. Prefer direct code to speculative extensibility.
 
 ### File placement
 
-Use the module as the ownership boundary, then group implementation by capability, lifetime or backend. This follows the interface/implementation separation in the [Epic module guide](References.md#code-style) and the backend separation in the referenced NVRHI build. Sparkle's contracts and dependencies determine the actual layout.
+Group module implementation by capability, lifetime or backend. [External precedents](References.md#code-style) inform placement; Sparkle's contracts and dependencies decide it.
 
 | Location | Contents |
 | --- | --- |
 | `<module>/CMakeLists.txt` | Target composition, source membership and dependencies |
 | `<module>/Public/` | Contracts used across module or host boundaries; organize larger surfaces by capability |
-| `<module>/Private/` | Implementation, private headers, PCH and executable entry points |
-| `<module>/Private/<capability>/` | A cohesive algorithm, state machine or workflow and its supporting types |
-| `<module>/Private/<backend>/` | Native implementation of the module's contracts, with capability folders where useful |
+| `<module>/Private/` | Implementation, private headers, PCH and entry points, grouped by capability or backend where useful |
 | `<module>/CMake/` | Target-specific SDK discovery, source selection, asset generation and deployment |
 | `<module>/Assets/` | Authored assets consumed by that module |
 
-Keep headers beside the implementation they describe; public contracts remain in `Public`. Use includes relative to the owning public or private root instead of reaching through `../Private`. Small cohesive surfaces may stay flat. Add a folder when it identifies a responsibility; avoid generic `Features`, `Helpers` or `Utils` levels and folders created only to hold one class. A large folder alone does not justify splitting a shared invariant or lifetime.
+Keep headers beside their implementation and includes relative to the owning public or private root. Add folders for responsibilities, not file counts; small cohesive surfaces may stay flat. Avoid generic `Features`, `Helpers` or `Utils` levels. Preserve shared invariants and lifetimes when splitting code.
 
 The source owners are:
 
 | Module or source root | Responsibility and placement |
 | --- | --- |
 | `Engine/Core` | Product-independent files, paths, processes, input values, math, logging and time |
-| `Engine/Tasks` | Graph construction, execution, scheduling and scope lifetime; product scheduling policy stays with callers |
-| `Engine/Platform` | Native window/input implementation; Core owns the shared input values |
-| `Engine/RHI` | Device/resource/command contracts, common validation and separate D3D12/Vulkan implementations |
-| `Engine/Renderer` | Scene/view preparation, GPU scene state, frame graphs, passes and image providers; vendor adapters remain separate from neutral orchestration |
-| `Engine/GameFramework` | Authored levels, cooked asset loading, animation and world state; ECS, editing, publication and render extraction stay private |
-| `Engine/Editor` | Inspection, editing controls and workspace/viewport presentation |
-| `Engine/Application` | Runtime host composition and startup, with separate Editor host workflows |
-| `Engine/Assets` | Shared shader source and default textures; passes own entry points, subjects own shared mathematics/material rules |
-| `Tools/Import/SourceImporters` | Source-format adapters and their imported scene contracts; source decoding stays outside runtime modules |
-| `Tools/Cooking` | AssetCooker discovers/plans/dispatches; Mesh, Material, Scene and Texture cookers own construction, processing and publication for their asset families |
+| `Engine/Tasks` | Task graphs, execution and scope lifetime; callers own scheduling policy |
+| `Engine/Platform` | Native window/input; Core owns shared input values |
+| `Engine/RHI` | GPU contracts, validation and D3D12/Vulkan backends |
+| `Engine/Renderer` | Scene/view preparation, GPU scene, frame graphs, passes and image providers |
+| `Engine/GameFramework` | Levels, asset loading, animation, world state and immutable render extraction |
+| `Engine/Editor` | Inspection, editing and viewport presentation |
+| `Engine/Application` | Runtime and Editor host composition |
+| `Engine/Assets` | Shader passes, shared shader mathematics/material rules and default textures |
+| `Tools/Import/SourceImporters` | Offline source-format adapters and imported scene contracts |
+| `Tools/Cooking` | Asset discovery/dispatch and asset-family processing/publication |
 | `Tools/Shaders/ShaderCompiler` | Compiler backends, source resolution, verification and cooked shader publication |
-| `Tools/Support/ToolSupport` | Shared catalog parsing, source/output paths and console/progress contracts; readers use the wire format, producers use the synchronized writer or a borrowed callback |
-| `Tools/Launcher/SparkleLauncher` | Workspace/build/cook/run operations, shell, GUI and selection edits to `Levels.catalog`; operation policy stays outside Engine |
-| `Projects/Showcase` | Thin Editor/Game entry points in `Private`, project assets, level definitions and project-specific offline conversion |
+| `Tools/Support/ToolSupport` | Shared catalogs, paths and console/progress contracts |
+| `Tools/Launcher/SparkleLauncher` | Workspace/build/cook/run operations, shell, GUI and scene selection |
+| `Projects/Showcase` | Thin product entry points, project assets/levels and offline conversion |
 
 ## Data and lifetime
 
-Borrow with references, views or handles, or move ownership, before copying. Extra storage needs a reason, an authoritative source, a lifetime and an invalidation rule. Publish complete immutable results; do not modify world state through derived Editor or Renderer data.
+Borrow or move ownership before copying. Extra storage needs a reason, authority, lifetime and invalidation rule. Publish complete immutable results; derived Editor/Renderer data must not mutate world state.
 
-Choose layout from actual access patterns and data size. Check bounds and arithmetic sizes, and define CPU/GPU representations explicitly. Use values for immutable data, `unique_ptr` for sole heap ownership and `shared_ptr` for genuinely shared lifetime.
+Choose layout from access patterns and data size. Check bounds/arithmetic and define CPU/GPU representations explicitly. Prefer values, `unique_ptr` for sole heap ownership and `shared_ptr` for shared lifetime.
 
 Spans and callback captures do not extend lifetime. Finish cancelled work before destroying its inputs. GPU resources remain alive until every queue using them completes.
 
-Check immutable inputs when their owner accepts them; express guaranteed presence with references or construction invariants. Keep checks for changing identity, capacity, thread ownership and GPU retirement at the operation that consumes that state. Report failures there with the operation, affected resource and native error where available; avoid repeating status logs and validation in callers.
+Validate immutable inputs at admission and express guaranteed presence through references or construction. Check changing identity, capacity, thread ownership and GPU retirement where consumed. Report the operation, resource and native error there; avoid duplicate caller checks/logs.
 
-Required work needs an implementation. Reject invalid or unsupported input before partially scheduling or publishing a result where possible. A dummy value, clear, copy or swallowed error cannot substitute for the requested operation.
+Reject invalid/unsupported input before partial scheduling or publication where possible. Dummy values, clears, copies and swallowed errors cannot substitute for required work.
 
 Editor navigation changes the viewport session, not authored cameras or undo history. Typed commands change world state; only explicit Save All writes the selected authored level. Failed edits, saves and replacement loads preserve the accepted state.
 
 ### Compatibility
 
-The project has no shipped compatibility contract, supported persisted user data or public plugin ABI. Change owned representations in place, update all producers/consumers, remove the old path and regenerate disposable output. Do not add internal schema/content/ABI versions, migrations, deprecated aliases, legacy switches or dual paths.
+There is no shipped compatibility contract, supported persisted user data or public plugin ABI. Change owned representations in place, update producers/consumers, remove old paths and regenerate disposable output. Do not add internal schema/content/ABI versions, migrations, aliases, legacy switches or dual paths.
 
-External versions, build provenance and counters for stale-handle/lifetime checks are valid. Support for persisted user data or installed external consumers needs a product decision. Removing a feature also updates its advertised scope, selectors, dependencies and preservation checks.
+External versions, build provenance and stale-handle/lifetime counters are valid. Persisted user data or installed external consumers need a product decision. Feature removal updates scope, selectors, dependencies and preservation checks.
 
 ## Verification
 
-[Code style](CodeStyle.md) covers source conventions and formatter commands. Review responsibility and behavior as well as formatting.
+[Code style](CodeStyle.md) owns source conventions and formatter commands. Start with the diff and static checks; review behavior and responsibility, then build the smallest affected target. Use focused runtime, failure, numerical or native-API checks; broaden to full builds, cooks and clean-machine tests when needed.
 
-Start with the diff and static checks, then build the smallest affected target. Use focused runtime, failure, numerical or native-API checks for the behavior in question. Run broad builds, cooks and clean-machine tests when the change requires that coverage.
+In the configured root workspace, run `code_style_check` or `ShaderCompilerCliValidation` with `cmake --build build --config <Profile> --target <Target>`. The standalone Launcher lacks these targets. Shader validation requires `SPARKLE_ENABLE_SHADER_COMPILER=ON` and cooks DXIL/SPIR-V into Shared's cooked shader directory.
 
-Run the existing check owners directly: `code_style_check` and `ShaderCompilerCliValidation` through `cmake --build build --config <Profile> --target <Target>`. Keep the command, source identity, logs and result with the work being validated.
-
-CMake owns build composition, SDK integration, shader tooling and deployment. Review module dependency direction and public/private boundaries with the affected code; keep executable checks close to the invariant they test. RHI configuration checks backend source membership, while shader CLI validation exercises actual compiler products. Avoid a separate source-text policy engine for historical filenames or implementation conventions.
+Keep executable checks with the invariant they test. Review ownership and dependency direction with the affected code; avoid a separate source-text policy engine for historical filenames or implementation conventions.
 
 Export changes need a real shared-library caller. Source/header moves need regenerated build membership. Check worker-count differences, cancellation, stale generations, bounds and delayed GPU completion where relevant.
 
-Record the revision/local changes, configuration, executable and input identity, hardware/driver/tools, command, expected result/tolerance and observation. Explain missing checks and exclusions. Follow Launcher process handoffs through to the responsive child application.
+Record source/local changes, product/input identity, configuration, environment, command, expected result/tolerance and observation. State missing coverage and exclusions. Follow Launcher handoffs to the responsive child application.
 
-Permanent test-only additions require explicit project approval. Keep temporary probes local and remove them before submission. Preserve existing tests unless their removal is agreed. Store shareable original results in ignored output and review generated code as carefully as other contributions.
+Permanent test-only additions need explicit project approval; remove local probes before submission. Preserve existing tests unless removal is agreed. Keep original results in ignored output and review generated code.
 
 ### Script ownership
 
-Keep scripts with a named workflow, a build/CI caller or documented command, and a useful result. Prefer existing CMake, compiler, formatter and GPU tools over another runner, parser or reporting layer. Maintain project-specific style checks with their rules; remove unused workflows with their helpers and controls. [External examples](References.md#pipeline-automation) provide precedent; local use and maintenance cost decide ownership.
+Each script needs a workflow, caller/documented command and useful result. Prefer existing build, compiler, formatter and GPU tools; retain project-specific style rules. Remove unused workflows with their helpers. [External examples](References.md#pipeline-automation) inform these choices.
 
-PowerShell entry points validate arguments and compose operations with explicit inputs. Dot-source capabilities from `$PSScriptRoot`; keep subprocess settlement and rollback with their owning operation. Shared script capabilities live under their subject in `CMake/`, following the same ownership rules as modules. Batch/command files stay small entry points. Moves update callers and package paths and remove replaced scripts. Check syntax and affected success/failure paths with local fixtures.
-
-Qualification fixes the bytes admitted to later steps: staging must reject changed products rather than accept new hashes. One transaction publishes complete private output. GPU incident files stay local until their dump, debug, source and symbol contents have been reviewed for sharing.
+Entry points validate inputs and compose subject-owned capabilities; keep process settlement and rollback with their operation. Shared capabilities live under their subject in `CMake/`. Moves update callers/package paths and remove replaced scripts. Check syntax and affected success/failure paths.
 
 ### Performance and images
 
-Fix the input, settings, warm-up, repeats, image domain and reference uncertainty before measuring. Report frame-time distributions, memory and measurement overhead. State whether cost improves, stays bounded, is unaffected or remains unmeasured. Remove unnecessary work before parallelizing.
+Fix inputs, settings, warm-up, repeats, image domain and reference uncertainty before measuring. Report frame-time distributions, memory, overhead and whether cost improves, stays bounded or remains unmeasured. Remove unnecessary work before parallelizing.
 
-Keep runs and machines separate. Choose absolute and relative effect thresholds and a statistical method that accounts for correlated frames. An interval crossing the threshold is inconclusive. Worst-frame comparisons need equal sample counts or an explicit model; pooled percentiles and a p-value cannot replace stable runs and correct images.
+Keep runs/machines separate. Choose absolute/relative thresholds and statistics accounting for correlated frames. An interval crossing a threshold is inconclusive. Worst-frame comparisons need equal sample counts or an explicit model; pooled percentiles cannot replace stable runs and correct images.
 
-Inspect native captures separately from optimized timing runs. Match the frame, shaders and symbols. CPU time, GPU queue intervals and presented latency are different quantities, as are logical resource bytes, allocator storage, device budgets and high-water memory.
+Separate native captures from optimized timing; match frames, shaders and symbols. Distinguish CPU time, GPU intervals and presented latency, and logical bytes, allocator storage, device budgets and high-water memory.
 
 ## Build and delivery
 
 Run loads level definitions and cooked dependencies without requiring raw assets or source-selection flags. Game presents the scene; Editor provides inspection and editing.
 
-Prepare the release base with a complete build and cook. [ReleaseProducts.cmake](../CMake/Packaging/ReleaseProducts.cmake) defines staging, verification and archive membership. Packaging prints the published archive path and SHA-256; its manifest, SBOM and provenance describe the payload. Matching source can import that base with [SyncProducts.ps1](../CMake/Packaging/SyncProducts.ps1), then rebuild/cook into the same outputs. Installer/updater, old-store migration and a freshness service are outside scope.
+Prepare the release base with a complete build and cook. [ReleaseProducts.cmake](../CMake/Packaging/ReleaseProducts.cmake) declares `release_package`; [Package.ps1](../CMake/Packaging/Package.ps1) requires canonical `build/`, reviewed `SPARKLE_RELEASE_INPUTS`, matching source/product hashes and the final `--shader-symbols` export. It publishes an **unsigned internal** archive with a path, SHA-256, manifest, SBOM and provenance. Staging rejects changed qualified bytes. Signing and public-release qualification remain open in [Roadmap](Roadmap.md#before-the-first-release).
 
-Multi-config generators produce both Shipping inventories. Single-config generators produce the selected Shipping inventory and expose packaging only for a Shipping build.
+The combined package requires **both ShippingEditor and ShippingGame inventories**. Multi-config builds produce both; a single Shipping configuration supplies only its own inventory.
+
+Matching source can import the prepared base with [SyncProducts.ps1](../CMake/Packaging/SyncProducts.ps1), then rebuild/cook into the same outputs. Installer/updater, old-store migration and a freshness service are outside scope.
 
 Scene selection does not grant redistribution rights. Preserve export restrictions on unqualified Classic/Modern Sponza derivatives and previews. Local acquisition, public archives and repository history are separate distribution cases. Keep [Qt notices](../CMake/Notices/Qt/README.md), [asset recipes](../Projects/Showcase/Assets/Meshes) and [thumbnail provenance](../Projects/Showcase/Launcher/Thumbnails/README.md).
 
-Test the final package's file/dependency list, standard-user launch, relocation, writable paths, source rebuild, scene output, symbols, failure/recovery and signing/download identity. Check rights, notices and provenance for those actual files. [Roadmap](Roadmap.md) records remaining work and earlier exclusions.
+Test the final package's file/dependency list, standard-user launch, relocation, writable paths, source rebuild, scene output, symbols, failure/recovery and signing/download identity. Check rights, notices and provenance for those actual files. Review GPU dumps, debug data, source and symbols before sharing incident files.
 
-Cookers publish complete validated output. Core provides containment, locks, incomplete markers and in-process rollback; readers hold their scope through lookup, decode and worker completion. Interrupted publication or failed rollback makes disposable output unusable: reject it, clean and recook. This does not provide persisted journal replay or power-loss recovery. Source and settings stay outside the disposable output.
+Cookers stage complete validated output before publication. Core owns containment, locks, incomplete markers and in-process rollback. Readers retain guards through their final filesystem access, including worker reads; decoding may continue from owned bytes afterward. Interrupted publication or failed rollback requires cleanup and recook, with source/settings outside disposable output. Persisted journal replay and power-loss recovery are unsupported.
 
 ## Writing documentation
 
-Write for people planning work or learning the engine. Start with purpose, then explain the behavior, targets, important choices and limits. Use descriptive headings, short paragraphs and tables for comparisons.
+Keep Engineering, Goals, References, Rendering and Roadmap at the scope and level of detail of the [November 8, 2026 guide set](https://github.com/LisowskiPawel/SparkleEngine/tree/dcd5b4d027543aeb11a133ac40da64cc74ce5a77/Docs). This is an editorial reference; behavior and decisions stay current.
 
-Keep goals, scope, priorities, lasting decisions, coding rules, numerical limits and primary references in the main guides. Each subject has one owner, as listed in [the index](README.md#guides). Update that owner when lasting behavior or guidance changes; link from other guides. Dependency evaluations cover selected work and concrete removal opportunities. Keep speculative catalogues, stage status, revision stamps, temporary baselines and delivery checklists out.
+Add material only for a recurring reader question about purpose, scope, a lasting decision, a required workflow or a product/comparison limit. Cite primary sources for those claims. Search the [existing owner](README.md#guides), including [dependency decisions](ThirdPartyMigration.md), before writing; revise its section and link from other guides.
 
-Use one concise `Docs/Implementation/<Feature>.md` per active feature for its plan, copyable prompts, acceptance criteria, failure checks and current progress. Update that same file at each stage; keep raw logs and comparison artifacts in ignored output.
+Keep minimum runnable setup commands and important current limits. Put API/wire detail and per-file inventories with their code owner. Keep stage checklists and individual run results out of main guides. Use one concise `Docs/Implementation/<Feature>.md` for active plans, acceptance/failure checks and progress; keep raw evidence in ignored output. At closure, retain lasting decisions and unresolved product limits, then delete the plan.
 
-At feature closure, fold only lasting guidance into the appropriate existing guide, delete the implementation file and remove the folder when empty. Do not archive plans or copy their progress history into the main guides.
-
-Link to the owning guide instead of repeating it. Preserve archived role wording and its provenance. Remove requirement codes and obsolete procedures. Check links/anchors, navigation, UTF-8, whitespace and `git diff --check`.
+Review every addition for necessity, ownership, duplication and level of detail against the original guide set. New sections or files need independent recurring use; moving clutter into a catalogue or hierarchy does not qualify. Remove repetition and obsolete text in the same edit. Preserve numerical requirements, archived role wording and provenance; check links/anchors, UTF-8, whitespace and `git diff --check`.

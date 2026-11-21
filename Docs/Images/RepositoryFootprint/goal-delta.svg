@@ -1,0 +1,487 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" width="973.353281pt" height="793.359687pt" viewBox="0 0 973.353281 793.359687" version="1.1" role="img" aria-label="Measured code footprint, assessed action and target state for every source owner">
+ <desc>RHI: 32893 code lines. KEEP + PROVE. Target: Checked resources, queues and retirement on both APIs; Renderer: 31739 code lines. REVIEW + PROVE. Target: Correct pixels; cohesive passes and frame composition; Launcher: 18132 code lines. REVIEW / BOUND. Target: One authority per mutable operation fact; GameFramework: 10915 code lines. KEEP + PROVE. Target: Material, animation and extraction semantics agree; Editor: 10472 code lines. REVIEW / BOUND. Target: Graphics inspection and selected editing workflows; ShaderCompiler: 7108 code lines. REUSE + PROVE. Target: Compiler-owned include expansion; retain ABI and identity; Core: 6150 code lines. REVIEW / BOUND. Target: Thin file, process and publication mechanisms; SourceImporters: 5038 code lines. KEEP + PROVE. Target: One canonical scene and material interpretation; Application: 4388 code lines. BOUND + PROVE. Target: Host composition; settle owned operations; Tasks: 2959 code lines. RETIRE TARGET. Target: No local execution module, scheduler or compatibility API; TextureCooker: 1823 code lines. KEEP + PROVE. Target: Upstream processing; accepted material/reference pixels; Platform: 1667 code lines. REPLACE TARGET. Target: Trial SDL3 mechanics; preserve input and native RHI policy; AssetCooker: 1365 code lines. BOUND + PROVE. Target: Plan and dispatch through existing family owners; ToolSupport: 1201 code lines. KEEP / BOUND. Target: One catalog, output-path and progress contract; SceneCooker: 1139 code lines. KEEP + PROVE. Target: Complete scene, skeleton and animation meaning; MaterialCooker: 358 code lines. KEEP + PROVE. Target: Material intent and texture requests stay thin; MeshCooker: 281 code lines. KEEP + PROVE. Target: Packed geometry and admitted allocation contracts; Showcase: 17 code lines. KEEP THIN. Target: Entry points compose the product; CMake native glue: 6 code lines. KEEP THIN. Target: Only required native upstream integration; Shaders: 6385 code lines. PROVE + BUILD. Target: Matched transport and guides; bounded owned kernels; Build / scripts / CI: 6076 code lines. BOUND + PROVE. Target: Reproducible owners, checks and offline delivery</desc><title>Current source footprint and goal-aligned target state</title>
+ <metadata>
+  <rdf:RDF>
+   <ns2:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+    <dc:title>Current source footprint and goal-aligned target state</dc:title>
+    <dc:description>Measured code lines with qualitative keep, review, replace and prove actions. No target LOC or defect score is assigned.</dc:description>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <ns2:Agent>
+      <dc:title>Matplotlib v3.10.7, https://matplotlib.org/</dc:title>
+     </ns2:Agent>
+    </dc:creator>
+   </ns2:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 793.359687  L 973.353281 793.359687  L 973.353281 0  L 0 0  z " style="fill: #ffffff" />
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 190.8 717.12  L 455.4 717.12  L 455.4 51.12  L 190.8 51.12  z " style="fill: #ffffff" />
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 190.8 717.12  L 190.8 51.12  " clip-path="url(#pfa5dad3a7f)" style="fill: none; stroke: #e4e8ef; stroke-width: 0.7; stroke-linecap: square" />
+     </g>
+     <g id="line2d_2" />
+     <g id="text_1">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #59667e" x="190.8" y="728.218437" transform="rotate(-0 190.8 728.218437)">0</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 301.05 717.12  L 301.05 51.12  " clip-path="url(#pfa5dad3a7f)" style="fill: none; stroke: #e4e8ef; stroke-width: 0.7; stroke-linecap: square" />
+     </g>
+     <g id="line2d_4" />
+     <g id="text_2">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #59667e" x="301.05" y="728.218437" transform="rotate(-0 301.05 728.218437)">15,000</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_5">
+      <path d="M 411.3 717.12  L 411.3 51.12  " clip-path="url(#pfa5dad3a7f)" style="fill: none; stroke: #e4e8ef; stroke-width: 0.7; stroke-linecap: square" />
+     </g>
+     <g id="line2d_6" />
+     <g id="text_3">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #59667e" x="411.3" y="728.218437" transform="rotate(-0 411.3 728.218437)">30,000</text>
+     </g>
+    </g>
+    <g id="text_4">
+     <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start" x="190.8" y="746.656406" transform="rotate(-0 190.8 746.656406)">Current code lines</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_7" />
+     <g id="text_5">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="94.05398" transform="rotate(-0 182.8 94.05398)">RHI</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_8" />
+     <g id="text_6">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="123.516488" transform="rotate(-0 182.8 123.516488)">Renderer</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_9" />
+     <g id="text_7">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="152.978996" transform="rotate(-0 182.8 152.978996)">Launcher</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_10" />
+     <g id="text_8">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="182.441504" transform="rotate(-0 182.8 182.441504)">GameFramework</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_11" />
+     <g id="text_9">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="211.904013" transform="rotate(-0 182.8 211.904013)">Editor</text>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_12" />
+     <g id="text_10">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="241.366521" transform="rotate(-0 182.8 241.366521)">ShaderCompiler</text>
+     </g>
+    </g>
+    <g id="ytick_7">
+     <g id="line2d_13" />
+     <g id="text_11">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="270.829029" transform="rotate(-0 182.8 270.829029)">Core</text>
+     </g>
+    </g>
+    <g id="ytick_8">
+     <g id="line2d_14" />
+     <g id="text_12">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="300.291538" transform="rotate(-0 182.8 300.291538)">SourceImporters</text>
+     </g>
+    </g>
+    <g id="ytick_9">
+     <g id="line2d_15" />
+     <g id="text_13">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="329.754046" transform="rotate(-0 182.8 329.754046)">Application</text>
+     </g>
+    </g>
+    <g id="ytick_10">
+     <g id="line2d_16" />
+     <g id="text_14">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="359.216554" transform="rotate(-0 182.8 359.216554)">Tasks</text>
+     </g>
+    </g>
+    <g id="ytick_11">
+     <g id="line2d_17" />
+     <g id="text_15">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="388.679062" transform="rotate(-0 182.8 388.679062)">TextureCooker</text>
+     </g>
+    </g>
+    <g id="ytick_12">
+     <g id="line2d_18" />
+     <g id="text_16">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="418.141571" transform="rotate(-0 182.8 418.141571)">Platform</text>
+     </g>
+    </g>
+    <g id="ytick_13">
+     <g id="line2d_19" />
+     <g id="text_17">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="447.604079" transform="rotate(-0 182.8 447.604079)">AssetCooker</text>
+     </g>
+    </g>
+    <g id="ytick_14">
+     <g id="line2d_20" />
+     <g id="text_18">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="477.066587" transform="rotate(-0 182.8 477.066587)">ToolSupport</text>
+     </g>
+    </g>
+    <g id="ytick_15">
+     <g id="line2d_21" />
+     <g id="text_19">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="506.529096" transform="rotate(-0 182.8 506.529096)">SceneCooker</text>
+     </g>
+    </g>
+    <g id="ytick_16">
+     <g id="line2d_22" />
+     <g id="text_20">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="535.991604" transform="rotate(-0 182.8 535.991604)">MaterialCooker</text>
+     </g>
+    </g>
+    <g id="ytick_17">
+     <g id="line2d_23" />
+     <g id="text_21">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="565.454112" transform="rotate(-0 182.8 565.454112)">MeshCooker</text>
+     </g>
+    </g>
+    <g id="ytick_18">
+     <g id="line2d_24" />
+     <g id="text_22">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="594.916621" transform="rotate(-0 182.8 594.916621)">Showcase</text>
+     </g>
+    </g>
+    <g id="ytick_19">
+     <g id="line2d_25" />
+     <g id="text_23">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="624.379129" transform="rotate(-0 182.8 624.379129)">CMake native glue</text>
+     </g>
+    </g>
+    <g id="ytick_20">
+     <g id="line2d_26" />
+     <g id="text_24">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="653.841637" transform="rotate(-0 182.8 653.841637)">Shaders</text>
+     </g>
+    </g>
+    <g id="ytick_21">
+     <g id="line2d_27" />
+     <g id="text_25">
+      <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #18243c" x="182.8" y="683.304145" transform="rotate(-0 182.8 683.304145)">Build / scripts / CI</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 190.8 81.392727  L 432.56355 81.392727  L 432.56355 97.597107  L 190.8 97.597107  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_4">
+    <path d="M 190.8 110.855236  L 424.08165 110.855236  L 424.08165 127.059615  L 190.8 127.059615  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_5">
+    <path d="M 190.8 140.317744  L 324.0702 140.317744  L 324.0702 156.522123  L 190.8 156.522123  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_6">
+    <path d="M 190.8 169.780252  L 271.02525 169.780252  L 271.02525 185.984632  L 190.8 185.984632  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_7">
+    <path d="M 190.8 199.24276  L 267.7692 199.24276  L 267.7692 215.44714  L 190.8 215.44714  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_8">
+    <path d="M 190.8 228.705269  L 243.0438 228.705269  L 243.0438 244.909648  L 190.8 244.909648  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_9">
+    <path d="M 190.8 258.167777  L 236.0025 258.167777  L 236.0025 274.372157  L 190.8 274.372157  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_10">
+    <path d="M 190.8 287.630285  L 227.8293 287.630285  L 227.8293 303.834665  L 190.8 303.834665  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_11">
+    <path d="M 190.8 317.092794  L 223.0518 317.092794  L 223.0518 333.297173  L 190.8 333.297173  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_12">
+    <path d="M 190.8 346.555302  L 212.54865 346.555302  L 212.54865 362.759681  L 190.8 362.759681  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_13">
+    <path d="M 190.8 376.01781  L 204.19905 376.01781  L 204.19905 392.22219  L 190.8 392.22219  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_14">
+    <path d="M 190.8 405.480319  L 203.05245 405.480319  L 203.05245 421.684698  L 190.8 421.684698  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_15">
+    <path d="M 190.8 434.942827  L 200.83275 434.942827  L 200.83275 451.147206  L 190.8 451.147206  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_16">
+    <path d="M 190.8 464.405335  L 199.62735 464.405335  L 199.62735 480.609715  L 190.8 480.609715  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_17">
+    <path d="M 190.8 493.867843  L 199.17165 493.867843  L 199.17165 510.072223  L 190.8 510.072223  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_18">
+    <path d="M 190.8 523.330352  L 193.4313 523.330352  L 193.4313 539.534731  L 190.8 539.534731  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_19">
+    <path d="M 190.8 552.79286  L 192.86535 552.79286  L 192.86535 568.99724  L 190.8 568.99724  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_20">
+    <path d="M 190.8 582.255368  L 190.92495 582.255368  L 190.92495 598.459748  L 190.8 598.459748  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_21">
+    <path d="M 190.8 611.717877  L 190.8441 611.717877  L 190.8441 627.922256  L 190.8 627.922256  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_22">
+    <path d="M 190.8 641.180385  L 237.72975 641.180385  L 237.72975 657.384764  L 190.8 657.384764  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="patch_23">
+    <path d="M 190.8 670.642893  L 235.4586 670.642893  L 235.4586 686.847273  L 190.8 686.847273  z " clip-path="url(#pfa5dad3a7f)" style="fill: #326fa8" />
+   </g>
+   <g id="text_26">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="92.806167" transform="rotate(-0 464.661 92.806167)">32,893</text>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="122.268675" transform="rotate(-0 464.661 122.268675)">31,739</text>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="151.731184" transform="rotate(-0 464.661 151.731184)">18,132</text>
+   </g>
+   <g id="text_29">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="181.193692" transform="rotate(-0 464.661 181.193692)">10,915</text>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="210.6562" transform="rotate(-0 464.661 210.6562)">10,472</text>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="240.118709" transform="rotate(-0 464.661 240.118709)">7,108</text>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="269.581217" transform="rotate(-0 464.661 269.581217)">6,150</text>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="299.043725" transform="rotate(-0 464.661 299.043725)">5,038</text>
+   </g>
+   <g id="text_34">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="328.506233" transform="rotate(-0 464.661 328.506233)">4,388</text>
+   </g>
+   <g id="text_35">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="357.968742" transform="rotate(-0 464.661 357.968742)">2,959</text>
+   </g>
+   <g id="text_36">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="387.43125" transform="rotate(-0 464.661 387.43125)">1,823</text>
+   </g>
+   <g id="text_37">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="416.893758" transform="rotate(-0 464.661 416.893758)">1,667</text>
+   </g>
+   <g id="text_38">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="446.356267" transform="rotate(-0 464.661 446.356267)">1,365</text>
+   </g>
+   <g id="text_39">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="475.818775" transform="rotate(-0 464.661 475.818775)">1,201</text>
+   </g>
+   <g id="text_40">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="505.281283" transform="rotate(-0 464.661 505.281283)">1,139</text>
+   </g>
+   <g id="text_41">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="534.743791" transform="rotate(-0 464.661 534.743791)">358</text>
+   </g>
+   <g id="text_42">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="564.2063" transform="rotate(-0 464.661 564.2063)">281</text>
+   </g>
+   <g id="text_43">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="593.668808" transform="rotate(-0 464.661 593.668808)">17</text>
+   </g>
+   <g id="text_44">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="623.131316" transform="rotate(-0 464.661 623.131316)">6</text>
+   </g>
+   <g id="text_45">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="652.593825" transform="rotate(-0 464.661 652.593825)">6,385</text>
+   </g>
+   <g id="text_46">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="464.661" y="682.056333" transform="rotate(-0 464.661 682.056333)">6,076</text>
+   </g>
+  </g>
+  <g id="text_47">
+   <text style="font-weight: 500; font-size: 18px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="7.2" y="20.877187" transform="rotate(-0 7.2 20.877187)">Current footprint against the target</text>
+  </g>
+  <g id="text_48">
+   <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="190.8" y="36.72" transform="rotate(-0 190.8 36.72)">Measured source</text>
+  </g>
+  <g id="text_49">
+   <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="536.4" y="36.72" transform="rotate(-0 536.4 36.72)">Assessed action</text>
+  </g>
+  <g id="text_50">
+   <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="736.2" y="36.72" transform="rotate(-0 736.2 36.72)">Target state</text>
+  </g>
+  <g id="text_51">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1f658f" x="536.4" y="92.53023" transform="rotate(-0 536.4 92.53023)">KEEP + PROVE</text>
+  </g>
+  <g id="text_52">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 86.371433)">Checked resources, queues and</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 98.689026)">retirement on both APIs</text>
+  </g>
+  <g id="text_53">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #7954a3" x="536.4" y="121.992738" transform="rotate(-0 536.4 121.992738)">REVIEW + PROVE</text>
+  </g>
+  <g id="text_54">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 115.833941)">Correct pixels; cohesive passes and</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 128.151535)">frame composition</text>
+  </g>
+  <g id="text_55">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #7954a3" x="536.4" y="151.455246" transform="rotate(-0 536.4 151.455246)">REVIEW / BOUND</text>
+  </g>
+  <g id="text_56">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 145.296449)">One authority per mutable operation</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 157.614043)">fact</text>
+  </g>
+  <g id="text_57">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1f658f" x="536.4" y="180.917754" transform="rotate(-0 536.4 180.917754)">KEEP + PROVE</text>
+  </g>
+  <g id="text_58">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 174.758958)">Material, animation and extraction</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 187.076551)">semantics agree</text>
+  </g>
+  <g id="text_59">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #7954a3" x="536.4" y="210.380263" transform="rotate(-0 536.4 210.380263)">REVIEW / BOUND</text>
+  </g>
+  <g id="text_60">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 204.221466)">Graphics inspection and selected</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 216.53906)">editing workflows</text>
+  </g>
+  <g id="text_61">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #985d12" x="536.4" y="239.842771" transform="rotate(-0 536.4 239.842771)">REUSE + PROVE</text>
+  </g>
+  <g id="text_62">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 233.683974)">Compiler-owned include expansion;</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 246.001568)">retain ABI and identity</text>
+  </g>
+  <g id="text_63">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #7954a3" x="536.4" y="269.305279" transform="rotate(-0 536.4 269.305279)">REVIEW / BOUND</text>
+  </g>
+  <g id="text_64">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 263.146482)">Thin file, process and publication</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 275.464076)">mechanisms</text>
+  </g>
+  <g id="text_65">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1f658f" x="536.4" y="298.767788" transform="rotate(-0 536.4 298.767788)">KEEP + PROVE</text>
+  </g>
+  <g id="text_66">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 292.608991)">One canonical scene and material</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 304.926584)">interpretation</text>
+  </g>
+  <g id="text_67">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1f658f" x="536.4" y="328.230296" transform="rotate(-0 536.4 328.230296)">BOUND + PROVE</text>
+  </g>
+  <g id="text_68">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 322.071499)">Host composition; settle owned</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 334.389093)">operations</text>
+  </g>
+  <g id="text_69">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #985d12" x="536.4" y="357.692804" transform="rotate(-0 536.4 357.692804)">RETIRE TARGET</text>
+  </g>
+  <g id="text_70">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 351.534007)">No local execution module, scheduler or</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 363.851601)">compatibility API</text>
+  </g>
+  <g id="text_71">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1f658f" x="536.4" y="387.155312" transform="rotate(-0 536.4 387.155312)">KEEP + PROVE</text>
+  </g>
+  <g id="text_72">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 380.996516)">Upstream processing; accepted</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 393.314109)">material/reference pixels</text>
+  </g>
+  <g id="text_73">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #985d12" x="536.4" y="416.617821" transform="rotate(-0 536.4 416.617821)">REPLACE TARGET</text>
+  </g>
+  <g id="text_74">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 410.459024)">Trial SDL3 mechanics; preserve input</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 422.776618)">and native RHI policy</text>
+  </g>
+  <g id="text_75">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1f658f" x="536.4" y="446.080329" transform="rotate(-0 536.4 446.080329)">BOUND + PROVE</text>
+  </g>
+  <g id="text_76">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 439.921532)">Plan and dispatch through existing</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 452.239126)">family owners</text>
+  </g>
+  <g id="text_77">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #59667e" x="536.4" y="475.542837" transform="rotate(-0 536.4 475.542837)">KEEP / BOUND</text>
+  </g>
+  <g id="text_78">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 469.384041)">One catalog, output-path and progress</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 481.701634)">contract</text>
+  </g>
+  <g id="text_79">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1f658f" x="536.4" y="505.005346" transform="rotate(-0 536.4 505.005346)">KEEP + PROVE</text>
+  </g>
+  <g id="text_80">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 498.846549)">Complete scene, skeleton and animation</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 511.164143)">meaning</text>
+  </g>
+  <g id="text_81">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1f658f" x="536.4" y="534.467854" transform="rotate(-0 536.4 534.467854)">KEEP + PROVE</text>
+  </g>
+  <g id="text_82">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 528.309057)">Material intent and texture requests</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 540.626651)">stay thin</text>
+  </g>
+  <g id="text_83">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1f658f" x="536.4" y="563.930362" transform="rotate(-0 536.4 563.930362)">KEEP + PROVE</text>
+  </g>
+  <g id="text_84">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 557.771565)">Packed geometry and admitted allocation</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 570.089159)">contracts</text>
+  </g>
+  <g id="text_85">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #59667e" x="536.4" y="593.392871" transform="rotate(-0 536.4 593.392871)">KEEP THIN</text>
+  </g>
+  <g id="text_86">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="736.2" y="593.392871" transform="rotate(-0 736.2 593.392871)">Entry points compose the product</text>
+  </g>
+  <g id="text_87">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #59667e" x="536.4" y="622.855379" transform="rotate(-0 536.4 622.855379)">KEEP THIN</text>
+  </g>
+  <g id="text_88">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 616.696582)">Only required native upstream</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 629.014176)">integration</text>
+  </g>
+  <g id="text_89">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1f658f" x="536.4" y="652.317887" transform="rotate(-0 536.4 652.317887)">PROVE + BUILD</text>
+  </g>
+  <g id="text_90">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 646.15909)">Matched transport and guides; bounded</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 658.476684)">owned kernels</text>
+  </g>
+  <g id="text_91">
+   <text style="font-weight: 500; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1f658f" x="536.4" y="681.780395" transform="rotate(-0 536.4 681.780395)">BOUND + PROVE</text>
+  </g>
+  <g id="text_92">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 675.621599)">Reproducible owners, checks and offline</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #18243c" transform="translate(736.2 687.939192)">delivery</text>
+  </g>
+  <g id="text_93">
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #59667e" x="7.2" y="770.4" transform="rotate(-0 7.2 770.4)">Actions are qualitative assessments, not defect scores or target line budgets. Replace/retire targets remain subject to fit and preservation gates.</text>
+  </g>
+  <g id="text_94">
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #59667e" x="7.2" y="784.08" transform="rotate(-0 7.2 784.08)">The owned model follows release and classical results; its numerical research limits remain proposals until agreed.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pfa5dad3a7f">
+   <rect x="190.8" y="51.12" width="264.6" height="666" />
+  </clipPath>
+ </defs>
+</svg>

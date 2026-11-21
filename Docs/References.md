@@ -4,10 +4,12 @@
 
 Sources behind the project guides, including dated role and professional studies. Pinned links identify the studied revision; check current prerequisites, licenses and fixes before reuse. Project rules and decisions remain in their owning guides.
 
+The [repository footprint study](RepositoryFootprint.md) owns measured peer comparisons and local structural findings, with source pins and scope limits.
+
 ## Contents
 
 - [Rendering research](#rendering-research), [scene sources](#scene-sources) and [production studies](#nvidia-production-studies)
-- [Tools and APIs](#tools-and-apis), [pipeline automation](#pipeline-automation) and [code style](#code-style)
+- [Integration precedents](#integration-precedents), [tools and APIs](#tools-and-apis), [pipeline automation](#pipeline-automation) and [code style](#code-style)
 - [Role sources](#role-sources), [employer study](#employer-role-study), [professional baseline](#professional-baseline) and [public work](#persona-and-portfolio)
 - [Documentation examples](#documentation-examples)
 
@@ -75,6 +77,24 @@ Studies that connect the professional goals to concrete engineering work. Publis
 - [Tiny CUDA NN's fused network](https://github.com/NVlabs/tiny-cuda-nn/blob/3daa6e5b8b8e0fa17971a1a20acfbb3754494b38/src/fully_fused_mlp.cu) and [Instant NGP experiment script](https://github.com/NVlabs/instant-ngp/blob/abe236ee00cf90cfca6e36e65c00435d5b21f50a/scripts/run.py): learn from layout/traffic and training-to-artifact experiments. CUDA, NeRF and a general tensor runtime remain outside our selected work.
 - [Slang lab exercises](https://developer.download.nvidia.com/ProGraphics/nvpro-samples/SlangLab/Slides.pdf): a model for short explanations with an observable task and real feedback, rather than a slide deck alone.
 
+## Integration precedents
+
+Primary examples behind the [migration decisions](ThirdPartyMigration.md). These are study sources; Sparkle integration still needs the owning guide's [adoption checks](ThirdPartyMigration.md#requirements-for-adoption).
+
+| Example | Relevant lesson |
+| --- | --- |
+| [Cycles replaces its scheduler with TBB](https://github.com/blender/blender/commit/e50f1ddc6540680d2aafc1c76f8339d69350f84a); [OpenUSD Work](https://openusd.org/release/api/work_page_front.html) | Scheduler retirement and process concurrency. Sparkle's task plan determines candidate fit and lifecycle requirements. |
+| [SDL3/ImGui Vulkan example](https://github.com/ocornut/imgui/blob/master/examples/example_sdl3_vulkan/main.cpp), [native window properties](https://wiki.libsdl.org/SDL3/SDL_GetWindowProperties) and [Vulkan surface API](https://wiki.libsdl.org/SDL3/SDL_Vulkan_CreateSurface) | Platform replacement through native window/surface boundaries, retaining a separate renderer. |
+| [Falcor graph compilation](https://github.com/NVIDIAGameWorks/Falcor/blob/759aad033ff610fb0d82c74f7e0a508d0096d5f2/Source/Falcor/RenderGraph/RenderGraph.cpp#L424) | Graph invalidation as a planning precedent; local caching still needs profiling and correct lifetime. |
+| [Falcor SDK composition](https://github.com/NVIDIAGameWorks/Falcor#nvidia-rtx-sdks); [NRD native dispatch API](https://github.com/NVIDIA-RTX/NRD#api) | Production algorithms integrated through an application-owned graphics API and resource lifetime. |
+| [RTXDI integration](https://github.com/NVIDIA-RTX/RTXDI/blob/main/Doc/Integration.md) and [integrable runtime](https://github.com/NVIDIA-RTX/RTXDI-Library) | Runtime resampling integration with application-owned scene, material and tracing callbacks. |
+| [Snowdrop FSR production study](https://gpuopen.com/download/GDC2024_High_Performance_Rendering_in_Snowdrop_Using_AMD_FidelityFX_Super_Resolution_3.pdf); [AMD FSR SDK requirements](https://gpuopen.com/amd-fsr-sdk/) | Temporal inputs, pass/queue placement and whole-frame integration. Use selected SDK requirements alongside the historical study. |
+| [Intel XeSS-SR guide](https://github.com/intel/xess/blob/main/doc/xess_sr_developer_guide_english.md) and [official Unreal plugin](https://github.com/GameTechDev/XeSSUnrealPlugin) | Super-resolution signals/resources and the distinction between portable execution and vendor acceleration. |
+| [DXC include-handler example](https://github.com/microsoft/DirectXShaderCompiler/wiki/Using-dxc.exe-and-dxcompiler.dll), [Slang compilation/filesystem API](https://docs.shader-slang.org/en/latest/external/slang/docs/user-guide/08-compiling.html), [volk device tables](https://github.com/zeux/volk#optimizing-device-calls) | Reuse of compiler and dispatch facilities while preserving source identity and native API ownership. |
+| [Qt 6.11 item views](https://doc.qt.io/qt-6.11/qlistview.html), [vswhere](https://github.com/microsoft/vswhere), [D3D12MA virtual allocation](https://gpuopen-librariesandsdks.github.io/D3D12MemoryAllocator/html/virtual_allocator.html) | Existing-library reuse for UI layout, installation discovery and descriptor ranges. |
+
+Check the actual licenses: [oneTBB](https://github.com/uxlfoundation/oneTBB/blob/master/LICENSE.txt), [SDL](https://github.com/libsdl-org/SDL/blob/main/LICENSE.txt), [FlatBuffers](https://github.com/google/flatbuffers/blob/master/LICENSE), [volk](https://github.com/zeux/volk/blob/master/LICENSE.md), [RTXDI runtime](https://github.com/NVIDIA-RTX/RTXDI-Library/blob/main/LICENSE.txt), [NRD](https://github.com/NVIDIA-RTX/NRD/blob/master/LICENSE.txt) and each selected AMD/Intel SDK artifact. Public source, sample licensing and runtime redistribution are separate facts.
+
 ## Tools and APIs
 
 - [Nsight shader profiling](https://docs.nvidia.com/nsight-graphics/UserGuide/shader-profiler.html): connect the executed kernel and source identity to measured hypotheses; native-ISA access is not assumed.
@@ -87,7 +107,7 @@ Studies that connect the professional goals to concrete engineering work. Publis
 
 ## Pipeline automation
 
-For CMake scope, compare [Donut's module and shader composition](https://github.com/NVIDIA-RTX/Donut/blob/52efbe37d7f550ea1c5c7ee02b75404ec7c72c09/CMakeLists.txt), [NVRHI's backend and SDK targets](https://github.com/NVIDIA-RTX/NVRHI/blob/bf0bbd9b666a7297492beb1999a4ddc0dfded143/CMakeLists.txt), and [RTXPT's shader/runtime setup and CPU test registration](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/CMakeLists.txt). These are concrete build consumers. Sparkle keeps backend membership checks, shader compilation/inspection, runtime deployment and capture qualification; source ownership conventions belong in review and the existing style tools.
+For CMake composition, compare [Donut's modules and shaders](https://github.com/NVIDIA-RTX/Donut/blob/52efbe37d7f550ea1c5c7ee02b75404ec7c72c09/CMakeLists.txt), [NVRHI's backends and SDK targets](https://github.com/NVIDIA-RTX/NVRHI/blob/bf0bbd9b666a7297492beb1999a4ddc0dfded143/CMakeLists.txt), and [RTXPT's shader/runtime setup and CPU test registration](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/CMakeLists.txt).
 
 [NRD's CI](https://github.com/NVIDIA-RTX/NRD/blob/90dea8bd91ec6b58d0f90cb6adf53c7da613b82c/.github/workflows/build.yml) runs deploy, build and SDK-preparation scripts. [RTXPT's scene runner](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/Testing/RegressionTesting-RUN.bat) and [image tests](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/Support/tests/run_tests.ps1) render identified scenes and compare results. [Falcor's CI](https://github.com/NVIDIAGameWorks/Falcor/blob/759aad033ff610fb0d82c74f7e0a508d0096d5f2/.github/workflows/build.yml) invokes setup and native build commands directly.
 
@@ -396,10 +416,13 @@ This study was recorded on **2026-10-10**. Affiliations are dated publisher desc
 | **Bart Wronski.** [NVIDIA Research profile](https://research.nvidia.com/person/bart-wronski) and [professional page](https://bartwronski.com/about/) linking the explicitly outdated [bartwronski account](https://github.com/bartwronski). | Mathematics, small experiments, ML and artist/content problems. Study sampling notebooks and prototypes as explanations. |
 | **Pawel Kozlowski.** [NVIDIA author page](https://developer.nvidia.com/blog/author/pkozlowski/); [2023 course notes, revised March 2024](https://intro-to-restir.cwyman.org/presentations/2023ReSTIR_Course_Notes.pdf) identified a principal Developer Technology role at publication. | Coauthored [Cyberpunk integration](https://intro-to-restir.cwyman.org/presentations/2023ReSTIR_Course_Cyberpunk_2077_Integration.pdf): partner materials, lighting, sampling and denoising constraints. |
 | **Dmitry Zhdan.** Historical affiliation in a [2020 NVIDIA presentation](https://developer.download.nvidia.com/video/gputechconf/gtc/2020/presentations/s22699-fast-denoising-with-self-stabilizing-recurrent-blurs.pdf); [dzhdanNV](https://github.com/dzhdanNV) is corroborated by an [NRD maintenance commit](https://github.com/NVIDIA-RTX/NRD/commit/e06852bd545973cb224eb28820b891205cfc1624). | Classical denoising: guide encodings, disocclusion, history and integration obligations. |
-| **Ingo Wald.** Historical context from a [page last modified in 2019](https://www.sci.utah.edu/~wald/) and a [2021 HPG paper](https://diglib.eg.org/bitstreams/911b634f-4d0b-4dd2-9f27-168c587033fc/download); [ingowald](https://github.com/ingowald) links the same site. | [OWL](https://github.com/ingowald/owl): typed host/device examples, launch/data ABI, acceleration structures and adoption. |
+| **Ingo Wald.** Historical context from a [personal page with 2022 news](https://www.sci.utah.edu/~wald/) and a [2021 HPG paper](https://diglib.eg.org/bitstreams/911b634f-4d0b-4dd2-9f27-168c587033fc/download); [ingowald](https://github.com/ingowald) links the same site. | [OWL](https://github.com/ingowald/owl): typed host/device examples, launch/data ABI, acceleration structures and adoption. |
 | **Thomas Müller.** [Tom94](https://github.com/Tom94) described an independent researcher and former NVIDIA principal. | tiny-cuda-nn, instant-ngp and tev connect mathematics, high-performance kernels and durable tools. Distinguish individual tools from collaborative research. |
 | **Jakub Boksansky.** Historical NVIDIA context from a [2023 session](https://www.nvidia.com/en-us/on-demand/playlist/playList-c48d18a7-fd57-443a-8550-43c8cdc046ae/); a [2025 JCGT paper](https://www.jcgt.org/published/0014/02/01/paper-lowres.pdf) lists AMD. His [site](https://boksajak.github.io/) links [boksajak](https://github.com/boksajak). | [Ray Tracing Gems examples](https://boksajak.github.io/blog/RayTracingGemsChapters): transport, ray cones and many-light derivations with executable explanations. |
 | **Christoph Schied.** [2019 NVIDIA biography](https://developer.nvidia.com/blog/author/cschied/) described an internship and later Facebook Reality Labs work. | [Quake II RTX](https://developer.nvidia.com/blog/real-time-path-tracing-and-denoising-in-quake-ii-rtx/): research-to-product changes and content adaptation, distinguishing Q2VKPT from later team work. |
+| **Tim Dörries.** His [site](https://doerriest.github.io/), checked 2026-11-21, identifies an Epic rendering role and links his projects. | [VEngine2](https://github.com/DoerriesT/VEngine2): a personal D3D12/Vulkan engine with owned backends, scene/animation and editor work; useful for the measured footprint comparison. |
+| **Sébastien Hillaire.** His [site](https://sebh.github.io/), checked 2026-11-21, identifies a principal graphics role at Epic. | [Sky Atmosphere](https://github.com/sebh/UnrealEngineSkyAtmosphere): focused paper/demo code and a small D3D11 base; distinguish it from Unreal Engine's full footprint. |
+| **Tongwei Dai.** His [portfolio](https://dw218192.github.io/portfolio/), checked 2026-11-21, identifies NVIDIA employment and links PTStudio. | [PTStudio](https://github.com/dw218192/PTStudio): renderer/editor work using Dawn/WebGPU and OpenUSD at the measured revision, with substantial tests and automation. |
 
 The study did not establish NVIDIA affiliation for [Will Usher / Twinklebear](https://github.com/Twinklebear), whose profile described Luminary Cloud.
 

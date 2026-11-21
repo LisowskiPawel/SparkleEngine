@@ -35,7 +35,8 @@ namespace SparkleLauncher
 				continue;
 			}
 
-			const ThirdPartyDependencyUiStatus status = BuildThirdPartyDependencyStatus(dependency, dependencyCachePath);
+			const bool bOperationActive = m_sourceDependencyRunIds.contains(dependency.Id);
+			const ThirdPartyDependencyUiStatus status = bOperationActive ? ThirdPartyDependencyUiStatus{} : BuildThirdPartyDependencyStatus(dependency, dependencyCachePath);
 			QPushButton* actionButton = CreateSourceDependencyActionButton(dependency);
 
 			QLabel* statusLabel = AddStatusRow(layout, dependency.Label, status.Text, status.Detail, status.State, actionButton);
@@ -76,7 +77,7 @@ namespace SparkleLauncher
 		const QString runId = m_sourceDependencyRunIds.value(dependency.Id);
 		const bool bCleaning = !runId.isEmpty() && m_cleaningSourceDependencyRunIds.contains(runId);
 		const bool bSyncing = !runId.isEmpty() && !bCleaning;
-		const SyncItemState state = bSyncing ? SyncItemState::Syncing : status.bSynced ? SyncItemState::Synced : SyncItemState::Missing;
+		const SyncItemState state = bSyncing ? SyncItemState::Syncing : status.bHasCache ? SyncItemState::Synced : SyncItemState::Missing;
 
 		ApplyInlineStatusLabel(
 		    statusLabel,
@@ -105,7 +106,8 @@ namespace SparkleLauncher
 			QPushButton* actionButton = m_sourceDependencyActionButtons.value(dependency.Id, nullptr);
 			if (statusLabel != nullptr && actionButton != nullptr)
 			{
-				const ThirdPartyDependencyUiStatus status = BuildThirdPartyDependencyStatus(dependency, workspaceOutputs.DependencyCacheRoot);
+				const bool bOperationActive = m_sourceDependencyRunIds.contains(dependency.Id);
+				const ThirdPartyDependencyUiStatus status = bOperationActive ? ThirdPartyDependencyUiStatus{} : BuildThirdPartyDependencyStatus(dependency, workspaceOutputs.DependencyCacheRoot);
 				ApplySourceDependencyRowState(dependency, status, *statusLabel, *actionButton);
 			}
 		}

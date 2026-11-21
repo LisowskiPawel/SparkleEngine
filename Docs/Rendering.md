@@ -8,6 +8,8 @@ Sparkle renders immutable scene and camera data through geometry, lighting, reco
 
 The source contains raster/ray surface paths, direct/indirect lighting, linear reconstruction, optional D3D12 DLSS, exposure, tone mapping and partial lens effects. Image correctness and native-API validation are still in progress. Decals, color grading and HDR are unfinished release features.
 
+Apply the [verification method](Engineering.md#verification) to each feature and the combined frame on both APIs, including failure, lifetime, performance and delivery checks.
+
 - [Release features](#release-features)
 - [Reference renderer](#reference-renderer)
 - [Later rendering work](#later-rendering-work)
@@ -29,6 +31,8 @@ flowchart LR
 
 ## Release features
 
+These are release requirements; existing implementation does not establish qualification.
+
 ### Frame and materials
 
 The frame accepts complete immutable scene/view inputs. Serial and threaded execution must agree, queues and resource use stay bounded, and GPU resources survive every queue that references them. The frame graph needs actual producers, correct dependencies, barriers and aliasing.
@@ -39,9 +43,27 @@ Base shading needs matching evaluation, sampling and probability densities (PDFs
 
 The current visibility path uses CPU frustum culling and batching with fixed residency budgets for opaque/alpha-tested surfaces. General streaming, occlusion/LOD and GPU-driven geometry are outside that path.
 
+### Texture cooking
+
+DirectXTex owns working images, conversion, mip generation and BC encoding; retained upstream codecs own decoding. These dependencies stay private to TextureCooker. Sparkle owns material intent, requests, admission and publication; runtime `.stex` loading has no processing dependency.
+
+HDR color defaults to **RGBA32F**, preserving finite signed values and alpha. **BC6H** is explicit, clamps negative RGB to zero and rejects values above 65504; meaningful HDR alpha requires uncompressed storage. New BC6H output must meet absolute RGB error at most **0.08** up to one, relative error at most **0.15** above one and normalized RMS error at most **0.04**. Failure preserves accepted output and recommends RGBA32F. Exact preservation of authored blocks does not establish source quality.
+
+Mip preservation and color transfer must agree; conversion processes pixels rather than relabelling blocks. Float data stays linear and RGB transfer preserves alpha. Normal encoding retains the authored hemisphere; scalar data retains its precision/range. The cooker and RHI admit 2D textures, arrays and single cubes; material slots accept only single-2D floating-point views. Volumes, cube arrays, multiframe input and multipart/deep EXR are excluded.
+
+Bound cooking, decoding, pending uploads and residency separately; logical allowances do not establish process/device-memory limits. Validate complete layouts and apply the [publication contract](Engineering.md#build-and-delivery) through byte acquisition, cancellation and GPU retirement.
+
+The [request API](../Tools/Cooking/TextureCooker/Public/TextureCookRequestList.h), [request codec](../Tools/Cooking/TextureCooker/Private/Requests), [source loaders](../Tools/Cooking/TextureCooker/Private/SourceLoading), [cooked format](../Engine/RHI/Public/Textures/CookedTextureAsset.h) and [runtime texture owner](../Engine/Renderer/Private/Textures) define detailed policies, formats, layouts and budgets.
+
+### SDK integration and owned research
+
+Keep production and Reference independent; owned research needs a stated contribution and stopping point. [Migration decisions](ThirdPartyMigration.md#rendering-sdks-worth-considering) own SDK selection and retirement boundaries; [Roadmap](Roadmap.md#after-release) owns order.
+
+Adapters own signals, settings, resets and SDK lifetime. Sparkle owns pass placement, states, descriptors, queues and retirement. Use NRD's native dispatch API through Sparkle RHI. Keep one production owner per path and compare correct raw signals, quality/cost, native behavior and reproduction.
+
 ### Direct lighting
 
-Direct lighting needs analytic or exhaustive small-light comparisons, correct units, emitter identity, selection probabilities, measure conversion and visibility. Reservoir reuse must preserve the intended raw mean during motion, disocclusion and zero-support cases. Keep the estimator in Renderer and use RTXDI as a reference implementation.
+Direct lighting needs analytic or exhaustive small-light comparisons, correct units, emitter identity, selection probabilities, measure conversion and visibility. Reservoir reuse must preserve the intended raw mean during motion, disocclusion and zero-support cases. Renderer owns the lighting contract. A production RTXDI trial must replace its matching local resampling path completely; Reference remains an independent control.
 
 ### Indirect lighting
 
@@ -65,13 +87,13 @@ The current tone operators include Reinhard, ACES approximation and ACES fitted.
 
 Color grading needs one scene-referred global grade and a 3D LUT with color metadata through import, cooking and per-view lifetime. Define LUT axes/domain, working color space, negative/HDR behavior and interpolation. File grammar, malformed-input handling, failure behavior and budgets remain open decisions. Volume grading, multi-look blending and an OCIO runtime are outside scope.
 
-The target display order is reconstruction, exposure/scene grade, tone/gamut mapping, vignette, chromatic aberration, encoding, then UI/present. Raw Reference and exact diagnostic views bypass artistic effects.
+The target display order is reconstruction, exposure/scene grade, tone/gamut mapping, vignette, chromatic aberration, encoding, then UI/present. Raw Reference products bypass this chain; the current Reference viewport uses display processing. Exact diagnostic views bypass tone mapping and, by default, lens effects.
 
 ### Lens effects
 
 Vignette and chromatic aberration have partial fixed passes. The first chromatic effect uses a fixed three-channel model. Evaluate the output-pixel strength proposal, then choose units, radial/aspect behavior and approved On defaults before implementation.
 
-Check viewport subrects and resizing, unchanged alpha/UI/raw output, and cost. At neutral strength, output must equal the input with no effect pass, allocation or copy. Vignette ordering still needs to match the target order above. New public controls are deferred.
+Check viewport subrects and resizing, unchanged alpha/UI/raw output, and cost. At neutral strength, output must equal the input with no effect pass, allocation or copy. Current presentation reverses the target lens-effect order; that remains a release gap. New public controls are deferred.
 
 ### HDR
 
@@ -87,6 +109,8 @@ Reference accuracy still needs independent execution checks. See [Current priori
 
 The full target is camera-originating scene-linear RGB reflective surface transport: visible emission/environment, direct next-event estimation, indirect reflection and compensated roulette. Transmission, media, physical subsurface and spectral transport are excluded.
 
+Current [admission](../Engine/Renderer/Private/Passes/Lighting/ReferencePathTracer/ReferencePathTracerSessionState.cpp) requires a perspective view, rejects blended/subsurface materials and restricts directional/point/spot lights to zero angular size or ideal punctual models. These limits apply before transport begins.
+
 The canonical material is glTF-style Lambertian plus single-scatter isotropic GGX/Smith/Schlick, with delta reflection at zero roughness and explicit normal, alpha and sidedness rules. Preserve metres, left-handed coordinates, row-vector/row-major transforms, reversed-Z, pinhole/box pixel sampling, linear Rec.709/D65 and base-mip bilinear textures.
 
 Light/lobe probabilities, comparable measures, MIS and emitter endpoints must match the estimator. Reference must not use the production GBuffer, reservoirs, denoised signals, temporal reconstruction or exposure/display results as transport input. Assets and low-level traversal may be shared, but shared decoding, transforms, materials and intersections need independent analytic, minimal or cross-renderer checks.
@@ -95,28 +119,28 @@ Light/lobe probabilities, comparable measures, MIS and emitter endpoints must ma
 
 The full surface reference has no valid deterministic depth/distance cutoff.
 
-Binary32 mean/variance accumulation and exact counts commit complete sample prefixes up to 1,048,576 samples per pixel. Non-finite values, overflow, safety-depth termination and mixed, stale or truncated output invalidate a reference result.
+The [current session](../Engine/Renderer/Private/Passes/Lighting/ReferencePathTracer/ReferencePathTracerSession.h) commits complete sample prefixes using binary32 mean/M2 accumulation and an exact count, with a fixed target of **4,096 samples per pixel**. Support for the required ceiling of **1,048,576** remains unimplemented. Non-finite values, overflow, safety-depth termination and mixed, stale or truncated output must invalidate a reference result.
 
 Finish analytic-rectangle camera/BSDF/visibility intersections, emitter identity and matching PDFs. Perfect-mirror and competing/collinear-emitter examples must expose the defect.
 
-Remaining checks cover independent references and uncertainty, rejection of invalid sample prefixes/files, identity changes, resets, cancellation, session preservation, inline/pipeline agreement, D3D12/Vulkan, GPU lifetime, ShippingEditor output and final scene/package reproduction. Reference controls/export in Game are excluded. Completed sampling or a sky-only image is insufficient.
+Reference-specific checks cover independent controls and uncertainty, invalid sample prefixes/files, identity changes, resets, cancellation, session preservation, inline/pipeline agreement and ShippingEditor output. Reference controls/export in Game are excluded. Completed sampling or a sky-only image is insufficient.
 
 ## Later rendering work
 
-These extensions follow release and their required inputs; [Roadmap](Roadmap.md#after-release) sets their delivery order. Test each feature before the selected combined configuration, with raw/uncached, TLAS and BCn results kept as controls. Unsupported requests must report the actual active path and reason.
+These extensions follow release and their required inputs; [Roadmap](Roadmap.md#after-release) sets delivery order. Keep raw/uncached, TLAS and BCn controls. Unsupported requests must report the actual active path and reason.
 
 ### Transport and materials
 
-- **Direct sampling:** mixed analytic, emissive-triangle and environment proposals with correct probabilities/support and bounded work. Compare variance and temporal quality at equal cost; guiding/ReGIR or advanced reuse needs a measured benefit.
-- **Indirect resampling:** start with a narrow ReSTIR GI-style secondary-path domain, then multi-bounce diffuse/rough-specular work. Derive path records, shift mappings and GRIS normalization before optimizing replay.
-- **Materials:** anisotropic GGX and one dielectric coat, with energy, sampling, PDF and tangent-frame checks. Extend the independent reference domain, then check guides, temporal behavior, native APIs and delivery.
+- **Direct sampling:** mixed analytic, emissive-triangle and environment proposals with correct probabilities/support and bounded work. Evaluate the bounded RTXDI replacement before extending the local production sampler. Compare variance and temporal quality at equal cost; guiding/ReGIR or advanced reuse needs a measured benefit.
+- **Indirect resampling:** start with a narrow ReSTIR GI-style secondary-path domain, then multi-bounce diffuse/rough-specular work. Choose one production owner before expansion. Keep owned experiments focused on the selected estimator question; derive path records, shift mappings and GRIS normalization and check them against Reference before optimizing replay.
+- **Materials:** anisotropic GGX and one dielectric coat, with energy, sampling, PDF and tangent-frame checks. Extend the independent reference domain, then check guides and temporal behavior.
 
 ### Reconstruction and caches
 
-- **Reconstruction:** one RELAX diffuse/specular temporal path, with quality, time, memory, motion, native-API and delivery results. The owned CNN is independent of this work.
-- **SHaRC:** bounded diffuse update/resolve/query with cold starts, resets, moving scenes, capacity and cache misses. Continue uncached paths on misses and measure benefit, GPU safety, package behavior and reproduction. Media/sharp-specular caching and streaming are outside scope.
+- **Reconstruction:** one RELAX diffuse/specular temporal path with checked signals, guides and motion. The owned CNN is independent of this work.
+- **SHaRC:** bounded diffuse update/resolve/query with cold starts, resets, moving scenes, capacity and cache misses. Continue uncached paths on misses. Media/sharp-specular caching and streaming are outside scope.
 - **NRC:** actual online learning/coupling, adaptation and bias measurements, compared with SHaRC and uncached transport on the same domain.
-- **Neural texture compression:** cooked latent materials and on-sample decode, filtering/LOD/material fidelity, BCn comparison and memory/compute tradeoffs, followed by native-API and delivery checks.
+- **Neural texture compression:** cooked latent materials and on-sample decode, filtering/LOD/material fidelity, BCn comparison and memory/compute tradeoffs.
 
 ### Acceleration structures and volumes
 
@@ -182,7 +206,7 @@ Application hosts the world and renderer. GameFramework publishes immutable inpu
 
 Shader [passes](../Engine/Assets/Shaders/Passes) own entry points and pass-specific resources. Shared [material rules](../Engine/Assets/Shaders/Material) and [color mathematics](../Engine/Assets/Shaders/Common/Color.hlsli) stay independent of passes. Match CPU upload records and shader layouts at their shared boundary.
 
-Renderer owns pass and recording-chunk labels; the recording command list determines native marker support. Required GPU-crash scopes stay active when optional markers are disabled. Native timestamp queries and resolution belong to RHI.
+Renderer labels passes and recording work; RHI owns native marker/timestamp support. Required GPU-crash scopes stay active when optional markers are disabled.
 
 World updates and extraction finish before immutable publication; structural edits wait for workers. Animation-only publication preserves edit history and viewport navigation.
 

@@ -51,7 +51,7 @@ private:
 
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	void RecordSourceCandidate();
-	void VerifySourceCandidateFiles(const nlohmann::json& sourceFiles) const;
+	void VerifySourceCandidateFiles(const nlohmann::json& sourceFiles);
 	void VerifyCapturedSource(const ShaderCompileRequest& request, const ShaderSourceFile& source) const;
 #endif
 

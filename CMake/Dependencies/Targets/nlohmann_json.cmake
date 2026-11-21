@@ -1,5 +1,5 @@
-set(SPARKLE_NLOHMANN_JSON_REVISION "55f93686c01528224f448c19128836e7df245f72")
-set(SPARKLE_NLOHMANN_JSON_VERSION "3.12.0")
+set(SPARKLE_NLOHMANN_JSON_REVISION "d732d616badc771ab1e85876b3a9eb8191fdf4c0")
+set(SPARKLE_NLOHMANN_JSON_VERSION "3.13.0-dev.d732d616 (unreleased)")
 sparkle_declare_git_dependency(nlohmann_json
     https://github.com/nlohmann/json.git
     ${SPARKLE_NLOHMANN_JSON_REVISION})

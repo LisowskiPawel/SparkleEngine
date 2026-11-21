@@ -1,0 +1,190 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" width="1108.8pt" height="439.2pt" viewBox="0 0 1108.8 439.2" version="1.1" role="img" aria-labelledby="peer-support-composition-title peer-support-composition-description">
+ <desc id="peer-support-composition-description">Absolute maintained lines by host/UI/editor, content/shader tools, native tests, automation and other native source. Sparkle has 56203 supporting lines, Falcor 39655, VEngine2 6972 and PTStudio 20226. Different product and evidence scopes require interpretation; no category is a waste score.</desc><title id="peer-support-composition-title">Supporting-code composition in Sparkle and three public frameworks/portfolios</title><title>Supporting-code composition in Sparkle and three public frameworks/portfolios</title>
+ <metadata>
+  <rdf:RDF>
+   <ns2:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+    <dc:title>Supporting-code composition in Sparkle and three public frameworks/portfolios</dc:title>
+    <dc:description>Absolute maintained lines by host/UI/editor, content/shader tools, native tests, automation and other native source. Sparkle has 56203 supporting lines, Falcor 39655, VEngine2 6972 and PTStudio 20226. Different product and evidence scopes require interpretation; no category is a waste score.</dc:description>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <ns2:Agent>
+      <dc:title>Matplotlib v3.10.7, https://matplotlib.org/</dc:title>
+     </ns2:Agent>
+    </dc:creator>
+   </ns2:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 439.2  L 1108.8 439.2  L 1108.8 0  L 0 0  z " style="fill: #ffffff" />
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 205.128 133.956  L 576.321996 133.956  L 576.321996 103.212  L 205.128 103.212  z " clip-path="url(#p0a3440c4c1)" style="fill: #89729b; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_3">
+    <path d="M 576.321996 133.956  L 768.750475 133.956  L 768.750475 103.212  L 576.321996 103.212  z " clip-path="url(#p0a3440c4c1)" style="fill: #b08334; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_4">
+    <path d="M 768.750475 133.956  L 837.076529 133.956  L 837.076529 103.212  L 768.750475 103.212  z " clip-path="url(#p0a3440c4c1)" style="fill: #2875a8; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_5">
+    <path d="M 837.076529 133.956  L 837.144 133.956  L 837.144 103.212  L 837.076529 103.212  z " clip-path="url(#p0a3440c4c1)" style="fill: #718293; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_6">
+    <path d="M 205.128 195.444  L 295.326038 195.444  L 295.326038 164.7  L 205.128 164.7  z " clip-path="url(#p0a3440c4c1)" style="fill: #89729b; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_7">
+    <path d="M 295.326038 195.444  L 404.53977 195.444  L 404.53977 164.7  L 295.326038 164.7  z " clip-path="url(#p0a3440c4c1)" style="fill: #b08334; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_8">
+    <path d="M 404.53977 195.444  L 534.388511 195.444  L 534.388511 164.7  L 404.53977 164.7  z " clip-path="url(#p0a3440c4c1)" style="fill: #3c8b67; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_9">
+    <path d="M 534.388511 195.444  L 651.057834 195.444  L 651.057834 164.7  L 534.388511 164.7  z " clip-path="url(#p0a3440c4c1)" style="fill: #2875a8; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_10">
+    <path d="M 205.128 256.932  L 273.74643 256.932  L 273.74643 226.188  L 205.128 226.188  z " clip-path="url(#p0a3440c4c1)" style="fill: #89729b; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_11">
+    <path d="M 273.74643 256.932  L 282.180357 256.932  L 282.180357 226.188  L 273.74643 226.188  z " clip-path="url(#p0a3440c4c1)" style="fill: #3c8b67; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_12">
+    <path d="M 282.180357 256.932  L 283.529786 256.932  L 283.529786 226.188  L 282.180357 226.188  z " clip-path="url(#p0a3440c4c1)" style="fill: #2875a8; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_13">
+    <path d="M 205.128 318.42  L 246.139376 318.42  L 246.139376 287.676  L 205.128 287.676  z " clip-path="url(#p0a3440c4c1)" style="fill: #89729b; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_14">
+    <path d="M 246.139376 318.42  L 266.875591 318.42  L 266.875591 287.676  L 246.139376 287.676  z " clip-path="url(#p0a3440c4c1)" style="fill: #b08334; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_15">
+    <path d="M 266.875591 318.42  L 357.264798 318.42  L 357.264798 287.676  L 266.875591 287.676  z " clip-path="url(#p0a3440c4c1)" style="fill: #3c8b67; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_16">
+    <path d="M 357.264798 318.42  L 432.41671 318.42  L 432.41671 287.676  L 357.264798 287.676  z " clip-path="url(#p0a3440c4c1)" style="fill: #2875a8; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_17">
+    <path d="M 432.41671 318.42  L 432.574144 318.42  L 432.574144 287.676  L 432.41671 287.676  z " clip-path="url(#p0a3440c4c1)" style="fill: #718293; stroke: #ffffff; stroke-linejoin: miter" />
+   </g>
+   <g id="patch_18">
+    <path d="M 33.264 371.124  L 47.6784 371.124  L 47.6784 362.34  L 33.264 362.34  z " clip-path="url(#p0a3440c4c1)" style="fill: #89729b" />
+   </g>
+   <g id="patch_19">
+    <path d="M 243.936 371.124  L 258.3504 371.124  L 258.3504 362.34  L 243.936 362.34  z " clip-path="url(#p0a3440c4c1)" style="fill: #b08334" />
+   </g>
+   <g id="patch_20">
+    <path d="M 454.608 371.124  L 469.0224 371.124  L 469.0224 362.34  L 454.608 362.34  z " clip-path="url(#p0a3440c4c1)" style="fill: #3c8b67" />
+   </g>
+   <g id="patch_21">
+    <path d="M 665.28 371.124  L 679.6944 371.124  L 679.6944 362.34  L 665.28 362.34  z " clip-path="url(#p0a3440c4c1)" style="fill: #2875a8" />
+   </g>
+   <g id="patch_22">
+    <path d="M 875.952 371.124  L 890.3664 371.124  L 890.3664 362.34  L 875.952 362.34  z " clip-path="url(#p0a3440c4c1)" style="fill: #718293" />
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 500; font-size: 21px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #24344a" x="33.264" y="32.146688" transform="rotate(-0 33.264 32.146688)">What the supporting-code category contains</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #526176" x="33.264" y="55.739312" transform="rotate(-0 33.264 55.739312)">Bars use an absolute source-line scale. Tests and reproduction tools can be valuable supporting work.</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #24344a" x="33.264" y="121.89525" transform="rotate(-0 33.264 121.89525)">SparkleEngine</text>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="390.724998" y="121.343375" transform="rotate(-0 390.724998 121.343375)">33,009</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="672.536235" y="121.343375" transform="rotate(-0 672.536235 121.343375)">17,112</text>
+   </g>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="802.913502" y="121.343375" transform="rotate(-0 802.913502 121.343375)">6,076</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #24344a" x="953.568" y="116.18565" transform="rotate(-0 953.568 116.18565)">56,203 lines</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #526176" x="953.568" y="131.444975" transform="rotate(-0 953.568 131.444975)">37.4% of own source</text>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #24344a" x="33.264" y="183.38325" transform="rotate(-0 33.264 183.38325)">Falcor</text>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="250.227019" y="182.831375" transform="rotate(-0 250.227019 182.831375)">8,021</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="349.932904" y="182.831375" transform="rotate(-0 349.932904 182.831375)">9,712</text>
+   </g>
+   <g id="text_12">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="469.46414" y="182.831375" transform="rotate(-0 469.46414 182.831375)">11,547</text>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="592.723172" y="182.831375" transform="rotate(-0 592.723172 182.831375)">10,375</text>
+   </g>
+   <g id="text_14">
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #24344a" x="953.568" y="177.67365" transform="rotate(-0 953.568 177.67365)">39,655 lines</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #526176" x="953.568" y="192.932975" transform="rotate(-0 953.568 192.932975)">23.2% of own source</text>
+   </g>
+   <g id="text_16">
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #24344a" x="33.264" y="244.87125" transform="rotate(-0 33.264 244.87125)">VEngine2</text>
+   </g>
+   <g id="text_17">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="239.437215" y="244.319375" transform="rotate(-0 239.437215 244.319375)">6,102</text>
+   </g>
+   <g id="text_18">
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #24344a" x="953.568" y="239.16165" transform="rotate(-0 953.568 239.16165)">6,972 lines</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #526176" x="953.568" y="254.420975" transform="rotate(-0 953.568 254.420975)">13.6% of own source</text>
+   </g>
+   <g id="text_20">
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #24344a" x="33.264" y="306.35925" transform="rotate(-0 33.264 306.35925)">PTStudio</text>
+   </g>
+   <g id="text_21">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="312.070195" y="305.807375" transform="rotate(-0 312.070195 305.807375)">8,038</text>
+   </g>
+   <g id="text_22">
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="394.840754" y="305.807375" transform="rotate(-0 394.840754 305.807375)">6,683</text>
+   </g>
+   <g id="text_23">
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #24344a" x="953.568" y="300.64965" transform="rotate(-0 953.568 300.64965)">20,226 lines</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #526176" x="953.568" y="315.908975" transform="rotate(-0 953.568 315.908975)">53.2% of own source</text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #24344a" x="55.44" y="369.491375" transform="rotate(-0 55.44 369.491375)">Host / UI / editor</text>
+   </g>
+   <g id="text_26">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #24344a" x="266.112" y="369.491375" transform="rotate(-0 266.112 369.491375)">Content / shader tools</text>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #24344a" x="476.784" y="369.491375" transform="rotate(-0 476.784 369.491375)">Native tests</text>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #24344a" x="687.456" y="369.491375" transform="rotate(-0 687.456 369.491375)">Automation</text>
+   </g>
+   <g id="text_29">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #24344a" x="898.128" y="369.491375" transform="rotate(-0 898.128 369.491375)">Other native</text>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #526176" x="33.264" y="402.431375" transform="rotate(-0 33.264 402.431375)">Sparkle embeds verification in existing tool owners; the zero standalone native-test slice does not mean no verification.</text>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #526176" x="33.264" y="420.877775" transform="rotate(-0 33.264 420.877775)">Classification is by maintained file responsibility. Mixed editor/importer or application/benchmark files stay together.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p0a3440c4c1">
+   <rect x="0" y="0" width="1108.8" height="439.2" />
+  </clipPath>
+ </defs>
+</svg>
