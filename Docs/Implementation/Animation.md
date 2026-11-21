@@ -4,17 +4,17 @@
 
 ## Recommendation and status
 
-**Use ozz-animation as the first feasibility candidate for delegating animation algorithms. It is the best fit among the standalone open-source options reviewed here for Sparkle's goal of avoiding animation specialization. A complete migration is not yet proved.** Its value is upstream ownership of sampling, compression, pose blending and optional IK; immediate code deletion is modest.
+**Stage 0 decision: REJECT/REVISE the proposed ozz 0.17.0 migration under the current capability-preservation and simplification constraints. Keep the existing evaluator.** Ozz remains a useful standalone animation library, but this study has not found a small complete supported bridge that transfers enough current maintenance. This is an architecture decision, not a measured runtime/performance rejection.
 
-This document proposes an implementation, explains the tradeoffs and identifies the actual retirement boundary. No dependency, cooked format or runtime code has changed. Research was checked on **November 21, 2026** against ozz **0.17.0**, released August 1, 2026, at commit `744eb9d99f606eda849acb0b1204f7a3dc20bca1`. Sparkle source inspection began at `719f89ec1b52968abaa139b8b9b70867b90df254`; the counted source hashes were rechecked after unrelated workspace commits. [Release](https://github.com/guillaumeblanc/ozz-animation/releases/tag/0.17.0).
+This document records the evaluated implementation and its retirement boundary. No dependency, cooked format or runtime code has changed. Initial research used Sparkle `719f89ec1b52968abaa139b8b9b70867b90df254`; stage 0 started at `2c14f97d32b4fe728700fb91da645e0a466ac4de` on **November 21, 2026**, with preserved unrelated edits and per-file identities. The selected upstream research pin remains ozz **0.17.0**, commit `744eb9d99f606eda849acb0b1204f7a3dc20bca1`. The [stage-0 report](../../build/validation/animation/stage-0/REPORT.md) records source-backed findings, corpus identities, copy/lifetime maps and frozen comparison criteria. [Release](https://github.com/guillaumeblanc/ozz-animation/releases/tag/0.17.0).
 
-There are already concrete fit concerns: skeletal STEP/cubic conversion, different quaternion interpolation, arbitrary parent-space matrices, a smaller joint limit and bounded archive admission. Resolve these before adopting the dependency. Retaining the existing implementation is preferable to adding ozz alongside comparable local machinery. This investigation does not change the roadmap's delivery order.
+There are concrete fit concerns: skeletal STEP/cubic conversion, quaternion approximation error, arbitrary parent-space matrices, a smaller joint limit and bounded archive admission. Different rotation interpolation is acceptable within the declared error budget; it is not an automatic failure. Resolve the complete bridge before adopting the dependency. Retaining the existing implementation is preferable to adding ozz alongside comparable local machinery. This investigation does not change the roadmap's delivery order.
 
-**Next action: [stage 0 — study and integration design](#stage-0--study-existing-integrations-and-choose-the-shape).** All stages below are unexecuted. Preparing this plan and its source research does not pass the architecture study, executable fit or implementation gates.
+**Next action: retain the current path; do not start stage 1 on the rejected design.** [Stage 0](#stage-0--study-existing-integrations-and-choose-the-shape) is complete with REJECT/REVISE. Source/reference reviews may correct this decision without a changed pin. A GO still needs a concrete supported design addressing the recorded costs or a separately adopted requirement change. Stages 1–4 remain NOT STARTED and gated; no executable fit or implementation result is claimed.
 
 ## Proposed responsibility split
 
-**Ozz handles animation evaluation and its optimized data. Sparkle keeps content interpretation, playback policy and rendering.** Source parsing already uses cgltf/Assimp; the intended new transfer is:
+**Evaluated target: ozz would handle animation evaluation and its optimized data; Sparkle would keep content interpretation, playback policy and rendering.** Source parsing already uses cgltf/Assimp. The transfer below was not selected at stage 0; current ownership remains unchanged:
 
 | Area | Transfer to ozz-animation | Keep in Sparkle |
 | --- | --- | --- |
@@ -44,7 +44,7 @@ The recommendation is about fit for this repository, not a universal quality or 
 
 | Option | Strength | Remaining work and decision |
 | --- | --- | --- |
-| **[ozz-animation](https://github.com/guillaumeblanc/ozz-animation)** | Engine-independent runtime, offline construction, compression, hierarchy evaluation, blending, generic tracks and focused IK facilities. | **Preferred candidate for transferring animation algorithm ownership.** Requires a real importer/cooked-format bridge and numerical/capacity proof. |
+| **[ozz-animation](https://github.com/guillaumeblanc/ozz-animation)** | Engine-independent runtime, offline construction, compression, hierarchy evaluation, blending, generic tracks and focused IK facilities. | **Not selected for the current bounded replacement.** Stage 0 found additional capacity, spatial, conversion and admission ownership; a cheaper complete supported design remains unestablished. |
 | **[Animation Compression Library / ACL](https://github.com/nfrechette/acl)** | Strong compression/decompression focus, scalar and transform tracks, documented error controls and production-oriented integration. | Best alternative if compressed clip size/sampling becomes the main problem. It leaves hierarchy evaluation, blending and IK elsewhere, so it transfers less of the responsibility you want to avoid. Uniform resampling also needs source-curve conversion. Do not stack ACL and ozz in this migration. [Integration](https://github.com/nfrechette/acl/blob/v2.1.0/docs/README.md). |
 | **Existing cgltf/Assimp; [ufbx](https://ufbx.github.io/elements/animation/)** | Source parsing is already delegated. Ufbx can evaluate FBX scenes and animation during import. | Import-time evaluation can help baking, but does not supply an engine-neutral runtime for both current glTF and FBX workflows. An importer replacement is a separate decision. |
 | **A complete engine animation system, for example [Godot](https://docs.godotengine.org/en/stable/tutorials/assets_pipeline/retargeting_3d_skeletons.html)** | Broader authoring, rig and retargeting workflows. | Appropriate when choosing that engine. Extracting its object/resource/editor systems into Sparkle would be a much broader integration; it is not the recommended leaf dependency. |
@@ -52,7 +52,7 @@ The recommendation is about fit for this repository, not a universal quality or 
 
 ### Trust, benefits and costs
 
-Ozz is an established specialist project: the repository had approximately **3,150 stars** when checked, a recent 0.17.0 release, a substantial test tree and a Windows CI definition covering Debug/Release, x64/Win32 and selected shared/reference configurations. The Forge documents an ozz multithreading example, providing a relevant external integration precedent. These are maintenance/adoption signals, not proof of Sparkle correctness or a commercial support guarantee. [Repository](https://github.com/guillaumeblanc/ozz-animation), [pinned CI](https://github.com/guillaumeblanc/ozz-animation/blob/0.17.0/.github/workflows/windows.yml), [The Forge](https://github.com/ConfettiFX/The-Forge/blob/master/README.md).
+Evaluate maintenance through the pinned implementation, focused upstream tests and [Windows CI definition](https://github.com/guillaumeblanc/ozz-animation/blob/744eb9d99f606eda849acb0b1204f7a3dc20bca1/.github/workflows/windows.yml). The Forge supplies a real [clip integration](https://github.com/ConfettiFX/The-Forge/blob/cd5046893faba2dc7869243873bf01f02a6f0df9/Common_3/Resources/AnimationSystem/Animation/Clip.cpp) at the recorded revision. These support API and ownership study; they do not establish Sparkle correctness, speed or commercial support. Read source-format standards for semantics and pinned tests for intended boundaries; popularity and example loading are insufficient adoption evidence.
 
 | Benefit | Cost or limit |
 | --- | --- |
@@ -67,7 +67,7 @@ ACL remains a credible alternative rather than an inferior library: its latest t
 
 ## Exactly what it would replace
 
-Counts below were reproduced with **cloc 2.06**, including headers. Physical lines include blanks/comments; code lines exclude them. The [local research evidence](../../artifacts/analysis/animation-20261121) retains counts and source hashes. These are inspected surfaces, not predicted net savings.
+Counts below were reproduced with **cloc 2.06**, including headers. Physical lines include blanks/comments; code lines exclude them. The [local research evidence](../../artifacts/analysis/animation-20261121) retains counts and source hashes; stage 0 freshly reproduced the six-file 273/240 ceiling. These are evaluated retirement surfaces, not selected implementation work or predicted net savings.
 
 | Current files under `Engine/GameFramework/Private/Animation/` | Physical / code lines | Proposed treatment |
 | --- | ---: | --- |
@@ -105,6 +105,8 @@ net first-party native removal = deleted native lines - added native lines
 Include headers, templates, callers, offline conversion and relocated algorithms. Report CMake/scripts, upstream source/build size, cooked size, load time, per-instance memory and runtime cost separately. Current accepted net removal is **zero**; no adapter-cost estimate or performance forecast is justified yet.
 
 ## Proposed pipeline and ownership
+
+This is the evaluated full-ozz shape for a possible revised design. Stage 0 selected keeping the current pipeline; none of these representation or target changes is adopted.
 
 ```mermaid
 flowchart LR
@@ -189,11 +191,11 @@ These failure IDs connect the existing [compatibility questions](#decisive-compa
 
 ## Staged implementation plan
 
-**Current state: all stages are NOT STARTED.** A stage proceeds only after its prerequisite exit is supported. These are work boundaries, not repeated permission checkpoints; report a real blocker or rejection instead of advancing on an assumption.
+**Current state: stage 0 complete, decision REJECT/REVISE; stages 1–4 NOT STARTED and gated.** A negative architecture decision completes the study without passing executable fit or selecting a production migration. The later stages below remain conditional instructions for a revised design, not the next authorized action under this verdict.
 
 | Stage | Deliverable | Exit needed for the next stage |
 | --- | --- | --- |
-| 0 — Study and shape | Evidence-based owner/representation/lifetime design and a bounded trial contract. | A specific supported candidate shape, retirement map, comparison limits and unresolved executable fit questions. |
+| 0 — Study and shape | **COMPLETE — REJECT/REVISE.** Retain the current evaluator; findings and frozen future checks recorded below. | No GO TO TRIAL. Reopen only when the identified design constraints have a concrete supported answer. |
 | 1 — Decisive fit | Local prototype of the difficult contracts, separate from production. | Supported curve/hierarchy/capacity/admission/lifetime fit with a credible complete maintenance win. |
 | 2 — Dependency | Pinned private runtime/offline linkage and matching delivery inputs. | Correct cache/toolchain/linkage/source-package composition through existing owners. |
 | 3 — Complete cutover | One functioning import → cook → load → evaluation → extraction route. | Real consumers converted, superseded mechanisms retired and focused correctness/failure/lifetime checks passing. |
@@ -211,61 +213,88 @@ Keep local probes, fixtures, executables and validation-only build additions out
 
 ### Stage 0 — Study existing integrations and choose the shape
 
-**Purpose:** decide the best complete integration for the documented graphics goal before writing production code or adding the dependency. This is an architecture deep dive with a concrete decision, not a checklist saying the guides were read.
+**Complete — REJECT/REVISE, November 21, 2026. Selected shape: retain the present evaluator.** No production code/dependency changes or executable trials were made. The [stage-0 report and frozen inputs](../../build/validation/animation/stage-0/REPORT.md) contain the complete path review, source pins, representation/copy/lifetime map, alternatives and F1–F8 check specifications. This negative design decision does not claim measured runtime failure or that no possible ozz integration exists.
 
-Study the live implementation through two complete paths: skeletal glTF/FBX playback and four-weight morph playback. Follow source identities and coordinate conversion through imported records, skeleton/clip builders, scene-generation publication, bounded loaders, resource stores, evaluation work, palette construction and immutable extraction. Include resource replacement/cancellation and current/previous deformation consumers. Record the real producers/readers and build membership of the [replacement map](#exactly-what-it-would-replace), including retained contracts.
+#### Findings from existing integrations
 
-Study these existing integrations and state what to reuse or deliberately avoid:
-
-| Precedent to inspect | Integration question to answer |
+| Studied source | Finding applied to this design |
 | --- | --- |
-| [SourceImporters composition](../../Tools/Import/SourceImporters/CMakeLists.txt), [cgltf recipe](../../CMake/Dependencies/Targets/cgltf.cmake), [Assimp recipe](../../CMake/Dependencies/Targets/assimp.cmake) and their private source adapters | How are parsers kept private while canonical imported contracts preserve source meaning? What hierarchy information has already been collapsed, and where must needed information survive for cooking? |
-| [DirectXTex recipe](../../CMake/Dependencies/Targets/directxtex.cmake), [TextureCooker composition](../../Tools/Cooking/TextureCooker/CMakeLists.txt), [TextureProcessor](../../Tools/Cooking/TextureCooker/Private/Processing/TextureProcessor.cpp) and the [texture contract](../Rendering.md#texture-cooking) | How does upstream own a complete algorithm/data mechanism while Sparkle keeps material intent, admission and publication? Reuse the boundary and local CMake-option scoping, not a second copy of the texture pipeline. |
-| [JSON recipe](../../CMake/Dependencies/Targets/nlohmann_json.cmake), [input admission](../../Engine/Core/Private/Json/JsonInputAdmission.cpp) and the [retained JSON decision](../ThirdPartyMigration.md#json) | How does upstream own parsing/storage while Sparkle retains bounded admission and domain rules? Do not reproduce the old animation codec to compensate for unsafe upstream loading. The unreleased JSON pin grants no general exception for another dependency. |
-| [Scene-generation publisher](../../Tools/Cooking/SceneCooker/Private/CookedSceneGenerationWriter.cpp), [GameFramework](../../Engine/GameFramework/CMakeLists.txt), [SceneCooker](../../Tools/Cooking/SceneCooker/CMakeLists.txt) and current extraction consumers | Which owners already handle complete-generation staging, private target dependencies, worker settlement and immutable output? Preserve them instead of adding per-animation publication or another world-output authority. |
-| Ozz's pinned [custom animation importer](https://github.com/guillaumeblanc/ozz-animation/blob/0.17.0/howtos/custom_animation_importer.cc), [custom skeleton importer](https://github.com/guillaumeblanc/ozz-animation/blob/0.17.0/howtos/custom_skeleton_importer.cc), [playback](https://github.com/guillaumeblanc/ozz-animation/blob/0.17.0/samples/playback/sample_playback.cc), [multithread sample](https://github.com/guillaumeblanc/ozz-animation/blob/0.17.0/samples/multithread/sample_multithread.cc) and archive/build source | Which supported APIs actually cover raw construction, sampling, hierarchy evaluation, allocation and serialization? Trace ownership/error behavior in source; demo loading is not proof of bounded malformed-input admission. |
-| [The Forge's ozz example](https://github.com/ConfettiFX/The-Forge/blob/master/README.md) and relevant [References integration precedents](../References.md#integration-precedents) | Inspect and record the actual source revision and narrow integration boundary. Identify what Sparkle can reuse as an idea and what is engine-specific; do not import another framework, scheduler or asset pipeline. |
+| Current glTF/FBX → cook/load → world/extraction paths | Both importers admit up to 65,536 joints. The glTF imported contract keeps collapsed parent-space matrices, not a general source-node tree. Four-weight morph playback is skeleton/instance-bound; current FBX animation import rejects morph channels. Preserve those actual supported paths and static import of node-only animation. |
+| SourceImporters and its cgltf/Assimp recipes | Keep parser types private and normalize source meaning once. A second ozz CLI import route would duplicate identity and spatial interpretation. Any helper ancestry must survive the source/import boundary deliberately. |
+| DirectXTex recipe/TextureProcessor and JSON recipe/InputAdmission | Reuse direct private upstream objects, leaf-local build options and small domain admission around one algorithm owner. A local animation partitioner/baker/compressed-format validator is substantial remaining ownership, not a forwarding adapter. |
+| Existing scene publisher, load scopes and staged world | Reuse complete-generation publication, request allocation charging, worker settlement, target generations and staged state/resource swap. No second publisher, scheduler, output tree or public ozz contract is needed. |
+| Pinned ozz custom importers, playback/multithread and runtime source | RawAnimation and RawSkeleton both enforce the 1,024 limit; sampling-only does not escape it. Animation construction fills missing keys with identity. Contexts are mutable, nonmovable and need explicit invalidation on replacement/address reuse. |
+| The Forge at `cd5046893faba2dc7869243873bf01f02a6f0df9` | Reuse the conceptual split between immutable clip and per-playback cache/local output. Its vendored archive/API differs from 0.17.0, including public `Deallocate()` and archive version 6 versus version 7; do not copy its wrapper or treat its tag/memory-stream loader as bounded admission proof. |
 
-**Design work:** compare at least (a) full ozz sampling plus hierarchy evaluation, (b) upstream sampling with retained Sparkle hierarchy work, and (c) retaining the current implementation. Include the entire conversion/admission/delivery cost and unchanged capabilities. A smaller transfer must earn its own benefit and revised retirement scope; it cannot inherit the six-file target. Reconsider ACL only if the requirement becomes compression rather than broader algorithm delegation.
+#### Reference authority and remaining proof
 
-For the preferred shape, resolve the following in the plan/report before the prototype:
+The [reference review](../../build/validation/animation/stage-0/reference-refinement/REFERENCE-REVIEW.md) and [19-source index](../../build/validation/animation/stage-0/reference-refinement/primary-sources.json) bind exact revisions, local hashes, claims and limits. Use the owning Sparkle contracts first, the published source-format standard for independent expected values, pinned headers/implementation for supported APIs, and focused upstream tests for intended boundaries. Samples demonstrate composition. No upstream tests were executed in this study.
 
-| Design decision | Required concrete result |
+| Question | Primary evidence | Decision boundary |
+| --- | --- | --- |
+| Source curves | Published [glTF Appendix C](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#appendix-c-interpolation), backed by Khronos source `8e798b02d254cea97659a333cfcb20875b62bdd4`; pinned [ozz converter](https://github.com/guillaumeblanc/ozz-animation/blob/744eb9d99f606eda849acb0b1204f7a3dc20bca1/src/animation/offline/gltf/gltf2ozz.cc#L166). | Duration-scaled cubic and quaternion normalization need independent oracles. glTF permits bounded SLERP approximations; measure error before requiring baking. Static tool helpers are not a public conversion API or error bound. |
+| Capacity and STEP | Pinned [builder boundary tests](https://github.com/guillaumeblanc/ozz-animation/blob/744eb9d99f606eda849acb0b1204f7a3dc20bca1/test/animation/offline/animation_builder_tests.cc#L42) and [generic-track STEP/Float4 tests](https://github.com/guillaumeblanc/ozz-animation/blob/744eb9d99f606eda849acb0b1204f7a3dc20bca1/test/animation/runtime/track_sampling_job_tests.cc#L123). | The skeletal 1,024 limit is confirmed; batching cost is unproved. Generic tracks support STEP. Seconds-to-ratio collisions and source bindings remain local checks. |
+| Spatial composition | Pinned [LocalToModel root/subtree API](https://github.com/guillaumeblanc/ozz-animation/blob/744eb9d99f606eda849acb0b1204f7a3dc20bca1/include/ozz/animation/runtime/local_to_model_job.h#L80) and [transform tests](https://github.com/guillaumeblanc/ozz-animation/blob/744eb9d99f606eda849acb0b1204f7a3dc20bca1/test/animation/runtime/local_to_model_job_tests.cc#L202); [DirectXMath convention](https://learn.microsoft.com/en-us/windows/win32/dxmath/pg-xnamath-getting-started#matrix-convention). | Root/subtree controls are supported building blocks, not a complete arbitrary parent-space bridge. TRS nodes can compose into shear. Sparkle reflects X; transposition alone does not change handedness. |
+| Admission and lifetime | Pinned [archive reads](https://github.com/guillaumeblanc/ozz-animation/blob/744eb9d99f606eda849acb0b1204f7a3dc20bca1/include/ozz/base/io/archive.h#L177), [load counts](https://github.com/guillaumeblanc/ozz-animation/blob/744eb9d99f606eda849acb0b1204f7a3dc20bca1/src/animation/runtime/animation.cc#L277), [allocator](https://github.com/guillaumeblanc/ozz-animation/blob/744eb9d99f606eda849acb0b1204f7a3dc20bca1/src/base/memory/allocator.cc#L94) and [valid archive round trips](https://github.com/guillaumeblanc/ozz-animation/blob/744eb9d99f606eda849acb0b1204f7a3dc20bca1/test/animation/runtime/track_archive_tests.cc#L133). | Supported stream/allocator interfaces merit investigation. Valid round trips do not prove bounded malformed-input rejection. Do not swap the default allocator per concurrent load. |
+
+Confirmed API constraints and unexecuted bridge costs are separate. No benchmark, upstream-test run, malformed-input exploit or impossibility result is claimed. The Forge remains an ownership precedent with a different vendored API/archive, not an authority for 0.17.0 behavior.
+
+#### Shape decision and retained responsibilities
+
+| Shape considered | Complete integration consequence | Decision |
+| --- | --- | --- |
+| Full ozz sampling/hierarchy plus morph tracks | Requires capacity partitions and cross-partition composition, a spatial/source-ancestry bridge, source-curve conversion and bounded compressed-data admission. The direct six-file target remains only 273 physical / 240 code lines before those costs. | **REJECT/REVISE.** No small complete supported design or demonstrated maintenance win established. |
+| Skeletal ozz sampling with Sparkle hierarchy | Keeps arbitrary parent-space composition but still needs <=1,024-track batches/contexts, curve conversion and new loading. Retains hierarchy ownership; cannot retire the entire pose evaluator. | Not selected. Retaining hierarchy alone does not solve capacity or the complete bridge cost. |
+| Generic upstream tracks with Sparkle hierarchy | Avoids the skeletal builder limit and supports STEP, but needs per-channel objects/mapping/loading and cubic/quaternion conversion. Direct sampler-plus-morph ceiling is 174 physical / 151 code lines, a subset of 273/240. | Not selected. No cheaper complete boundary demonstrated; no invented adapter/net estimate. |
+| Current implementation | Preserves admitted range, source curves, parent-space matrices, existing admission/publication and renderer behavior. | **SELECT NOW.** No new files, public APIs, dependency targets, formats, caches or runtime representations. |
+
+Partitioning through supported jobs is possible in principle; this study has not established a complete small partition/spatial design. Ozz exposes read-only compressed spans, but no inspected whole-animation validation API replaces checking their offsets/iframe/data invariants. An exact-read stream and stable budgeted allocator could help with bytes/allocations; they do not alone restore current semantic admission. No upstream fork, reduced joint range, TRS approximation, fallback or capability waiver is adopted.
+
+The selected owner/copy budget is the current one: importers own canonical source values; cookers own staged products; the existing publisher/read scope owns disk generations; stores own runtime clips/skeletons; each evaluation slot owns mutable scratch/final values; Renderer owns extracted/current/previous deformation through GPU retirement. The report traces writers, readers, lifetimes and conditional upstream replacements individually. Required final palette/history values are not treated as redundant copies merely to increase deletion credit.
+
+If a design is reopened, keep runtime objects private to GameFramework and offline construction private to SceneCooker, preserving the existing renderer contract. Ozz 0.17.0's CMake 3.30 requirement also affects setup/tool discovery: current root minimum is 3.27 and Launcher detection admits 3.20. Recipe/cache/Sync/Clean, metadata, CRT/linkage, notices and source/prebuilt delivery changes remain part of the complete cost, not work performed by this stage.
+
+#### Frozen comparison limits and corpus
+
+These are stage-0 review choices fixed before candidate measurements, not externally certified tolerances, release qualification or a GO decision. Keep the quality limits unless an explicit design review changes their rationale before new measurements. The report gives exact formulas, input hashes, sampling grids and stopping conditions.
+
+| Criterion | Fixed comparison rule |
 | --- | --- |
-| Module/file/API shape | Name existing owners to extend, mechanisms/files to delete and each necessary new private surface. Keep source parsing upstream/private, conversion in SceneCooker and runtime objects in GameFramework. Justify any public contract change by a real module boundary; do not prescribe speculative files/classes. |
-| Representation and copy budget | List source keys, offline raw inputs, cooked bytes, loaded upstream objects, skeleton metadata/maps, per-instance context/scratch and renderer output. For each, name its sole authority, purpose, multiplicity, writer/readers, lifetime and invalidation. Remove runtime raw-key mirrors and duplicate pose/skeleton stores; distinguish necessary final palette output from redundant copies. |
-| Spatial and temporal contract | Specify joint/ancestor remapping, skin-reference and row/column conversion, missing channels, static duration, STEP boundaries, quaternion/cubic baking and four-weight bindings. Identify exactly which conversion algorithms remain local and why they are small. No unsupported TRS decomposition assumption. |
-| Capacity, admission and lifetime | Explain a supported route for the current joint range, including helper expansion; malformed-count/allocation admission; context invalidation/address reuse; concurrent instances; cancellation and publication ordering. Define allocation/destruction ownership across static/shared module boundaries; avoid global allocator changes during concurrent loads. |
-| Dependency/delivery | Select an immutable candidate, required source files, runtime/offline targets, CRT/linkage, local build options and the CMake 3.30/tool-discovery consequence. Map Sync/Clean/cache, Launcher metadata, notices, source/prebuilt package inputs and absence of runtime downloads to existing owners. |
-| Comparison and stopping rules | Identify real glTF/FBX/skin/morph inputs, small analytic cases and reproducible commands. Set absolute/relative matrix, deformed-position, quaternion and weight tolerances, exact STEP/default/identity requirements, allocation/capacity limits and relevant cost comparisons before stage 1. Do not reuse bind-matrix tolerance as a visible-animation budget. |
+| Identity/defaults/STEP | Exact binding/component selection and source interval at keys and adjacent representable float times; no transition shift, smoothing, missing-channel identity substitution or loss of external zero-duration behavior. |
+| Finite matrices / positions | Per-element matrix error <= `1e-4 + 1e-5 * max(abs(reference), abs(candidate))`; final deformed-position error <= `1e-3 m + 1e-5 * max(norm(reference), norm(candidate))`. Existing bind admission remains a separate contract. |
+| Rotation / morph values | Quaternion and nondegenerate normal/tangent angular error <= `1e-3 rad`; four-weight absolute error <= `1e-4` per component, including overshoot. |
+| Capacity/admission/lifetime | Preserve the current 65,536-joint range and 2 GiB decoded-allocation request budget, with new upstream charges included. Release-mode rejection and 0/1/2/4-worker replacement/cancellation/instance checks must pass; no new steady-state frame allocations. |
+| Complete cost review | Positive net native removal is the review target with all relocated/new code charged. Also compare owned mechanisms/authorities; report missed numerical targets once without chasing counts or removing safeguards. Timing/storage review limits are frozen in the report and remain unmeasured. |
 
-**Acceptance:** the study contains a reasoned choice and rejected alternatives, complete retirement/retention and representation/lifetime maps, source-backed upstream API use, a specific F1–F5 prototype plan, later consumer/delivery checks for F6–F8 and predeclared comparison limits. It explains how the chosen shape reduces owned mechanisms without weakening rendering or existing workflows. Known contradictions are not hidden as later TODOs; genuine executable uncertainties have a discriminating check and stop condition in stage 1. Record GO TO TRIAL or REJECT/REVISE with reasons. No production dependency, cooked format or runtime changes occur in this stage.
+Available real inputs are CesiumMan glTF (19 joints, one 2-second clip, 57 LINEAR TRS channels) and the 7,684,560-byte Knight FBX named by ModernSponzaKnight. Metadata/identity inspection is complete; importer/deformation trials are not. Inspection of all local 10 glTF and 2 GLB files found no animated four-weight source. The [ten-case analytical pack](../../build/validation/animation/stage-0/reference-refinement/oracle-cases.json) specifies defaults/static playback, exact STEP, duration-scaled cubic overshoot, rotation, collapsed shear, a complete four-weight fixture blueprint, capacity, admission and lifetime cases. The fixture has not been generated/imported; a representative real morph corpus remains missing.
+
+Keep source semantics, observed current behavior and candidate agreement as three separate comparisons. In particular, `R1_CUBIC_SIGN_ORACLE` discriminates authored cubic quaternion behavior from the current importer's hemisphere alignment. This is a source-level question to verify, not an observed runtime defect or an authorized repair. The pack includes explicit scalar/weight/matrix values and Sparkle's X reflection; neither an old/new match nor a sampling grid alone certifies source correctness or bounds arbitrary cubic baking.
+
+**Handoff readiness:** source/reference evidence and discriminating case specifications are ready. A supported complete capacity/spatial/admission design is still missing. Before candidate measurements in a permitted stage 1, bind actual temporary harness commands/toolchain, generate and admit the specified fixtures, resolve any source-versus-current discrepancy policy, and capture the current path against the independent values. F1–F5 and later F6–F8 checks remain specified, not executed.
+
+**Exit:** the study produced a reasoned negative decision with guide/precedent findings, alternative and authority/copy/lifetime maps, frozen criteria and missing coverage recorded. **Next:** keep current code and the existing Roadmap priorities. Stage 1 remains NOT STARTED/gated. Reopen for a concrete supported capacity/spatial/admission design, an adopted requirement/consumer change, or an explicit source/reference/architecture review. Correct affected inferences even if the pin is unchanged; a GO still needs a plausibly cheaper complete shape. An upstream/source/input change invalidates only affected conclusions; an unrelated HEAD change does not require repeating the study.
 
 Ready-to-use prompt:
 
 ```text
-Execute only stage 0 of Docs/Implementation/Animation.md, including its Shared
-execution and handoff contract. Do a deep integration-design study before any
-production code/dependency change. Read all nine guides linked by the plan and
-turn their goals into concrete design constraints. Trace the real glTF/FBX,
-skeleton, morph, cook/load, world/extraction and replacement/cancellation paths.
-Study the named local integrations and pinned ozz examples, plus the actual
-The Forge integration source; record revisions, lessons and limits.
-
-Compare full ozz evaluation, sampling-only delegation and keeping current code.
-Choose the smallest supported complete shape for Sparkle's rendering goals.
-Specify owners/files/APIs, representations and copy budget, context/module
-lifetimes, conversion/admission/capacity strategy, dependency/delivery costs,
-retirements and preserved workflows. Freeze concrete comparison limits and
-inputs for stage 1, including all difficult compatibility questions. Put raw
-evidence in ignored output and revise this plan's proposed architecture and
-status in place. Finish with GO TO TRIAL or REJECT/REVISE, explicit unresolved
-proofs and the next action. Do not execute stage 1 or mark this research as fit.
+Refine only stage 0 of Docs/Implementation/Animation.md and its Shared execution
+and handoff contract. Read the recorded decision, report, primary-source index
+and analytical case pack. Study affected guide/owner paths and strongest pinned
+APIs, implementation, focused tests and source-format standards. Reuse matching
+evidence; correct unsupported conclusions even if the pin is unchanged. Separate
+confirmed constraints, assumptions and executable uncertainties. Compare complete
+ownership/copy/lifetime, conversion/admission/capacity and delivery costs. Keep
+the source oracle distinct from observed current behavior; bind revised inputs,
+limits, missing proofs and discriminating checks before any measurements.
+Record GO TO TRIAL only for one credible complete supported shape; otherwise
+record REJECT/REVISE with reasons and exact next action in this plan. Keep
+production code/dependencies untouched. Do not execute stage 1, silently fix a
+baseline discrepancy or treat source/test inspection as executable fit.
 ```
 
 ### Stage 1 — Prove decisive fit locally
 
-**Work:** use stage 0's frozen design, inputs and limits to build the smallest isolated prototype exercising F1–F5 through upstream construction, serialization/loading, sampling and final deformation values. Include STEP times immediately before/at/after a transition, cubic interior/overshoot, large rotations, missing/default components, zero-duration clips, sheared/collapsed ancestors, more than 1,024 evaluation joints, reordered joints, morphs and two independently playing instances. Check malformed input in Release and repeated context/resource replacement under serial and worker execution. Compare both the existing implementation and independent known values so a shared existing defect cannot become the oracle.
+**Work:** require stage 0's GO TO TRIAL for matching inputs. First bind temporary harness build/run commands and toolchain, generate/validate the analytical fixtures, resolve source-versus-current oracle policy and capture current-path observations. Then use the frozen design, inputs and limits to build the smallest isolated prototype exercising F1–F5 through upstream construction, serialization/loading, sampling and final deformation values. Include STEP times immediately before/at/after a transition, cubic interior/overshoot, large rotations, missing/default components, zero-duration clips, sheared/collapsed ancestors, more than 1,024 evaluation joints, reordered joints, morphs and two independently playing instances. Check malformed input in Release and repeated context/resource replacement under serial and worker execution. Compare both the existing implementation and independent known values so a shared existing defect cannot become the oracle.
 
 **Do / avoid:** prefer upstream facilities and actual owner behavior; allow comparison implementations only in ignored local output. Do not patch library limits, hide failures with a fallback, move the complete local evaluator into the cooker or launch the full benchmark campaign before resolving decisive fit.
 
@@ -277,10 +306,13 @@ Ready-to-use prompt:
 Execute only stage 1 of Docs/Implementation/Animation.md and its Shared execution
 and handoff contract. Verify stage 0's recorded GO TO TRIAL and matching inputs;
 if absent, report the missing prerequisite without assuming a design. Build an
-isolated local prototype of that shape and exercise F1-F5 against the frozen
-limits through real upstream build/serialize/load/sample/deformation operations.
-Use current behavior plus independent known values, and include capacity,
-malformed Release input, concurrent instances and context replacement.
+isolated local harness; bind actual build/run commands and toolchain, generate
+and validate fixtures from the analytical case pack, and record current-path
+results against independent source values first. Resolve source-versus-current
+discrepancies explicitly; do not silently repair or accept them. Then exercise
+the selected upstream shape through real build/serialize/load/sample/deformation
+operations for F1-F5 at the frozen limits, including capacity, malformed Release
+input, concurrent instances and context replacement.
 Record failures, conversion retained and the complete estimated integration
 cost. Keep production code/recipes untouched and probes out of submitted source.
 Update this plan with the fit verdict, affected design corrections, passed and
@@ -362,4 +394,4 @@ lasting guidance and remaining limits into their owners and remove this plan;
 otherwise edit it with the exact blocker, remaining work and next action.
 ```
 
-Keep the current evaluator if supported integration cannot deliver a demonstrated maintenance win while preserving existing capabilities. Future feature lists and dependency popularity alone do not justify adoption. This document revision has executed no implementation stage, integration build, animation parity probe, GPU test or performance benchmark.
+Stage 0 selected keeping the current evaluator: a complete maintenance win with preserved capabilities is not established for this design. Future feature lists and dependency popularity alone do not justify adoption. Only the architecture study has executed; integration builds, animation parity probes, GPU tests and performance/package qualification remain UNVERIFIED.

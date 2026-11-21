@@ -6,11 +6,11 @@ Temporary code-delivery plan. Remove completed actions as their evidence passes;
 
 The deliverable is less task infrastructure to maintain so Sparkle can focus on its [three rendering cases](../Goals.md#the-three-cases). Follow the footprint study's [first retirement priority](../RepositoryFootprint.md#cuts-before-expansion): transfer the complete execution mechanism upstream and simplify its real callers. Its frozen scope is **3,017 code / 3,566 physical lines in 42 native files**, including the scene-preparation adapters; this is a gross retirement target, not measured net savings. Keep that denominator separate from later source freezes and all-infrastructure accounting. Graphics-share checkpoints are investigation context, not migration quotas.
 
-**Stage 2 outcome — failed adoption:** the pinned enkiTS prototype failed native preparation rollback, including a reproduced unsettled worker through the actual Launcher constructor. The Launcher operation fixture passed its twelve checks; the incident writer compiled but its runtime/notification checks and occupied-I/O frame progress remain unrun. No runtime is selected. Keep `Engine/Tasks` and its consumers; stages 3–7 cannot proceed without a supported design passing the gate. Evidence and actual prototype accounting are in `build/validation/task-runtime/enki-fit-20261121/REPORT.md` and `INTEGRATION-LEDGER.md`.
+**Stage 2 — authorized fork under qualification:** unmodified enkiTS v1.12 remains rejected for preparation rollback. On 21 November 2026 the user authorized forking it as needed. The local fork now passes the original allocation/partial-worker failures and a 234-check preparation/failure/retry sweep; writer notification/lifetime and occupied-I/O frame gates remain open. No runtime is selected yet. The original rejection and prototype accounting remain in `build/validation/task-runtime/enki-fit-20261121/`; current source, authorization and receipts are in `build/validation/task-runtime/runtime-reopen-20261121/`. Keep `Engine/Tasks` until the replacement passes its gates and callers convert.
 
 | Stage | Work remaining |
 | --- | --- |
-| 2 — Runtime fit | Pinned enkiTS rejected after executable preparation/lifetime failure; no supported winner. Reopen only with a complete supported argument addressing the recorded rejection and remaining gates. |
+| 2 — Runtime fit | Qualify the authorized enkiTS fork after native rollback repair; finish actual writer/operation lifetime and held-I/O frame gates, then select or reject it. |
 | 3 — Dependency/composition | Integrate the winner through existing dependency, staging and package owners; implement supported linkage/offline inputs and verify the actual loaded runtime in focused host checks. |
 | 4 — Frame/world conversion | Convert world, preparation, visibility and recording directly, preserving rendering ownership and deterministic caller-thread execution. |
 | 5 — Loading/cook conversion | Convert loading, residency preparation and cook batches while preserving admission, byte budgets, generations, publication, COM and item results. |
@@ -30,6 +30,8 @@ One upstream runtime must own runnable queues, workers, stealing, wakeup, range 
 Delete the entire Tasks module, public API, `SparkleTasks` target/DLL and package surface. Remove generic graph/context/scope/event/dispatch machinery, padding graphs, redundant result/status translation, forwarding-only classes and obsolete configuration. Do not retain aliases, a compatibility facade, a dormant backend or a generic synchronous graph interpreter. Count relocated mechanisms as integration; earlier cleanup earns no migration credit.
 
 Use the supported upstream facility directly before writing an adapter. The integration targets are ceilings to minimize, not allowances to fill. A bridge needs an actual consumer and a named ABI, resource or lifetime requirement that native/standard facilities do not already satisfy; keep it private to that owner. Unsupported fit is a reason to reject the candidate, not to rebuild Tasks around it.
+
+The user authorized an enkiTS fork on 21 November 2026. Identify it by the original upstream commit plus exact patch/source hashes; count maintained fork changes and any added API/state/failure paths explicitly. This exception permits native repairs; the remaining ownership, capacity, allocation, lifetime and preservation requirements still apply.
 
 | Existing mechanism to remove | Intended authority after conversion |
 | --- | --- |
@@ -133,7 +135,7 @@ Keep one ignored report tying each required code claim to its owner, actual upst
 
 ### 2. Prove executable runtime fit
 
-**Rejected on 21 November 2026.** Supported cleanup after failed native initialization left an allocation unreleased; failure after one worker started left thirteen native allocations and that worker unsettled. The actual Launcher constructor reproduced the worker failure. Neither a compiler exception-model adjustment nor the native shutdown/delete entry points repaired rollback. The existing runtime explicitly stops and joins partially started workers. No fork, private repair or replacement worker controller was added. The unchecked items below remain unproved requirements for any reopened design, not work to repeat against the rejected mapping. The stage exit was not achieved.
+**Reopened with user authorization on 21 November 2026.** The unmodified pin's allocation/partial-worker failures remain recorded and are not waived. The authorized native fork repairs partial startup and exposes bounded C preparation errors; the original failures and the allocation/semaphore/worker failure/retry sweep now pass. Reuse the successful Launcher integration and continue the unchecked actual-owner gates below. The stage exit has not yet been achieved.
 
 ```text
 With the focused inputs frozen, prototype the remaining pinned enkiTS mapping on actual Launcher completion and GPU-crash writer bodies.
