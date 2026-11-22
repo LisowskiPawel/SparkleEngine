@@ -20,7 +20,7 @@ The recorded Windows toolchain is:
 
 Other combinations need separate testing. These versions describe the recorded setup, not the latest available releases.
 
-The offline shader tool stages ShaderMake, `dxc.exe`, `slangc.exe` and their DLL/module payloads through its CMake owner. `DXC_SDK_ROOT`, `SLANG_SDK_ROOT` and `SPIRV_TOOLS_SDK_ROOT` select explicit SDK inputs; ShaderMake does not acquire compilers. The tool's `slang-standard-module-*` trees are managed SDK payload: unchanged preparation preserves them; SDK changes repair/prune their contents. Slang 2026.8 full-PDB CLI export needs the pinned [loop-location](../CMake/Dependencies/Patches/SlangLoopSourceLocations.patch) and [debug-format](../CMake/Dependencies/Patches/SlangDebugInformationFormat.patch) corrections. Use short paths: the SDK directory exporter can omit long-path artifacts, which the cooker rejects. Ordinary SDK setup does not amend qualified GPU-crash receipts.
+The offline shader tool stages ShaderMake, `dxc.exe`, `slangc.exe` and their DLL/module payloads through its CMake owner. `DXC_SDK_ROOT`, `SLANG_SDK_ROOT` and `SPIRV_TOOLS_SDK_ROOT` select explicit SDK inputs; ShaderMake does not acquire compilers. The tool's `slang-standard-module-*` trees are managed SDK payload: unchanged preparation preserves them; SDK changes repair/prune their contents. Slang 2026.8 full-PDB CLI export needs the pinned [loop-location](../ThirdParty/slang/Patches/SlangLoopSourceLocations.patch) and [debug-format](../ThirdParty/slang/Patches/SlangDebugInformationFormat.patch) corrections. Use short paths: the SDK directory exporter can omit long-path artifacts, which the cooker rejects. Ordinary SDK setup does not amend qualified GPU-crash receipts.
 
 The project and standalone Launcher minimum is CMake 3.30, including its configuration-aware transitive dependency metadata; the [Visual Studio 18 2026 generator](https://cmake.org/cmake/help/latest/generator/Visual%20Studio%2018%202026.html) below requires 4.2+. Launcher uses four build jobs; direct builds select `--parallel`. Private PCHs do not replace explicit includes.
 
@@ -76,13 +76,21 @@ Put stable contracts in `Public` and implementation in `Private`. New public API
 
 Core is the base dependency. GameFramework does not depend on Renderer or RHI; RHI does not depend on Renderer. Native types remain inside the backend or an explicit interop interface. Dependencies follow actual public use, not convenient transitive includes.
 
-Use the [integration contract](ThirdPartyMigration.md#ownership-and-dependency-workflow) for identifiable vendor source, Sparkle build bindings and native adapters. Linkage, public usage and allocator/context lifetime follow the actual library/module boundary. Prepared cooking uses existing tools; build reuse, verified input admission, runtime repair and configuration-correct distribution metadata require their own checks. Existing exceptions follow the [staged refinement](Implementation/ThirdPartyIntegration.md).
+Use the [integration contract](ThirdPartyMigration.md#ownership-and-dependency-workflow) and [dependency navigation](../ThirdParty/README.md) for recipes, vendor source, Sparkle compile bindings and native adapters. Linkage, public usage and allocator/context lifetime follow the actual library/module boundary. Prepared cooking uses existing tools; build reuse, verified input admission, runtime repair and configuration-correct distribution metadata require their own checks. Existing exceptions follow the [staged refinement](Implementation/ThirdPartyIntegration.md).
 
 For replacements, name the mechanism being retired and the policy retained. Assess the complete producer-to-consumer change, including callers and adapters. Moving code earns no removal credit; report non-native, generated, dependency and build/runtime costs separately. Keep capability additions distinct from simplification.
 
 Orchestration shows what happens and in what order. Keep cohesive algorithms/state machines together and split independently changing responsibilities. Avoid god classes, numbered fragments, forwarding-only collaborators, helper bags and service locators. Assess public surface, repetition and dependencies as well as size.
 
 Keep feature state and mechanism in one predictable location. New caches, queues, layers, flags or APIs need a current user and a reason simpler code is insufficient. Prefer direct code to speculative extensibility.
+
+### Execution ownership
+
+Application owns separate enkiTS frame, background and I/O resources; callers borrow them through explicit composition. Use the selected native C interface directly for ranges, dependencies, pinned work and completion. Keep standard stop tokens, typed results, bounded admission, process supervision and publication with the domain owner. The dependency recipe identifies the maintained fork and validates its exact source/patch bytes.
+
+All-zero worker configuration uses direct caller-thread kernels before asynchronous initialization. Threaded composition requires positive non-aliased resources, a global maximum of 256 native workers and the accounted external coordinator slot. Preserve logical partition caps and stable aggregation independently of native range grain. Register a foreign thread with only one pool at a time; release frame registration before cache joins that need sequential I/O/background registration.
+
+Published results and cancellation are not physical completion. Keep task arguments, callbacks, mapped inputs and reservations alive until every native reader settles. Explicitly seal admission and join in the owning close path; invoke standard stop callbacks outside locks they can reenter. Launcher destruction belongs to its creator thread. RHI fences retain GPU resources independently of CPU task completion. After GPU drain, settle the incident writer's ten-second deadline before cache or Editor-operation joins can block on its I/O worker; a missed deadline retains live storage through fatal process exit.
 
 ### File placement
 
@@ -96,14 +104,14 @@ Group module implementation by capability, lifetime or backend. [External preced
 | `<module>/CMake/` | Target-specific SDK discovery, source selection, asset generation and deployment |
 | `<module>/Assets/` | Authored assets consumed by that module |
 
-Keep headers beside their implementation and includes relative to the owning public or private root. Add folders for responsibilities, not file counts; small cohesive surfaces may stay flat. Avoid generic `Features`, `Helpers` or `Utils` levels. Preserve shared invariants and lifetimes when splitting code.
+Dependency recipes, compile bindings and patches live together under `ThirdParty/<name>`; shared cache/admission mechanics stay under `CMake/Dependencies`. Keep headers beside their implementation and includes relative to the owning public or private root. Add folders for responsibilities, not file counts; small cohesive surfaces may stay flat. Avoid generic `Features`, `Helpers` or `Utils` levels. Preserve shared invariants and lifetimes when splitting code.
 
 The source owners are:
 
 | Module or source root | Responsibility and placement |
 | --- | --- |
 | `Engine/Core` | Product-independent files, paths, processes, input values, math, logging and time |
-| `Engine/Tasks` | Task graphs, execution and scope lifetime; callers own scheduling policy |
+
 | `Engine/Platform` | Native window/input; Core owns shared input values |
 | `Engine/RHI` | GPU contracts, validation and D3D12/Vulkan backends |
 | `Engine/Renderer` | Scene/view preparation, GPU scene, frame graphs, passes and image providers |

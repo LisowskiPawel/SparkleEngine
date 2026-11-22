@@ -3,7 +3,8 @@
 #include "GameFramework/Public/Rendering/RenderAssetHandles.h"
 #include "Meshes/GpuMesh.h"
 #include "Resources/Residency/AssetResidency.h"
-#include "Tasks/Public/TaskExecution.h"
+#include <exception>
+#include <stop_token>
 
 #include <cstddef>
 #include <utility>
@@ -18,14 +19,14 @@ class Mesh;
 class RenderCommandList;
 class RenderHardwareInterface;
 class RhiCommandSubmissionService;
-class TaskExecutor;
-class TaskScope;
+struct enkiTaskScheduler;
+struct enkiPinnedTask;
 struct GpuMeshPreparedData;
 
 class GpuMeshCache final
 {
 public:
-	GpuMeshCache(RenderHardwareInterface& renderHardwareInterface, RhiCommandSubmissionService& submissions, TaskExecutor& taskExecutor, TaskScope& parentScope);
+	GpuMeshCache(RenderHardwareInterface& renderHardwareInterface, RhiCommandSubmissionService& submissions, enkiTaskScheduler* cpu);
 	~GpuMeshCache() noexcept;
 
 	GpuMeshCache(const GpuMeshCache&) = delete;
@@ -57,14 +58,15 @@ private:
 	struct MeshRequest final
 	{
 		CacheKey Key;
+		std::stop_token Stop;
 		ImmutableRenderMeshHandle Source;
 		GpuMeshHandle Handle;
 		AssetGenerationHandle Generation;
-		TaskExecution Execution;
-		std::shared_ptr<GpuMeshPreparedData> Prepared;
+		enkiPinnedTask* Preparation = nullptr;
+		std::exception_ptr Failure;
+		std::unique_ptr<GpuMeshPreparedData> Prepared;
 		std::unique_ptr<GpuMesh> Uploaded;
 		std::uint64_t ResidentBytes = 0;
-		bool bPreparationStarted = false;
 		bool bUploadSubmitted = false;
 		bool bWanted = true;
 	};
@@ -75,6 +77,7 @@ private:
 	MeshRequest* FindRequest(const CacheKey& key) noexcept;
 	void LaunchPendingPreparations();
 	void LaunchPreparation(MeshRequest& request);
+	static void PrepareMesh(void* argument) noexcept;
 	void ConsumeCompletedPreparations() noexcept;
 	void ActivateResidentMeshes() noexcept;
 	void RemoveTerminalRequests() noexcept;
@@ -83,8 +86,8 @@ private:
 
 	RenderHardwareInterface* m_renderHardwareInterface = nullptr;
 	RhiCommandSubmissionService* m_submissions = nullptr;
-	TaskExecutor* m_taskExecutor = nullptr;
-	std::unique_ptr<TaskScope> m_taskScope;
+	enkiTaskScheduler* m_cpu;
+	std::stop_source m_stop;
 	AssetResidency m_residency;
 	std::uint64_t m_nextGpuMeshHandle = 1u;
 	std::map<CacheKey, ActiveMesh> m_cache;

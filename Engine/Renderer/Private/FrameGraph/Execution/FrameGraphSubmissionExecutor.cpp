@@ -4,6 +4,7 @@
 
 #include "RHI/Public/Commands/RhiCommandSubmissionService.h"
 
+#include "Core/Public/Diagnostics/Error.h"
 #include <algorithm>
 #include <span>
 
@@ -11,11 +12,11 @@ FrameGraphSubmissionExecutor::FrameGraphSubmissionExecutor(
     const FrameGraph& frameGraph,
     const FrameGraphPlan& plan,
     RhiCommandSubmissionService& submissionService,
-    TaskExecutor& taskExecutor,
+    enkiTaskScheduler* frameScheduler,
     std::span<RhiSubmissionToken> batchTokens) noexcept :
     m_plan(plan),
     m_submissionService(submissionService),
-    m_recordingExecutor(frameGraph, plan, submissionService, taskExecutor),
+    m_recordingExecutor(frameGraph, plan, submissionService, frameScheduler),
     m_batchTokens(batchTokens)
 {
 }
@@ -87,7 +88,7 @@ RhiSubmissionToken FrameGraphSubmissionExecutor::RecordAndSubmitBatch(const Fram
 {
 	if (!m_recordingExecutor.RecordBatch(batch, std::move(initializationLease)))
 	{
-		return {};
+		throw Diagnostics::Error("Frame recording failed before batch submission.");
 	}
 
 	const std::span<RhiCommandRecordingLease> recordings = m_recordingExecutor.Aggregate();

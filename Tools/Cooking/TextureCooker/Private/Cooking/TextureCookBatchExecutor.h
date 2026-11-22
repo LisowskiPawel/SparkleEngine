@@ -1,7 +1,7 @@
 #pragma once
 
 #include "TextureCookRequestList.h"
-#include "TaskTypes.h"
+#include <exception>
 #include "Cooking/TextureCookMemoryLimiter.h"
 #include "Core/Public/Files/FileSetPublication.h"
 
@@ -11,10 +11,6 @@
 #include <functional>
 #include <span>
 #include <vector>
-
-class CompiledTaskGraph;
-class TaskNodeHandle;
-struct TaskExecutorConfig;
 
 class TextureCookBatchExecutor final
 {
@@ -29,12 +25,11 @@ public:
 	TextureCookBatchExecutor(const TextureCookBatchExecutor&) = delete;
 	TextureCookBatchExecutor& operator=(const TextureCookBatchExecutor&) = delete;
 
-	const std::vector<TaskResult>& Execute();
+	const std::vector<std::exception_ptr>& Execute();
 
 private:
-	TaskExecutorConfig BuildExecutorConfig() const;
-	CompiledTaskGraph BuildTaskGraph(std::vector<TaskNodeHandle>& outTaskHandles);
-	TaskResult CookRequest(std::uint32_t index);
+	static void CookRange(std::uint32_t begin, std::uint32_t end, std::uint32_t thread, void* argument) noexcept;
+	void CookRequest(std::uint32_t index);
 	static std::uint32_t ResolveBackgroundWorkerCount();
 
 	const std::vector<TextureCookRequest>& m_requests;
@@ -43,5 +38,5 @@ private:
 	TextureCookMemoryLimiter m_sourceMemoryLimiter;
 	std::function<void(std::size_t, std::size_t)> m_progress;
 	std::atomic<std::size_t> m_completedRequests{0};
-	std::vector<TaskResult> m_results;
+	std::vector<std::exception_ptr> m_results;
 };

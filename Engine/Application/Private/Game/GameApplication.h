@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <stop_token>
 #include <string>
 #include <string_view>
 
@@ -13,9 +14,7 @@ class InputSystem;
 class GameWorld;
 class Renderer;
 class LevelSession;
-class TaskExecutor;
-class TaskScope;
-class ApplicationTaskRuntime;
+struct enkiTaskScheduler;
 class CameraInputIntentCollector;
 class EditorApplication;
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
@@ -67,9 +66,9 @@ private:
 	InputSystem& GetInputSystem() noexcept;
 	LevelSession* GetLevelSession() const noexcept;
 	Renderer& GetRenderer() noexcept;
-	TaskExecutor& GetTaskExecutor() noexcept;
-	TaskScope& GetApplicationTaskScope() noexcept;
 
+	void InitializeExecution();
+	void SettleExecution() noexcept;
 	void InitializeHost();
 	void InitializeInput();
 	void InitializeGameWorld();
@@ -98,7 +97,10 @@ private:
 	std::unique_ptr<GpuCrashIncidentSink> m_gpuCrashSink;
 	std::string m_pendingReadiness;
 #endif
-	std::unique_ptr<ApplicationTaskRuntime> m_taskRuntime;
+	enkiTaskScheduler* m_frameScheduler = nullptr;
+	enkiTaskScheduler* m_backgroundScheduler = nullptr;
+	enkiTaskScheduler* m_ioScheduler = nullptr;
+	std::stop_source m_stop{std::nostopstate};
 	std::unique_ptr<CameraInputIntentCollector> m_cameraInputIntentCollector;
 	GameApplicationOptions m_options;
 	bool m_bIsInitialized = false;

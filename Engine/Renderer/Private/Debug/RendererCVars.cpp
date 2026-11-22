@@ -8,7 +8,7 @@ ConsoleVariable<RendererDiagnosticMarkerVerbosity> CVarRendererDiagnosticMarkerV
     "r.Diagnostics.MarkerVerbosity",
     RendererDiagnosticMarkerVerbosity::FramePass,
     "Renderer diagnostic marker verbosity: 0=off, 1=frame and frame-graph passes, 2=detailed markers.");
-ConsoleVariable<bool> CVarRendererParallelFrameGraphRecording("r.FrameGraph.ParallelRecording", true, "Record compiled typed-shader frame-graph chunks through SparkleTasks.");
+ConsoleVariable<bool> CVarRendererParallelFrameGraphRecording("r.FrameGraph.ParallelRecording", true, "Record compiled typed-shader frame-graph chunks with native pinned tasks.");
 ConsoleVariable<bool> CVarRayTracingTlasRefit("r.RayTracing.Tlas.Refit", true, "Use TLAS refit/update after the initial full build when PTLAS is disabled.");
 ConsoleVariable<std::uint32_t> CVarRayTracingPartitionsPerAxis("r.RayTracing.Ptlas.PartitionsPerAxis", 8u, "Logical ray tracing partition grid resolution per axis.");
 ConsoleVariable<RayTracingPtlasPartitionUpdateMode> CVarRayTracingPtlasPartitionUpdateMode(

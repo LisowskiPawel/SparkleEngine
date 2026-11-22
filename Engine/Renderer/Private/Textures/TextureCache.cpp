@@ -12,13 +12,10 @@
 #include "RHI/Public/Descriptors/RhiDescriptorService.h"
 #include "RHI/Public/Resources/RhiResourceService.h"
 #include "RHI/Public/Resources/RhiUploadService.h"
-#include "Tasks/Public/TaskExecutor.h"
-#include "Tasks/Public/TaskScope.h"
 #include "Textures/TextureDiagnosticsSnapshotBuilder.h"
 
 #include <algorithm>
 #include <array>
-#include <chrono>
 #include <utility>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_textureCacheLogger, "Renderer.TextureCache");
@@ -28,24 +25,34 @@ TextureCache::TextureCache(
     RhiDescriptorService& descriptorService,
     RhiUploadService& uploadService,
     RhiCommandSubmissionService& submissions,
-    TaskExecutor& taskExecutor,
-    TaskScope& parentScope) :
+    enkiTaskScheduler* io,
+    enkiTaskScheduler* cpu) :
     m_resourceService(resourceService),
     m_descriptorService(descriptorService),
     m_textureFactory(resourceService, descriptorService, uploadService),
     m_submissions(submissions),
-    m_taskExecutor(taskExecutor),
-    m_taskScope(std::make_unique<TaskScope>(TaskScopeDesc{TaskScopeKind::AssetGeneration, "Renderer texture generations"}, &parentScope)),
+    m_io(io),
+    m_cpu(cpu),
     m_residency(AssetResidencyBudget{.MaximumPendingUploadBytes = 512ull * 1024ull * 1024ull})
 {
 }
 
 TextureCache::~TextureCache() noexcept
 {
-	if (m_taskScope != nullptr)
+	for (auto& request : m_requests)
 	{
-		m_taskScope->Cancel();
-		(void) m_taskScope->JoinFor(std::chrono::milliseconds::max());
+		if (request.Load)
+		{
+			request.Load->Cancel();
+		}
+	}
+	for (auto& request : m_requests)
+	{
+		if (request.Load)
+		{
+			request.Load->Join();
+		}
+		request.Load.reset();
 	}
 	UnloadAll();
 }

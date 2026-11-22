@@ -39,7 +39,7 @@ class RhiCommandSubmissionService;
 class FrameGraphTransientAllocator;
 class FrameGraphRecordingChunkRecorder;
 class FrameGraphBuilder;
-class TaskExecutor;
+struct enkiTaskScheduler;
 class Window;
 class RenderHardwareInterface;
 class RhiResourceService;
@@ -159,7 +159,7 @@ public:
 
 	const FrameGraphPlan& Compile();
 
-	void Execute(const FrameGraphPlan& plan, RhiCommandSubmissionService& submissionService, TaskExecutor& taskExecutor) const;
+	void Execute(const FrameGraphPlan& plan, RhiCommandSubmissionService& submissionService, enkiTaskScheduler* frameScheduler) const;
 
 	template <typename TParameters> TypedPassParameterInstance<TParameters>& AllocParameters(const char* debugName, ShaderStageVisibility visibility = ShaderStageVisibility::None)
 	{

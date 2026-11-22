@@ -2,7 +2,7 @@
 
 [Integration contract](../ThirdPartyMigration.md#ownership-and-dependency-workflow) | [Footprint](../RepositoryFootprint.md#third-party-separation-and-build-reuse) | [Primary precedents](../References.md#integration-precedents)
 
-**Next: the unobserved behavior controls below.** Source/target separation, recipe-generated facts, read-only build admission, reader/writer coordination, selected contributor attribution and stable runtime delivery are implemented. Retain only missing acceptance and administrative cleanup here. TaskRuntime, WindowInput and ShaderMake own their behavior, retirement and fixed budgets; these refinements add no first-release prerequisites.
+**Next: the unobserved behavior controls below.** Source/target separation, recipe-generated facts, read-only build admission, reader/writer coordination, selected contributor attribution and stable runtime delivery are implemented. Retain only missing acceptance and administrative cleanup here. The adopted [task runtime](../ThirdPartyMigration.md#task-execution), WindowInput and ShaderMake retain their behavior, retirement and fixed qualification budgets; these refinements add no first-release prerequisites.
 
 ## Current findings and scope
 

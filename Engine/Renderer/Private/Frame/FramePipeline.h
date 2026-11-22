@@ -33,8 +33,7 @@ class RenderScene;
 class RenderScenePreparation;
 class RenderViewPreparation;
 class RenderViewState;
-class TaskExecutor;
-class TaskScope;
+struct enkiTaskScheduler;
 class TextureCache;
 class ViewportCaptureService;
 class Window;
@@ -64,8 +63,9 @@ private:
 	    RenderDeviceServices& deviceServices,
 	    RenderPassRuntimeCache& renderPassRuntimeCache,
 	    RendererMemoryMonitor& memoryMonitor,
-	    TaskExecutor& taskExecutor,
-	    TaskScope& assetTaskParentScope,
+	    enkiTaskScheduler* io,
+	    enkiTaskScheduler* cpu,
+	    enkiTaskScheduler* frameScheduler,
 	    bool bEnableUiRenderPackets);
 
 	void SubmitViewportRenderRequest(ViewportRenderRequest request) noexcept { m_viewportRenderRequest = std::move(request); }
@@ -118,7 +118,7 @@ private:
 	RenderDeviceServices& m_deviceServices;
 	RenderPassRuntimeCache& m_renderPassRuntimeCache;
 	RendererMemoryMonitor& m_memoryMonitor;
-	TaskExecutor& m_taskExecutor;
+	enkiTaskScheduler* m_frameScheduler = nullptr;
 	std::unique_ptr<GpuMeshCache> m_gpuMeshCache;
 	std::unique_ptr<TextureCache> m_textureCache;
 	std::unique_ptr<RenderScenePreparation> m_renderScenePreparation;

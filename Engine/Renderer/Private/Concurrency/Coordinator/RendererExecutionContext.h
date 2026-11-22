@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 
+struct enkiTaskScheduler;
 class FramePipeline;
 class RenderCoordinator;
 class RendererHost;
@@ -40,6 +41,7 @@ private:
 	Threading::OwnerThread m_owner{"RenderCoordinator renderer state"};
 	std::unique_ptr<RendererHost> m_rendererHost;
 	std::unique_ptr<FramePipeline> m_pipeline;
+	enkiTaskScheduler* m_externalFrameScheduler = nullptr;
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
 	RhiExternalCapture* m_externalCapture = nullptr;
 #endif

@@ -8,8 +8,7 @@ class RenderPassRuntimeCache;
 class RendererBackendOwner;
 class RendererMemoryMonitor;
 class RendererExecutionContext;
-class TaskExecutor;
-class TaskScope;
+struct enkiTaskScheduler;
 class Window;
 struct RendererMemoryDiagnosticsSnapshot;
 struct ShaderDiagnosticsSnapshot;
@@ -29,7 +28,7 @@ public:
 private:
 	friend class RendererExecutionContext;
 
-	std::unique_ptr<FramePipeline> CreateFramePipeline(TaskExecutor& taskExecutor, TaskScope& assetTaskParentScope, bool bEnableUiRenderPackets);
+	std::unique_ptr<FramePipeline> CreateFramePipeline(enkiTaskScheduler* io, enkiTaskScheduler* cpu, enkiTaskScheduler* frameScheduler, bool bEnableUiRenderPackets);
 	void ReloadShaders();
 	ShaderDiagnosticsSnapshot CaptureShaderDiagnostics() const;
 	std::uint64_t GetShaderGeneration() const noexcept;

@@ -1,20 +1,22 @@
 #pragma once
 
 #include "Editor/Capture/ViewportCaptureSlot.h"
-#include "Editor/Operations/EditorOperationSlot.h"
+#include <memory>
+#include <stop_token>
 #include "Editor/ReferencePathTracer/ReferencePathTracerArtifact.h"
 
 #include <filesystem>
 #include <optional>
 
-class TaskExecutor;
-class TaskScope;
+struct enkiTaskScheduler;
 class Renderer;
 
 class ReferencePathTracerArtifactCoordinator final
 {
 public:
-	ReferencePathTracerArtifactCoordinator(TaskExecutor& executor, TaskScope& scope) noexcept;
+	ReferencePathTracerArtifactCoordinator(enkiTaskScheduler* io, std::stop_token stop) noexcept;
+	~ReferencePathTracerArtifactCoordinator();
+	void Shutdown() noexcept;
 
 	void Request(
 	    ReferencePathTracerArtifactKind kind,
@@ -38,7 +40,11 @@ private:
 	void Fail(std::string message);
 	static std::filesystem::path DefaultOutputRoot();
 
-	EditorOperationSlot<ReferencePathTracerArtifactWriteResult> m_writeOperation;
+	struct Write;
+	static void WriteArtifact(void* argument) noexcept;
+	enkiTaskScheduler* m_io;
+	std::stop_token m_stop;
+	std::unique_ptr<Write> m_write;
 	ReferencePathTracerArtifactKind m_kind = ReferencePathTracerArtifactKind::PartialPrefix;
 	std::filesystem::path m_outputRoot;
 	std::filesystem::path m_publicationDirectory;

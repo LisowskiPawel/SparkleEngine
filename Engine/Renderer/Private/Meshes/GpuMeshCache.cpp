@@ -5,29 +5,51 @@
 #include "Meshes/GpuMeshPreparation.h"
 #include "RHI/Public/Commands/RhiCommandSubmissionService.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
-#include "Tasks/Public/TaskExecutor.h"
-#include "Tasks/Public/TaskScope.h"
+#include <TaskScheduler_c.h>
 
 #include <algorithm>
-#include <chrono>
 #include <utility>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_gpuMeshCacheLogger, "Renderer.GpuMeshCache");
 
-GpuMeshCache::GpuMeshCache(RenderHardwareInterface& renderHardwareInterface, RhiCommandSubmissionService& submissions, TaskExecutor& taskExecutor, TaskScope& parentScope) :
+GpuMeshCache::GpuMeshCache(RenderHardwareInterface& renderHardwareInterface, RhiCommandSubmissionService& submissions, enkiTaskScheduler* cpu) :
     m_renderHardwareInterface(&renderHardwareInterface),
     m_submissions(&submissions),
-    m_taskExecutor(&taskExecutor),
-    m_taskScope(std::make_unique<TaskScope>(TaskScopeDesc{TaskScopeKind::AssetGeneration, "Renderer mesh generations"}, &parentScope))
+    m_cpu(cpu)
 {
 }
 
 GpuMeshCache::~GpuMeshCache() noexcept
 {
-	if (m_taskScope != nullptr)
+	m_stop.request_stop();
+	bool bRegistered = false;
+	for (auto& [key, request] : m_requests)
 	{
-		m_taskScope->Cancel();
-		(void) m_taskScope->JoinFor(std::chrono::milliseconds::max());
+		if (!request.Preparation)
+		{
+			continue;
+		}
+		if (!enkiIsPinnedTaskComplete(m_cpu, request.Preparation))
+		{
+			if (enkiGetThreadNum(m_cpu) == ENKI_NO_THREAD_NUM)
+			{
+				if (!enkiRegisterExternalTaskThread(m_cpu))
+				{
+					Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, "GPU mesh teardown could not acquire its reserved native CPU registration.");
+				}
+				bRegistered = true;
+			}
+			if (!bRegistered && enkiGetThreadNum(m_cpu) != 0)
+			{
+				Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, "GPU mesh teardown requires its creator or the detached render owner.");
+			}
+			enkiWaitForPinnedTask(m_cpu, request.Preparation);
+		}
+		enkiDeletePinnedTask(m_cpu, request.Preparation);
+	}
+	if (bRegistered)
+	{
+		enkiDeRegisterExternalTaskThread(m_cpu);
 	}
 
 	m_requests.clear();
@@ -61,11 +83,6 @@ GpuMeshHandle GpuMeshCache::Request(const ImmutableRenderMeshHandle& mesh)
 		return existingRequest->Handle;
 	}
 
-	if (m_taskScope == nullptr)
-	{
-		Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, "GPU mesh cache has no task scope.");
-	}
-
 	const std::size_t maximumRequestCount = m_residency.GetBudget().MaximumRequestBacklog;
 	if (m_requests.size() >= maximumRequestCount)
 	{
@@ -76,7 +93,7 @@ GpuMeshHandle GpuMeshCache::Request(const ImmutableRenderMeshHandle& mesh)
 		return {};
 	}
 
-	auto prepared = std::make_shared<GpuMeshPreparedData>();
+	auto prepared = std::make_unique<GpuMeshPreparedData>();
 	const std::optional<AssetGenerationHandle> generation = m_residency.BeginGeneration(key.first, key.second);
 	if (!generation)
 	{
@@ -90,7 +107,8 @@ GpuMeshHandle GpuMeshCache::Request(const ImmutableRenderMeshHandle& mesh)
 	request.Source = mesh;
 	request.Handle = handle;
 	request.Generation = *generation;
-	request.Prepared = prepared;
+	request.Prepared = std::move(prepared);
+	request.Stop = m_stop.get_token();
 	try
 	{
 		if (!m_requests.emplace(key, std::move(request)).second)
@@ -197,8 +215,13 @@ void GpuMeshCache::RetainOnly(std::span<const GpuMeshHandle> handles) noexcept
 		request.bWanted = isWanted(request.Handle);
 		if (!request.bWanted)
 		{
+			const bool bPreparing = m_residency.GetState(request.Generation) == AssetResidencyState::Decoding;
+			if (bPreparing)
+			{
+				continue;
+			}
 			(void) m_residency.Cancel(request.Generation);
-			if (!request.Execution.IsValid() && request.Uploaded == nullptr)
+			if (request.Uploaded == nullptr)
 			{
 				request.Prepared.reset();
 			}

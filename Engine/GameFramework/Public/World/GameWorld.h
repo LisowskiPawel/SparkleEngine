@@ -24,12 +24,12 @@ namespace Assets
 
 struct GameWorldResourceStores;
 class WorldEditCommandQueue;
-class TaskExecutor;
+struct enkiTaskScheduler;
 
 class SPARKLE_ENGINE_API GameWorld final
 {
 public:
-	explicit GameWorld(TaskExecutor& taskExecutor);
+	explicit GameWorld(enkiTaskScheduler* frameScheduler);
 	~GameWorld() noexcept;
 
 	GameWorld(const GameWorld&) = delete;
@@ -54,7 +54,7 @@ private:
 
 	std::unique_ptr<ECS::GameWorldState> m_state;
 	std::unique_ptr<GameWorldResourceStores> m_resources;
-	TaskExecutor& m_taskExecutor;
+	enkiTaskScheduler* m_frameScheduler = nullptr;
 	CameraInputIntent m_cameraInputIntent;
 	CameraNavigationSettings m_cameraNavigationSettings;
 	std::uint64_t m_generation = 1;

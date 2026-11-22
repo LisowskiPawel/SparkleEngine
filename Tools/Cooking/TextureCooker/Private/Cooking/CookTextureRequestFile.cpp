@@ -5,7 +5,6 @@
 #include "Constants/TextureCookerConstants.h"
 #include "Cooking/TextureCookBatchExecutor.h"
 #include "TextureCookRequestList.h"
-#include "TaskTypes.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
@@ -46,18 +45,31 @@ static std::vector<std::filesystem::path> CollectProtectedInputs(const std::vect
 	return inputs;
 }
 
-static std::size_t ReportFailures(const std::vector<TextureCookRequest>& requests, const std::vector<TaskResult>& results)
+static std::size_t ReportFailures(const std::vector<TextureCookRequest>& requests, const std::vector<std::exception_ptr>& results)
 {
 	std::size_t failureCount = 0;
 	for (std::size_t index = 0; index < requests.size(); ++index)
 	{
-		const TaskResult& result = results[index];
-		if (result.GetOutcome() == TaskOutcome::Succeeded)
+		const auto& failure = results[index];
+		if (!failure)
 		{
 			continue;
 		}
 
 		++failureCount;
+		std::string reason;
+		try
+		{
+			std::rethrow_exception(failure);
+		}
+		catch (const std::exception& error)
+		{
+			reason = error.what();
+		}
+		catch (...)
+		{
+			reason = "Unknown texture cook failure.";
+		}
 
 		ToolConsole::Message(
 		    std::cerr,
@@ -65,7 +77,7 @@ static std::size_t ReportFailures(const std::vector<TextureCookRequest>& request
 		    "Texture cook failed",
 		    {ToolConsole::Field("assetId", Formatting::FormatHexUInt64(requests[index].assetId)),
 		        ToolConsole::PathField("source", requests[index].sourcePath),
-		        ToolConsole::QuotedField("reason", result.GetDiagnostic())});
+		        ToolConsole::QuotedField("reason", reason)});
 	}
 
 	return failureCount;
@@ -120,7 +132,7 @@ int CookTextureRequestFile(const std::filesystem::path& requestFilePath)
 			    const auto sourceName = Strings::ToNarrow(requests[requestIndex].sourcePath.filename().wstring());
 			    progress.Report("Cooked texture", sourceName, completed, totalWork);
 		    });
-		const std::vector<TaskResult>& results = executor.Execute();
+		const std::vector<std::exception_ptr>& results = executor.Execute();
 
 		if (ReportFailures(requests, results) != 0)
 		{

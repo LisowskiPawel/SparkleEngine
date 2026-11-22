@@ -22,12 +22,12 @@ function Get-SelectedSourcePaths
     }
     elseif ($Staged)
     {
-        $selectedPaths = @(& git -C $RepositoryRoot -c core.quotepath=false diff --cached --name-only --diff-filter=ACMR -- CMake Engine Tools Projects)
+        $selectedPaths = @(& git -C $RepositoryRoot -c core.quotepath=false diff --cached --name-only --diff-filter=ACMR -- CMake Engine Tools Projects ThirdParty)
         if ($LASTEXITCODE -ne 0) { throw "Failed to enumerate staged source files." }
     }
     else
     {
-        $selectedPaths = @(& git -C $RepositoryRoot -c core.quotepath=false ls-files --cached --others --exclude-standard -- CMake Engine Tools Projects)
+        $selectedPaths = @(& git -C $RepositoryRoot -c core.quotepath=false ls-files --cached --others --exclude-standard -- CMake Engine Tools Projects ThirdParty)
         if ($LASTEXITCODE -ne 0) { throw "Failed to enumerate repository source files." }
     }
 
@@ -35,7 +35,7 @@ function Get-SelectedSourcePaths
     {
         $extension = [IO.Path]::GetExtension($relativePath)
         if ($extension -notin @('.c', '.cc', '.cpp', '.cxx', '.h', '.hh', '.hpp', '.hxx', '.hlsl', '.hlsli') -or
-            $relativePath -notmatch '^(CMake|Engine|Tools|Projects)/')
+            $relativePath -notmatch '^(CMake|Engine|Tools|Projects)/|^ThirdParty/[^/]+/Bindings/')
         {
             continue
         }

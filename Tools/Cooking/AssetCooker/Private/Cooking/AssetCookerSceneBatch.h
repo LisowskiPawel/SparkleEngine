@@ -6,13 +6,8 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <functional>
+#include <exception>
 #include <vector>
-
-class CompiledTaskGraph;
-class TaskExecutionContext;
-class TaskResult;
-struct TaskExecutorConfig;
 
 class AssetCookerSceneBatch final
 {
@@ -23,14 +18,9 @@ private:
 	struct Item;
 
 	static std::uint32_t ResolveWorkerCount() noexcept;
-	static TaskExecutorConfig BuildExecutorConfig(std::uint32_t taskCapacity);
-	static CompiledTaskGraph BuildTaskGraph(
-	    const std::vector<AssetCookerSceneEntry>& sceneEntries,
-	    std::vector<Item>& items,
-	    std::uint32_t taskCapacity,
-	    const std::function<void(std::uint32_t)>& itemCompleted);
-	static TaskResult BuildProduct(const std::vector<AssetCookerSceneEntry>& sceneEntries, std::vector<Item>& items, std::uint32_t index, TaskExecutionContext& context);
-	static TaskResult BuildProducts(const std::vector<AssetCookerSceneEntry>& sceneEntries, std::vector<Item>& items, const ToolWorkProgressCallback& progress, std::size_t totalWork);
+	struct BuildRun;
+	static void BuildRange(std::uint32_t begin, std::uint32_t end, std::uint32_t thread, void* argument) noexcept;
+	static std::exception_ptr BuildProducts(const std::vector<AssetCookerSceneEntry>& sceneEntries, std::vector<Item>& items, const ToolWorkProgressCallback& progress, std::size_t totalWork);
 	static void MergeDiagnostics(std::vector<Item>& items, AssetCookerDiagnostics& diagnostics);
 	static bool PublishProducts(std::vector<Item>& items, AssetCookerDiagnostics& diagnostics);
 };

@@ -38,13 +38,14 @@ Projects/**/*.hxx text eol=lf
 Projects/**/*.hlsl text eol=lf
 Projects/**/*.hlsli text eol=lf
 
-CMake/**/*.h text eol=lf
-CMake/**/*.cpp text eol=lf
+ThirdParty/*/Bindings/** text eol=lf
 # Patch context markers include spaces on otherwise empty lines.
-CMake/Dependencies/Patches/*.patch text eol=lf -whitespace
+ThirdParty/*/Patches/*.patch text eol=lf -whitespace
+# Preserve the exact qualified enkiTS patch bytes through Git checkouts.
+ThirdParty/enkits/Patches/enkiTS-sparkle-runtime.patch -text !eol
 
-# The code-style manifest excludes the vendored D3D12 subtree.
-Engine/RHI/Private/D3D12/ThirdParty/** text=auto !eol
+# Preserve admitted vendor bytes independently of owned-source formatting.
+ThirdParty/D3DX12/Include/** -text !eol
 
 # Public source archives retain acquisition recipes, not uncleared sample bytes.
 Projects/Showcase/Assets/Meshes/Sponza/Sponza.gltf export-ignore

@@ -84,7 +84,7 @@ function(sparkle_stage_nvidia_streamline_runtime product_target)
 
     # Read the same declared payload when disabled, so old owned files can retire.
     set(SPARKLE_SOURCE_DEPENDENCY_METADATA_ONLY TRUE)
-    include("${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/Targets/nvidia-streamline.cmake")
+    include("${SPARKLE_REPOSITORY_ROOT}/ThirdParty/nvidia-streamline/Dependency.cmake")
     set(_stale_files)
     foreach(_runtime IN LISTS _sparkle_streamline_runtime_files)
         get_filename_component(_name "${_runtime}" NAME)

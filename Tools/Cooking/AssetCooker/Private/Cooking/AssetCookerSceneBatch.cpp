@@ -3,7 +3,9 @@
 #include "CookedSceneGenerationWriter.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "ImportedSceneCooker.h"
-#include "TaskExecutor.h"
+#include <TaskScheduler_c.h>
+#include <memory>
+#include <new>
 
 #include <algorithm>
 #include <atomic>
@@ -15,6 +17,7 @@ struct AssetCookerSceneBatch::Item final
 {
 	CookedSceneBuild Build;
 	AssetCookerDiagnostics Diagnostics;
+	std::exception_ptr Failure;
 };
 
 bool AssetCookerSceneBatch::Execute(const std::vector<AssetCookerSceneEntry>& sceneEntries, AssetCookerDiagnostics& diagnostics, const ToolWorkProgressCallback& progress)
@@ -31,12 +34,23 @@ bool AssetCookerSceneBatch::Execute(const std::vector<AssetCookerSceneEntry>& sc
 		progress({.Action = "Cooking scene assets", .Total = totalWork});
 	}
 	std::vector<Item> items(sceneEntries.size());
-	const TaskResult buildResult = BuildProducts(sceneEntries, items, progress, totalWork);
+	const auto buildFailure = BuildProducts(sceneEntries, items, progress, totalWork);
 
 	MergeDiagnostics(items, diagnostics);
-	if (!buildResult.Succeeded())
+	if (buildFailure)
 	{
-		diagnostics.AddError(AssetCookerCategory::SceneAssets, "Scene asset generation failed before publication: " + std::string(buildResult.GetDiagnostic()));
+		try
+		{
+			std::rethrow_exception(buildFailure);
+		}
+		catch (const std::exception& error)
+		{
+			diagnostics.AddError(AssetCookerCategory::SceneAssets, "Scene asset generation failed before publication: " + std::string(error.what()));
+		}
+		catch (...)
+		{
+			diagnostics.AddError(AssetCookerCategory::SceneAssets, "Scene asset generation failed before publication: unknown failure.");
+		}
 		return false;
 	}
 
@@ -58,80 +72,97 @@ std::uint32_t AssetCookerSceneBatch::ResolveWorkerCount() noexcept
 	return std::clamp(hardwareThreads > 1u ? hardwareThreads - 1u : 1u, 1u, 4u);
 }
 
-TaskExecutorConfig AssetCookerSceneBatch::BuildExecutorConfig(std::uint32_t taskCapacity)
+struct AssetCookerSceneBatch::BuildRun final
 {
-	return TaskExecutorConfig{
-	    .FrameCriticalWorkerCount = 1u,
-	    .BackgroundWorkerCount = ResolveWorkerCount(),
-	    .MaximumTasksPerExecution = taskCapacity,
-	    .MaximumEdgesPerExecution = 1u,
-	    .MaximumActiveExecutions = 1u};
+	const std::vector<AssetCookerSceneEntry>& Entries;
+	std::vector<Item>& Items;
+	const ToolWorkProgressCallback& Progress;
+	std::size_t TotalWork;
+	std::atomic<std::size_t> Completed{0};
+};
+
+void AssetCookerSceneBatch::BuildRange(std::uint32_t begin, std::uint32_t end, std::uint32_t, void* argument) noexcept
+{
+	auto& run = *static_cast<BuildRun*>(argument);
+	for (auto index = begin; index < end; ++index)
+	{
+		auto& item = run.Items[index];
+		try
+		{
+			item.Build = ImportedSceneCooker::Build(run.Entries[index], item.Diagnostics);
+			if (run.Progress)
+			{
+				const auto completed = ++run.Completed;
+				run.Progress({.Action = "Cooked scene", .Item = run.Entries[index].relativePath, .Completed = completed, .Total = run.TotalWork});
+			}
+		}
+		catch (...)
+		{
+			item.Failure = std::current_exception();
+		}
+	}
 }
 
-CompiledTaskGraph AssetCookerSceneBatch::BuildTaskGraph(
+std::exception_ptr AssetCookerSceneBatch::BuildProducts(
     const std::vector<AssetCookerSceneEntry>& sceneEntries,
     std::vector<Item>& items,
-    std::uint32_t taskCapacity,
-    const std::function<void(std::uint32_t)>& itemCompleted)
+    const ToolWorkProgressCallback& progress,
+    std::size_t totalWork)
 {
-	TaskGraphBuilder builder(TaskGraphLimits{.MaximumTasks = taskCapacity, .MaximumEdges = 1u});
-
-	for (std::uint32_t index = 0; index < sceneEntries.size(); ++index)
+	if (sceneEntries.empty())
 	{
-		builder.Add(
-		    TaskDesc{.Name = "Build cataloged scene", .Lane = TaskLane::Background},
-		    [&sceneEntries, &items, itemCompleted, index](TaskExecutionContext& context)
-		    {
-			    TaskResult result = BuildProduct(sceneEntries, items, index, context);
-			    if (result.GetOutcome() == TaskOutcome::Succeeded)
-			    {
-				    itemCompleted(index);
-			    }
-			    return result;
-		    });
+		return {};
 	}
-
-	return builder.Compile();
-}
-
-TaskResult AssetCookerSceneBatch::BuildProduct(const std::vector<AssetCookerSceneEntry>& sceneEntries, std::vector<Item>& items, std::uint32_t index, TaskExecutionContext& context)
-{
-	if (context.IsCancellationRequested())
+	BuildRun run{sceneEntries, items, progress, totalWork};
+	const auto workers = ResolveWorkerCount();
+	if (workers == 1)
 	{
-		return TaskResult::Cancelled("Scene asset generation was cancelled.");
+		BuildRange(0, static_cast<std::uint32_t>(sceneEntries.size()), 0, &run);
 	}
-
-	Item& item = items[index];
-	try
+	else
 	{
-		item.Build = ImportedSceneCooker::Build(sceneEntries[index], item.Diagnostics);
-		return TaskResult::Success();
-	}
-	catch (const Diagnostics::Error&)
-	{
-		return TaskResult::Failure("Cataloged scene generation failed.");
-	}
-}
-
-TaskResult AssetCookerSceneBatch::BuildProducts(const std::vector<AssetCookerSceneEntry>& sceneEntries, std::vector<Item>& items, const ToolWorkProgressCallback& progress, std::size_t totalWork)
-{
-	const std::uint32_t taskCapacity = static_cast<std::uint32_t>(std::max<std::size_t>(sceneEntries.size(), 1u));
-	std::atomic<std::size_t> completed{0};
-
-	const auto itemCompleted = [&sceneEntries, &progress, &completed, totalWork](std::uint32_t index)
-	{
-		if (progress)
+		try
 		{
-			const std::size_t completedWork = ++completed;
-			progress({.Action = "Cooked scene", .Item = sceneEntries[index].relativePath, .Completed = completedWork, .Total = totalWork});
-		}
-	};
+			auto scheduler = std::unique_ptr<enkiTaskScheduler, decltype(&enkiDeleteTaskScheduler)>(enkiNewTaskScheduler(), enkiDeleteTaskScheduler);
+			if (!scheduler)
+			{
+				throw std::bad_alloc();
+			}
+			auto config = enkiGetTaskSchedulerConfig(scheduler.get());
+			config.numTaskThreadsToCreate = workers - 1;
+			config.numExternalTaskThreads = 0;
+			char error[256]{};
+			if (!enkiTryInitTaskSchedulerWithConfig(scheduler.get(), config, error, sizeof(error)))
+			{
+				throw Diagnostics::Error(error);
+			}
 
-	TaskExecutor executor(BuildExecutorConfig(taskCapacity));
-	TaskExecutionContext context;
-	const auto graph = BuildTaskGraph(sceneEntries, items, taskCapacity, itemCompleted);
-	const TaskExecution execution = executor.Submit(graph, context);
-	return execution.GetResult();
+			auto deleteRange = [&scheduler](enkiTaskSet* task)
+			{
+				enkiDeleteTaskSet(scheduler.get(), task);
+			};
+			std::unique_ptr<enkiTaskSet, decltype(deleteRange)> range(enkiCreateTaskSet(scheduler.get(), BuildRange), deleteRange);
+			if (!range)
+			{
+				throw std::bad_alloc();
+			}
+			enkiSetParamsTaskSet(range.get(), {&run, static_cast<std::uint32_t>(sceneEntries.size()), 1, 0});
+			enkiAddTaskSet(scheduler.get(), range.get());
+			enkiWaitForTaskSet(scheduler.get(), range.get());
+		}
+		catch (...)
+		{
+			return std::current_exception();
+		}
+	}
+	for (const auto& item : items)
+	{
+		if (item.Failure)
+		{
+			return item.Failure;
+		}
+	}
+	return {};
 }
 
 void AssetCookerSceneBatch::MergeDiagnostics(std::vector<Item>& items, AssetCookerDiagnostics& diagnostics)

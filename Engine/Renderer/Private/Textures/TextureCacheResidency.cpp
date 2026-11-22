@@ -99,7 +99,13 @@ void TextureCache::ActivateResidentRequests() noexcept
 	    std::remove_if(
 	        m_requests.begin(),
 	        m_requests.end(),
-	        [](const TextureRequest& request) noexcept { return request.bLoadStarted && !request.Execution.IsValid() && !request.Decoded && !request.Uploaded; }),
+	        [this](const TextureRequest& request) noexcept
+	        {
+		        const auto state = m_residency.GetState(request.Generation);
+		        const bool bTerminal = state == AssetResidencyState::Resident || state == AssetResidencyState::Retired;
+		        const bool bNoCpuPayload = !request.Load && !request.Decoded;
+		        return bTerminal && bNoCpuPayload && !request.Uploaded;
+	        }),
 	    m_requests.end());
 }
 

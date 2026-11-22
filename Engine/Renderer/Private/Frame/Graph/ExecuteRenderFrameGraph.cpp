@@ -13,5 +13,5 @@ void FramePipeline::ExecuteFrame()
 	m_frameGraph->Setup();
 	const FrameGraphPlan& plan = m_frameGraph->Compile();
 	m_frameGraph->PreparePasses();
-	m_frameGraph->Execute(plan, m_deviceServices, m_taskExecutor);
+	m_frameGraph->Execute(plan, m_deviceServices, m_frameScheduler);
 }

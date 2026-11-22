@@ -4,17 +4,20 @@
 
 #include "Debug/RendererCVars.h"
 #include "RHI/Public/Commands/RhiCommandSubmissionService.h"
-#include "Tasks/Public/TaskExecutionContext.h"
-#include "Tasks/Public/TaskExecutor.h"
-#include "Tasks/Public/TaskGraph.h"
 
+#include <TaskScheduler_c.h>
+#include <atomic>
+#include <memory>
 #include <cassert>
 
-FrameGraphRecordingExecutor::FrameGraphRecordingExecutor(const FrameGraph& frameGraph, const FrameGraphPlan& plan, RhiCommandSubmissionService& submissionService, TaskExecutor& taskExecutor) noexcept
-    :
+FrameGraphRecordingExecutor::FrameGraphRecordingExecutor(
+    const FrameGraph& frameGraph,
+    const FrameGraphPlan& plan,
+    RhiCommandSubmissionService& submissionService,
+    enkiTaskScheduler* frameScheduler) noexcept :
     m_plan(plan),
     m_submissionService(submissionService),
-    m_taskExecutor(taskExecutor),
+    m_frameScheduler(frameScheduler),
     m_chunkRecorder(frameGraph, plan)
 {
 }
@@ -35,7 +38,11 @@ bool FrameGraphRecordingExecutor::RecordBatch(const FrameGraphSubmissionBatch& b
 bool FrameGraphRecordingExecutor::ShouldRecordBatchInParallel(const FrameGraphSubmissionBatch& batch) const noexcept
 {
 	const bool bParallelRecordingEnabled = CVarRendererParallelFrameGraphRecording.Get() && batch.recordingChunkCount >= 2;
-	return bParallelRecordingEnabled && m_taskExecutor.GetWorkerCount(TaskLane::FrameCritical) >= 2;
+	if (!bParallelRecordingEnabled || !m_frameScheduler)
+	{
+		return false;
+	}
+	return enkiGetTaskSchedulerConfig(m_frameScheduler).numTaskThreadsToCreate >= 2;
 }
 
 void FrameGraphRecordingExecutor::RecordBatchSerial(const FrameGraphSubmissionBatch& batch, RhiCommandRecordingLease initializationLease)
@@ -142,32 +149,66 @@ void FrameGraphRecordingExecutor::RecordSerialRange(std::uint32_t firstResult, s
 	}
 }
 
+struct FrameGraphRecordingExecutor::Range final
+{
+	FrameGraphRecordingExecutor* Owner = nullptr;
+	std::uint32_t ResultIndex = 0;
+	std::atomic<bool>* bSucceeded = nullptr;
+};
+
+void FrameGraphRecordingExecutor::RecordRange(void* argument) noexcept
+{
+	auto& range = *static_cast<Range*>(argument);
+	try
+	{
+		range.Owner->RecordChunk(range.ResultIndex);
+	}
+	catch (...)
+	{
+		range.Owner->m_results[range.ResultIndex].Lease = RhiCommandRecordingLease{};
+		*range.bSucceeded = false;
+	}
+}
+
 bool FrameGraphRecordingExecutor::RecordParallelRange(std::uint32_t firstResult, std::uint32_t resultCount)
 {
-	TaskGraphBuilder builder(TaskGraphLimits{.MaximumTasks = resultCount, .MaximumEdges = 0});
-
-	for (std::uint32_t resultOffset = 0; resultOffset < resultCount; ++resultOffset)
+	std::atomic<bool> bSucceeded{true};
+	std::array<Range, RecordingPlan::MaximumChunksPerSubmissionBatch> ranges;
+	auto destroy = [scheduler = m_frameScheduler](enkiPinnedTask* task)
 	{
-		const std::uint32_t resultIndex = firstResult + resultOffset;
-		(void) builder.Add(
-		    TaskDesc{.Name = "Renderer.FrameGraph.RecordChunk", .Lane = TaskLane::FrameCritical},
-		    [resultIndex](TaskExecutionContext& context)
-		    {
-			    FrameGraphRecordingExecutor* const executor = context.TryGet<FrameGraphRecordingExecutor>();
-			    if (executor == nullptr)
-			    {
-				    return TaskResult::Failure("Frame-graph recording task has no execution owner.");
-			    }
-
-			    executor->RecordChunk(resultIndex);
-			    return TaskResult::Success();
-		    });
+		enkiDeletePinnedTask(scheduler, task);
+	};
+	using NativeTask = std::unique_ptr<enkiPinnedTask, decltype(destroy)>;
+	std::array<NativeTask, RecordingPlan::MaximumChunksPerSubmissionBatch> tasks{
+	    NativeTask{nullptr, destroy},
+	    NativeTask{nullptr, destroy},
+	    NativeTask{nullptr, destroy},
+	    NativeTask{nullptr, destroy},
+	    NativeTask{nullptr, destroy},
+	    NativeTask{nullptr, destroy},
+	    NativeTask{nullptr, destroy},
+	    NativeTask{nullptr, destroy}};
+	const auto config = enkiGetTaskSchedulerConfig(m_frameScheduler);
+	for (std::uint32_t offset = 0; offset < resultCount; ++offset)
+	{
+		ranges[offset] = {this, firstResult + offset, &bSucceeded};
+		const auto worker = config.numExternalTaskThreads + 1 + offset % config.numTaskThreadsToCreate;
+		tasks[offset].reset(enkiCreatePinnedTask(m_frameScheduler, RecordRange, worker));
+		if (!tasks[offset])
+		{
+			return false;
+		}
+		enkiSetArgsPinnedTask(tasks[offset].get(), &ranges[offset]);
 	}
-
-	const CompiledTaskGraph graph = builder.Compile();
-	TaskExecutionContext context(*this);
-	const TaskExecution execution = m_taskExecutor.Submit(graph, context);
-	return execution.GetStatus() == TaskExecutionStatus::Succeeded;
+	for (std::uint32_t offset = 0; offset < resultCount; ++offset)
+	{
+		enkiAddPinnedTask(m_frameScheduler, tasks[offset].get());
+	}
+	for (std::uint32_t offset = 0; offset < resultCount; ++offset)
+	{
+		enkiWaitForPinnedTask(m_frameScheduler, tasks[offset].get());
+	}
+	return bSucceeded.load();
 }
 
 void FrameGraphRecordingExecutor::RecordChunk(std::uint32_t resultIndex)
@@ -176,7 +217,9 @@ void FrameGraphRecordingExecutor::RecordChunk(std::uint32_t resultIndex)
 	RecordingChunkResult& result = m_results[resultIndex];
 	assert(result.Lease.IsValid());
 
-	m_chunkRecorder.Record(GetChunk(resultIndex), result.Lease.GetCommandList());
+	const RecordingChunk& chunk = GetChunk(resultIndex);
+	RenderCommandList& commandList = result.Lease.GetCommandList();
+	m_chunkRecorder.Record(chunk, commandList);
 	result.Lease.Close();
 }
 

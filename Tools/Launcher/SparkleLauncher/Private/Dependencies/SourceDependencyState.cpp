@@ -57,6 +57,7 @@ namespace SparkleLauncher
 			    {"imgui", "Immediate-mode UI with SDL3 and native rendering backends.", false, true},
 			    {"spdlog", "Repo-wide logging backend.", true, true},
 			    {"boost-process", "Native child creation, environment, output and completion.", true, true},
+			    {"enkits", "Native task queues, workers, dependencies and completion; maintained runtime fork.", true, true},
 			    {"ozz_animation", "Animation construction, sampling and joint hierarchy evaluation.", false, true},
 			    {"editor-icons", "Launcher/editor icon font asset and license.", true, true},
 			    {"cgltf", "glTF 2.0 source scene parsing.", false, features.bContentPipelineEnabled},

@@ -3,7 +3,6 @@
 
 #include "Diagnostics/GpuCrash/GpuCrashIncidentSink.h"
 
-#include "Concurrency/ApplicationTaskRuntime.h"
 #include "Diagnostics/GpuCrash/GpuCrashInputs.h"
 #include <nlohmann/json.hpp>
 #include "Core/Public/Strings/StringUtils.h"
@@ -11,7 +10,7 @@
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Hash/HashUtils.h"
-#include "Tasks/Public/TaskExecutor.h"
+#include <new>
 
 #include <chrono>
 #include <iostream>
@@ -19,11 +18,16 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogGpuCrashSink, "Application.GpuCrash");
 
-GpuCrashIncidentSink::GpuCrashIncidentSink(ApplicationTaskRuntime& runtime, const GpuCrashStartup& startup, ERhiBackendApi api) :
-    m_scope(TaskScopeDesc{TaskScopeKind::Application, "GPU crash artifacts"}, &runtime.GetApplicationScope())
+GpuCrashIncidentSink::GpuCrashIncidentSink(enkiTaskScheduler* scheduler, std::stop_token cancellation, const GpuCrashStartup& startup, ERhiBackendApi api) :
+    m_scheduler(scheduler),
+    m_cancellation(cancellation)
 {
 	try
 	{
+		if (!m_scheduler || enkiGetTaskSchedulerConfig(m_scheduler).numTaskThreadsToCreate == 0)
+		{
+			throw Diagnostics::Error("GPU crash collection requires an admitted native I/O worker.");
+		}
 		Hash::Sha256Digest executableHash;
 		std::string error;
 		const auto executablePath = Filesystem::GetExecutablePath();
@@ -41,13 +45,38 @@ GpuCrashIncidentSink::GpuCrashIncidentSink(ApplicationTaskRuntime& runtime, cons
 		m_inputs = std::make_unique<GpuCrashInputs>(startup, api);
 		WriteManifest("Preparing");
 
-		auto writeArtifacts = [this](TaskExecutionContext& context)
+		m_writer = enkiCreatePinnedTask(
+		    m_scheduler,
+		    [](void* argument)
+		    {
+			    auto& sink = *static_cast<GpuCrashIncidentSink*>(argument);
+			    {
+				    std::lock_guard lock(sink.m_mutex);
+				    sink.m_writerPhase = WriterPhase::Running;
+			    }
+			    try
+			    {
+				    sink.Drain();
+			    }
+			    catch (...)
+			    {
+				    sink.MarkIncomplete();
+				    sink.m_bWriteFailed.store(true, std::memory_order_relaxed);
+				    sink.CloseWriter();
+			    }
+		    },
+		    enkiGetTaskSchedulerConfig(m_scheduler).numExternalTaskThreads + 1);
+		if (!m_writer)
 		{
-			return Drain(context);
-		};
-
-		TaskDesc task{"Write GPU crash artifacts", TaskLane::BlockingIo};
-		m_dispatch = runtime.GetExecutor().PrepareDispatch(m_scope, std::move(task), std::move(writeArtifacts));
+			throw std::bad_alloc();
+		}
+		enkiSetArgsPinnedTask(m_writer, this);
+		m_completion = enkiCreateCompletionAction(m_scheduler, nullptr, CompleteWriter);
+		if (!m_completion)
+		{
+			throw std::bad_alloc();
+		}
+		enkiSetParamsCompletionAction(m_completion, {nullptr, this, enkiGetCompletableFromPinnedTask(m_writer)});
 	}
 	catch (...)
 	{
@@ -62,9 +91,16 @@ GpuCrashIncidentSink::GpuCrashIncidentSink(ApplicationTaskRuntime& runtime, cons
 			{
 			}
 		}
-		m_dispatch.Close();
-		m_scope.Cancel();
-		m_scope.JoinFor(std::chrono::seconds(10));
+		CloseWriter();
+		WaitForWriter(std::chrono::seconds(10));
+		if (m_completion)
+		{
+			enkiDeleteCompletionAction(m_scheduler, m_completion);
+		}
+		if (m_writer)
+		{
+			enkiDeletePinnedTask(m_scheduler, m_writer);
+		}
 		RemoveUnusedSlot();
 		throw;
 	}
@@ -92,11 +128,13 @@ GpuCrashIncidentSink::~GpuCrashIncidentSink()
 	{
 		Diagnostics::Fatal(LogGpuCrashSink, __FILE__, __LINE__, "GPU crash sink must settle after native callback admission closes, before destruction.");
 	}
-	if (!m_scope.JoinFor(std::chrono::seconds(10)))
+	if (!WaitForWriter(std::chrono::seconds(10)))
 	{
 		// Returning would free a task capture or a still-borrowed callback sink.
 		Diagnostics::Fatal(LogGpuCrashSink, __FILE__, __LINE__, "GPU crash writer did not settle; retaining its storage until process exit.");
 	}
+	enkiDeleteCompletionAction(m_scheduler, m_completion);
+	enkiDeletePinnedTask(m_scheduler, m_writer);
 	RemoveUnusedSlot();
 }
 
@@ -106,7 +144,7 @@ void GpuCrashIncidentSink::AbortPreparation() noexcept
 	MarkIncomplete();
 	Finalize(false, false, 0);
 	// Startup owns this scope; any successfully enabled RHI session has sealed first.
-	if (!m_scope.JoinFor(std::chrono::seconds(10)))
+	if (!WaitForWriter(std::chrono::seconds(10)))
 	{
 		Diagnostics::Fatal(LogGpuCrashSink, __FILE__, __LINE__, "GPU crash preparation rollback did not settle.");
 	}
@@ -144,7 +182,7 @@ bool GpuCrashIncidentSink::Enqueue(RhiGpuCrashArtifactId id, std::span<const std
 			bReserved = false;
 		}
 
-		if (!m_dispatch.Notify())
+		if (!NotifyWriter())
 		{
 			MarkIncomplete();
 			return false;
@@ -178,7 +216,7 @@ void GpuCrashIncidentSink::MarkReady() noexcept
 			m_pendingState = "Ready";
 		}
 	}
-	if (!m_dispatch.Notify())
+	if (!NotifyWriter())
 	{
 		MarkIncomplete();
 	}
@@ -196,7 +234,7 @@ void GpuCrashIncidentSink::BeginCollection(std::int64_t nativeFailure) noexcept
 		m_nativeFailure = nativeFailure;
 		m_pendingState = "Collecting";
 	}
-	if (!m_dispatch.Notify())
+	if (!NotifyWriter())
 	{
 		MarkIncomplete();
 	}
@@ -216,16 +254,17 @@ void GpuCrashIncidentSink::Finalize(bool bSdkFinished, bool bTimedOut, std::int6
 		m_bTimedOut = bTimedOut;
 		m_nativeFailure = nativeFailure;
 	}
-	if (!m_dispatch.Notify())
+	if (!NotifyWriter(true))
 	{
 		MarkIncomplete();
-		m_dispatch.Close();
+		CloseWriter();
 	}
 }
 
 bool GpuCrashIncidentSink::IsSettled() const noexcept
 {
-	return m_dispatch.GetExecution().IsSettled();
+	std::lock_guard lock(m_mutex);
+	return m_bWriterClosed && m_writerPhase == WriterPhase::Idle;
 }
 
 std::string_view GpuCrashIncidentSink::GetIncidentId() const noexcept
@@ -247,9 +286,9 @@ bool GpuCrashIncidentSink::Pop(Payload& payload) noexcept
 	return true;
 }
 
-TaskResult GpuCrashIncidentSink::Drain(TaskExecutionContext& context)
+void GpuCrashIncidentSink::Drain()
 {
-	for (std::size_t processed = 0; processed < 8 && !context.IsCancellationRequested(); ++processed)
+	for (std::size_t processed = 0; processed < 8 && !m_cancellation.stop_requested(); ++processed)
 	{
 		Payload payload;
 		if (!Pop(payload))
@@ -276,8 +315,17 @@ TaskResult GpuCrashIncidentSink::Drain(TaskExecutionContext& context)
 		m_outstandingBytes -= size;
 	}
 
-	if (context.IsCancellationRequested())
+	if (m_cancellation.stop_requested())
 	{
+		Payload discarded;
+		while (Pop(discarded))
+		{
+			const auto size = discarded.Bytes.size();
+			std::vector<std::byte>{}.swap(discarded.Bytes);
+			std::lock_guard lock(m_mutex);
+			--m_outstandingCount;
+			m_outstandingBytes -= size;
+		}
 		MarkIncomplete();
 		try
 		{
@@ -287,8 +335,8 @@ TaskResult GpuCrashIncidentSink::Drain(TaskExecutionContext& context)
 		{
 			m_bWriteFailed.store(true, std::memory_order_relaxed);
 		}
-		m_dispatch.Close();
-		return TaskResult::Cancelled("GPU crash artifact publication was cancelled.");
+		CloseWriter();
+		return;
 	}
 
 	const char* pendingState = nullptr;
@@ -334,14 +382,71 @@ TaskResult GpuCrashIncidentSink::Drain(TaskExecutionContext& context)
 		catch (...)
 		{
 			MarkIncomplete();
-			m_dispatch.Close();
+			CloseWriter();
 			throw;
 		}
-		m_dispatch.Close();
+		CloseWriter();
 	}
-	else if (bMore && !m_dispatch.Notify())
+	else if (bMore && !NotifyWriter())
 	{
 		MarkIncomplete();
 	}
-	return TaskResult::Success();
+	return;
+}
+
+// The post action is the writer's sole dependent. Upstream permits deleting the
+// action here; the native body and predecessor's last borrowed access are done.
+void GpuCrashIncidentSink::CompleteWriter(void* argument, std::uint32_t) noexcept
+{
+	auto& sink = *static_cast<GpuCrashIncidentSink*>(argument);
+	std::lock_guard lock(sink.m_mutex);
+	if (std::exchange(sink.m_bWriterRerun, false))
+	{
+		sink.m_writerPhase = WriterPhase::Queued;
+		enkiAddPinnedTask(sink.m_scheduler, sink.m_writer);
+	}
+	else
+	{
+		sink.m_writerPhase = WriterPhase::Idle;
+		sink.m_writerSettled.notify_all();
+	}
+}
+
+bool GpuCrashIncidentSink::NotifyWriter(bool bCleanup) noexcept
+{
+	std::lock_guard lock(m_mutex);
+	if (m_bWriterClosed || (!bCleanup && m_cancellation.stop_requested()))
+	{
+		return false;
+	}
+	if (m_writerPhase == WriterPhase::Running)
+	{
+		m_bWriterRerun = true;
+	}
+	else if (m_writerPhase == WriterPhase::Idle)
+	{
+		m_writerPhase = WriterPhase::Queued;
+		enkiAddPinnedTask(m_scheduler, m_writer);
+	}
+	return true;
+}
+
+void GpuCrashIncidentSink::CloseWriter() noexcept
+{
+	std::lock_guard lock(m_mutex);
+	m_bWriterClosed = true;
+	if (m_writerPhase == WriterPhase::Idle)
+	{
+		m_writerSettled.notify_all();
+	}
+	if (m_cancellation.stop_requested() || m_bWriteFailed.load(std::memory_order_relaxed))
+	{
+		m_bWriterRerun = false;
+	}
+}
+
+bool GpuCrashIncidentSink::WaitForWriter(std::chrono::milliseconds timeout) const noexcept
+{
+	std::unique_lock lock(m_mutex);
+	return m_writerSettled.wait_for(lock, timeout, [this] { return m_bWriterClosed && m_writerPhase == WriterPhase::Idle; });
 }

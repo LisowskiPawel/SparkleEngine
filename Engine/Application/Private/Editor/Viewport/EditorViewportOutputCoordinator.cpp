@@ -9,10 +9,16 @@
 
 #include <utility>
 
-EditorViewportOutputCoordinator::EditorViewportOutputCoordinator(TaskExecutor& executor, TaskScope& scope) noexcept :
-    m_presentationCapture(executor, scope),
-    m_referenceArtifacts(executor, scope)
+EditorViewportOutputCoordinator::EditorViewportOutputCoordinator(enkiTaskScheduler* io, std::stop_token stop) noexcept :
+    m_presentationCapture(io, stop),
+    m_referenceArtifacts(io, stop)
 {
+}
+
+void EditorViewportOutputCoordinator::Shutdown() noexcept
+{
+	m_presentationCapture.Shutdown();
+	m_referenceArtifacts.Shutdown();
 }
 
 void EditorViewportOutputCoordinator::Update(UI& ui, Renderer& renderer)

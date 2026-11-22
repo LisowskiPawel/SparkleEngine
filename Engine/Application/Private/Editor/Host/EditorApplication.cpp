@@ -16,7 +16,6 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Input/InputSystem.h"
 #include "Renderer.h"
-#include "Tasks/Public/TaskScope.h"
 #include "Time/Timer.h"
 #include "Window/Window.h"
 #include "World/GameWorld.h"
@@ -42,7 +41,7 @@ void EditorApplication::Initialize()
 	}
 
 	InitializeGameApplication();
-	if (m_game->GetWindow().ShouldClose())
+	if (!m_game->m_bIsInitialized || m_game->GetWindow().ShouldClose())
 	{
 		return;
 	}
@@ -114,16 +113,25 @@ void EditorApplication::RenderEditorFrame(Renderer& renderer)
 
 void EditorApplication::Shutdown()
 {
-	if (m_operationScope)
+	m_operationStop.request_stop();
+	if (m_game)
 	{
-		m_operationScope->Cancel();
-		(void) m_operationScope->JoinFor(std::chrono::milliseconds::max());
+		// GPU diagnostics must settle before operation joins share their I/O worker.
+		m_game->m_renderer.reset();
 	}
+	if (m_viewportOutput)
+	{
+		m_viewportOutput->Shutdown();
+	}
+	if (m_shaderCompileOperation)
+	{
+		m_shaderCompileOperation->Shutdown();
+	}
+	m_parentStop.reset();
 
 	m_ui.reset();
 	m_viewportOutput.reset();
 	m_shaderCompileOperation.reset();
-	m_operationScope.reset();
 	m_game.reset();
 	m_bIsEditorSessionActive = false;
 }
@@ -146,21 +154,22 @@ void EditorApplication::InitializeGameApplication()
 
 void EditorApplication::InitializeEditorOperations()
 {
-	if (!m_operationScope)
+	const bool bNewStop = !m_operationStop.stop_possible() || m_operationStop.stop_requested();
+	if (bNewStop)
 	{
-		TaskScopeDesc scopeDesc{TaskScopeKind::Document, "Editor operations"};
-		TaskScope& applicationScope = m_game->GetApplicationTaskScope();
-		m_operationScope = std::make_unique<TaskScope>(std::move(scopeDesc), &applicationScope);
+		m_parentStop.reset();
+		m_operationStop = std::stop_source{};
+		m_parentStop.emplace(m_game->m_stop.get_token(), [stop = m_operationStop]() mutable noexcept { stop.request_stop(); });
 	}
 
 	if (!m_viewportOutput)
 	{
-		m_viewportOutput = std::make_unique<EditorViewportOutputCoordinator>(m_game->GetTaskExecutor(), *m_operationScope);
+		m_viewportOutput = std::make_unique<EditorViewportOutputCoordinator>(m_game->m_ioScheduler, m_operationStop.get_token());
 	}
 
 	if (!m_shaderCompileOperation && m_compileShaders)
 	{
-		m_shaderCompileOperation = std::make_unique<EditorShaderCompileOperation>(m_game->GetTaskExecutor(), *m_operationScope, m_compileShaders);
+		m_shaderCompileOperation = std::make_unique<EditorShaderCompileOperation>(m_game->m_ioScheduler, m_operationStop.get_token(), m_compileShaders);
 	}
 }
 

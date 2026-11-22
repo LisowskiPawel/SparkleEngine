@@ -93,16 +93,11 @@ void TextureCache::RequestTexture(const ResolvedTexturePath& source, std::uint32
 	{
 		Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "Texture generation could not enter residency.");
 	}
-	if (m_taskScope == nullptr)
-	{
-		Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "Texture cache has no task scope.");
-	}
 
 	TextureRequest request;
 	request.Source = source;
 	request.Generation = *handle;
 	request.DecodeReservationBytes = decodeReservationBytes;
-	request.Payload = std::make_shared<CookedTextureLoadPayload>();
 	m_requests.push_back(std::move(request));
 	LaunchPendingRequests();
 }
@@ -110,13 +105,14 @@ void TextureCache::RequestTexture(const ResolvedTexturePath& source, std::uint32
 void TextureCache::CancelRequest(TextureRequest& request) noexcept
 {
 	request.bWanted = false;
-	if (request.Execution.IsValid())
+	if (request.Load)
 	{
+		request.Load->Cancel();
 		return;
 	}
 	(void) m_residency.Cancel(request.Generation);
 	request.Decoded.reset();
-	request.Payload.reset();
+	request.Load.reset();
 }
 
 void TextureCache::SynchronizeSceneTextures(const RenderTextureTable& textures)
@@ -175,17 +171,18 @@ void TextureCache::SynchronizeSceneTextures(const RenderTextureTable& textures)
 
 void TextureCache::LaunchPendingRequests()
 {
-	const std::size_t activeLoadCount = static_cast<std::size_t>(
-	    std::count_if(m_requests.begin(), m_requests.end(), [](const TextureRequest& request) noexcept { return request.bLoadStarted && request.Execution.IsValid(); }));
+	const std::size_t activeLoadCount = static_cast<std::size_t>(std::count_if(m_requests.begin(), m_requests.end(), [](const TextureRequest& request) noexcept { return request.Load != nullptr; }));
 
 	std::size_t availableSlots = activeLoadCount < kMaximumConcurrentLoads ? kMaximumConcurrentLoads - activeLoadCount : 0;
-	for (TextureRequest& request : m_requests)
+	for (std::size_t requestIndex = 0; requestIndex < m_requests.size(); ++requestIndex)
 	{
+		TextureRequest& request = m_requests[requestIndex];
 		if (availableSlots == 0)
 		{
 			return;
 		}
-		if (request.bLoadStarted || !request.bWanted || request.Payload == nullptr)
+		const bool bPending = m_residency.GetState(request.Generation) == AssetResidencyState::Reading && request.bWanted;
+		if (request.Load || !bPending)
 		{
 			continue;
 		}
@@ -194,8 +191,17 @@ void TextureCache::LaunchPendingRequests()
 		{
 			continue;
 		}
-		request.Execution = LaunchCookedTextureLoad(m_taskExecutor, *m_taskScope, request.Source.Path, request.Payload, request.DecodeReservationBytes);
-		request.bLoadStarted = true;
+		try
+		{
+			auto load = std::make_unique<CookedTextureLoad>(m_io, m_cpu, request.Source.Path, request.DecodeReservationBytes);
+			load->Start(static_cast<std::uint32_t>(requestIndex));
+			request.Load = std::move(load);
+		}
+		catch (...)
+		{
+			(void) m_residency.Cancel(request.Generation);
+			throw;
+		}
 		--availableSlots;
 	}
 }
@@ -205,39 +211,40 @@ void TextureCache::ConsumeCompletedRequests() noexcept
 	bool bAcceptedPayload = false;
 	for (TextureRequest& request : m_requests)
 	{
-		if (!request.Execution.IsValid() || !request.Execution.IsSettled())
+		if (!request.Load || !request.Load->IsSettled())
 		{
 			continue;
 		}
 
-		const TaskExecutionStatus executionStatus = request.Execution.GetStatus();
-		const TaskResult executionResult = request.Execution.GetResult();
-		request.Execution = {};
 		if (!request.bWanted)
 		{
 			(void) m_residency.Cancel(request.Generation);
-			request.Payload.reset();
+			request.Load.reset();
 			continue;
 		}
-		if (executionStatus != TaskExecutionStatus::Succeeded)
+		LoadedTextureData texture;
+		try
 		{
-			const std::string message = std::format("Texture generation {} for '{}' failed: {}", request.Generation.Generation, request.Source.Path.string(), executionResult.GetDiagnostic());
-
+			texture = request.Load->TakeTexture();
+		}
+		catch (const std::exception& error)
+		{
+			const std::string message = std::format("Texture generation {} for '{}' failed: {}", request.Generation.Generation, request.Source.Path.string(), error.what());
 			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, message);
 		}
-		if (request.Payload == nullptr)
+		catch (...)
 		{
-			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "Texture task graph produced no decoded payload.");
+			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "Unknown texture decode failure.");
 		}
+		request.Load.reset();
 
-		const std::uint64_t decodedBytes = RendererTextureFactory::CalculatePayloadBytes(request.Payload->Texture.Upload);
+		const std::uint64_t decodedBytes = RendererTextureFactory::CalculatePayloadBytes(texture.Upload);
 		if (!m_residency.PublishReadyForUpload(request.Generation, decodedBytes, decodedBytes))
 		{
 			Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "Texture generation exceeded reserved residency capacity.");
 		}
 
-		request.Decoded.emplace(std::move(request.Payload->Texture));
-		request.Payload.reset();
+		request.Decoded.emplace(std::move(texture));
 		bAcceptedPayload = true;
 	}
 	if (bAcceptedPayload)
@@ -252,7 +259,7 @@ void TextureCache::ConsumeCompletedRequests() noexcept
 	        [this](const TextureRequest& request) noexcept
 	        {
 		        const AssetResidencyState state = m_residency.GetState(request.Generation);
-		        return !request.Execution.IsValid() && !request.Decoded && !request.Uploaded && state == AssetResidencyState::Retired;
+		        return !request.Load && !request.Decoded && !request.Uploaded && state == AssetResidencyState::Retired;
 	        }),
 	    m_requests.end());
 }

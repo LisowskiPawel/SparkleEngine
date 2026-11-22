@@ -291,6 +291,13 @@ void GpuCrashSession::FinishLoss(std::int64_t nativeFailure) noexcept
 
 void GpuCrashSession::Shutdown() noexcept
 {
+	{
+		std::lock_guard lock(m_sinkMutex);
+		if (!m_sink)
+		{
+			return;
+		}
+	}
 	Settle(false, 0);
 }
 

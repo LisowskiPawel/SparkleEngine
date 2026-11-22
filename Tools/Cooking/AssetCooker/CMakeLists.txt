@@ -61,7 +61,7 @@ set(ASSET_COOKER_COOKING_LINK_LIBRARIES
     ToolSupport
     SparkleCore
     SparkleGameFramework
-    SparkleTasks
+    enkiTS
 )
 
 target_link_libraries(AssetCookerCore

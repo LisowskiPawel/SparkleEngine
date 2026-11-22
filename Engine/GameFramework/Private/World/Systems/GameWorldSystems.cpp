@@ -1,70 +1,85 @@
 #include "PCH.h"
-
 #include "World/Systems/GameWorldSystems.h"
-
 #include "World/GameWorldState.h"
 #include "World/ECS/EntityIterationScope.h"
 #include "World/Resources/GameWorldResourceStores.h"
-#include "Tasks/Public/TaskExecutionContext.h"
-#include "Tasks/Public/TaskExecutor.h"
-#include "Tasks/Public/ParallelFor.h"
-
-#include <string>
-#include <string_view>
-#include <utility>
+#include <TaskScheduler_c.h>
+#include <algorithm>
+#include <atomic>
+#include <memory>
+#include <new>
 
 namespace ECS
 {
-	namespace GameWorldSystemGrain
+	template <class System> struct WorldSystemRange final
 	{
-		constexpr ParallelForPolicy Animation{.GrainSize = 8, .SerialThreshold = 16, .MaximumPartitions = 16};
-		constexpr ParallelForPolicy Pose{.GrainSize = 2, .SerialThreshold = 4, .MaximumPartitions = 16};
-		constexpr ParallelForPolicy Transform{.GrainSize = 64, .SerialThreshold = 128, .MaximumPartitions = 16};
-		constexpr ParallelForPolicy Extraction{.GrainSize = 64, .SerialThreshold = 128, .MaximumPartitions = 16};
-	}
+		System& Work;
+		bool (System::*Kernel)(std::uint32_t, std::uint32_t);
+		std::uint32_t Count;
+		std::atomic<bool>& bSucceeded;
+		std::uint32_t Grain = 1;
 
-	template <typename Execute> static TaskResult ExecuteSystemTask(TaskExecutionContext& context, Execute execute)
-	{
-		if (context.IsCancellationRequested())
+		static void Run(std::uint32_t begin, std::uint32_t end, std::uint32_t, void* argument) noexcept
 		{
-			return TaskResult::Cancelled("World update cancelled at the owner boundary.");
-		}
-		auto* systems = context.TryGet<GameWorldSystemExecution>();
-		const bool bSucceeded = systems != nullptr && execute(*systems);
-		return bSucceeded ? TaskResult::Success() : TaskResult::Failure("World update failed to evaluate its assigned work.");
-	}
-
-	template <typename Execute> static TaskNodeHandle AddSystemRange(TaskGraphBuilder& tasks, std::string_view name, std::uint32_t count, ParallelForPolicy policy, Execute execute)
-	{
-		TaskDesc task{std::string(name), TaskLane::FrameCritical};
-
-		auto executePartition = [execute](std::uint32_t begin, std::uint32_t end, TaskExecutionContext& context)
-		{
-			if (begin == end)
+			auto& range = *static_cast<WorldSystemRange*>(argument);
+			begin = static_cast<std::uint32_t>((std::min) (std::uint64_t{begin} * range.Grain, std::uint64_t{range.Count}));
+			end = static_cast<std::uint32_t>((std::min) (std::uint64_t{end} * range.Grain, std::uint64_t{range.Count}));
+			if (begin >= end || !range.bSucceeded.load())
 			{
-				return TaskResult::Success();
+				return;
 			}
 
-			auto executeRange = [execute, begin, end](GameWorldSystemExecution& systems)
+			try
 			{
-				return execute(systems, begin, end);
-			};
+				if (!(range.Work.*range.Kernel)(begin, end))
+				{
+					range.bSucceeded = false;
+				}
+			}
+			catch (...)
+			{
+				range.bSucceeded = false;
+			}
+		}
+	};
 
-			return ExecuteSystemTask(context, std::move(executeRange));
+	template <class System>
+	static auto CreateSystemRange(enkiTaskScheduler* scheduler, WorldSystemRange<System>& range, std::uint32_t grain, std::uint32_t serialThreshold, std::uint32_t maximumPartitions = 16)
+	{
+		auto destroy = [scheduler](enkiTaskSet* task)
+		{
+			enkiDeleteTaskSet(scheduler, task);
 		};
+		auto task = std::unique_ptr<enkiTaskSet, decltype(destroy)>(enkiCreateTaskSet(scheduler, &WorldSystemRange<System>::Run), destroy);
+		if (!task)
+		{
+			throw std::bad_alloc();
+		}
 
-		return ParallelFor(tasks, std::move(task), count, policy, std::move(executePartition));
+		const auto count = (std::max) (range.Count, 1u);
+		const auto boundedGrain = (std::max) (grain, 1u + (count - 1) / maximumPartitions);
+		const auto minRange = count <= serialThreshold ? count : boundedGrain;
+		range.Grain = minRange;
+		const auto partitions = 1u + (count - 1) / minRange;
+		enkiSetParamsTaskSet(task.get(), {&range, partitions, 1, 0});
+
+		return task;
 	}
 
-	static bool ExecuteSystemTasks(const CompiledTaskGraph& tasks, TaskExecutor& executor, GameWorldSystemExecution& systems)
+	static auto DependOnSystem(enkiTaskScheduler* scheduler, enkiTaskSet* prerequisite, enkiTaskSet* dependent)
 	{
-		if (!tasks.IsValid())
+		auto destroy = [scheduler](enkiDependency* dependency)
 		{
-			return false;
+			enkiDeleteDependency(scheduler, dependency);
+		};
+		auto dependency = std::unique_ptr<enkiDependency, decltype(destroy)>(enkiCreateDependency(scheduler), destroy);
+		if (!dependency)
+		{
+			throw std::bad_alloc();
 		}
-		TaskExecutionContext context(systems);
-		TaskExecution execution = executor.Submit(tasks, context);
-		return execution.IsValid() && execution.GetStatus() == TaskExecutionStatus::Succeeded;
+
+		enkiSetDependency(dependency.get(), enkiGetCompletableFromTaskSet(prerequisite), enkiGetCompletableFromTaskSet(dependent));
+		return dependency;
 	}
 
 	GameWorldSystemExecution::GameWorldSystemExecution(GameWorldState& state, const GameWorldSystemExecutionContext& context) :
@@ -76,173 +91,95 @@ namespace ECS
 	{
 	}
 
-	CompiledTaskGraph GameWorldSystemExecution::BuildUpdateTasks(const GameWorldSystemTasks::UpdateCounts& counts)
-	{
-		TaskGraphBuilder tasks;
-
-		const auto camera = tasks.Add(
-		    TaskDesc{"Game.CameraMovement", TaskLane::FrameCritical},
-		    [](TaskExecutionContext& context)
-		    {
-			    const auto moveCamera = [](GameWorldSystemExecution& systems)
-			    {
-				    const EntityId changed = systems.m_camera.Update();
-				    if (changed.IsValid())
-				    {
-					    systems.m_state.MarkTransformDirty(changed);
-					    systems.m_state.RecordChange(changed);
-				    }
-				    return true;
-			    };
-
-			    return ExecuteSystemTask(context, moveCamera);
-		    });
-
-		const auto playback = AddSystemRange(
-		    tasks,
-		    "Game.AnimationPlaybackAdvance",
-		    counts.Playback,
-		    GameWorldSystemGrain::Animation,
-		    [](GameWorldSystemExecution& systems, std::uint32_t begin, std::uint32_t end) { return systems.m_animation.RunPlayback(begin, end); });
-
-		const auto pose = AddSystemRange(
-		    tasks,
-		    "Game.AnimationPoseEvaluation",
-		    counts.Poses,
-		    GameWorldSystemGrain::Pose,
-		    [](GameWorldSystemExecution& systems, std::uint32_t begin, std::uint32_t end) { return systems.m_animation.RunPose(begin, end); });
-
-		const auto morph = AddSystemRange(
-		    tasks,
-		    "Game.MorphWeightEvaluation",
-		    counts.MorphSamples,
-		    GameWorldSystemGrain::Animation,
-		    [](GameWorldSystemExecution& systems, std::uint32_t begin, std::uint32_t end) { return systems.m_animation.RunMorphSamples(begin, end); });
-
-		const auto morphCommit = tasks.Add(
-		    TaskDesc{"Game.MorphOutputCommit", TaskLane::FrameCritical},
-		    [](TaskExecutionContext& context)
-		    {
-			    const auto commitMorphOutputs = [](GameWorldSystemExecution& systems)
-			    {
-				    return systems.m_animation.CommitMorphOutputs();
-			    };
-
-			    return ExecuteSystemTask(context, commitMorphOutputs);
-		    });
-
-		const auto transformPreparation = tasks.Add(
-		    TaskDesc{"Game.PrepareTransforms", TaskLane::FrameCritical},
-		    [](TaskExecutionContext& context)
-		    {
-			    const auto prepareTransforms = [](GameWorldSystemExecution& systems)
-			    {
-				    systems.m_state.PrepareTransformWork();
-				    return true;
-			    };
-
-			    return ExecuteSystemTask(context, prepareTransforms);
-		    });
-
-		tasks.DependsOn(playback, camera);
-		tasks.DependsOn(pose, playback);
-		tasks.DependsOn(morph, playback);
-		tasks.DependsOn(morphCommit, pose);
-		tasks.DependsOn(morphCommit, morph);
-		tasks.DependsOn(transformPreparation, pose);
-		tasks.DependsOn(transformPreparation, morphCommit);
-		return tasks.Compile();
-	}
-
-	CompiledTaskGraph GameWorldSystemExecution::BuildTransformTasks(std::uint32_t count)
-	{
-		TaskGraphBuilder tasks;
-
-		const auto transforms = AddSystemRange(
-		    tasks,
-		    "Game.TransformEvaluation",
-		    count,
-		    GameWorldSystemGrain::Transform,
-		    [](GameWorldSystemExecution& systems, std::uint32_t begin, std::uint32_t end) { return systems.m_transform.RunTransforms(begin, end); });
-
-		const auto cameras = AddSystemRange(
-		    tasks,
-		    "Game.CameraDerivedState",
-		    count,
-		    GameWorldSystemGrain::Transform,
-		    [](GameWorldSystemExecution& systems, std::uint32_t begin, std::uint32_t end) { return systems.m_transform.RunCameraDerivedState(begin, end); });
-
-		tasks.DependsOn(cameras, transforms);
-		return tasks.Compile();
-	}
-
-	CompiledTaskGraph GameWorldSystemExecution::BuildExtractionTasks(std::uint32_t count)
-	{
-		TaskGraphBuilder tasks;
-
-		const auto meshes = AddSystemRange(
-		    tasks,
-		    "Game.MeshExtraction",
-		    count,
-		    GameWorldSystemGrain::Extraction,
-		    [](GameWorldSystemExecution& systems, std::uint32_t begin, std::uint32_t end) { return systems.m_extraction.Run(begin, end); });
-
-		const auto commit = tasks.Add(
-		    TaskDesc{"Game.ExtractionCommit", TaskLane::FrameCritical},
-		    [](TaskExecutionContext& context)
-		    {
-			    const auto commitExtraction = [](GameWorldSystemExecution& systems)
-			    {
-				    systems.m_state.CommitExtraction();
-				    return true;
-			    };
-
-			    return ExecuteSystemTask(context, commitExtraction);
-		    });
-
-		tasks.DependsOn(commit, meshes);
-		return tasks.Compile();
-	}
-
-	bool GameWorldSystemExecution::Execute(TaskExecutor& executor)
+	bool GameWorldSystemExecution::Execute(enkiTaskScheduler* scheduler)
 	{
 		if (!m_state.m_registry.IsStructureFrozen())
 		{
 			return false;
 		}
-		GameWorldSystemTasks& tasks = m_state.m_systemTasks;
-
-		const GameWorldSystemTasks::UpdateCounts counts{.Playback = m_animation.GetPlaybackCount(), .Poses = m_animation.GetPoseCount(), .MorphSamples = m_animation.GetMorphSampleCount()};
-
-		if (!tasks.Update.IsValid() || counts != tasks.Counts)
+		const EntityId changed = m_camera.Update();
+		if (changed.IsValid())
 		{
-			tasks.Update = BuildUpdateTasks(counts);
-			tasks.Counts = counts;
+			m_state.MarkTransformDirty(changed);
+			m_state.RecordChange(changed);
 		}
-		if (!ExecuteSystemTasks(tasks.Update, executor, *this))
+		if (!scheduler)
+		{
+			if (!m_animation.RunPlayback(0, m_animation.GetPlaybackCount()))
+			{
+				return false;
+			}
+			if (!m_animation.RunPose(0, m_animation.GetPoseCount()))
+			{
+				return false;
+			}
+			if (!m_animation.RunMorphSamples(0, m_animation.GetMorphSampleCount()))
+			{
+				return false;
+			}
+		}
+		else
+		{
+			std::atomic<bool> bSucceeded{true};
+			WorldSystemRange playback{m_animation, &AnimationSystemExecution::RunPlayback, m_animation.GetPlaybackCount(), bSucceeded};
+			WorldSystemRange pose{m_animation, &AnimationSystemExecution::RunPose, m_animation.GetPoseCount(), bSucceeded};
+			WorldSystemRange morph{m_animation, &AnimationSystemExecution::RunMorphSamples, m_animation.GetMorphSampleCount(), bSucceeded};
+			auto playbackTask = CreateSystemRange(scheduler, playback, 8, 16);
+			auto poseTask = CreateSystemRange(scheduler, pose, 2, 4);
+			auto morphTask = CreateSystemRange(scheduler, morph, 8, 16);
+			auto poseDependency = DependOnSystem(scheduler, playbackTask.get(), poseTask.get());
+			auto morphDependency = DependOnSystem(scheduler, playbackTask.get(), morphTask.get());
+
+			enkiAddTaskSet(scheduler, playbackTask.get());
+			enkiWaitForTaskSet(scheduler, poseTask.get());
+			enkiWaitForTaskSet(scheduler, morphTask.get());
+			if (!bSucceeded.load())
+			{
+				return false;
+			}
+		}
+		if (!m_animation.CommitMorphOutputs())
 		{
 			return false;
 		}
-
-		// Read the prepared ranges after camera movement and animation settle.
+		m_state.PrepareTransformWork();
 		const auto dirtyCount = m_transform.GetDirtyTransformCount();
-		if (!tasks.Transforms.IsValid() || dirtyCount != tasks.DirtyTransformCount)
+		if (!scheduler)
 		{
-			tasks.Transforms = BuildTransformTasks(dirtyCount);
-			tasks.DirtyTransformCount = dirtyCount;
+			if (!m_transform.RunTransforms(0, dirtyCount))
+			{
+				return false;
+			}
+			if (!m_transform.RunCameraDerivedState(0, dirtyCount))
+			{
+				return false;
+			}
+			if (!m_extraction.Run(0, m_extraction.GetMeshCount()))
+			{
+				return false;
+			}
 		}
-		if (!ExecuteSystemTasks(tasks.Transforms, executor, *this))
+		else
 		{
-			return false;
-		}
+			std::atomic<bool> bSucceeded{true};
+			WorldSystemRange transforms{m_transform, &TransformSystemExecution::RunTransforms, dirtyCount, bSucceeded};
+			WorldSystemRange cameras{m_transform, &TransformSystemExecution::RunCameraDerivedState, dirtyCount, bSucceeded};
+			WorldSystemRange meshes{m_extraction, &MeshExtractionSystemExecution::Run, m_extraction.GetMeshCount(), bSucceeded};
+			auto transformTask = CreateSystemRange(scheduler, transforms, 64, 128);
+			auto cameraTask = CreateSystemRange(scheduler, cameras, 64, 128);
+			auto meshTask = CreateSystemRange(scheduler, meshes, 64, 128);
+			auto cameraDependency = DependOnSystem(scheduler, transformTask.get(), cameraTask.get());
+			auto meshDependency = DependOnSystem(scheduler, cameraTask.get(), meshTask.get());
 
-		const auto meshCount = m_extraction.GetMeshCount();
-		if (!tasks.Extraction.IsValid() || meshCount != tasks.MeshCount)
-		{
-			tasks.Extraction = BuildExtractionTasks(meshCount);
-			tasks.MeshCount = meshCount;
+			enkiAddTaskSet(scheduler, transformTask.get());
+			enkiWaitForTaskSet(scheduler, meshTask.get());
+			if (!bSucceeded.load())
+			{
+				return false;
+			}
 		}
-		return ExecuteSystemTasks(tasks.Extraction, executor, *this);
+		m_state.CommitExtraction();
+		return true;
 	}
 
 	bool GameWorldState::ExecuteSystems(const GameWorldSystemExecutionContext& context)
@@ -258,7 +195,7 @@ namespace ECS
 			return false;
 		}
 		GameWorldSystemExecution systems(*this, context);
-		const bool bExecuted = systems.Execute(context.Executor);
+		const bool bExecuted = systems.Execute(context.Scheduler);
 		if (bExecuted)
 		{
 			m_dirtyTransforms.clear();

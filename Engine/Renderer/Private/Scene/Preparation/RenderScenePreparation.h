@@ -4,14 +4,14 @@
 
 class GpuMeshCache;
 class RenderScene;
-class TaskExecutor;
+struct enkiTaskScheduler;
 class TextureCache;
 struct PreparedRenderScene;
 
 class RenderScenePreparation final
 {
 public:
-	RenderScenePreparation(TaskExecutor& taskExecutor, GpuMeshCache& gpuMeshCache, TextureCache& textureCache);
+	RenderScenePreparation(enkiTaskScheduler* scheduler, GpuMeshCache& gpuMeshCache, TextureCache& textureCache);
 	~RenderScenePreparation() noexcept;
 
 	RenderScenePreparation(const RenderScenePreparation&) = delete;

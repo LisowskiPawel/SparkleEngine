@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <string>
 #include <string_view>
+#include <stop_token>
 #include <vector>
 
 class LevelAsset;
@@ -20,13 +21,12 @@ namespace Assets
 	struct SceneLoadCompletion;
 	struct SceneLoadPackage;
 }
-class TaskExecutor;
-class TaskScope;
+struct enkiTaskScheduler;
 
 class SPARKLE_ENGINE_API LevelSession final
 {
 public:
-	LevelSession(GameWorld& world, TaskExecutor& taskExecutor, TaskScope& applicationScope);
+	LevelSession(GameWorld& world, enkiTaskScheduler* io, enkiTaskScheduler* cpu, std::stop_token parentStop);
 	~LevelSession() noexcept;
 
 	LevelSession(const LevelSession&) = delete;

@@ -5,7 +5,7 @@
 #include "Rendering/RenderResourceTables.h"
 #include "Resources/Residency/AssetResidency.h"
 #include "RHI/Public/Resources/RhiResourceHandles.h"
-#include "Textures/CookedTextureLoadTask.h"
+#include "Textures/CookedTextureLoad.h"
 #include "Textures/RendererTexture.h"
 #include "Textures/RendererTextureFactory.h"
 
@@ -26,8 +26,7 @@ class RhiCommandSubmissionService;
 class RhiDescriptorService;
 class RhiResourceService;
 class RhiUploadService;
-class TaskExecutor;
-class TaskScope;
+struct enkiTaskScheduler;
 
 namespace Assets
 {
@@ -52,8 +51,8 @@ public:
 	    RhiDescriptorService& descriptorService,
 	    RhiUploadService& uploadService,
 	    RhiCommandSubmissionService& submissions,
-	    TaskExecutor& taskExecutor,
-	    TaskScope& parentScope);
+	    enkiTaskScheduler* io,
+	    enkiTaskScheduler* cpu);
 	~TextureCache() noexcept;
 
 	TextureCache(const TextureCache&) = delete;
@@ -91,13 +90,11 @@ private:
 	{
 		ResolvedTexturePath Source;
 		AssetGenerationHandle Generation;
-		TaskExecution Execution;
-		std::shared_ptr<CookedTextureLoadPayload> Payload;
+		std::unique_ptr<CookedTextureLoad> Load;
 		std::optional<LoadedTextureData> Decoded;
 		std::optional<RendererTexture> Uploaded;
 		RhiResourceHandle UploadedResource;
 		std::uint64_t DecodeReservationBytes = 0;
-		bool bLoadStarted = false;
 		bool bUploadSubmitted = false;
 		bool bWanted = true;
 	};
@@ -142,8 +139,8 @@ private:
 	RhiDescriptorService& m_descriptorService;
 	RendererTextureFactory m_textureFactory;
 	RhiCommandSubmissionService& m_submissions;
-	TaskExecutor& m_taskExecutor;
-	std::unique_ptr<TaskScope> m_taskScope;
+	enkiTaskScheduler* m_io;
+	enkiTaskScheduler* m_cpu;
 	AssetResidency m_residency;
 	std::array<TextureKey, kTextureCount> m_textureSlotKeys;
 	std::unordered_map<TextureKey, RendererTexture> m_defaultTextures;

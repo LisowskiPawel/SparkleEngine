@@ -35,27 +35,27 @@ namespace SparkleLauncher
 		    inputs);
 	}
 
-	OperationRecord RunLauncherOperationPlan(LauncherOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback)
+	OperationRecord RunLauncherOperationPlan(LauncherOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
 	{
 		return std::visit(
-		    [&processRunner, &outputCallback](auto&& typedPlan) -> OperationRecord
+		    [&processRunner, &outputCallback, cancellation](auto&& typedPlan) -> OperationRecord
 		    {
 			    using Plan = std::remove_cvref_t<decltype(typedPlan)>;
 			    if constexpr (std::is_same_v<Plan, BuildWorkspaceOperationPlan>)
 			    {
-				    return RunBuildWorkspaceOperationPlan(std::move(typedPlan), processRunner, outputCallback);
+				    return RunBuildWorkspaceOperationPlan(std::move(typedPlan), processRunner, outputCallback, cancellation);
 			    }
 			    else if constexpr (std::is_same_v<Plan, LevelOperationPlan>)
 			    {
-				    return RunLevelOperationPlan(std::move(typedPlan), processRunner, outputCallback);
+				    return RunLevelOperationPlan(std::move(typedPlan), processRunner, outputCallback, cancellation);
 			    }
 			    else if constexpr (std::is_same_v<Plan, LevelRunOperationPlan>)
 			    {
-				    return RunLevelRunOperationPlan(std::move(typedPlan), processRunner, outputCallback);
+				    return RunLevelRunOperationPlan(std::move(typedPlan), processRunner, outputCallback, cancellation);
 			    }
 			    else if constexpr (std::is_same_v<Plan, CookOperationPlan>)
 			    {
-				    return RunCookOperationPlan(std::move(typedPlan), processRunner, outputCallback);
+				    return RunCookOperationPlan(std::move(typedPlan), processRunner, outputCallback, cancellation);
 			    }
 			    else
 			    {

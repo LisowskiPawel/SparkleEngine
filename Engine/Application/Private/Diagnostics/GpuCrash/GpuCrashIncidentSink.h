@@ -1,13 +1,15 @@
 #pragma once
 
 #include "RHI/Public/Diagnostics/RhiGpuCrash.h"
-#include "Tasks/Public/TaskDispatch.h"
-#include "Tasks/Public/TaskScope.h"
+#include <TaskScheduler_c.h>
+#include <stop_token>
 
 #include <array>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <chrono>
+#include <condition_variable>
 #include <filesystem>
 #include <map>
 #include <memory>
@@ -15,14 +17,13 @@
 #include <string>
 #include <vector>
 
-class ApplicationTaskRuntime;
 class GpuCrashInputs;
 struct GpuCrashStartup;
 
 class GpuCrashIncidentSink final : public RhiGpuCrashArtifactSink
 {
 public:
-	GpuCrashIncidentSink(ApplicationTaskRuntime& runtime, const GpuCrashStartup& startup, ERhiBackendApi api);
+	GpuCrashIncidentSink(enkiTaskScheduler* scheduler, std::stop_token cancellation, const GpuCrashStartup& startup, ERhiBackendApi api);
 	~GpuCrashIncidentSink() override;
 
 	bool IsReadyPublished() const;
@@ -49,7 +50,11 @@ private:
 		std::size_t Bytes = 0;
 	};
 
-	TaskResult Drain(TaskExecutionContext& context);
+	void Drain();
+	bool NotifyWriter(bool bCleanup = false) noexcept;
+	void CloseWriter() noexcept;
+	bool WaitForWriter(std::chrono::milliseconds timeout) const noexcept;
+	static void CompleteWriter(void* argument, std::uint32_t thread) noexcept;
 	bool Pop(Payload& payload) noexcept;
 
 	void WritePayload(const Payload& payload);
@@ -66,8 +71,19 @@ private:
 	static constexpr std::size_t MaximumFiles = 65'536;
 	static constexpr std::size_t MetadataAllowance = 64u * 1024u * 1024u;
 
-	TaskScope m_scope;
-	TaskDispatch m_dispatch;
+	enkiTaskScheduler* m_scheduler;
+	std::stop_token m_cancellation;
+	enkiPinnedTask* m_writer = nullptr;
+	enkiCompletionAction* m_completion = nullptr;
+	enum class WriterPhase : std::uint8_t
+	{
+		Idle,
+		Queued,
+		Running
+	};
+	WriterPhase m_writerPhase = WriterPhase::Idle;
+	bool m_bWriterRerun = false;
+	bool m_bWriterClosed = false;
 	std::filesystem::path m_directory;
 	std::string m_identity;
 	std::string m_executableHash;
@@ -78,6 +94,7 @@ private:
 	std::size_t m_writtenBytes = 0;
 
 	mutable std::mutex m_mutex;
+	mutable std::condition_variable m_writerSettled;
 	std::array<Payload, MaximumPayloads> m_queue;
 	std::size_t m_head = 0;
 	std::size_t m_count = 0;

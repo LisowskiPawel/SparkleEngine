@@ -10,7 +10,7 @@
 
 class FrameGraph;
 class RhiCommandSubmissionService;
-class TaskExecutor;
+struct enkiTaskScheduler;
 
 struct RecordingChunkResult final
 {
@@ -21,7 +21,7 @@ struct RecordingChunkResult final
 class FrameGraphRecordingExecutor final
 {
 public:
-	FrameGraphRecordingExecutor(const FrameGraph& frameGraph, const FrameGraphPlan& plan, RhiCommandSubmissionService& submissionService, TaskExecutor& taskExecutor) noexcept;
+	FrameGraphRecordingExecutor(const FrameGraph& frameGraph, const FrameGraphPlan& plan, RhiCommandSubmissionService& submissionService, enkiTaskScheduler* frameScheduler) noexcept;
 
 	bool RecordBatch(const FrameGraphSubmissionBatch& batch, RhiCommandRecordingLease initializationLease = {});
 	std::span<RhiCommandRecordingLease> Aggregate();
@@ -33,6 +33,8 @@ private:
 	bool RecordChunks();
 	std::uint32_t FindParallelRangeEnd(std::uint32_t firstResult) const noexcept;
 	void RecordSerialRange(std::uint32_t firstResult, std::uint32_t endResult);
+	struct Range;
+	static void RecordRange(void* argument) noexcept;
 	bool RecordParallelRange(std::uint32_t firstResult, std::uint32_t resultCount);
 	void RecordChunk(std::uint32_t resultIndex);
 	bool CanRecordParallel(const RecordingChunkResult& result, const RecordingChunk& chunk) const noexcept;
@@ -43,7 +45,7 @@ private:
 
 	const FrameGraphPlan& m_plan;
 	RhiCommandSubmissionService& m_submissionService;
-	TaskExecutor& m_taskExecutor;
+	enkiTaskScheduler* m_frameScheduler = nullptr;
 	FrameGraphRecordingChunkRecorder m_chunkRecorder;
 	std::array<RecordingChunkResult, RecordingPlan::MaximumChunksPerSubmissionBatch> m_results;
 	std::array<RhiCommandRecordingLease, RecordingPlan::MaximumChunksPerSubmissionBatch> m_aggregatedLeases;

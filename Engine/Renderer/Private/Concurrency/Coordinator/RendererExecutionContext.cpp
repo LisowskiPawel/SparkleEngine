@@ -5,6 +5,7 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Console/CVarRegistry.h"
 #include "Frame/FramePipeline.h"
+#include <TaskScheduler_c.h>
 #include "RHI/Public/Device/RhiDeviceLaunch.h"
 #include "Host/RendererHost.h"
 #include "Renderer/Public/Concurrency/RendererExecutionConfig.h"
@@ -15,15 +16,47 @@ RendererExecutionContext::RendererExecutionContext(Window& window, const RhiDevi
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
 	m_externalCapture = deviceLaunch.ExternalCapture;
 #endif
-	m_rendererHost = std::make_unique<RendererHost>(window, deviceLaunch);
+	enkiTaskScheduler* const frameScheduler = executionConfig.FrameScheduler;
+	if (executionConfig.IsThreaded() && frameScheduler)
+	{
+		if (!enkiRegisterExternalTaskThread(frameScheduler))
+		{
+			throw Diagnostics::Error("Render coordinator could not acquire its native frame registration.");
+		}
+		m_externalFrameScheduler = frameScheduler;
+	}
 
-	m_pipeline = m_rendererHost->CreateFramePipeline(*executionConfig.AssetTaskExecutor, *executionConfig.AssetTaskParentScope, executionConfig.bEnableUiRenderPackets);
+	try
+	{
+		m_rendererHost = std::make_unique<RendererHost>(window, deviceLaunch);
+		m_pipeline = m_rendererHost->CreateFramePipeline(executionConfig.IoScheduler, executionConfig.BackgroundScheduler, frameScheduler, executionConfig.bEnableUiRenderPackets);
+	}
+	catch (...)
+	{
+		if (m_rendererHost)
+		{
+			m_rendererHost->SettleForShutdown();
+		}
+		if (m_externalFrameScheduler)
+		{
+			enkiDeRegisterExternalTaskThread(m_externalFrameScheduler);
+			m_externalFrameScheduler = nullptr;
+		}
+		m_pipeline.reset();
+		m_rendererHost.reset();
+		throw;
+	}
 }
 
 RendererExecutionContext::~RendererExecutionContext() noexcept
 {
 	m_owner.AssertAccess();
 	m_rendererHost->SettleForShutdown();
+	if (m_externalFrameScheduler)
+	{
+		enkiDeRegisterExternalTaskThread(m_externalFrameScheduler);
+		m_externalFrameScheduler = nullptr;
+	}
 	m_pipeline.reset();
 	m_rendererHost.reset();
 }

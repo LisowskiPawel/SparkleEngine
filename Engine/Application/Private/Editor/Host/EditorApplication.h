@@ -4,11 +4,13 @@
 #include "EditorShaderCompileAction.h"
 
 #include <memory>
+#include <stop_token>
+#include <functional>
+#include <optional>
 
 class Renderer;
 class GameApplication;
 class UI;
-class TaskScope;
 class EditorShaderCompileOperation;
 class EditorViewportOutputCoordinator;
 struct RenderViewCameraData;
@@ -41,7 +43,8 @@ private:
 
 	EditorShaderCompileAction m_compileShaders;
 	std::unique_ptr<GameApplication> m_game;
-	std::unique_ptr<TaskScope> m_operationScope;
+	std::stop_source m_operationStop{std::nostopstate};
+	std::optional<std::stop_callback<std::function<void()>>> m_parentStop;
 	std::unique_ptr<EditorViewportOutputCoordinator> m_viewportOutput;
 	std::unique_ptr<EditorShaderCompileOperation> m_shaderCompileOperation;
 	std::unique_ptr<UI> m_ui;

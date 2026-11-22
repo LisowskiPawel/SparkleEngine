@@ -9,6 +9,7 @@
 #include "SparkleLauncher/ProcessRunner.h"
 
 #include <string_view>
+#include <stop_token>
 #include <variant>
 
 namespace SparkleLauncher
@@ -17,5 +18,5 @@ namespace SparkleLauncher
 	using LauncherOperationPlan = std::variant<BuildWorkspaceOperationPlan, LevelOperationPlan, LevelRunOperationPlan, CookOperationPlan, MaintenanceOperationPlan>;
 
 	LauncherOperationPlan PlanLauncherOperation(std::string_view operationId, const LauncherOperationInputs& inputs);
-	OperationRecord RunLauncherOperationPlan(LauncherOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback);
+	OperationRecord RunLauncherOperationPlan(LauncherOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation = {});
 }

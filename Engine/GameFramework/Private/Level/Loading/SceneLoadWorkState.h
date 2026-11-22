@@ -4,15 +4,12 @@
 #include "Assets/Cooked/LoadedSceneManifest.h"
 #include "Assets/Loaders/CookedAssetFileSet.h"
 #include "Core/Public/Files/FileSetPublication.h"
-#include "Tasks/Public/TaskTypes.h"
 
 #include <cstdint>
 #include <atomic>
 #include <filesystem>
 #include <memory>
 #include <vector>
-
-class TaskExecutionContext;
 
 namespace Assets
 {
@@ -42,9 +39,9 @@ namespace Assets
 		}
 
 		void PreparePackage(std::uint64_t requestId, std::uint64_t worldGeneration, std::uint64_t documentGeneration, LevelDesc level, const SceneAssetCatalog& catalog);
-		TaskResult ReadAsset(std::size_t index, TaskExecutionContext& context);
-		TaskResult DecodeAsset(std::size_t index, TaskExecutionContext& context);
-		TaskResult FinalizePackage(TaskExecutionContext& context);
+		void ReadAsset(std::size_t index);
+		void DecodeAsset(std::size_t index);
+		void FinalizePackage();
 
 	private:
 		void ResolveAssets(const SceneAssetCatalog& catalog);

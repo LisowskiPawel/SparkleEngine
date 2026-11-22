@@ -80,7 +80,7 @@ target_link_libraries(SparkleApplication
         SparkleCore
         SparklePlatform
         SparkleGameFramework
-        SparkleTasks
+        enkiTS
 )
 
 if(SPARKLE_WITH_GPU_CRASH_DEBUGGING)
@@ -119,7 +119,7 @@ target_link_libraries(SparkleApplicationEditor
         SparklePlatform
         SparkleGameFramework
         SparkleEditor
-        SparkleTasks
+        enkiTS
         imgui
         tinyexr
         nlohmann_json::nlohmann_json

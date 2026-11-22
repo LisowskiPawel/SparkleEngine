@@ -79,13 +79,15 @@ namespace SparkleLauncher
 	    std::vector<LevelOperationProcessStep>& processSteps,
 	    IProcessRunner& processRunner,
 	    const Process::ChildProcessOutputCallback& outputCallback,
-	    OperationRecord& operation)
+	    OperationRecord& operation,
+	    std::stop_token cancellation)
 	{
 		for (std::size_t stepIndex = 0; stepIndex < processSteps.size(); ++stepIndex)
 		{
 			LevelOperationProcessStep& step = processSteps[stepIndex];
 			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex, processSteps.size());
 			Process::ChildProcessRequest request = step.Request;
+			request.Cancellation = cancellation;
 			AppendProcessOutputCallback(request, outputCallback);
 			operation.LogPath = request.LogPath;
 
@@ -114,7 +116,7 @@ namespace SparkleLauncher
 		return true;
 	}
 
-	OperationRecord RunLevelOperationPlan(LevelOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback)
+	OperationRecord RunLevelOperationPlan(LevelOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
@@ -123,7 +125,7 @@ namespace SparkleLauncher
 		{
 			return operation;
 		}
-		if (!AcquireLevelPacks(processSteps, processRunner, outputCallback, operation))
+		if (!AcquireLevelPacks(processSteps, processRunner, outputCallback, operation, cancellation))
 		{
 			return operation;
 		}

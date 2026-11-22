@@ -8,18 +8,79 @@
 #include "Core/Public/Strings/StringUtils.h"
 #include "Renderer.h"
 
+#include <TaskScheduler_c.h>
+#include "Core/Public/Diagnostics/Verify.h"
+#include <new>
+#include <exception>
 #include <format>
 #include <optional>
 #include <utility>
 
-EditorViewportCaptureCoordinator::EditorViewportCaptureCoordinator(TaskExecutor& executor, TaskScope& scope) noexcept :
-    m_writeOperation(executor, scope)
+SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_editorCaptureLogger, "Application.Capture");
+
+struct EditorViewportCaptureCoordinator::Write final
 {
+	ViewportCaptureReadback Readback;
+	std::filesystem::path OutputPath;
+	std::stop_token Stop;
+	ViewportCaptureResult Result;
+	enkiPinnedTask* Task = nullptr;
+};
+
+EditorViewportCaptureCoordinator::EditorViewportCaptureCoordinator(enkiTaskScheduler* io, std::stop_token stop) noexcept :
+    m_io(io),
+    m_stop(stop)
+{
+}
+
+EditorViewportCaptureCoordinator::~EditorViewportCaptureCoordinator()
+{
+	if (m_write)
+	{
+		Diagnostics::Fatal(g_editorCaptureLogger, __FILE__, __LINE__, "Viewport capture work must be consumed or explicitly shut down before owner destruction.");
+	}
+}
+
+void EditorViewportCaptureCoordinator::Shutdown() noexcept
+{
+	if (m_write)
+	{
+		if (m_write->Task)
+		{
+			enkiWaitForPinnedTask(m_io, m_write->Task);
+			enkiDeletePinnedTask(m_io, m_write->Task);
+		}
+		m_write.reset();
+	}
+	m_capture.Discard();
+}
+
+void EditorViewportCaptureCoordinator::WriteCapture(void* argument) noexcept
+{
+	auto& write = *static_cast<Write*>(argument);
+	try
+	{
+		write.Result = ViewportCaptureWriter::Write(std::move(write.Readback), write.OutputPath, write.Stop);
+	}
+	catch (const std::exception& error)
+	{
+		write.Result.Status = ViewportCaptureStatus::Failed;
+		write.Result.FailureReason = error.what();
+	}
+	catch (...)
+	{
+		write.Result.Status = ViewportCaptureStatus::Failed;
+		write.Result.FailureReason = "Unknown viewport capture write failure.";
+	}
 }
 
 std::optional<ConsoleOutputRecord> EditorViewportCaptureCoordinator::Request(Renderer& renderer, std::uint64_t frameId)
 {
-	if (!m_capture.IsSettled() || m_writeOperation.IsOccupied())
+	if (m_stop.stop_requested())
+	{
+		return ConsoleOutputRecord{ConsoleCommandSeverity::Error, "Viewport capture owner is closed."};
+	}
+	if (!m_capture.IsSettled() || m_write != nullptr)
 	{
 		return ConsoleOutputRecord{ConsoleCommandSeverity::Error, "Viewport capture is already in progress."};
 	}
@@ -47,43 +108,54 @@ std::optional<ConsoleOutputRecord> EditorViewportCaptureCoordinator::Update(Rend
 			return ConsoleOutputRecord{ConsoleCommandSeverity::Error, "Viewport capture failed: " + readback.Result.FailureReason};
 		}
 
-		std::string errorMessage;
-
-		const std::string taskName = "Write viewport capture";
-
-		auto operationTask = [readback = std::move(readback), outputPath = m_outputPath](ViewportCaptureResult& result, TaskExecutionContext& context) mutable
+		try
 		{
-			result = ViewportCaptureWriter::Write(std::move(readback), outputPath, context.GetCancellationToken());
-			if (result)
+			auto write = std::make_unique<Write>(std::move(readback), m_outputPath, m_stop);
+			if (m_io)
 			{
-				return TaskResult::Success();
+				const auto config = enkiGetTaskSchedulerConfig(m_io);
+				write->Task = enkiCreatePinnedTask(m_io, WriteCapture, config.numExternalTaskThreads + 1);
+				if (!write->Task)
+				{
+					throw std::bad_alloc();
+				}
+				enkiSetArgsPinnedTask(write->Task, write.get());
 			}
-			return context.IsCancellationRequested() ? TaskResult::Cancelled(result.FailureReason) : TaskResult::Failure(result.FailureReason);
-		};
-
-		const bool bOperationStarted = m_writeOperation.Start(taskName, "A viewport capture is already being written.", std::move(operationTask), errorMessage);
-
-		if (!bOperationStarted)
+			m_write = std::move(write);
+			if (m_io)
+			{
+				enkiAddPinnedTask(m_io, m_write->Task);
+			}
+			else
+			{
+				WriteCapture(m_write.get());
+			}
+		}
+		catch (const std::exception& error)
 		{
-			return ConsoleOutputRecord{ConsoleCommandSeverity::Error, "Viewport capture could not start: " + errorMessage};
+			return ConsoleOutputRecord{ConsoleCommandSeverity::Error, "Viewport capture could not start: " + std::string(error.what())};
 		}
 	}
-
-	ViewportCaptureResult result;
-	if (const std::optional<TaskResult> taskResult = m_writeOperation.TryConsume(result))
+	if (m_write)
 	{
-		if (!taskResult->Succeeded())
+		if (m_write->Task && !enkiIsPinnedTaskComplete(m_io, m_write->Task))
 		{
-			const char* status = taskResult->WasCancelled() ? "cancelled" : "failed";
-			std::string message = std::format("Viewport capture {}: {}", status, taskResult->GetDiagnostic());
-			return ConsoleOutputRecord{ConsoleCommandSeverity::Error, std::move(message)};
+			return std::nullopt;
 		}
-		else
+		auto result = std::move(m_write->Result);
+		if (m_write->Task)
 		{
-			const std::string outputPath = Strings::ToNarrow(m_outputPath.wstring());
-			return ConsoleOutputRecord{ConsoleCommandSeverity::Info, "Viewport captured: " + outputPath};
+			enkiDeletePinnedTask(m_io, m_write->Task);
 		}
+		m_write.reset();
+		if (!result)
+		{
+			return ConsoleOutputRecord{ConsoleCommandSeverity::Error, "Viewport capture failed: " + result.FailureReason};
+		}
+		const std::string outputPath = Strings::ToNarrow(m_outputPath.wstring());
+		return ConsoleOutputRecord{ConsoleCommandSeverity::Info, "Viewport captured: " + outputPath};
 	}
+
 	return std::nullopt;
 }
 

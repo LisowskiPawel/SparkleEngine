@@ -19,6 +19,7 @@ include(${SPARKLE_REPOSITORY_ROOT}/CMake/SparkleHostTool.cmake)
 # Launcher at runtime and are not prerequisites of the Launcher product itself.
 set(SPARKLE_SOURCE_DEPENDENCY_ALLOWLIST
     cli11
+    enkits
     nlohmann_json
     spdlog
     boost-process
@@ -29,6 +30,5 @@ include(${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/FetchDependencies.cmake NO
 include("${SPARKLE_REPOSITORY_ROOT}/Engine/CMake/EngineModule.cmake")
 add_subdirectory(${SPARKLE_REPOSITORY_ROOT}/Engine/Core ${CMAKE_BINARY_DIR}/Engine/Core)
 include(${SPARKLE_REPOSITORY_ROOT}/Engine/RHI/CMake/Contracts.cmake)
-add_subdirectory(${SPARKLE_REPOSITORY_ROOT}/Engine/Tasks ${CMAKE_BINARY_DIR}/Engine/Tasks)
 add_subdirectory(${SPARKLE_REPOSITORY_ROOT}/Tools/Support/ToolSupport ${CMAKE_BINARY_DIR}/Tools/Support/ToolSupport)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/SparkleLauncher ${CMAKE_BINARY_DIR}/SparkleLauncher)

@@ -4,8 +4,7 @@
 
 #include <cstdint>
 
-class TaskExecutor;
-class TaskScope;
+struct enkiTaskScheduler;
 
 enum class RendererExecutionMode : std::uint8_t
 {
@@ -18,11 +17,12 @@ struct SPARKLE_RENDERER_API RendererExecutionConfig final
 	RendererExecutionMode Mode = RendererExecutionMode::Serial;
 	std::uint32_t RenderPipelineDepth = 0;
 	bool bEnableUiRenderPackets = false;
-	TaskExecutor* AssetTaskExecutor = nullptr;
-	TaskScope* AssetTaskParentScope = nullptr;
+	// Borrowed from the application host; null selects direct frame kernels.
+	enkiTaskScheduler* FrameScheduler = nullptr;
+	enkiTaskScheduler* IoScheduler = nullptr;
+	enkiTaskScheduler* BackgroundScheduler = nullptr;
 
 	bool IsThreaded() const noexcept;
-	bool HasAssetTaskRuntime() const noexcept;
 	void Validate() const;
 	std::uint32_t GetFrameQueueCapacity() const noexcept;
 };

@@ -4,7 +4,6 @@
 #include "Core/Public/Process/ProcessReadiness.h"
 #include "Renderer/Public/ExternalCapture/RendererGraphicsLaunch.h"
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
-  #include "Concurrency/ApplicationTaskRuntime.h"
   #include "Diagnostics/GpuCrash/GpuCrashIncidentSink.h"
   #include "Diagnostics/GpuCrash/GpuCrashInputs.h"
 #endif
@@ -85,7 +84,7 @@ void GameApplication::PrepareGpuCrashDiagnostics(RendererGraphicsLaunch& graphic
 	if (!startup.ShaderExport.empty())
 	{
 		graphics.GpuCrash.LibraryPath = ResolveAftermathLibraryPath();
-		m_gpuCrashSink = std::make_unique<GpuCrashIncidentSink>(*m_taskRuntime, startup, graphics.BackendApi);
+		m_gpuCrashSink = std::make_unique<GpuCrashIncidentSink>(m_ioScheduler, m_stop.get_token(), startup, graphics.BackendApi);
 		graphics.GpuCrash.Mode = RhiGpuCrashMode::Aftermath;
 		graphics.GpuCrash.Sink = m_gpuCrashSink.get();
 	}

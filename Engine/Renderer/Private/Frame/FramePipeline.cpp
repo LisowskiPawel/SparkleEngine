@@ -32,28 +32,29 @@ FramePipeline::FramePipeline(
     RenderDeviceServices& deviceServices,
     RenderPassRuntimeCache& renderPassRuntimeCache,
     RendererMemoryMonitor& memoryMonitor,
-    TaskExecutor& taskExecutor,
-    TaskScope& assetTaskParentScope,
+    enkiTaskScheduler* io,
+    enkiTaskScheduler* cpu,
+    enkiTaskScheduler* frameScheduler,
     bool bEnableUiRenderPackets) :
     m_window(window),
     m_deviceServices(deviceServices),
     m_renderPassRuntimeCache(renderPassRuntimeCache),
     m_memoryMonitor(memoryMonitor),
-    m_taskExecutor(taskExecutor)
+    m_frameScheduler(frameScheduler)
 {
 	RenderHardwareInterface& renderHardwareInterface = m_deviceServices.GetRenderHardwareInterface();
-	m_gpuMeshCache = std::make_unique<GpuMeshCache>(renderHardwareInterface, m_deviceServices, m_taskExecutor, assetTaskParentScope);
+	m_gpuMeshCache = std::make_unique<GpuMeshCache>(renderHardwareInterface, m_deviceServices, cpu);
 
 	m_textureCache = std::make_unique<TextureCache>(
 	    renderHardwareInterface.GetResourceService(),
 	    renderHardwareInterface.GetDescriptorService(),
 	    renderHardwareInterface.GetUploadService(),
 	    m_deviceServices,
-	    m_taskExecutor,
-	    assetTaskParentScope);
+	    io,
+	    cpu);
 
-	m_renderScenePreparation = std::make_unique<RenderScenePreparation>(m_taskExecutor, *m_gpuMeshCache, *m_textureCache);
-	m_renderViewPreparation = std::make_unique<RenderViewPreparation>(m_taskExecutor);
+	m_renderScenePreparation = std::make_unique<RenderScenePreparation>(m_frameScheduler, *m_gpuMeshCache, *m_textureCache);
+	m_renderViewPreparation = std::make_unique<RenderViewPreparation>(m_frameScheduler);
 	m_renderViewState = std::make_unique<RenderViewState>();
 
 	m_renderScene = std::make_unique<RenderScene>(

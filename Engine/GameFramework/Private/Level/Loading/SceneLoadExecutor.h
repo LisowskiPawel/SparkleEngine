@@ -7,10 +7,9 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <stop_token>
 
-class TaskExecutor;
-class TaskScope;
-class CompiledTaskGraph;
+struct enkiTaskScheduler;
 
 namespace Assets
 {
@@ -26,7 +25,7 @@ namespace Assets
 	class SceneLoadExecutor final
 	{
 	public:
-		SceneLoadExecutor(TaskExecutor& executor, TaskScope& applicationScope);
+		SceneLoadExecutor(enkiTaskScheduler* io, enkiTaskScheduler* cpu, std::stop_token parentStop);
 		~SceneLoadExecutor();
 
 		SceneLoadExecutor(const SceneLoadExecutor&) = delete;
@@ -39,7 +38,6 @@ namespace Assets
 		std::uint64_t GetCatalogGeneration() const noexcept;
 
 	private:
-		void Launch(std::shared_ptr<SceneLoadWorkState> shared, const CompiledTaskGraph& graph);
 		struct ControlState;
 		std::unique_ptr<ControlState> m_control;
 	};

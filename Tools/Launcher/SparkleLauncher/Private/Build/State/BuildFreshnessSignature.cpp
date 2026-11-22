@@ -48,7 +48,7 @@ namespace SparkleLauncher
 			paths.push_back(rootCMake);
 		}
 
-		static const std::array<std::string_view, 4> directories = {"CMake", "Engine", "Tools", "Projects"};
+		static const std::array<std::string_view, 5> directories = {"CMake", "Engine", "Tools", "Projects", "ThirdParty"};
 		for (std::string_view directory : directories)
 		{
 			const std::filesystem::path root = workspaceRoot / std::string(directory);
@@ -77,7 +77,7 @@ namespace SparkleLauncher
 	std::optional<std::string> ComputeSourceListHash(const std::filesystem::path& workspaceRoot)
 	{
 		std::vector<std::string> relativePaths;
-		static const std::array<std::string_view, 5> directories = {"Engine", "Tools", "Projects", "ThirdParty", "CMake/Dependencies/Bindings"};
+		static const std::array<std::string_view, 4> directories = {"Engine", "Tools", "Projects", "ThirdParty"};
 		for (std::string_view directory : directories)
 		{
 			const std::filesystem::path root = workspaceRoot / std::string(directory);

@@ -9,12 +9,58 @@
 #include "Editor/ReferencePathTracer/ReferencePathTracerArtifactWriter.h"
 #include "Renderer.h"
 
+#include <TaskScheduler_c.h>
+#include "Core/Public/Diagnostics/Verify.h"
+#include <new>
 #include <optional>
 #include <utility>
 
-ReferencePathTracerArtifactCoordinator::ReferencePathTracerArtifactCoordinator(TaskExecutor& executor, TaskScope& scope) noexcept :
-    m_writeOperation(executor, scope)
+SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_referenceArtifactLogger, "Application.ReferenceArtifact");
+
+struct ReferencePathTracerArtifactCoordinator::Write final
 {
+	ReferencePathTracerArtifactWriteRequest Request;
+	std::stop_token Stop;
+	ReferencePathTracerArtifactWriteResult Result;
+	enkiPinnedTask* Task = nullptr;
+};
+
+ReferencePathTracerArtifactCoordinator::ReferencePathTracerArtifactCoordinator(enkiTaskScheduler* io, std::stop_token stop) noexcept :
+    m_io(io),
+    m_stop(stop)
+{
+}
+
+ReferencePathTracerArtifactCoordinator::~ReferencePathTracerArtifactCoordinator()
+{
+	if (m_write)
+	{
+		Diagnostics::Fatal(g_referenceArtifactLogger, __FILE__, __LINE__, "Reference artifact work must be consumed or explicitly shut down before owner destruction.");
+	}
+}
+
+void ReferencePathTracerArtifactCoordinator::Shutdown() noexcept
+{
+	if (m_write)
+	{
+		if (m_write->Task)
+		{
+			enkiWaitForPinnedTask(m_io, m_write->Task);
+			enkiDeletePinnedTask(m_io, m_write->Task);
+		}
+		m_write.reset();
+	}
+	m_meanCapture.Discard();
+	m_moment2Capture.Discard();
+	m_mean.reset();
+	m_moment2.reset();
+	m_pendingKind.reset();
+}
+
+void ReferencePathTracerArtifactCoordinator::WriteArtifact(void* argument) noexcept
+{
+	auto& write = *static_cast<Write*>(argument);
+	write.Result = ReferencePathTracerArtifactWriter::Write(std::move(write.Request), write.Stop);
 }
 
 void ReferencePathTracerArtifactCoordinator::Request(
@@ -24,6 +70,11 @@ void ReferencePathTracerArtifactCoordinator::Request(
     const std::filesystem::path& outputRoot,
     std::uint64_t maximumOutputBytes)
 {
+	if (m_stop.stop_requested())
+	{
+		Fail("Reference artifact owner is closed.");
+		return;
+	}
 	if (!IsSettled())
 	{
 		m_lastResult = ReferencePathTracerArtifactWriteResult{.ErrorMessage = "A Reference artifact operation is already in progress."};
@@ -155,29 +206,38 @@ void ReferencePathTracerArtifactCoordinator::PublishIfReady()
 
 void ReferencePathTracerArtifactCoordinator::StartPublication(ReferencePathTracerArtifactWriteRequest request)
 {
-	std::string errorMessage;
-	const std::string taskName = "Publish Reference Path Tracer artifact";
-
-	auto operationTask = [request = std::move(request)](ReferencePathTracerArtifactWriteResult& result, TaskExecutionContext& context) mutable
+	if (m_write || m_stop.stop_requested())
 	{
-		if (context.IsCancellationRequested())
-		{
-			return TaskResult::Cancelled("Reference Path Tracer artifact publication was cancelled.");
-		}
-		result = ReferencePathTracerArtifactWriter::Write(std::move(request), context.GetCancellationToken());
-		if (result.bSucceeded)
-		{
-			return TaskResult::Success();
-		}
-		return context.IsCancellationRequested() ? TaskResult::Cancelled(result.ErrorMessage) : TaskResult::Failure(result.ErrorMessage);
-	};
-
-	const bool bOperationStarted = m_writeOperation.Start(taskName, "A Reference Path Tracer artifact is already being written.", std::move(operationTask), errorMessage);
-
-	if (!bOperationStarted)
-	{
-		Fail(std::move(errorMessage));
+		Fail("Reference artifact publication owner is occupied or closed.");
 		return;
+	}
+	try
+	{
+		auto write = std::make_unique<Write>(std::move(request), m_stop);
+		if (m_io)
+		{
+			const auto config = enkiGetTaskSchedulerConfig(m_io);
+			const auto worker = config.numExternalTaskThreads + 1 + 1 % config.numTaskThreadsToCreate;
+			write->Task = enkiCreatePinnedTask(m_io, WriteArtifact, worker);
+			if (!write->Task)
+			{
+				throw std::bad_alloc();
+			}
+			enkiSetArgsPinnedTask(write->Task, write.get());
+		}
+		m_write = std::move(write);
+		if (m_io)
+		{
+			enkiAddPinnedTask(m_io, m_write->Task);
+		}
+		else
+		{
+			WriteArtifact(m_write.get());
+		}
+	}
+	catch (const std::exception& error)
+	{
+		Fail(error.what());
 	}
 }
 
@@ -222,19 +282,21 @@ void ReferencePathTracerArtifactCoordinator::BeginPendingCapture(Renderer& rende
 
 void ReferencePathTracerArtifactCoordinator::CollectPublicationResult()
 {
-	ReferencePathTracerArtifactWriteResult result;
-	if (const std::optional<TaskResult> taskResult = m_writeOperation.TryConsume(result))
+	if (!m_write)
 	{
-		if (!taskResult->Succeeded())
-		{
-			result.bSucceeded = false;
-			if (result.ErrorMessage.empty())
-			{
-				result.ErrorMessage = taskResult->GetDiagnostic();
-			}
-		}
-		m_lastResult = std::move(result);
+		return;
 	}
+	if (m_write->Task && !enkiIsPinnedTaskComplete(m_io, m_write->Task))
+	{
+		return;
+	}
+	auto result = std::move(m_write->Result);
+	if (m_write->Task)
+	{
+		enkiDeletePinnedTask(m_io, m_write->Task);
+	}
+	m_write.reset();
+	m_lastResult = std::move(result);
 }
 
 bool ReferencePathTracerArtifactCoordinator::IsSettled() const noexcept
@@ -244,7 +306,7 @@ bool ReferencePathTracerArtifactCoordinator::IsSettled() const noexcept
 		return false;
 	}
 	const bool bReadbacksSettled = m_meanCapture.IsSettled() && m_moment2Capture.IsSettled();
-	return bReadbacksSettled && !m_writeOperation.IsOccupied();
+	return bReadbacksSettled && !m_write;
 }
 
 std::optional<ReferencePathTracerArtifactWriteResult> ReferencePathTracerArtifactCoordinator::TakeResult() noexcept

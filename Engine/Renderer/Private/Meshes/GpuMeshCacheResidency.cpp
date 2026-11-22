@@ -5,8 +5,8 @@
 #include "Meshes/GpuMeshPreparation.h"
 #include "RHI/Public/Commands/RhiCommandSubmissionService.h"
 #include "Scene/Meshes/Mesh.h"
-#include "Tasks/Public/TaskExecutor.h"
-#include "Tasks/Public/TaskScope.h"
+#include <TaskScheduler_c.h>
+#include <new>
 
 #include <algorithm>
 #include <array>
@@ -58,10 +58,10 @@ void GpuMeshCache::LaunchPendingPreparations()
 	const std::size_t activePreparationCount = static_cast<std::size_t>(std::count_if(
 	    m_requests.begin(),
 	    m_requests.end(),
-	    [](const auto& entry) noexcept
+	    [this](const auto& entry) noexcept
 	    {
 		    const MeshRequest& request = entry.second;
-		    return request.bPreparationStarted && request.Execution.IsValid();
+		    return m_residency.GetState(request.Generation) == AssetResidencyState::Decoding;
 	    }));
 
 	std::size_t availableSlots = activePreparationCount < kMaximumConcurrentPreparations ? kMaximumConcurrentPreparations - activePreparationCount : 0;
@@ -72,7 +72,8 @@ void GpuMeshCache::LaunchPendingPreparations()
 		{
 			return;
 		}
-		if (request.bPreparationStarted || !request.bWanted || request.Prepared == nullptr)
+		const bool bPending = m_residency.GetState(request.Generation) == AssetResidencyState::Reading && request.bWanted;
+		if (!bPending || request.Prepared == nullptr)
 		{
 			continue;
 		}
@@ -91,29 +92,44 @@ void GpuMeshCache::LaunchPendingPreparations()
 	}
 }
 
+void GpuMeshCache::PrepareMesh(void* argument) noexcept
+{
+	auto& request = *static_cast<MeshRequest*>(argument);
+	if (request.Stop.stop_requested())
+	{
+		return;
+	}
+	try
+	{
+		*request.Prepared = PrepareGpuMesh(request.Source);
+	}
+	catch (...)
+	{
+		request.Failure = std::current_exception();
+	}
+}
+
 void GpuMeshCache::LaunchPreparation(MeshRequest& request)
 {
-	const ImmutableRenderMeshHandle mesh = request.Source;
-	const std::shared_ptr<GpuMeshPreparedData> prepared = request.Prepared;
-
-	request.Execution = m_taskExecutor->Launch(
-	    *m_taskScope,
-	    TaskDesc{.Name = "Prepare immutable mesh generation", .Lane = TaskLane::Background},
-	    [mesh, prepared](TaskExecutionContext& context)
-	    {
-		    if (context.IsCancellationRequested())
-		    {
-			    return TaskResult::Cancelled("Mesh preparation cancelled.");
-		    }
-
-		    *prepared = PrepareGpuMesh(mesh);
-		    return TaskResult::Success();
-	    });
-
-	request.bPreparationStarted = true;
-	if (!request.Execution.IsValid())
+	if (m_cpu)
 	{
-		Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, "GPU mesh preparation task launch failed.");
+		const auto config = enkiGetTaskSchedulerConfig(m_cpu);
+		const auto worker = config.numExternalTaskThreads + 1 + static_cast<std::uint32_t>(request.Handle.Value % config.numTaskThreadsToCreate);
+		request.Preparation = enkiCreatePinnedTask(m_cpu, PrepareMesh, worker);
+		if (!request.Preparation)
+		{
+			(void) m_residency.Cancel(request.Generation);
+			throw std::bad_alloc();
+		}
+		enkiSetArgsPinnedTask(request.Preparation, &request);
+	}
+	if (m_cpu)
+	{
+		enkiAddPinnedTask(m_cpu, request.Preparation);
+	}
+	else
+	{
+		PrepareMesh(&request);
 	}
 }
 
@@ -122,14 +138,19 @@ void GpuMeshCache::ConsumeCompletedPreparations() noexcept
 	for (auto& entry : m_requests)
 	{
 		MeshRequest& request = entry.second;
-		if (!request.Execution.IsValid() || !request.Execution.IsSettled())
+		if (m_residency.GetState(request.Generation) != AssetResidencyState::Decoding)
 		{
 			continue;
 		}
-
-		const TaskExecutionStatus status = request.Execution.GetStatus();
-		const TaskResult result = request.Execution.GetResult();
-		request.Execution = {};
+		if (request.Preparation && !enkiIsPinnedTaskComplete(m_cpu, request.Preparation))
+		{
+			continue;
+		}
+		if (request.Preparation)
+		{
+			enkiDeletePinnedTask(m_cpu, request.Preparation);
+			request.Preparation = nullptr;
+		}
 
 		if (!request.bWanted)
 		{
@@ -138,10 +159,22 @@ void GpuMeshCache::ConsumeCompletedPreparations() noexcept
 			continue;
 		}
 
-		if (status != TaskExecutionStatus::Succeeded)
+		if (request.Failure)
 		{
-			Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, result.GetDiagnostic().empty() ? "GPU mesh preparation task failed." : result.GetDiagnostic());
+			try
+			{
+				std::rethrow_exception(request.Failure);
+			}
+			catch (const std::exception& error)
+			{
+				Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, error.what());
+			}
+			catch (...)
+			{
+				Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, "GPU mesh preparation failed.");
+			}
 		}
+
 		if (request.Prepared == nullptr)
 		{
 			Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, "GPU mesh preparation produced no payload.");
@@ -195,7 +228,7 @@ void GpuMeshCache::RemoveTerminalRequests() noexcept
 	{
 		const AssetResidencyState state = m_residency.GetState(request->second.Generation);
 
-		const bool bTerminalSecond = !request->second.Execution.IsValid() && request->second.Prepared == nullptr;
+		const bool bTerminalSecond = request->second.Preparation == nullptr && request->second.Prepared == nullptr;
 		const bool bUploadMissing = bTerminalSecond && (request->second.Uploaded == nullptr);
 		const bool bTerminalState = state == AssetResidencyState::Resident || state == AssetResidencyState::Retired;
 		const bool bTerminal = bUploadMissing && bTerminalState;

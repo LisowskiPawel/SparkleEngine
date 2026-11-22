@@ -1,10 +1,10 @@
-include("${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/Targets/d3dx12.cmake")
+include("${SPARKLE_REPOSITORY_ROOT}/ThirdParty/D3DX12/Dependency.cmake")
 
 if(SPARKLE_RHI_WITH_D3D12_NVAPI)
     sparkle_configure_nvidia_nvapi_target()
 endif()
 
-include("${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/Targets/d3d12ma.cmake")
+include("${SPARKLE_REPOSITORY_ROOT}/ThirdParty/d3d12ma/Dependency.cmake")
 
 file(GLOB_RECURSE SPARKLE_RHI_D3D12_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/D3D12/*.cpp
@@ -18,10 +18,6 @@ if(NOT SPARKLE_WITH_GPU_CRASH_DEBUGGING)
     list(FILTER SPARKLE_RHI_D3D12_SOURCES EXCLUDE REGEX "/Diagnostics/GpuCrash/")
     list(FILTER SPARKLE_RHI_D3D12_HEADERS EXCLUDE REGEX "/Diagnostics/GpuCrash/")
 endif()
-
-add_library(imgui_d3d12 STATIC ${imgui_SOURCE_DIR}/backends/imgui_impl_dx12.cpp)
-target_link_libraries(imgui_d3d12 PUBLIC imgui d3d12 dxgi d3dcompiler)
-set_target_properties(imgui_d3d12 PROPERTIES FOLDER "ThirdParty/ImGui")
 
 list(FILTER SPARKLE_RHI_D3D12_SOURCES EXCLUDE REGEX "/D3D12PixEvents\\.cpp$")
 

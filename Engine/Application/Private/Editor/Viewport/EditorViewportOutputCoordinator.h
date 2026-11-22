@@ -5,19 +5,19 @@
 
 #include <cstdint>
 
-class TaskExecutor;
-class TaskScope;
+struct enkiTaskScheduler;
 class Renderer;
 class UI;
 
 class EditorViewportOutputCoordinator final
 {
 public:
-	EditorViewportOutputCoordinator(TaskExecutor& executor, TaskScope& scope) noexcept;
+	EditorViewportOutputCoordinator(enkiTaskScheduler* io, std::stop_token stop) noexcept;
 
 	EditorViewportOutputCoordinator(const EditorViewportOutputCoordinator&) = delete;
 	EditorViewportOutputCoordinator& operator=(const EditorViewportOutputCoordinator&) = delete;
 
+	void Shutdown() noexcept;
 	void Update(UI& ui, Renderer& renderer);
 	void HandleAction(UI& ui, Renderer& renderer, std::uint64_t frameId);
 

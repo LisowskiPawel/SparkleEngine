@@ -8,6 +8,9 @@
 #include "Core/RhiBackendSelection.h"
 #include "Core/RhiCapabilities.h"
 #include "Diagnostics/RhiExternalCapture.h"
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+  #include "Diagnostics/GpuCrash/GpuCrashSession.h"
+#endif
 #include "Device/RenderDeviceBackendFactory.h"
 #include "Device/RenderDeviceBackendServices.h"
 #include "Device/RenderDeviceServicesState.h"
@@ -165,6 +168,13 @@ void RenderDeviceServices::SettleForShutdown() noexcept
 	}
 #endif
 	m_state->GetBackendServices().SettleForShutdown();
+#if SPARKLE_WITH_GPU_CRASH_DEBUGGING
+	// Settle diagnostics before cache joins can wait behind their writer on I/O.
+	if (auto* session = GpuCrashSession::Current())
+	{
+		session->Shutdown();
+	}
+#endif
 }
 
 void RenderDeviceServices::ResizeSwapChain() noexcept

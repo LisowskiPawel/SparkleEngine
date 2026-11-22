@@ -3,7 +3,6 @@
 
 #include "Core/Public/Math/Frustum.h"
 #include "Scene/Preparation/PreparedRenderScene.h"
-#include "Tasks/Public/TaskExecutionContext.h"
 #include "View/RenderView.h"
 
 #include <algorithm>
@@ -52,9 +51,8 @@ static float ComputeCameraDistanceSquared(const DirectX::XMFLOAT3& cameraPositio
 	return x * x + y * y + z * z;
 }
 
-TaskResult EvaluateRenderViewVisibility(std::uint32_t begin, std::uint32_t end, TaskExecutionContext& context)
+void EvaluateRenderViewVisibility(RenderViewVisibilityRun& run, std::uint32_t begin, std::uint32_t end) noexcept
 {
-	RenderViewVisibilityRun& run = *context.TryGet<RenderViewVisibilityRun>();
 	const std::size_t rangeBegin = (std::min<std::size_t>) (begin, run.Scene->primitives.size());
 	const std::size_t rangeEnd = (std::min<std::size_t>) (end, run.Scene->primitives.size());
 	for (std::size_t primitiveIndex = rangeBegin; primitiveIndex < rangeEnd; ++primitiveIndex)
@@ -76,7 +74,6 @@ TaskResult EvaluateRenderViewVisibility(std::uint32_t begin, std::uint32_t end, 
 		              primitive.Draw.Transform.WorldMatrix)}
 		    : MeshRenderItem{};
 	}
-	return TaskResult::Success();
 }
 
 void BuildRenderViewWorkload(const PreparedRenderScene& scene, RenderView& view) noexcept

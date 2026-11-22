@@ -55,7 +55,7 @@ target_link_libraries(SparkleRenderer
     PRIVATE
         SparklePlatform
         SparkleGameFramework
-        SparkleTasks
+        enkiTS
         SparkleRendererNvidiaStreamlineProviders
         imgui
 )

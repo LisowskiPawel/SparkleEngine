@@ -21,10 +21,10 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_gameWorldLogger, "GameFramework.GameWorld");
 
-GameWorld::GameWorld(TaskExecutor& taskExecutor) :
+GameWorld::GameWorld(enkiTaskScheduler* frameScheduler) :
     m_state(std::make_unique<ECS::GameWorldState>()),
     m_resources(std::make_unique<GameWorldResourceStores>()),
-    m_taskExecutor(taskExecutor),
+    m_frameScheduler(frameScheduler),
     m_editCommands(std::make_unique<WorldEditCommandQueue>()),
     m_renderFrameSubmissionExtractor(std::make_unique<ECS::RenderFrameSubmissionExtractor>())
 {
@@ -46,7 +46,7 @@ void GameWorld::Update(float deltaSeconds)
 
 	const ECS::GameWorldSystemExecutionContext executionContext{
 	    .Resources = *m_resources,
-	    .Executor = m_taskExecutor,
+	    .Scheduler = m_frameScheduler,
 	    .Camera =
 	        {
 	            .Intent = m_cameraInputIntent,
@@ -76,7 +76,7 @@ void GameWorld::PublishCameraInputIntent(const CameraInputIntent& intent) noexce
 
 void GameWorld::CommitSceneLoadPackage(Assets::SceneLoadPackage package)
 {
-	GameWorld stagedWorld(m_taskExecutor);
+	GameWorld stagedWorld(m_frameScheduler);
 	InitializeSceneLoadLevel(*stagedWorld.m_state, package.Level);
 
 	PopulateStagedScene(*stagedWorld.m_state, *stagedWorld.m_resources, package);

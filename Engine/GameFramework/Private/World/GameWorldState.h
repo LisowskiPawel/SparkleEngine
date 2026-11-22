@@ -25,7 +25,6 @@
 
 class SkeletonResourceStore;
 class GameWorldResourceStores;
-class TaskExecutor;
 
 namespace ECS
 {
@@ -120,7 +119,6 @@ namespace ECS
 		MorphWeightStorage m_morphWeights;
 		WorldExtractionStorage m_extraction;
 		std::vector<EntityId> m_transformWork;
-		GameWorldSystemTasks m_systemTasks;
 		std::vector<SceneMeshInstanceGroupData> m_meshInstanceGroups;
 		std::optional<SkyEnvironment> m_skyEnvironment;
 		std::vector<EntityId> m_dirtyTransforms;

@@ -8,7 +8,7 @@
 #include "RHI/Public/Commands/RhiCommandSubmissionService.h"
 #include <algorithm>
 
-void FrameGraph::Execute(const FrameGraphPlan& plan, RhiCommandSubmissionService& submissionService, TaskExecutor& taskExecutor) const
+void FrameGraph::Execute(const FrameGraphPlan& plan, RhiCommandSubmissionService& submissionService, enkiTaskScheduler* frameScheduler) const
 {
 	EnsureTransientResourcesMaterialized(plan);
 	submissionService.PrepareCommandRecording();
@@ -18,7 +18,7 @@ void FrameGraph::Execute(const FrameGraphPlan& plan, RhiCommandSubmissionService
 	RenderCommandList& initialGraphicsCommandList = submissionService.GetCurrentGraphicsCommandList();
 	RecordFrameBeginBarriers(plan, initialGraphicsCommandList);
 
-	FrameGraphSubmissionExecutor submissionExecutor(*this, plan, submissionService, taskExecutor, m_submissionBatchTokens);
+	FrameGraphSubmissionExecutor submissionExecutor(*this, plan, submissionService, frameScheduler, m_submissionBatchTokens);
 	RenderCommandList& finalGraphicsCommandList = submissionExecutor.Execute(initialGraphicsCommandList);
 	RecordFrameEndBarriers(plan, finalGraphicsCommandList);
 

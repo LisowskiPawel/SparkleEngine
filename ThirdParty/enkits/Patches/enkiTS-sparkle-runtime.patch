@@ -1,0 +1,675 @@
+diff --git a/src/TaskScheduler.cpp b/src/TaskScheduler.cpp
+--- a/src/TaskScheduler.cpp
++++ b/src/TaskScheduler.cpp
+@@ -1,3 +1,4 @@
++// Sparkle fork of enkiTS v1.12: native preparation rollback and C error handling.
+ // Copyright (c) 2013 Doug Binks
+ //
+ // This software is provided 'as-is', without any express or implied
+@@ -20,6 +21,8 @@
+ #include "LockLessMultiReadPipe.h"
+ #include <type_traits>
+ #include <algorithm>
++#include <new>
++#include <system_error>
+ 
+ #if defined __i386__ || defined __x86_64__
+ #include "x86intrin.h"
+@@ -324,126 +327,134 @@
+         return;
+     }
+ 
+-    m_NumThreads = m_Config.numTaskThreadsToCreate + m_Config.numExternalTaskThreads + 1;
+-
+-    for( int priority = 0; priority < TASK_PRIORITY_NUM; ++priority )
+-    {
+-        m_pPipesPerThread[ priority ]          = NewArray<TaskPipe>( m_NumThreads, ENKI_FILE_AND_LINE );
+-        m_pPinnedTaskListPerThread[ priority ] = NewArray<PinnedTaskList>( m_NumThreads, ENKI_FILE_AND_LINE );
+-    }
+-
+-    m_pNewTaskSemaphore      = SemaphoreNew();
+-    m_pTaskCompleteSemaphore = SemaphoreNew();
+-
+-    // we create one less thread than m_NumThreads as the main thread counts as one
+-    m_pThreadDataStore   = NewArray<ThreadDataStore>( m_NumThreads, ENKI_FILE_AND_LINE );
+-    m_pThreads           = NewArray<std::thread>( m_NumThreads, ENKI_FILE_AND_LINE );
+-    m_bRunning = true;
+-    m_bWaitforAllCalled = false;
+-    m_bShutdownRequested = false;
+-
+-    // current thread is primary enkiTS thread
+-    m_pThreadDataStore[0].threadState = ENKI_THREAD_STATE_PRIMARY_REGISTERED;
+-    gtl_threadNum = 0;
+-
+-    for( uint32_t thread = GetNumFirstExternalTaskThread(); thread < m_Config.numExternalTaskThreads + GetNumFirstExternalTaskThread(); ++thread )
+-    {
+-        m_pThreadDataStore[thread].threadState   = ENKI_THREAD_STATE_EXTERNAL_UNREGISTERED;
+-    }
+-    for( uint32_t thread = m_Config.numExternalTaskThreads + GetNumFirstExternalTaskThread(); thread < m_NumThreads; ++thread )
+-    {
+-        m_pThreadDataStore[thread].threadState   = ENKI_THREAD_STATE_NOT_LAUNCHED;
+-    }
+-
+-
+-    // Create Wait New Pinned Task Semaphores and init rndSeed
+-    for( uint32_t threadNum = 0; threadNum < m_NumThreads; ++threadNum )
+-    {
+-        m_pThreadDataStore[threadNum].pWaitNewPinnedTaskSemaphore = SemaphoreNew();
+-        m_pThreadDataStore[threadNum].rndSeed = threadNum;
+-    }
+-
+-    // only launch threads once all thread states are set
+-    for( uint32_t thread = m_Config.numExternalTaskThreads + GetNumFirstExternalTaskThread(); thread < m_NumThreads; ++thread )
+-    {
+-        m_pThreads[thread]                       = std::thread( TaskingThreadFunction, ThreadArgs{ thread, this } );
+-        ++m_NumInternalTaskThreadsRunning;
+-    }
+-
+-    // ensure we have sufficient tasks to equally fill either all threads including main
+-    // or just the threads we've launched, this is outside the first init as we want to be able
+-    // to runtime change it
+-    if( 1 == m_NumThreads )
+-    {
+-        m_NumPartitions        = 1;
+-        m_NumInitialPartitions = 1;
+-    }
+-    else
+-    {
+-        // There could be more threads than hardware threads if external threads are
+-        // being intended for blocking functionality such as io etc.
+-        // We only need to partition for a maximum of the available processor parallelism.
+-        uint32_t numThreadsToPartitionFor = std::min( m_NumThreads, GetNumHardwareThreads() );
+-        m_NumPartitions = numThreadsToPartitionFor * (numThreadsToPartitionFor - 1);
+-        // ensure m_NumPartitions, m_NumInitialPartitions non zero, can happen if m_NumThreads > 1 && GetNumHardwareThreads() == 1
+-        m_NumPartitions        = std::max( m_NumPartitions,              (uint32_t)1 );
+-        m_NumInitialPartitions = std::max( numThreadsToPartitionFor - 1, (uint32_t)1 );
+-        m_NumInitialPartitions = std::min( m_NumInitialPartitions, gc_MaxNumInitialPartitions );
+-    }
+-
+-#ifdef ENKI_USE_WINDOWS_PROCESSOR_API
+-    // x64 bit Windows may support >64 logical processors using processor groups, and only allocate threads to a default group.
+-    // We need to detect this and distribute threads accordingly
+-    if( GetNumHardwareThreads() > 64 &&                                    // only have processor groups if > 64 hardware threads
+-        std::thread::hardware_concurrency() < GetNumHardwareThreads() &&   // if std::thread sees > 64 hardware threads no need to distribute
+-        std::thread::hardware_concurrency() < m_NumThreads )               // no need to distribute if number of threads requested lower than std::thread sees
+-    {
+-        uint32_t numProcessorGroups = GetActiveProcessorGroupCount();
+-        GROUP_AFFINITY mainThreadAffinity;
+-        BOOL success = GetThreadGroupAffinity( GetCurrentThread(), &mainThreadAffinity );
+-        ENKI_ASSERT( success );
+-        if( success )
+-        {
+-            uint32_t mainProcessorGroup = mainThreadAffinity.Group;
+-            uint32_t currLogicalProcess = GetActiveProcessorCount( (WORD)mainProcessorGroup ); // we start iteration at end of current process group's threads
+-
+-            // If more threads are created than there are logical processors then we still want to distribute them evenly amongst groups
+-            // so we iterate continuously around the groups until we reach m_NumThreads
+-            uint32_t group = 0;
+-            while( currLogicalProcess < m_NumThreads )
+-            {
+-                ++group; // start at group 1 since we set currLogicalProcess to start of next group
+-                uint32_t currGroup = ( group + mainProcessorGroup ) % numProcessorGroups; // we start at mainProcessorGroup, go round in circles
+-                uint32_t groupNumLogicalProcessors = GetActiveProcessorCount( (WORD)currGroup );
+-                ENKI_ASSERT( groupNumLogicalProcessors <= 64 );
+-                uint64_t GROUPMASK = 0xFFFFFFFFFFFFFFFFULL >> (64-groupNumLogicalProcessors); // group mask should not have 1's where there are no processors
+-                for( uint32_t groupLogicalProcess = 0; ( groupLogicalProcess < groupNumLogicalProcessors ) && ( currLogicalProcess < m_NumThreads ); ++groupLogicalProcess, ++currLogicalProcess )
++    try
++    {
++        m_NumThreads = m_Config.numTaskThreadsToCreate + m_Config.numExternalTaskThreads + 1;
++    
++        for( int priority = 0; priority < TASK_PRIORITY_NUM; ++priority )
++        {
++            m_pPipesPerThread[ priority ]          = NewArray<TaskPipe>( m_NumThreads, ENKI_FILE_AND_LINE );
++            m_pPinnedTaskListPerThread[ priority ] = NewArray<PinnedTaskList>( m_NumThreads, ENKI_FILE_AND_LINE );
++        }
++    
++        m_pNewTaskSemaphore      = SemaphoreNew();
++        m_pTaskCompleteSemaphore = SemaphoreNew();
++    
++        // we create one less thread than m_NumThreads as the main thread counts as one
++        m_pThreadDataStore   = NewArray<ThreadDataStore>( m_NumThreads, ENKI_FILE_AND_LINE );
++        m_pThreads           = NewArray<std::thread>( m_NumThreads, ENKI_FILE_AND_LINE );
++        m_bRunning = true;
++        m_bWaitforAllCalled = false;
++        m_bShutdownRequested = false;
++    
++        // current thread is primary enkiTS thread
++        m_pThreadDataStore[0].threadState = ENKI_THREAD_STATE_PRIMARY_REGISTERED;
++        gtl_threadNum = 0;
++    
++        for( uint32_t thread = GetNumFirstExternalTaskThread(); thread < m_Config.numExternalTaskThreads + GetNumFirstExternalTaskThread(); ++thread )
++        {
++            m_pThreadDataStore[thread].threadState   = ENKI_THREAD_STATE_EXTERNAL_UNREGISTERED;
++        }
++        for( uint32_t thread = m_Config.numExternalTaskThreads + GetNumFirstExternalTaskThread(); thread < m_NumThreads; ++thread )
++        {
++            m_pThreadDataStore[thread].threadState   = ENKI_THREAD_STATE_NOT_LAUNCHED;
++        }
++    
++    
++        // Create Wait New Pinned Task Semaphores and init rndSeed
++        for( uint32_t threadNum = 0; threadNum < m_NumThreads; ++threadNum )
++        {
++            m_pThreadDataStore[threadNum].pWaitNewPinnedTaskSemaphore = SemaphoreNew();
++            m_pThreadDataStore[threadNum].rndSeed = threadNum;
++        }
++    
++        // only launch threads once all thread states are set
++        for( uint32_t thread = m_Config.numExternalTaskThreads + GetNumFirstExternalTaskThread(); thread < m_NumThreads; ++thread )
++        {
++            m_pThreads[thread]                       = std::thread( TaskingThreadFunction, ThreadArgs{ thread, this } );
++            ++m_NumInternalTaskThreadsRunning;
++        }
++    
++        // ensure we have sufficient tasks to equally fill either all threads including main
++        // or just the threads we've launched, this is outside the first init as we want to be able
++        // to runtime change it
++        if( 1 == m_NumThreads )
++        {
++            m_NumPartitions        = 1;
++            m_NumInitialPartitions = 1;
++        }
++        else
++        {
++            // There could be more threads than hardware threads if external threads are
++            // being intended for blocking functionality such as io etc.
++            // We only need to partition for a maximum of the available processor parallelism.
++            uint32_t numThreadsToPartitionFor = std::min( m_NumThreads, GetNumHardwareThreads() );
++            m_NumPartitions = numThreadsToPartitionFor * (numThreadsToPartitionFor - 1);
++            // ensure m_NumPartitions, m_NumInitialPartitions non zero, can happen if m_NumThreads > 1 && GetNumHardwareThreads() == 1
++            m_NumPartitions        = std::max( m_NumPartitions,              (uint32_t)1 );
++            m_NumInitialPartitions = std::max( numThreadsToPartitionFor - 1, (uint32_t)1 );
++            m_NumInitialPartitions = std::min( m_NumInitialPartitions, gc_MaxNumInitialPartitions );
++        }
++    
++    #ifdef ENKI_USE_WINDOWS_PROCESSOR_API
++        // x64 bit Windows may support >64 logical processors using processor groups, and only allocate threads to a default group.
++        // We need to detect this and distribute threads accordingly
++        if( GetNumHardwareThreads() > 64 &&                                    // only have processor groups if > 64 hardware threads
++            std::thread::hardware_concurrency() < GetNumHardwareThreads() &&   // if std::thread sees > 64 hardware threads no need to distribute
++            std::thread::hardware_concurrency() < m_NumThreads )               // no need to distribute if number of threads requested lower than std::thread sees
++        {
++            uint32_t numProcessorGroups = GetActiveProcessorGroupCount();
++            GROUP_AFFINITY mainThreadAffinity;
++            BOOL success = GetThreadGroupAffinity( GetCurrentThread(), &mainThreadAffinity );
++            ENKI_ASSERT( success );
++            if( success )
++            {
++                uint32_t mainProcessorGroup = mainThreadAffinity.Group;
++                uint32_t currLogicalProcess = GetActiveProcessorCount( (WORD)mainProcessorGroup ); // we start iteration at end of current process group's threads
++    
++                // If more threads are created than there are logical processors then we still want to distribute them evenly amongst groups
++                // so we iterate continuously around the groups until we reach m_NumThreads
++                uint32_t group = 0;
++                while( currLogicalProcess < m_NumThreads )
+                 {
+-                    if( currLogicalProcess > m_Config.numExternalTaskThreads + GetNumFirstExternalTaskThread() )
++                    ++group; // start at group 1 since we set currLogicalProcess to start of next group
++                    uint32_t currGroup = ( group + mainProcessorGroup ) % numProcessorGroups; // we start at mainProcessorGroup, go round in circles
++                    uint32_t groupNumLogicalProcessors = GetActiveProcessorCount( (WORD)currGroup );
++                    ENKI_ASSERT( groupNumLogicalProcessors <= 64 );
++                    uint64_t GROUPMASK = 0xFFFFFFFFFFFFFFFFULL >> (64-groupNumLogicalProcessors); // group mask should not have 1's where there are no processors
++                    for( uint32_t groupLogicalProcess = 0; ( groupLogicalProcess < groupNumLogicalProcessors ) && ( currLogicalProcess < m_NumThreads ); ++groupLogicalProcess, ++currLogicalProcess )
+                     {
+-                        auto thread_handle = m_pThreads[currLogicalProcess].native_handle();
+-
+-                        // From https://learn.microsoft.com/en-us/windows/win32/procthread/processor-groups
+-                        // If a thread is assigned to a different group than the process, the process's affinity is updated to include the thread's affinity
+-                        // and the process becomes a multi-group process.
+-                        GROUP_AFFINITY threadAffinity;
+-                        success = GetThreadGroupAffinity( thread_handle, &threadAffinity );
+-                        ENKI_ASSERT(success); (void)success;
+-                        if( threadAffinity.Group != currGroup )
++                        if( currLogicalProcess > m_Config.numExternalTaskThreads + GetNumFirstExternalTaskThread() )
+                         {
+-                            threadAffinity.Group = (WORD)currGroup;
+-                            threadAffinity.Mask  = GROUPMASK;
+-                            success = SetThreadGroupAffinity( thread_handle, &threadAffinity, nullptr );
+-                            ENKI_ASSERT( success ); (void)success;
++                            auto thread_handle = m_pThreads[currLogicalProcess].native_handle();
++    
++                            // From https://learn.microsoft.com/en-us/windows/win32/procthread/processor-groups
++                            // If a thread is assigned to a different group than the process, the process's affinity is updated to include the thread's affinity
++                            // and the process becomes a multi-group process.
++                            GROUP_AFFINITY threadAffinity;
++                            success = GetThreadGroupAffinity( thread_handle, &threadAffinity );
++                            ENKI_ASSERT(success); (void)success;
++                            if( threadAffinity.Group != currGroup )
++                            {
++                                threadAffinity.Group = (WORD)currGroup;
++                                threadAffinity.Mask  = GROUPMASK;
++                                success = SetThreadGroupAffinity( thread_handle, &threadAffinity, nullptr );
++                                ENKI_ASSERT( success ); (void)success;
++                            }
+                         }
+                     }
+                 }
+             }
+         }
+-    }
+-#endif
+-
+-    m_bHaveThreads = true;
++    #endif
++    
++        m_bHaveThreads = true;
++    }
++    catch( ... )
++    {
++        StopThreads( true );
++        throw;
++    }
+ }
+ 
+ void TaskScheduler::StopThreads( bool bWait_ )
+@@ -455,7 +466,7 @@
+     m_bShutdownRequested.store( true, std::memory_order_release );
+     m_bRunning.store( false, std::memory_order_release );
+ 
+-    if( m_bHaveThreads )
++    if( m_NumThreads != 0 )
+     {
+ 
+         // wait for threads to quit before deleting data
+@@ -474,14 +485,19 @@
+         // detach threads starting with thread GetNumFirstExternalTaskThread() (as 0 is initialization thread).
+         for( uint32_t thread = m_Config.numExternalTaskThreads +  GetNumFirstExternalTaskThread(); thread < m_NumThreads; ++thread )
+         {
+-            ENKI_ASSERT( m_pThreads[thread].joinable() );
+-            m_pThreads[thread].join();
++            if( m_pThreads && m_pThreads[thread].joinable() )
++            {
++                m_pThreads[thread].join();
++            }
+         }
+ 
+         // delete any Wait New Pinned Task Semaphores
+         for( uint32_t threadNum = 0; threadNum < m_NumThreads; ++threadNum )
+         {
+-            SemaphoreDelete( m_pThreadDataStore[threadNum].pWaitNewPinnedTaskSemaphore );
++            if( m_pThreadDataStore )
++            {
++                SemaphoreDelete( m_pThreadDataStore[threadNum].pWaitNewPinnedTaskSemaphore );
++            }
+         }
+ 
+         DeleteArray( m_pThreadDataStore, m_NumThreads, ENKI_FILE_AND_LINE );
+@@ -508,6 +524,8 @@
+             m_pPinnedTaskListPerThread[ priority ] = NULL;
+         }
+         m_NumThreads = 0;
++        m_NumPartitions = 0;
++        m_NumInitialPartitions = 0;
+     }
+ }
+ 
+@@ -1203,6 +1221,10 @@
+ T* TaskScheduler::NewArray( size_t num_, const char* file_, int line_  )
+ {
+     T* pRet = (T*)m_Config.customAllocator.alloc( alignof(T), num_*sizeof(T), m_Config.customAllocator.userData, file_, line_ );
++    if( !pRet )
++    {
++        throw std::bad_alloc();
++    }
+     if( !std::is_trivial<T>::value )
+     {
+         T* pCurr = pRet;
+@@ -1219,6 +1241,10 @@
+ template<typename T>
+ void TaskScheduler::DeleteArray( T* p_, size_t num_, const char* file_, int line_ )
+ {
++    if( !p_ )
++    {
++        return;
++    }
+     if( !std::is_trivially_destructible<T>::value )
+     {
+         size_t i = num_;
+@@ -1248,6 +1274,10 @@
+ T* TaskScheduler::Alloc( const char* file_, int line_  )
+ {
+     T* pRet = (T*)m_Config.customAllocator.alloc( alignof(T), sizeof(T), m_Config.customAllocator.userData, file_, line_ );
++    if( !pRet )
++    {
++        throw std::bad_alloc();
++    }
+     return pRet;
+ }
+ 
+@@ -1437,11 +1467,23 @@
+ {
+     semaphoreid_t* pSemaphore = this->Alloc<semaphoreid_t>( ENKI_FILE_AND_LINE );
+     SemaphoreCreate( *pSemaphore );
++#ifdef _WIN32
++    if( !pSemaphore->sem )
++    {
++        const DWORD error = GetLastError();
++        this->Free( pSemaphore, ENKI_FILE_AND_LINE );
++        throw std::system_error( (int)error, std::system_category(), "enkiTS semaphore creation" );
++    }
++#endif
+     return pSemaphore;
+ }
+ 
+ void TaskScheduler::SemaphoreDelete( semaphoreid_t* pSemaphore_ )
+ {
++    if( !pSemaphore_ )
++    {
++        return;
++    }
+     SemaphoreClose( *pSemaphore_ );
+     this->Free( pSemaphore_, ENKI_FILE_AND_LINE );
+ }
+diff --git a/src/TaskScheduler_c.cpp b/src/TaskScheduler_c.cpp
+--- a/src/TaskScheduler_c.cpp
++++ b/src/TaskScheduler_c.cpp
+@@ -1,3 +1,4 @@
++// Sparkle fork of enkiTS v1.12: native rollback, C error handling and completable observation.
+ // Copyright (c) 2013 Doug Binks
+ //
+ // This software is provided 'as-is', without any express or implied
+@@ -18,6 +19,9 @@
+ 
+ #include "TaskScheduler_c.h"
+ #include "TaskScheduler.h"
++#include <exception>
++#include <cstring>
++#include <algorithm>
+ 
+ using namespace enki;
+ 
+@@ -111,26 +115,48 @@
+ 
+ enkiTaskScheduler* enkiNewTaskScheduler()
+ {
+-    CustomAllocator defaultAllocator;
+-    enkiTaskScheduler* pETS = (enkiTaskScheduler*)defaultAllocator.alloc(
+-        alignof(enkiTaskScheduler), sizeof(enkiTaskScheduler), defaultAllocator.userData, ENKI_FILE_AND_LINE );
+-    new(pETS) enkiTaskScheduler;
+-    return pETS;
++    try
++    {
++        CustomAllocator defaultAllocator;
++        enkiTaskScheduler* pETS = (enkiTaskScheduler*)defaultAllocator.alloc(
++            alignof(enkiTaskScheduler), sizeof(enkiTaskScheduler), defaultAllocator.userData, ENKI_FILE_AND_LINE );
++        if( !pETS )
++        {
++            return nullptr;
++        }
++        new(pETS) enkiTaskScheduler;
++        return pETS;
++    }
++    catch( ... )
++    {
++        return nullptr;
++    }
+ }
+ 
+ enkiTaskScheduler* enkiNewTaskSchedulerWithCustomAllocator( struct enkiCustomAllocator customAllocator_ )
+ {
+-    enkiTaskScheduler* pETS = (enkiTaskScheduler*)customAllocator_.alloc(
+-        alignof(enkiTaskScheduler), sizeof(enkiTaskScheduler), customAllocator_.userData, ENKI_FILE_AND_LINE );
+-
+-    CustomAllocator customAllocatorCpp;
+-    customAllocatorCpp.alloc      = customAllocator_.alloc;
+-    customAllocatorCpp.free       = customAllocator_.free;
+-    customAllocatorCpp.userData = customAllocator_.userData;
+-
+-    new(pETS) enkiTaskScheduler;
+-    pETS->enkiSetCustomAllocator( customAllocatorCpp );
+-    return pETS;
++    try
++    {
++        enkiTaskScheduler* pETS = (enkiTaskScheduler*)customAllocator_.alloc(
++            alignof(enkiTaskScheduler), sizeof(enkiTaskScheduler), customAllocator_.userData, ENKI_FILE_AND_LINE );
++        if( !pETS )
++        {
++            return nullptr;
++        }
++    
++        CustomAllocator customAllocatorCpp;
++        customAllocatorCpp.alloc      = customAllocator_.alloc;
++        customAllocatorCpp.free       = customAllocator_.free;
++        customAllocatorCpp.userData = customAllocator_.userData;
++    
++        new(pETS) enkiTaskScheduler;
++        pETS->enkiSetCustomAllocator( customAllocatorCpp );
++        return pETS;
++    }
++    catch( ... )
++    {
++        return nullptr;
++    }
+ }
+ 
+ struct enkiTaskSchedulerConfig enkiGetTaskSchedulerConfig( enkiTaskScheduler* pETS_ )
+@@ -197,6 +223,40 @@
+    pETS_->Initialize( config );
+ }
+ 
++int enkiTryInitTaskSchedulerWithConfig( enkiTaskScheduler* pETS_, struct enkiTaskSchedulerConfig config_, char* error_, size_t errorCapacity_ )
++{
++    if( error_ && errorCapacity_ )
++    {
++        error_[0] = '\0';
++    }
++    const char* message = "enkiTS initialization failed";
++    try
++    {
++        enkiInitTaskSchedulerWithConfig( pETS_, config_ );
++        return 1;
++    }
++    catch( const std::exception& error )
++    {
++        if( error_ && errorCapacity_ )
++        {
++            const size_t count = std::min( std::strlen(error.what()), errorCapacity_ - 1 );
++            std::memcpy( error_, error.what(), count );
++            error_[count] = '\0';
++        }
++        return 0;
++    }
++    catch( ... )
++    {
++        if( error_ && errorCapacity_ )
++        {
++            const size_t count = std::min( std::strlen(message), errorCapacity_ - 1 );
++            std::memcpy( error_, message, count );
++            error_[count] = '\0';
++        }
++        return 0;
++    }
++}
++
+ void enkiWaitforAllAndShutdown( enkiTaskScheduler* pETS_ )
+ {
+     pETS_->WaitforAllAndShutdown();
+@@ -216,12 +276,23 @@
+ 
+ enkiTaskSet* enkiCreateTaskSet( enkiTaskScheduler* pETS_, enkiTaskExecuteRange taskFunc_  )
+ {
+-    CustomAllocator customAllocator = pETS_->GetConfig().customAllocator;
+-    enkiTaskSet* pTask = (enkiTaskSet*)customAllocator.alloc(
+-        alignof(enkiTaskSet), sizeof(enkiTaskSet), customAllocator.userData, ENKI_FILE_AND_LINE );
+-    new(pTask) enkiTaskSet( taskFunc_ );
+-
+-    return pTask;
++    try
++    {
++        CustomAllocator customAllocator = pETS_->GetConfig().customAllocator;
++        enkiTaskSet* pTask = (enkiTaskSet*)customAllocator.alloc(
++            alignof(enkiTaskSet), sizeof(enkiTaskSet), customAllocator.userData, ENKI_FILE_AND_LINE );
++        if( !pTask )
++        {
++            return nullptr;
++        }
++        new(pTask) enkiTaskSet( taskFunc_ );
++    
++        return pTask;
++    }
++    catch( ... )
++    {
++        return nullptr;
++    }
+ }
+ 
+ void enkiDeleteTaskSet( enkiTaskScheduler* pETS_, enkiTaskSet* pTaskSet_ )
+@@ -310,11 +381,22 @@
+ 
+ enkiPinnedTask* enkiCreatePinnedTask(enkiTaskScheduler* pETS_, enkiPinnedTaskExecute taskFunc_, uint32_t threadNum_)
+ {
+-    CustomAllocator customAllocator = pETS_->GetConfig().customAllocator;
+-    enkiPinnedTask* pTask = (enkiPinnedTask*)customAllocator.alloc(
+-        alignof(enkiPinnedTask), sizeof(enkiPinnedTask), customAllocator.userData, ENKI_FILE_AND_LINE );
+-    new(pTask) enkiPinnedTask( taskFunc_, threadNum_ );
+-    return pTask;
++    try
++    {
++        CustomAllocator customAllocator = pETS_->GetConfig().customAllocator;
++        enkiPinnedTask* pTask = (enkiPinnedTask*)customAllocator.alloc(
++            alignof(enkiPinnedTask), sizeof(enkiPinnedTask), customAllocator.userData, ENKI_FILE_AND_LINE );
++        if( !pTask )
++        {
++            return nullptr;
++        }
++        new(pTask) enkiPinnedTask( taskFunc_, threadNum_ );
++        return pTask;
++    }
++    catch( ... )
++    {
++        return nullptr;
++    }
+ }
+ 
+ void enkiDeletePinnedTask( enkiTaskScheduler* pETS_, enkiPinnedTask* pPinnedTask_ )
+@@ -453,11 +535,22 @@
+ 
+ enkiCompletable* enkiCreateCompletable( enkiTaskScheduler* pETS_ )
+ {
+-    CustomAllocator customAllocator = pETS_->GetConfig().customAllocator;
+-    enkiCompletable* pTask = (enkiCompletable*)customAllocator.alloc(
+-        alignof(enkiCompletable), sizeof(enkiCompletable), customAllocator.userData, ENKI_FILE_AND_LINE );
+-    new(pTask) enkiCompletable();
+-    return pTask;
++    try
++    {
++        CustomAllocator customAllocator = pETS_->GetConfig().customAllocator;
++        enkiCompletable* pTask = (enkiCompletable*)customAllocator.alloc(
++            alignof(enkiCompletable), sizeof(enkiCompletable), customAllocator.userData, ENKI_FILE_AND_LINE );
++        if( !pTask )
++        {
++            return nullptr;
++        }
++        new(pTask) enkiCompletable();
++        return pTask;
++    }
++    catch( ... )
++    {
++        return nullptr;
++    }
+ }
+ 
+ void enkiDeleteCompletable( enkiTaskScheduler* pETS_, enkiCompletable* pCompletable_ )
+@@ -468,6 +561,11 @@
+     customAllocator.free( pCompletable_, sizeof(enkiCompletable), customAllocator.userData, ENKI_FILE_AND_LINE );
+ }
+ 
++int enkiIsCompletableComplete( enkiTaskScheduler* pETS_, enkiCompletable* pTask_ )
++{
++    return pTask_->GetIsComplete();
++}
++
+ void enkiWaitForCompletable( enkiTaskScheduler* pETS_, enkiCompletable* pTask_ )
+ {
+     return pETS_->WaitforTask( reinterpret_cast<ICompletable*>( pTask_ ) );
+@@ -480,11 +578,22 @@
+ 
+ enkiDependency* enkiCreateDependency( enkiTaskScheduler* pETS_ )
+ {
+-    CustomAllocator customAllocator = pETS_->GetConfig().customAllocator;
+-    enkiDependency* pDep = (enkiDependency*)customAllocator.alloc(
+-        alignof(enkiDependency), sizeof(enkiDependency), customAllocator.userData, ENKI_FILE_AND_LINE );
+-    new(pDep) enkiDependency();
+-    return pDep;
++    try
++    {
++        CustomAllocator customAllocator = pETS_->GetConfig().customAllocator;
++        enkiDependency* pDep = (enkiDependency*)customAllocator.alloc(
++            alignof(enkiDependency), sizeof(enkiDependency), customAllocator.userData, ENKI_FILE_AND_LINE );
++        if( !pDep )
++        {
++            return nullptr;
++        }
++        new(pDep) enkiDependency();
++        return pDep;
++    }
++    catch( ... )
++    {
++        return nullptr;
++    }
+ }
+ 
+ void enkiDeleteDependency( enkiTaskScheduler* pETS_, enkiDependency* pDependency_ )
+@@ -502,13 +611,24 @@
+ 
+ enkiCompletionAction* enkiCreateCompletionAction( enkiTaskScheduler* pETS_, enkiCompletionFunction completionFunctionPreComplete_, enkiCompletionFunction completionFunctionPostComplete_ )
+ {
+-    CustomAllocator customAllocator = pETS_->GetConfig().customAllocator;
+-    enkiCompletionAction* pCA = (enkiCompletionAction*)customAllocator.alloc(
+-        alignof(enkiCompletionAction), sizeof(enkiCompletionAction), customAllocator.userData, ENKI_FILE_AND_LINE );
+-    new(pCA) enkiCompletionAction();
+-    pCA->completionFunctionPreComplete = completionFunctionPreComplete_;
+-    pCA->completionFunctionPostComplete = completionFunctionPostComplete_;
+-    return pCA;
++    try
++    {
++        CustomAllocator customAllocator = pETS_->GetConfig().customAllocator;
++        enkiCompletionAction* pCA = (enkiCompletionAction*)customAllocator.alloc(
++            alignof(enkiCompletionAction), sizeof(enkiCompletionAction), customAllocator.userData, ENKI_FILE_AND_LINE );
++        if( !pCA )
++        {
++            return nullptr;
++        }
++        new(pCA) enkiCompletionAction();
++        pCA->completionFunctionPreComplete = completionFunctionPreComplete_;
++        pCA->completionFunctionPostComplete = completionFunctionPostComplete_;
++        return pCA;
++    }
++    catch( ... )
++    {
++        return nullptr;
++    }
+ }
+ 
+ void enkiDeleteCompletionAction( enkiTaskScheduler* pETS_, enkiCompletionAction* pCompletionAction_ )
+diff --git a/src/TaskScheduler_c.h b/src/TaskScheduler_c.h
+--- a/src/TaskScheduler_c.h
++++ b/src/TaskScheduler_c.h
+@@ -1,3 +1,4 @@
++// Sparkle fork of enkiTS v1.12: native preparation rollback and C error handling.
+ // Copyright (c) 2013 Doug Binks
+ //
+ // This software is provided 'as-is', without any express or implied
+@@ -171,6 +172,11 @@
+ // Initialize a task scheduler with config, see enkiTaskSchedulerConfig for details
+ ENKITS_API void                enkiInitTaskSchedulerWithConfig( enkiTaskScheduler* pETS_, struct enkiTaskSchedulerConfig config_ );
+ 
++// Authorized Sparkle fork: failure-returning initialization. On failure native
++// preparation has rolled back; the scheduler can be retried or deleted. Returns
++// 1 on success, 0 on failure. Optional error storage is bounded and null-terminated.
++ENKITS_API int enkiTryInitTaskSchedulerWithConfig( enkiTaskScheduler* pETS_, struct enkiTaskSchedulerConfig config_, char* error_, size_t errorCapacity_ );
++
+ // Waits for all task sets to complete and shutdown threads - not guaranteed to work unless we know we
+ // are in a situation where tasks aren't being continuously added.
+ // pETS_ can then be reused.
+@@ -357,6 +363,10 @@
+ // Delete an enkiCompletable created with enkiCreateCompletable
+ ENKITS_API void                enkiDeleteCompletable( enkiTaskScheduler* pETS_, enkiCompletable* pCompletable_ );
+ 
++// Nonblocking observation of the public ICompletable completion state.
++// This does not settle a post-completion callback; that callback must retain its borrows.
++ENKITS_API int                 enkiIsCompletableComplete( enkiTaskScheduler* pETS_, enkiCompletable* pTask_ );
++
+ // Wait for a given completable.
+ // should only be called from thread which created the task scheduler, or within a task
+ // if called with 0 it will try to run tasks, and return if none available.

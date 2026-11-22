@@ -10,7 +10,7 @@
 class FrameGraph;
 class RenderCommandList;
 class RhiCommandSubmissionService;
-class TaskExecutor;
+struct enkiTaskScheduler;
 
 class FrameGraphSubmissionExecutor final
 {
@@ -19,7 +19,7 @@ public:
 	    const FrameGraph& frameGraph,
 	    const FrameGraphPlan& plan,
 	    RhiCommandSubmissionService& submissionService,
-	    TaskExecutor& taskExecutor,
+	    enkiTaskScheduler* frameScheduler,
 	    std::span<RhiSubmissionToken> batchTokens) noexcept;
 
 	RenderCommandList& Execute(RenderCommandList& initialGraphicsCommandList);

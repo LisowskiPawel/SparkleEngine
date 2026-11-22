@@ -8,12 +8,10 @@
 #include "Core/Public/Diagnostics/Logger.h"
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Core/Public/Files/FileUtils.h"
-#include "TaskExecution.h"
-#include "TaskExecutionContext.h"
-#include "TaskExecutor.h"
-#include "TaskGraph.h"
-#include "TaskTypes.h"
 
+#include <TaskScheduler_c.h>
+#include <memory>
+#include <new>
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
@@ -47,7 +45,7 @@ TextureCookBatchExecutor::~TextureCookBatchExecutor()
 	}
 }
 
-const std::vector<TaskResult>& TextureCookBatchExecutor::Execute()
+const std::vector<std::exception_ptr>& TextureCookBatchExecutor::Execute()
 {
 	if (m_requests.size() > (std::numeric_limits<std::uint32_t>::max)())
 	{
@@ -57,56 +55,67 @@ const std::vector<TaskResult>& TextureCookBatchExecutor::Execute()
 	{
 		throw Diagnostics::Error("Texture publication does not match its cook requests.");
 	}
-	m_results.resize(m_requests.size(), TaskResult::Cancelled("Texture cook did not execute."));
-
-	TaskExecutor executor(BuildExecutorConfig());
-	TaskExecutionContext context;
-	std::vector<TaskNodeHandle> taskHandles;
-	const auto graph = BuildTaskGraph(taskHandles);
-	const TaskExecution execution = executor.Submit(graph, context);
-
-	for (std::size_t index = 0; index < taskHandles.size(); ++index)
+	m_results.assign(m_requests.size(), {});
+	m_completedRequests.store(0);
+	if (m_requests.empty())
 	{
-		const std::optional<TaskResult> taskResult = execution.GetTaskResult(taskHandles[index]);
-		if (!taskResult)
-		{
-			Diagnostics::Fatal(g_textureCookBatchExecutorLogger, __FILE__, __LINE__, "Texture cook execution settled without a result for one of its tasks.");
-		}
-		m_results[index] = *taskResult;
+		return m_results;
 	}
+
+	const auto workers = ResolveBackgroundWorkerCount();
+	if (workers == 1)
+	{
+		CookRange(0, static_cast<std::uint32_t>(m_requests.size()), 0, this);
+		return m_results;
+	}
+
+	auto scheduler = std::unique_ptr<enkiTaskScheduler, decltype(&enkiDeleteTaskScheduler)>(enkiNewTaskScheduler(), enkiDeleteTaskScheduler);
+	if (!scheduler)
+	{
+		throw std::bad_alloc();
+	}
+	auto config = enkiGetTaskSchedulerConfig(scheduler.get());
+	config.numTaskThreadsToCreate = workers - 1;
+	config.numExternalTaskThreads = 0;
+	char error[256]{};
+	if (!enkiTryInitTaskSchedulerWithConfig(scheduler.get(), config, error, sizeof(error)))
+	{
+		throw Diagnostics::Error(error);
+	}
+
+	auto deleteRange = [&scheduler](enkiTaskSet* task)
+	{
+		enkiDeleteTaskSet(scheduler.get(), task);
+	};
+	std::unique_ptr<enkiTaskSet, decltype(deleteRange)> range(enkiCreateTaskSet(scheduler.get(), CookRange), deleteRange);
+	if (!range)
+	{
+		throw std::bad_alloc();
+	}
+	enkiSetParamsTaskSet(range.get(), {this, static_cast<std::uint32_t>(m_requests.size()), 1, 0});
+	enkiAddTaskSet(scheduler.get(), range.get());
+	enkiWaitForTaskSet(scheduler.get(), range.get());
 
 	return m_results;
 }
 
-TaskExecutorConfig TextureCookBatchExecutor::BuildExecutorConfig() const
+void TextureCookBatchExecutor::CookRange(std::uint32_t begin, std::uint32_t end, std::uint32_t, void* argument) noexcept
 {
-	const std::uint32_t maximumTasks = static_cast<std::uint32_t>(std::max<std::size_t>(m_requests.size(), 1));
-
-	return TaskExecutorConfig{
-	    .FrameCriticalWorkerCount = 1,
-	    .BackgroundWorkerCount = ResolveBackgroundWorkerCount(),
-	    .MaximumTasksPerExecution = maximumTasks,
-	    .MaximumEdgesPerExecution = 1,
-	    .MaximumActiveExecutions = 1};
-}
-
-CompiledTaskGraph TextureCookBatchExecutor::BuildTaskGraph(std::vector<TaskNodeHandle>& outTaskHandles)
-{
-	const std::uint32_t maximumTasks = static_cast<std::uint32_t>(std::max<std::size_t>(m_requests.size(), 1));
-	TaskGraphBuilder graph(TaskGraphLimits{.MaximumTasks = maximumTasks, .MaximumEdges = 1});
-	outTaskHandles.clear();
-	outTaskHandles.reserve(m_requests.size());
-
-	for (std::uint32_t index = 0; index < m_requests.size(); ++index)
+	auto& batch = *static_cast<TextureCookBatchExecutor*>(argument);
+	for (auto index = begin; index < end; ++index)
 	{
-		const auto task = graph.Add(TaskDesc{.Name = "Cook texture request", .Lane = TaskLane::Background}, [this, index](TaskExecutionContext&) { return CookRequest(index); });
-		outTaskHandles.push_back(task);
+		try
+		{
+			batch.CookRequest(index);
+		}
+		catch (...)
+		{
+			batch.m_results[index] = std::current_exception();
+		}
 	}
-
-	return graph.Compile();
 }
 
-TaskResult TextureCookBatchExecutor::CookRequest(std::uint32_t index)
+void TextureCookBatchExecutor::CookRequest(std::uint32_t index)
 {
 	TextureCookRequest stagedRequest = m_requests[index];
 	stagedRequest.outputPath = m_publication[index].StagedPath;
@@ -118,7 +127,6 @@ TaskResult TextureCookBatchExecutor::CookRequest(std::uint32_t index)
 		const std::size_t completed = ++m_completedRequests;
 		m_progress(index, completed);
 	}
-	return TaskResult::Success();
 }
 
 std::uint32_t TextureCookBatchExecutor::ResolveBackgroundWorkerCount()

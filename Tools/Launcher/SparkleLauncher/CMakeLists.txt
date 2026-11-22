@@ -138,7 +138,7 @@ target_link_libraries(SparkleLauncher
     PRIVATE
         SparkleLauncherCore
         SparkleCore
-        SparkleTasks
+        enkiTS
         ToolSupport
         Qt6::Widgets
 )

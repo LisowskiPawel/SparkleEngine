@@ -1,49 +1,30 @@
 #include "Gui/Operations/LauncherOperationService.h"
-
 #include "Operations/LauncherOperationExecution.h"
 #include "GpuCrash/GpuCrashLaunch.h"
-#include "Tasks/Public/TaskExecutionContext.h"
-#include "Tasks/Public/TaskExecutor.h"
-#include "Tasks/Public/TaskGraph.h"
-#include "Tasks/Public/TaskScope.h"
-
-#include <atomic>
-#include <exception>
-#include <map>
+#include <TaskScheduler_c.h>
+#include "Core/Public/Diagnostics/Verify.h"
+#include "Core/Public/Diagnostics/Logger.h"
+#include <thread>
+#include <algorithm>
+#include <array>
+#include <iostream>
+#include <list>
+#include <mutex>
+#include <new>
 #include <optional>
+#include <variant>
+#include <stop_token>
 #include <stdexcept>
 #include <utility>
 
 namespace SparkleLauncher
 {
-	class TaskContextProcessRunner final : public IProcessRunner
-	{
-	public:
-		explicit TaskContextProcessRunner(IProcessRunner& runner, TaskExecutionContext& context);
-		Process::ChildProcessResult Run(const Process::ChildProcessRequest& request) override;
-
-	private:
-		IProcessRunner& m_runner;
-		TaskExecutionContext& m_context;
-	};
-
-	TaskContextProcessRunner::TaskContextProcessRunner(IProcessRunner& runner, TaskExecutionContext& context) :
-	    m_runner(runner),
-	    m_context(context)
-	{
-	}
-
-	Process::ChildProcessResult TaskContextProcessRunner::Run(const Process::ChildProcessRequest& request)
-	{
-		Process::ChildProcessRequest scopedRequest = request;
-		scopedRequest.Cancellation = m_context.GetCancellationToken();
-		return m_runner.Run(scopedRequest);
-	}
+	SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_operationLogger, "Launcher.Operations");
 
 	static OperationRecord ExecuteLauncherOperation(
 	    const LauncherOperationRequest& request,
 	    IProcessRunner& processRunner,
-	    TaskExecutionContext& context,
+	    std::stop_token cancellation,
 	    const Process::ChildProcessOutputCallback& outputCallback)
 	{
 		const std::string operationId = request.OperationId.toStdString();
@@ -76,191 +57,295 @@ namespace SparkleLauncher
 			return std::move(*blockedOperation);
 		}
 
-		TaskContextProcessRunner taskProcessRunner(processRunner, context);
-		return RunLauncherOperationPlan(std::move(plan), taskProcessRunner, outputCallback);
+		return RunLauncherOperationPlan(std::move(plan), processRunner, outputCallback, cancellation);
 	}
 
 	struct LauncherOperationService::Implementation final
 	{
-		explicit Implementation(ProcessRunnerFactory processRunnerFactory) :
-		    m_processRunnerFactory(std::move(processRunnerFactory))
+		static constexpr std::size_t MaximumRuns = 16;
+
+		struct Run final
 		{
+			Implementation* Owner;
+			std::string Id;
+			LauncherOperationRequest Request;
+			OperationRecord Record;
+			OutputCallback Output;
+			CompletionCallback Completion;
+			std::optional<GpuCrashIncident> Incident;
+			std::function<void(std::string)> Observation;
+			std::stop_source Stop;
+			enkiPinnedTask* Work = nullptr;
+			enkiCompletionAction* Cleanup = nullptr;
+
+			~Run()
+			{
+				if (Cleanup)
+				{
+					enkiDeleteCompletionAction(Owner->Scheduler, Cleanup);
+				}
+				if (Work)
+				{
+					enkiDeletePinnedTask(Owner->Scheduler, Work);
+				}
+			}
+		};
+
+		explicit Implementation(ProcessRunnerFactory factory) :
+		    Factory(std::move(factory))
+		{
+			Scheduler = enkiNewTaskScheduler();
+			if (!Scheduler)
+			{
+				throw std::bad_alloc();
+			}
+			try
+			{
+				auto config = enkiGetTaskSchedulerConfig(Scheduler);
+				config.numTaskThreadsToCreate = 2;
+				config.numExternalTaskThreads = 0;
+				char error[256]{};
+				if (!enkiTryInitTaskSchedulerWithConfig(Scheduler, config, error, sizeof(error)))
+				{
+					throw std::runtime_error(error);
+				}
+			}
+			catch (...)
+			{
+				enkiDeleteTaskScheduler(Scheduler);
+				throw;
+			}
 		}
 
 		~Implementation()
 		{
-			m_rootScope.Cancel();
-			m_executor.Shutdown(TaskExecutorShutdownMode::Cancel);
-			for (const auto& operation : m_operationScopes)
+			if (std::this_thread::get_id() != CreatorThread)
 			{
-				operation.second->JoinFor(std::chrono::milliseconds::zero());
+				Diagnostics::Fatal(g_operationLogger, __FILE__, __LINE__, "Launcher operation service must shut down on its initializing UI thread, after callback admission closes.");
 			}
-			m_rootScope.JoinFor(std::chrono::milliseconds::zero());
-		}
 
-		void ReapSettledOperations()
-		{
-			for (auto operation = m_operationScopes.begin(); operation != m_operationScopes.end();)
+			std::array<std::optional<std::stop_source>, MaximumRuns> stops;
+			std::size_t count = 0;
 			{
-				// JoinFor closes the per-run scope. A scope does not become settled merely
-				// because its only execution finished; the owner must close it explicitly.
-				if (!operation->second->JoinFor(std::chrono::milliseconds::zero()))
+				std::lock_guard lock(Mutex);
+				bClosing = true;
+				for (const auto& run : Runs)
 				{
-					++operation;
-					continue;
+					stops[count++].emplace(run->Stop);
 				}
+			}
+			for (auto& stop : stops)
+			{
+				if (stop)
+				{
+					stop->request_stop();
+				}
+			}
+			// Joining native workers also covers post actions already marked complete.
+			enkiWaitforAllAndShutdown(Scheduler);
+			enkiDeleteTaskScheduler(Scheduler);
+		}
 
-				operation = m_operationScopes.erase(operation);
+		static void Execute(void* argument) noexcept
+		{
+			auto& run = *static_cast<Run*>(argument);
+			try
+			{
+				if (run.Stop.stop_requested())
+				{
+					return;
+				}
+				if (run.Incident)
+				{
+					run.Observation(ReadGpuCrashCollectionState(*run.Incident));
+					return;
+				}
+				auto runner = run.Owner->Factory();
+				if (!runner)
+				{
+					throw std::runtime_error("No process runner is available for this Launcher operation.");
+				}
+				run.Record = ExecuteLauncherOperation(run.Request, *runner, run.Stop.get_token(), run.Output);
+			}
+			catch (const std::exception& error)
+			{
+				if (run.Incident)
+				{
+					return;
+				}
+				try
+				{
+					SetOperationFailure(run.Record, OperationProblemKind::Internal, error.what(), "Resolve the reported error, then retry.");
+				}
+				catch (...)
+				{ /* The pre-admission failure record remains valid. */
+				}
+				MarkOperationFinished(run.Record, OperationStatus::Failed, std::nullopt);
+			}
+			catch (...)
+			{
+				if (run.Incident)
+				{
+					return;
+				}
+				try
+				{
+					SetOperationFailure(run.Record, OperationProblemKind::Internal, "Unhandled Launcher operation exception.", "Restart Sparkle Launcher before retrying.");
+				}
+				catch (...)
+				{ /* The pre-admission failure record remains valid. */
+				}
+				MarkOperationFinished(run.Record, OperationStatus::Failed, std::nullopt);
 			}
 		}
 
-		ProcessRunnerFactory m_processRunnerFactory;
-		std::atomic<bool> m_bOperationRunning{false};
-		TaskExecutor m_executor{TaskExecutorConfig{.FrameCriticalWorkerCount = 1, .BackgroundWorkerCount = 1, .BlockingIoWorkerCount = 2, .MaximumActiveExecutions = 16}};
-		TaskScope m_rootScope{TaskScopeDesc{TaskScopeKind::Application, "Launcher operations"}};
-		std::map<std::string, std::unique_ptr<TaskScope>, std::less<>> m_operationScopes;
+		static void Complete(void* argument, std::uint32_t) noexcept
+		{
+			auto& run = *static_cast<Run*>(argument);
+			if (run.Incident)
+			{
+				return;
+			}
+			try
+			{
+				if (run.Record.Status == OperationStatus::Pending)
+				{
+					const bool bCanceled = run.Stop.stop_requested();
+					run.Record.Failure->Kind = bCanceled ? OperationProblemKind::Cancellation : OperationProblemKind::Internal;
+					MarkOperationFinished(run.Record, bCanceled ? OperationStatus::Canceled : OperationStatus::Failed, std::nullopt);
+				}
+				{
+					std::lock_guard lock(run.Owner->Mutex);
+					run.Owner->bBusy = false;
+				}
+				run.Completion(std::move(run.Record));
+			}
+			catch (...)
+			{
+				std::cerr << "Launcher completion callback failed.\n";
+			}
+		}
+
+		static void Release(void* argument, std::uint32_t) noexcept
+		{
+			auto* run = static_cast<Run*>(argument);
+			std::unique_ptr<Run> retired;
+			{
+				std::lock_guard lock(run->Owner->Mutex);
+				auto& runs = run->Owner->Runs;
+				const auto found = std::find_if(runs.begin(), runs.end(), [run](const auto& item) { return item.get() == run; });
+				retired = std::move(*found);
+				runs.erase(found);
+			}
+			// Upstream permits post-action deletion. Captures die outside the mutex.
+		}
+
+		void Prepare(Run& run)
+		{
+			run.Work = enkiCreatePinnedTask(Scheduler, Execute, static_cast<std::uint32_t>(Runs.size() % 2) + 1);
+			if (!run.Work)
+			{
+				throw std::bad_alloc();
+			}
+			enkiSetArgsPinnedTask(run.Work, &run);
+			run.Cleanup = enkiCreateCompletionAction(Scheduler, Complete, Release);
+			if (!run.Cleanup)
+			{
+				throw std::bad_alloc();
+			}
+			enkiSetParamsCompletionAction(run.Cleanup, {&run, &run, enkiGetCompletableFromPinnedTask(run.Work)});
+		}
+
+		const std::thread::id CreatorThread = std::this_thread::get_id();
+		ProcessRunnerFactory Factory;
+		enkiTaskScheduler* Scheduler = nullptr;
+		std::mutex Mutex;
+		std::list<std::unique_ptr<Run>> Runs;
+		bool bBusy = false;
+		bool bClosing = false;
 	};
 
-	LauncherOperationService::LauncherOperationService(ProcessRunnerFactory processRunnerFactory) :
-	    m_implementation(std::make_unique<Implementation>(std::move(processRunnerFactory)))
+	LauncherOperationService::LauncherOperationService(ProcessRunnerFactory factory) :
+	    m_implementation(std::make_unique<Implementation>(std::move(factory)))
 	{
 	}
 
 	LauncherOperationService::~LauncherOperationService() = default;
 
-	void LauncherOperationService::Launch(LauncherOperationRequest request, std::string title, OutputCallback outputCallback, CompletionCallback completionCallback)
+	void LauncherOperationService::Launch(LauncherOperationRequest request, std::string title, OutputCallback output, CompletionCallback completion)
 	{
-		m_implementation->ReapSettledOperations();
-		const std::string runId = request.RunId.isEmpty() ? request.OperationId.toStdString() : request.RunId.toStdString();
-		if (runId.empty())
+		auto& owner = *m_implementation;
+		const auto id = request.RunId.isEmpty() ? request.OperationId.toStdString() : request.RunId.toStdString();
+		if (id.empty())
 		{
 			throw std::logic_error("Launcher operation run identity is empty.");
 		}
-		const bool bOperationAdmissionBusy = m_implementation->m_bOperationRunning.load(std::memory_order_acquire) || m_implementation->m_operationScopes.contains(runId);
-
-		if (bOperationAdmissionBusy)
+		auto run = std::make_unique<Implementation::Run>();
+		run->Owner = &owner;
+		run->Id = id;
+		run->Record = MakeOperationRecord(request.OperationId.toStdString(), std::move(title));
+		SetOperationFailure(run->Record, OperationProblemKind::Internal, "Launcher operation was interrupted before producing a result.", "Retry the operation when ready.");
+		run->Request = std::move(request);
+		run->Output = std::move(output);
+		run->Completion = std::move(completion);
+		std::unique_lock lock(owner.Mutex);
+		const bool bDuplicate = std::any_of(owner.Runs.begin(), owner.Runs.end(), [&id](const auto& active) { return active->Id == id; });
+		if (owner.bClosing || owner.bBusy || bDuplicate || owner.Runs.size() == Implementation::MaximumRuns)
 		{
-			OperationRecord record = MakeOperationRecord(request.OperationId.toStdString(), title);
-
-			SetOperationFailure(
-			    record,
-			    OperationProblemKind::Prerequisite,
-			    "Another Launcher operation is running.",
-			    "Wait for the running operation or select it in Activity and cancel it, then retry.");
-
-			MarkOperationFinished(record, OperationStatus::Skipped, std::nullopt);
-			completionCallback(std::move(record));
+			lock.unlock();
+			SetOperationFailure(run->Record, OperationProblemKind::Prerequisite, "Another Launcher operation is running.", "Wait for the running operation or cancel it, then retry.");
+			MarkOperationFinished(run->Record, OperationStatus::Skipped, std::nullopt);
+			run->Completion(std::move(run->Record));
 			return;
 		}
+		owner.Prepare(*run);
+		auto* work = run->Work;
+		owner.Runs.push_back(std::move(run));
+		owner.bBusy = true;
+		lock.unlock();
+		enkiAddPinnedTask(owner.Scheduler, work);
+	}
 
-		auto record = std::make_shared<OperationRecord>(MakeOperationRecord(request.OperationId.toStdString(), std::move(title)));
-		auto operationScope = std::make_unique<TaskScope>(TaskScopeDesc{TaskScopeKind::ToolInvocation, "Launcher operation " + runId}, &m_implementation->m_rootScope);
-		TaskScope& scope = *operationScope;
-		m_implementation->m_operationScopes.emplace(runId, std::move(operationScope));
-		m_implementation->m_bOperationRunning.store(true, std::memory_order_release);
-		try
+	bool LauncherOperationService::Cancel(std::string_view id) noexcept
+	{
+		auto& owner = *m_implementation;
+		std::stop_source stop{std::nostopstate};
 		{
-			TaskGraphBuilder graph;
-
-			const TaskNodeHandle execute = graph.Add(
-			    TaskDesc{"Launcher operation", TaskLane::BlockingIo},
-			    [request = std::move(request), processRunnerFactory = m_implementation->m_processRunnerFactory, outputCallback = std::move(outputCallback), record](TaskExecutionContext& context)
-			    {
-				    try
-				    {
-					    std::unique_ptr<IProcessRunner> processRunner = processRunnerFactory();
-					    if (!processRunner)
-					    {
-						    throw std::runtime_error("No process runner is available for this Launcher operation.");
-					    }
-
-					    *record = ExecuteLauncherOperation(request, *processRunner, context, outputCallback);
-					    return TaskResult::Success();
-				    }
-				    catch (const std::exception& exception)
-				    {
-					    SetOperationFailure(*record, OperationProblemKind::Internal, exception.what(), "Resolve the reported error, then retry.");
-				    }
-				    catch (...)
-				    {
-					    SetOperationFailure(*record, OperationProblemKind::Internal, "Unhandled Launcher operation exception.", "Restart Sparkle Launcher before retrying.");
-				    }
-				    MarkOperationFinished(*record, OperationStatus::Failed, std::nullopt);
-				    return TaskResult::Failure(record->Failure->Summary);
-			    });
-
-			// Cleanup runs even when cancellation prevents the operation body from starting.
-			graph.ContinueWith(
-			    execute,
-			    TaskDesc{"Complete Launcher operation", TaskLane::BlockingIo, TaskCompletionPolicy::Cleanup},
-			    [record, completionCallback, implementation = m_implementation.get()](TaskExecutionContext& context)
-			    {
-				    if (record->Status == OperationStatus::Pending)
-				    {
-					    const bool bCanceled = context.IsCancellationRequested();
-
-					    SetOperationFailure(
-					        *record,
-					        bCanceled ? OperationProblemKind::Cancellation : OperationProblemKind::Internal,
-					        bCanceled ? "Launcher operation was canceled before starting." : "Launcher operation did not produce a result.",
-					        "Retry the operation when ready.");
-
-					    MarkOperationFinished(*record, bCanceled ? OperationStatus::Canceled : OperationStatus::Failed, std::nullopt);
-				    }
-				    // Mutating work has settled; scope bookkeeping can finish after the next workflow starts.
-				    implementation->m_bOperationRunning.store(false, std::memory_order_release);
-				    completionCallback(std::move(*record));
-				    return TaskResult::Success();
-			    });
-
-			const TaskExecution execution = m_implementation->m_executor.Launch(scope, graph.Compile());
-			if (execution.GetStatus() == TaskExecutionStatus::Rejected)
+			std::lock_guard lock(owner.Mutex);
+			for (const auto& run : owner.Runs)
 			{
-				SetOperationFailure(*record, OperationProblemKind::Internal, std::string(execution.GetResult().GetDiagnostic()), "Restart Sparkle Launcher before retrying.");
-				MarkOperationFinished(*record, OperationStatus::Failed, std::nullopt);
-				scope.JoinFor(std::chrono::milliseconds::zero());
-				m_implementation->m_operationScopes.erase(runId);
-				m_implementation->m_bOperationRunning.store(false, std::memory_order_release);
-				completionCallback(std::move(*record));
+				if (run->Id == id)
+				{
+					stop = run->Stop;
+					break;
+				}
 			}
 		}
-		catch (...)
+		if (!stop.stop_possible())
 		{
-			const auto operation = m_implementation->m_operationScopes.find(runId);
-			if (operation != m_implementation->m_operationScopes.end())
-			{
-				m_implementation->m_bOperationRunning.store(false, std::memory_order_release);
-				operation->second->JoinFor(std::chrono::milliseconds::zero());
-				m_implementation->m_operationScopes.erase(operation);
-			}
-			throw;
+			return false;
 		}
+		stop.request_stop();
+		return true;
 	}
 
 	bool LauncherOperationService::ObserveGpuCrash(GpuCrashIncident incident, std::function<void(std::string)> completion)
 	{
-		const auto execution = m_implementation->m_executor.Launch(
-		    m_implementation->m_rootScope,
-		    TaskDesc{"Read GPU crash session", TaskLane::BlockingIo},
-		    [incident = std::move(incident), completion = std::move(completion)](TaskExecutionContext&)
-		    {
-			    std::string state = ReadGpuCrashCollectionState(incident);
-			    completion(std::move(state));
-			    return TaskResult::Success();
-		    });
-
-		return execution.IsValid() && execution.GetStatus() != TaskExecutionStatus::Rejected;
-	}
-
-	bool LauncherOperationService::Cancel(std::string_view runId) noexcept
-	{
-		const auto operation = m_implementation->m_operationScopes.find(runId);
-		if (operation == m_implementation->m_operationScopes.end() || operation->second->IsSettled())
+		auto& owner = *m_implementation;
+		auto run = std::make_unique<Implementation::Run>();
+		run->Owner = &owner;
+		run->Incident = std::move(incident);
+		run->Observation = std::move(completion);
+		std::unique_lock lock(owner.Mutex);
+		if (owner.bClosing || owner.Runs.size() == Implementation::MaximumRuns)
 		{
 			return false;
 		}
-
-		operation->second->Cancel();
+		owner.Prepare(*run);
+		auto* work = run->Work;
+		owner.Runs.push_back(std::move(run));
+		lock.unlock();
+		enkiAddPinnedTask(owner.Scheduler, work);
 		return true;
 	}
 }

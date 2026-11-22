@@ -8,6 +8,7 @@ include(FetchContent)
 include(${CMAKE_CURRENT_SOURCE_DIR}/CMake/Contracts.cmake)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/BackendOptions.cmake")
+include("${SPARKLE_REPOSITORY_ROOT}/ThirdParty/imgui/Backends.cmake")
 
 file(GLOB_RECURSE SPARKLE_RHI_PUBLIC_HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/*.h

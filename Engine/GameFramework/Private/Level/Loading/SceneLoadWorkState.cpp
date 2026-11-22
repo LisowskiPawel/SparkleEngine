@@ -5,7 +5,6 @@
 #include "Assets/Loading/SceneAssetFileReader.h"
 #include "Assets/Loading/SceneAssetPayloadDecoder.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Tasks/Public/TaskExecutionContext.h"
 
 #include <string>
 #include <optional>
@@ -53,42 +52,24 @@ namespace Assets
 		}
 	}
 
-	TaskResult SceneLoadWorkState::ReadAsset(std::size_t index, TaskExecutionContext& context)
+	void SceneLoadWorkState::ReadAsset(std::size_t index)
 	{
-		if (context.IsCancellationRequested())
-		{
-			return TaskResult::Cancelled("Scene load cancelled before asset read.");
-		}
 		SceneAssetLoadWork& work = Assets[index];
 		SceneAssetFileReader::Read(work.Id, work.ManifestPath, work.Manifest, work.Files);
 		Stage.store(LevelLoadOperationStage::Decoding, std::memory_order_release);
-		return TaskResult::Success();
 	}
 
-	TaskResult SceneLoadWorkState::DecodeAsset(std::size_t index, TaskExecutionContext& context)
+	void SceneLoadWorkState::DecodeAsset(std::size_t index)
 	{
-		if (context.IsCancellationRequested())
-		{
-			return TaskResult::Cancelled("Scene load cancelled before asset decode.");
-		}
 		SceneAssetLoadWork& work = Assets[index];
 		work.Payload = SceneAssetPayloadDecoder::Decode(work.Manifest, work.Files);
 		PrepareSceneAssetForCommit(work);
-		work.Files.Reset();
-		work.Manifest = {};
 		CompletedDecodes.fetch_add(1, std::memory_order_relaxed);
-		return TaskResult::Success();
 	}
 
-	TaskResult SceneLoadWorkState::FinalizePackage(TaskExecutionContext& context)
+	void SceneLoadWorkState::FinalizePackage()
 	{
-		if (context.IsCancellationRequested())
-		{
-			return TaskResult::Cancelled("Scene load cancelled before package finalization.");
-		}
 		Stage.store(LevelLoadOperationStage::Validating, std::memory_order_release);
 		FinalizeSceneLoadPackage(*this);
-		Stage.store(LevelLoadOperationStage::Ready, std::memory_order_release);
-		return TaskResult::Success();
 	}
 }

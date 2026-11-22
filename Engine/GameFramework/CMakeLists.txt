@@ -40,8 +40,8 @@ sparkle_target_precompile_headers(SparkleGameFramework
 target_link_libraries(SparkleGameFramework
     PUBLIC
         SparkleCore
-		SparkleTasks
     PRIVATE
+        enkiTS
         ozz_animation_offline
 )
 

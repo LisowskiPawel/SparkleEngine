@@ -1,6 +1,7 @@
 # Select source inputs; each recipe owns its pin, required files and native targets.
 set(_sparkle_source_dependencies
     cli11
+    enkits
     nlohmann_json
     nvidia-nvapi
     sdl3
@@ -77,7 +78,7 @@ set(ENV{GIT_LFS_SKIP_SMUDGE} 1)
 set(ENV{GIT_CONFIG_PARAMETERS} "'filter.lfs.process=' 'filter.lfs.smudge=' 'filter.lfs.clean=' 'filter.lfs.required=false' 'core.longpaths=true'")
 
 foreach(_dependency IN LISTS _sparkle_source_dependencies)
-    include("${CMAKE_CURRENT_LIST_DIR}/Targets/${_dependency}.cmake")
+    include("${SPARKLE_REPOSITORY_ROOT}/ThirdParty/${_dependency}/Dependency.cmake")
 endforeach()
 
 foreach(_variable IN ITEMS GIT_LFS_SKIP_SMUDGE GIT_CONFIG_PARAMETERS)

@@ -4,17 +4,13 @@
 
 #include "Scene/Preparation/Lighting/RenderLightPreparation.h"
 #include "Scene/Preparation/RenderScenePreparationRun.h"
-#include "Tasks/Public/TaskExecutionContext.h"
 
 #include <utility>
 
-TaskResult RenderScenePreparationMerger::Merge(TaskExecutionContext& context)
+void RenderScenePreparationMerger::Merge(RenderScenePreparationRun& run)
 {
-	RenderScenePreparationRun& run = *context.TryGet<RenderScenePreparationRun>();
-
 	CommitPreparedRenderLights(run.PreparedLights, run.PreparedScene);
 	run.PreparedScene.primitives = std::move(run.PreparedPrimitives);
-	return TaskResult::Success();
 }
 
 void RenderScenePreparationMerger::PublishSceneOutputs(RenderScenePreparationRun& run)
@@ -25,9 +21,8 @@ void RenderScenePreparationMerger::PublishSceneOutputs(RenderScenePreparationRun
 	run.PreparedScene.previousMorphWeights = std::move(run.Deformation.PreviousMorphWeights);
 }
 
-TaskResult RenderScenePreparationMerger::BuildRayTracingPlan(TaskExecutionContext& context)
+void RenderScenePreparationMerger::BuildRayTracingPlan(RenderScenePreparationRun& run)
 {
-	RenderScenePreparationRun& run = *context.TryGet<RenderScenePreparationRun>();
 	auto& rayTracingInstances = run.PreparedScene.rayTracingInstances;
 
 	rayTracingInstances.reserve(run.PreparedScene.primitives.size());
@@ -42,6 +37,4 @@ TaskResult RenderScenePreparationMerger::BuildRayTracingPlan(TaskExecutionContex
 
 		rayTracingInstances.push_back(RenderRayTracingInstance{.PrimitiveIndex = primitiveIndex, .GpuSceneSlot = draw.Source.GpuSceneSlot});
 	}
-
-	return TaskResult::Success();
 }

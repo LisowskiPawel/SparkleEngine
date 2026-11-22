@@ -5616,7 +5616,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ShaderMake git 4f1ffd56dac27fc3d620ad7efeee42b4dd71fa72 + compiler-contract
 Source: https://github.com/NVIDIA-RTX/ShaderMake/tree/4f1ffd56dac27fc3d620ad7efeee42b4dd71fa72
-Local correction: CMake/Dependencies/Patches/ShaderMakeCompilerContract.patch
+Local correction: ThirdParty/shadermake/Patches/ShaderMakeCompilerContract.patch
 
 Copyright (c) 2014-2023, NVIDIA CORPORATION. All rights reserved.
 
@@ -5704,7 +5704,7 @@ s_isinf.c: Changed to return -1 for -Inf by Ulrich Drepper <drepper@cygnus.com>.
 Public domain.
 
 D3DX12
-Source: ThirdParty/D3DX12/d3dx12.h
+Source: ThirdParty/D3DX12/Include/d3dx12.h
 Identity: SHA-256 bc48e96fe3995e8181a5ecd1cab5840b095dba58044523abacbacb52fd7ead2b (historical upstream revision unrecorded)
 License: MIT
 
@@ -5933,10 +5933,37 @@ express Statement of Purpose.
 
 Maintained parser bounds patches
 
-cgltf 1.15: CMake/Dependencies/Patches/CgltfAccessorBounds.patch
+cgltf 1.15: ThirdParty/cgltf/Patches/CgltfAccessorBounds.patch
 Backport of open upstream proposal 8211a9f12a729e7c2998bcc68f43c2ed2e5462d9 (PR 293); validation hunks only.
 
-Assimp 5.4.3: CMake/Dependencies/Patches/AssimpMaterialKeyBounds.patch
+Assimp 5.4.3: ThirdParty/assimp/Patches/AssimpMaterialKeyBounds.patch
 Local bounds check for oversized material keys (CVE-2025-70067).
 
 Both retain the upstream license texts above. Configured source-package versions bind the base identity and exact patch SHA-256. These corrections do not claim that every upstream advisory is resolved.
+
+enkiTS v1.12, Sparkle runtime fork
+Source: https://github.com/dougbinks/enkiTS/blob/0289cf6ffce86697e1f46cb4eeca1c946bffec71/License.txt (Git blob)
+Revision: 0289cf6ffce86697e1f46cb4eeca1c946bffec71
+Patch: ThirdParty/enkits/Patches/enkiTS-sparkle-runtime.patch
+Patch SHA-256: 8d066c5a4227d6943a7f3cd68176e5f5c2791e257875ef194e0e9ab43d46b201
+Changes: native preparation rollback, public C preparation error handling and a C binding for public completable observation.
+License: Zlib
+SHA-256: 445bc1c1f7c6a7c6c7b57e4132c02404816a64ed8bf678d3c8c049bebf57d61b
+
+Copyright (c) 2013 Doug Binks
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgement in the product documentation would be
+   appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.

@@ -13,13 +13,14 @@
 
 #include <utility>
 #include <format>
+#include <exception>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_levelSessionLogger, "GameFramework.LevelSession");
 
-LevelSession::LevelSession(GameWorld& world, TaskExecutor& taskExecutor, TaskScope& applicationScope) :
+LevelSession::LevelSession(GameWorld& world, enkiTaskScheduler* io, enkiTaskScheduler* cpu, std::stop_token parentStop) :
     m_gameWorld(world),
     m_levelRegistry(std::make_unique<LevelRegistry>(Filesystem::GetProjectPath())),
-    m_loadExecutor(std::make_unique<Assets::SceneLoadExecutor>(taskExecutor, applicationScope))
+    m_loadExecutor(std::make_unique<Assets::SceneLoadExecutor>(io, cpu, parentStop))
 {
 	InitializeStartupLevel();
 }
@@ -130,7 +131,7 @@ void LevelSession::StartLevelChange(LevelAsset& requestedLevel) noexcept
 	{
 		m_loadExecutor->Start(requestId, m_gameWorld.GetGeneration(), m_documentGeneration, requestedLevel.GetDescription());
 	}
-	catch (const Diagnostics::Error& error)
+	catch (const std::exception& error)
 	{
 		m_lastLoadDiagnostic = error.what();
 		m_loadingLevel = nullptr;
@@ -203,6 +204,14 @@ void LevelSession::CompleteLevelChange() noexcept
 	if (bStaleOwners || package.CatalogGeneration != m_loadExecutor->GetCatalogGeneration())
 	{
 		RejectLevelLoad(level, "Scene load package was rejected because an owner generation changed.");
+		return;
+	}
+	// A successful body can precede physical native settlement. A newer intent
+	// received during that interval owns the next publication.
+	if (m_pendingLevelChange)
+	{
+		m_lastLoadDiagnostic = "Scene load superseded by a newer level request.";
+		m_bLevelChangeInProgress = false;
 		return;
 	}
 	ActivateLoadedLevel(level, std::move(*completion->Package));

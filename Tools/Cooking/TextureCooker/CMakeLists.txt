@@ -89,7 +89,7 @@ target_link_libraries(TextureCooker
         DirectXTex
         ToolSupport
         SparkleCore
-        SparkleTasks
+        enkiTS
         TextureCookShared
         zlibstatic
         SparkleRHIContracts
