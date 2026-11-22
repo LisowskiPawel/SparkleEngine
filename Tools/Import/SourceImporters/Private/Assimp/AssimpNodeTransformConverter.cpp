@@ -8,11 +8,6 @@
 #include <limits>
 #include <vector>
 
-const aiNode* AssimpNodeTransformConverter::FindNode(const aiScene& scene, const aiString& name) noexcept
-{
-	return scene.mRootNode != nullptr ? FindNode(*scene.mRootNode, name) : nullptr;
-}
-
 std::uint32_t AssimpNodeTransformConverter::FindNodeIndex(const aiScene& scene, const aiNode& target) noexcept
 {
 	if (scene.mRootNode == nullptr)
@@ -94,23 +89,6 @@ DirectX::XMFLOAT4X4 AssimpNodeTransformConverter::BuildNodeAttachedOrientation(c
 	DirectX::XMFLOAT4X4 result;
 	DirectX::XMStoreFloat4x4(&result, worldTransform);
 	return result;
-}
-
-const aiNode* AssimpNodeTransformConverter::FindNode(const aiNode& node, const aiString& name) noexcept
-{
-	if (node.mName == name)
-	{
-		return &node;
-	}
-
-	for (unsigned int childIndex = 0; childIndex < node.mNumChildren; ++childIndex)
-	{
-		if (const aiNode* match = FindNode(*node.mChildren[childIndex], name))
-		{
-			return match;
-		}
-	}
-	return nullptr;
 }
 
 bool AssimpNodeTransformConverter::FindNodeIndex(const aiNode& node, const aiNode& target, std::uint32_t& nextIndex, std::uint32_t& outIndex) noexcept

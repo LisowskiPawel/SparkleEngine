@@ -22,7 +22,7 @@ void FbxCameraImporter::ImportCameras(const aiScene& scene, float sourceMetersPe
 	for (unsigned int cameraIndex = 0; cameraIndex < scene.mNumCameras; ++cameraIndex)
 	{
 		const aiCamera* sourceCamera = scene.mCameras[cameraIndex];
-		const aiNode* node = sourceCamera != nullptr ? AssimpNodeTransformConverter::FindNode(scene, sourceCamera->mName) : nullptr;
+		const aiNode* node = sourceCamera != nullptr ? scene.mRootNode->FindNode(sourceCamera->mName) : nullptr;
 		if (sourceCamera == nullptr || sourceCamera->mName.length == 0 || node == nullptr || sourceCamera->mOrthographicWidth != 0.0f)
 		{
 			throw Diagnostics::Error(std::format("FBX camera {} has incomplete source data or an unsupported projection.", cameraIndex));

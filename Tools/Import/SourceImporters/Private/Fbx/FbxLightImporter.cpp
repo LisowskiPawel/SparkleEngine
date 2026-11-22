@@ -111,7 +111,7 @@ void FbxLightImporter::ImportLights(const aiScene& scene, float sourceMetersPerU
 	for (unsigned int lightIndex = 0; lightIndex < scene.mNumLights; ++lightIndex)
 	{
 		const aiLight* sourceLight = scene.mLights[lightIndex];
-		const aiNode* node = sourceLight != nullptr ? AssimpNodeTransformConverter::FindNode(scene, sourceLight->mName) : nullptr;
+		const aiNode* node = sourceLight != nullptr ? scene.mRootNode->FindNode(sourceLight->mName) : nullptr;
 		const ImportedLightKind kind = sourceLight != nullptr ? FbxLightTranslation::ToImportedLightKind(sourceLight->mType) : ImportedLightKind::Unknown;
 		if (sourceLight == nullptr || sourceLight->mName.length == 0 || node == nullptr || kind == ImportedLightKind::Unknown)
 		{

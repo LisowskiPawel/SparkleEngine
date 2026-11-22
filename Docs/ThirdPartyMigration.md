@@ -10,7 +10,7 @@ These support the existing roadmap; they add no first-release prerequisites. Con
 
 | Action | Ownership to transfer or simplify | Completion condition |
 | --- | --- | --- |
-| **Close Qt scene-view cleanup** | Production uses Qt item views; the old grid, per-card widgets and widget-state maps are retired. [Remaining cleanup](Implementation/LauncherItemViews.md). | Resolve policy-rejected local probe/fixture cleanup, then remove the plan and its links. Broader display/product qualification stays with Roadmap. |
+| **Close Qt scene-view cleanup** | Production uses Qt item views; the old grid, per-card widgets and widget-state maps are retired. [Remaining cleanup](../build/validation/launcher-item-views/candidate-20261122/REPORT.md#required-cleanup-open). | Resolve policy-rejected local probe/fixture cleanup and verify absence. Broader display/product qualification stays with Roadmap. |
 | **Trial compiler preprocessing** | Let DXC/Slang evaluate includes and conditions; retire Sparkle's recursive [include expander](../Tools/Shaders/ShaderCompiler/Private/Compiler/ShaderSourcePreprocessor.cpp). Independent of the Qt trial. | Preserve virtual roots, generated parameters, dependency/debug source identity, typed ABI, accepted publication and reload on both shader targets. |
 | **Integrate selected rendering SDKs** | Follow the [rendering choices below](#rendering-sdks-worth-considering) in [Roadmap order](Roadmap.md#after-release). | Deliver a measured rendering benefit; retire any production algorithm being replaced. Record complete integration costs. |
 
@@ -19,6 +19,8 @@ New EnTT, FlatBuffers, importer-replacement and hashing dependencies remain cond
 ## Reuse already available code
 
 The [source/API audit](../build/validation/third-party-reuse-20261122/REPORT.md) led to the [delivered reuse changes](../build/validation/third-party-reuse-20261122/delivery/REPORT.md). ImGui owns string-input resizing; SPIRV-Reflect owns module destruction; existing Core, Qt and DirectXMath functions replace duplicated hashing, string/path-list handling, run removal and Hermite arithmetic. Raw authored-identity hashes still reject zero, and animation tangents retain their time scaling.
+
+The subsequent [integration owner review](../build/validation/integration-owner-refinement-20261122/REPORT.md) covers all 26 dependency recipes and selected production consumers. It removes capture-state mirrors, animation bridge APIs and Assimp's duplicated tree search, delegates native process utilities to Boost, and closes TinyEXR output ownership. Repeat this review when dependencies or their consumers change: trace producers, callers and lifetime, compare the pinned API's complete contract, retire the displaced mechanism and measure the connected result. A shorter API with weaker behavior is not a saving.
 
 Launcher Workspace dependencies and Clean scopes use stock Qt item views. Each dependency view has one native action button; current identity and readiness are resolved again before dispatch. Operations outlive their widgets. Clean keeps its explicit `clean-all` meaning, available-row selection and confirmation; its directory inventory comes from the maintenance owner and can include preserved files. Keep filesystem inspection outside item data access and painting.
 
@@ -38,7 +40,8 @@ These are frozen, differently scoped delivery results. **Do not add the rows int
 
 | Delivered owner | Recorded cost result | Evidence |
 | --- | --- | --- |
-| Existing API reuse | 246 fewer native physical / 200 fewer code lines across 23 complete changed owner/caller files; two CMake lines added. Includes named logging and Workspace/Clean presentation; upstream ImGui adapter compilation is separate. | [Delivery and limits](../build/validation/third-party-reuse-20261122/delivery/REPORT.md), [complete costs](../build/validation/third-party-reuse-20261122/delivery/costs.json) |
+| Integration owner refinement | 178 fewer native physical lines across SDL3, Boost, ozz, Assimp and TinyEXR; CMake physical count unchanged. Actual Cesium construction uses 57 fewer SDK allocations with identical sampled poses. | [Review and limits](../build/validation/integration-owner-refinement-20261122/REPORT.md), [complete costs](../build/validation/integration-owner-refinement-20261122/costs.json) |
+| Existing API reuse | 246 fewer native physical / 200 fewer code lines across 23 complete changed owner/caller files; two CMake lines added. Includes named logging and Workspace/Clean presentation; upstream ImGui adapter compilation is separate. Required local probe cleanup remains open after policy rejection. | [Delivery and limits](../build/validation/third-party-reuse-20261122/delivery/REPORT.md), [complete costs](../build/validation/third-party-reuse-20261122/delivery/costs.json) |
 | Qt Launcher scene views | 34 fewer native physical lines and one fewer code line across the complete connected UI; CMake physical count unchanged. This is a modest reduction. Required local cleanup remains open. | [Delivery and limits](../build/validation/launcher-item-views/candidate-20261122/REPORT.md), [complete costs](../build/validation/launcher-item-views/candidate-20261122/costs.json) |
 | enkiTS maintained fork | 2,118 fewer C++ physical lines; 2,005 fewer complete-infrastructure lines after maintained native additions. Added-code/API/state/cleanup targets missed. | [Cumulative review](../build/validation/task-runtime/srp-20261122/REPORT.md) |
 | ShaderMake | 374 fewer native physical / 194 fewer code lines. Maintained ShaderMake/Slang patches, build and payload costs are separate. | [Cost record](../build/validation/shadermake/launcher-workflow-20261122/costs.json) |
@@ -100,11 +103,15 @@ The authorized maintained enkiTS fork owns execution; Tasks is retired. Sparkle 
 
 ### Window and input
 
-One shared SDL3 runtime and stock ImGui SDL3 backend own window/event/pointer mechanics. Core/InputSystem retain SDL-free values, routing and cancellation; RHI retains native presentation and GPU retirement before window destruction. Queries/callbacks stay on the creating thread. Launcher remains SDL-free. Do not restore a Win32 decoder, camera warp loop or SDL rendering layer. [Recipe](../ThirdParty/sdl3/Dependency.cmake).
+One shared SDL3 runtime and stock ImGui SDL3 backend own window/event/pointer mechanics. InputSystem's optional capture layer owns routed capture; SDL owns cursor hiding, without Core input-state or camera-controller mirrors. Core/InputSystem retain SDL-free values, routing and cancellation; RHI retains native presentation and GPU retirement before window destruction. Queries/callbacks stay on the creating thread. Launcher remains SDL-free. Do not restore a Win32 decoder, camera warp loop or SDL rendering layer. [Recipe](../ThirdParty/sdl3/Dependency.cmake).
 
 ### Child processes
 
 Core's synchronous [request/result](../Engine/Core/Public/Process/ChildProcess.h) uses private Boost.Process/Asio mechanics and Boost.Scope guards. Keep command-line compatibility, creation-time job membership, process-tree termination/readiness policy and physical settlement before borrowed state dies. Stop callbacks only signal; missing/error/timeout completion remains a reported failure, with no hard finite OS cleanup guarantee. Keep one caller-driven context and no fallback backend. [Recipe](../ThirdParty/boost-process/Dependency.cmake).
+
+### Animation
+
+GameFramework's skeleton and animation loaders own typed admission, allocation-budget reservation and immutable ozz construction together. Payload appenders consume runtime resources directly; decoded records stay local to their loader. Preserve bind defaults, original skin order, four morph weights and external zero-duration behavior. Ozz owns sampling, hierarchy evaluation and the clip name; prepared pose work owns exclusive sampling contexts. Keep unsafe upstream archive loading outside this boundary. [Recipe](../ThirdParty/ozz_animation/Dependency.cmake).
 
 ### Logging
 

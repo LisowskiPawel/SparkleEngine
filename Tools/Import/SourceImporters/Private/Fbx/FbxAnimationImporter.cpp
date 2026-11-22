@@ -124,7 +124,7 @@ public:
 			throw Diagnostics::Error("FBX animation channel has no keys or uses unsupported boundary behavior.");
 		}
 
-		const aiNode* targetNode = AssimpNodeTransformConverter::FindNode(scene, sourceChannel.mNodeName);
+		const aiNode* targetNode = scene.mRootNode->FindNode(sourceChannel.mNodeName);
 		if (targetNode == nullptr)
 		{
 			throw Diagnostics::Error("FBX animation channel targets an unknown node.");

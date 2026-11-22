@@ -151,7 +151,7 @@ void AssimpSkinImporter::CollectSkeletonTopology(const aiScene& scene, const aiN
 	for (unsigned int boneIndex = 0; boneIndex < mesh.mNumBones; ++boneIndex)
 	{
 		const aiBone* bone = mesh.mBones[boneIndex];
-		const aiNode* boneNode = bone != nullptr ? AssimpNodeTransformConverter::FindNode(scene, bone->mName) : nullptr;
+		const aiNode* boneNode = bone != nullptr ? scene.mRootNode->FindNode(bone->mName) : nullptr;
 		if (bone == nullptr || bone->mName.length == 0 || boneNode == nullptr || !boneNames.emplace(bone->mName.C_Str()).second)
 		{
 			throw Diagnostics::Error(std::format("FBX mesh '{}' has an invalid or ambiguous bone {}.", FbxSkinTranslation::MeshName(mesh), boneIndex));

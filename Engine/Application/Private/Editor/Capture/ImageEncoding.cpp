@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <limits>
+#include <memory>
 #include <utility>
 
 #include <tinyexr.h>
@@ -263,19 +264,15 @@ bool ImageEncoding::EncodeExr(const LinearRgbImage& image, std::vector<std::byte
 	unsigned char* encoded = nullptr;
 	const char* exrError = nullptr;
 	const std::size_t encodedSize = SaveEXRImageToMemory(&exrImage, &header, &encoded, &exrError);
-	if (encodedSize == 0u || encoded == nullptr)
+	const std::unique_ptr<unsigned char, decltype(&std::free)> encodedScope(encoded, &std::free);
+	const std::unique_ptr<const char, decltype(&FreeEXRErrorMessage)> errorScope(exrError, &FreeEXRErrorMessage);
+	if (encodedSize == 0u || !encodedScope)
 	{
-		errorMessage = exrError != nullptr ? exrError : "TinyEXR could not encode the image.";
-		if (exrError != nullptr)
-		{
-			FreeEXRErrorMessage(exrError);
-		}
-		free(encoded);
+		errorMessage = errorScope ? errorScope.get() : "TinyEXR could not encode the image.";
 		return false;
 	}
 	encodedBytes.resize(encodedSize);
-	std::memcpy(encodedBytes.data(), encoded, encodedSize);
-	free(encoded);
+	std::memcpy(encodedBytes.data(), encodedScope.get(), encodedSize);
 	errorMessage.clear();
 	return true;
 }
