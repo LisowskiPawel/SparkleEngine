@@ -250,9 +250,7 @@ static void ReadVariableBinding(const nlohmann::json& variable, const nlohmann::
 	{
 		const nlohmann::json* uniform = FindLayoutBinding(variable, "uniform");
 		reflection.PushConstants.push_back(
-		    {.OffsetInBytes = ReadLayoutNumber(binding, "index"),
-		        .SizeInBytes = uniform ? ReadLayoutNumber(*uniform, "size") : 0u,
-		        .VisibilityMask = ToShaderStageMask(stage)});
+		    {.OffsetInBytes = ReadLayoutNumber(binding, "index"), .SizeInBytes = uniform ? ReadLayoutNumber(*uniform, "size") : 0u, .VisibilityMask = ToShaderStageMask(stage)});
 	}
 }
 

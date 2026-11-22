@@ -2,6 +2,7 @@
 #include "Cooking/Compilation/ShaderCompileJob.h"
 
 #include <tuple>
+#include <algorithm>
 
 bool ShaderCompileJob::HasSameCompilerInput(const ShaderCompileJob& other) const noexcept
 {
@@ -50,5 +51,9 @@ bool ShaderCompileJob::HasSameCompilerInput(const ShaderCompileJob& other) const
 		return false;
 	}
 
-	return Request.DescriptorBindingRemaps == other.Request.DescriptorBindingRemaps;
+	const bool bCapturedSourcesMatch = std::ranges::equal(
+	    Request.SourceFiles,
+	    other.Request.SourceFiles,
+	    [](const ShaderSourceFile& source, const ShaderSourceFile& candidate) { return source.VirtualPath == candidate.VirtualPath && source.Contents == candidate.Contents; });
+	return bCapturedSourcesMatch && Request.DescriptorBindingRemaps == other.Request.DescriptorBindingRemaps;
 }

@@ -246,7 +246,7 @@ Vendor groups identify provenance; hardware and API support are component-specif
 
 | Project | Native G / N | Role and decision |
 | --- | --- | --- |
-| **[SDL3](https://github.com/libsdl-org/SDL)** | **≤868** / unproved [W](#native-removal-estimates) | **Trial.** [Staged window/input plan and GLFW comparison](Implementation/WindowInput.md): study integration shape first, then delegate native mechanics and ImGui platform backend; preserve UI/input behavior and D3D12/Vulkan RHI/viewport routing. |
+| **[SDL3](https://github.com/libsdl-org/SDL)** | **≤868** / unproved [W](#native-removal-estimates) | **Trial.** [Window/input delivery](Implementation/WindowInput.md) binds the baseline before the real engine fit trial; delegate native mechanics and ImGui platform backend while preserving UI/input behavior and D3D12/Vulkan RHI/viewport routing. |
 | **[GLFW](https://github.com/glfw/glfw)** | **≤868** / unproved [W](#native-removal-estimates) | **Alternative.** Narrower window/input/surface helper; satisfy the complete SDL3 preservation boundary with less glue. |
 | [Qt item views](https://doc.qt.io/qt-6.11/qlistview.html) | ≤160 / unproved [Q](#native-removal-estimates) | **Conditional reuse, Launcher only.** Replace custom card reflow with model/view/delegate ownership; preserve sizing, DPI, focus/actions and readiness. Count the complete UI change. |
 | [D3D12MA virtual allocator](https://gpuopen-librariesandsdks.github.io/D3D12MemoryAllocator/html/virtual_allocator.html), AMD | ≤153 / unproved [V](#native-removal-estimates) | **Conditional reuse.** Descriptor range allocation only; retain native RHI/retirement and external synchronization. Token tracking must not erase the saving. |
@@ -507,7 +507,9 @@ These are retained decisions, not pending JSON conversions. Revisit a complete f
 
 ### Window and input
 
-The [window/input study](Implementation/WindowInput.md) maps SDL3 and GLFW to the current owners and proposes a native-handle-first SDL3 trial. Preserve title bars, borderless/windowed behavior, resize/minimize/restore, startup/close, 100/150/200% DPI, capture/focus loss, cursor restoration, shortcuts, deferred dispatch and viewport navigation. Use SDL native handles/surfaces and the [ImGui SDL3 platform backend](https://github.com/ocornut/imgui/blob/master/backends/imgui_impl_sdl3.cpp); retain Renderer UI, D3D12/Vulkan RHI and swapchain ownership without OpenGL.
+The [window/input delivery](Implementation/WindowInput.md) trials one shared SDL3 runtime with private Platform/Editor dependencies and borrowed HWND presentation. Compile the stock [ImGui SDL3 platform backend](https://github.com/ocornut/imgui/blob/6d910d5487d11ca567b61c7824b0c78c569d62f0/backends/imgui_impl_sdl3.cpp) in Editor; keep the ImGui core target free of platform backends and retain Renderer UI, D3D12/Vulkan RHI, loader and swapchain ownership without OpenGL. GLFW remains the alternative; runtime fit and net savings are unverified.
+
+Preserve title bars, borderless/windowed behavior, resize/minimize/restore, startup/close, 100/150/200% DPI, capture/focus loss, cursor restoration, shortcuts, deferred dispatch and viewport navigation. InputSystem owns routed relative-pointer state; stock ImGui owns normal UI drag/cursor mechanics. A bounded Platform-private native cancellation observer is admissible if required to cover synchronous interruption; it must not recreate window/input mechanics. [SDL hit testing](https://wiki.libsdl.org/SDL3/SDL_SetWindowHitTest) and [relative mode](https://wiki.libsdl.org/SDL3/SDL_SetWindowRelativeMouseMode) support the design, not a claim of Sparkle qualification.
 
 ### Reuse before adding a library
 

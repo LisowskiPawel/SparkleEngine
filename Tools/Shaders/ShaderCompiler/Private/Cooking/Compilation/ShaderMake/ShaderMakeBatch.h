@@ -10,8 +10,8 @@
 struct ShaderCookSettings;
 
 std::vector<ShaderCompileResult> CompileShaderMakeProducers(
-	const ShaderCookSettings& settings,
-	std::span<const ShaderCompileJob> jobs,
-	std::span<const std::size_t> producerIndices,
-	std::size_t totalWork,
-	const ToolWorkProgressCallback& progress);
+    const ShaderCookSettings& settings,
+    std::span<const ShaderCompileJob> jobs,
+    std::span<const std::size_t> producerIndices,
+    std::size_t totalWork,
+    const ToolWorkProgressCallback& progress);

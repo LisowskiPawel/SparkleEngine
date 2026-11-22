@@ -96,23 +96,28 @@ static void ValidateTarget(IDxcUtils& utils, const ShaderCompileRequest& request
 	std::memcpy(&version, program, sizeof(version));
 	const auto targetMinor = static_cast<std::uint32_t>(std::string_view(GetShaderTargetName(request.Target)).back() - '0');
 	const std::uint32_t kind = request.UnitKind == ShaderCompileUnitKind::Library ? 6u
-		: request.Stage == ShaderStage::Vertex ? 1u : request.Stage == ShaderStage::Pixel ? 0u
-		: request.Stage == ShaderStage::Geometry ? 2u : request.Stage == ShaderStage::Hull ? 3u
-		: request.Stage == ShaderStage::Domain ? 4u : 5u;
+	    : request.Stage == ShaderStage::Vertex                                    ? 1u
+	    : request.Stage == ShaderStage::Pixel                                     ? 0u
+	    : request.Stage == ShaderStage::Geometry                                  ? 2u
+	    : request.Stage == ShaderStage::Hull                                      ? 3u
+	    : request.Stage == ShaderStage::Domain                                    ? 4u
+	                                                                              : 5u;
 	if (version != ((kind << 16u) | 0x60u | targetMinor))
 	{
 		throw Diagnostics::Error("ShaderMake emitted the wrong DXIL stage or shader model.");
 	}
 }
 
-ShaderCompileResult ReadShaderMakeOutput(const std::filesystem::path& root, const ShaderMakeProducer& producer, std::shared_ptr<const ShaderCompileInvocation> invocation, std::string_view diagnostics)
+ShaderCompileResult ReadShaderMakeOutput(const std::filesystem::path& root, const ShaderMakeProducer& producer, std::shared_ptr<const ShaderCompileInvocation> invocation)
 {
-	const ShaderCompileJob& job = *producer.Job;
+	const ShaderCompileJob& job = producer.Job;
 	const ShaderCompileRequest& request = job.Request;
 	const bool bSlang = job.BackendName == "slang";
 	const bool bDxil = IsDxilTarget(request.Target);
 	const bool bContainer = bSlang && bDxil && request.bCaptureDebugArtifacts;
 	const std::filesystem::path outputDirectory = root / "out" / producer.Name;
+	RejectReparsePoint(root);
+	RejectReparsePoint(root / "out");
 	ValidateShaderMakeTree(outputDirectory);
 	const std::filesystem::path codePath = root / producer.Code;
 	std::vector<std::filesystem::path> codeFiles;
@@ -162,9 +167,8 @@ ShaderCompileResult ReadShaderMakeOutput(const std::filesystem::path& root, cons
 		}
 		else
 		{
-			reflection = request.UnitKind == ShaderCompileUnitKind::Library
-				? ExtractDxilLibraryReflection(*utils.Get(), metadata, request.EntryPoint)
-				: ExtractDxilReflection(*utils.Get(), metadata, request.Stage);
+			reflection = request.UnitKind == ShaderCompileUnitKind::Library ? ExtractDxilLibraryReflection(*utils.Get(), metadata, request.EntryPoint)
+			                                                                : ExtractDxilReflection(*utils.Get(), metadata, request.Stage);
 		}
 	}
 	ShaderDebugArtifactSet debug;
@@ -172,7 +176,6 @@ ShaderCompileResult ReadShaderMakeOutput(const std::filesystem::path& root, cons
 	{
 		debug.Invocation = std::move(invocation);
 		debug.CompilerInputPath = producer.Input;
-		debug.CompilerOutput = diagnostics;
 		debug.Disassembly = bDxil ? DisassembleDxil(bytecode) : DisassembleSpirV(bytecode);
 		if (bSlang)
 		{
@@ -180,6 +183,8 @@ ShaderCompileResult ReadShaderMakeOutput(const std::filesystem::path& root, cons
 		}
 		else
 		{
+			RejectReparsePoint(root / "preprocessed");
+			ValidateShaderMakeTree((root / producer.Preprocessed).parent_path());
 			const auto text = ReadCompilerBytes(root / producer.Preprocessed);
 			debug.PreprocessedSource.assign(text.begin(), text.end());
 		}
@@ -206,19 +211,19 @@ ShaderCompileResult ReadShaderMakeOutput(const std::filesystem::path& root, cons
 	}
 	const std::uint64_t bytecodeHash = Hash::Fnv1a64(bytecode.data(), bytecode.size());
 	CookedStageBuild output{
-		.stage = request.Stage,
-		.format = bDxil ? ShaderBinaryFormat::Dxil : ShaderBinaryFormat::SpirV,
-		.sourcePath = request.VirtualSourcePath,
-		.entryPoint = request.EntryPoint,
-		.backendName = job.BackendName,
-		.codegenTarget = GetShaderTargetName(request.Target),
-		.backendVersion = job.BackendVersion,
-		.sourceHash = job.SourceContentHash,
-		.includeClosureHash = job.DependencyClosureHash,
-		.requestHash = job.RequestHash,
-		.compileInputHash = job.InputHash,
-		.bytecode = std::move(bytecode),
-		.bytecodeHash = bytecodeHash,
-		.reflection = std::move(reflection)};
+	    .stage = request.Stage,
+	    .format = bDxil ? ShaderBinaryFormat::Dxil : ShaderBinaryFormat::SpirV,
+	    .sourcePath = request.VirtualSourcePath,
+	    .entryPoint = request.EntryPoint,
+	    .backendName = job.BackendName,
+	    .codegenTarget = GetShaderTargetName(request.Target),
+	    .backendVersion = job.BackendVersion,
+	    .sourceHash = job.SourceContentHash,
+	    .includeClosureHash = job.DependencyClosureHash,
+	    .requestHash = job.RequestHash,
+	    .compileInputHash = job.InputHash,
+	    .bytecode = std::move(bytecode),
+	    .bytecodeHash = bytecodeHash,
+	    .reflection = std::move(reflection)};
 	return {.ShaderType = request.ShaderType, .Target = request.Target, .InputHash = job.InputHash, .Output = std::move(output), .DebugArtifacts = std::move(debug)};
 }

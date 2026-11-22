@@ -16,8 +16,14 @@ struct ShaderBackendEntry final
 };
 
 static const std::array<ShaderBackendEntry, 2> kShaderBackends = {{
-    {"dxc", ".hlsl", {.bSupportsDxil = true, .bSupportsSpirV = true, .bSupportsDxilRayTracingLibrary = true,
-        .bSupportsSpirVRayTracingLibrary = true, .bSupportsDxilInlineRayQuery = true, .bSupportsSpirVInlineRayQuery = true}},
+    {"dxc",
+        ".hlsl",
+        {.bSupportsDxil = true,
+            .bSupportsSpirV = true,
+            .bSupportsDxilRayTracingLibrary = true,
+            .bSupportsSpirVRayTracingLibrary = true,
+            .bSupportsDxilInlineRayQuery = true,
+            .bSupportsSpirVInlineRayQuery = true}},
     {"slang", ".slang", {.bSupportsDxil = true, .bSupportsSpirV = true, .bSupportsSpirVRayTracingLibrary = true, .bSupportsSpirVInlineRayQuery = true}},
 }};
 

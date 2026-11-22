@@ -23,7 +23,7 @@ static const char* GetVulkanVersion(ShaderTarget target)
 
 static std::string BuildDxcOptions(const ShaderMakeProducer& producer, ShaderMakeOperation operation)
 {
-	const ShaderCompileRequest& request = producer.Job->Request;
+	const ShaderCompileRequest& request = producer.Job.Request;
 	std::string options = "-HV 2021 -Ges -all_resources_bound";
 	if (request.bTreatWarningsAsErrors)
 	{
@@ -91,7 +91,7 @@ static std::string BuildDxcOptions(const ShaderMakeProducer& producer, ShaderMak
 
 static std::string BuildSlangOptions(const ShaderMakeProducer& producer)
 {
-	const ShaderCompileRequest& request = producer.Job->Request;
+	const ShaderCompileRequest& request = producer.Job.Request;
 	std::string options = "-module-name SparkleShader -stage ";
 	options += GetSlangShaderStageName(request.Stage);
 	if (request.UnitKind == ShaderCompileUnitKind::Library)
@@ -137,13 +137,20 @@ std::string BuildShaderMakeConfiguration(std::span<const ShaderMakeProducer> pro
 	std::string configuration;
 	for (const ShaderMakeProducer& producer : producers)
 	{
-		const ShaderCompileJob& job = *producer.Job;
+		const ShaderCompileJob& job = producer.Job;
 		const ShaderCompileRequest& request = job.Request;
 		const std::string profile = request.UnitKind == ShaderCompileUnitKind::Library ? "lib" : GetShaderStagePrefix(request.Stage);
 		const std::string options = job.BackendName == "dxc" ? BuildDxcOptions(producer, operation) : BuildSlangOptions(producer);
 		const std::string shaderModel = std::string(GetShaderModelProfileName(request.Target)).substr(3);
-		configuration += std::format("{} -T {} -E {} -m {} -O{} -o {} -X \"{}\"\n",
-			producer.Input.generic_string(), profile, request.EntryPoint, shaderModel, request.bEnableOptimizations ? 3 : 0, producer.Name, options);
+		configuration += std::format(
+		    "{} -T {} -E {} -m {} -O{} -o {} -X \"{}\"\n",
+		    producer.Input.generic_string(),
+		    profile,
+		    request.EntryPoint,
+		    shaderModel,
+		    request.bEnableOptimizations ? 3 : 0,
+		    producer.Name,
+		    options);
 	}
 	return configuration;
 }
@@ -152,10 +159,30 @@ std::vector<std::string> BuildShaderMakeArguments(const ShaderCompileJob& job, s
 {
 	const ShaderCompileRequest& request = job.Request;
 	std::vector<std::string> arguments{
-		"-p", IsSpirVTarget(request.Target) ? "SPIRV" : "DXIL", "-c", std::move(configurationPath), "-o", operation == ShaderMakeOperation::Preprocess ? "preprocessed" : "out",
-		"--sourceDir", ".", "--ignoreConfigDir", "--compiler", std::move(compilerPath),
-		"--binary", "--force", "--noRegShifts", "--no16bitTypes", "--noDefaultSpirvExtensions", "--noImplicitDefines", "--relativePaths",
-		"--retryCount", "0", "--jobs", std::to_string(workers), "--vulkanVersion", GetVulkanVersion(request.Target)};
+	    "-p",
+	    IsSpirVTarget(request.Target) ? "SPIRV" : "DXIL",
+	    "-c",
+	    std::move(configurationPath),
+	    "-o",
+	    operation == ShaderMakeOperation::Preprocess ? "preprocessed" : "out",
+	    "--sourceDir",
+	    ".",
+	    "--ignoreConfigDir",
+	    "--compiler",
+	    std::move(compilerPath),
+	    "--binary",
+	    "--force",
+	    "--noRegShifts",
+	    "--no16bitTypes",
+	    "--noDefaultSpirvExtensions",
+	    "--noImplicitDefines",
+	    "--relativePaths",
+	    "--retryCount",
+	    "0",
+	    "--jobs",
+	    std::to_string(workers),
+	    "--vulkanVersion",
+	    GetVulkanVersion(request.Target)};
 	if (job.BackendName == "slang")
 	{
 		arguments.insert(arguments.end(), {"--slangProfile", GetSlangTargetProfileName(request.Target), "--matrixRowMajor"});

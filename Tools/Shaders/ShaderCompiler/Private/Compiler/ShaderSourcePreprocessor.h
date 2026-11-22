@@ -11,4 +11,8 @@ enum class ShaderSourceLinePaths : std::uint8_t
 	RootRelative,
 };
 
-std::string PreprocessShaderSource(std::string_view sourcePath, const ShaderCompileRequest& request, std::vector<ShaderSourceFile>* sourceFiles = nullptr, ShaderSourceLinePaths linePaths = ShaderSourceLinePaths::Virtual);
+std::string PreprocessShaderSource(
+    std::string_view sourcePath,
+    const ShaderCompileRequest& request,
+    std::vector<ShaderSourceFile>* sourceFiles = nullptr,
+    ShaderSourceLinePaths linePaths = ShaderSourceLinePaths::Virtual);

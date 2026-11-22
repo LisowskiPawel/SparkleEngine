@@ -2,12 +2,7 @@
 
 [Delivery rules](../ThirdPartyMigration.md#code-delivery-and-qualification) | [Ownership](../Engineering.md#module-boundaries) | [Dependencies](../ThirdPartyMigration.md#ownership-and-dependency-workflow)
 
-**Next: stage 0; all stages are unstarted.** Trial SDL3 first, GLFW as the alternative. Recorded research inputs are SDL 3.4.20 at `f00dc919ca35b9756316e86c4777392de442f9b2` and GLFW 3.5.1 at `d9d6f0f1f967807ffade6598ea9a631ebaf37a56`; select/admit the actual pin through the existing dependency owner. Runtime fit and net savings remain unverified.
-
-## Stage 0: integration design deep dive
-
-- [ ] Read the nine Docs guides and complete host/window/input/ImGui/RHI producer, consumer, state, thread and teardown paths. Choose the smallest supported boundary, compare alternatives and name actual retirements, ABI/caller/target changes and decisive fit experiments.
-- [ ] Decide one runtime, ImGui backend placement, HWND/native interop, capture/cursor authority, relative-motion precision/units, chrome/hit regions, DPI/pixels and owned deferred events. Explain rejected alternatives/unsupported requirements; this research stage adds no prototype/production code.
+**Next: stage 1.** Use the [design inputs and decisive experiments](../../build/validation/window-input/stage-0-20261122/REPORT.md), with source/upstream hashes beside the report. Trial SDL3 first, GLFW as the alternative. Research inputs are SDL 3.4.20 at `f00dc919ca35b9756316e86c4777392de442f9b2`, GLFW 3.5.1 at `d9d6f0f1f967807ffade6598ea9a631ebaf37a56` and the existing ImGui pin `6d910d5487d11ca567b61c7824b0c78c569d62f0`; select/admit the actual pin through the existing dependency owner. Runtime fit and net savings remain unverified.
 
 ## Stage 1: bind the baseline and checks
 
@@ -41,7 +36,9 @@ Keep D3D12/Vulkan, Renderer UI and RHI swapchains/surfaces; no OpenGL, SDL GPU/2
 
 One main-thread pump owns native acquisition; Core keeps values/frame state and existing routed policy. Required state updates precede callbacks even when UI consumes an event. Borrow events synchronously, own deferred text/values and preserve subscriber and queued-before-immediate order. Cancellation clears state/queues first, sends releases once under reentrancy and distinguishes pointer-only from full keyboard cancellation. Keep camera intent in its existing collector; retain fractional/continuous edge-crossing motion without warps or mode-entry jumps. Stock ImGui/camera must share coherent capture/cursor authority; command keys stay distinct from text.
 
-Decide SDL shared/static ownership and stock `imgui_impl_sdl3.cpp` placement from the DLL graph; avoid duplicate SDL globals or platform dependencies spreading through ImGui into RHI. Use pinned cache/recipe/target/staging/notices/source-package owners and the current ImGui revision. Disable unused SDL services, `SDL_OPENGL` and `SDL_OPENGLES`; verify ImGui gamepad/backend calls still link. Native HWND Vulkan need not enable SDL helpers; Sparkle D3D12/Vulkan remain independent. Keep one runtime/private dependencies; no upstream fork, compatibility backend, mirrored native state or service facade.
+Use one shared SDL3 runtime privately linked by Platform and Editor; compile stock `imgui_impl_sdl3.cpp` in Editor and leave the `imgui` core target free of platform backends. Normal Editor drag/cursor mechanics stay with stock ImGui; InputSystem owns successful relative mode and Editor derives its cursor override from that state. Preserve fractional Core positions/deltas, system-scaled relative response and the existing camera sensitivity; freeze tolerances before trial. Editor publishes title hit regions; drawable pixel extent and UI content scale remain distinct. A small Platform-private native subclass may observe synchronous cancellation only; queued SDL message hooks alone do not establish capture-loss parity. Prove its reentrancy/detachment without rebuilding a native backend.
+
+Use pinned cache/recipe/target/staging/notices/source-package owners and the current ImGui revision. Disable unused SDL services, `SDL_OPENGL` and `SDL_OPENGLES`; verify ImGui gamepad/backend calls still link. Native HWND Vulkan need not enable SDL helpers; Sparkle D3D12/Vulkan remain independent. Keep one runtime/private dependencies; no upstream fork, compatibility backend, mirrored native state or service facade.
 
 Fixed retirement scope: **752 code / at most 868 physical lines in 13 files**. Net removal is `868 - retained old scoped lines - all new/relocated integration and caller lines`; name additional caller scopes separately. Report CMake/scripts/upstream/build/runtime/memory/package costs separately. Preserve supported behavior and existing product blockers; do not manipulate Core enums or safeguards to manufacture savings.
 

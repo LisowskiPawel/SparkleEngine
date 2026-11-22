@@ -153,15 +153,20 @@ void ShaderDebugArtifactWriter::WriteCompilerOutputs(const std::filesystem::path
 	{
 		WriteText(bundleDirectory / "disassembly.txt", debugArtifacts.Disassembly);
 	}
-	WriteText(bundleDirectory / "compiler-stderr.txt", debugArtifacts.CompilerOutput);
 	const ShaderCompileInvocation& invocation = *debugArtifacts.Invocation;
 	WriteText(bundleDirectory / "compile-args.json", nlohmann::json(invocation.Arguments).dump());
 	WriteText(std::filesystem::path("sources") / invocation.ConfigurationPath, invocation.Configuration);
+	std::filesystem::path compilerOutputPath = invocation.ConfigurationPath;
+	compilerOutputPath.replace_extension(".log");
+	WriteText(std::filesystem::path("sources") / compilerOutputPath, invocation.CompilerOutput);
 	if (debugArtifacts.PreprocessingInvocation)
 	{
 		const ShaderCompileInvocation& preprocessing = *debugArtifacts.PreprocessingInvocation;
 		WriteText(bundleDirectory / "preprocess-args.json", nlohmann::json(preprocessing.Arguments).dump());
 		WriteText(std::filesystem::path("sources") / preprocessing.ConfigurationPath, preprocessing.Configuration);
+		std::filesystem::path preprocessingOutputPath = preprocessing.ConfigurationPath;
+		preprocessingOutputPath.replace_extension(".log");
+		WriteText(std::filesystem::path("sources") / preprocessingOutputPath, preprocessing.CompilerOutput);
 	}
 
 	if (!debugArtifacts.Symbols.empty())
@@ -269,6 +274,8 @@ std::string ShaderDebugArtifactWriter::BuildCompileRequestJson(
     const ShaderDebugArtifactSet& debugArtifacts)
 {
 	const std::string symbolName = std::filesystem::path(debugArtifacts.SymbolName).filename().generic_string();
+	std::filesystem::path compilerOutputPath = debugArtifacts.Invocation->ConfigurationPath;
+	compilerOutputPath.replace_extension(".log");
 
 	nlohmann::json document{
 	    {"shaderTypeId", Formatting::FormatHexUInt64(request.ShaderType)},
@@ -288,7 +295,10 @@ std::string ShaderDebugArtifactWriter::BuildCompileRequestJson(
 	    {"compilerInputSha256", compilerInputSha256},
 	    {"compilerInputPath", (std::filesystem::path("sources") / debugArtifacts.CompilerInputPath).generic_string()},
 	    {"configurationPath", (std::filesystem::path("sources") / debugArtifacts.Invocation->ConfigurationPath).generic_string()},
+	    {"compilerOutputPath", (std::filesystem::path("sources") / compilerOutputPath).generic_string()},
+	    {"executionWorkingDirectory", debugArtifacts.Invocation->WorkingDirectory.generic_string()},
 	    {"replayWorkingDirectory", "sources"},
+	    {"replayCompilerOverrideRequired", true},
 	    {"optimized", request.bEnableOptimizations},
 	    {"symbolName", symbolName},
 	    {"compilerLookupKeyKind", nullptr},

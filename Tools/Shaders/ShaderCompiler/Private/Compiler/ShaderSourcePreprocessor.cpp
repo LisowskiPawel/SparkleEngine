@@ -188,15 +188,30 @@ static std::string BuildShaderDefines(const ShaderCompileRequest& request)
 	{
 		const std::size_t separator = define.find('=');
 		const std::string_view name(define.data(), separator == std::string::npos ? define.size() : separator);
+		const std::size_t parameters = name.find('(');
+		const std::string_view identifier = name.substr(0, parameters);
+		const std::string_view suffix = parameters == std::string_view::npos ? "" : name.substr(parameters);
+		const bool bParameterList = !suffix.empty() && suffix.back() == ')';
+		const bool bParameterTokens = std::ranges::all_of(
+		    suffix,
+		    [](unsigned char character)
+		    {
+			    const bool bLetter = (character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z');
+			    const bool bDigit = character >= '0' && character <= '9';
+			    return bLetter || bDigit || std::string_view("_(),. \t").find(character) != std::string_view::npos;
+		    });
+		const bool bValidParameters = bParameterList && bParameterTokens;
+		const bool bValidSuffix = suffix.empty() || bValidParameters;
+		const bool bMacroName = IsShaderIdentifier(identifier) && bValidSuffix;
 		const std::string_view value = separator == std::string::npos ? "1" : std::string_view(define).substr(separator + 1u);
 		const bool bHasControl = std::ranges::any_of(value, [](char character) { return character == '\0' || character == '\r' || character == '\n'; });
 		const std::size_t lastToken = value.find_last_not_of(" \t");
 		const bool bContinuesLine = lastToken != std::string_view::npos && value[lastToken] == '\\';
-		if (!IsShaderIdentifier(name) || bHasControl || bContinuesLine)
+		if (!bMacroName || bHasControl || bContinuesLine)
 		{
 			throw Diagnostics::Error("Shader define requires an identifier and a single-line replacement value.");
 		}
-		prefix += std::format("#undef {}\n#define {} {}\n", name, name, value);
+		prefix += std::format("#ifdef {}\n#undef {}\n#endif\n#define {} {}\n", identifier, identifier, name, value);
 	}
 	return prefix;
 }

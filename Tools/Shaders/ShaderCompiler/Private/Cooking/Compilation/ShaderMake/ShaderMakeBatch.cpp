@@ -63,6 +63,11 @@ ShaderMakeStaging::~ShaderMakeStaging()
 	}
 	try
 	{
+		const DWORD rootAttributes = GetFileAttributesW(Directory.c_str());
+		if (rootAttributes == INVALID_FILE_ATTRIBUTES || (rootAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0)
+		{
+			return;
+		}
 		for (const auto& entry : std::filesystem::recursive_directory_iterator(Directory))
 		{
 			const DWORD attributes = GetFileAttributesW(entry.path().c_str());
@@ -100,14 +105,14 @@ static ShaderMakeProducer MakeProducer(const ShaderCompileJob& job, std::size_t 
 	const std::string extension = bContainer ? "" : bDxil ? ".dxil" : ".spirv";
 	const std::filesystem::path code = output / (name + suffix + extension);
 	return {
-		.Job = &job,
-		.ResultIndex = index,
-		.Name = name,
-		.Input = std::filesystem::path("_generated") / (name + ".hlsl"),
-		.Code = bContainer ? code / "children/0/0.dxil" : code,
-		.Reflection = output / (bSlang ? "reflection.json" : "reflection.bin"),
-		.Preprocessed = std::filesystem::path("preprocessed") / name / (name + suffix + ".hlsl"),
-		.Symbols = bContainer ? code / "children/0/associated" : output};
+	    .Job = job,
+	    .ResultIndex = index,
+	    .Name = name,
+	    .Input = std::filesystem::path("_generated") / (name + ".hlsl"),
+	    .Code = bContainer ? code / "children/0/0.dxil" : code,
+	    .Reflection = output / (bSlang ? "reflection.json" : "reflection.bin"),
+	    .Preprocessed = std::filesystem::path("preprocessed") / name / (name + suffix + ".hlsl"),
+	    .Symbols = bContainer ? code / "children/0/associated" : output};
 }
 
 static std::vector<ShaderMakeGroup> GroupProducers(std::span<const ShaderCompileJob> jobs, std::span<const std::size_t> indices)
@@ -117,10 +122,7 @@ static std::vector<ShaderMakeGroup> GroupProducers(std::span<const ShaderCompile
 	{
 		const ShaderCompileJob& job = jobs[indices[index]];
 		const auto key = std::tie(job.BackendName, job.Request.Target, job.Request.bCaptureDebugArtifacts);
-		const auto group = std::ranges::find_if(groups, [&key](const ShaderMakeGroup& candidate)
-		{
-			return std::tie(candidate.Backend, candidate.Target, candidate.bCaptureDebugArtifacts) == key;
-		});
+		const auto group = std::ranges::find_if(groups, [&key](const ShaderMakeGroup& candidate) { return std::tie(candidate.Backend, candidate.Target, candidate.bCaptureDebugArtifacts) == key; });
 		if (group == groups.end())
 		{
 			groups.push_back({.Backend = job.BackendName, .Target = job.Request.Target, .bCaptureDebugArtifacts = job.Request.bCaptureDebugArtifacts});
@@ -149,10 +151,10 @@ static void WriteCapturedSources(const std::filesystem::path& root, const Shader
 	std::map<std::string, std::string> casing;
 	for (const ShaderMakeProducer& producer : group.Producers)
 	{
-		WriteCompilerText(root / producer.Input, producer.Job->Request.SourceCode);
-		for (const ShaderSourceFile& file : producer.Job->Request.SourceFiles)
+		WriteCompilerText(root / producer.Input, producer.Job.Request.SourceCode);
+		for (const ShaderSourceFile& file : producer.Job.Request.SourceFiles)
 		{
-			const std::string canonical = producer.Job->Request.SourceMounts.get().CanonicalizeVirtualPath(file.VirtualPath);
+			const std::string canonical = producer.Job.Request.SourceMounts.get().CanonicalizeVirtualPath(file.VirtualPath);
 			const std::string name = canonical.substr(1);
 			const auto [caseEntry, bCaseInserted] = casing.emplace(Strings::ToLowerCopy(name), name);
 			if (!bCaseInserted && caseEntry->second != name)
@@ -181,14 +183,13 @@ static void VerifyToolchain(std::uint64_t expected)
 }
 
 static std::shared_ptr<const ShaderCompileInvocation> RunShaderMake(
-	ShaderMakeStaging& staging,
-	const ShaderMakeGroup& group,
-	std::size_t groupIndex,
-	std::uint32_t workers,
-	ShaderMakeOperation operation,
-	std::string& diagnostics)
+    ShaderMakeStaging& staging,
+    const ShaderMakeGroup& group,
+    std::size_t groupIndex,
+    std::uint32_t workers,
+    ShaderMakeOperation operation)
 {
-	const ShaderCompileJob& job = *group.Producers.front().Job;
+	const ShaderCompileJob& job = group.Producers.front().Job;
 	VerifyToolchain(job.BackendVersion);
 	auto invocation = std::make_shared<ShaderCompileInvocation>();
 	invocation->ConfigurationPath = std::filesystem::path("_requests") / std::format("group-{}{}.cfg", groupIndex, operation == ShaderMakeOperation::Preprocess ? "-preprocess" : "");
@@ -198,11 +199,14 @@ static std::shared_ptr<const ShaderCompileInvocation> RunShaderMake(
 	process.ExecutablePath = Filesystem::GetExecutableDirectory() / "ShaderMake.exe";
 	const std::filesystem::path compiler = Filesystem::GetExecutableDirectory() / (group.Backend == "dxc" ? "dxc.exe" : "slangc.exe");
 	const std::string compilerPath = compiler.lexically_relative(staging.Directory).generic_string();
-	const bool bShellSafe = !compilerPath.empty() && std::ranges::all_of(compilerPath, [](unsigned char character)
-	{
-		return (character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z')
-			|| (character >= '0' && character <= '9') || character == '/' || character == '.' || character == '_' || character == '-';
-	});
+	const bool bShellSafe = !compilerPath.empty()
+	    && std::ranges::all_of(
+	        compilerPath,
+	        [](unsigned char character)
+	        {
+		        return (character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || (character >= '0' && character <= '9') || character == '/' || character == '.'
+		            || character == '_' || character == '-';
+	        });
 	if (!bShellSafe)
 	{
 		throw Diagnostics::Error("ShaderMake requires a same-volume compiler path with ASCII artifact components.");
@@ -212,24 +216,25 @@ static std::shared_ptr<const ShaderCompileInvocation> RunShaderMake(
 	invocation->Arguments.push_back(process.ExecutablePath.generic_string());
 	invocation->Arguments.insert(invocation->Arguments.end(), process.Arguments.begin(), process.Arguments.end());
 	staging.bCanRemove = false;
-	const Process::ChildProcessResult result = Process::RunChildProcess(process);
+	Process::ChildProcessResult result = Process::RunChildProcess(process);
 	staging.bCanRemove = !result.bLaunched || result.FailureReason.empty();
-	diagnostics += result.CapturedOutput;
 	if (!result.Succeeded())
 	{
-		throw Diagnostics::Error(std::format("ShaderMake {} batch failed (exit {}): {}\n{}\nInvocation: {}",
-			group.Backend, result.ExitCode, result.FailureReason, result.CapturedOutput, staging.Directory.string()));
+		throw Diagnostics::Error(
+		    std::format("ShaderMake {} batch failed (exit {}): {}\n{}\nInvocation: {}", group.Backend, result.ExitCode, result.FailureReason, result.CapturedOutput, staging.Directory.string()));
 	}
+	invocation->WorkingDirectory = process.WorkingDirectory;
+	invocation->CompilerOutput = std::move(result.CapturedOutput);
 	VerifyToolchain(job.BackendVersion);
 	return invocation;
 }
 
 std::vector<ShaderCompileResult> CompileShaderMakeProducers(
-	const ShaderCookSettings& settings,
-	std::span<const ShaderCompileJob> jobs,
-	std::span<const std::size_t> producerIndices,
-	std::size_t totalWork,
-	const ToolWorkProgressCallback& progress)
+    const ShaderCookSettings& settings,
+    std::span<const ShaderCompileJob> jobs,
+    std::span<const std::size_t> producerIndices,
+    std::size_t totalWork,
+    const ToolWorkProgressCallback& progress)
 {
 	const std::uint32_t hardwareThreads = std::max(1u, std::thread::hardware_concurrency());
 	const std::uint32_t workers = std::clamp(settings.maximumParallelCompiles, 1u, std::min(hardwareThreads, 8u));
@@ -241,28 +246,27 @@ std::vector<ShaderCompileResult> CompileShaderMakeProducers(
 		const ShaderMakeGroup& group = groups[index];
 		ShaderMakeStaging staging;
 		WriteCapturedSources(staging.Directory, group);
-		std::string diagnostics;
-		const auto invocation = RunShaderMake(staging, group, index, workers, ShaderMakeOperation::Compile, diagnostics);
+		const auto invocation = RunShaderMake(staging, group, index, workers, ShaderMakeOperation::Compile);
 		std::shared_ptr<const ShaderCompileInvocation> preprocessing;
 		if (group.Backend == "dxc" && group.bCaptureDebugArtifacts)
 		{
-			preprocessing = RunShaderMake(staging, group, index, workers, ShaderMakeOperation::Preprocess, diagnostics);
+			preprocessing = RunShaderMake(staging, group, index, workers, ShaderMakeOperation::Preprocess);
 		}
 		for (const ShaderMakeProducer& producer : group.Producers)
 		{
 			try
 			{
-				ShaderCompileResult result = ReadShaderMakeOutput(staging.Directory, producer, invocation, diagnostics);
+				ShaderCompileResult result = ReadShaderMakeOutput(staging.Directory, producer, invocation);
 				result.DebugArtifacts.PreprocessingInvocation = preprocessing;
 				results[producer.ResultIndex] = std::move(result);
 			}
 			catch (const std::exception& error)
 			{
-				throw Diagnostics::Error(std::format("Failed to ingest {} - {}", FormatShaderCompileJob(*producer.Job), error.what()));
+				throw Diagnostics::Error(std::format("Failed to ingest {} - {}", FormatShaderCompileJob(producer.Job), error.what()));
 			}
 			if (progress)
 			{
-				progress({.Action = "Read compiled producer", .Item = producer.Job->Request.ShaderTypeName, .Completed = ++completed, .Total = totalWork});
+				progress({.Action = "Read compiled producer", .Item = producer.Job.Request.ShaderTypeName, .Completed = ++completed, .Total = totalWork});
 			}
 		}
 	}
