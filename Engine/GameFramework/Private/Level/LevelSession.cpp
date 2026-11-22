@@ -17,7 +17,7 @@
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_levelSessionLogger, "GameFramework.LevelSession");
 
 LevelSession::LevelSession(GameWorld& world, TaskExecutor& taskExecutor, TaskScope& applicationScope) :
-    m_gameWorld(&world),
+    m_gameWorld(world),
     m_levelRegistry(std::make_unique<LevelRegistry>(Filesystem::GetProjectPath())),
     m_loadExecutor(std::make_unique<Assets::SceneLoadExecutor>(taskExecutor, applicationScope))
 {
@@ -112,7 +112,7 @@ void LevelSession::StartLevelChange(LevelAsset& requestedLevel) noexcept
 {
 	const std::string previousLevelName = m_activeLevel ? std::string(m_activeLevel->GetName()) : std::string{};
 	const std::string requestedLevelName(requestedLevel.GetName());
-	const std::uint64_t requestId = m_nextRequestId++;
+	const std::uint64_t requestId = m_latestRequestId + 1;
 
 	m_loadExecutor->Cancel();
 	m_latestRequestId = requestId;
@@ -128,7 +128,7 @@ void LevelSession::StartLevelChange(LevelAsset& requestedLevel) noexcept
 
 	try
 	{
-		m_loadExecutor->Start(requestId, m_gameWorld->GetGeneration(), m_documentGeneration, requestedLevel.GetDescription());
+		m_loadExecutor->Start(requestId, m_gameWorld.GetGeneration(), m_documentGeneration, requestedLevel.GetDescription());
 	}
 	catch (const Diagnostics::Error& error)
 	{
@@ -163,18 +163,6 @@ void LevelSession::RejectLevelLoad(LevelAsset& level, std::string diagnostic) no
 	m_levelChangeEvents.OnLevelLoadFailed.Broadcast(level.GetName());
 }
 
-void LevelSession::NotifyLevelUnloading(const std::string& previousName, const std::string& requestedName)
-{
-	LevelWillUnloadEventArgs args;
-	args.previousLevelName = previousName;
-	args.requestedLevelName = requestedName;
-	m_levelChangeEvents.OnLevelWillUnload.Broadcast(args);
-	if (!previousName.empty())
-	{
-		m_levelChangeEvents.OnLevelUnloaded.Broadcast(previousName);
-	}
-}
-
 void LevelSession::NotifyLevelChanged(const std::string& previousName, const std::string& activeName)
 {
 	LevelChangedEventArgs args;
@@ -187,13 +175,12 @@ void LevelSession::ActivateLoadedLevel(LevelAsset& level, Assets::SceneLoadPacka
 {
 	const std::string previousName = m_activeLevel ? std::string(m_activeLevel->GetName()) : std::string{};
 	const std::string loadedName(level.GetName());
-	m_gameWorld->CommitSceneLoadPackage(std::move(package));
-	NotifyLevelUnloading(previousName, loadedName);
-	m_gameWorld->FinalizeSceneLoadCommit();
+	m_gameWorld.CommitSceneLoadPackage(std::move(package));
+	m_gameWorld.FinalizeSceneLoadCommit();
 	m_activeLevel = &level;
-	NotifyLevelChanged(previousName, loadedName);
 	m_bLevelChangeInProgress = false;
 	m_lastLoadDiagnostic.clear();
+	NotifyLevelChanged(previousName, loadedName);
 }
 
 void LevelSession::CompleteLevelChange() noexcept
@@ -217,7 +204,7 @@ void LevelSession::CompleteLevelChange() noexcept
 		return;
 	}
 	const Assets::SceneLoadPackage& package = *completion->Package;
-	const bool bStaleOwners = package.WorldGeneration != m_gameWorld->GetGeneration() || package.DocumentGeneration != m_documentGeneration;
+	const bool bStaleOwners = package.WorldGeneration != m_gameWorld.GetGeneration() || package.DocumentGeneration != m_documentGeneration;
 	if (bStaleOwners || package.CatalogGeneration != m_loadExecutor->GetCatalogGeneration())
 	{
 		RejectLevelLoad(level, "Scene load package was rejected because an owner generation changed.");
@@ -240,7 +227,7 @@ bool LevelSession::SaveActiveLevel() noexcept
 
 	try
 	{
-		LevelDesc description = CaptureLevelWorldState(m_activeLevel->GetDescription(), m_gameWorld->AcquireReadView());
+		LevelDesc description = CaptureLevelWorldState(m_activeLevel->GetDescription(), m_gameWorld.AcquireReadView());
 		m_activeLevel->Save(std::move(description));
 		m_lastLoadDiagnostic.clear();
 		return true;

@@ -1,6 +1,7 @@
 #include "PCH.h"
 
 #include "Animations/CookedAnimationAssetBuilder.h"
+#include "Animations/AnimationPreviewBaker.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Hash/HashUtils.h"
@@ -17,20 +18,6 @@ public:
 	static Assets::CookedAssetId BuildAnimationAssetId(std::string_view sceneAssetId, std::uint32_t sourceAnimationIndex)
 	{
 		return Hash::Fnv1a64(std::string(sceneAssetId) + "#animation#" + std::to_string(sourceAnimationIndex));
-	}
-
-	static Assets::CookedAnimationInterpolation ToCookedInterpolation(ImportedAnimationInterpolation interpolation)
-	{
-		switch (interpolation)
-		{
-			case ImportedAnimationInterpolation::Linear:
-				return Assets::CookedAnimationInterpolation::Linear;
-			case ImportedAnimationInterpolation::Step:
-				return Assets::CookedAnimationInterpolation::Step;
-			case ImportedAnimationInterpolation::CubicSpline:
-				return Assets::CookedAnimationInterpolation::CubicSpline;
-		}
-		throw Diagnostics::Error("Imported animation uses an unsupported interpolation mode.");
 	}
 
 	static Assets::CookedAnimationTargetPath ToCookedTargetPath(ImportedAnimationTargetPath targetPath)
@@ -127,7 +114,7 @@ void CookedAnimationTranslation::AppendChannel(
 		throw Diagnostics::Error(std::format("Imported animation clip {} channel {} has incomplete sampler data.", clipIndex, channelIndex));
 	}
 	const Assets::CookedAnimationTargetPath targetPath = ToCookedTargetPath(importedChannel.targetPath);
-	const Assets::CookedAnimationInterpolation interpolation = ToCookedInterpolation(sampler.interpolation);
+	const auto bakedKeys = AnimationPreviewBaker::Bake(sampler, importedChannel.targetPath, importedClip.durationSeconds);
 	const bool bInvalidAnimationJoint = importedChannel.targetPath != ImportedAnimationTargetPath::Weights && importedChannel.targetJointIndex >= skeleton.joints.size();
 
 	if (bInvalidAnimationJoint)
@@ -136,36 +123,22 @@ void CookedAnimationTranslation::AppendChannel(
 	}
 
 	const bool bKeyframeStorageOverflow = asset.keyframes.size() > (std::numeric_limits<std::uint32_t>::max)()
-	    || sampler.keyframes.size() > (std::numeric_limits<std::uint32_t>::max)() - asset.keyframes.size();
+	    || bakedKeys.size() > (std::numeric_limits<std::uint32_t>::max)() - asset.keyframes.size();
 
 	if (bKeyframeStorageOverflow)
 	{
 		throw Diagnostics::Error(std::format("Imported animation clip {} channel {} has too many keyframes.", clipIndex, channelIndex));
 	}
 
-	float previousTime = -1.0f;
-	for (const ImportedAnimationKeyframe& keyframe : sampler.keyframes)
-	{
-		if (keyframe.timeSeconds < 0.0f || keyframe.timeSeconds <= previousTime || keyframe.timeSeconds > importedClip.durationSeconds)
-		{
-			throw Diagnostics::Error(std::format("Imported animation clip {} channel {} has invalid keyframe timing.", clipIndex, channelIndex));
-		}
-		previousTime = keyframe.timeSeconds;
-	}
-
 	const auto firstKeyframe = static_cast<std::uint32_t>(asset.keyframes.size());
-	for (const ImportedAnimationKeyframe& importedKeyframe : sampler.keyframes)
-	{
-		asset.keyframes.push_back({.timeSeconds = importedKeyframe.timeSeconds, .value = importedKeyframe.value, .inTangent = importedKeyframe.inTangent, .outTangent = importedKeyframe.outTangent});
-	}
+	asset.keyframes.insert(asset.keyframes.end(), bakedKeys.begin(), bakedKeys.end());
 
 	asset.channels.push_back(
 	    {.targetPath = targetPath,
-	        .interpolation = interpolation,
 	        .targetNodeIndex = importedChannel.targetNodeIndex,
 	        .targetJointIndex = importedChannel.targetJointIndex,
 	        .firstKeyframe = firstKeyframe,
-	        .keyframeCount = static_cast<std::uint32_t>(sampler.keyframes.size())});
+	        .keyframeCount = static_cast<std::uint32_t>(bakedKeys.size())});
 }
 
 void CookedAnimationAssetBuilder::Build(const SourceImportOutput& importOutput, std::string_view sceneAssetId, CookedSceneBuild& outBuild)

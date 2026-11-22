@@ -28,7 +28,6 @@ namespace ECS
 		bool RunPlayback(std::uint32_t begin, std::uint32_t end);
 		bool RunPose(std::uint32_t begin, std::uint32_t end);
 		bool RunMorphSamples(std::uint32_t begin, std::uint32_t end);
-		bool RunSkinning(std::uint32_t begin, std::uint32_t end);
 		bool CommitMorphOutputs();
 
 	private:

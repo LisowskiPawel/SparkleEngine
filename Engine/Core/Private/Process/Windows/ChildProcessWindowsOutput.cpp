@@ -1,14 +1,25 @@
 #include "Process/Windows/ChildProcessWindows.h"
 #include "Process/Windows/ChildProcessWindowsPipe.h"
 
-#include <array>
-#include <fstream>
-#include <stop_token>
-#include <string>
-
 #if defined(_WIN32)
+  #include <boost/asio/awaitable.hpp>
+  #include <boost/asio/bind_cancellation_slot.hpp>
+  #include <boost/asio/cancellation_signal.hpp>
+  #include <boost/asio/co_spawn.hpp>
+  #include <boost/asio/readable_pipe.hpp>
+  #include <boost/asio/redirect_error.hpp>
+  #include <boost/asio/use_awaitable.hpp>
+  #include <boost/asio/windows/object_handle.hpp>
+  #include <array>
+  #include <exception>
+  #include <fstream>
+  #include <optional>
+  #include <stop_token>
+
 namespace Process
 {
+	namespace Asio = boost::asio;
+
 	static bool OpenChildOutputLog(const std::filesystem::path& logPath, std::ofstream& log, ChildProcessResult& result)
 	{
 		if (!logPath.empty())
@@ -29,128 +40,165 @@ namespace Process
 		return true;
 	}
 
-	enum class ChildOutputEvent : std::uint8_t
+	static void ConsumeOutput(ChildProcessResult& result, const ChildProcessOutputCallback& outputCallback, std::ofstream& log, const char* data, std::size_t size)
 	{
-		ProcessExited,
-		OutputReady,
-		Cancelled,
-		Finished,
-		Failed
-	};
-
-	static ChildOutputEvent WaitForChildOutputEvent(
-	    const WindowsProcessHandle& process,
-	    const WindowsChildOutputReader& reader,
-	    const WindowsProcessHandle& cancelEvent,
-	    bool bProcessExited,
-	    bool bTerminationRequested,
-	    ChildProcessResult& result)
-	{
-		std::array<HANDLE, 3> waits{};
-		DWORD processIndex = MAXDWORD;
-		DWORD cancelIndex = MAXDWORD;
-		DWORD count = 0;
-		if (!bProcessExited)
+		result.CapturedOutput.append(data, size);
+		if (outputCallback)
 		{
-			processIndex = count;
-			waits[count++] = process.Get();
+			outputCallback(std::string_view(data, size));
 		}
-		if (reader.HasPendingRead())
+		if (log.is_open())
 		{
-			waits[count++] = reader.GetReadEvent();
+			log.write(data, static_cast<std::streamsize>(size));
 		}
-		if (!bTerminationRequested)
-		{
-			cancelIndex = count;
-			waits[count++] = cancelEvent.Get();
-		}
-		if (count == 0)
-		{
-			return ChildOutputEvent::Finished;
-		}
-		const DWORD waitResult = WaitForMultipleObjects(count, waits.data(), FALSE, INFINITE);
-		if (waitResult == WAIT_FAILED)
-		{
-			result.FailureReason = "Failed while waiting for child process completion: " + FormatWindowsProcessError(GetLastError());
-			return ChildOutputEvent::Failed;
-		}
-		const DWORD signalled = waitResult - WAIT_OBJECT_0;
-		if (signalled == processIndex)
-		{
-			return ChildOutputEvent::ProcessExited;
-		}
-		if (signalled == cancelIndex)
-		{
-			return ChildOutputEvent::Cancelled;
-		}
-		return ChildOutputEvent::OutputReady;
 	}
 
-	static void FinishChildProcessOutput(const WindowsProcessHandle& process, std::ofstream& log, ChildProcessResult& result)
+	static Asio::awaitable<void> ReadChildOutput(const ChildProcessRequest& request, WindowsOwnedProcess& child, Asio::readable_pipe& reader, std::ofstream& log, ChildProcessResult& result)
 	{
-		DWORD exitCode = 1;
-		GetExitCodeProcess(process.Get(), &exitCode);
-		result.ExitCode = static_cast<int>(exitCode);
+		std::array<char, 4096> bytes{};
+		boost::system::error_code error;
+		do
+		{
+			const auto size = co_await reader.async_read_some(Asio::buffer(bytes), Asio::redirect_error(Asio::use_awaitable, error));
+			if (size != 0)
+			{
+				ConsumeOutput(result, request.OutputCallback, log, bytes.data(), size);
+				if (log.is_open() && !log)
+				{
+					throw std::runtime_error("Failed to write child process log.");
+				}
+			}
+		} while (!error);
+		const boost::system::error_code brokenPipe(ERROR_BROKEN_PIPE, boost::system::system_category());
+		const bool bPipeClosed = error == Asio::error::eof || error == brokenPipe;
+		if (!bPipeClosed)
+		{
+			throw boost::system::system_error(error, "Failed to read child process output");
+		}
+		// A descendant can retain the writer after root exit; settle both before returning.
+		result.ExitCode = co_await child.Process.async_wait(Asio::use_awaitable);
+	}
+
+	static void CollectChildProcessOutput(const ChildProcessRequest& request, WindowsOwnedProcess& child, WindowsProcessHandle& readPipe, std::ofstream& log, ChildProcessResult& result)
+	{
+		Asio::readable_pipe reader(child.Context);
+		reader.assign(readPipe.Get());
+		readPipe.Release();
+		WindowsProcessHandle nativeEvent(CreateEventW(nullptr, TRUE, FALSE, nullptr));
+		if (!nativeEvent)
+		{
+			const DWORD eventError = GetLastError();
+			TerminateOwnedWindowsProcess(child);
+			result.FailureReason = "Failed to create child cancellation event: " + FormatWindowsProcessError(eventError);
+			return;
+		}
+		Asio::windows::object_handle event(child.Context, nativeEvent.Get());
+		nativeEvent.Release();
+		const auto signal = [handle = event.native_handle()]() noexcept
+		{
+			SetEvent(handle);
+		};
+		std::optional<std::stop_callback<decltype(signal)>> cancellation;
+		cancellation.emplace(request.Cancellation, signal);
+		std::exception_ptr failure;
+		Asio::cancellation_signal settlementFailure;
+		boost::system::error_code eventFailure;
+		try
+		{
+			event.async_wait(
+			    [&](boost::system::error_code error) noexcept
+			    {
+				    // Registration presence is the terminal boundary, including an already queued stop.
+				    if (!cancellation)
+				    {
+					    return;
+				    }
+				    if (!error)
+				    {
+					    result.bCancelled = true;
+					    TerminateOwnedWindowsProcess(child);
+					    if (child.TerminationError != ERROR_SUCCESS)
+					    {
+						    settlementFailure.emit(Asio::cancellation_type::all);
+					    }
+				    }
+				    else if (error != Asio::error::operation_aborted)
+				    {
+					    eventFailure = error;
+					    TerminateOwnedWindowsProcess(child);
+					    settlementFailure.emit(Asio::cancellation_type::all);
+					    boost::system::error_code ignored;
+					    reader.cancel(ignored);
+				    }
+			    });
+			Asio::co_spawn(
+			    child.Context,
+			    ReadChildOutput(request, child, reader, log, result),
+			    Asio::bind_cancellation_slot(
+			        settlementFailure.slot(),
+			        [&](std::exception_ptr error) noexcept
+			        {
+				        if (error)
+				        {
+					        if (!failure)
+					        {
+						        failure = error;
+					        }
+					        TerminateOwnedWindowsProcess(child);
+				        }
+				        cancellation.reset();
+				        boost::system::error_code ignored;
+				        event.cancel(ignored);
+			        }));
+			child.Context.run();
+		}
+		catch (...)
+		{
+			failure = std::current_exception();
+			cancellation.reset();
+			TerminateOwnedWindowsProcess(child);
+			settlementFailure.emit(Asio::cancellation_type::all);
+			boost::system::error_code ignored;
+			reader.cancel(ignored);
+			event.cancel(ignored);
+			child.Context.restart();
+			child.Context.run();
+		}
+		if (eventFailure)
+		{
+			result.FailureReason = "Failed to observe child cancellation: " + eventFailure.message();
+		}
+		else if (failure)
+		{
+			try
+			{
+				std::rethrow_exception(failure);
+			}
+			catch (const boost::system::system_error& error)
+			{
+				const bool bOperationAborted = error.code() == Asio::error::operation_aborted;
+				if (!bOperationAborted || child.TerminationError == ERROR_SUCCESS)
+				{
+					result.FailureReason = error.what();
+				}
+			}
+			catch (const std::exception& error)
+			{
+				result.FailureReason = error.what();
+			}
+			catch (...)
+			{
+				result.FailureReason = "Child process output failed.";
+			}
+		}
 		if (log.is_open())
 		{
 			log.flush();
 			if (!log && result.FailureReason.empty())
 			{
-				result.FailureReason = "Failed to write the child process log.";
+				result.FailureReason = "Failed to write child process log.";
 			}
 		}
-	}
-
-	static void CollectChildProcessOutput(const ChildProcessRequest& request, const WindowsOwnedProcess& child, const WindowsProcessHandle& readPipe, std::ofstream& log, ChildProcessResult& result)
-	{
-		WindowsChildOutputReader outputReader(readPipe.Get());
-		const bool bCancellationRequested = request.Cancellation.stop_requested();
-		const HANDLE cancelEventHandle = CreateEventW(nullptr, TRUE, bCancellationRequested, nullptr);
-		WindowsProcessHandle cancelEvent(cancelEventHandle);
-		if (!outputReader.IsValid() || !cancelEvent)
-		{
-			const DWORD eventError = GetLastError();
-			TerminateOwnedWindowsProcess(child);
-			result.FailureReason = "Failed to create child process completion events: " + FormatWindowsProcessError(eventError);
-			return;
-		}
-		std::stop_callback cancellationWake(request.Cancellation, [event = cancelEvent.Get()] { SetEvent(event); });
-
-		bool bProcessExited = false;
-		bool bTerminationRequested = false;
-		while (!bProcessExited || !outputReader.IsClosed())
-		{
-			if (outputReader.ReadAvailable(request.OutputCallback, log, result))
-			{
-				continue;
-			}
-
-			const ChildOutputEvent event = WaitForChildOutputEvent(child.Process, outputReader, cancelEvent, bProcessExited, bTerminationRequested, result);
-			if (event == ChildOutputEvent::Finished)
-			{
-				break;
-			}
-			if (event == ChildOutputEvent::Failed)
-			{
-				TerminateOwnedWindowsProcess(child);
-				break;
-			}
-			if (event == ChildOutputEvent::ProcessExited)
-			{
-				bProcessExited = true;
-				continue;
-			}
-			if (event == ChildOutputEvent::Cancelled)
-			{
-				result.bCancelled = true;
-				bTerminationRequested = true;
-				TerminateJobObject(child.Job.Get(), 1);
-				continue;
-			}
-			outputReader.CompleteRead(request.OutputCallback, log, result);
-		}
-
-		FinishChildProcessOutput(child.Process, log, result);
 	}
 
 	ChildProcessResult RunWindowsChildProcessToExit(const ChildProcessRequest& request)
@@ -173,7 +221,17 @@ namespace Process
 			return result;
 		}
 		writePipe.Reset();
-		CollectChildProcessOutput(request, child, readPipe, log, result);
+		try
+		{
+			CollectChildProcessOutput(request, child, readPipe, log, result);
+		}
+		catch (const std::exception& error)
+		{
+			TerminateOwnedWindowsProcess(child);
+			result.FailureReason = error.what();
+		}
+		TerminateOwnedWindowsProcess(child);
+		AppendWindowsProcessTerminationFailure(child, result);
 		return result;
 	}
 }

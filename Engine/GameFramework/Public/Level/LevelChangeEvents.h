@@ -13,12 +13,6 @@ struct SPARKLE_ENGINE_API LevelChangeStartedEventArgs
 	std::string requestedLevelName;
 };
 
-struct SPARKLE_ENGINE_API LevelWillUnloadEventArgs
-{
-	std::string previousLevelName;
-	std::string requestedLevelName;
-};
-
 struct SPARKLE_ENGINE_API LevelChangedEventArgs
 {
 	std::string previousLevelName;
@@ -29,9 +23,8 @@ class SPARKLE_ENGINE_API LevelChangeEvents final
 {
 public:
 	Event<void(const LevelChangeStartedEventArgs&), 16> OnLevelChangeStarted;
-	Event<void(const LevelWillUnloadEventArgs&), 16> OnLevelWillUnload;
-	Event<void(std::string_view), 16> OnLevelUnloaded;
 	Event<void(std::string_view), 16> OnLevelWillLoad;
+	// The world is published and the session is ready for save/reload requests before notification.
 	Event<void(const LevelChangedEventArgs&), 16> OnLevelChanged;
 	Event<void(std::string_view), 16> OnLevelLoadFailed;
 };

@@ -2,25 +2,6 @@
 
 #include "World/Resources/SkeletonResourceStore.h"
 
-#include "GameFramework/Public/Scene/Animations/SkeletonTransformContract.h"
-
-static ECS::AnimationJointTransform DecomposeLocalTransform(const SkeletonResource& skeleton, std::size_t jointIndex) noexcept
-{
-	const DirectX::XMMATRIX local = DirectX::XMLoadFloat4x4(&skeleton.joints[jointIndex].bindLocalTransform);
-	DirectX::XMVECTOR scale;
-	DirectX::XMVECTOR rotation;
-	DirectX::XMVECTOR translation;
-	ECS::AnimationJointTransform result;
-	if (DirectX::XMMatrixDecompose(&scale, &rotation, &translation, local))
-	{
-		DirectX::XMStoreFloat3(&result.Translation, translation);
-		const DirectX::XMVECTOR normalizedRotation = DirectX::XMQuaternionNormalize(rotation);
-		DirectX::XMStoreFloat4(&result.Rotation, normalizedRotation);
-		DirectX::XMStoreFloat3(&result.Scale, scale);
-	}
-	return result;
-}
-
 void SkeletonResourceStore::Append(std::vector<SkeletonResource> skeletons)
 {
 	m_entries.reserve(m_entries.size() + skeletons.size());
@@ -31,16 +12,6 @@ void SkeletonResourceStore::Append(std::vector<SkeletonResource> skeletons)
 			continue;
 		}
 		Entry entry;
-		entry.BindLocalTransforms.reserve(skeleton.joints.size());
-		for (std::size_t jointIndex = 0; jointIndex < skeleton.joints.size(); ++jointIndex)
-		{
-			const ECS::AnimationJointTransform local = DecomposeLocalTransform(skeleton, jointIndex);
-			entry.BindLocalTransforms.push_back(local);
-		}
-		if (!SkeletonTransformContract::BuildEvaluationOrder(skeleton.joints, entry.EvaluationOrder))
-		{
-			continue;
-		}
 		entry.Resource = std::move(skeleton);
 		const auto slot = static_cast<std::uint32_t>(m_entries.size());
 		m_entries.push_back(std::move(entry));
@@ -61,5 +32,5 @@ ECS::SkeletonEvaluationData SkeletonResourceStore::Resolve(SkeletonResourceHandl
 		return {};
 	}
 	const Entry& entry = m_entries[handle.Slot];
-	return entry.Generation == handle.Generation ? ECS::SkeletonEvaluationData{&entry.Resource, entry.BindLocalTransforms, entry.EvaluationOrder} : ECS::SkeletonEvaluationData{};
+	return entry.Generation == handle.Generation ? ECS::SkeletonEvaluationData{&entry.Resource} : ECS::SkeletonEvaluationData{};
 }

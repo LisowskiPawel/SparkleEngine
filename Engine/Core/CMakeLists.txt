@@ -55,6 +55,8 @@ sparkle_target_precompile_headers(SparkleCore
 target_link_libraries(SparkleCore
     PUBLIC
         spdlog::spdlog
+    PRIVATE
+        Boost::process
 )
 
 if(WIN32)

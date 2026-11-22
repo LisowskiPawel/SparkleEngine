@@ -41,6 +41,8 @@ target_link_libraries(SparkleGameFramework
     PUBLIC
         SparkleCore
 		SparkleTasks
+    PRIVATE
+        ozz_animation_offline
 )
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${SPARKLE_GAMEFRAMEWORK_PUBLIC_HEADERS})

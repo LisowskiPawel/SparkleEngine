@@ -10,5 +10,6 @@ namespace Assets
 	{
 		CookedSkeletonAssetHeader header;
 		std::vector<CookedSkeletonJointRecord> joints;
+		std::vector<CookedSkeletonEvaluationJointRecord> evaluationJoints;
 	};
 }

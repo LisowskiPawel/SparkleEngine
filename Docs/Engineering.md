@@ -20,7 +20,7 @@ The recorded Windows toolchain is:
 
 Other combinations need separate testing. These versions describe the recorded setup, not the latest available releases.
 
-The project minimum is CMake 3.27; the [Visual Studio 18 2026 generator](https://cmake.org/cmake/help/latest/generator/Visual%20Studio%2018%202026.html) below requires 4.2+. Launcher uses four build jobs; direct builds select `--parallel`. Private PCHs do not replace explicit includes.
+The project minimum is CMake 3.30; the [Visual Studio 18 2026 generator](https://cmake.org/cmake/help/latest/generator/Visual%20Studio%2018%202026.html) below requires 4.2+. Launcher uses four build jobs; direct builds select `--parallel`. Private PCHs do not replace explicit includes.
 
 ### Build Launcher
 

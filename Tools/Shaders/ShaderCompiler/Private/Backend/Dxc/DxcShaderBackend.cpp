@@ -86,11 +86,6 @@ std::uint64_t DxcShaderBackend::QueryBackendVersion(IDxcCompiler3& compiler)
 	return (static_cast<std::uint64_t>(major) << 48u) | (static_cast<std::uint64_t>(minor) << 32u) | static_cast<std::uint64_t>(commit);
 }
 
-ShaderBackendCapabilities DxcShaderBackend::GetCapabilities() const
-{
-	return GetStaticCapabilities();
-}
-
 std::string_view DxcShaderBackend::GetBackendName() const
 {
 	return "dxc";

@@ -22,7 +22,7 @@ namespace ECS
 			return {};
 		}
 		const Entry& entry = m_entries[handle.Slot];
-		return entry.Generation == handle.Generation ? ResolvedAnimationClip{&entry.Resource, entry.Skeleton, entry.MorphChannelIndices, entry.TargetGeneration} : ResolvedAnimationClip{};
+		return entry.Generation == handle.Generation ? ResolvedAnimationClip{&entry.Resource, entry.Skeleton, entry.TargetGeneration} : ResolvedAnimationClip{};
 	}
 
 	bool AnimationClipResourceStore::ResolveTargets(const SkeletonResourceStore& skeletons, std::uint32_t targetGeneration) noexcept
@@ -34,15 +34,6 @@ namespace ECS
 		for (Entry& entry : m_entries)
 		{
 			entry.Skeleton = skeletons.Find(entry.Resource.targetSkeletonAssetId);
-			entry.MorphChannelIndices.clear();
-			entry.MorphChannelIndices.reserve(entry.Resource.channels.size());
-			for (std::uint32_t index = 0; index < entry.Resource.channels.size(); ++index)
-			{
-				if (entry.Resource.channels[index].targetPath == Assets::CookedAnimationTargetPath::Weights)
-				{
-					entry.MorphChannelIndices.push_back(index);
-				}
-			}
 			entry.TargetGeneration = targetGeneration;
 		}
 		return true;

@@ -14,7 +14,6 @@ namespace ECS
 	{
 		const AnimationClipResource* Resource = nullptr;
 		SkeletonResourceHandle Skeleton;
-		std::span<const std::uint32_t> MorphChannelIndices;
 		std::uint32_t TargetGeneration = 0;
 
 		bool IsValid() const noexcept { return Resource != nullptr && TargetGeneration != 0; }
@@ -32,7 +31,6 @@ namespace ECS
 		{
 			AnimationClipResource Resource;
 			SkeletonResourceHandle Skeleton;
-			std::vector<std::uint32_t> MorphChannelIndices;
 			std::uint32_t Generation = 1;
 			std::uint32_t TargetGeneration = 0;
 		};

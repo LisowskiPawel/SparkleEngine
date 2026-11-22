@@ -22,9 +22,11 @@ namespace CookedSkeletonAssetWriter
 		    .fileHeader = {Assets::kCookedSkeletonAssetMagic},
 		    .jointCount = static_cast<std::uint32_t>(skeletonAsset.joints.size()),
 		    .jointStride = sizeof(Assets::CookedSkeletonJointRecord),
+		    .evaluationJointCount = static_cast<std::uint32_t>(skeletonAsset.evaluationJoints.size()),
+		    .evaluationJointStride = sizeof(Assets::CookedSkeletonEvaluationJointRecord),
 		    .flags = 0};
 
-		SparkleTools::WriteBinaryAssetFile(stagedOutputPath, header, skeletonAsset.joints);
+		SparkleTools::WriteBinaryAssetFile(stagedOutputPath, header, skeletonAsset.joints, skeletonAsset.evaluationJoints);
 	}
 
 	void StageSkeletonAssets(const std::vector<CookedSkeletonAssetBuild>& skeletonAssets, std::vector<Files::FilePublication>& outPublication)

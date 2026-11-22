@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Backend/IShaderBackend.h"
 #include "Backend/ShaderBackendCapabilities.h"
 
 #include <cstdint>
@@ -9,6 +8,8 @@
 #include <string>
 #include <string_view>
 #include <vector>
+
+class IShaderBackend;
 
 struct ShaderBackendDescriptor final
 {
@@ -19,6 +20,7 @@ struct ShaderBackendDescriptor final
 };
 
 std::vector<ShaderBackendDescriptor> ListShaderBackends();
+ShaderBackendDescriptor QueryShaderBackend(std::string_view name);
 std::span<const std::string_view> ListShaderBinaryFormats() noexcept;
 std::span<const ShaderTarget> ListShaderCodegenTargets() noexcept;
 std::unique_ptr<IShaderBackend> CreateShaderBackend(std::string_view name);

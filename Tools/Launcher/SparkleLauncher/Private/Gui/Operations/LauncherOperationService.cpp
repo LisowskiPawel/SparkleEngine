@@ -1,7 +1,8 @@
 #include "Gui/Operations/LauncherOperationService.h"
 
-#include "Gui/Operations/LauncherOperationExecution.h"
+#include "Operations/LauncherOperationExecution.h"
 #include "GpuCrash/GpuCrashLaunch.h"
+#include "Tasks/Public/TaskExecutionContext.h"
 #include "Tasks/Public/TaskExecutor.h"
 #include "Tasks/Public/TaskGraph.h"
 #include "Tasks/Public/TaskScope.h"
@@ -9,11 +10,76 @@
 #include <atomic>
 #include <exception>
 #include <map>
+#include <optional>
 #include <stdexcept>
 #include <utility>
 
 namespace SparkleLauncher
 {
+	class TaskContextProcessRunner final : public IProcessRunner
+	{
+	public:
+		explicit TaskContextProcessRunner(IProcessRunner& runner, TaskExecutionContext& context);
+		Process::ChildProcessResult Run(const Process::ChildProcessRequest& request) override;
+
+	private:
+		IProcessRunner& m_runner;
+		TaskExecutionContext& m_context;
+	};
+
+	TaskContextProcessRunner::TaskContextProcessRunner(IProcessRunner& runner, TaskExecutionContext& context) :
+	    m_runner(runner),
+	    m_context(context)
+	{
+	}
+
+	Process::ChildProcessResult TaskContextProcessRunner::Run(const Process::ChildProcessRequest& request)
+	{
+		Process::ChildProcessRequest scopedRequest = request;
+		scopedRequest.Cancellation = m_context.GetCancellationToken();
+		return m_runner.Run(scopedRequest);
+	}
+
+	static OperationRecord ExecuteLauncherOperation(
+	    const LauncherOperationRequest& request,
+	    IProcessRunner& processRunner,
+	    TaskExecutionContext& context,
+	    const Process::ChildProcessOutputCallback& outputCallback)
+	{
+		const std::string operationId = request.OperationId.toStdString();
+		LauncherOperationPlan plan = PlanLauncherOperation(operationId, request.Inputs);
+
+		auto blockedOperation = std::visit(
+		    [](auto& typedPlan) -> std::optional<OperationRecord>
+		    {
+			    if (typedPlan.bCanRun)
+			    {
+				    return std::nullopt;
+			    }
+
+			    OperationRecord record = std::move(typedPlan.Operation);
+			    if (!record.Failure.has_value())
+			    {
+				    SetOperationFailure(
+				        record,
+				        OperationProblemKind::Prerequisite,
+				        typedPlan.ReadinessMessages.empty() ? "Operation readiness failed." : typedPlan.ReadinessMessages.back(),
+				        "Resolve the reported prerequisite, refresh the workflow, then retry.");
+			    }
+			    MarkOperationFinished(record, OperationStatus::Skipped, std::nullopt);
+			    return record;
+		    },
+		    plan);
+
+		if (blockedOperation.has_value())
+		{
+			return std::move(*blockedOperation);
+		}
+
+		TaskContextProcessRunner taskProcessRunner(processRunner, context);
+		return RunLauncherOperationPlan(std::move(plan), taskProcessRunner, outputCallback);
+	}
+
 	struct LauncherOperationService::Implementation final
 	{
 		explicit Implementation(ProcessRunnerFactory processRunnerFactory) :

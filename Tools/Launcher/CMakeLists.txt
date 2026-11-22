@@ -21,6 +21,7 @@ set(SPARKLE_SOURCE_DEPENDENCY_ALLOWLIST
     cli11
     nlohmann_json
     spdlog
+    boost-process
     editor-icons
 )
 include(${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/FetchDependencies.cmake NO_POLICY_SCOPE)

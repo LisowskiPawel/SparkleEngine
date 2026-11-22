@@ -18,7 +18,6 @@ set(SPARKLE_LAUNCHER_GUI_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherBackend.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherGuiApp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherSettings.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherOperationExecution.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherOperationService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherProgressStreamDecoder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Models/LauncherCleanUiModel.cpp
@@ -60,7 +59,6 @@ set(SPARKLE_LAUNCHER_GUI_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherGuiApp.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/App/LauncherSettings.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherOperationRequest.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherOperationExecution.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherOperationService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Operations/LauncherProgressStreamDecoder.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Models/LauncherCleanUiModel.h

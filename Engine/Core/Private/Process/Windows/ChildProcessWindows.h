@@ -14,6 +14,8 @@
   #include <string>
   #include <string_view>
   #include <vector>
+  #include <boost/asio/io_context.hpp>
+  #include <boost/process/v2/process.hpp>
 
 namespace Process
 {
@@ -32,6 +34,7 @@ namespace Process
 
 		explicit operator bool() const noexcept;
 		void Reset(HANDLE handle = nullptr) noexcept;
+		HANDLE Release() noexcept;
 
 	private:
 		HANDLE m_handle = nullptr;
@@ -39,13 +42,17 @@ namespace Process
 
 	struct WindowsOwnedProcess final
 	{
-		WindowsProcessHandle Process;
+		boost::asio::io_context Context;
+		boost::process::v2::basic_process<boost::asio::io_context::executor_type> Process{Context.get_executor()};
 		WindowsProcessHandle Job;
+		WindowsProcessHandle JobCompletion;
+		DWORD TerminationError = ERROR_IO_PENDING;
 	};
 
 	std::string WideToUtf8(std::wstring_view text);
 	std::string FormatWindowsProcessError(DWORD code);
-	void TerminateOwnedWindowsProcess(const WindowsOwnedProcess& process) noexcept;
+	void TerminateOwnedWindowsProcess(WindowsOwnedProcess& process) noexcept;
+	void AppendWindowsProcessTerminationFailure(const WindowsOwnedProcess& process, ChildProcessResult& result);
 	bool PrepareChildProcessLogDirectory(const std::filesystem::path& logPath, ChildProcessResult& result);
 	bool LaunchOwnedWindowsProcess(
 	    const ChildProcessRequest& request,

@@ -1,14 +1,12 @@
 #pragma once
 
-#include "Backend/ShaderBackendCapabilities.h"
 #include "Compiler/ShaderCompileRequest.h"
 #include "Compiler/Output/CompiledShader.h"
 
 #include <cstdint>
 #include <string_view>
 
-// Single seam between the cooker and concrete shader backends.
-// Orchestration code talks to IShaderBackend only.
+// Compile execution owns backend instances; planning consumes backend descriptors.
 class IShaderBackend
 {
 public:
@@ -18,8 +16,6 @@ public:
 	IShaderBackend& operator=(const IShaderBackend&) = delete;
 	IShaderBackend(IShaderBackend&&) = delete;
 	IShaderBackend& operator=(IShaderBackend&&) = delete;
-
-	virtual ShaderBackendCapabilities GetCapabilities() const = 0;
 
 	// Stable backend identity for cooked binaries and compile-input hashes.
 	// Different backends must never collide on the same artifact slot.

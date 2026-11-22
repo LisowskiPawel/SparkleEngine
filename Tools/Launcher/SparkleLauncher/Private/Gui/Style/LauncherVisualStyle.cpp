@@ -303,20 +303,7 @@ namespace SparkleLauncher
 		addRule("QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical", "height: 0; background: transparent;");
 		addRule("QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical", "background: transparent;");
 		addRule("#ActivityDetailsPanel", "background: transparent; border: none;");
-		addRule("#ActivityList", "background: transparent; border: none; border-radius: 0; padding: 0;");
-		addRule("#ActivityRunRow", "background: transparent; border: 1px solid transparent; padding: 1px 0;");
-		addRule("#ActivityRunRow[Selected=\"true\"]", "background: " + selection + "; border: 1px solid #5c8c22; border-radius: 2px;");
-		addRule("#ActivityRunIndicator", "background: " + UiColor(LauncherUi::Color::StateQueued) + "; border-radius: 1px;");
-		addRule("#ActivityRunIndicator[RunState=\"queued\"]", "background: " + UiColor(LauncherUi::Color::StateQueued) + ";");
-		addRule("#ActivityRunIndicator[RunState=\"running\"]", "background: " + UiColor(LauncherUi::Color::StateRunning) + ";");
-		addRule("#ActivityRunIndicator[RunState=\"done\"]", "background: " + UiColor(LauncherUi::Color::StateSuccess) + ";");
-		addRule("#ActivityRunIndicator[RunState=\"blocked\"]", "background: " + warning + ";");
-		addRule("#ActivityRunIndicator[RunState=\"canceled\"]", "background: " + warning + ";");
-		addRule("#ActivityRunIndicator[RunState=\"failed\"]", "background: " + UiColor(LauncherUi::Color::StateDestructive) + ";");
-		addRule("#ActivityRunTitle", "color: " + textBody + "; font-size: 8.25pt; font-weight: 650; padding: 0; margin: 0;");
-		addRule("#ActivityRunState", "color: " + textMuted + "; font-size: 7.75pt; font-weight: 700; padding: 0; margin: 0;");
-		addRule("#ActivityRunRow[Selected=\"true\"] #ActivityRunTitle", "color: #ffffff;");
-		addRule("#ActivityRunRow[Selected=\"true\"] #ActivityRunState", "color: #dff3cf;");
+		addRule("#ActivityList", "background: transparent; border: none; border-radius: 0; padding: 0; font-size: 8.25pt;");
 
 		addRule(
 		    "#OperationOutput",

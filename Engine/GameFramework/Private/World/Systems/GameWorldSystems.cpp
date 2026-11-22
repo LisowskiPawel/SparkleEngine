@@ -119,13 +119,6 @@ namespace ECS
 		    GameWorldSystemGrain::Animation,
 		    [](GameWorldSystemExecution& systems, std::uint32_t begin, std::uint32_t end) { return systems.m_animation.RunMorphSamples(begin, end); });
 
-		const auto skinning = AddSystemRange(
-		    tasks,
-		    "Game.SkinningMatrixEvaluation",
-		    counts.Poses,
-		    GameWorldSystemGrain::Pose,
-		    [](GameWorldSystemExecution& systems, std::uint32_t begin, std::uint32_t end) { return systems.m_animation.RunSkinning(begin, end); });
-
 		const auto morphCommit = tasks.Add(
 		    TaskDesc{"Game.MorphOutputCommit", TaskLane::FrameCritical},
 		    [](TaskExecutionContext& context)
@@ -154,11 +147,9 @@ namespace ECS
 		tasks.DependsOn(playback, camera);
 		tasks.DependsOn(pose, playback);
 		tasks.DependsOn(morph, playback);
-		tasks.DependsOn(skinning, pose);
-		tasks.DependsOn(skinning, morph);
 		tasks.DependsOn(morphCommit, pose);
 		tasks.DependsOn(morphCommit, morph);
-		tasks.DependsOn(transformPreparation, skinning);
+		tasks.DependsOn(transformPreparation, pose);
 		tasks.DependsOn(transformPreparation, morphCommit);
 		return tasks.Compile();
 	}

@@ -3,6 +3,7 @@
 #include "Verification/ShaderParameterStructVerifier.h"
 
 #include "Cooking/ShaderCookDiagnostics.h"
+#include "Cooking/Compilation/ShaderCompileJob.h"
 #include "Cooking/CookedStageBuild.h"
 #include "Core/Public/Diagnostics/Error.h"
 
@@ -192,7 +193,7 @@ void VerifyCookedShaderParameters(const ShaderCompileJob& job, const CookedStage
 	const auto mismatch = FindShaderParameterMismatch(*job.Request.ParameterStruct, compiledStage.reflection, job.Request.UnitKind == ShaderCompileUnitKind::Library);
 	if (mismatch)
 	{
-		const auto jobDescription = FormatShaderCompileJob(job, compiledStage.backendName, job.Request.Target);
+		const auto jobDescription = FormatShaderCompileJob(job);
 		const auto diagnostic = std::format("SC2001 {} parameter-struct '{}' verification failed: {}", jobDescription, job.Request.ParameterStruct->Name, *mismatch);
 		throw Diagnostics::Error(diagnostic);
 	}

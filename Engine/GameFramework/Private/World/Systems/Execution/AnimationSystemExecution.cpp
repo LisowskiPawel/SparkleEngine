@@ -3,9 +3,7 @@
 #include "AnimationSystemExecution.h"
 
 #include "Animation/AnimationEvaluationStorage.h"
-#include "Animation/AnimationPoseEvaluator.h"
-#include "Animation/MorphWeightEvaluator.h"
-#include "Animation/SkinningMatrixEvaluator.h"
+#include "Animation/AnimationPreviewEvaluator.h"
 #include "World/Resources/AnimationClipResourceStore.h"
 #include "World/Resources/SkeletonResourceStore.h"
 #include "World/Resources/MorphWeightStorage.h"
@@ -79,8 +77,8 @@ namespace ECS
 
 			const ResolvedAnimationClip clip = m_clips.Resolve(slot.Clip);
 			const SkeletonEvaluationData skeleton = m_skeletons.Resolve(slot.Skeleton);
-			const bool bClipAvailable = clip.IsValid();
-			const bool bPoseEvaluated = bClipAvailable && AnimationPoseEvaluator::Evaluate(*clip.Resource, skeleton, state->TimeSeconds, slot.LocalTransforms, slot.ModelSpaceTransforms);
+			const bool bInputsAvailable = clip.IsValid() && skeleton.IsValid();
+			const bool bPoseEvaluated = bInputsAvailable && AnimationPreviewEvaluator::EvaluatePose(*clip.Resource, *skeleton.Resource, state->TimeSeconds, slot);
 			if (!bPoseEvaluated)
 			{
 				return false;
@@ -107,25 +105,8 @@ namespace ECS
 				continue;
 			}
 
-			const bool bWeightsEvaluated = MorphWeightEvaluator::Evaluate(*clip.Resource, sample.ChannelIndex, state->TimeSeconds, sample.Weights);
+			const bool bWeightsEvaluated = AnimationPreviewEvaluator::EvaluateMorph(*clip.Resource, sample.TrackIndex, state->TimeSeconds, sample.Weights);
 			if (!bWeightsEvaluated)
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	bool AnimationSystemExecution::RunSkinning(std::uint32_t begin, std::uint32_t end)
-	{
-		std::span<AnimationEvaluationStorage::PoseWorkSlot> work = m_evaluation.GetPoseWork();
-		for (std::uint32_t index = begin; index < end; ++index)
-		{
-			AnimationEvaluationStorage::PoseWorkSlot& slot = work[index];
-			const auto& skeleton = m_skeletons.Resolve(slot.Skeleton);
-			const bool bMatricesEvaluated = SkinningMatrixEvaluator::Evaluate(skeleton, slot.ModelSpaceTransforms, slot.JointMatrices);
-
-			if (!bMatricesEvaluated)
 			{
 				return false;
 			}

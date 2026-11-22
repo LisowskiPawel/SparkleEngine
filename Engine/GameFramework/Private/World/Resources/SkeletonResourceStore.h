@@ -33,8 +33,6 @@ private:
 	struct Entry final
 	{
 		SkeletonResource Resource;
-		std::vector<ECS::AnimationJointTransform> BindLocalTransforms;
-		std::vector<std::uint32_t> EvaluationOrder;
 		std::uint32_t Generation = 1;
 	};
 

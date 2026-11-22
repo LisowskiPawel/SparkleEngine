@@ -94,7 +94,8 @@ namespace SparkleLauncher
 			{
 				if (result.bCancelled)
 				{
-					SetOperationFailure(operation, OperationProblemKind::Cancellation, step.DisplayName + " was canceled.", "Run Sync again when ready.");
+					const auto summary = result.FailureReason.empty() ? step.DisplayName + " was canceled." : result.FailureReason;
+					SetOperationFailure(operation, OperationProblemKind::Cancellation, summary, "Run Sync again when ready.");
 				}
 				else
 				{

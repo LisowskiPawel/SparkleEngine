@@ -1,8 +1,10 @@
 #include "Process/Windows/ChildProcessWindows.h"
 #include "Process/ProcessReadinessEnvironment.h"
 
+#include <algorithm>
 #include <array>
 #include <atomic>
+#include <exception>
 #include <fstream>
 #include <stop_token>
 #include <string>
@@ -18,11 +20,16 @@ namespace Process
 		{
 			return;
 		}
+		input.seekg(0, std::ios::end);
+		const std::streamoff observedEnd = input.tellg();
 		input.seekg(static_cast<std::streamoff>(consumedBytes));
 		std::array<char, 4096> buffer{};
-		while (input)
+		// A growing writer must not keep this poll from reaching readiness or cancellation.
+		while (input && static_cast<std::streamoff>(consumedBytes) < observedEnd)
 		{
-			input.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+			const auto pendingBytes = observedEnd - static_cast<std::streamoff>(consumedBytes);
+			const auto readSize = std::min(static_cast<std::streamoff>(buffer.size()), pendingBytes);
+			input.read(buffer.data(), readSize);
 			const std::streamsize bytesRead = input.gcount();
 			if (bytesRead <= 0)
 			{
@@ -92,13 +99,13 @@ namespace Process
 		return decision;
 	}
 
-	static bool VerifyChildAfterReadiness(const WindowsOwnedProcess& child, ChildProcessResult& result)
+	static bool VerifyChildAfterReadiness(WindowsOwnedProcess& child, ChildProcessResult& result)
 	{
-		const DWORD childState = WaitForSingleObject(child.Process.Get(), 0);
+		const DWORD childState = WaitForSingleObject(child.Process.native_handle(), 0);
 		if (childState == WAIT_OBJECT_0)
 		{
 			DWORD exitCode = 1;
-			GetExitCodeProcess(child.Process.Get(), &exitCode);
+			GetExitCodeProcess(child.Process.native_handle(), &exitCode);
 			result.ExitCode = static_cast<int>(exitCode);
 			result.FailureReason = "Child exited during readiness verification.";
 			return false;
@@ -113,7 +120,7 @@ namespace Process
 		return true;
 	}
 
-	static bool ReleaseWindowsProcessOwnership(const WindowsOwnedProcess& child, ChildProcessResult& result)
+	static bool ReleaseWindowsProcessOwnership(WindowsOwnedProcess& child, ChildProcessResult& result)
 	{
 		JOBOBJECT_EXTENDED_LIMIT_INFORMATION releasedLimits{};
 		const bool bLimitsReleased = SetInformationJobObject(child.Job.Get(), JobObjectExtendedLimitInformation, &releasedLimits, static_cast<DWORD>(sizeof(releasedLimits))) != FALSE;
@@ -125,10 +132,19 @@ namespace Process
 			result.FailureReason = "Application became ready, but process ownership could not be transferred: " + FormatWindowsProcessError(releaseError);
 			return false;
 		}
+		JOBOBJECT_ASSOCIATE_COMPLETION_PORT releasedCompletion{};
+		const bool bCompletionReleased = SetInformationJobObject(child.Job.Get(), JobObjectAssociateCompletionPortInformation, &releasedCompletion, sizeof(releasedCompletion)) != FALSE;
+		if (!bCompletionReleased)
+		{
+			const DWORD releaseError = GetLastError();
+			TerminateOwnedWindowsProcess(child);
+			result.FailureReason = "Application ownership transfer could not release completion observation: " + FormatWindowsProcessError(releaseError);
+			return false;
+		}
 		return true;
 	}
 
-	static void ValidateAndReleaseChildProcess(const ChildProcessRequest& request, const WindowsOwnedProcess& child, ChildProcessResult& result)
+	static void ValidateAndReleaseChildProcess(const ChildProcessRequest& request, WindowsOwnedProcess& child, ChildProcessResult& result)
 	{
 		const auto decision = EvaluateChildReadiness(request, result);
 		if (decision == ChildReadinessDecision::Rejected)
@@ -144,11 +160,14 @@ namespace Process
 		{
 			return;
 		}
+		child.Process.detach();
+		child.Job.Reset();
+		child.JobCompletion.Reset();
 		result.bReady = decision == ChildReadinessDecision::Ready;
 		result.ExitCode = result.bReady ? 0 : -1;
 	}
 
-	static void WaitForChildReadiness(const ChildProcessRequest& request, const WindowsOwnedProcess& child, const WindowsProcessHandle& readinessEvent, ChildProcessResult& result)
+	static void WaitForChildReadiness(const ChildProcessRequest& request, WindowsOwnedProcess& child, const WindowsProcessHandle& readinessEvent, ChildProcessResult& result)
 	{
 		const bool bCancellationRequested = request.Cancellation.stop_requested();
 		const HANDLE cancelEventHandle = CreateEventW(nullptr, TRUE, bCancellationRequested, nullptr);
@@ -164,7 +183,7 @@ namespace Process
 		std::stop_callback cancellationWake(request.Cancellation, [event = cancelEvent.Get()] { SetEvent(event); });
 
 		std::uint64_t consumedLogBytes = 0;
-		const std::array<HANDLE, 3> waits = {child.Process.Get(), readinessEvent.Get(), cancelEvent.Get()};
+		const std::array<HANDLE, 3> waits = {child.Process.native_handle(), readinessEvent.Get(), cancelEvent.Get()};
 		while (true)
 		{
 			const DWORD waitResult = WaitForMultipleObjects(static_cast<DWORD>(waits.size()), waits.data(), FALSE, 50);
@@ -176,7 +195,7 @@ namespace Process
 			if (waitResult == WAIT_OBJECT_0)
 			{
 				DWORD exitCode = 1;
-				GetExitCodeProcess(child.Process.Get(), &exitCode);
+				GetExitCodeProcess(child.Process.native_handle(), &exitCode);
 				result.ExitCode = static_cast<int>(exitCode);
 				result.FailureReason = "Child process exited before reporting application readiness.";
 				return;
@@ -232,7 +251,25 @@ namespace Process
 			return result;
 		}
 		outputFile.Reset();
-		WaitForChildReadiness(request, child, readinessEvent, result);
+		try
+		{
+			WaitForChildReadiness(request, child, readinessEvent, result);
+		}
+		catch (const std::exception& error)
+		{
+			TerminateOwnedWindowsProcess(child);
+			result.FailureReason = error.what();
+		}
+		catch (...)
+		{
+			TerminateOwnedWindowsProcess(child);
+			result.FailureReason = "Child process readiness output failed.";
+		}
+		if (child.Job)
+		{
+			TerminateOwnedWindowsProcess(child);
+			AppendWindowsProcessTerminationFailure(child, result);
+		}
 		return result;
 	}
 }

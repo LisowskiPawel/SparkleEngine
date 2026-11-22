@@ -63,7 +63,7 @@ function(sparkle_prepare_git_fetchcontent_source dependency_name)
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET)
     execute_process(
-        COMMAND "${GIT_EXECUTABLE}" status --porcelain --untracked-files=all
+        COMMAND "${GIT_EXECUTABLE}" status --porcelain --untracked-files=all --ignore-submodules=none
         WORKING_DIRECTORY "${ARG_SOURCE_DIR}"
         RESULT_VARIABLE status_result
         OUTPUT_VARIABLE source_status
@@ -116,7 +116,7 @@ function(sparkle_declare_git_dependency dependency_name repository revision)
         GIT_REPOSITORY "${repository}"
         GIT_TAG "${revision}"
         GIT_SHALLOW FALSE
-        GIT_PROGRESS FALSE)
+        GIT_PROGRESS FALSE ${ARGN})
     sparkle_prepare_git_fetchcontent_source("${dependency_name}" EXPECTED_REVISION "${revision}")
 endfunction()
 

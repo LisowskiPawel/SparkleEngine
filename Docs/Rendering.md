@@ -200,6 +200,14 @@ Classify source materials as exact, deliberately converted, visibly approximated
 
 A warmed Bistro scene switch aims to avoid hitches above 50 ms; report cold loading separately. Confirm these proposals against the first measured baseline. They do not replace [first-release requirements](Roadmap.md#release-requirements), and Reference need not run in realtime.
 
+## Animation previews
+
+GameFramework privately uses ozz-animation for pose sampling, hierarchy evaluation and four-weight morph tracks. SceneCooker preserves source identities and original skin order, converts parent-space transforms to TRS helpers and bakes STEP/cubic curves to linear previews at intervals no longer than 1/60 second. Rotation segments are also subdivided to limit linearized rotation error. Missing components use bind defaults; zero-duration clips remain static; negative morph weights and overshoot are retained.
+
+Preview rigs admit at most 1,024 evaluation joints including helpers. Unsupported shear, helper overflow, nonfinite/half-float-overflow skeletal values and collapsed normalized sample times reject with an export/bake diagnostic. Cooked skeleton/animation layouts changed: rebuild and recook assets together. Sparkle retains bounded typed loading, complete-generation publication, immutable extraction and renderer/GPU current/previous deformation ownership. There is one runtime evaluator.
+
+The current Launcher has one imported skeletal clip, CesiumMan. Knight's bound FBX currently imports as static geometry without usable vertex weights; ozz cannot reconstruct a rig from that export. See the [animation implementation and qualification record](Implementation/Animation.md) for preserved content limits, verified GPU playback/replacement/reset and remaining comparison/package checks.
+
 ## Source map
 
 Application hosts the world and renderer. GameFramework publishes immutable input; [Renderer](../Engine/Renderer) prepares scene/view/frame work; [RHI](../Engine/RHI) implements GPU operations through D3D12/Vulkan. [Module ownership and placement](Engineering.md#file-placement) describes the supporting systems.

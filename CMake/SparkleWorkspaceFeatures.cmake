@@ -22,3 +22,5 @@ endif()
 # Shared by workspace acquisition and standalone Launcher cache identity checks.
 set(SPARKLE_DIRECTXTEX_REVISION 4feb3e11a020f35b796fc769a74216a555d4f5ef)
 set(SPARKLE_KTX_REVISION 91ace88675ac59a97e55d0378a6602a9ae6b98bd)
+set(SPARKLE_OZZ_ANIMATION_REVISION 744eb9d99f606eda849acb0b1204f7a3dc20bca1)
+set(SPARKLE_SHADERMAKE_REVISION 4f1ffd56dac27fc3d620ad7efeee42b4dd71fa72)

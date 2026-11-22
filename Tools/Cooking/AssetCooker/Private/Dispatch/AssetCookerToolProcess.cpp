@@ -21,14 +21,14 @@ int AssetCookerToolProcess::Run(const std::filesystem::path& executablePath, con
 	        },
 	        .Cancellation = std::move(cancellation)});
 
-	if (!result.bLaunched)
+	if (!result.bLaunched || !result.FailureReason.empty())
 	{
 		ToolConsole::Message(
 		    std::cerr,
 		    ToolConsoleSeverity::Error,
-		    "Failed to launch tool",
+		    result.bLaunched ? "Tool execution failed" : "Failed to launch tool",
 		    {ToolConsole::QuotedField("tool", executablePath.filename().string()), ToolConsole::PathField("path", executablePath), ToolConsole::QuotedField("reason", result.FailureReason)});
-		return 1;
+		return result.ExitCode > 0 ? result.ExitCode : 1;
 	}
-	return result.ExitCode;
+	return result.bCancelled && result.ExitCode == 0 ? 1 : result.ExitCode;
 }

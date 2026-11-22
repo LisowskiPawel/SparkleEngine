@@ -8,7 +8,7 @@
 #include <string_view>
 #include <vector>
 
-class ShaderBackendPool;
+struct ShaderBackendDescriptor;
 struct ShaderCookSettings;
 struct IncludeClosureHash;
 
@@ -17,7 +17,7 @@ class ShaderCompileJobBuilder final
 public:
 	explicit ShaderCompileJobBuilder(const ShaderContractCatalog& catalog);
 
-	ShaderCompileJob Build(const ShaderCookSettings& settings, const ShaderCookDesc& shader, ShaderTarget target, ShaderBackendPool& backendPool) const;
+	ShaderCompileJob Build(const ShaderCookSettings& settings, const ShaderCookDesc& shader, ShaderTarget target, const ShaderBackendDescriptor& backend) const;
 
 private:
 	ShaderCompileRequest BuildRequest(const ShaderCookSettings& settings, const ShaderCookDesc& shader, ShaderTarget target) const;

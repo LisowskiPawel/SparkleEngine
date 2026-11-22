@@ -132,6 +132,8 @@ A frontend must not mutate Renderer CVars across threads. Global changes use the
 
 Shaders follow the same readability and responsibility rules. Put attributes on their own line before the governed declaration/control statement. Separate input checks/output from shared mathematics and feature policy.
 
+Preserve the established per-shader/pass files: declarations, registrations and `Add...Pass` functions must remain recognizable from filenames. Keep the [Unreal RDG-style](https://dev.epicgames.com/documentation/en-us/unreal-engine/render-dependency-graph-in-unreal-engine) sequence of typed parameter allocation, resource/value binding and pass addition or dispatch. Do not combine shader/pass families into aggregate files or introduce replacement binding groups to reduce file count. Small pass files are intentional.
+
 Validate domains at construction, publication or dispatch. Avoid repeated `IsValid/IsSupported/Try*`, range/finite checks, sentinels and validity plumbing inside BSDF, lighting, sampling, traversal and accumulation. Keep mathematical support, sidedness, visibility, random outcomes and required terminal branches, plus checks for values that can actually change after input validation. Fix missing guarantees at the input boundary.
 
 Document shader differences required by syntax, ABI, waves, resources or measured GPU behavior. Shader-style changes need representative DXIL/SPIR-V compilation, reflection/layout and affected cooked-package checks. Scripts/build files follow their own language tools and local conventions.

@@ -2,9 +2,6 @@
 #include "Process/Windows/ChildProcessWindows.h"
 #include "Process/CommandLineUtils.h"
 
-#include <algorithm>
-#include <cwchar>
-
 #if defined(_WIN32)
 namespace Process
 {
@@ -35,54 +32,6 @@ namespace Process
 			commandLine += CommandLine::QuoteArgument(argument);
 		}
 		return Utf8ToWide(commandLine);
-	}
-
-	std::vector<wchar_t> BuildWindowsChildEnvironment(const std::vector<Process::EnvironmentOverride>& overrides)
-	{
-		if (overrides.empty())
-		{
-			return {};
-		}
-
-		std::vector<std::wstring> entries;
-		if (LPWCH environment = GetEnvironmentStringsW())
-		{
-			for (const wchar_t* current = environment; *current != L'\0'; current += std::wcslen(current) + 1)
-			{
-				entries.emplace_back(current);
-			}
-			FreeEnvironmentStringsW(environment);
-		}
-		for (const Process::EnvironmentOverride& overrideValue : overrides)
-		{
-			const std::wstring prefix = Utf8ToWide(overrideValue.Name) + L"=";
-			const std::wstring replacement = prefix + Utf8ToWide(overrideValue.Value);
-
-			const auto matchesName = [&prefix](const std::wstring& value)
-			{
-				return value.rfind(prefix, 0) == 0;
-			};
-
-			auto entry = std::find_if(entries.begin(), entries.end(), matchesName);
-			if (entry == entries.end())
-			{
-				entries.push_back(replacement);
-			}
-			else
-			{
-				*entry = replacement;
-			}
-		}
-
-		std::sort(entries.begin(), entries.end());
-		std::vector<wchar_t> block;
-		for (const std::wstring& entry : entries)
-		{
-			block.insert(block.end(), entry.begin(), entry.end());
-			block.push_back(L'\0');
-		}
-		block.push_back(L'\0');
-		return block;
 	}
 
 }

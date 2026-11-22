@@ -26,7 +26,7 @@ namespace SparkleLauncher
 		m_activityPanel->UpdateOperationProgress(runId, phase, completed, total);
 	}
 
-	void LauncherMainWindow::DisplayOperationFinished(const QString& runId, const QString& operationId, const QString& title, const LauncherOperationResult& result)
+	void LauncherMainWindow::DisplayOperationFinished(const QString& runId, const QString& operationId, const QString&, const LauncherOperationResult& result)
 	{
 		const bool bSucceeded = result.Status == OperationStatus::Succeeded;
 		if (result.GpuCrash)
@@ -37,7 +37,7 @@ namespace SparkleLauncher
 		{
 			m_settings.SetShaderExportPath(result.ShaderExportPath);
 		}
-		m_activityPanel->DisplayOperationFinished(runId, title, result);
+		m_activityPanel->DisplayOperationFinished(runId, result);
 		m_workflowPanel->setEnabled(!m_activityPanel->HasActiveRun());
 
 		const bool bSceneStatusHandled = m_sceneCatalog->CompleteOperation(runId, operationId);

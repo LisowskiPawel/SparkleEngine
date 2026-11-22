@@ -184,9 +184,7 @@ namespace SparkleLauncher::LauncherUi
 		inline constexpr int CollapsedHeight = 40;
 		inline constexpr int ExpandedHeight = 260;
 		inline constexpr int ListWidth = 280;
-		inline constexpr int RowHeight = 26;
 		inline constexpr int HistoryRowHeight = 34;
-		inline constexpr int RunIndicatorWidth = 4;
 		inline constexpr const char* ExpandGlyph = "Show";
 		inline constexpr const char* CollapseGlyph = "Hide";
 

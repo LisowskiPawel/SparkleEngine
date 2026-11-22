@@ -4,14 +4,14 @@
 
 #include "SourceAssetPaths.h"
 
-#include "Backend/IShaderBackend.h"
-#include "Backend/ShaderBackendPool.h"
+#include "Backend/ShaderBackendFactory.h"
 #include "Compiler/ShaderCompileProfile.h"
 #include "Compiler/ShaderSourceMountTable.h"
 #include "Compiler/ShaderSourcePreprocessor.h"
 #include "Cooking/Planning/Identity/IncludeClosureHasher.h"
 #include "Cooking/Planning/Identity/ShaderCompileRequestHasher.h"
 #include "Cooking/ShaderCookSettings.h"
+#include "Cooking/ShaderCookDiagnostics.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Hash/HashUtils.h"
 
@@ -62,28 +62,36 @@ ShaderCompileInputHash ShaderCompileJobBuilder::BuildInputHash(
 	return Hash::FinalizeFnv1a64(hash);
 }
 
-ShaderCompileJob ShaderCompileJobBuilder::Build(const ShaderCookSettings& settings, const ShaderCookDesc& shader, ShaderTarget target, ShaderBackendPool& backendPool) const
+ShaderCompileJob ShaderCompileJobBuilder::Build(const ShaderCookSettings& settings, const ShaderCookDesc& shader, ShaderTarget target, const ShaderBackendDescriptor& backend) const
 {
 	ShaderCompileRequest request = BuildRequest(settings, shader, target);
-	IShaderBackend& backend = backendPool.ResolveAndAcquire(request.VirtualSourcePath, request.Target, settings.backendName);
-	IncludeClosureHash closure = PreprocessSource(request);
-	const std::uint64_t sourceHash = Hash::Fnv1a64(request.SourceCode);
-	const std::uint64_t requestHash = HashShaderCompileRequest(request);
-	std::string backendName(backend.GetBackendName());
-	const std::uint64_t backendVersion = backend.GetBackendVersion();
-	std::string targetProfile = BuildShaderTargetProfile(request);
-	const ShaderCompileInputHash inputHash = BuildInputHash(sourceHash, closure.includeClosureHash, requestHash, backendName, backendVersion);
+	try
+	{
+		backend.Capabilities.ValidateRequest(request);
+		IncludeClosureHash closure = PreprocessSource(request);
+		const std::uint64_t sourceHash = Hash::Fnv1a64(request.SourceCode);
+		const std::uint64_t requestHash = HashShaderCompileRequest(request);
+		std::string backendName(backend.Name);
+		const std::uint64_t backendVersion = backend.Version;
+		std::string targetProfile = BuildShaderTargetProfile(request);
+		const ShaderCompileInputHash inputHash = BuildInputHash(sourceHash, closure.includeClosureHash, requestHash, backendName, backendVersion);
 
-	return ShaderCompileJob{
-	    .Request = std::move(request),
-	    .BackendName = std::move(backendName),
-	    .TargetProfile = std::move(targetProfile),
-	    .BackendVersion = backendVersion,
-	    .SourceContentHash = sourceHash,
-	    .DependencyClosureHash = closure.includeClosureHash,
-	    .RequestHash = requestHash,
-	    .InputHash = inputHash,
-	    .VirtualDependencies = std::move(closure.virtualDependencies)};
+		return ShaderCompileJob{
+		    .Request = std::move(request),
+		    .BackendName = std::move(backendName),
+		    .TargetProfile = std::move(targetProfile),
+		    .BackendVersion = backendVersion,
+		    .SourceContentHash = sourceHash,
+		    .DependencyClosureHash = closure.includeClosureHash,
+		    .RequestHash = requestHash,
+		    .InputHash = inputHash,
+		    .VirtualDependencies = std::move(closure.virtualDependencies)};
+	}
+	catch (const Diagnostics::Error& error)
+	{
+		const std::string requestDescription = FormatShaderCompileRequest(request, backend.Name);
+		throw Diagnostics::Error(std::format("Failed to plan {} - {}", requestDescription, error.what()));
+	}
 }
 
 IncludeClosureHash ShaderCompileJobBuilder::PreprocessSource(ShaderCompileRequest& request)

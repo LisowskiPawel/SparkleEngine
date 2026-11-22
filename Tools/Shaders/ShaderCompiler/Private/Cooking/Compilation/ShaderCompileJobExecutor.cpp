@@ -10,77 +10,58 @@
 #include "Compiler/ShaderCompileRequest.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Hash/HashUtils.h"
-#include "Compiler/Output/ShaderDebugArtifactSet.h"
+#include "Compiler/Output/CompiledShader.h"
 
+#include <cstdint>
 #include <format>
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace ShaderCompileJobExecutor
 {
-	static CookedStageBuild CompileStage(IShaderBackend& backend, const ShaderCompileRequest& request, ShaderDebugArtifactSet* outDebugArtifacts)
-	{
-		const ShaderBackendCapabilities capabilities = backend.GetCapabilities();
-		const bool bRayLibraryUnsupported = HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::RayTracingPipeline) && !capabilities.SupportsRayTracingLibrary(request.Target);
-
-		if (bRayLibraryUnsupported)
-		{
-			throw Diagnostics::Error(std::string{"Active shader backend does not support shader libraries for target '"} + GetShaderTargetName(request.Target) + "'.");
-		}
-		const bool bInlineQueryUnsupported = HasShaderCompileFeature(request.RequiredFeatures, ShaderCompileFeatureFlags::InlineRayQuery) && !capabilities.SupportsInlineRayQuery(request.Target);
-
-		if (bInlineQueryUnsupported)
-		{
-			throw Diagnostics::Error(std::string{"Active shader backend does not support inline ray queries for target '"} + GetShaderTargetName(request.Target) + "'.");
-		}
-
-		CompiledShader compiledShader = backend.Compile(request);
-		CookedStageBuild compiledStage;
-		compiledStage.stage = request.Stage;
-		compiledStage.format = IsSpirVTarget(request.Target) ? ShaderBinaryFormat::SpirV : ShaderBinaryFormat::Dxil;
-		compiledStage.sourcePath = request.VirtualSourcePath;
-		compiledStage.entryPoint = request.EntryPoint;
-		compiledStage.backendName.assign(backend.GetBackendName());
-		compiledStage.codegenTarget.assign(GetShaderTargetName(request.Target));
-		compiledStage.backendVersion = backend.GetBackendVersion();
-		compiledStage.bytecode = compiledShader.TakeBytecode();
-		compiledStage.bytecodeHash = Hash::Fnv1a64(compiledStage.bytecode.data(), compiledStage.bytecode.size());
-		compiledStage.reflection = compiledShader.TakeReflection();
-
-		if (outDebugArtifacts != nullptr)
-		{
-			*outDebugArtifacts = compiledShader.TakeDebugArtifacts();
-		}
-
-		return compiledStage;
-	}
-
 	ShaderCompileResult Execute(const ShaderCompileJob& job)
 	{
-		ShaderDebugArtifactSet debugArtifacts;
-		CookedStageBuild output;
 		try
 		{
 			std::unique_ptr<IShaderBackend> backend = CreateShaderBackend(job.BackendName);
-			output = CompileStage(*backend, job.Request, job.Request.bCaptureDebugArtifacts ? &debugArtifacts : nullptr);
+			const bool bNameMatches = backend->GetBackendName() == job.BackendName;
+			const bool bVersionMatches = backend->GetBackendVersion() == job.BackendVersion;
+			if (!bNameMatches || !bVersionMatches)
+			{
+				throw Diagnostics::Error("Shader compiler identity changed after planning.");
+			}
+			CompiledShader compiledShader = backend->Compile(job.Request);
+			std::vector<std::uint8_t> bytecode = compiledShader.TakeBytecode();
+			const std::uint64_t bytecodeHash = Hash::Fnv1a64(bytecode.data(), bytecode.size());
+			CookedStageBuild output{
+			    .stage = job.Request.Stage,
+			    .format = IsSpirVTarget(job.Request.Target) ? ShaderBinaryFormat::SpirV : ShaderBinaryFormat::Dxil,
+			    .sourcePath = job.Request.VirtualSourcePath,
+			    .entryPoint = job.Request.EntryPoint,
+			    .backendName = job.BackendName,
+			    .codegenTarget = GetShaderTargetName(job.Request.Target),
+			    .backendVersion = job.BackendVersion,
+			    .sourceHash = job.SourceContentHash,
+			    .includeClosureHash = job.DependencyClosureHash,
+			    .requestHash = job.RequestHash,
+			    .compileInputHash = job.InputHash,
+			    .bytecode = std::move(bytecode),
+			    .bytecodeHash = bytecodeHash,
+			    .reflection = compiledShader.TakeReflection()};
+
+			return ShaderCompileResult{
+			    .ShaderType = job.Request.ShaderType,
+			    .Target = job.Request.Target,
+			    .InputHash = job.InputHash,
+			    .Output = std::move(output),
+			    .DebugArtifacts = compiledShader.TakeDebugArtifacts()};
 		}
 		catch (const Diagnostics::Error& error)
 		{
-			const std::string jobContext = FormatShaderCompileJob(job, job.BackendName, job.Request.Target);
+			const std::string jobContext = FormatShaderCompileJob(job);
 			throw Diagnostics::Error(std::format("Failed to compile {} - {}", jobContext, error.what()));
 		}
-
-		output.sourceHash = job.SourceContentHash;
-		output.includeClosureHash = job.DependencyClosureHash;
-		output.requestHash = job.RequestHash;
-		output.compileInputHash = job.InputHash;
-
-		return ShaderCompileResult{
-		    .ShaderType = job.Request.ShaderType,
-		    .Target = job.Request.Target,
-		    .InputHash = job.InputHash,
-		    .Output = std::move(output),
-		    .DebugArtifacts = std::move(debugArtifacts)};
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Backend/IShaderBackend.h"
+#include "Backend/ShaderBackendCapabilities.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
   #define WIN32_LEAN_AND_MEAN
@@ -34,8 +35,6 @@ public:
 
 	static ShaderBackendCapabilities GetStaticCapabilities() noexcept;
 	static std::uint64_t QueryBackendVersion();
-
-	ShaderBackendCapabilities GetCapabilities() const override;
 
 	std::string_view GetBackendName() const override;
 	std::uint64_t GetBackendVersion() const override;

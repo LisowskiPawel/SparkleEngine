@@ -9,6 +9,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QKeySequence>
 #include <QtGui/QTextCursor>
+#include <QtGui/QTextDocument>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QListWidget>
@@ -35,6 +36,21 @@ namespace SparkleLauncher
 		}
 		const quint64 boundedCompleted = std::min(completed, total);
 		return static_cast<int>(static_cast<long double>(boundedCompleted) * 100.0L / static_cast<long double>(total));
+	}
+
+	static QString RunStateText(OperationStatus state)
+	{
+		switch (state)
+		{
+			case OperationStatus::Pending:
+				return "Queued";
+			case OperationStatus::Succeeded:
+				return "Done";
+			case OperationStatus::Skipped:
+				return "Blocked";
+			default:
+				return QString::fromStdString(ToString(state));
+		}
 	}
 
 	LauncherActivityPanel::LauncherActivityPanel(
@@ -126,7 +142,18 @@ namespace SparkleLauncher
 		m_cancelRunButton->setAccessibleName("Cancel selected run");
 		m_cancelRunButton->setVisible(false);
 		registerFocusable(m_cancelRunButton);
-		connect(m_cancelRunButton, &QPushButton::clicked, this, [this, cancelRun = std::move(cancelRun)]() { cancelRun(m_activeRunId); });
+		connect(
+		    m_cancelRunButton,
+		    &QPushButton::clicked,
+		    this,
+		    [this, cancelRun = std::move(cancelRun)]()
+		    {
+			    const QListWidgetItem* item = m_runList->currentItem();
+			    if (item != nullptr)
+			    {
+				    cancelRun(item->data(Qt::UserRole).toString());
+			    }
+		    });
 		outputHeaderLayout->addWidget(m_cancelRunButton);
 
 		m_copyOutputButton = new QPushButton("Copy output", outputPane);
@@ -160,6 +187,8 @@ namespace SparkleLauncher
 		m_operationOutput = new QTextEdit(outputPane);
 		m_operationOutput->setObjectName("OperationOutput");
 		m_operationOutput->setReadOnly(true);
+		m_noticeDocument = new QTextDocument(this);
+		m_noticeDocument->setUndoRedoEnabled(false);
 		m_operationOutput->setToolTip("Select a run to view its output.");
 		m_operationOutput->setAccessibleName("Selected run output");
 		m_operationOutput->setAccessibleDescription("Read-only output for the selected run.");
@@ -175,7 +204,9 @@ namespace SparkleLauncher
 
 	void LauncherActivityPanel::ShowMessage(const QString& message)
 	{
-		m_operationOutput->setPlainText(message);
+		m_noticeDocument->setDefaultFont(m_operationOutput->font());
+		m_noticeDocument->setPlainText(message);
+		m_operationOutput->setDocument(m_noticeDocument);
 	}
 
 	void LauncherActivityPanel::RegisterRun(const QString& runId, const QString& title)
@@ -183,13 +214,13 @@ namespace SparkleLauncher
 		QListWidgetItem* item = new QListWidgetItem(m_runList);
 		item->setData(Qt::UserRole, runId);
 		item->setSizeHint(QSize(0, LauncherUi::Activity::HistoryRowHeight));
-		item->setText(QString());
-		const RunWidgets rowWidgets = CreateRunWidgets(title);
-		m_runList->setItemWidget(item, rowWidgets.Root);
-		m_runs.insert(runId, {item, rowWidgets, OperationStatus::Pending, title, title + " queued.\n"});
+		QTextDocument* output = new QTextDocument(this);
+		output->setDefaultFont(m_operationOutput->font());
+		output->setUndoRedoEnabled(false);
+		output->setPlainText(title + " queued.\n");
+		m_runs.insert(runId, {item, OperationStatus::Pending, title, output});
 		SetRunState(runId, OperationStatus::Pending, title);
 		m_runList->setCurrentItem(item);
-		m_activeRunId = runId;
 		SetExpanded(m_bExpanded);
 	}
 
@@ -206,7 +237,8 @@ namespace SparkleLauncher
 	void LauncherActivityPanel::AppendOperationOutput(const QString& runId, const QString& outputText)
 	{
 		AppendRunOutput(runId, outputText);
-		if (m_activeRunId == runId)
+		const QListWidgetItem* item = m_runList->currentItem();
+		if (item != nullptr && item->data(Qt::UserRole).toString() == runId)
 		{
 			ShowRunOutput(runId);
 		}
@@ -224,23 +256,23 @@ namespace SparkleLauncher
 		run->ProgressPhase = phase;
 		run->ProgressCompleted = completed;
 		run->ProgressTotal = total;
-		if (m_activeRunId == runId)
+		UpdateRunItem(*run);
+		if (run->Item == m_runList->currentItem())
 		{
 			ShowRunOutput(runId);
 		}
-		else
-		{
-			UpdateRunProgressPresentation(*run);
-		}
 	}
 
-	QString LauncherActivityPanel::DisplayOperationFinished(const QString& runId, const QString& title, const LauncherOperationResult& result)
+	void LauncherActivityPanel::DisplayOperationFinished(const QString& runId, const LauncherOperationResult& result)
 	{
 		auto run = m_runs.find(runId);
-		const QString effectiveTitle = run == m_runs.end() ? title : run->Title;
-		SetRunState(runId, result.Status, effectiveTitle);
-		const QString statusText = QString::fromStdString(ToString(result.Status));
+		if (run == m_runs.end())
+		{
+			return;
+		}
 
+		SetRunState(runId, result.Status, run->Title);
+		const QString statusText = QString::fromStdString(ToString(result.Status));
 		if (result.Status == OperationStatus::Succeeded)
 		{
 			AppendRunOutput(runId, "\nResult: " + statusText + "\n");
@@ -251,12 +283,6 @@ namespace SparkleLauncher
 		}
 		else
 		{
-			run = m_runs.find(runId);
-			if (run == m_runs.end())
-			{
-				return effectiveTitle;
-			}
-
 			QString diagnosis = "Result: " + statusText + "\n";
 			diagnosis += "Problem type: " + result.ProblemKind + "\n";
 			diagnosis += "What failed: " + result.Problem + "\n";
@@ -269,47 +295,50 @@ namespace SparkleLauncher
 			{
 				diagnosis += "Log: " + result.LogPath + "\n";
 			}
-			run->Output = diagnosis + "\nProcess output:\n" + run->Output;
+			QTextCursor cursor(run->Output);
+			cursor.insertText(diagnosis + "\nProcess output:\n");
 		}
 
 		ShowRunOutput(runId);
 		SetExpanded(true);
-		return effectiveTitle;
 	}
 
 	void LauncherActivityPanel::AppendRunOutput(const QString& runId, const QString& text)
 	{
 		auto run = m_runs.find(runId);
-		if (run == m_runs.end())
+		if (run == m_runs.end() || text.isEmpty())
 		{
 			return;
 		}
 
-		run->Output += text;
-		const int overflowCharacters = run->Output.size() - kMaxOperationOutputCharacters;
+		const bool bSkipLineFeed = run->bOutputEndsWithCarriageReturn && text.startsWith('\n');
+		run->bOutputEndsWithCarriageReturn = text.endsWith('\r');
+		QTextCursor cursor(run->Output);
+		cursor.movePosition(QTextCursor::End);
+		cursor.insertText(bSkipLineFeed ? text.sliced(1) : text);
+		const int overflowCharacters = run->Output->characterCount() - 1 - kMaxOperationOutputCharacters;
 		if (overflowCharacters > 0)
 		{
-			run->Output.remove(0, overflowCharacters);
+			cursor.setPosition(0);
+			cursor.setPosition(overflowCharacters, QTextCursor::KeepAnchor);
+			cursor.removeSelectedText();
 		}
 	}
 
-	void LauncherActivityPanel::UpdateRunProgressPresentation(RunRecord& run)
+	void LauncherActivityPanel::UpdateRunItem(const RunRecord& run)
 	{
-		if (run.State != OperationStatus::Running || run.Widgets.StateLabel == nullptr)
+		QString stateText = RunStateText(run.State);
+		if (run.State == OperationStatus::Running && run.ProgressTotal != 0)
 		{
-			return;
+			stateText += QStringLiteral(" \u00b7 %1%").arg(ProgressPercentage(run.ProgressCompleted, run.ProgressTotal));
 		}
-
-		QString stateText = "Running";
-		if (run.ProgressTotal != 0)
-		{
-			stateText += QStringLiteral(" · %1%").arg(ProgressPercentage(run.ProgressCompleted, run.ProgressTotal));
-		}
-		run.Widgets.StateLabel->setText(stateText);
-		if (run.Item != nullptr)
-		{
-			run.Item->setData(Qt::AccessibleTextRole, stateText + ": " + run.Title);
-		}
+		const QString caption = stateText + ": " + run.Title;
+		run.Item->setText(caption);
+		run.Item->setIcon(IconForState(run.State));
+		run.Item->setData(Qt::UserRole + 1, stateText);
+		run.Item->setData(Qt::AccessibleTextRole, caption);
+		run.Item->setData(Qt::AccessibleDescriptionRole, "Launcher activity run " + RunStateText(run.State).toLower());
+		run.Item->setToolTip(caption);
 	}
 
 	void LauncherActivityPanel::ShowRunOutput(const QString& runId)
@@ -320,65 +349,53 @@ namespace SparkleLauncher
 			return;
 		}
 
-		m_activeRunId = runId;
-		UpdateRunSelectionVisuals();
+		if (m_runList->currentItem() != run->Item)
+		{
+			m_runList->setCurrentItem(run->Item);
+			return;
+		}
+
 		const OperationStatus state = run->State;
 		m_cancelRunButton->setVisible(state == OperationStatus::Pending || state == OperationStatus::Running);
-		const QString& title = run->Title;
-		QString stateName;
-		switch (state)
+		const QString stateText = RunStateText(state);
+		const QString stateName = stateText.toLower();
+		QString summary = stateText + ": " + run->Title + ". ";
+		if (state == OperationStatus::Running)
 		{
-			case OperationStatus::Pending:
-				stateName = "queued";
-
-				m_selectedRunSummary->setText("Queued: " + title + ". Waiting to start.");
-				break;
-
-			case OperationStatus::Running:
-				stateName = "running";
-
-				if (run->bHasProgress)
+			if (run->bHasProgress)
+			{
+				summary += run->ProgressPhase;
+				if (run->ProgressTotal != 0)
 				{
-					QString progressText = run->ProgressPhase;
-					if (run->ProgressTotal != 0)
-					{
-						progressText += QStringLiteral(" — %1/%2 (%3%)")
-						                    .arg(static_cast<qulonglong>(run->ProgressCompleted))
-						                    .arg(static_cast<qulonglong>(run->ProgressTotal))
-						                    .arg(ProgressPercentage(run->ProgressCompleted, run->ProgressTotal));
-					}
-					m_selectedRunSummary->setText("Running: " + title + ". " + progressText + ".");
+					summary += QStringLiteral(" \u2014 %1/%2 (%3%)")
+					               .arg(static_cast<qulonglong>(run->ProgressCompleted))
+					               .arg(static_cast<qulonglong>(run->ProgressTotal))
+					               .arg(ProgressPercentage(run->ProgressCompleted, run->ProgressTotal));
 				}
-				else
-				{
-					m_selectedRunSummary->setText("Running: " + title + ". Waiting for progress from the active tool.");
-				}
-				break;
-
-			case OperationStatus::Succeeded:
-				stateName = "done";
-
-				m_selectedRunSummary->setText("Done: " + title + ". Output is available below.");
-				break;
-
-			case OperationStatus::Skipped:
-				stateName = "blocked";
-
-				m_selectedRunSummary->setText("Blocked: " + title + ". Follow the next action below.");
-				break;
-
-			case OperationStatus::Canceled:
-				stateName = "canceled";
-
-				m_selectedRunSummary->setText("Canceled: " + title + ". Run it again when ready.");
-				break;
-
-			case OperationStatus::Failed:
-				stateName = "failed";
-
-				m_selectedRunSummary->setText("Failed: " + title + ". Follow the next action below.");
-				break;
+				summary += ".";
+			}
+			else
+			{
+				summary += "Waiting for progress from the active tool.";
+			}
 		}
+		else if (state == OperationStatus::Pending)
+		{
+			summary += "Waiting to start.";
+		}
+		else if (state == OperationStatus::Succeeded)
+		{
+			summary += "Output is available below.";
+		}
+		else if (state == OperationStatus::Canceled)
+		{
+			summary += "Run it again when ready.";
+		}
+		else
+		{
+			summary += "Follow the next action below.";
+		}
+		m_selectedRunSummary->setText(summary);
 		m_selectedRunSummary->setProperty("RunState", stateName);
 		m_selectedRunSummary->style()->unpolish(m_selectedRunSummary);
 		m_selectedRunSummary->style()->polish(m_selectedRunSummary);
@@ -404,10 +421,13 @@ namespace SparkleLauncher
 		const bool bCompactOutput = state == OperationStatus::Succeeded;
 		m_operationOutput->setMinimumHeight(bCompactOutput ? LauncherUi::OperationOutput::MinHeight : LauncherUi::OperationOutput::ProminentMinHeight);
 		m_operationOutput->setMaximumHeight(bCompactOutput ? LauncherUi::OperationOutput::CompactMaxHeight : LauncherUi::OperationOutput::MaxHeight);
-		m_operationOutput->setPlainText(run->Output);
+		if (m_operationOutput->document() != run->Output)
+		{
+			m_operationOutput->setDocument(run->Output);
+		}
 		m_operationOutput->moveCursor(QTextCursor::End);
 
-		const bool bCanCopyOutput = m_bExpanded && !m_operationOutput->toPlainText().isEmpty();
+		const bool bCanCopyOutput = m_bExpanded && !m_operationOutput->document()->isEmpty();
 		m_copyOutputButton->setVisible(!runId.isEmpty());
 		m_copyOutputButton->setEnabled(bCanCopyOutput);
 		m_copyOutputButton->setToolTip(bCanCopyOutput ? "Copy output for the selected run. Shortcut: Ctrl+Shift+C." : "Select a run to copy its output. Shortcut: Ctrl+Shift+C.");
@@ -416,40 +436,6 @@ namespace SparkleLauncher
 	bool LauncherActivityPanel::HasActiveRun() const
 	{
 		return std::any_of(m_runs.cbegin(), m_runs.cend(), [](const RunRecord& run) { return run.State == OperationStatus::Pending || run.State == OperationStatus::Running; });
-	}
-
-	LauncherActivityPanel::RunWidgets LauncherActivityPanel::CreateRunWidgets(const QString& title)
-	{
-		RunWidgets widgets;
-		QWidget* row = new QWidget(m_runList);
-		row->setObjectName("ActivityRunRow");
-		row->setFixedHeight(LauncherUi::Activity::RowHeight);
-		QHBoxLayout* rowLayout = new QHBoxLayout(row);
-		rowLayout->setContentsMargins(0, 0, 0, 0);
-		rowLayout->setSpacing(LauncherUi::Space::Small - 2);
-
-		QFrame* indicator = new QFrame(row);
-		indicator->setObjectName("ActivityRunIndicator");
-		indicator->setFixedWidth(LauncherUi::Activity::RunIndicatorWidth);
-		rowLayout->addWidget(indicator, 0);
-
-		QVBoxLayout* textLayout = new QVBoxLayout();
-		textLayout->setContentsMargins(0, 0, 0, 0);
-		textLayout->setSpacing(0);
-		QLabel* titleLabel = new QLabel(title, row);
-		titleLabel->setObjectName("ActivityRunTitle");
-		titleLabel->setWordWrap(false);
-		QLabel* stateLabel = new QLabel("Queued", row);
-		stateLabel->setObjectName("ActivityRunState");
-		textLayout->addWidget(titleLabel);
-		textLayout->addWidget(stateLabel);
-		rowLayout->addLayout(textLayout, 1);
-
-		widgets.Root = row;
-		widgets.Indicator = indicator;
-		widgets.TitleLabel = titleLabel;
-		widgets.StateLabel = stateLabel;
-		return widgets;
 	}
 
 	QIcon LauncherActivityPanel::IconForState(OperationStatus state) const
@@ -516,63 +502,7 @@ namespace SparkleLauncher
 		run->State = state;
 		run->Title = title;
 
-		QString stateText;
-		switch (state)
-		{
-			case OperationStatus::Pending:
-				stateText = "Queued";
-				break;
-
-			case OperationStatus::Running:
-				stateText = "Running";
-				break;
-
-			case OperationStatus::Succeeded:
-				stateText = "Done";
-				break;
-
-			case OperationStatus::Skipped:
-				stateText = "Blocked";
-				break;
-
-			case OperationStatus::Canceled:
-				stateText = "Canceled";
-				break;
-
-			case OperationStatus::Failed:
-				stateText = "Failed";
-				break;
-		}
-
-		run->Item->setText(QString());
-		run->Item->setIcon(IconForState(state));
-		run->Item->setData(Qt::UserRole + 1, stateText);
-		run->Item->setData(Qt::AccessibleTextRole, stateText + ": " + title);
-		run->Item->setData(Qt::AccessibleDescriptionRole, "Launcher activity run " + stateText.toLower());
-		run->Item->setToolTip(stateText + ": " + title);
-
-		const RunWidgets& widgets = run->Widgets;
-		if (widgets.Root != nullptr)
-		{
-			widgets.Root->setProperty("RunState", stateText.toLower());
-			if (widgets.Indicator != nullptr)
-			{
-				widgets.Indicator->setProperty("RunState", stateText.toLower());
-				widgets.Indicator->style()->unpolish(widgets.Indicator);
-				widgets.Indicator->style()->polish(widgets.Indicator);
-			}
-			if (widgets.TitleLabel != nullptr)
-			{
-				widgets.TitleLabel->setText(title);
-			}
-			if (widgets.StateLabel != nullptr)
-			{
-				widgets.StateLabel->setText(stateText);
-			}
-			widgets.Root->style()->unpolish(widgets.Root);
-			widgets.Root->style()->polish(widgets.Root);
-		}
-		UpdateRunSelectionVisuals();
+		UpdateRunItem(*run);
 	}
 
 	void LauncherActivityPanel::SetExpanded(bool bExpanded)
@@ -591,22 +521,8 @@ namespace SparkleLauncher
 		m_toggleOutputButton->setToolTip(!bHasRuns ? "Run a workflow to view its activity." : bExpanded ? "Minimize recent runs and raw process output." : "Show recent runs and raw process output.");
 		m_toggleOutputButton->setAccessibleDescription(m_toggleOutputButton->toolTip());
 
-		const bool bCanCopyOutput = bExpanded && !m_operationOutput->toPlainText().isEmpty();
-		m_copyOutputButton->setVisible(bExpanded && !m_activeRunId.isEmpty());
+		const bool bCanCopyOutput = bExpanded && !m_operationOutput->document()->isEmpty();
+		m_copyOutputButton->setVisible(bExpanded && m_runList->currentItem() != nullptr);
 		m_copyOutputButton->setEnabled(bCanCopyOutput);
-	}
-
-	void LauncherActivityPanel::UpdateRunSelectionVisuals()
-	{
-		for (auto it = m_runs.begin(); it != m_runs.end(); ++it)
-		{
-			const bool bSelected = it.key() == m_activeRunId;
-			if (it->Widgets.Root != nullptr)
-			{
-				it->Widgets.Root->setProperty("Selected", bSelected);
-				it->Widgets.Root->style()->unpolish(it->Widgets.Root);
-				it->Widgets.Root->style()->polish(it->Widgets.Root);
-			}
-		}
 	}
 }

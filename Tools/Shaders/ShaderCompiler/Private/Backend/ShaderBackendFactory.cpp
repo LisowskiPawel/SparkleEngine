@@ -63,10 +63,15 @@ static std::string GetVirtualSourceExtension(std::string_view sourcePath)
 	return NormalizeShaderBackendName(sourcePath.substr(period));
 }
 
-static const ShaderBackendEntry* FindShaderBackend(std::string_view name) noexcept
+static const ShaderBackendEntry& GetShaderBackend(std::string_view name)
 {
-	const auto backend = std::ranges::find(kShaderBackends, name, &ShaderBackendEntry::Name);
-	return backend != kShaderBackends.end() ? &*backend : nullptr;
+	const std::string normalized = NormalizeShaderBackendName(name);
+	const auto backend = std::ranges::find(kShaderBackends, normalized, &ShaderBackendEntry::Name);
+	if (backend == kShaderBackends.end())
+	{
+		throw Diagnostics::Error("Unknown shader backend '" + std::string(name) + "'.");
+	}
+	return *backend;
 }
 
 static std::string SelectAutomaticShaderBackendName(std::string_view sourcePath, ShaderTarget target)
@@ -88,9 +93,15 @@ std::vector<ShaderBackendDescriptor> ListShaderBackends()
 	descriptors.reserve(kShaderBackends.size());
 	for (const ShaderBackendEntry& backend : kShaderBackends)
 	{
-		descriptors.push_back({.Name = backend.Name, .SourceExtension = backend.SourceExtension, .Capabilities = backend.Capabilities, .Version = backend.QueryVersion()});
+		descriptors.push_back(QueryShaderBackend(backend.Name));
 	}
 	return descriptors;
+}
+
+ShaderBackendDescriptor QueryShaderBackend(std::string_view name)
+{
+	const ShaderBackendEntry& backend = GetShaderBackend(name);
+	return {.Name = backend.Name, .SourceExtension = backend.SourceExtension, .Capabilities = backend.Capabilities, .Version = backend.QueryVersion()};
 }
 
 std::span<const std::string_view> ListShaderBinaryFormats() noexcept
@@ -105,13 +116,8 @@ std::span<const ShaderTarget> ListShaderCodegenTargets() noexcept
 
 std::unique_ptr<IShaderBackend> CreateShaderBackend(std::string_view name)
 {
-	const ShaderBackendEntry* backend = FindShaderBackend(NormalizeShaderBackendName(name));
-	if (backend == nullptr)
-	{
-		throw Diagnostics::Error("Unknown shader backend '" + std::string(name) + "'.");
-	}
-
-	return backend->Create();
+	const ShaderBackendEntry& backend = GetShaderBackend(name);
+	return backend.Create();
 }
 
 std::string ResolveShaderBackendName(std::string_view sourcePath, ShaderTarget target, std::string_view requestedName)
@@ -126,15 +132,11 @@ std::string ResolveShaderBackendName(std::string_view sourcePath, ShaderTarget t
 		}
 	}
 
-	const ShaderBackendEntry* backend = FindShaderBackend(selectedName);
-	if (backend == nullptr)
-	{
-		throw Diagnostics::Error("Unknown shader backend '" + selectedName + "'.");
-	}
-	if (!backend->Capabilities.SupportsTarget(target))
+	const ShaderBackendEntry& backend = GetShaderBackend(selectedName);
+	if (!backend.Capabilities.SupportsTarget(target))
 	{
 		throw Diagnostics::Error("Shader backend '" + selectedName + "' does not support target '" + GetShaderTargetName(target) + "'.");
 	}
 
-	return std::string(backend->Name);
+	return std::string(backend.Name);
 }

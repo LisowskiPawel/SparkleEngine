@@ -1,3 +1,17 @@
+# Stage the private batch tool through the same owner as the compiler payloads.
+sparkle_configure_host_tool_target(ShaderMake)
+add_custom_target(ShaderCompilerBatchTool
+    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:ShaderCompiler>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:ShaderMake>" "$<TARGET_FILE_DIR:ShaderCompiler>/ShaderMake.exe"
+    DEPENDS ShaderMake
+    VERBATIM)
+set_target_properties(ShaderCompilerBatchTool PROPERTIES FOLDER "Tools")
+add_dependencies(ShaderCompiler ShaderCompilerBatchTool)
+set_property(TARGET ShaderCompiler APPEND PROPERTY SPARKLE_RUNTIME_SUPPORT_FILES ShaderMake.exe)
+get_target_property(_shadermake_source_package ShaderMake SPARKLE_SOURCE_PACKAGE)
+set_property(TARGET ShaderCompiler PROPERTY SPARKLE_SOURCE_PACKAGE "${_shadermake_source_package}")
+
 # Declare each Slang payload's staging and release inventory together.
 set(_shader_runtime_support)
 foreach(_support IN LISTS SLANG_RUNTIME_SUPPORT_FILES)

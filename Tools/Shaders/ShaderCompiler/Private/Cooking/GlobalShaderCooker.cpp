@@ -3,13 +3,9 @@
 
 #include "Cooking/GlobalShaderCooker.h"
 
-#include "Backend/ShaderBackendPool.h"
 #include "Cooking/Publication/ShaderArtifactPublication.h"
 #include "Cooking/Compilation/ShaderCompileBatch.h"
 #include "Cooking/Planning/ShaderCookPlanBuilder.h"
-#include "Core/Public/Diagnostics/Error.h"
-
-#include <span>
 
 ShaderCookResult CookGlobalShaders(const ShaderCookSettings& settings, const ToolWorkProgressCallback& progress)
 {
@@ -19,8 +15,7 @@ ShaderCookResult CookGlobalShaders(const ShaderCookSettings& settings, const Too
 	{
 		progress({.Action = "Planning shader cook"});
 	}
-	ShaderBackendPool backendPool;
-	ShaderCookPipelinePlan plan = BuildShaderCookPlan(settings, backendPool, progress);
+	ShaderCookPipelinePlan plan = BuildShaderCookPlan(settings, progress);
 	result.compileJobCount = plan.jobs.size();
 	result.selectedShaderCount = plan.shaders.size();
 	if (plan.jobs.empty() && plan.removedShaderTypeCount == 0)

@@ -1,0 +1,136 @@
+ShaderMake compiler contract
+Base: 4f1ffd56dac27fc3d620ad7efeee42b4dd71fa72
+License: MIT (upstream LICENSE.txt and ThirdPartyLicenses.txt)
+
+Expose explicit precision/profile/extension/define policy controls and include
+them in the upstream signature. Preserve relative compiler/source paths when
+requested, use native filesystem cwd discovery and encode diagnostic paths as
+UTF-8. Sparkle supplies contained ASCII paths to the nested shell; this option
+is not a general shell-argument serializer. No compiler/process implementation
+is added. Keep the shared source cache unmodified.
+
+diff --git a/ShaderMake/ShaderMake.cpp b/ShaderMake/ShaderMake.cpp
+index e3e25ea..fbad0fb 100644
+--- a/ShaderMake/ShaderMake.cpp
++++ b/ShaderMake/ShaderMake.cpp
+@@ -103,7 +103,7 @@ struct Options {
+     vector<fs::path> includeDirs;
+     vector<fs::path> relaxedIncludes;
+     vector<string> defines;
+-    vector<string> spirvExtensions = {"SPV_EXT_descriptor_indexing", "KHR"};
++    vector<string> spirvExtensions;
+     vector<string> compilerOptions;
+     vector<string> metalShaderConverterOptions;
+     vector<string> compilerAliasArgs;
+@@ -148,6 +148,11 @@ struct Options {
+     bool stripReflection = false;
+     bool matrixRowMajor = false;
+     bool hlsl2021 = false;
++    bool no16bitTypes = false;
++    const char* slangProfile = nullptr;
++    bool noDefaultSpirvExtensions = false;
++    bool noImplicitDefines = false;
++    bool relativePaths = false;
+     bool verbose = false;
+     bool colorize = false;
+     bool slang = false;
+@@ -301,7 +306,7 @@ static uint64_t HashString(const string& value) {
+ }
+ 
+ static string PathToString(fs::path path) {
+-    return path.lexically_normal().make_preferred().string();
++    return path.lexically_normal().make_preferred().u8string();
+ }
+ 
+ static fs::path RemoveLeadingDotDots(const fs::path& path) {
+@@ -667,6 +672,11 @@ static string GetBuildSignature() {
+     AppendBuildSignatureValue(signature, "stripReflection", to_string(g_Options.stripReflection));
+     AppendBuildSignatureValue(signature, "matrixRowMajor", to_string(g_Options.matrixRowMajor));
+     AppendBuildSignatureValue(signature, "hlsl2021", to_string(g_Options.hlsl2021));
++    AppendBuildSignatureValue(signature, "no16bitTypes", to_string(g_Options.no16bitTypes));
++    AppendBuildSignatureValue(signature, "slangProfile", g_Options.slangProfile ? g_Options.slangProfile : "");
++    AppendBuildSignatureValue(signature, "noDefaultSpirvExtensions", to_string(g_Options.noDefaultSpirvExtensions));
++    AppendBuildSignatureValue(signature, "noImplicitDefines", to_string(g_Options.noImplicitDefines));
++    AppendBuildSignatureValue(signature, "relativePaths", to_string(g_Options.relativePaths));
+     AppendBuildSignaturePaths(signature, "include", g_Options.includeDirs);
+     AppendBuildSignaturePaths(signature, "relaxedInclude", g_Options.relaxedIncludes);
+     AppendBuildSignatureValues(signature, "define", g_Options.defines);
+@@ -1272,6 +1282,11 @@ bool Options::Parse(int32_t argc, const char** argv) {
+         OPT_BOOLEAN(0, "stripReflection", &stripReflection, "Maps to '-Qstrip_reflect' DXC/FXC option: strip reflection information from a shader binary", nullptr, 0, 0),
+         OPT_BOOLEAN(0, "matrixRowMajor", &matrixRowMajor, "Maps to '-Zpr' DXC/FXC option: pack matrices in row-major order", nullptr, 0, 0),
+         OPT_BOOLEAN(0, "hlsl2021", &hlsl2021, "Maps to '-HV 2021' DXC option: enable HLSL 2021 standard", nullptr, 0, 0),
++        OPT_BOOLEAN(0, "no16bitTypes", &no16bitTypes, "Do not automatically enable DXC native 16-bit types", nullptr, 0, 0),
++        OPT_STRING(0, "slangProfile", &slangProfile, "Exact Slang target profile, replacing the generated profile", nullptr, 0, 0),
++        OPT_BOOLEAN(0, "noDefaultSpirvExtensions", &noDefaultSpirvExtensions, "Use only explicitly requested SPIR-V extensions", nullptr, 0, 0),
++        OPT_BOOLEAN(0, "noImplicitDefines", &noImplicitDefines, "Do not inject compiler or platform defines into compiler arguments", nullptr, 0, 0),
++        OPT_BOOLEAN(0, "relativePaths", &relativePaths, "Keep relative source and compiler paths in child commands", nullptr, 0, 0),
+         OPT_BOOLEAN(0, "slang", &slang, "Compiler is Slang", nullptr, 0, 0),
+         OPT_BOOLEAN(0, "slangHLSL", &slangHlsl, "Use HLSL compatibility mode when compiler is Slang", nullptr, 0, 0),
+         OPT_GROUP("Defines & include directories:"),
+@@ -1322,6 +1337,9 @@ bool Options::Parse(int32_t argc, const char** argv) {
+     argparse_describe(&argparse, nullptr, "\nMulti-threaded shader compiling & processing tool");
+     argparse_parse(&argparse, argc, argv);
+ 
++    if (!noDefaultSpirvExtensions)
++        spirvExtensions.insert(spirvExtensions.begin(), {"SPV_EXT_descriptor_indexing", "KHR"});
++
+     if (!config) {
+         Printf(RED "ERROR: Config file not specified!\n");
+         return false;
+@@ -1511,18 +1529,8 @@ bool Options::Parse(int32_t argc, const char** argv) {
+         return false;
+     }
+ 
+-    // Absolute path is needed for source files to get "clickable" messages
+-#ifdef _WIN32
+-    char cd[MAX_PATH];
+-    if (!GetCurrentDirectoryA(sizeof(cd), cd))
+-#else
+-    char cd[PATH_MAX];
+-    if (!getcwd(cd, sizeof(cd)))
+-#endif
+-    {
+-        Printf(RED "ERROR: Cannot get the working directory!\n");
+-        return false;
+-    }
++    // Relative child paths avoid cmd.exe expansion of the working directory on Windows.
++    const fs::path cd = relativePaths ? fs::path(".") : fs::current_path();
+ 
+     configFile = fs::path(cd) / fs::path(config);
+ 
+@@ -1792,7 +1800,7 @@ static void ExeCompile() {
+                 }
+ 
+                 // Profile
+-                cmd << " -profile " << taskData.profile << "_" << taskData.shaderModel;
++                cmd << " -profile " << (g_Options.slangProfile ? string(g_Options.slangProfile) : taskData.profile + "_" + taskData.shaderModel);
+ 
+                 // Target/platform
+                 cmd << " -target " << g_PlatformSlangTargets[g_Options.platform];
+@@ -1908,7 +1916,7 @@ static void ExeCompile() {
+                 cmd << optimizationLevelRemap[taskData.optimizationLevel];
+ 
+                 uint32_t smMajor = 0, smMinor = 0;
+-                if (ParseShaderModelVersion(taskData.shaderModel.c_str(), smMajor, smMinor) && g_Options.platform != DXBC && (smMajor > 6 || (smMajor == 6 && smMinor >= 2)))
++                if (!g_Options.no16bitTypes && ParseShaderModelVersion(taskData.shaderModel.c_str(), smMajor, smMinor) && g_Options.platform != DXBC && (smMajor > 6 || (smMajor == 6 && smMinor >= 2)))
+                     cmd << " -enable-16bit-types";
+ 
+                 if (g_Options.warningsAreErrors)
+@@ -2437,14 +2445,14 @@ static bool ProcessConfigLine(uint32_t lineIndex, const string& line, const fs::
+     taskData.profile = configLine.profile;
+     taskData.shaderModel = configLine.shaderModel;
+     fs::path compilerPath = compilerAlias ? compilerAlias->path : fs::path(g_Options.compiler);
+-    taskData.compiler = PathToString(fs::absolute(compilerPath));
++    taskData.compiler = PathToString(g_Options.relativePaths ? compilerPath : fs::absolute(compilerPath));
+     taskData.compilerType = compilerType;
+     taskData.combinedDefines = combinedDefines;
+     taskData.outputFileWithoutExt = outputFileWithoutExt;
+     taskData.defines = configLine.defines;
+-    if (taskData.compilerType == COMPILER_SLANG && !HasDefine(g_Options.defines, "__SLANG__"))
++    if (!g_Options.noImplicitDefines && taskData.compilerType == COMPILER_SLANG && !HasDefine(g_Options.defines, "__SLANG__"))
+         AddImplicitDefine(taskData.defines, "__SLANG__");
+-    if (g_Options.platform == SPIRV && !HasDefine(g_Options.defines, "__spirv__"))
++    if (!g_Options.noImplicitDefines && g_Options.platform == SPIRV && !HasDefine(g_Options.defines, "__spirv__"))
+         AddImplicitDefine(taskData.defines, "__spirv__");
+     taskData.compilerOptions = configLine.compilerOptions;
+     taskData.compilerOptionsDXIL = configLine.compilerOptionsDXIL;

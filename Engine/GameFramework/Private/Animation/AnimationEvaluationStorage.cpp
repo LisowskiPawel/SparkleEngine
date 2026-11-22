@@ -83,18 +83,21 @@ namespace ECS
 
 		PoseWorkSlot work{.Entity = entity, .Clip = clipHandle, .Skeleton = clip.Skeleton, .SourceInstanceId = sourceInstanceId};
 		const std::size_t jointCount = skeleton.Resource->joints.size();
-		work.LocalTransforms.resize(jointCount);
-		work.ModelSpaceTransforms.resize(jointCount);
+		// Rebuilding generation-bound work creates fresh contexts, including reused
+		// resource addresses. Immutable clips outlive all tasks using these slots.
+		work.Context = std::make_unique<ozz::animation::SamplingJob::Context>(skeleton.Resource->evaluation.num_joints());
+		work.LocalTransforms.resize(skeleton.Resource->evaluation.num_soa_joints());
+		work.ModelSpaceTransforms.resize(skeleton.Resource->evaluation.num_joints());
 		work.JointMatrices.resize(jointCount);
 		m_poseWork.push_back(std::move(work));
 	}
 
 	void AnimationEvaluationStorage::AppendMorphSamples(EntityId entity, AnimationResourceHandle clipHandle, const ResolvedAnimationClip& clip, std::uint64_t sourceInstanceId)
 	{
-		for (std::uint32_t channelIndex : clip.MorphChannelIndices)
+		for (std::uint32_t trackIndex = 0; trackIndex < clip.Resource->morphTracks.size(); ++trackIndex)
 		{
-			const AnimationChannel& channel = clip.Resource->channels[channelIndex];
-			MorphSampleSlot sample{.AnimationEntity = entity, .Clip = clipHandle, .SourceInstanceId = sourceInstanceId, .ChannelIndex = channelIndex, .TargetNodeIndex = channel.targetNodeIndex};
+			const AnimationMorphTrack& track = clip.Resource->morphTracks[trackIndex];
+			MorphSampleSlot sample{.AnimationEntity = entity, .Clip = clipHandle, .SourceInstanceId = sourceInstanceId, .TrackIndex = trackIndex, .TargetNodeIndex = track.targetNodeIndex};
 			sample.Weights.resize(4);
 			m_morphSamples.push_back(std::move(sample));
 		}

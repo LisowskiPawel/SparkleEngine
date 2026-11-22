@@ -63,17 +63,15 @@ private:
 	LevelAsset& TakeLoadingLevel(std::uint64_t requestId) noexcept;
 	void RejectLevelLoad(LevelAsset& level, std::string diagnostic) noexcept;
 	void ActivateLoadedLevel(LevelAsset& level, Assets::SceneLoadPackage package) noexcept;
-	void NotifyLevelUnloading(const std::string& previousName, const std::string& requestedName);
 	void NotifyLevelChanged(const std::string& previousName, const std::string& activeName);
 
-	GameWorld* m_gameWorld = nullptr;
+	GameWorld& m_gameWorld;
 	std::unique_ptr<LevelRegistry> m_levelRegistry;
 	std::unique_ptr<Assets::SceneLoadExecutor> m_loadExecutor;
 	LevelChangeEvents m_levelChangeEvents;
 	LevelAsset* m_activeLevel = nullptr;
 	LevelAsset* m_pendingLevelChange = nullptr;
 	LevelAsset* m_loadingLevel = nullptr;
-	std::uint64_t m_nextRequestId = 1;
 	std::uint64_t m_latestRequestId = 0;
 	std::uint64_t m_documentGeneration = 1;
 	std::string m_lastLoadDiagnostic;

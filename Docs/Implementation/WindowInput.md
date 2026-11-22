@@ -172,7 +172,7 @@ Preserve vertical/horizontal wheel fractions, direction and client position, inc
 | Native window, keyboard, mouse, cursor and event mechanics | SDL3 owns the implementation. Delete the superseded Platform Win32 backend after fit passes. |
 | Core input enums/events/state | Keep the small engine vocabulary and frame-state semantics; adapt only necessary precision/units. These are useful contracts for multiple consumers, not another native backend. |
 | Platform routing/dispatch/cancellation | Retain cohesive policy with its current owner. SDL's keyboard state is not a substitute for layer state or synthesized releases. |
-| Core child processes | Keep the separate [Boost.Process study](BoostProcess.md). Adding SDL does not establish process-tree, pipe, cancellation or Launcher workflow parity. Count no process savings under W. |
+| Core child processes | Keep the separate [Boost.Process / Asio boundary](../ThirdPartyMigration.md#child-processes). Adding SDL does not establish process-tree, pipe, cancellation or Launcher workflow parity. Count no process savings under W. |
 | Core JSON | Already delegated to nlohmann/json under the [retained decision](../ThirdPartyMigration.md#json). No additional retirement credit. |
 | Tasks, files/paths, time, logging and publication | No replacement is established by this window trial. Reuse their existing owners; do not add SDL wrappers for unrelated services. Task execution has its own [plan](TaskRuntime.md). |
 | RHI / Renderer | Keep D3D12, Vulkan, GPU allocation, synchronization, presentation, render graph and UI rendering. Native Windows graphics interop remains legitimate. |

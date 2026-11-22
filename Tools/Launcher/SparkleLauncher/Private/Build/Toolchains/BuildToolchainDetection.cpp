@@ -17,7 +17,7 @@
 namespace SparkleLauncher
 {
 	static constexpr std::string_view kVisualStudioCppComponent = "Microsoft.VisualStudio.Component.VC.Tools.x86.x64";
-	static constexpr std::string_view kMinimumCMakeVersion = "3.20.0";
+	static constexpr std::string_view kMinimumCMakeVersion = "3.30.0";
 	static constexpr std::string_view kMinimumGitVersion = "2.25.0";
 
 	static std::string ResolveGenerator()

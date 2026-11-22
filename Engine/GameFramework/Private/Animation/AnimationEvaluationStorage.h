@@ -10,6 +10,10 @@
 #include <limits>
 #include <span>
 #include <vector>
+#include <memory>
+#include <ozz/animation/runtime/sampling_job.h>
+#include <ozz/base/maths/soa_transform.h>
+#include <ozz/base/maths/simd_math.h>
 
 namespace ECS
 {
@@ -25,8 +29,9 @@ namespace ECS
 			AnimationResourceHandle Clip;
 			SkeletonResourceHandle Skeleton;
 			std::uint64_t SourceInstanceId = 0;
-			std::vector<AnimationJointTransform> LocalTransforms;
-			std::vector<DirectX::XMFLOAT4X4> ModelSpaceTransforms;
+			std::unique_ptr<ozz::animation::SamplingJob::Context> Context;
+			std::vector<ozz::math::SoaTransform> LocalTransforms;
+			std::vector<ozz::math::Float4x4> ModelSpaceTransforms;
 			std::vector<DirectX::XMFLOAT4X4> JointMatrices;
 		};
 
@@ -35,7 +40,7 @@ namespace ECS
 			EntityId AnimationEntity;
 			AnimationResourceHandle Clip;
 			std::uint64_t SourceInstanceId = 0;
-			std::uint32_t ChannelIndex = 0;
+			std::uint32_t TrackIndex = 0;
 			std::uint32_t TargetNodeIndex = (std::numeric_limits<std::uint32_t>::max)();
 			std::vector<float> Weights;
 		};

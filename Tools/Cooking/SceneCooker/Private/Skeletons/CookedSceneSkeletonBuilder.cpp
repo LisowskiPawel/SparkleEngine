@@ -8,6 +8,7 @@
 #include "GameFramework/Public/Scene/Animations/SkeletonTransformContract.h"
 
 #include <cstring>
+#include <cmath>
 #include <cstdint>
 #include <format>
 #include <limits>
@@ -29,6 +30,77 @@ namespace CookedSceneSkeletonBuilder
 		std::memcpy(destination, sourceName.data(), sourceName.size());
 	}
 
+	static std::uint32_t AppendEvaluationTransform(const DirectX::XMFLOAT4X4& matrix, std::uint32_t parent, CookedSkeletonAssetBuild& asset)
+	{
+		if (asset.evaluationJoints.size() >= Assets::kMaxAnimationEvaluationJoints)
+		{
+			throw Diagnostics::Error("Animation preview exceeds 1,024 evaluation joints including parent helpers; simplify the exported rig.");
+		}
+		if (!SkeletonTransformContract::IsTrsDecomposable(matrix))
+		{
+			throw Diagnostics::Error("Animation preview cannot represent a sheared parent transform; bake transforms in the source asset before export.");
+		}
+
+		DirectX::XMVECTOR scale;
+		DirectX::XMVECTOR rotation;
+		DirectX::XMVECTOR translation;
+		const auto transform = DirectX::XMLoadFloat4x4(&matrix);
+		if (!DirectX::XMMatrixDecompose(&scale, &rotation, &translation, transform))
+		{
+			throw Diagnostics::Error("Animation preview transform decomposition failed; bake the source rig.");
+		}
+		Assets::CookedSkeletonEvaluationJointRecord record{.parentJointIndex = parent};
+		DirectX::XMStoreFloat3(&record.translation, translation);
+		DirectX::XMStoreFloat4(&record.rotation, DirectX::XMQuaternionNormalize(rotation));
+		DirectX::XMStoreFloat3(&record.scale, scale);
+		const auto normalizedRotation = DirectX::XMLoadFloat4(&record.rotation);
+		const auto reconstructed = DirectX::XMMatrixAffineTransformation(scale, DirectX::XMVectorZero(), normalizedRotation, translation);
+		DirectX::XMFLOAT4X4 reconstructedValues;
+		DirectX::XMStoreFloat4x4(&reconstructedValues, reconstructed);
+		for (std::uint32_t row = 0; row < 4; ++row)
+		{
+			for (std::uint32_t column = 0; column < 4; ++column)
+			{
+				const float expected = matrix.m[row][column];
+				const float error = std::abs(reconstructedValues.m[row][column] - expected);
+				if (error > 1.0e-5f + 1.0e-5f * std::abs(expected))
+				{
+					throw Diagnostics::Error("Animation preview would lose shear or non-TRS bind data; bake the source transforms before export.");
+				}
+			}
+		}
+		const float components[] = {record.translation.x, record.translation.y, record.translation.z, record.scale.x, record.scale.y, record.scale.z};
+		for (float component : components)
+		{
+			if (!std::isfinite(component) || std::abs(component) > 65504.0f)
+			{
+				throw Diagnostics::Error("Animation preview bind transform exceeds the skeletal numeric range; rescale the source rig.");
+			}
+		}
+		const auto index = static_cast<std::uint32_t>(asset.evaluationJoints.size());
+		asset.evaluationJoints.push_back(record);
+		return index;
+	}
+
+	static void AppendEvaluationBranch(const ImportedSkeleton& skeleton, std::uint32_t jointIndex, std::uint32_t parent, CookedSkeletonAssetBuild& asset)
+	{
+		const auto& joint = skeleton.joints[jointIndex];
+		const DirectX::XMFLOAT4X4 identity{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+		if (std::memcmp(&joint.parentSpaceTransform, &identity, sizeof(identity)) != 0)
+		{
+			parent = AppendEvaluationTransform(joint.parentSpaceTransform, parent, asset);
+		}
+		const auto evaluationIndex = AppendEvaluationTransform(joint.bindLocalTransform, parent, asset);
+		asset.joints[jointIndex].evaluationJointIndex = evaluationIndex;
+		for (std::uint32_t child = 0; child < skeleton.joints.size(); ++child)
+		{
+			if (skeleton.joints[child].parentJointIndex == jointIndex)
+			{
+				AppendEvaluationBranch(skeleton, child, evaluationIndex, asset);
+			}
+		}
+	}
+
 	void BuildSkeletons(const SourceImportOutput& importOutput, std::string_view sceneAssetId, CookedSceneBuild& outBuild)
 	{
 		outBuild.outputs.skeletonAssets.clear();
@@ -40,6 +112,10 @@ namespace CookedSceneSkeletonBuilder
 		for (std::size_t skeletonIndex = 0; skeletonIndex < importOutput.scene.skeletons.size(); ++skeletonIndex)
 		{
 			const ImportedSkeleton& importedSkeleton = importOutput.scene.skeletons[skeletonIndex];
+			if (importedSkeleton.joints.size() > Assets::kMaxAnimationEvaluationJoints)
+			{
+				throw Diagnostics::Error("Animation preview exceeds 1,024 joints before parent helper expansion; simplify the exported rig.");
+			}
 			if (!importedSkeleton.IsValid())
 			{
 				throw Diagnostics::Error(std::format("Imported skeleton {} has no joints.", skeletonIndex));
@@ -103,12 +179,15 @@ namespace CookedSceneSkeletonBuilder
 				Assets::CookedSkeletonJointRecord jointRecord;
 				CopyJointName(importedJoint.name, jointRecord.name);
 				jointRecord.sourceNodeIndex = importedJoint.sourceNodeIndex;
-				jointRecord.parentJointIndex = importedJoint.parentJointIndex;
 				jointRecord.inverseBindMatrix = importedJoint.inverseBindMatrix;
-				jointRecord.bindLocalTransform = importedJoint.bindLocalTransform;
-				jointRecord.parentSpaceTransform = importedJoint.parentSpaceTransform;
-				jointRecord.bindModelTransform = importedJoint.bindModelTransform;
 				skeletonAsset.joints.push_back(jointRecord);
+			}
+			for (std::uint32_t joint = 0; joint < importedSkeleton.joints.size(); ++joint)
+			{
+				if (importedSkeleton.joints[joint].parentJointIndex == Assets::kInvalidCookedSkeletonJointIndex)
+				{
+					AppendEvaluationBranch(importedSkeleton, joint, Assets::kInvalidCookedSkeletonJointIndex, skeletonAsset);
+				}
 			}
 
 			outBuild.manifest.skeletonRefs.push_back(Assets::CookedSceneSkeletonRef{.skeletonAssetId = skeletonAsset.assetId, .sourceSkinIndex = importedSkeleton.sourceSkinIndex, .flags = 0});

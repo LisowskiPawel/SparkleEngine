@@ -3,7 +3,7 @@
 
 #include "Cooking/Planning/ShaderCookPlanBuilder.h"
 
-#include "Backend/ShaderBackendPool.h"
+#include "Backend/ShaderBackendFactory.h"
 #include "Contracts/ShaderContractCatalogBuilder.h"
 #include "Contracts/ShaderContractValidator.h"
 #include "Cooking/Planning/ShaderCompileJobBuilder.h"
@@ -14,8 +14,11 @@
 #include <algorithm>
 #include <format>
 #include <span>
+#include <string>
+#include <string_view>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 static void ValidateTargets(std::span<const ShaderTarget> targets)
 {
@@ -78,18 +81,24 @@ static void SelectShaders(const ShaderCookSettings& settings, const ShaderContra
 	plan.shaderOutputs.resize(plan.shaders.size());
 }
 
-static void BuildCompileJobs(
-    const ShaderCookSettings& settings,
-    const ShaderContractCatalog& catalog,
-    ShaderBackendPool& backendPool,
-    ShaderCookPipelinePlan& plan,
-    const ToolWorkProgressCallback& progress)
+static const ShaderBackendDescriptor& ResolveBackendDescriptor(std::vector<ShaderBackendDescriptor>& backends, std::string_view name)
+{
+	const auto existing = std::ranges::find(backends, name, &ShaderBackendDescriptor::Name);
+	if (existing != backends.end())
+	{
+		return *existing;
+	}
+	return backends.emplace_back(QueryShaderBackend(name));
+}
+
+static void BuildCompileJobs(const ShaderCookSettings& settings, const ShaderContractCatalog& catalog, ShaderCookPipelinePlan& plan, const ToolWorkProgressCallback& progress)
 {
 	if (plan.shaders.empty())
 	{
 		return;
 	}
 	const ShaderCompileJobBuilder jobBuilder(catalog);
+	std::vector<ShaderBackendDescriptor> backends;
 	const std::size_t planningWork = plan.shaders.size() * settings.targets.size();
 	std::size_t completedPlanningWork = 0;
 	if (progress)
@@ -101,7 +110,10 @@ static void BuildCompileJobs(
 		plan.shaderOutputs[shaderIndex].reserve(settings.targets.size());
 		for (const ShaderTarget target : settings.targets)
 		{
-			ShaderCompileJob job = jobBuilder.Build(settings, plan.shaders[shaderIndex], target, backendPool);
+			const ShaderCookDesc& shader = plan.shaders[shaderIndex];
+			const std::string backendName = ResolveShaderBackendName(shader.sourcePath, target, settings.backendName);
+			const ShaderBackendDescriptor& backend = ResolveBackendDescriptor(backends, backendName);
+			ShaderCompileJob job = jobBuilder.Build(settings, shader, target, backend);
 			job.ShaderIndex = shaderIndex;
 			plan.jobs.push_back(std::move(job));
 			if (progress)
@@ -142,14 +154,14 @@ static void BuildDependencyManifest(ShaderCookPipelinePlan& plan)
 	}
 }
 
-ShaderCookPipelinePlan BuildShaderCookPlan(const ShaderCookSettings& settings, ShaderBackendPool& backendPool, const ToolWorkProgressCallback& progress)
+ShaderCookPipelinePlan BuildShaderCookPlan(const ShaderCookSettings& settings, const ToolWorkProgressCallback& progress)
 {
 	ValidateTargets(settings.targets);
 	ShaderCookPipelinePlan plan;
 	plan.dependencyManifest = ReadDependencyManifest(settings);
 	const ShaderContractCatalog catalog = BuildValidatedCatalog();
 	SelectShaders(settings, catalog, plan);
-	BuildCompileJobs(settings, catalog, backendPool, plan, progress);
+	BuildCompileJobs(settings, catalog, plan, progress);
 	BuildDependencyManifest(plan);
 	return plan;
 }

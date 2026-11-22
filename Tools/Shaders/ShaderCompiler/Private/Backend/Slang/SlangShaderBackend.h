@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Backend/IShaderBackend.h"
+#include "Backend/ShaderBackendCapabilities.h"
 
 #include <cstdint>
 #include <string_view>
@@ -25,7 +26,6 @@ public:
 	static ShaderBackendCapabilities GetStaticCapabilities() noexcept;
 	static std::uint64_t QueryBackendVersion();
 
-	ShaderBackendCapabilities GetCapabilities() const override;
 	std::string_view GetBackendName() const override;
 	std::uint64_t GetBackendVersion() const override;
 	CompiledShader Compile(const ShaderCompileRequest& request) override;
@@ -33,15 +33,20 @@ public:
 private:
 	struct SymbolSelection;
 
-	Slang::ComPtr<slang::ISession> CreateSession(const ShaderCompileRequest& request) const;
+	Slang::ComPtr<slang::ISession> CreateSession(const ShaderCompileRequest& request, std::span<const std::string> arguments) const;
 	static Slang::ComPtr<slang::IComponentType> LinkProgram(slang::ISession& session, const ShaderCompileRequest& request, std::string& diagnostics);
 	static std::vector<std::uint8_t> ExtractBytecode(slang::IComponentType& program, std::string& diagnostics);
 	static ShaderReflection ExtractReflection(const ShaderCompileRequest& request, slang::IComponentType& program, std::span<const std::uint8_t> bytecode, std::string& diagnostics);
 	static SlangStage MapStage(ShaderStage stage);
 	static SlangCompileTarget MapTarget(ShaderTarget target);
 	static std::string BlobToString(slang::IBlob* blob);
-	static std::vector<std::string> BuildDebugArgumentStrings(const ShaderCompileRequest& request);
-	static ShaderDebugArtifactSet CaptureDebugArtifacts(const ShaderCompileRequest& request, slang::IComponentType& program, std::span<const std::uint8_t> bytecode, std::string_view diagnostics);
+	static std::vector<std::string> BuildCompileArguments(const ShaderCompileRequest& request);
+	static ShaderDebugArtifactSet CaptureDebugArtifacts(
+	    const ShaderCompileRequest& request,
+	    slang::IComponentType& program,
+	    std::span<const std::uint8_t> bytecode,
+	    std::string_view diagnostics,
+	    std::vector<std::string> arguments);
 	static void ExtractSymbols(slang::IComponentType& program, ShaderDebugArtifactSet& artifacts);
 	static std::uint64_t QueryBackendVersion(slang::IGlobalSession& globalSession);
 

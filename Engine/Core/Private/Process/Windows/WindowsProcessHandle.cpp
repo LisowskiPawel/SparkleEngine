@@ -44,5 +44,10 @@ namespace Process
 		m_handle = handle;
 	}
 
+	HANDLE WindowsProcessHandle::Release() noexcept
+	{
+		return std::exchange(m_handle, nullptr);
+	}
+
 }
 #endif

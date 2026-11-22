@@ -9,11 +9,14 @@ set(_sparkle_source_dependencies
     stb
     tinyexr
     spdlog
+    boost-process
     zlib
     assimp
+    ozz_animation
     directxtex
     ktx
     spirv-reflect
+    shadermake
     editor-icons
     nvidia-streamline
     winpixeventruntime
@@ -41,7 +44,7 @@ else()
         list(REMOVE_ITEM _sparkle_source_dependencies cgltf mikktspace stb assimp directxtex ktx)
     endif()
     if(NOT SPARKLE_ENABLE_SHADER_COMPILER)
-        list(REMOVE_ITEM _sparkle_source_dependencies spirv-reflect)
+        list(REMOVE_ITEM _sparkle_source_dependencies spirv-reflect shadermake)
     endif()
     if(NOT SPARKLE_ENABLE_NVIDIA_STREAMLINE)
         list(REMOVE_ITEM _sparkle_source_dependencies nvidia-streamline)

@@ -1,0 +1,23 @@
+Slang 2026.8 downstream debug artifact format
+Base: d88cc8fff35baf96cf30d242b2572564cf8043b6
+License: Apache-2.0 WITH LLVM-exception (upstream LICENSE)
+
+Forward the parsed debug format to the existing downstream compiler options.
+Without this assignment, -g2 -gpdb generates debug information but leaves the
+downstream format at DEFAULT, so the DXC adapter does not attach its PDB.
+Validated with the loop-location correction in an isolated source build;
+this patch alone does not qualify or replace installed SDK inputs.
+
+diff --git a/source/slang/slang-code-gen.cpp b/source/slang/slang-code-gen.cpp
+--- a/source/slang/slang-code-gen.cpp
++++ b/source/slang/slang-code-gen.cpp
+@@ -816,6 +816,9 @@ SlangResult CodeGenContext::emitWithDownstreamForEntryPoints(ComPtr<IArtifact>& outArtifact)
+             break;
+         }
+ 
++        options.m_debugInfoFormat = getTargetProgram()->getOptionSet().getEnumOption<SlangDebugInfoFormat>(
++            CompilerOptionName::DebugInformationFormat);
++
+         switch (getTargetProgram()->getOptionSet().getFloatingPointMode())
+         {
+         case FloatingPointMode::Default:

@@ -1,76 +1,89 @@
 #include "PCH.h"
 
 #include "Assets/Loaders/SkeletonAssetLoader.h"
-
 #include "Assets/Cooked/LoadedSkeletonAsset.h"
+
 #include "Assets/Loaders/CookedAssetByteReader.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "GameFramework/Public/Scene/Animations/SkeletonTransformContract.h"
 
-#include <cstdint>
-#include <limits>
-#include <span>
-#include <unordered_set>
-#include <vector>
+#include <array>
+#include <cmath>
 
 namespace Assets
 {
-	static void ValidateSkeletonHeader(const CookedSkeletonAssetHeader& header)
+	static void ValidateEvaluationJoints(const LoadedSkeletonAsset& asset)
 	{
-		if (!header.fileHeader.HasMagic(kCookedSkeletonAssetMagic) || header.jointStride != sizeof(CookedSkeletonJointRecord))
+		std::array<std::uint32_t, kMaxAnimationEvaluationJoints> ancestors;
+		std::size_t depth = 0;
+		for (std::uint32_t index = 0; index < asset.evaluationJoints.size(); ++index)
 		{
-			throw Diagnostics::Error("Invalid cooked skeleton asset header; recook the asset");
+			const auto& joint = asset.evaluationJoints[index];
+			if (joint.parentJointIndex == kInvalidCookedSkeletonJointIndex)
+			{
+				depth = 0;
+			}
+			else
+			{
+				while (depth > 0 && ancestors[depth - 1] != joint.parentJointIndex)
+				{
+					--depth;
+				}
+				if (depth == 0)
+				{
+					throw Diagnostics::Error("Cooked skeleton must use depth-first parent-before-child evaluation order; recook the asset");
+				}
+			}
+			ancestors[depth++] = index;
+			const float components[] = {joint.translation.x, joint.translation.y, joint.translation.z, joint.scale.x, joint.scale.y, joint.scale.z};
+			for (float component : components)
+			{
+				if (!std::isfinite(component) || std::abs(component) > 65504.0f)
+				{
+					throw Diagnostics::Error("Cooked skeleton contains invalid evaluation transforms");
+				}
+			}
+			const auto rotation = DirectX::XMLoadFloat4(&joint.rotation);
+			const float lengthSquared = DirectX::XMVectorGetX(DirectX::XMVector4LengthSq(rotation));
+			if (!std::isfinite(lengthSquared) || std::abs(lengthSquared - 1.0f) > 1.0e-3f)
+			{
+				throw Diagnostics::Error("Cooked skeleton contains an invalid evaluation rotation");
+			}
 		}
 	}
 
-	static void ValidateSkeletonJoint(std::span<const CookedSkeletonJointRecord> joints, std::size_t index, std::unordered_set<std::uint32_t>& nodes)
+	static void ValidateSkinJoints(const LoadedSkeletonAsset& asset)
 	{
-		const auto& joint = joints[index];
-		const bool bValidName = Strings::IsNullTerminated(std::span(joint.name));
-		const bool bValidNode = joint.sourceNodeIndex != (std::numeric_limits<std::uint32_t>::max)();
-		const bool bUniqueNode = nodes.insert(joint.sourceNodeIndex).second;
-		const bool bParentInRange = joint.parentJointIndex < joints.size() && joint.parentJointIndex != index;
-		const bool bValidParent = joint.parentJointIndex == kInvalidCookedSkeletonJointIndex || bParentInRange;
-		if (!bValidName || !bValidNode)
-		{
-			throw Diagnostics::Error("Cooked skeleton joint identity is invalid");
-		}
-		if (!bUniqueNode || !bValidParent)
-		{
-			throw Diagnostics::Error("Cooked skeleton joint hierarchy is invalid");
-		}
-
-		const bool bFiniteBind = SkeletonTransformContract::IsFinite(joint.inverseBindMatrix) && SkeletonTransformContract::IsFinite(joint.bindLocalTransform);
-		const bool bFiniteHierarchy = SkeletonTransformContract::IsFinite(joint.parentSpaceTransform) && SkeletonTransformContract::IsFinite(joint.bindModelTransform);
-		const bool bInvertible = SkeletonTransformContract::IsInvertible(joint.inverseBindMatrix) && SkeletonTransformContract::IsInvertible(joint.bindLocalTransform);
-		const auto* parent = bParentInRange ? &joints[joint.parentJointIndex].bindModelTransform : nullptr;
-		const bool bBindInvariant = SkeletonTransformContract::SatisfiesBindInvariant(joint.bindLocalTransform, joint.parentSpaceTransform, parent, joint.bindModelTransform);
-		if (!bFiniteBind || !bFiniteHierarchy)
-		{
-			throw Diagnostics::Error("Cooked skeleton contains non-finite transforms");
-		}
-		if (!bInvertible || !SkeletonTransformContract::IsTrsDecomposable(joint.bindLocalTransform))
-		{
-			throw Diagnostics::Error("Cooked skeleton violates the current transform contract; recook the spatial asset");
-		}
-		if (!bBindInvariant)
-		{
-			throw Diagnostics::Error("Cooked skeleton violates the current bind invariant; recook the spatial asset");
-		}
-	}
-
-	static void ValidateSkeletonJoints(const LoadedSkeletonAsset& asset)
-	{
-		std::unordered_set<std::uint32_t> nodes;
+		std::array<bool, kMaxAnimationEvaluationJoints> mapped{};
 		for (std::size_t index = 0; index < asset.joints.size(); ++index)
 		{
-			ValidateSkeletonJoint(asset.joints, index, nodes);
-		}
-		std::vector<std::uint32_t> order;
-		if (asset.joints.empty() || !SkeletonTransformContract::BuildEvaluationOrder(asset.joints, order))
-		{
-			throw Diagnostics::Error("Cooked skeleton has an empty or cyclic hierarchy; recook the spatial asset");
+			const auto& joint = asset.joints[index];
+			const bool bValidName = Strings::IsNullTerminated(std::span(joint.name));
+			const bool bValidNode = joint.sourceNodeIndex != kInvalidCookedSkeletonJointIndex;
+			const bool bValidMapping = joint.evaluationJointIndex < asset.evaluationJoints.size();
+			if (!bValidName || !bValidNode || !bValidMapping)
+			{
+				throw Diagnostics::Error("Cooked skeleton has invalid skin identity or evaluation mapping");
+			}
+			if (mapped[joint.evaluationJointIndex])
+			{
+				throw Diagnostics::Error("Cooked skeleton maps multiple skin joints to one evaluation joint");
+			}
+			mapped[joint.evaluationJointIndex] = true;
+			for (std::size_t previous = 0; previous < index; ++previous)
+			{
+				if (asset.joints[previous].sourceNodeIndex == joint.sourceNodeIndex)
+				{
+					throw Diagnostics::Error("Cooked skeleton repeats a source node identity");
+				}
+			}
+			const bool bFinite = SkeletonTransformContract::IsFinite(joint.inverseBindMatrix);
+			const bool bInvertible = bFinite && SkeletonTransformContract::IsInvertible(joint.inverseBindMatrix);
+			if (!bInvertible)
+			{
+				throw Diagnostics::Error("Cooked skeleton contains an invalid inverse bind matrix");
+			}
 		}
 	}
 
@@ -79,9 +92,19 @@ namespace Assets
 		CookedAssetByteReader reader(bytes, budget);
 		LoadedSkeletonAsset asset;
 		asset.header = reader.Read<CookedSkeletonAssetHeader>();
-		ValidateSkeletonHeader(asset.header);
-		asset.joints = reader.ReadArray<CookedSkeletonJointRecord>(asset.header.jointCount);
-		ValidateSkeletonJoints(asset);
+		const auto& header = asset.header;
+		const bool bSkinLayout = header.fileHeader.HasMagic(kCookedSkeletonAssetMagic) && header.jointStride == sizeof(CookedSkeletonJointRecord);
+		const bool bCurrentLayout = bSkinLayout && header.evaluationJointStride == sizeof(CookedSkeletonEvaluationJointRecord);
+		const bool bSkinCount = header.jointCount > 0 && header.jointCount <= kMaxAnimationEvaluationJoints;
+		const bool bEvaluationCount = header.evaluationJointCount >= header.jointCount && header.evaluationJointCount <= kMaxAnimationEvaluationJoints;
+		if (!bCurrentLayout || header.flags != 0 || !bSkinCount || !bEvaluationCount)
+		{
+			throw Diagnostics::Error("Invalid cooked animation-preview skeleton header or capacity; recook the asset");
+		}
+		asset.joints = reader.ReadArray<CookedSkeletonJointRecord>(header.jointCount);
+		asset.evaluationJoints = reader.ReadArray<CookedSkeletonEvaluationJointRecord>(header.evaluationJointCount);
+		ValidateEvaluationJoints(asset);
+		ValidateSkinJoints(asset);
 		if (reader.GetRemainingByteCount() != 0)
 		{
 			throw Diagnostics::Error("Cooked skeleton asset contains unexpected trailing bytes");

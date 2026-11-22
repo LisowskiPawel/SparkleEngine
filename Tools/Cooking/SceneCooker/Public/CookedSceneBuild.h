@@ -20,6 +20,7 @@ struct CookedSkeletonAssetBuild final
 	std::uint32_t sourceSkinIndex = 0;
 	std::filesystem::path sourcePath;
 	std::vector<Assets::CookedSkeletonJointRecord> joints;
+	std::vector<Assets::CookedSkeletonEvaluationJointRecord> evaluationJoints;
 };
 
 struct CookedAnimationAssetBuild final

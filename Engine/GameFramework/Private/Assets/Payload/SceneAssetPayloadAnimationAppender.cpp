@@ -9,6 +9,8 @@
 #include "Assets/Loaders/CookedAssetFileSet.h"
 #include "Assets/Translators/SceneAssetAnimationTranslator.h"
 #include "Core/Public/Formatting/HexFormat.h"
+#include "Core/Public/Diagnostics/Error.h"
+#include <algorithm>
 #include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include <filesystem>
@@ -28,10 +30,16 @@ namespace Assets
 			const std::filesystem::path animationAssetPath = Paths::CookedAnimationAsset(animationRef.animationAssetId);
 			const auto bytes = files.Get(animationAssetPath);
 			const LoadedAnimationAsset animationAsset = AnimationAssetLoader::Decode(bytes, budget);
-			budget.ReserveArray<AnimationChannel>(animationAsset.channels.size());
-			budget.ReserveArray<AnimationKeyframe>(animationAsset.keyframes.size());
 			budget.Reserve(sizeof(animationAsset.header.name));
-			AnimationClipResource animation = BuildSceneAssetAnimation(animationAsset, animationRef.animationAssetId);
+			const auto skeleton = std::find_if(
+			    sceneAssetPayload.skeletons.begin(),
+			    sceneAssetPayload.skeletons.end(),
+			    [&](const auto& entry) { return entry.assetId == animationAsset.header.targetSkeletonAssetId; });
+			if (skeleton == sceneAssetPayload.skeletons.end())
+			{
+				throw Diagnostics::Error("Animation preview target skeleton was not loaded in the same scene generation");
+			}
+			AnimationClipResource animation = BuildSceneAssetAnimation(animationAsset, animationRef.animationAssetId, *skeleton, budget);
 			sceneAssetPayload.animations.push_back(std::move(animation));
 			files.Release(animationAssetPath);
 		}

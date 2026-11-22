@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <atomic>
 #include <limits>
+#include <string>
 #include <thread>
 
 struct AssetCookerSceneBatch::Item final
@@ -30,12 +31,12 @@ bool AssetCookerSceneBatch::Execute(const std::vector<AssetCookerSceneEntry>& sc
 		progress({.Action = "Cooking scene assets", .Total = totalWork});
 	}
 	std::vector<Item> items(sceneEntries.size());
-	const bool bBuilt = BuildProducts(sceneEntries, items, progress, totalWork);
+	const TaskResult buildResult = BuildProducts(sceneEntries, items, progress, totalWork);
 
 	MergeDiagnostics(items, diagnostics);
-	if (!bBuilt)
+	if (!buildResult.Succeeded())
 	{
-		diagnostics.AddError(AssetCookerCategory::SceneAssets, "Scene asset generation failed before publication.");
+		diagnostics.AddError(AssetCookerCategory::SceneAssets, "Scene asset generation failed before publication: " + std::string(buildResult.GetDiagnostic()));
 		return false;
 	}
 
@@ -79,7 +80,7 @@ CompiledTaskGraph AssetCookerSceneBatch::BuildTaskGraph(
 	{
 		builder.Add(
 		    TaskDesc{.Name = "Build cataloged scene", .Lane = TaskLane::Background},
-		    [&sceneEntries, &items, &itemCompleted, index](TaskExecutionContext& context)
+		    [&sceneEntries, &items, itemCompleted, index](TaskExecutionContext& context)
 		    {
 			    TaskResult result = BuildProduct(sceneEntries, items, index, context);
 			    if (result.GetOutcome() == TaskOutcome::Succeeded)
@@ -112,7 +113,7 @@ TaskResult AssetCookerSceneBatch::BuildProduct(const std::vector<AssetCookerScen
 	}
 }
 
-bool AssetCookerSceneBatch::BuildProducts(const std::vector<AssetCookerSceneEntry>& sceneEntries, std::vector<Item>& items, const ToolWorkProgressCallback& progress, std::size_t totalWork)
+TaskResult AssetCookerSceneBatch::BuildProducts(const std::vector<AssetCookerSceneEntry>& sceneEntries, std::vector<Item>& items, const ToolWorkProgressCallback& progress, std::size_t totalWork)
 {
 	const std::uint32_t taskCapacity = static_cast<std::uint32_t>(std::max<std::size_t>(sceneEntries.size(), 1u));
 	std::atomic<std::size_t> completed{0};
@@ -130,7 +131,7 @@ bool AssetCookerSceneBatch::BuildProducts(const std::vector<AssetCookerSceneEntr
 	TaskExecutionContext context;
 	const auto graph = BuildTaskGraph(sceneEntries, items, taskCapacity, itemCompleted);
 	const TaskExecution execution = executor.Submit(graph, context);
-	return execution.GetStatus() == TaskExecutionStatus::Succeeded;
+	return execution.GetResult();
 }
 
 void AssetCookerSceneBatch::MergeDiagnostics(std::vector<Item>& items, AssetCookerDiagnostics& diagnostics)
