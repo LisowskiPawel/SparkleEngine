@@ -3,6 +3,7 @@
 #include "Level/Loading/SceneLoadPackageBuilder.h"
 #include "Level/Loading/SceneLoadWorkState.h"
 #include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Hash/HashUtils.h"
 
 #include <cstdint>
 #include <format>
@@ -14,14 +15,7 @@
 
 static std::uint64_t MakeAuthoredInstanceId(std::string_view identity)
 {
-	constexpr std::uint64_t OffsetBasis = 14695981039346656037ull;
-	constexpr std::uint64_t Prime = 1099511628211ull;
-	std::uint64_t hash = OffsetBasis;
-	for (char character : identity)
-	{
-		hash ^= static_cast<std::uint8_t>(character);
-		hash *= Prime;
-	}
+	const std::uint64_t hash = Hash::Fnv1a64(identity);
 	if (hash == 0)
 	{
 		throw Diagnostics::Error(std::format("Scene asset identity '{}' hashes to the reserved null identity.", identity));

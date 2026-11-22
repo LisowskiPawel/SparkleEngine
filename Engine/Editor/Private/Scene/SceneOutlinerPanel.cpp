@@ -13,6 +13,7 @@
 #include <string>
 
 #include <imgui.h>
+#include <misc/cpp/imgui_stdlib.h>
 
 SceneOutlinerPanel::SceneOutlinerPanel(EditorSceneSession& scene, float widthPixels) noexcept :
     m_scene(scene),
@@ -28,19 +29,9 @@ void SceneOutlinerPanel::SetTopInset(float topInsetPixels) noexcept
 void SceneOutlinerPanel::BuildToolbar() noexcept
 {
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.0f, 3.0f));
-	char filterBuffer[128] = {};
-	const std::size_t copyLength = (std::min) (m_filterText.size(), sizeof(filterBuffer) - 1);
-	if (copyLength > 0)
-	{
-		std::copy_n(m_filterText.data(), copyLength, filterBuffer);
-	}
-
 	ImGui::SetNextItemWidth(-1.0f);
 	const std::string searchHint = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Search, "Search actors, lights, meshes...");
-	if (ImGui::InputTextWithHint("##SceneFilter", searchHint.c_str(), filterBuffer, sizeof(filterBuffer)))
-	{
-		m_filterText = filterBuffer;
-	}
+	ImGui::InputTextWithHint("##SceneFilter", searchHint.c_str(), &m_filterText);
 
 	ImGui::Spacing();
 	if (EditorWidgets::DrawFilterChip("All", m_activeFilter == SceneOutlinerFilter::All))

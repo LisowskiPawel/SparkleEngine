@@ -7,8 +7,11 @@
 
 namespace SparkleLauncher
 {
-	static void CountCleanTarget(MaintenanceCleanTarget& target)
+	void InspectMaintenanceCleanTarget(MaintenanceCleanTarget& target)
 	{
+		target.FileCount = 0;
+		target.DirectoryCount = 0;
+		target.ByteCount = 0;
 		std::error_code errorCode;
 		target.bExists = std::filesystem::exists(target.Path, errorCode);
 		if (!target.bExists || errorCode)
@@ -44,7 +47,11 @@ namespace SparkleLauncher
 			else if (entry.is_regular_file(errorCode))
 			{
 				++target.FileCount;
-				target.ByteCount += entry.file_size(errorCode);
+				const auto byteCount = entry.file_size(errorCode);
+				if (!errorCode)
+				{
+					target.ByteCount += byteCount;
+				}
 			}
 			errorCode.clear();
 			iterator.increment(errorCode);
@@ -58,7 +65,7 @@ namespace SparkleLauncher
 		target.DisplayName = std::move(displayName);
 		target.Path = std::move(path);
 		target.Detail = std::move(detail);
-		CountCleanTarget(target);
+		InspectMaintenanceCleanTarget(target);
 		plan.CleanTargets.push_back(std::move(target));
 	}
 

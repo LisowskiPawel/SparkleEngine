@@ -17,22 +17,21 @@ void NormalizeSpirVBindings(std::vector<std::uint8_t>& bytecode, std::span<const
 		return;
 	}
 
-	SpvReflectShaderModule module{};
-	if (spvReflectCreateShaderModule(bytecode.size(), bytecode.data(), &module) != SPV_REFLECT_RESULT_SUCCESS)
+	spv_reflect::ShaderModule module(bytecode.size(), bytecode.data());
+	if (module.GetResult() != SPV_REFLECT_RESULT_SUCCESS)
 	{
 		throw Diagnostics::Error("spvReflectCreateShaderModule failed");
 	}
 
 	std::uint32_t bindingCount = 0;
-	SpvReflectResult result = spvReflectEnumerateDescriptorBindings(&module, &bindingCount, nullptr);
+	SpvReflectResult result = module.EnumerateDescriptorBindings(&bindingCount, nullptr);
 	std::vector<SpvReflectDescriptorBinding*> bindings(bindingCount, nullptr);
 	if (result == SPV_REFLECT_RESULT_SUCCESS && bindingCount > 0)
 	{
-		result = spvReflectEnumerateDescriptorBindings(&module, &bindingCount, bindings.data());
+		result = module.EnumerateDescriptorBindings(&bindingCount, bindings.data());
 	}
 	if (result != SPV_REFLECT_RESULT_SUCCESS)
 	{
-		spvReflectDestroyShaderModule(&module);
 		throw Diagnostics::Error("spvReflectEnumerateDescriptorBindings failed");
 	}
 
@@ -40,32 +39,27 @@ void NormalizeSpirVBindings(std::vector<std::uint8_t>& bytecode, std::span<const
 	{
 		if (binding == nullptr || binding->name == nullptr)
 		{
-			spvReflectDestroyShaderModule(&module);
 			throw Diagnostics::Error("SPIR-V descriptor has no canonical binding name");
 		}
 		const auto remap = std::ranges::find_if(remaps, [binding](const ShaderDescriptorBindingRemap& candidate) { return candidate.Name == binding->name; });
 		if (remap == remaps.end())
 		{
 			const std::string name = binding->name;
-			spvReflectDestroyShaderModule(&module);
 			throw Diagnostics::Error("SPIR-V descriptor has no unambiguous canonical binding: '" + name + "'");
 		}
-		result = spvReflectChangeDescriptorBindingNumbers(&module, binding, remap->Binding, remap->Set);
+		result = module.ChangeDescriptorBindingNumbers(binding, remap->Binding, remap->Set);
 		if (result != SPV_REFLECT_RESULT_SUCCESS)
 		{
-			spvReflectDestroyShaderModule(&module);
 			throw Diagnostics::Error("spvReflectChangeDescriptorBindingNumbers failed for '" + remap->Name + "'");
 		}
 	}
 
-	const std::uint32_t normalizedSize = spvReflectGetCodeSize(&module);
-	const std::uint32_t* const normalizedCode = spvReflectGetCode(&module);
+	const std::uint32_t normalizedSize = module.GetCodeSize();
+	const std::uint32_t* const normalizedCode = module.GetCode();
 	if (normalizedCode == nullptr || normalizedSize == 0)
 	{
-		spvReflectDestroyShaderModule(&module);
 		throw Diagnostics::Error("spvReflectGetCode returned empty bytecode");
 	}
 	bytecode.resize(normalizedSize);
 	std::memcpy(bytecode.data(), normalizedCode, normalizedSize);
-	spvReflectDestroyShaderModule(&module);
 }

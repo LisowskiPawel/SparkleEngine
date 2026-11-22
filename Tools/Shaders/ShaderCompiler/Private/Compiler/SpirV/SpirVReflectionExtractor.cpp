@@ -190,7 +190,7 @@ static void FlattenBlockMembers(const SpvReflectBlockVariable& block, std::uint3
 	}
 }
 
-static void ReflectDescriptorBindings(SpvReflectShaderModule& module, ShaderReflection& reflection)
+static void ReflectDescriptorBindings(const SpvReflectShaderModule& module, ShaderReflection& reflection)
 {
 	// Emit CB records for uniform buffers plus resource bindings for all descriptors.
 	// Binding entries point at the CB record when applicable.
@@ -252,7 +252,7 @@ static void ReflectDescriptorBindings(SpvReflectShaderModule& module, ShaderRefl
 	}
 }
 
-static void ReflectVertexInputs(SpvReflectShaderModule& module, ShaderReflection& reflection)
+static void ReflectVertexInputs(const SpvReflectShaderModule& module, ShaderReflection& reflection)
 {
 	std::uint32_t inputCount = 0;
 	spvReflectEnumerateInputVariables(&module, &inputCount, nullptr);
@@ -287,7 +287,7 @@ static void ReflectVertexInputs(SpvReflectShaderModule& module, ShaderReflection
 	}
 }
 
-static void ReflectPushConstants(SpvReflectShaderModule& module, ShaderStage stage, ShaderReflection& reflection)
+static void ReflectPushConstants(const SpvReflectShaderModule& module, ShaderStage stage, ShaderReflection& reflection)
 {
 	// Push-constant blocks.
 	{
@@ -336,7 +336,7 @@ static void ReflectPushConstants(SpvReflectShaderModule& module, ShaderStage sta
 	}
 }
 
-static void ReflectSpecializationConstants(SpvReflectShaderModule& module, ShaderReflection& reflection)
+static void ReflectSpecializationConstants(const SpvReflectShaderModule& module, ShaderReflection& reflection)
 {
 	// Specialization constants.
 	{
@@ -376,13 +376,13 @@ ShaderReflection ExtractSpirVReflection(std::span<const std::uint8_t> bytecode, 
 		throw Diagnostics::Error("SPIR-V reflection: empty bytecode");
 	}
 
-	SpvReflectShaderModule module{};
-	SpvReflectResult res = spvReflectCreateShaderModule(bytecode.size(), bytecode.data(), &module);
-	if (res != SPV_REFLECT_RESULT_SUCCESS)
+	spv_reflect::ShaderModule owner(bytecode.size(), bytecode.data());
+	if (owner.GetResult() != SPV_REFLECT_RESULT_SUCCESS)
 	{
 		throw Diagnostics::Error("SPIR-V reflection: spvReflectCreateShaderModule failed");
 	}
 
+	const SpvReflectShaderModule& module = owner.GetShaderModule();
 	ReflectDescriptorBindings(module, reflection);
 
 	if (stage == ShaderStage::Vertex)
@@ -401,6 +401,5 @@ ShaderReflection ExtractSpirVReflection(std::span<const std::uint8_t> bytecode, 
 		reflection.ThreadGroupSize = {ep.local_size.x, ep.local_size.y, ep.local_size.z};
 	}
 
-	spvReflectDestroyShaderModule(&module);
 	return reflection;
 }

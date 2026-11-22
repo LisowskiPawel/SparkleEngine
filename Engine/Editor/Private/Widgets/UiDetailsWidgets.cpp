@@ -5,12 +5,11 @@
 
 #include "Style/SparkleUiPalette.h"
 
-#include <algorithm>
 #include <cfloat>
 #include <cmath>
-#include <vector>
 
 #include <imgui.h>
+#include <misc/cpp/imgui_stdlib.h>
 
 namespace EditorWidgets
 {
@@ -345,16 +344,9 @@ namespace EditorWidgets
 			return false;
 		}
 
-		const std::size_t bufferSize = (std::max) (std::size_t{1024}, value.size() + 1u);
-		std::vector<char> buffer(bufferSize, '\0');
-		std::copy(value.begin(), value.end(), buffer.begin());
 		ImGui::TableSetColumnIndex(1);
 		ImGui::SetNextItemWidth(-FLT_MIN);
-		bool bChanged = ImGui::InputText("##value", buffer.data(), buffer.size());
-		if (bChanged)
-		{
-			value = buffer.data();
-		}
+		bool bChanged = ImGui::InputText("##value", &value);
 
 		if (resetValue != nullptr)
 		{

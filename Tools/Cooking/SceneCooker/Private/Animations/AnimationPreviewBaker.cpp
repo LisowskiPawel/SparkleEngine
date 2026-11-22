@@ -29,14 +29,10 @@ namespace AnimationPreviewBaker
 			return path == ImportedAnimationTargetPath::Rotation ? DirectX::XMQuaternionSlerp(a, b, ratio) : DirectX::XMVectorLerp(a, b, ratio);
 		}
 
-		const float squared = ratio * ratio;
-		const float cubed = squared * ratio;
 		const float interval = right.timeSeconds - left.timeSeconds;
-		const auto outgoing = DirectX::XMLoadFloat4(&left.outTangent);
-		const auto incoming = DirectX::XMLoadFloat4(&right.inTangent);
-		const auto values = a * (2.0f * cubed - 3.0f * squared + 1.0f) + b * (-2.0f * cubed + 3.0f * squared);
-		const auto tangents = outgoing * ((cubed - 2.0f * squared + ratio) * interval) + incoming * ((cubed - squared) * interval);
-		return values + tangents;
+		const auto outgoing = DirectX::XMLoadFloat4(&left.outTangent) * interval;
+		const auto incoming = DirectX::XMLoadFloat4(&right.inTangent) * interval;
+		return DirectX::XMVectorHermite(a, outgoing, b, incoming, ratio);
 	}
 
 	static void AppendKey(std::vector<Assets::CookedAnimationKeyframeRecord>& output, float time, DirectX::XMVECTOR value, ImportedAnimationTargetPath path, float duration)

@@ -10,7 +10,7 @@ These support the existing roadmap; they add no first-release prerequisites. Con
 
 | Action | Ownership to transfer or simplify | Completion condition |
 | --- | --- | --- |
-| **Complete Qt scene item views** | The isolated fit trial passed. Finish production conversion so existing Qt owns Launcher placement/scrolling/navigation. [Active plan](Implementation/LauncherItemViews.md). | Retire custom reflow/per-card widget assembly; preserve information, sizing, DPI, focus/actions and readiness. Prove the complete connected UI is smaller and clearer. |
+| **Close Qt scene-view cleanup** | Production uses Qt item views; the old grid, per-card widgets and widget-state maps are retired. [Remaining cleanup](Implementation/LauncherItemViews.md). | Resolve policy-rejected local probe/fixture cleanup, then remove the plan and its links. Broader display/product qualification stays with Roadmap. |
 | **Trial compiler preprocessing** | Let DXC/Slang evaluate includes and conditions; retire Sparkle's recursive [include expander](../Tools/Shaders/ShaderCompiler/Private/Compiler/ShaderSourcePreprocessor.cpp). Independent of the Qt trial. | Preserve virtual roots, generated parameters, dependency/debug source identity, typed ABI, accepted publication and reload on both shader targets. |
 | **Integrate selected rendering SDKs** | Follow the [rendering choices below](#rendering-sdks-worth-considering) in [Roadmap order](Roadmap.md#after-release). | Deliver a measured rendering benefit; retire any production algorithm being replaced. Record complete integration costs. |
 
@@ -28,7 +28,7 @@ The [November 22 source/API audit](../build/validation/third-party-reuse-2026112
 | **Bounded trial: named logging** | spdlog already has named lookup/registration and logger cloning. | Retire the local named-logger map and duplicated construction where a complete reduction is demonstrated. Keep bootstrap, sink/file policy, atomic creation and failure handling inside Core; static linkage makes module ownership significant. |
 | **Next Qt fit trials: Workspace/Clean rows** | Existing Qt item models/views, standard check roles and delegates; reuse the current clean-plan inventory owner. | Investigate replacing dependency label/button maps, string-valued action properties, repeated row trees and the second directory scan. Retain readiness, run identity, exact clean targets and confirmation. Count model/delegate/accessibility costs; Qt does not supply Sparkle's select-all or cleanup policy. |
 
-Complete the existing scene-view work before broadening Qt conversion. Compiler preprocessing remains the larger independent mechanism trial above. Plain-text log widgets and ImGui list clipping are conditional responsiveness ideas, without an established code-removal benefit.
+Resolve the required scene-view cleanup before broadening Qt conversion. Compiler preprocessing remains the larger independent mechanism trial above. Plain-text log widgets and ImGui list clipping are conditional responsiveness ideas, without an established code-removal benefit.
 
 The audit also checked already delegated import/texture/animation/allocation paths. Do not credit those deliveries again or replace domain validation with a similarly named utility. The report records per-library coverage, precise source fragments and rejected near-matches; a fetched transitive module or SDK header is not automatically an enabled dependency.
 
@@ -37,9 +37,8 @@ The audit also checked already delegated import/texture/animation/allocation pat
 | Pending bounded trial | Reviewed scope before replacement costs | Meaning |
 | --- | ---: | --- |
 | Compiler preprocessor pair | 253 physical / 221 code lines | Whole reviewed pair; exact source/debug and generated-input work still needs an owner. |
-| Qt custom reflow class | At most 160 physical / 140 code lines | Historical Q fragment only. Model/delegate/caller costs and any additional card retirement are counted separately by the active plan. |
 
-The historical pending inventory spans **992 physical / 873 code lines in 18 files across ten scopes**, excluding delivered migrations. It is a review ceiling, with **no supported future net forecast**. [Frozen source ranges](../build/validation/third-party-removal-triple-check-20261121/per-file-ledger.csv) retain the original identities; the preprocessor pair was subsequently recounted. Judge broader code movement through [module ownership](Engineering.md#module-boundaries).
+The historical pending inventory before Qt scene conversion spans **992 physical / 873 code lines in 18 files across ten scopes**. Its retired Q fragment retains its original **160 physical / 140 code** ceiling in the Qt ledger and earns no future credit. The inventory is a review ceiling, with **no supported future net forecast**. [Frozen source ranges](../build/validation/third-party-removal-triple-check-20261121/per-file-ledger.csv) retain the original identities; the preprocessor pair was subsequently recounted. Judge broader code movement through [module ownership](Engineering.md#module-boundaries).
 
 ## Delivered integrations versus savings
 
@@ -47,6 +46,7 @@ These are frozen, differently scoped delivery results. **Do not add the rows int
 
 | Delivered owner | Recorded cost result | Evidence |
 | --- | --- | --- |
+| Qt Launcher scene views | 34 fewer native physical lines and one fewer code line across the complete connected UI; CMake physical count unchanged. This is a modest reduction. Required local cleanup remains open. | [Delivery and limits](../build/validation/launcher-item-views/candidate-20261122/REPORT.md), [complete costs](../build/validation/launcher-item-views/candidate-20261122/costs.json) |
 | enkiTS maintained fork | 2,118 fewer C++ physical lines; 2,005 fewer complete-infrastructure lines after maintained native additions. Added-code/API/state/cleanup targets missed. | [Cumulative review](../build/validation/task-runtime/srp-20261122/REPORT.md) |
 | ShaderMake | 374 fewer native physical / 194 fewer code lines. Maintained ShaderMake/Slang patches, build and payload costs are separate. | [Cost record](../build/validation/shadermake/launcher-workflow-20261122/costs.json) |
 | VMA / D3D12MA reuse | Initial reuse removed 75 native physical lines after maintained patch additions. The subsequent cleanup removes another 327 native lines from its frozen scope. CMake costs separate; runtime/CPU-storage costs unmeasured. | [Initial costs](../build/validation/gpu-allocators/delivery-20261122/costs.json), [final integration and limits](../build/validation/gpu-allocators/finalization-20261122/REPORT.md) |
@@ -96,6 +96,10 @@ Sync/configure and cache-affecting Clean use the source-cache writer lock; build
 Review bundled code, installed SDKs, plugins and data independently; matching declared source-package lists cannot discover undeclared contributors. The [qualification receipt](../build/validation/third-party-integration-20261122/stage4/REPORT.md) retains identified implementation results and the accepted cleanup disposition. Final package/legal/clean-machine acceptance stays with [Roadmap](Roadmap.md#before-the-first-release).
 
 ## Retained decisions
+
+### Launcher scenes
+
+Existing Qt Widgets owns scene placement, wrapping, navigation and selection. One private list model owns presentation rows; a delegate paints cards and one shared native Source/primary button pair serves the current item. Domain owners retain catalogue meaning, readiness, request construction and operation lifetime. Keep stable-identity dispatch and refresh the existing scene page; do not restore per-row widget trees, status/button maps or a second reflow path. The complete conversion is nearly flat in code size; no general runtime, memory or package saving is established. [Source owner](../Tools/Launcher/SparkleLauncher/Private/Gui/Pages/Scenes/LauncherSceneView.cpp).
 
 ### Task execution
 

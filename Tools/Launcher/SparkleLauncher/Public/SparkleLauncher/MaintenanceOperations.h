@@ -45,6 +45,8 @@ namespace SparkleLauncher
 		bool bExists = false;
 	};
 
+	void InspectMaintenanceCleanTarget(MaintenanceCleanTarget& target);
+
 	struct MaintenanceCleanPathSpec
 	{
 		std::string DisplayName;

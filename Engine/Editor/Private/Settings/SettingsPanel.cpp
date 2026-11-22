@@ -7,9 +7,9 @@
 #include "Icons/EditorIcon.h"
 
 #include <imgui.h>
+#include <misc/cpp/imgui_stdlib.h>
 
 #include <algorithm>
-#include <array>
 #include <cfloat>
 #include <string>
 #include <utility>
@@ -137,22 +137,10 @@ void SettingsPanel::DrawToolbar(bool bDisableInteraction)
 	ImGui::EndDisabled();
 	ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-	std::array<char, 128> filterBuffer{};
-	const std::size_t copyLength = (std::min) (m_filterText.size(), filterBuffer.size() - 1);
-	if (copyLength > 0)
-	{
-		m_filterText.copy(filterBuffer.data(), copyLength);
-	}
-
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
 	ImGui::SetNextItemWidth(-FLT_MIN);
 	const std::string searchHint = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Search, "Search");
-	const bool bFilterEdited = ImGui::InputTextWithHint("##SettingsSearch", searchHint.c_str(), filterBuffer.data(), filterBuffer.size());
-
-	if (bFilterEdited)
-	{
-		m_filterText = filterBuffer.data();
-	}
+	ImGui::InputTextWithHint("##SettingsSearch", searchHint.c_str(), &m_filterText);
 	ImGui::PopStyleVar();
 }
 

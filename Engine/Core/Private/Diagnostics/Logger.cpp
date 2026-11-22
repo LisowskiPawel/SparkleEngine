@@ -8,8 +8,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <unordered_map>
-#include <vector>
 
 namespace Logging
 {
@@ -31,54 +29,40 @@ namespace Logging
 		return GetLogger();
 	}
 
-	using LoggerMap = std::unordered_map<std::string, std::shared_ptr<spdlog::logger>>;
-
-	struct LoggerRegistry final
+	struct LoggerBootstrapState final
 	{
 		std::mutex Mutex;
-		LoggerMap NamedLoggers;
-		std::vector<spdlog::sink_ptr> SharedSinks;
-		spdlog::level::level_enum Level = spdlog::level::info;
 		bool bInitialized = false;
 		std::optional<std::filesystem::path> ActiveLogFilePath;
 	};
 
-	static LoggerRegistry& GetLoggerRegistry() noexcept
+	static LoggerBootstrapState& GetBootstrapState() noexcept
 	{
-		static LoggerRegistry registry;
-		return registry;
-	}
-
-	static std::shared_ptr<spdlog::logger> CreateLoggerLocked(std::string_view name)
-	{
-		const LoggerRegistry& registry = GetLoggerRegistry();
-		auto logger = std::make_shared<spdlog::logger>(std::string(name), registry.SharedSinks.begin(), registry.SharedSinks.end());
-		logger->set_level(registry.Level);
-		logger->flush_on(spdlog::level::err);
-		return logger;
+		static LoggerBootstrapState state;
+		return state;
 	}
 
 	static void EnsureInitializedLocked()
 	{
-		LoggerRegistry& registry = GetLoggerRegistry();
-		if (registry.bInitialized)
+		LoggerBootstrapState& state = GetBootstrapState();
+		if (state.bInitialized)
 		{
 			return;
 		}
 
-		registry.SharedSinks = CreateLoggerSinks(registry.ActiveLogFilePath);
-		registry.Level = ReadConfiguredLoggerLevel();
-		auto coreLogger = CreateLoggerLocked(kCoreLoggerName);
-		registry.NamedLoggers.emplace(std::string(kCoreLoggerName), coreLogger);
+		const auto sinks = CreateLoggerSinks(state.ActiveLogFilePath);
+		auto coreLogger = std::make_shared<spdlog::logger>(std::string(kCoreLoggerName), sinks.begin(), sinks.end());
+		coreLogger->set_level(ReadConfiguredLoggerLevel());
+		coreLogger->flush_on(spdlog::level::err);
 		spdlog::set_default_logger(coreLogger);
-		registry.bInitialized = true;
+		state.bInitialized = true;
 	}
 
 	void Initialize() noexcept
 	{
 		try
 		{
-			std::lock_guard<std::mutex> lock(GetLoggerRegistry().Mutex);
+			std::lock_guard<std::mutex> lock(GetBootstrapState().Mutex);
 			EnsureInitializedLocked();
 		}
 		catch (...)
@@ -91,10 +75,10 @@ namespace Logging
 	{
 		try
 		{
-			LoggerRegistry& registry = GetLoggerRegistry();
-			std::lock_guard<std::mutex> lock(registry.Mutex);
+			LoggerBootstrapState& state = GetBootstrapState();
+			std::lock_guard<std::mutex> lock(state.Mutex);
 			EnsureInitializedLocked();
-			return registry.ActiveLogFilePath;
+			return state.ActiveLogFilePath;
 		}
 		catch (...)
 		{
@@ -106,18 +90,16 @@ namespace Logging
 	{
 		try
 		{
-			LoggerRegistry& registry = GetLoggerRegistry();
-			std::lock_guard<std::mutex> lock(registry.Mutex);
+			std::lock_guard<std::mutex> lock(GetBootstrapState().Mutex);
 			EnsureInitializedLocked();
 			const std::string loggerName(name);
-			const auto existing = registry.NamedLoggers.find(loggerName);
-			if (existing != registry.NamedLoggers.end())
+			if (auto existing = spdlog::get(loggerName))
 			{
-				return existing->second;
+				return existing;
 			}
 
-			auto logger = CreateLoggerLocked(name);
-			registry.NamedLoggers.emplace(loggerName, logger);
+			auto logger = spdlog::default_logger()->clone(loggerName);
+			spdlog::register_logger(logger);
 			return logger;
 		}
 		catch (...)

@@ -4,7 +4,8 @@ set(SPARKLE_IMGUI_REQUIRED_FILES imgui.h imgui.cpp imgui_draw.cpp imgui_tables.c
     imgui_widgets.cpp imgui_demo.cpp imgui_internal.h imstb_rectpack.h imstb_textedit.h
     imstb_truetype.h LICENSE.txt backends/imgui_impl_sdl3.cpp backends/imgui_impl_sdl3.h
     backends/imgui_impl_dx12.cpp backends/imgui_impl_dx12.h
-    backends/imgui_impl_vulkan.cpp backends/imgui_impl_vulkan.h)
+    backends/imgui_impl_vulkan.cpp backends/imgui_impl_vulkan.h
+    misc/cpp/imgui_stdlib.cpp misc/cpp/imgui_stdlib.h)
 
 sparkle_declare_git_dependency(imgui
     https://github.com/ocornut/imgui.git
@@ -24,6 +25,7 @@ add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/imgui_draw.cpp
     ${imgui_SOURCE_DIR}/imgui_tables.cpp
     ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp
 )
 
 target_include_directories(imgui PUBLIC

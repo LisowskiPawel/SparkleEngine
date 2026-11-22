@@ -95,19 +95,8 @@ namespace SparkleLauncher
 
 	bool LauncherWorkspaceSetup::CompleteOperation(const QString& runId)
 	{
-		bool bChanged = false;
-		for (auto dependencyRun = m_sourceDependencyRunIds.begin(); dependencyRun != m_sourceDependencyRunIds.end();)
-		{
-			if (dependencyRun.value() == runId)
-			{
-				bChanged = true;
-				dependencyRun = m_sourceDependencyRunIds.erase(dependencyRun);
-			}
-			else
-			{
-				++dependencyRun;
-			}
-		}
+		const auto completedRuns = m_sourceDependencyRunIds.removeIf([&runId](const auto& dependencyRun) { return dependencyRun.value() == runId; });
+		const bool bChanged = completedRuns > 0;
 		m_cleaningSourceDependencyRunIds.remove(runId);
 		if (bChanged)
 		{

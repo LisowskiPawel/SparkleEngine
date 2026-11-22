@@ -17,6 +17,7 @@
 #include <optional>
 
 #include <imgui.h>
+#include <misc/cpp/imgui_stdlib.h>
 
 SceneInspectorPanel::SceneInspectorPanel(EditorSceneSession& scene, float widthPixels) noexcept :
     m_scene(scene),
@@ -26,13 +27,6 @@ SceneInspectorPanel::SceneInspectorPanel(EditorSceneSession& scene, float widthP
 
 void SceneInspectorPanel::BuildDetailsToolbar() noexcept
 {
-	char filterBuffer[128] = {};
-	const std::size_t copyLength = (std::min) (m_filterText.size(), sizeof(filterBuffer) - 1);
-	if (copyLength > 0)
-	{
-		std::copy_n(m_filterText.data(), copyLength, filterBuffer);
-	}
-
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8.0f, 5.0f));
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
@@ -43,10 +37,7 @@ void SceneInspectorPanel::BuildDetailsToolbar() noexcept
 	ImGui::PushStyleColor(ImGuiCol_Border, borderColor);
 	ImGui::SetNextItemWidth(-1.0f);
 	const std::string searchHint = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Search, "Search");
-	if (ImGui::InputTextWithHint("##DetailsFilter", searchHint.c_str(), filterBuffer, sizeof(filterBuffer)))
-	{
-		m_filterText = filterBuffer;
-	}
+	ImGui::InputTextWithHint("##DetailsFilter", searchHint.c_str(), &m_filterText);
 	ImGui::PopStyleColor(4);
 	ImGui::PopStyleVar(3);
 }

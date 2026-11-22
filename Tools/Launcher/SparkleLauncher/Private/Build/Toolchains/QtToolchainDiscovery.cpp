@@ -1,36 +1,29 @@
 #include "Build/Toolchains/QtToolchainDiscovery.h"
 
 #include "Core/Public/Environment/EnvironmentVariables.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 #include <algorithm>
-#include <cctype>
 #include <optional>
 #include <ranges>
-#include <sstream>
 #include <system_error>
 
 namespace SparkleLauncher
 {
-	static std::string ToLower(std::string value)
-	{
-		std::transform(value.begin(), value.end(), value.begin(), [](unsigned char character) { return static_cast<char>(std::tolower(character)); });
-		return value;
-	}
-
 	static std::string BuildPathSortKey(const std::filesystem::path& path)
 	{
-		return ToLower(path.lexically_normal().generic_string());
+		return Strings::ToLowerCopy(path.lexically_normal().generic_string());
 	}
 
 	static bool PathLooksLikeMsvcKitRoot(const std::filesystem::path& path)
 	{
-		const std::string directoryName = ToLower(path.filename().string());
+		const std::string directoryName = Strings::ToLowerCopy(path.filename().string());
 		return directoryName.find("msvc") != std::string::npos && directoryName.find("64") != std::string::npos && directoryName.find("arm64") == std::string::npos;
 	}
 
 	static bool PathLooksLikeMingwKitRoot(const std::filesystem::path& path)
 	{
-		return ToLower(path.filename().string()).find("mingw") != std::string::npos;
+		return Strings::ToLowerCopy(path.filename().string()).find("mingw") != std::string::npos;
 	}
 
 	static std::optional<std::filesystem::path> NormalizeKitRootCandidate(std::filesystem::path path)
@@ -44,7 +37,7 @@ namespace SparkleLauncher
 		path = path.lexically_normal();
 		if (std::filesystem::is_regular_file(path, errorCode))
 		{
-			if (ToLower(path.filename().string()) == "qmake.exe")
+			if (Strings::ToLowerCopy(path.filename().string()) == "qmake.exe")
 			{
 				const std::filesystem::path root = path.parent_path().parent_path();
 				return std::filesystem::exists(root / "lib" / "cmake" / "Qt6" / "Qt6Config.cmake", errorCode) ? std::optional<std::filesystem::path>(root) : std::nullopt;
@@ -65,7 +58,7 @@ namespace SparkleLauncher
 		}
 		errorCode.clear();
 
-		if (ToLower(path.filename().string()) == "qt6")
+		if (Strings::ToLowerCopy(path.filename().string()) == "qt6")
 		{
 			const std::filesystem::path root = path.parent_path().parent_path();
 			const bool bQmakePresent = std::filesystem::exists(root / "bin" / "qmake.exe", errorCode);
@@ -77,21 +70,6 @@ namespace SparkleLauncher
 			}
 		}
 		return std::nullopt;
-	}
-
-	static std::vector<std::filesystem::path> SplitPathList(std::string_view value)
-	{
-		std::vector<std::filesystem::path> paths;
-		std::stringstream stream{std::string(value)};
-		std::string segment;
-		while (std::getline(stream, segment, ';'))
-		{
-			if (!segment.empty())
-			{
-				paths.emplace_back(segment);
-			}
-		}
-		return paths;
 	}
 
 	static void AddKitCandidate(QtToolchainDiscovery& discovery, const std::filesystem::path& candidate, std::vector<std::filesystem::path>& seenCandidates)
@@ -153,7 +131,7 @@ namespace SparkleLauncher
 		}
 		if (Environment::TryGetVariable("CMAKE_PREFIX_PATH", value))
 		{
-			for (const std::filesystem::path& path : SplitPathList(value))
+			for (const std::string_view path : Strings::Split(value, ';', false))
 			{
 				AddKitCandidate(discovery, path, seenCandidates);
 			}
