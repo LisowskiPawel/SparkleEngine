@@ -22,19 +22,10 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_d3d12MemoryLogger, "RHI.D3D12.Memory");
 
 struct D3D12GpuMemoryAllocator::Impl
 {
-	D3D12MA::Allocator* allocator = nullptr;
+	Microsoft::WRL::ComPtr<D3D12MA::Allocator> allocator;
 	mutable std::mutex recordsMutex;
 	std::vector<D3D12GpuAllocationRecord*> liveRecords;
 	std::vector<D3D12GpuHeapRecord*> liveHeapRecords;
-
-	~Impl() noexcept
-	{
-		if (allocator != nullptr)
-		{
-			allocator->Release();
-			allocator = nullptr;
-		}
-	}
 };
 
 D3D12GpuMemoryAllocator::D3D12GpuMemoryAllocator(IDXGIAdapter* adapter, ID3D12Device* device) noexcept :
@@ -50,20 +41,10 @@ D3D12GpuMemoryAllocator::D3D12GpuMemoryAllocator(IDXGIAdapter* adapter, ID3D12De
 	allocatorDesc.pAdapter = adapter;
 	allocatorDesc.pDevice = device;
 
-	CHECK(D3D12MA::CreateAllocator(&allocatorDesc, &m_impl->allocator));
+	CHECK(D3D12MA::CreateAllocator(&allocatorDesc, m_impl->allocator.ReleaseAndGetAddressOf()));
 }
 
 D3D12GpuMemoryAllocator::~D3D12GpuMemoryAllocator() noexcept = default;
-
-bool D3D12GpuMemoryAllocator::IsInitialized() const noexcept
-{
-	return m_impl != nullptr && m_impl->allocator != nullptr;
-}
-
-bool D3D12GpuMemoryAllocator::SupportsBudgetQueries() const noexcept
-{
-	return IsInitialized();
-}
 
 void D3D12GpuMemoryAllocator::SetCurrentFrameIndex(std::uint32_t frameIndex) noexcept
 {
@@ -75,14 +56,9 @@ RhiMemoryUsageSnapshot D3D12GpuMemoryAllocator::CreateMemoryUsageSnapshot() cons
 {
 	m_owner.AssertAccess();
 	RhiMemoryUsageSnapshot snapshot;
-	if (m_impl == nullptr || m_impl->allocator == nullptr)
-	{
-		return snapshot;
-	}
-
 	D3D12MA::Budget localBudget = {};
 	D3D12MA::Budget nonLocalBudget = {};
-	D3D12MemoryUsage::QueryBudget(*m_impl->allocator, localBudget, nonLocalBudget, snapshot);
+	D3D12MemoryUsage::QueryBudget(*m_impl->allocator.Get(), localBudget, nonLocalBudget, snapshot);
 
 	std::vector<D3D12MemoryCategoryAggregation> aggregations;
 	{
@@ -122,7 +98,7 @@ std::unique_ptr<D3D12GpuHeapRecord> D3D12GpuMemoryAllocator::CreateTransientHeap
     std::uint64_t alignment,
     std::wstring_view debugName) noexcept
 {
-	if (m_impl == nullptr || m_impl->allocator == nullptr || sizeInBytes == 0)
+	if (sizeInBytes == 0)
 	{
 		return {};
 	}
@@ -135,27 +111,22 @@ std::unique_ptr<D3D12GpuHeapRecord> D3D12GpuMemoryAllocator::CreateTransientHeap
 	allocationInfo.SizeInBytes = sizeInBytes;
 	allocationInfo.Alignment = alignment;
 
-	D3D12MA::Allocation* allocation = nullptr;
-	const HRESULT hr = m_impl->allocator->AllocateMemory(&allocationDesc, &allocationInfo, &allocation);
+	Microsoft::WRL::ComPtr<D3D12MA::Allocation> allocation;
+	const HRESULT hr = m_impl->allocator->AllocateMemory(&allocationDesc, &allocationInfo, allocation.ReleaseAndGetAddressOf());
 	if (FAILED(hr) || allocation == nullptr || allocation->GetHeap() == nullptr)
 	{
-		if (allocation != nullptr)
-		{
-			allocation->Release();
-		}
 		return {};
 	}
 
 	auto record = std::make_unique<D3D12GpuHeapRecord>();
-	record->NativeHeap = allocation->GetHeap();
-	record->Allocation = allocation;
+	record->Allocation = std::move(allocation);
 	record->Category = RhiMemoryCategory::TransientResource;
 	record->ResidencyClass = RhiMemoryResidencyClass::Transient;
 	record->Owner = this;
 	record->DebugName = std::wstring(debugName);
 	if (!record->DebugName.empty())
 	{
-		record->NativeHeap->SetName(record->DebugName.c_str());
+		record->Allocation->GetHeap()->SetName(record->DebugName.c_str());
 		record->Allocation->SetName(record->DebugName.c_str());
 	}
 	RegisterHeapRecord(*record);
@@ -192,17 +163,18 @@ std::unique_ptr<D3D12GpuAllocationRecord> D3D12GpuMemoryAllocator::CreateResourc
     RhiMemoryResidencyClass residencyClass,
     std::wstring_view debugName) noexcept
 {
-	if (m_impl == nullptr || m_impl->allocator == nullptr)
-	{
-		return {};
-	}
-
 	D3D12MA::ALLOCATION_DESC allocationDesc = {};
 	allocationDesc.HeapType = ToHeapType(residencyClass);
 
-	D3D12MA::Allocation* allocation = nullptr;
+	Microsoft::WRL::ComPtr<D3D12MA::Allocation> allocation;
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
-	const HRESULT hr = m_impl->allocator->CreateResource(&allocationDesc, &resourceDesc, initialState, optimizedClearValue, &allocation, IID_PPV_ARGS(resource.ReleaseAndGetAddressOf()));
+	const HRESULT hr = m_impl->allocator->CreateResource(
+	    &allocationDesc,
+	    &resourceDesc,
+	    initialState,
+	    optimizedClearValue,
+	    allocation.ReleaseAndGetAddressOf(),
+	    IID_PPV_ARGS(resource.ReleaseAndGetAddressOf()));
 	if (FAILED(hr) || allocation == nullptr || resource == nullptr)
 	{
 		std::size_t liveAllocationCount = 0;
@@ -224,16 +196,12 @@ std::unique_ptr<D3D12GpuAllocationRecord> D3D12GpuMemoryAllocator::CreateResourc
 		    liveHeapCount,
 		    Strings::ToNarrow(debugName));
 
-		if (allocation != nullptr)
-		{
-			allocation->Release();
-		}
 		return {};
 	}
 
 	auto record = std::make_unique<D3D12GpuAllocationRecord>();
 	record->Resource = std::move(resource);
-	record->Allocation = allocation;
+	record->Allocation = std::move(allocation);
 	record->Category = category;
 	record->ResidencyClass = residencyClass;
 	record->Owner = this;
@@ -256,13 +224,13 @@ std::unique_ptr<D3D12GpuAllocationRecord> D3D12GpuMemoryAllocator::CreateAliasin
     const D3D12_CLEAR_VALUE* optimizedClearValue,
     std::wstring_view debugName) noexcept
 {
-	if (m_impl == nullptr || m_impl->allocator == nullptr || heap.Allocation == nullptr)
+	if (heap.Allocation == nullptr)
 	{
 		return {};
 	}
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
-	const HRESULT hr = m_impl->allocator->CreateAliasingResource(heap.Allocation, heapOffset, &resourceDesc, initialState, optimizedClearValue, IID_PPV_ARGS(resource.ReleaseAndGetAddressOf()));
+	const HRESULT hr = m_impl->allocator->CreateAliasingResource(heap.Allocation.Get(), heapOffset, &resourceDesc, initialState, optimizedClearValue, IID_PPV_ARGS(resource.ReleaseAndGetAddressOf()));
 	if (FAILED(hr) || resource == nullptr)
 	{
 		return {};
@@ -271,7 +239,6 @@ std::unique_ptr<D3D12GpuAllocationRecord> D3D12GpuMemoryAllocator::CreateAliasin
 	auto record = std::make_unique<D3D12GpuAllocationRecord>();
 	record->Resource = std::move(resource);
 	record->Allocation = heap.Allocation;
-	record->Allocation->AddRef();
 	record->ParentHeap = &heap;
 	record->Owner = this;
 	record->Category = RhiMemoryCategory::TransientResource;
@@ -320,7 +287,7 @@ D3D12_HEAP_FLAGS D3D12GpuMemoryAllocator::ToTransientHeapFlags(RhiTransientAlloc
 D3D12GpuAllocationRecord* D3D12GpuMemoryAllocator::FindAllocationRecord(ID3D12Resource* resource) const noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl == nullptr || resource == nullptr)
+	if (resource == nullptr)
 	{
 		return nullptr;
 	}
@@ -338,10 +305,7 @@ D3D12GpuAllocationRecord* D3D12GpuMemoryAllocator::FindAllocationRecord(ID3D12Re
 void D3D12GpuMemoryAllocator::PublishRecordingReadView() noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl != nullptr)
-	{
-		m_recordingResources->Publish(m_impl->liveRecords);
-	}
+	m_recordingResources->Publish(m_impl->liveRecords);
 }
 
 void D3D12GpuMemoryAllocator::ClearRecordingReadView() noexcept
@@ -372,11 +336,6 @@ void D3D12GpuMemoryAllocator::RegisterAllocationRecord(D3D12GpuAllocationRecord&
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	D3D12GpuCrash::Resource(record.Resource.Get());
 #endif
-	if (m_impl == nullptr)
-	{
-		return;
-	}
-
 	std::scoped_lock lock(m_impl->recordsMutex);
 	if (std::find(m_impl->liveRecords.begin(), m_impl->liveRecords.end(), &record) == m_impl->liveRecords.end())
 	{
@@ -387,11 +346,6 @@ void D3D12GpuMemoryAllocator::RegisterAllocationRecord(D3D12GpuAllocationRecord&
 void D3D12GpuMemoryAllocator::UnregisterAllocationRecord(D3D12GpuAllocationRecord& record) noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl == nullptr)
-	{
-		return;
-	}
-
 	std::scoped_lock lock(m_impl->recordsMutex);
 	auto eraseBegin = std::remove(m_impl->liveRecords.begin(), m_impl->liveRecords.end(), &record);
 	m_impl->liveRecords.erase(eraseBegin, m_impl->liveRecords.end());
@@ -400,11 +354,6 @@ void D3D12GpuMemoryAllocator::UnregisterAllocationRecord(D3D12GpuAllocationRecor
 void D3D12GpuMemoryAllocator::RegisterHeapRecord(D3D12GpuHeapRecord& record) noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl == nullptr)
-	{
-		return;
-	}
-
 	std::scoped_lock lock(m_impl->recordsMutex);
 	if (std::find(m_impl->liveHeapRecords.begin(), m_impl->liveHeapRecords.end(), &record) == m_impl->liveHeapRecords.end())
 	{
@@ -415,11 +364,6 @@ void D3D12GpuMemoryAllocator::RegisterHeapRecord(D3D12GpuHeapRecord& record) noe
 void D3D12GpuMemoryAllocator::UnregisterHeapRecord(D3D12GpuHeapRecord& record) noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl == nullptr)
-	{
-		return;
-	}
-
 	std::scoped_lock lock(m_impl->recordsMutex);
 	auto eraseBegin = std::remove(m_impl->liveHeapRecords.begin(), m_impl->liveHeapRecords.end(), &record);
 	m_impl->liveHeapRecords.erase(eraseBegin, m_impl->liveHeapRecords.end());

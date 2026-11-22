@@ -2,6 +2,7 @@
 #include "Gui/Widgets/LauncherOptionWidgets.h"
 #include "Gui/GpuCrash/LauncherGpuCrashPanel.h"
 #include "Gui/Shell/LauncherMainWindow.h"
+#include "Gui/Pages/Scenes/LauncherSceneCatalog.h"
 
 #include "Gui/Widgets/LauncherLayoutWidgets.h"
 #include "Gui/Models/LauncherContentModel.h"
@@ -219,8 +220,7 @@ namespace SparkleLauncher
 			m_settings.SetBuildConfiguration("shipping");
 		}
 
-		const BuildToolchainStatus toolchain = bInstalled ? BuildToolchainStatus{}
-		                                                  : DetectBuildToolchain(m_workspaceRoot, ResolveSelectedWorkspaceIde(m_settings), ResolveSelectedWorkspaceCompiler(m_settings));
+		const BuildToolchainStatus toolchain = bInstalled ? BuildToolchainStatus{} : DetectBuildToolchain(ResolveSelectedWorkspaceIde(m_settings), ResolveSelectedWorkspaceCompiler(m_settings));
 
 		const LauncherContextUiModel model = LauncherContextUiModel::Build(toolchain, m_workspaceRoot);
 		PopulateBoundContextCombo(m_runModeCombo, model.RunModes, m_settings.RunMode(), m_settings, &LauncherSettings::SetRunMode);
@@ -258,7 +258,14 @@ namespace SparkleLauncher
 		QVBoxLayout* layout = new QVBoxLayout(content);
 		layout->setContentsMargins(bIsSceneSelection ? LauncherUi::Page::SceneSelectionMargins : LauncherUi::Page::ContentMargins);
 		layout->setSpacing(bIsSceneSelection ? 0 : LauncherUi::Page::Spacing);
-		AddOptionsForOperation(*layout, operationId);
+		if (bIsSceneSelection)
+		{
+			m_sceneCatalog->AddSceneSelection(*layout, *scrollArea);
+		}
+		else
+		{
+			AddOptionsForOperation(*layout, operationId);
+		}
 		layout->addStretch(1);
 		scrollArea->setWidget(content);
 		return scrollArea;

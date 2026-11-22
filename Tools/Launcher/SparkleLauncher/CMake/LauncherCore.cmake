@@ -1,7 +1,6 @@
 set(SPARKLE_LAUNCHER_CORE_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/GpuCrashIncident.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/BuildWorkspaceOperations.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/ArtifactNaming.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/BuildProfileCatalog.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/EditorShaderCompilation.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SparkleLauncher/CookOperations.h

@@ -18,12 +18,6 @@ namespace SparkleLauncher
 
 	void LauncherMainWindow::AddOptionsForOperation(QVBoxLayout& layout, const QString& operationId)
 	{
-		if (operationId == LauncherScenesOperationId())
-		{
-			m_sceneCatalog->AddSceneSelection(layout);
-			return;
-		}
-
 		if (operationId == "levels.run")
 		{
 			AddNoOptionsMessage(layout, "Choose a scene and use the launch settings in the footer.");

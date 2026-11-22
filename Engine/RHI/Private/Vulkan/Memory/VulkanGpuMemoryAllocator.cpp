@@ -41,32 +41,18 @@ struct VulkanGpuMemoryAllocator::Impl final
 	}
 };
 
-std::uint32_t VulkanGpuMemoryAllocator::ResolveVmaMemoryUsage(RhiMemoryResidencyClass residencyClass) noexcept
+static VmaAllocationCreateInfo ResolveAllocationCreateInfo(RhiMemoryResidencyClass residencyClass) noexcept
 {
 	switch (residencyClass)
 	{
 		case RhiMemoryResidencyClass::HostUpload:
+			return {.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT, .usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST};
 		case RhiMemoryResidencyClass::HostReadback:
-			return VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
+			return {.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT, .usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST};
 		case RhiMemoryResidencyClass::DeviceLocal:
 		case RhiMemoryResidencyClass::Transient:
 		default:
-			return VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
-	}
-}
-
-std::uint32_t VulkanGpuMemoryAllocator::ResolveVmaAllocationFlags(RhiMemoryResidencyClass residencyClass) noexcept
-{
-	switch (residencyClass)
-	{
-		case RhiMemoryResidencyClass::HostUpload:
-			return VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
-		case RhiMemoryResidencyClass::HostReadback:
-			return VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
-		case RhiMemoryResidencyClass::DeviceLocal:
-		case RhiMemoryResidencyClass::Transient:
-		default:
-			return 0;
+			return {.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE};
 	}
 }
 
@@ -120,16 +106,6 @@ VulkanGpuMemoryAllocator::VulkanGpuMemoryAllocator(VulkanRhi& rhi) noexcept :
 
 VulkanGpuMemoryAllocator::~VulkanGpuMemoryAllocator() noexcept = default;
 
-bool VulkanGpuMemoryAllocator::IsInitialized() const noexcept
-{
-	return m_impl != nullptr && m_impl->Allocator != nullptr;
-}
-
-bool VulkanGpuMemoryAllocator::SupportsBudgetQueries() const noexcept
-{
-	return IsInitialized();
-}
-
 void VulkanGpuMemoryAllocator::SetCurrentFrameIndex(std::uint32_t frameIndex) noexcept
 {
 	m_owner.AssertAccess();
@@ -152,10 +128,6 @@ RhiMemoryUsageSnapshot VulkanGpuMemoryAllocator::CreateMemoryUsageSnapshot() con
 {
 	m_owner.AssertAccess();
 	RhiMemoryUsageSnapshot snapshot;
-	if (m_impl == nullptr || m_impl->Allocator == nullptr)
-	{
-		return snapshot;
-	}
 	std::array<VmaBudget, VK_MAX_MEMORY_HEAPS> heapBudgets = {};
 	VulkanMemoryUsage::QueryBudget(m_impl->Allocator, m_impl->MemoryProperties, heapBudgets, snapshot);
 	std::vector<VulkanMemoryCategoryAggregation> aggregations;
@@ -178,14 +150,8 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanGpuMemoryAllocator::CreateBuffe
     std::wstring_view debugName,
     VkDeviceSize minimumAlignment) noexcept
 {
-	if (m_impl == nullptr || m_impl->Allocator == nullptr)
-	{
-		return {};
-	}
 
-	const VmaAllocationCreateInfo allocationCreateInfo{
-	    .flags = static_cast<VmaAllocationCreateFlags>(ResolveVmaAllocationFlags(residencyClass)),
-	    .usage = static_cast<VmaMemoryUsage>(ResolveVmaMemoryUsage(residencyClass))};
+	const VmaAllocationCreateInfo allocationCreateInfo = ResolveAllocationCreateInfo(residencyClass);
 
 	VkBufferCreateInfo nativeCreateInfo = bufferCreateInfo;
 	m_rhi.ConfigureResourceQueueSharing(nativeCreateInfo);
@@ -220,14 +186,8 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanGpuMemoryAllocator::CreateImage
     RhiMemoryResidencyClass residencyClass,
     std::wstring_view debugName) noexcept
 {
-	if (m_impl == nullptr || m_impl->Allocator == nullptr)
-	{
-		return {};
-	}
 
-	const VmaAllocationCreateInfo allocationCreateInfo{
-	    .flags = static_cast<VmaAllocationCreateFlags>(ResolveVmaAllocationFlags(residencyClass)),
-	    .usage = static_cast<VmaMemoryUsage>(ResolveVmaMemoryUsage(residencyClass))};
+	const VmaAllocationCreateInfo allocationCreateInfo = ResolveAllocationCreateInfo(residencyClass);
 
 	VkImageCreateInfo nativeCreateInfo = imageCreateInfo;
 	m_rhi.ConfigureResourceQueueSharing(nativeCreateInfo);
@@ -257,7 +217,7 @@ std::unique_ptr<VulkanGpuMemoryBlockRecord> VulkanGpuMemoryAllocator::CreateTran
     std::uint64_t alignment,
     std::wstring_view debugName) noexcept
 {
-	if (m_impl == nullptr || m_impl->Allocator == nullptr || sizeInBytes == 0)
+	if (sizeInBytes == 0)
 	{
 		return {};
 	}
@@ -282,8 +242,7 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanGpuMemoryAllocator::CreateAlias
 {
 	VkImageCreateInfo nativeCreateInfo = imageCreateInfo;
 	m_rhi.ConfigureResourceQueueSharing(nativeCreateInfo);
-	const bool bAllocatorAvailable = m_impl != nullptr && m_impl->Allocator != nullptr;
-	const bool bMemoryBlockPrepared = bAllocatorAvailable && EnsureMemoryBlockAllocationForImage(memoryBlock, nativeCreateInfo);
+	const bool bMemoryBlockPrepared = EnsureMemoryBlockAllocationForImage(memoryBlock, nativeCreateInfo);
 	const bool bMemoryBlockAllocated = bMemoryBlockPrepared && memoryBlock.Allocation != nullptr;
 
 	if (!bMemoryBlockAllocated)
@@ -318,8 +277,7 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanGpuMemoryAllocator::CreateAlias
 {
 	VkBufferCreateInfo nativeCreateInfo = bufferCreateInfo;
 	m_rhi.ConfigureResourceQueueSharing(nativeCreateInfo);
-	const bool bAllocatorAvailable = m_impl != nullptr && m_impl->Allocator != nullptr;
-	const bool bMemoryBlockPrepared = bAllocatorAvailable && EnsureMemoryBlockAllocationForBuffer(memoryBlock, nativeCreateInfo);
+	const bool bMemoryBlockPrepared = EnsureMemoryBlockAllocationForBuffer(memoryBlock, nativeCreateInfo);
 	const bool bMemoryBlockAllocated = bMemoryBlockPrepared && memoryBlock.Allocation != nullptr;
 
 	if (!bMemoryBlockAllocated)
@@ -345,8 +303,7 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanGpuMemoryAllocator::CreateAlias
 
 bool VulkanGpuMemoryAllocator::WriteAllocation(VulkanGpuAllocationRecord& record, const void* data, std::size_t sizeInBytes, std::size_t destinationOffsetInBytes) noexcept
 {
-	const bool bAllocatorAvailable = m_impl != nullptr && m_impl->Allocator != nullptr;
-	if (!bAllocatorAvailable || record.Allocation == nullptr)
+	if (record.Allocation == nullptr)
 	{
 		return false;
 	}
@@ -365,8 +322,7 @@ bool VulkanGpuMemoryAllocator::WriteAllocation(VulkanGpuAllocationRecord& record
 
 bool VulkanGpuMemoryAllocator::ReadAllocation(const VulkanGpuAllocationRecord& record, void* data, std::size_t sizeInBytes, std::size_t sourceOffsetInBytes) noexcept
 {
-	const bool bAllocatorAvailable = m_impl != nullptr && m_impl->Allocator != nullptr;
-	if (!bAllocatorAvailable || record.Allocation == nullptr)
+	if (record.Allocation == nullptr)
 	{
 		return false;
 	}
@@ -383,14 +339,9 @@ bool VulkanGpuMemoryAllocator::ReadAllocation(const VulkanGpuAllocationRecord& r
 	return VulkanResult::Succeeded(result);
 }
 
-void* VulkanGpuMemoryAllocator::MapUploadPage(VulkanGpuAllocationRecord& record) noexcept
-{
-	return MapHostAllocation(record, RhiMemoryResidencyClass::HostUpload);
-}
-
 bool VulkanGpuMemoryAllocator::FlushUploadPage(VulkanGpuAllocationRecord& record, std::size_t offsetInBytes, std::size_t sizeInBytes) noexcept
 {
-	if (m_impl == nullptr || m_impl->Allocator == nullptr || record.Allocation == nullptr || !record.bIsMapped || offsetInBytes > record.ResourceSizeInBytes
+	if (record.Allocation == nullptr || record.CpuMappedAddress == nullptr || offsetInBytes > record.ResourceSizeInBytes
 	    || sizeInBytes > record.ResourceSizeInBytes - offsetInBytes)
 	{
 		return false;
@@ -400,13 +351,13 @@ bool VulkanGpuMemoryAllocator::FlushUploadPage(VulkanGpuAllocationRecord& record
 	return VulkanResult::Succeeded(result);
 }
 
-void* VulkanGpuMemoryAllocator::MapHostAllocation(VulkanGpuAllocationRecord& record, RhiMemoryResidencyClass residencyClass) noexcept
+void* VulkanGpuMemoryAllocator::MapUploadPage(VulkanGpuAllocationRecord& record) noexcept
 {
-	if (m_impl == nullptr || m_impl->Allocator == nullptr || record.Allocation == nullptr || record.ResidencyClass != residencyClass)
+	if (record.Allocation == nullptr || record.ResidencyClass != RhiMemoryResidencyClass::HostUpload)
 	{
 		return nullptr;
 	}
-	if (record.bIsMapped)
+	if (record.CpuMappedAddress != nullptr)
 	{
 		return record.CpuMappedAddress;
 	}
@@ -418,7 +369,6 @@ void* VulkanGpuMemoryAllocator::MapHostAllocation(VulkanGpuAllocationRecord& rec
 		return nullptr;
 	}
 
-	record.bIsMapped = true;
 	record.CpuMappedAddress = mappedData;
 	return mappedData;
 }
@@ -426,10 +376,6 @@ void* VulkanGpuMemoryAllocator::MapHostAllocation(VulkanGpuAllocationRecord& rec
 void VulkanGpuMemoryAllocator::PublishRecordingReadView() noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl == nullptr)
-	{
-		return;
-	}
 
 	m_recordingResources->Publish(m_impl->LiveRecords);
 }
@@ -487,7 +433,7 @@ void VulkanGpuMemoryAllocator::ReleaseRecordingResource(VulkanRecordingResourceU
 VulkanGpuAllocationRecord* VulkanGpuMemoryAllocator::FindAllocationRecord(RhiResourceHandle resource) const noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl == nullptr || !resource)
+	if (!resource)
 	{
 		return nullptr;
 	}
@@ -512,7 +458,7 @@ VulkanGpuAllocationRecord* VulkanGpuMemoryAllocator::FindAllocationRecord(RhiRes
 VulkanGpuAllocationRecord* VulkanGpuMemoryAllocator::FindAllocationRecordByDeviceAddress(VkDeviceAddress deviceAddress) const noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl == nullptr || deviceAddress == 0)
+	if (deviceAddress == 0)
 	{
 		return nullptr;
 	}
@@ -540,7 +486,7 @@ VulkanGpuAllocationRecord* VulkanGpuMemoryAllocator::FindAllocationRecordByDevic
 void VulkanGpuMemoryAllocator::QueueDestroyResource(std::unique_ptr<VulkanGpuAllocationRecord> record) noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl == nullptr || record == nullptr)
+	if (record == nullptr)
 	{
 		return;
 	}
@@ -553,7 +499,7 @@ void VulkanGpuMemoryAllocator::QueueDestroyResource(std::unique_ptr<VulkanGpuAll
 void VulkanGpuMemoryAllocator::QueueDestroyMemoryBlock(std::unique_ptr<VulkanGpuMemoryBlockRecord> record) noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl == nullptr || record == nullptr)
+	if (record == nullptr)
 	{
 		return;
 	}
@@ -565,10 +511,6 @@ void VulkanGpuMemoryAllocator::QueueDestroyMemoryBlock(std::unique_ptr<VulkanGpu
 void VulkanGpuMemoryAllocator::DrainCompletedReleases(const std::array<std::uint64_t, RhiQueueTypeCount>& completedValues) noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl == nullptr)
-	{
-		return;
-	}
 
 	std::vector<std::unique_ptr<VulkanGpuMemoryBlockRecord>> readyMemoryBlockReleases;
 	std::vector<std::unique_ptr<VulkanGpuAllocationRecord>> readyReleases;
@@ -625,17 +567,17 @@ void VulkanGpuMemoryAllocator::FlushPendingReleases() noexcept
 
 void VulkanGpuMemoryAllocator::DestroyAllocation(VulkanGpuAllocationRecord& record) noexcept
 {
-	if (m_impl == nullptr || m_impl->Allocator == nullptr)
+	if (record.CpuMappedAddress != nullptr)
 	{
-		return;
+		vmaUnmapMemory(m_impl->Allocator, record.Allocation);
+	}
+	if (record.AccelerationStructure != VK_NULL_HANDLE && m_rhi.GetDestroyAccelerationStructure() != nullptr)
+	{
+		m_rhi.GetDestroyAccelerationStructure()(m_rhi.GetDevice(), record.AccelerationStructure, nullptr);
 	}
 
-	if (!record.bOwnsAllocation || record.ParentMemoryBlock != nullptr)
+	if (record.ParentMemoryBlock != nullptr)
 	{
-		if (record.AccelerationStructure != VK_NULL_HANDLE && m_rhi.GetDestroyAccelerationStructure() != nullptr)
-		{
-			m_rhi.GetDestroyAccelerationStructure()(m_rhi.GetDevice(), record.AccelerationStructure, nullptr);
-		}
 		if (record.Buffer != VK_NULL_HANDLE)
 		{
 			vkDestroyBuffer(m_rhi.GetDevice(), record.Buffer, nullptr);
@@ -644,95 +586,37 @@ void VulkanGpuMemoryAllocator::DestroyAllocation(VulkanGpuAllocationRecord& reco
 		{
 			vkDestroyImage(m_rhi.GetDevice(), record.Image, nullptr);
 		}
-
-		record.Buffer = VK_NULL_HANDLE;
-		record.Image = VK_NULL_HANDLE;
-		record.AccelerationStructure = VK_NULL_HANDLE;
-		record.DeviceAddress = 0;
-		record.BufferDeviceAddress = 0;
-		record.AccelerationStructureType = VK_ACCELERATION_STRUCTURE_TYPE_MAX_ENUM_KHR;
-		record.bIsPtlas = false;
-		record.Allocation = nullptr;
-		record.ResourceKind = VulkanGpuAllocationResourceKind::Unknown;
-		return;
-	}
-
-	if (record.Allocation == nullptr)
-	{
 		return;
 	}
 
 	switch (record.ResourceKind)
 	{
 		case VulkanGpuAllocationResourceKind::Buffer:
-			if (record.AccelerationStructure != VK_NULL_HANDLE && m_rhi.GetDestroyAccelerationStructure() != nullptr)
-			{
-				m_rhi.GetDestroyAccelerationStructure()(m_rhi.GetDevice(), record.AccelerationStructure, nullptr);
-				record.AccelerationStructure = VK_NULL_HANDLE;
-			}
-			if (record.Buffer != VK_NULL_HANDLE)
-			{
-				vmaDestroyBuffer(m_impl->Allocator, record.Buffer, record.Allocation);
-			}
+			vmaDestroyBuffer(m_impl->Allocator, record.Buffer, record.Allocation);
 			break;
 		case VulkanGpuAllocationResourceKind::Image:
-			if (record.Image != VK_NULL_HANDLE)
-			{
-				vmaDestroyImage(m_impl->Allocator, record.Image, record.Allocation);
-			}
+			vmaDestroyImage(m_impl->Allocator, record.Image, record.Allocation);
 			break;
 		case VulkanGpuAllocationResourceKind::Unknown:
 		default:
 			vmaFreeMemory(m_impl->Allocator, record.Allocation);
 			break;
 	}
-
-	record.Buffer = VK_NULL_HANDLE;
-	record.Image = VK_NULL_HANDLE;
-	record.AccelerationStructure = VK_NULL_HANDLE;
-	record.DeviceAddress = 0;
-	record.BufferDeviceAddress = 0;
-	record.AccelerationStructureType = VK_ACCELERATION_STRUCTURE_TYPE_MAX_ENUM_KHR;
-	record.bIsPtlas = false;
-	record.Allocation = nullptr;
-	record.ResourceKind = VulkanGpuAllocationResourceKind::Unknown;
 }
 
 void VulkanGpuMemoryAllocator::DestroyMemoryBlock(VulkanGpuMemoryBlockRecord& record) noexcept
 {
-	if (m_impl == nullptr || m_impl->Allocator == nullptr || record.Allocation == nullptr)
+	if (record.Allocation != nullptr)
 	{
-		return;
+		vmaFreeMemory(m_impl->Allocator, record.Allocation);
 	}
-
-	vmaFreeMemory(m_impl->Allocator, record.Allocation);
-	record.Allocation = nullptr;
-	record.AllocatedBytes = 0;
-	record.MemoryTypeIndex = UINT32_MAX;
-	record.MemoryHeapIndex = UINT32_MAX;
-}
-
-void VulkanGpuMemoryAllocator::UnmapAllocation(VulkanGpuAllocationRecord& record) noexcept
-{
-	if (m_impl == nullptr || m_impl->Allocator == nullptr || record.Allocation == nullptr)
-	{
-		return;
-	}
-
-	vmaUnmapMemory(m_impl->Allocator, record.Allocation);
-	record.bIsMapped = false;
-	record.CpuMappedAddress = nullptr;
 }
 
 void VulkanGpuMemoryAllocator::SetAllocationDebugName(VulkanGpuAllocationRecord& record, std::wstring_view debugName) noexcept
 {
-	if (m_impl == nullptr || m_impl->Allocator == nullptr)
-	{
-		return;
-	}
 
 	const std::string narrowName = Strings::ToNarrow(debugName);
-	if (record.bOwnsAllocation && record.Allocation != nullptr)
+	if (record.ParentMemoryBlock == nullptr && record.Allocation != nullptr)
 	{
 		vmaSetAllocationName(m_impl->Allocator, record.Allocation, narrowName.empty() ? nullptr : narrowName.c_str());
 	}
@@ -759,7 +643,7 @@ void VulkanGpuMemoryAllocator::SetAllocationDebugName(VulkanGpuAllocationRecord&
 
 void VulkanGpuMemoryAllocator::SetMemoryBlockDebugName(VulkanGpuMemoryBlockRecord& record, std::wstring_view debugName) noexcept
 {
-	if (m_impl == nullptr || m_impl->Allocator == nullptr || record.Allocation == nullptr)
+	if (record.Allocation == nullptr)
 	{
 		return;
 	}
@@ -771,10 +655,6 @@ void VulkanGpuMemoryAllocator::SetMemoryBlockDebugName(VulkanGpuMemoryBlockRecor
 void VulkanGpuMemoryAllocator::RegisterAllocationRecord(VulkanGpuAllocationRecord& record) noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl == nullptr)
-	{
-		return;
-	}
 
 	std::scoped_lock lock(m_impl->RecordsMutex);
 	if (std::find(m_impl->LiveRecords.begin(), m_impl->LiveRecords.end(), &record) == m_impl->LiveRecords.end())
@@ -786,10 +666,6 @@ void VulkanGpuMemoryAllocator::RegisterAllocationRecord(VulkanGpuAllocationRecor
 void VulkanGpuMemoryAllocator::UnregisterAllocationRecord(VulkanGpuAllocationRecord& record) noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl == nullptr)
-	{
-		return;
-	}
 
 	std::scoped_lock lock(m_impl->RecordsMutex);
 	auto eraseBegin = std::remove(m_impl->LiveRecords.begin(), m_impl->LiveRecords.end(), &record);
@@ -799,10 +675,6 @@ void VulkanGpuMemoryAllocator::UnregisterAllocationRecord(VulkanGpuAllocationRec
 void VulkanGpuMemoryAllocator::RegisterMemoryBlockRecord(VulkanGpuMemoryBlockRecord& record) noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl == nullptr)
-	{
-		return;
-	}
 
 	std::scoped_lock lock(m_impl->RecordsMutex);
 	const bool bMemoryBlockNotRegistered = std::find(m_impl->LiveMemoryBlockRecords.begin(), m_impl->LiveMemoryBlockRecords.end(), &record) == m_impl->LiveMemoryBlockRecords.end();
@@ -816,10 +688,6 @@ void VulkanGpuMemoryAllocator::RegisterMemoryBlockRecord(VulkanGpuMemoryBlockRec
 void VulkanGpuMemoryAllocator::UnregisterMemoryBlockRecord(VulkanGpuMemoryBlockRecord& record) noexcept
 {
 	m_owner.AssertAccess();
-	if (m_impl == nullptr)
-	{
-		return;
-	}
 
 	std::scoped_lock lock(m_impl->RecordsMutex);
 	auto eraseBegin = std::remove(m_impl->LiveMemoryBlockRecords.begin(), m_impl->LiveMemoryBlockRecords.end(), &record);
@@ -845,7 +713,6 @@ bool VulkanGpuMemoryAllocator::CompleteMemoryBlockAllocation(VulkanGpuMemoryBloc
 	VmaAllocationInfo allocationInfo = {};
 	vmaGetAllocationInfo(m_impl->Allocator, memoryBlock.Allocation, &allocationInfo);
 	memoryBlock.AllocatedBytes = allocationInfo.size;
-	memoryBlock.MemoryTypeIndex = allocationInfo.memoryType;
 	memoryBlock.MemoryHeapIndex = ResolveMemoryHeapIndex(m_impl->MemoryProperties, allocationInfo.memoryType);
 	SetMemoryBlockDebugName(memoryBlock, memoryBlock.DebugName);
 	return true;
@@ -853,10 +720,6 @@ bool VulkanGpuMemoryAllocator::CompleteMemoryBlockAllocation(VulkanGpuMemoryBloc
 
 bool VulkanGpuMemoryAllocator::EnsureMemoryBlockAllocationForImage(VulkanGpuMemoryBlockRecord& memoryBlock, const VkImageCreateInfo& imageCreateInfo) noexcept
 {
-	if (m_impl == nullptr || m_impl->Allocator == nullptr)
-	{
-		return false;
-	}
 	if (memoryBlock.Allocation != nullptr)
 	{
 		return true;
@@ -878,10 +741,6 @@ bool VulkanGpuMemoryAllocator::EnsureMemoryBlockAllocationForImage(VulkanGpuMemo
 
 bool VulkanGpuMemoryAllocator::EnsureMemoryBlockAllocationForBuffer(VulkanGpuMemoryBlockRecord& memoryBlock, const VkBufferCreateInfo& bufferCreateInfo) noexcept
 {
-	if (m_impl == nullptr || m_impl->Allocator == nullptr)
-	{
-		return false;
-	}
 	if (memoryBlock.Allocation != nullptr)
 	{
 		return true;
@@ -923,12 +782,7 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanGpuMemoryAllocator::CreateAlloc
 	record->UsedBytes = allocationInfo.size;
 	record->AllocatedBytes = allocationInfo.size;
 	record->ResourceSizeInBytes = allocationInfo.size;
-	record->MemoryTypeIndex = allocationInfo.memoryType;
 	record->MemoryHeapIndex = ResolveMemoryHeapIndex(m_impl->MemoryProperties, allocationInfo.memoryType);
-	if (resourceKind == VulkanGpuAllocationResourceKind::Image)
-	{
-		record->AspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	}
 	record->Owner = this;
 	record->DebugName = std::wstring(debugName);
 	SetAllocationDebugName(*record, debugName);
@@ -943,11 +797,6 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanGpuMemoryAllocator::CreateAlias
     VulkanGpuMemoryBlockRecord& memoryBlock,
     std::wstring_view debugName) noexcept
 {
-	if (memoryBlock.Allocation == nullptr)
-	{
-		return {};
-	}
-
 	auto record = std::make_unique<VulkanGpuAllocationRecord>();
 	record->Buffer = buffer;
 	record->Image = image;
@@ -957,27 +806,8 @@ std::unique_ptr<VulkanGpuAllocationRecord> VulkanGpuMemoryAllocator::CreateAlias
 	record->Category = memoryBlock.Category;
 	record->ResidencyClass = memoryBlock.ResidencyClass;
 	record->AllocatedBytes = 0;
-	record->MemoryTypeIndex = memoryBlock.MemoryTypeIndex;
 	record->MemoryHeapIndex = memoryBlock.MemoryHeapIndex;
-	record->bOwnsAllocation = false;
 
-	if (resourceKind == VulkanGpuAllocationResourceKind::Buffer && buffer != VK_NULL_HANDLE)
-	{
-		VkBufferMemoryRequirementsInfo2 requirementsInfo{.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_REQUIREMENTS_INFO_2, .pNext = nullptr, .buffer = buffer};
-		VkMemoryRequirements2 memoryRequirements{.sType = VK_STRUCTURE_TYPE_MEMORY_REQUIREMENTS_2};
-		vkGetBufferMemoryRequirements2(m_rhi.GetDevice(), &requirementsInfo, &memoryRequirements);
-		record->ResourceSizeInBytes = memoryRequirements.memoryRequirements.size;
-		record->UsedBytes = memoryRequirements.memoryRequirements.size;
-	}
-	if (resourceKind == VulkanGpuAllocationResourceKind::Image && image != VK_NULL_HANDLE)
-	{
-		VkImageMemoryRequirementsInfo2 requirementsInfo{.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_REQUIREMENTS_INFO_2, .pNext = nullptr, .image = image};
-		VkMemoryRequirements2 memoryRequirements{.sType = VK_STRUCTURE_TYPE_MEMORY_REQUIREMENTS_2};
-		vkGetImageMemoryRequirements2(m_rhi.GetDevice(), &requirementsInfo, &memoryRequirements);
-		record->ResourceSizeInBytes = memoryRequirements.memoryRequirements.size;
-		record->UsedBytes = memoryRequirements.memoryRequirements.size;
-		record->AspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	}
 
 	record->Owner = this;
 	record->DebugName = std::wstring(debugName);

@@ -251,25 +251,4 @@ namespace SparkleLauncher
 		return "Unknown";
 	}
 
-	QString LauncherActionImpactKindName(LauncherActionImpactKind impactKind)
-	{
-		switch (impactKind)
-		{
-			case LauncherActionImpactKind::None:
-				return "None";
-			case LauncherActionImpactKind::SourceDependencies:
-				return "Source dependencies";
-			case LauncherActionImpactKind::LevelAssets:
-				return "Level assets";
-			case LauncherActionImpactKind::WorkspaceFiles:
-				return "Workspace files";
-			case LauncherActionImpactKind::BuildOutputs:
-				return "Build outputs";
-			case LauncherActionImpactKind::CookedOutputs:
-				return "Cooked outputs";
-			case LauncherActionImpactKind::GeneratedState:
-				return "Generated state";
-		}
-		return "Unknown";
-	}
 }

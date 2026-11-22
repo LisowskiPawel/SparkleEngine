@@ -21,7 +21,6 @@ public:
 	VulkanTypeConversions() = delete;
 
 	static VkFormat ToVkFormat(PixelFormat format) noexcept;
-	static PixelFormat ToPixelFormat(VkFormat format) noexcept;
 	static VkIndexType ToVkIndexType(RhiIndexFormat format) noexcept;
 	static VkCompareOp ToVkCompareOp(CompareOp op) noexcept;
 	static VkStencilOp ToVkStencilOp(RhiStencilOp op) noexcept;

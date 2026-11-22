@@ -103,14 +103,6 @@ namespace EditorWidgets
 		ImGui::PopID();
 	}
 
-	void DrawSectionHeader(const char* title)
-	{
-		ImFont* headingFont = SparkleUiTheme::GetHeadingFont();
-		ImGui::PushID(title);
-		DrawHeaderBar(title, nullptr, 22.0f, SparkleUiPalette::SectionHeaderBackground(), SparkleUiPalette::SectionHeaderBorder(), headingFont, nullptr, ImVec2(6.0f, 3.0f));
-		ImGui::PopID();
-	}
-
 	bool DrawFilterChip(const char* label, bool bActive) noexcept
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5.0f, 2.0f));

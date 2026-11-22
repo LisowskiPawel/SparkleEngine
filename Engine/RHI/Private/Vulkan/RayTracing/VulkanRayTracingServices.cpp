@@ -74,11 +74,6 @@ const RhiPtlasService& VulkanRayTracingServices::GetPtlasService() const noexcep
 	return m_ptlasServices;
 }
 
-RhiRayTracingCapabilities VulkanRayTracingServices::GetCapabilities() const noexcept
-{
-	return m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities() : RhiRayTracingCapabilities{};
-}
-
 RhiRayTracingAccelerationStructurePrebuildInfo VulkanRayTracingServices::GetBottomLevelAccelerationStructurePrebuildInfo(const RhiRayTracingGeometryDesc& geometry) const noexcept
 {
 	const bool bSizingUnavailableCapabilities = m_rhi == nullptr || !m_rhi->GetRayTracingCapabilities().bSupportsAccelerationStructure;
@@ -115,27 +110,7 @@ RhiRayTracingAccelerationStructurePrebuildInfo VulkanRayTracingServices::GetBott
 	    .UpdateScratchDataSizeInBytes = nativeInfo.updateScratchSize};
 }
 
-RhiRayTracingAccelerationStructurePrebuildInfo VulkanRayTracingServices::GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags) const noexcept
-{
-	return m_tlasServices.GetTlasPrebuildInfo(instanceCount, buildFlags);
-}
-
-RhiPtlasBuildSizes VulkanRayTracingServices::GetPtlasBuildSizes(const RhiPtlasDesc& desc) const noexcept
-{
-	return m_ptlasServices.GetPtlasBuildSizes(desc);
-}
-
-RhiOwnedResourceHandle VulkanRayTracingServices::CreatePtlasBuffer(const RhiPtlasBuildSizes& sizes, std::wstring_view debugName)
-{
-	return m_ptlasServices.CreatePtlasBuffer(sizes, debugName);
-}
-
-RhiOwnedResourceHandle VulkanRayTracingServices::CreatePtlasOperationBuffer(const RhiPtlasOperationPackDesc& operationPack, std::wstring_view debugName)
-{
-	return m_ptlasServices.CreatePtlasOperationBuffer(operationPack, debugName);
-}
-
-RhiOwnedResourceHandle VulkanRayTracingServices::CreateScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName)
+RhiOwnedResourceHandle VulkanRayTracingServices::CreateRayTracingScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName)
 {
 	const std::uint64_t scratchAlignment = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities().ScratchBufferByteAlignment : 0;
 	const bool bScratchInputsMemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
@@ -160,12 +135,7 @@ RhiOwnedResourceHandle VulkanRayTracingServices::CreateScratchBuffer(std::uint64
 	return record != nullptr ? MakeVulkanOwnedResourceHandle(std::move(record)) : RhiOwnedResourceHandle{};
 }
 
-RhiOwnedResourceHandle VulkanRayTracingServices::CreateRayTracingScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName)
-{
-	return CreateScratchBuffer(sizeInBytes, debugName);
-}
-
-RhiOwnedResourceHandle VulkanRayTracingServices::CreateAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType type, std::wstring_view debugName)
+RhiOwnedResourceHandle VulkanRayTracingServices::CreateRayTracingAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType type, std::wstring_view debugName)
 {
 	const std::uint64_t asAlignment = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities().AccelerationStructureByteAlignment : 0;
 	const bool bStorageInputsMemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
@@ -226,21 +196,6 @@ RhiOwnedResourceHandle VulkanRayTracingServices::CreateAccelerationStructureBuff
 	record->DeviceAddress = m_rhi->GetAccelerationStructureDeviceAddress()(m_rhi->GetDevice(), &addressInfo);
 	SetVulkanAllocationRecordDebugName(*record, debugName.empty() ? L"RayTracingAccelerationStructure" : debugName);
 	return record->DeviceAddress != 0 ? MakeVulkanOwnedResourceHandle(std::move(record)) : RhiOwnedResourceHandle{};
-}
-
-RhiOwnedResourceHandle VulkanRayTracingServices::CreateRayTracingAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType type, std::wstring_view debugName)
-{
-	return CreateAccelerationStructureBuffer(sizeInBytes, type, debugName);
-}
-
-RhiOwnedResourceHandle VulkanRayTracingServices::CreateInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
-{
-	return m_tlasServices.CreateTlasInstanceBuffer(instances, instanceCount, debugName);
-}
-
-RhiOwnedResourceHandle VulkanRayTracingServices::CreateRayTracingInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
-{
-	return CreateInstanceBuffer(instances, instanceCount, debugName);
 }
 
 std::unique_ptr<RayTracingShaderTable> VulkanRayTracingServices::CreateRayTracingShaderTable(const RayTracingShaderTableDesc& desc)

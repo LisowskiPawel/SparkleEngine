@@ -3,7 +3,7 @@
 
 #include "Cli/InspectShaderCommand.h"
 
-#include "Constants/ShaderCompilerConstants.h"
+#include "Cli/ShaderCompilerExitCodes.h"
 #include "Contracts/ShaderContractCatalogBuilder.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/FileSetPublication.h"

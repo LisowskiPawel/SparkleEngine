@@ -2,7 +2,7 @@
 
 #include "Cli/ListShadersCommand.h"
 
-#include "Constants/ShaderCompilerConstants.h"
+#include "Cli/ShaderCompilerExitCodes.h"
 #include "Contracts/ShaderContractCatalogBuilder.h"
 #include "Contracts/ShaderContractValidator.h"
 #include "Core/Public/Diagnostics/Error.h"

@@ -26,8 +26,6 @@ public:
 	D3D12GpuMemoryAllocator(D3D12GpuMemoryAllocator&&) = delete;
 	D3D12GpuMemoryAllocator& operator=(D3D12GpuMemoryAllocator&&) = delete;
 
-	bool IsInitialized() const noexcept;
-	bool SupportsBudgetQueries() const noexcept;
 	void SetCurrentFrameIndex(std::uint32_t frameIndex) noexcept;
 	RhiMemoryUsageSnapshot CreateMemoryUsageSnapshot() const;
 	std::unique_ptr<D3D12GpuAllocationRecord> CreateTexture(

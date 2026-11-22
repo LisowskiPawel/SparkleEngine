@@ -192,7 +192,7 @@ namespace SparkleLauncher
 	bool BuildWorkspaceOperationRequiresConfigureStep(const BuildWorkspaceOperationPlan& plan);
 	const std::vector<BuildWorkspaceOperationDefinition>& GetBuildWorkspaceOperationDefinitions();
 	std::optional<BuildWorkspaceOperationDefinition> FindBuildWorkspaceOperationDefinition(std::string_view operationId);
-	BuildToolchainStatus DetectBuildToolchain(const std::filesystem::path& workspaceRoot, WorkspaceIde preferredIde, WorkspaceCompiler compiler = WorkspaceCompiler::Msvc);
+	BuildToolchainStatus DetectBuildToolchain(WorkspaceIde preferredIde, WorkspaceCompiler compiler = WorkspaceCompiler::Msvc);
 	BuildFilesFreshnessStatus CheckBuildFilesFreshness(const std::filesystem::path& workspaceRoot, const BuildToolchainStatus& toolchain);
 	bool UpdateBuildFilesFreshnessStamp(const std::filesystem::path& workspaceRoot, const BuildToolchainStatus& toolchain, std::string& errorMessage);
 	BuildWorkspaceOperationPlan PlanBuildWorkspaceOperation(std::string_view operationId, const BuildWorkspaceOperationRequest& request);

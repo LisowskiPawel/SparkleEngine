@@ -36,16 +36,6 @@ void EditorTransactionHistory::FinishInteraction() noexcept
 	m_bCoalescing = false;
 }
 
-bool EditorTransactionHistory::CanUndo() const noexcept
-{
-	return !m_undo.empty();
-}
-
-bool EditorTransactionHistory::CanRedo() const noexcept
-{
-	return !m_redo.empty();
-}
-
 void EditorTransactionHistory::DismissLastResult() noexcept
 {
 	m_lastResult.reset();

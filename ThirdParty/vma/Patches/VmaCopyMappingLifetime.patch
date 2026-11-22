@@ -1,0 +1,23 @@
+--- a/include/vk_mem_alloc.h
++++ b/include/vk_mem_alloc.h
+@@ -14491,8 +14491,8 @@
+     if(res == VK_SUCCESS)
+     {
+         memcpy((char*)dstMappedData + dstAllocationLocalOffset, pSrcHostPointer, (size_t)size);
++        res = FlushOrInvalidateAllocation(dstAllocation, dstAllocationLocalOffset, size, VMA_CACHE_FLUSH);
+         Unmap(dstAllocation);
+-        res = FlushOrInvalidateAllocation(dstAllocation, dstAllocationLocalOffset, size, VMA_CACHE_FLUSH);
+     }
+     return res;
+ }
+@@ -14511,8 +14511,8 @@
+         if(res == VK_SUCCESS)
+         {
+             memcpy(pDstHostPointer, (const char*)srcMappedData + srcAllocationLocalOffset, (size_t)size);
+-            Unmap(srcAllocation);
+-        }
++        }
++        Unmap(srcAllocation);
+     }
+     return res;
+ }

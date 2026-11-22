@@ -7,9 +7,8 @@ set(SPARKLE_LAUNCHER_GUI_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Build/LauncherBuildOptions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Clean/LauncherCleanOptions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Cook/LauncherCookOptions.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Scenes/LauncherSceneCards.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Scenes/LauncherSceneCatalog.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Scenes/LauncherSceneLaunch.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Scenes/LauncherSceneView.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Workspace/LauncherDependencyRows.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Workspace/LauncherWorkspaceSetup.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Shell/LauncherMainWindowPages.cpp
@@ -52,6 +51,7 @@ set(SPARKLE_LAUNCHER_GUI_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Clean/LauncherCleanOptions.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Cook/LauncherCookOptions.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Scenes/LauncherSceneCatalog.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Scenes/LauncherSceneView.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Pages/Workspace/LauncherWorkspaceSetup.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Widgets/LauncherOptionWidgets.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/GpuCrash/LauncherGpuCrashPanel.h

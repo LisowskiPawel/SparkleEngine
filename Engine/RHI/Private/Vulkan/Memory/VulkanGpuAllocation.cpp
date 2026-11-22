@@ -6,29 +6,14 @@
 
 VulkanGpuAllocationRecord::~VulkanGpuAllocationRecord() noexcept
 {
-	if (ParentMemoryBlock != nullptr)
-	{
-		if (ParentMemoryBlock->AliasingResourceCount > 0)
-		{
-			--ParentMemoryBlock->AliasingResourceCount;
-		}
-		ParentMemoryBlock = nullptr;
-	}
-
 	if (Owner != nullptr)
 	{
 		Owner->UnregisterAllocationRecord(*this);
-	}
-
-	if (Owner != nullptr && bIsMapped && Allocation != nullptr)
-	{
-		Owner->UnmapAllocation(*this);
-	}
-
-	if (Owner != nullptr)
-	{
 		Owner->DestroyAllocation(*this);
-		Owner = nullptr;
+	}
+	if (ParentMemoryBlock != nullptr && ParentMemoryBlock->AliasingResourceCount > 0)
+	{
+		--ParentMemoryBlock->AliasingResourceCount;
 	}
 }
 
@@ -38,7 +23,6 @@ VulkanGpuMemoryBlockRecord::~VulkanGpuMemoryBlockRecord() noexcept
 	{
 		Owner->UnregisterMemoryBlockRecord(*this);
 		Owner->DestroyMemoryBlock(*this);
-		Owner = nullptr;
 	}
 }
 

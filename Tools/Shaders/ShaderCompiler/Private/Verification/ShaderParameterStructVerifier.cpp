@@ -176,7 +176,8 @@ namespace ShaderParameterVerification
 
 static std::optional<std::string> FindShaderParameterMismatch(const ShaderParameterStructDescriptor& descriptor, const ShaderReflection& reflection, bool bAllowUnreflectedDeclarations)
 {
-	if (auto mismatch = ShaderParameterVerification::FindAutomaticValueMismatch(descriptor, reflection, bAllowUnreflectedDeclarations))
+	auto mismatch = ShaderParameterVerification::FindAutomaticValueMismatch(descriptor, reflection, bAllowUnreflectedDeclarations);
+	if (mismatch)
 	{
 		return mismatch;
 	}

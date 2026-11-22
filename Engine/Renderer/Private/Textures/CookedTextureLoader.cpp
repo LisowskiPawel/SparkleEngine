@@ -52,7 +52,9 @@ static PixelFormat ValidateHeader(const CookedTextureAssetHeader& header, const 
 	{
 		throw Diagnostics::Error("Cooked texture asset has reserved layout bits for '" + resolvedPath.string() + "'.");
 	}
-	if (header.GetDimension() == TextureResourceDimension::TextureCube && (header.GetArraySize() != 6 || header.width != header.height))
+	const bool bInvalidCubeShape = header.GetArraySize() != 6 || header.width != header.height;
+	const bool bInvalidCube = header.GetDimension() == TextureResourceDimension::TextureCube && bInvalidCubeShape;
+	if (bInvalidCube)
 	{
 		throw Diagnostics::Error("Cooked texture asset header has an invalid cubemap face count for '" + resolvedPath.string() + "'");
 	}

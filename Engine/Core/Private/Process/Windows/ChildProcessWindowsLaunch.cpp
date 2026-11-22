@@ -54,7 +54,8 @@ namespace Process
 			if (bOwnJob && message == JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO)
 			{
 				JOBOBJECT_BASIC_ACCOUNTING_INFORMATION accounting{};
-				if (!QueryInformationJobObject(child.Job.get(), JobObjectBasicAccountingInformation, &accounting, sizeof(accounting), nullptr))
+				const bool bAccountingRead = QueryInformationJobObject(child.Job.get(), JobObjectBasicAccountingInformation, &accounting, sizeof(accounting), nullptr) != FALSE;
+				if (!bAccountingRead)
 				{
 					return child.TerminationError = GetLastError();
 				}

@@ -40,7 +40,6 @@ struct VulkanGpuAllocationRecord final
 	std::uint64_t UsedBytes = 0;
 	std::uint64_t AllocatedBytes = 0;
 	std::uint64_t ResourceSizeInBytes = 0;
-	std::uint32_t MemoryTypeIndex = UINT32_MAX;
 	std::uint32_t MemoryHeapIndex = UINT32_MAX;
 	VkFormat Format = VK_FORMAT_UNDEFINED;
 	VkExtent3D Extent = {};
@@ -49,9 +48,7 @@ struct VulkanGpuAllocationRecord final
 	VkFlags Usage = 0;
 	std::wstring DebugName;
 	VulkanGpuMemoryAllocator* Owner = nullptr;
-	bool bIsMapped = false;
 	void* CpuMappedAddress = nullptr;
-	bool bOwnsAllocation = true;
 	bool bPendingRelease = false;
 	RhiSubmissionState LastUse;
 	std::atomic<std::uint32_t> RecordingReferenceCount = 0;
@@ -74,7 +71,6 @@ struct VulkanGpuMemoryBlockRecord final
 	std::uint64_t AllocatedBytes = 0;
 	std::uint64_t RequestedSizeInBytes = 0;
 	std::uint64_t Alignment = 0;
-	std::uint32_t MemoryTypeIndex = UINT32_MAX;
 	std::uint32_t MemoryHeapIndex = UINT32_MAX;
 	std::wstring DebugName;
 	VulkanGpuMemoryAllocator* Owner = nullptr;

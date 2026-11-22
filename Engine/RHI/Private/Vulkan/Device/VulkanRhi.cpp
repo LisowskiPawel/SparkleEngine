@@ -91,11 +91,6 @@ const VulkanFeatureStatus& VulkanRhi::GetFeatureStatus() const noexcept
 	return m_featureStatus;
 }
 
-const std::vector<std::string>& VulkanRhi::GetEnabledInstanceExtensions() const noexcept
-{
-	return m_enabledInstanceExtensions;
-}
-
 const std::vector<std::string>& VulkanRhi::GetEnabledDeviceExtensions() const noexcept
 {
 	return m_enabledDeviceExtensions;

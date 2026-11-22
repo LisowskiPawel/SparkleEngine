@@ -1,11 +1,25 @@
 #pragma once
 
-#include <QtCore/QString>
+#include <QtCore/QAbstractListModel>
 #include <QtCore/QVector>
+#include <QtGui/QPixmap>
+
+#include <cstdint>
 
 namespace SparkleLauncher
 {
 	struct LauncherContentSummary;
+	class LauncherSettings;
+
+	enum class LauncherLevelAction : std::uint8_t
+	{
+		None,
+		Run,
+		Sync,
+		Details,
+		Source,
+		CopyDetails,
+	};
 
 	struct LauncherLevelUiEntry final
 	{
@@ -18,6 +32,11 @@ namespace SparkleLauncher
 		QString State;
 		QString SourcePageUrl;
 		QString UnsupportedReason;
+		QString ActionText;
+		QString ActionToolTip;
+		QString ArtworkIdentity;
+		QPixmap Artwork;
+		LauncherLevelAction Action = LauncherLevelAction::None;
 		bool bSelected = false;
 		bool bSourceReady = false;
 		bool bGameSupported = true;
@@ -27,12 +46,24 @@ namespace SparkleLauncher
 		bool bCanSync = false;
 	};
 
-	struct LauncherLevelUiModel final
+	class LauncherLevelUiModel final : public QAbstractListModel
 	{
-		bool bLoaded = false;
-		QString LoadError;
-		QVector<LauncherLevelUiEntry> Levels;
+	public:
+		explicit LauncherLevelUiModel(QObject* parent = nullptr);
+		void Refresh(const LauncherContentSummary* content, const LauncherSettings& settings, const QString& openingLevelId);
+		int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+		QVariant data(const QModelIndex& index, int role) const override;
+		const LauncherLevelUiEntry* Level(const QModelIndex& index) const;
 
-		static LauncherLevelUiModel Build(const LauncherContentSummary& content);
+		const QVector<LauncherLevelUiEntry>& Levels() const { return m_levels; }
+
+		const QString& ContentId() const { return m_contentId; }
+
+		const QString& Error() const { return m_error; }
+
+	private:
+		QVector<LauncherLevelUiEntry> m_levels;
+		QString m_contentId;
+		QString m_error;
 	};
 }

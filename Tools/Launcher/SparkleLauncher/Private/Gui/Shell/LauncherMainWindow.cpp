@@ -299,15 +299,24 @@ namespace SparkleLauncher
 		}
 
 		m_bIsRebuildingOptions = true;
+		const QString scenesOperationId = LauncherScenesOperationId();
+		QWidget* scenesPage = m_optionsPageByOperation.contains(scenesOperationId) ? m_optionsStack->widget(m_optionsPageByOperation.value(scenesOperationId)) : nullptr;
 
 		while (m_optionsStack->count() > 0)
 		{
 			QWidget* page = m_optionsStack->widget(0);
 			m_optionsStack->removeWidget(page);
-			page->deleteLater();
+			if (page != scenesPage)
+			{
+				page->deleteLater();
+			}
 		}
 		m_optionsPageByOperation.clear();
-		m_sceneCatalog->ResetWidgets();
+		if (scenesPage != nullptr)
+		{
+			m_optionsPageByOperation.insert(scenesOperationId, m_optionsStack->addWidget(scenesPage));
+		}
+		m_sceneCatalog->Refresh();
 		m_workspaceSetup->ResetWidgets();
 
 		EnsureOptionsPage(m_selectedOperationId);

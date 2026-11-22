@@ -25,14 +25,4 @@ namespace SparkleLauncher
 		return LauncherUiModelForOperation(operationId).DisplayName;
 	}
 
-	QString LauncherOperationImpactText(const QString& operationId)
-	{
-		return LauncherUiModelForOperation(operationId).ImpactText;
-	}
-
-	QString LauncherWorkflowPrimaryVerb(const QString& operationId)
-	{
-		const QString primaryVerb = LauncherUiModelForOperation(operationId).PrimaryVerb;
-		return primaryVerb.isEmpty() ? QString("Run") : primaryVerb;
-	}
 }

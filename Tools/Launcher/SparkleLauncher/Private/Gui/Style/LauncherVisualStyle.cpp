@@ -194,23 +194,6 @@ namespace SparkleLauncher
 		addRule("#InlineStatusValue[State=\"bad\"]", "color: #ef8f86;");
 		addRule("#StatusActionCell", "background: transparent; border: none;");
 		addRule("#StatusDetail", "color: " + textMuted + "; font-size: 8.5pt;");
-		addRule("#MapCatalogCard", "background: #1d201e; border: 1px solid #363b37; border-radius: 5px;");
-		addRule("#MapCatalogCard:hover", "border-color: #596159;");
-		addRule("#MapCatalogCard[State=\"ok\"]", "border-color: #3d4639;");
-		addRule("#MapCatalogCard[State=\"warning\"]", "border-color: #504936;");
-		addRule("#MapCardThumbnail", "background: #090b0a; border: none; border-right: 1px solid #343934;");
-		addRule("#MapCardBody", "background: #1d201e; border: none;");
-		addRule("#MapCatalogCard:hover #MapCardBody", "background: #222624;");
-
-		addRule(
-		    "#MapCardTitle",
-		    "background: transparent; color: #f4f7f1; border: none; border-left: 2px solid #596159; font-size: 10.5pt; font-weight: "
-		    "700; padding: 1px 0 1px 9px;");
-
-		addRule("#MapCardTitle[State=\"ok\"]", "border-left-color: " + accent + ";");
-		addRule("#MapCardTitle[State=\"warning\"]", "border-left-color: " + warning + ";");
-		addRule("#MapCardDescription", "color: " + textBody + "; font-size: 8.75pt; line-height: 132%; padding: 1px 1px;");
-		addRule("#MapCardMeta", "color: " + textMuted + "; font-size: 8pt; padding: 0 1px;");
 		addRule("#MapCardSourceButton", "background: transparent; color: " + textSecondary + "; border: 1px solid #4b524d; border-radius: 4px; padding: 2px 8px; font-size: 8.25pt; font-weight: 650;");
 		addRule("#MapCardSourceButton:hover", "background: #32373a; color: #ffffff; border-color: #707a75;");
 		addRule("#MapCardActionButton", "background: #26321f; color: #f4f7f1; border: 1px solid " + accent + "; border-radius: 4px; padding: 2px 8px; font-size: 8.25pt; font-weight: 700;");

@@ -67,13 +67,7 @@ public:
 	NativeGraphicsQueueHandle GetGraphicsQueueHandle() const noexcept;
 	RenderCommandList& GetGraphicsCommandList(std::uint32_t frameIndex) noexcept;
 	RenderCommandList& GetCommandList(ERhiQueueType queueType, std::uint32_t frameIndex) noexcept;
-	RhiRayTracingCapabilities GetRayTracingCapabilities() const noexcept;
 	RhiImGuiRenderer& GetImGuiRenderer() noexcept;
-	RhiRayTracingAccelerationStructurePrebuildInfo GetBottomLevelAccelerationStructurePrebuildInfo(const RhiRayTracingGeometryDesc& geometry) const noexcept;
-	RhiRayTracingAccelerationStructurePrebuildInfo GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags = ERhiTlasBuildFlags::None) const noexcept;
-	RhiOwnedResourceHandle CreateRayTracingScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName);
-	RhiOwnedResourceHandle CreateRayTracingAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType type, std::wstring_view debugName);
-	RhiOwnedResourceHandle CreateRayTracingInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName);
 	void SetCurrentFrameIndex(std::uint32_t frameIndex) noexcept;
 	void ResetTransientFrameResources() noexcept;
 	void RebuildSwapChainBackBufferViews() noexcept;

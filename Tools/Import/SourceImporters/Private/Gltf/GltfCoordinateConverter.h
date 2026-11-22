@@ -14,7 +14,6 @@ public:
 	static DirectX::XMMATRIX ComputeNodeWorldTransform(const cgltf_node* node);
 	static DirectX::XMMATRIX ConvertMatrix(DirectX::FXMMATRIX sourceRowMatrix) noexcept;
 	static DirectX::XMFLOAT3 ConvertPosition(const DirectX::XMFLOAT3& value) noexcept;
-	static DirectX::XMFLOAT3 ConvertDirection(const DirectX::XMFLOAT3& value) noexcept;
 	static DirectX::XMFLOAT3 ConvertNormal(const DirectX::XMFLOAT3& value) noexcept;
 	static DirectX::XMFLOAT3 ConvertTranslation(const DirectX::XMFLOAT3& value) noexcept;
 	static DirectX::XMFLOAT3 ConvertTranslationTangent(const DirectX::XMFLOAT3& value) noexcept;

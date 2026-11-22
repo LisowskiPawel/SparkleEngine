@@ -10,33 +10,20 @@
 
 D3D12GpuAllocationRecord::~D3D12GpuAllocationRecord() noexcept
 {
-	if (ParentHeap != nullptr)
-	{
-		if (ParentHeap->AliasingResourceCount > 0)
-		{
-			--ParentHeap->AliasingResourceCount;
-		}
-		ParentHeap = nullptr;
-	}
-
 	if (Owner != nullptr)
 	{
 		Owner->UnregisterAllocationRecord(*this);
-		Owner = nullptr;
 	}
 
 	if (bIsMapped && Resource != nullptr)
 	{
 		Resource->Unmap(0, nullptr);
-		bIsMapped = false;
-		CpuMappedAddress = nullptr;
 	}
 
 	Resource.Reset();
-	if (Allocation != nullptr)
+	if (ParentHeap != nullptr && ParentHeap->AliasingResourceCount > 0)
 	{
-		Allocation->Release();
-		Allocation = nullptr;
+		--ParentHeap->AliasingResourceCount;
 	}
 }
 
@@ -45,19 +32,6 @@ D3D12GpuHeapRecord::~D3D12GpuHeapRecord() noexcept
 	if (Owner != nullptr)
 	{
 		Owner->UnregisterHeapRecord(*this);
-		Owner = nullptr;
-	}
-
-	NativeHeap.Reset();
-	if (Allocation != nullptr)
-	{
-		Allocation->Release();
-		Allocation = nullptr;
-	}
-	if (Pool != nullptr)
-	{
-		Pool->Release();
-		Pool = nullptr;
 	}
 }
 
@@ -116,5 +90,5 @@ D3D12GpuHeapRecord* GetD3D12GpuHeapRecord(RhiOwnedMemoryBlockHandle handle) noex
 ID3D12Heap* GetD3D12Heap(RhiOwnedMemoryBlockHandle handle) noexcept
 {
 	D3D12GpuHeapRecord* const record = GetD3D12GpuHeapRecord(handle);
-	return record != nullptr ? record->NativeHeap.Get() : nullptr;
+	return record != nullptr && record->Allocation != nullptr ? record->Allocation->GetHeap() : nullptr;
 }

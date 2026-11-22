@@ -63,10 +63,8 @@ void D3D12DescriptorHeapManager::BindGlobalDescriptorState(D3D12RenderCommandLis
 	commandList.SetShaderVisibleDescriptorHeaps(static_cast<std::uint32_t>(_countof(heaps)), heaps);
 }
 
-void D3D12DescriptorHeapManager::FreeHandle(D3D12_DESCRIPTOR_HEAP_TYPE type, D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle, D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle)
+void D3D12DescriptorHeapManager::FreeHandle(D3D12_DESCRIPTOR_HEAP_TYPE type, D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle)
 {
-	(void) gpuHandle;
-
 	D3D12DescriptorHeap* heap = GetHeap(type);
 	if (heap == nullptr || m_rhi == nullptr)
 	{
@@ -81,40 +79,14 @@ void D3D12DescriptorHeapManager::FreeHandle(D3D12_DESCRIPTOR_HEAP_TYPE type, D3D
 	}
 
 	const SIZE_T byteOffset = cpuHandle.ptr - firstHandle.GetCPU().ptr;
-	const UINT index = static_cast<UINT>(byteOffset / incrementSize);
-	GetAllocator(type)->Free(heap->GetHandleAt(index));
-}
-
-void D3D12DescriptorHeapManager::FreeContiguous(D3D12_DESCRIPTOR_HEAP_TYPE type, D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle, D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle, uint32_t count)
-{
-	(void) gpuHandle;
-
-	if (count == 0)
+	const SIZE_T index = byteOffset / incrementSize;
+	const UINT capacity = heap->GetNumDescriptors();
+	if (byteOffset % incrementSize != 0 || index >= capacity)
 	{
 		return;
 	}
 
-	D3D12DescriptorHeap* heap = GetHeap(type);
-	if (heap == nullptr || m_rhi == nullptr)
-	{
-		return;
-	}
-
-	const D3D12DescriptorHandle firstHandle = heap->GetHandleAt(0);
-	const UINT incrementSize = firstHandle.GetIncrementSize();
-	if (incrementSize == 0 || cpuHandle.ptr < firstHandle.GetCPU().ptr)
-	{
-		return;
-	}
-
-	const SIZE_T byteOffset = cpuHandle.ptr - firstHandle.GetCPU().ptr;
-	if ((byteOffset % incrementSize) != 0)
-	{
-		return;
-	}
-
-	const UINT index = static_cast<UINT>(byteOffset / incrementSize);
-	FreeContiguous(type, heap->GetHandleAt(index), count);
+	GetAllocator(type)->Free(heap->GetHandleAt(static_cast<UINT>(index)));
 }
 
 void D3D12DescriptorHeapManager::FreeContiguous(D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12DescriptorHandle& handle, uint32_t count)

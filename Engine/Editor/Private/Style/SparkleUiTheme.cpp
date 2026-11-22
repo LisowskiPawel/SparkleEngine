@@ -158,11 +158,6 @@ namespace SparkleUiTheme
 		io.FontDefault = g_bodyFont;
 	}
 
-	ImFont* GetBodyFont()
-	{
-		return g_bodyFont;
-	}
-
 	ImFont* GetHeadingFont()
 	{
 		return g_headingFont;

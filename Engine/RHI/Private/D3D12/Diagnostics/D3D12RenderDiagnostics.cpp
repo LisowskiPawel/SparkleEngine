@@ -17,6 +17,7 @@
 
 #include "Core/Public/Strings/StringUtils.h"
 
+#include <D3D12MemAlloc.h>
 #include <cstring>
 #include <memory>
 #include <string>
@@ -53,8 +54,9 @@ public:
 		if (record != nullptr)
 		{
 			record->DebugName = debugName;
+			record->Allocation->SetName(record->DebugName.c_str());
 		}
-		SetD3D12ObjectDebugName(record != nullptr ? record->NativeHeap.Get() : nullptr, debugName);
+		SetD3D12ObjectDebugName(GetD3D12Heap(memoryBlock), debugName);
 	}
 
 	void SetDebugName(RhiOwnedResourceHandle resource, std::wstring_view debugName) noexcept override
@@ -299,7 +301,7 @@ public:
 	{
 	}
 
-	bool SupportsBudgetQueries() const noexcept override { return m_allocator.SupportsBudgetQueries(); }
+	bool SupportsBudgetQueries() const noexcept override { return true; }
 
 	bool SupportsDelayedDestructionTracking() const noexcept override { return false; }
 

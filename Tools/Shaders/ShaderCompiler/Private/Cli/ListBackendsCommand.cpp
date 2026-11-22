@@ -3,7 +3,7 @@
 #include "Cli/ListBackendsCommand.h"
 
 #include "Backend/ShaderBackends.h"
-#include "Constants/ShaderCompilerConstants.h"
+#include "Cli/ShaderCompilerExitCodes.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 #include <exception>

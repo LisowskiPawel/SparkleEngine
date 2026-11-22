@@ -6,7 +6,7 @@
 
 #include "Analysis/CookedShaderStatsPass.h"
 #include "RHI/Public/Shaders/ShaderTarget.h"
-#include "Constants/ShaderCompilerConstants.h"
+#include "Cli/ShaderCompilerExitCodes.h"
 #include "Cooking/GlobalShaderCooker.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "ToolConsole.h"

@@ -22,9 +22,6 @@ public:
 	RhiPtlasBuildSizes GetPtlasBuildSizes(ID3D12Device10* device, const RhiPtlasDesc& desc) const noexcept;
 	bool BuildPtlas(ID3D12GraphicsCommandList7* commandList, const RhiPtlasBuildCommandDesc& desc) const noexcept;
 
-	bool IsRuntimeInitialized() const noexcept;
-	const char* GetRuntimeStatusReason() const noexcept;
-
 private:
 	static std::uint64_t AlignUp(std::uint64_t value, std::uint64_t alignment) noexcept;
 	static const char* ToNvapiStatusReason(int status) noexcept;

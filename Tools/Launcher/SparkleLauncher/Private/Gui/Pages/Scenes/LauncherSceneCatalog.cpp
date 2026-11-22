@@ -1,6 +1,9 @@
 #include "Gui/Pages/Scenes/LauncherSceneCatalog.h"
-#include "Core/Public/Diagnostics/Error.h"
+#include "Gui/Pages/Scenes/LauncherSceneView.h"
+#include "Gui/Widgets/LauncherSceneWidgets.h"
+#include "Gui/Style/LauncherUiDesign.h"
 #include "Gui/Widgets/LauncherOptionWidgets.h"
+#include "Core/Public/Diagnostics/Error.h"
 #include "Gui/Operations/LauncherOperationConfirmation.h"
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QLabel>
@@ -13,14 +16,17 @@
 #include "Gui/Models/LauncherContentModel.h"
 
 #include "SparkleLauncher/MaintenanceOperations.h"
-#include <QtCore/QStringList>
-#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
-#include <exception>
-#include <string_view>
+#include <QtWidgets/QScrollArea>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QMessageBox>
+#include <QtGui/QDesktopServices>
+#include <QtGui/QClipboard>
+#include <QtGui/QGuiApplication>
+#include <QtCore/QUrl>
+#include <algorithm>
 #include <utility>
-#include <vector>
 
 namespace SparkleLauncher
 {
@@ -41,16 +47,26 @@ namespace SparkleLauncher
 	{
 	}
 
-	void LauncherSceneCatalog::ResetWidgets()
+	LauncherSceneCatalog::~LauncherSceneCatalog()
 	{
-		m_levelStatusLabels.clear();
-		m_levelActionButtons.clear();
+		delete m_view;
+	}
+
+	void LauncherSceneCatalog::Refresh()
+	{
+		m_levelModel.Refresh(m_contentModel.Content(), m_settings, m_startingLevelRunId.isEmpty() ? QString() : m_startingLevelId);
+		if (m_catalogMessage != nullptr)
+		{
+			const QString message = !m_levelModel.Error().isEmpty() ? m_levelModel.Error() : m_levelModel.rowCount() == 0 ? QStringLiteral("The catalogue has no levels.") : QString();
+			m_catalogMessage->setText(message);
+			m_catalogMessage->setVisible(!message.isEmpty());
+		}
 	}
 
 	bool LauncherSceneCatalog::CompleteOperation(const QString& runId, const QString& operationId)
 	{
 		const bool bCatalogChanged = operationId == "levels.sync" || operationId == "workspace.clean";
-		const bool bLaunchSettled = runId == m_startingLevelRunId;
+		const bool bLaunchSettled = !m_startingLevelRunId.isEmpty() && runId == m_startingLevelRunId;
 		if (bLaunchSettled)
 		{
 			m_startingLevelRunId.clear();
@@ -58,54 +74,9 @@ namespace SparkleLauncher
 		}
 		if (bCatalogChanged || bLaunchSettled)
 		{
-			RefreshLevelActionButtons();
+			Refresh();
 		}
-		return bCatalogChanged;
-	}
-
-	void LauncherSceneCatalog::AddLevelContentGroups(QVBoxLayout& layout)
-	{
-		QVBoxLayout* catalogLayout = AddOptionGroup(layout, "Levels", QString());
-		const LauncherContentSummary* content = m_contentModel.Content();
-		if (content == nullptr)
-		{
-			AddNoOptionsMessage(*catalogLayout, "Workspace content is unavailable.");
-			return;
-		}
-
-		const LauncherLevelUiModel model = LauncherLevelUiModel::Build(*content);
-		if (!model.bLoaded)
-		{
-			AddNoOptionsMessage(*catalogLayout, model.LoadError.isEmpty() ? QStringLiteral("The repository has no readable Levels.catalog.") : model.LoadError);
-			return;
-		}
-
-		AddSyncLevelRows(*catalogLayout, *content, model);
-	}
-
-	void LauncherSceneCatalog::RefreshLevelActionButtons()
-	{
-		const LauncherContentSummary* content = m_contentModel.Content();
-		if (content == nullptr)
-		{
-			return;
-		}
-
-		const LauncherLevelUiModel model = LauncherLevelUiModel::Build(*content);
-		if (!model.bLoaded)
-		{
-			return;
-		}
-
-		for (const LauncherLevelUiEntry& level : model.Levels)
-		{
-			QLabel* statusLabel = m_levelStatusLabels.value(level.Id, nullptr);
-			QPushButton* button = m_levelActionButtons.value(level.Id, nullptr);
-			if (statusLabel != nullptr && button != nullptr)
-			{
-				ApplyLevelActionButtonState(*statusLabel, *button, level);
-			}
-		}
+		return bCatalogChanged || bLaunchSettled;
 	}
 
 	void LauncherSceneCatalog::SyncAllLevels()
@@ -125,24 +96,12 @@ namespace SparkleLauncher
 		}
 	}
 
-	LauncherLevelUiModel LauncherSceneCatalog::BuildLevelUiModel() const
-	{
-		const LauncherContentSummary* content = m_contentModel.Content();
-		if (content == nullptr)
-		{
-			return {};
-		}
-
-		return LauncherLevelUiModel::Build(*content);
-	}
-
 	void LauncherSceneCatalog::UpdateActionAvailability(QPushButton& cleanButton, QPushButton& runButton, bool bHasActionCleanTargets)
 	{
 		bool bCanSyncLevel = false;
 		bool bHasSelectedLevels = false;
 		bool bHasExtractedLevelContent = false;
-		const LauncherLevelUiModel levelModel = BuildLevelUiModel();
-		for (const LauncherLevelUiEntry& level : levelModel.Levels)
+		for (const LauncherLevelUiEntry& level : m_levelModel.Levels())
 		{
 			const bool bSupportedLevel = level.Id != "Empty" && level.bGameSupported;
 			const bool bSelectableLevel = bSupportedLevel && level.bCanPrepare;
@@ -150,7 +109,6 @@ namespace SparkleLauncher
 			if (level.Id != "Empty" && level.bSelected)
 			{
 				bHasSelectedLevels = true;
-				break;
 			}
 		}
 
@@ -176,5 +134,106 @@ namespace SparkleLauncher
 
 		const QString reason = bCanSyncLevel ? QStringLiteral("Sync all available levels. Existing runs keep going.") : QStringLiteral("No catalog levels are available to sync.");
 		ApplyActionAvailability(runButton, bCanSyncLevel, reason);
+	}
+
+	void LauncherSceneCatalog::AddSceneSelection(QVBoxLayout& layout, QScrollArea& scrollArea)
+	{
+		const QString heroDetail = QStringLiteral("Choose a scene and open Editor or Game. Sync, Build and Cook are optional developer tools.");
+		layout.addWidget(CreateSceneHeroCard(m_workspaceRoot, "Explore Sparkle", heroDetail, "neutral", nullptr, nullptr, "showcase-hero.png", layout.parentWidget()));
+		auto* body = new QWidget(layout.parentWidget());
+		body->setObjectName("SceneSelectionBody");
+		auto* bodyLayout = new QVBoxLayout(body);
+		// The view includes a trailing cell gutter; the visible cards retain the original right margin.
+		bodyLayout
+		    ->setContentsMargins(LauncherUi::Scenes::BodyLeft, LauncherUi::Scenes::BodyTop, LauncherUi::Scenes::BodyRight - LauncherUi::MapCatalog::HorizontalSpacing, LauncherUi::Scenes::BodyBottom);
+		bodyLayout->setSpacing(LauncherUi::Scenes::SectionSpacing);
+		QVBoxLayout* catalogue = AddOptionGroup(*bodyLayout, "Levels", QString());
+		m_catalogMessage = new QLabel(catalogue->parentWidget());
+		m_catalogMessage->setObjectName("MutedLabel");
+		m_catalogMessage->setWordWrap(true);
+		catalogue->addWidget(m_catalogMessage);
+		Refresh();
+		m_view = new LauncherSceneView(m_levelModel, catalogue->parentWidget(), [this](QWidget* widget) { emit FocusableWidgetCreated(widget); });
+		catalogue->addWidget(m_view);
+		connect(m_view, &LauncherSceneView::ActionRequested, this, &LauncherSceneCatalog::DispatchAction);
+		connect(
+		    m_view,
+		    &LauncherSceneView::CurrentItemChanged,
+		    &scrollArea,
+		    [this, &scrollArea](const QRect& rect)
+		    {
+			    const QPoint center = m_view->viewport()->mapTo(scrollArea.widget(), rect.center());
+			    scrollArea.ensureVisible(center.x(), center.y(), rect.width() / 2, rect.height() / 2);
+		    });
+		layout.addWidget(body);
+	}
+
+	void LauncherSceneCatalog::DispatchAction(const QString& contentId, const QString& levelId, LauncherLevelAction action)
+	{
+		if (contentId != m_contentModel.ContentId())
+		{
+			return;
+		}
+		Refresh();
+		const auto& levels = m_levelModel.Levels();
+		const auto found = std::find_if(levels.begin(), levels.end(), [&levelId](const auto& level) { return level.Id == levelId; });
+		const LauncherContentSummary* content = m_contentModel.Content();
+		if (found == levels.end() || content == nullptr)
+		{
+			return;
+		}
+		// Use the current row only until request construction; no row reference survives dispatch.
+		const LauncherLevelUiEntry& level = *found;
+		if (action == LauncherLevelAction::Source)
+		{
+			if (!level.SourcePageUrl.isEmpty())
+			{
+				QDesktopServices::openUrl(QUrl(level.SourcePageUrl));
+			}
+		}
+		else if (action == LauncherLevelAction::CopyDetails)
+		{
+			QGuiApplication::clipboard()->setText(level.Detail);
+		}
+		else if (action == level.Action && action == LauncherLevelAction::Run)
+		{
+			StartLevel(*content, level);
+		}
+		else if (action == level.Action && action == LauncherLevelAction::Sync)
+		{
+			LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, QStringLiteral("levels.sync"));
+			std::get<LevelOperationRequest>(request.Inputs).RequestedLevelIds = {level.Id.toStdString()};
+			m_startOperation(std::move(request), QStringLiteral("Sync %1").arg(level.DisplayName));
+		}
+		else if (action == level.Action && action == LauncherLevelAction::Details)
+		{
+			QMessageBox::information(&m_dialogParent, level.DisplayName, level.ActionToolTip);
+		}
+	}
+
+	void LauncherSceneCatalog::StartLevel(const LauncherContentSummary& content, const LauncherLevelUiEntry& level)
+	{
+		if (!m_startingLevelRunId.isEmpty())
+		{
+			m_activityPanel->ShowRunOutput(m_startingLevelRunId);
+			return;
+		}
+		if (!level.bGameSupported || !level.bCanSelect)
+		{
+			return;
+		}
+
+		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, QStringLiteral("levels.run"));
+		auto& inputs = std::get<LevelRunOperationRequest>(request.Inputs);
+		inputs.ContentId = content.Id.toStdString();
+		inputs.LevelId = level.Id.toStdString();
+		const QString action = m_settings.RunMode() == QStringLiteral("game") ? QStringLiteral("Run ") : QStringLiteral("Open ");
+		m_startingLevelId = level.Id;
+		m_startingLevelRunId = m_startOperation(std::move(request), action + level.DisplayName);
+		if (m_startingLevelRunId.isEmpty())
+		{
+			m_startingLevelId.clear();
+		}
+		Refresh();
 	}
 }

@@ -278,7 +278,7 @@ public:
 	{
 	}
 
-	bool SupportsBudgetQueries() const noexcept override { return m_allocator.SupportsBudgetQueries(); }
+	bool SupportsBudgetQueries() const noexcept override { return true; }
 
 	bool SupportsDelayedDestructionTracking() const noexcept override { return true; }
 

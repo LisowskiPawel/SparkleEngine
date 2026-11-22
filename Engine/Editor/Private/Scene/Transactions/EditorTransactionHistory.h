@@ -22,9 +22,6 @@ public:
 
 	void FinishInteraction() noexcept;
 
-	bool CanUndo() const noexcept;
-	bool CanRedo() const noexcept;
-
 	const std::optional<WorldEditResult>& GetLastResult() const noexcept { return m_lastResult; }
 
 	void DismissLastResult() noexcept;

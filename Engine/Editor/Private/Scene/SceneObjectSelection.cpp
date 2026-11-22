@@ -26,11 +26,6 @@ SceneObjectSelection SceneObjectSelection::Mesh(EntityId entity) noexcept
 	return {SceneObjectType::Mesh, entity};
 }
 
-bool SceneObjectSelection::IsNone() const noexcept
-{
-	return type == SceneObjectType::None;
-}
-
 bool SceneObjectSelection::operator==(const SceneObjectSelection& other) const noexcept
 {
 	return type == other.type && entity == other.entity;

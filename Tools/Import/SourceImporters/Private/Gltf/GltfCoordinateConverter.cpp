@@ -57,11 +57,6 @@ DirectX::XMFLOAT3 GltfCoordinateConverter::ConvertPosition(const DirectX::XMFLOA
 	return ReflectSourceX(value);
 }
 
-DirectX::XMFLOAT3 GltfCoordinateConverter::ConvertDirection(const DirectX::XMFLOAT3& value) noexcept
-{
-	return ReflectSourceX(value);
-}
-
 DirectX::XMFLOAT3 GltfCoordinateConverter::ConvertNormal(const DirectX::XMFLOAT3& value) noexcept
 {
 	return ReflectSourceX(value);

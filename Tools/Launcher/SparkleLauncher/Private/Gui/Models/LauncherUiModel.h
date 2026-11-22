@@ -42,5 +42,4 @@ namespace SparkleLauncher
 
 	LauncherOperationUiModel LauncherUiModelForOperation(const QString& operationId);
 	QString LauncherWorkflowPageKindName(LauncherWorkflowPageKind pageKind);
-	QString LauncherActionImpactKindName(LauncherActionImpactKind impactKind);
 }

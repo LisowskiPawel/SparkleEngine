@@ -114,7 +114,8 @@ ShaderCompileResult ReadShaderMakeOutput(const std::filesystem::path& root, cons
 	const ShaderCompileRequest& request = job.Request;
 	const bool bSlang = job.BackendName == "slang";
 	const bool bDxil = IsDxilTarget(request.Target);
-	const bool bContainer = bSlang && bDxil && request.bCaptureDebugArtifacts;
+	const bool bSlangDxil = bSlang && bDxil;
+	const bool bContainer = bSlangDxil && request.bCaptureDebugArtifacts;
 	const std::filesystem::path outputDirectory = root / "out" / producer.Name;
 	RejectReparsePoint(root);
 	RejectReparsePoint(root / "out");

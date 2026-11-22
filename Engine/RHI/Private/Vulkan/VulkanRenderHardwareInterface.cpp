@@ -156,11 +156,6 @@ RenderCommandList& VulkanRenderHardwareInterface::GetCommandList(ERhiQueueType q
 	return m_commandRecordingContext->GetCurrentCommandList(queueType, frameIndex);
 }
 
-RhiRayTracingCapabilities VulkanRenderHardwareInterface::GetRayTracingCapabilities() const noexcept
-{
-	return m_rayTracingServices->GetCapabilities();
-}
-
 RenderDiagnostics& VulkanRenderHardwareInterface::GetDiagnostics() noexcept
 {
 	return *m_diagnostics;
@@ -174,31 +169,6 @@ const RenderDiagnostics& VulkanRenderHardwareInterface::GetDiagnostics() const n
 RhiImGuiRenderer& VulkanRenderHardwareInterface::GetImGuiRenderer() noexcept
 {
 	return *m_imguiBackend;
-}
-
-RhiRayTracingAccelerationStructurePrebuildInfo VulkanRenderHardwareInterface::GetBottomLevelAccelerationStructurePrebuildInfo(const RhiRayTracingGeometryDesc& geometry) const noexcept
-{
-	return m_rayTracingServices->GetBottomLevelAccelerationStructurePrebuildInfo(geometry);
-}
-
-RhiRayTracingAccelerationStructurePrebuildInfo VulkanRenderHardwareInterface::GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags) const noexcept
-{
-	return m_rayTracingServices->GetTlasPrebuildInfo(instanceCount, buildFlags);
-}
-
-RhiOwnedResourceHandle VulkanRenderHardwareInterface::CreateRayTracingScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName)
-{
-	return m_rayTracingServices->CreateScratchBuffer(sizeInBytes, debugName);
-}
-
-RhiOwnedResourceHandle VulkanRenderHardwareInterface::CreateRayTracingAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType type, std::wstring_view debugName)
-{
-	return m_rayTracingServices->CreateAccelerationStructureBuffer(sizeInBytes, type, debugName);
-}
-
-RhiOwnedResourceHandle VulkanRenderHardwareInterface::CreateRayTracingInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
-{
-	return m_rayTracingServices->CreateInstanceBuffer(instances, instanceCount, debugName);
 }
 
 void VulkanRenderHardwareInterface::SetCurrentFrameIndex(std::uint32_t frameIndex) noexcept

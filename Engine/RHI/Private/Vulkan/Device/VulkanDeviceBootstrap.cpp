@@ -57,11 +57,6 @@ void VulkanRhi::CreateInstance() noexcept
 	}
 #endif
 
-	for (const char* extension : instanceExtensions)
-	{
-		m_enabledInstanceExtensions.emplace_back(extension);
-	}
-
 	std::vector<const char*> layerNames;
 	layerNames.reserve(m_enabledLayers.size());
 	for (const std::string& layer : m_enabledLayers)

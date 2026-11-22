@@ -1,16 +1,13 @@
 #pragma once
 
 #include <QtCore/QRectF>
-#include <QtCore/QSize>
 #include <QtCore/QVector>
 #include <QtGui/QColor>
 #include <QtGui/QPixmap>
-#include <QtWidgets/QWidget>
 
 #include <cstdint>
 
 class QPainter;
-class QPaintEvent;
 
 namespace SparkleLauncher
 {
@@ -49,21 +46,4 @@ namespace SparkleLauncher
 
 	void PaintLauncherArtwork(QPainter& painter, const QRectF& targetRect, const QPixmap& source, const LauncherArtworkSpec& spec);
 
-	class LauncherArtworkWidget final : public QWidget
-	{
-	public:
-		LauncherArtworkWidget(QPixmap source, LauncherArtworkSpec spec, QSize designSize, QWidget* parent = nullptr);
-
-		bool hasHeightForWidth() const override;
-		int heightForWidth(int width) const override;
-		QSize sizeHint() const override;
-
-	protected:
-		void paintEvent(QPaintEvent* event) override;
-
-	private:
-		QPixmap m_source;
-		LauncherArtworkSpec m_spec;
-		QSize m_designSize;
-	};
 }

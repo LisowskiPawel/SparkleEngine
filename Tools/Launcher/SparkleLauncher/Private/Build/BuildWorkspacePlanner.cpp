@@ -6,7 +6,6 @@
 #include "Build/Toolchains/HostToolInstaller.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
-#include "SparkleLauncher/ArtifactNaming.h"
 #include "ToolOutputPaths.h"
 
 #include <algorithm>
@@ -166,14 +165,14 @@ namespace SparkleLauncher
 		    {BuildWorkspaceOperationKind::SyncCode,
 		        "workspace.sync-code",
 		        "Sync",
-		        std::string(ArtifactNaming::kActionSyncSourceDependencies),
+		        "Sync Code",
 		        "Download enabled repository dependencies and refresh workspace configure state; registered host-tool actions remain "
 		        "available "
 		        "on the same page."},
 		    {BuildWorkspaceOperationKind::GenerateBuildFiles,
 		        "workspace.generate-build-files",
 		        "Build",
-		        std::string(ArtifactNaming::kActionGenerateBuildFiles),
+		        "Generate Build Files",
 		        "Refresh generated CMake and IDE build files for the selected generator, platform, toolset, and Qt kit."},
 		    {BuildWorkspaceOperationKind::BuildWorkspace,
 		        "workspace.build",
@@ -238,7 +237,7 @@ namespace SparkleLauncher
 	static void InspectWorkspacePrerequisites(BuildWorkspaceOperationPlan& plan)
 	{
 		const BuildWorkspaceOperationRequest& request = plan.Request;
-		plan.Toolchain = DetectBuildToolchain(request.WorkspaceRoot, request.PreferredIde, request.Compiler);
+		plan.Toolchain = DetectBuildToolchain(request.PreferredIde, request.Compiler);
 		plan.Freshness = CheckBuildFilesFreshness(request.WorkspaceRoot, plan.Toolchain);
 		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(request.WorkspaceRoot);
 		plan.SourceDependencies = InspectSourceDependencyCache(workspaceOutputs.DependencyCacheRoot);

@@ -99,7 +99,7 @@ void D3D12MemoryUsage::AccumulateAllocations(
 		}
 		aggregation.Stats.UsedBytes += allocationBytes;
 		aggregation.Stats.AllocatedBytes += allocationBytes;
-		AddBlockReference(aggregation, record->Allocation);
+		AddBlockReference(aggregation, record->Allocation.Get());
 	}
 }
 
@@ -130,7 +130,7 @@ void D3D12MemoryUsage::AccumulateHeaps(
 		aggregation.Stats.ResourceCount += record->AliasingResourceCount;
 		aggregation.Stats.UsedBytes += allocationBytes;
 		aggregation.Stats.AllocatedBytes += allocationBytes;
-		AddBlockReference(aggregation, record->Allocation);
+		AddBlockReference(aggregation, record->Allocation.Get());
 	}
 }
 

@@ -19,11 +19,7 @@ public:
 
 	UINT GetIncrementSize() const noexcept { return m_incrementSize; }
 
-	void SetIndex(UINT idx) noexcept { m_index = idx; }
-
 	bool IsValid() const noexcept { return (m_index != InvalidIndex) && (m_cpuHandle.ptr != 0); }
-
-	bool IsShaderVisible() const noexcept;
 
 	static constexpr UINT InvalidIndex = ~0u;
 
@@ -31,7 +27,6 @@ private:
 	UINT m_index = InvalidIndex;
 
 	UINT m_incrementSize = 0;
-	D3D12_DESCRIPTOR_HEAP_TYPE m_descriptorType = D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES;
 	D3D12_CPU_DESCRIPTOR_HANDLE m_cpuHandle = {0};
 	D3D12_GPU_DESCRIPTOR_HANDLE m_gpuHandle = {0};
 };

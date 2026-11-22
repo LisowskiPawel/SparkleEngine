@@ -27,9 +27,6 @@ D3D12NvapiRayTracingProvider::D3D12NvapiRayTracingProvider() noexcept
 	const NvAPI_Status status = NvAPI_Initialize();
 	m_bRuntimeInitialized = status == NVAPI_OK;
 	m_runtimeStatusReason = m_bRuntimeInitialized ? "d3d12-nvapi-runtime-initialized" : ToNvapiStatusReason(status);
-#else
-	m_runtimeInitialized = false;
-	m_runtimeStatusReason = "d3d12-nvapi-headers-not-compiled";
 #endif
 }
 
@@ -79,16 +76,6 @@ const char* D3D12NvapiRayTracingProvider::ToNvapiStatusReason(int status) noexce
 	static_cast<void>(status);
 	return "d3d12-nvapi-headers-not-compiled";
 #endif
-}
-
-bool D3D12NvapiRayTracingProvider::IsRuntimeInitialized() const noexcept
-{
-	return m_bRuntimeInitialized;
-}
-
-const char* D3D12NvapiRayTracingProvider::GetRuntimeStatusReason() const noexcept
-{
-	return m_runtimeStatusReason;
 }
 
 RhiPtlasCapabilities D3D12NvapiRayTracingProvider::QueryPtlasCapabilities(ID3D12Device10* device, bool bRunsOnNvidiaDevice, bool bSupportsAccelerationStructure) const noexcept

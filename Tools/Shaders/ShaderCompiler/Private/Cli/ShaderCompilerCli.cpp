@@ -6,7 +6,7 @@
 #include "Cli/ListShadersCommand.h"
 #include "Cli/ListTargetsCommand.h"
 #include "Cli/ShaderCookOptions.h"
-#include "Constants/ShaderCompilerConstants.h"
+#include "Cli/ShaderCompilerExitCodes.h"
 #include "Cooking/ShaderCookSettings.h"
 #include "ToolConsole.h"
 

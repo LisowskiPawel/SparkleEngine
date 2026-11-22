@@ -72,6 +72,19 @@ namespace GraphicsPipelineMaterialization
 	}
 }
 
+bool GraphicsAttachmentSignature::operator==(const GraphicsAttachmentSignature& other) const noexcept
+{
+	if (ColorCount != other.ColorCount || DepthStencilAttachmentFormat != other.DepthStencilAttachmentFormat || SampleCount != other.SampleCount)
+	{
+		return false;
+	}
+	if (ColorCount > ColorFormats.size())
+	{
+		return ColorFormats == other.ColorFormats;
+	}
+	return std::equal(ColorFormats.begin(), ColorFormats.begin() + ColorCount, other.ColorFormats.begin());
+}
+
 std::size_t GraphicsPipelineKeyHash::operator()(const GraphicsPipelineKey& key) const noexcept
 {
 	std::uint64_t hash = Hash::kFnv64OffsetBasis;

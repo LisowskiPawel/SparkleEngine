@@ -99,27 +99,7 @@ RhiRayTracingAccelerationStructurePrebuildInfo D3D12RayTracingServices::GetBotto
 	return prebuildInfo;
 }
 
-RhiRayTracingAccelerationStructurePrebuildInfo D3D12RayTracingServices::GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags) const noexcept
-{
-	return m_tlasServices.GetTlasPrebuildInfo(instanceCount, buildFlags);
-}
-
-RhiPtlasBuildSizes D3D12RayTracingServices::GetPtlasBuildSizes(const RhiPtlasDesc& desc) const noexcept
-{
-	return m_ptlasServices.GetPtlasBuildSizes(desc);
-}
-
-RhiOwnedResourceHandle D3D12RayTracingServices::CreatePtlasBuffer(const RhiPtlasBuildSizes& sizes, std::wstring_view debugName)
-{
-	return m_ptlasServices.CreatePtlasBuffer(sizes, debugName);
-}
-
-RhiOwnedResourceHandle D3D12RayTracingServices::CreatePtlasOperationBuffer(const RhiPtlasOperationPackDesc& operationPack, std::wstring_view debugName)
-{
-	return m_ptlasServices.CreatePtlasOperationBuffer(operationPack, debugName);
-}
-
-RhiOwnedResourceHandle D3D12RayTracingServices::CreateScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName)
+RhiOwnedResourceHandle D3D12RayTracingServices::CreateRayTracingScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName)
 {
 	const std::uint64_t scratchAlignment = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities().ScratchBufferByteAlignment : 0;
 	const bool bScratchAllocationMemoryAllocator = m_rhi == nullptr || m_memoryAllocator == nullptr;
@@ -143,12 +123,7 @@ RhiOwnedResourceHandle D3D12RayTracingServices::CreateScratchBuffer(std::uint64_
 	return ownedRecord != nullptr ? MakeD3D12OwnedResourceHandle(std::move(ownedRecord)) : RhiOwnedResourceHandle{};
 }
 
-RhiOwnedResourceHandle D3D12RayTracingServices::CreateRayTracingScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName)
-{
-	return CreateScratchBuffer(sizeInBytes, debugName);
-}
-
-RhiOwnedResourceHandle D3D12RayTracingServices::CreateAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType, std::wstring_view debugName)
+RhiOwnedResourceHandle D3D12RayTracingServices::CreateRayTracingAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType, std::wstring_view debugName)
 {
 	const std::uint64_t asAlignment = m_rhi != nullptr ? m_rhi->GetRayTracingCapabilities().AccelerationStructureByteAlignment : 0;
 	const bool bAllocatorAvailable = m_rhi != nullptr && m_memoryAllocator != nullptr;
@@ -169,21 +144,6 @@ RhiOwnedResourceHandle D3D12RayTracingServices::CreateAccelerationStructureBuffe
 	    ownedDebugName);
 
 	return ownedRecord != nullptr ? MakeD3D12OwnedResourceHandle(std::move(ownedRecord)) : RhiOwnedResourceHandle{};
-}
-
-RhiOwnedResourceHandle D3D12RayTracingServices::CreateRayTracingAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType type, std::wstring_view debugName)
-{
-	return CreateAccelerationStructureBuffer(sizeInBytes, type, debugName);
-}
-
-RhiOwnedResourceHandle D3D12RayTracingServices::CreateInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
-{
-	return m_tlasServices.CreateTlasInstanceBuffer(instances, instanceCount, debugName);
-}
-
-RhiOwnedResourceHandle D3D12RayTracingServices::CreateRayTracingInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
-{
-	return CreateInstanceBuffer(instances, instanceCount, debugName);
 }
 
 bool D3D12RayTracingServices::BuildPtlas(ID3D12GraphicsCommandList7* commandList, const RhiPtlasBuildCommandDesc& desc) const noexcept

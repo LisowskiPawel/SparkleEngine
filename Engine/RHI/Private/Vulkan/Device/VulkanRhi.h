@@ -78,7 +78,6 @@ public:
 	const VulkanCommandQueue& GetCommandQueue(ERhiQueueType queueType) const noexcept;
 	std::uint32_t GetGraphicsQueueFamilyIndex() const noexcept;
 	std::uint32_t GetQueueFamilyIndex(ERhiQueueType queueType) const noexcept;
-	std::uint32_t GetQueueIndex(ERhiQueueType queueType) const noexcept;
 	bool HasIndependentQueue(ERhiQueueType queueType) const noexcept;
 	void ConfigureResourceQueueSharing(VkBufferCreateInfo& createInfo) const noexcept;
 	void ConfigureResourceQueueSharing(VkImageCreateInfo& createInfo) const noexcept;
@@ -89,7 +88,6 @@ public:
 	PFN_vkCmdInsertDebugUtilsLabelEXT GetCmdInsertDebugUtilsLabel() const noexcept;
 	const VulkanAdapterInfo& GetAdapterInfo() const noexcept;
 	const VulkanFeatureStatus& GetFeatureStatus() const noexcept;
-	const std::vector<std::string>& GetEnabledInstanceExtensions() const noexcept;
 	const std::vector<std::string>& GetEnabledDeviceExtensions() const noexcept;
 	bool IsValidationEnabled() const noexcept;
 	RhiRayTracingCapabilities GetRayTracingCapabilities() const noexcept;
@@ -155,7 +153,6 @@ private:
 	PFN_vkCreateRayTracingPipelinesKHR m_createRayTracingPipelines = nullptr;
 	PFN_vkGetRayTracingShaderGroupHandlesKHR m_getRayTracingShaderGroupHandles = nullptr;
 	PFN_vkCmdTraceRaysKHR m_cmdTraceRays = nullptr;
-	std::vector<std::string> m_enabledInstanceExtensions;
 	std::vector<std::string> m_enabledDeviceExtensions;
 	std::vector<std::string> m_enabledLayers;
 	VulkanDiagnosticMessageQueue m_diagnosticMessageQueue;

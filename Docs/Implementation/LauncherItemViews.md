@@ -2,7 +2,7 @@
 
 [Migration decision](../ThirdPartyMigration.md#native-removal-estimates) | [Cut candidate](../RepositoryFootprint.md#launcher-presentation-machinery) | [Engineering](../Engineering.md) | [Code style](../CodeStyle.md)
 
-**Next: Stage 1.** The [frozen baseline and contract](../../build/validation/launcher-item-views/candidate-20261122/STAGE-0.md) bind the source snapshot, current UI observations, removal boundary and trial controls. Qt fit and production delivery remain unproved.
+**Next: Stage 2.** The [source/contract baseline](../../build/validation/launcher-item-views/candidate-20261122/STAGE-0.md) and [isolated Qt fit receipt](../../build/validation/launcher-item-views/candidate-20261122/STAGE-1.md) bind the selected design and passing trial controls. Production integration, complete net removal and final qualification remain open.
 
 The deliverable is a simpler Launcher scene catalogue: Qt owns item placement, scrolling and index navigation; a small scene model and delegate replace the custom grid and per-card widget assembly. Preserve scene information, responsive sizing, DPI, keyboard/accessibility, Source and primary actions, readiness and operation feedback. The complete connected UI must be smaller and easier to reason about. The historical **Q ceiling is 160 physical / 140 code lines**, not a promised saving or the whole implementation budget.
 
@@ -41,27 +41,6 @@ Use three independent verdicts: **technical delivery**, **simplification**, and 
 - Fix defects and unnecessary machinery, then review a numerical miss once under the [delivery policy](../ThirdPartyMigration.md#code-delivery-and-qualification). If the complete candidate still fails the simplification exit, record NO-GO for this design. Do not quietly waive the promise, reduce supported behavior or repeat arbitrary tuning to hit a line count.
 
 At every stage exit, record the exact candidate, passed/missing controls, commands/artifacts, limitations, invalidation triggers and next runnable action. Remove completed stages, prompts and individual completed actions in the same run under the [documentation rules](../Engineering.md#writing-documentation); preserve stage numbers and keep receipts outside the active plan. Reuse matching evidence. A named-stage request includes its necessary prerequisites and ends at its verified exit; a full-delivery request continues through closure. A concrete unavailable input needs its owner and resume action, not another identical trial.
-
-## Stage 1: prove responsive layout and usable actions together
-
-**Purpose:** retire the design risk with one representative slice before converting the whole catalogue.
-
-- [ ] Build a bounded prototype using the installed Qt kit, real row values, representative artwork and both primary/Source actions. Start with `QListView` in `IconMode`, `LeftToRight`, wrapping, `Adjust`, and explicitly `Static` movement; disable editing/drag/drop. A small sizing adapter may set cell geometry; Qt must place/wrap/scroll items. Do not write row/column placement or rebuild a `QGridLayout` behind the view. [QListView behavior](https://doc.qt.io/qt-6.11/qlistview.html).
-- [ ] Match minimum/maximum widths, four-column cap, aspect, margins, gaps and partial rows, including scrollbar appearance and wide surplus space. `gridSize` overrides `spacing`; account for gutters once. Use `uniformItemSizes` only when the delegate really guarantees one size. Verify below-minimum widths and font/text fit rather than silently clipping actions. Share one item-local geometry calculation between painting and hit testing.
-- [ ] Resolve the existing outer `QScrollArea` versus the item's scroll area explicitly. Trial the smallest composition preserving scene/hero/footer behavior and predictable wheel, keyboard and focus scrolling. Reject nested scrolling traps, viewport-width ancestor walks, resize recursion or an expanding catalogue that needs a replacement layout controller. Charge any scene-page factory and scroll-restoration changes.
-- [ ] Use a `QStyledItemDelegate` for scene presentation and a bounded input path to controller intent. Prototype card activation, independent Source activation, visible keyboard focus and accessible actions together. [Delegate hooks](https://doc.qt.io/qt-6.11/qstyleditemdelegate.html) do not make painted buttons separate focusable/accessibility controls. Prove the required semantics with actual Qt/Windows inspection. Count any needed accessibility adapter or temporary active-item editor before accepting the design; do not retain an editor/widget tree for every row.
-- [ ] Prove exactly one dispatch for a click, double click and Enter/Space sequence; Source must not launch a scene. Clear pressed/hover state on reset, removal, scroll and focus loss. Validate 100%, fractional and 200% scaling available locally, plus a real screen transition when available; synthetic scaling alone cannot qualify mixed-DPI behavior. Use logical coordinates and DPR-aware image handling under Qt's [high-DPI model](https://doc.qt.io/qt-6.11/highdpi.html).
-- [ ] Compare the entire projected replacement, including model, delegate, actions/accessibility and shell work, against the frozen boundary. Record GO only when geometry and interactions pass and the complete design has a credible net reduction. Record bounded NO-GO with the failing requirement if Qt needs comparable custom machinery; remove the rejected candidate and retain the finding with the dependency decision.
-
-**Do:** use one representative slice to falsify fit early; temporary prototype support stays local. **Avoid:** `setIndexWidget` or persistent editors for every card, a custom placement engine, context-menu-only substitution for an existing reachable action, or counting the 160-line class deletion alone. Qt recommends [delegates for dynamic custom item content](https://doc.qt.io/qt-6.11/qabstractitemview.html#setIndexWidget).
-
-**Exit:** the difficult layout, scroll, focus/action and accessibility behavior works on the identified candidate; costs and any unobserved hardware cells are explicit. GO authorizes the selected implementation design to advance, not a product-readiness claim. The current implementation remains the production path until cutover.
-
-Ready-to-use prompt:
-
-```text
-Complete Stage 1 of Docs/Implementation/LauncherItemViews.md, making missing Stage 0 prerequisites ready first. Prototype the responsive Qt view and real primary/Source interactions together on the existing Qt kit. Prove geometry, scrolling, single dispatch, keyboard/accessibility and available DPI behavior, and include every adapter/caller in the projected cost. Reject per-row widget trees and a replacement reflow engine. Produce a supported GO or NO-GO, keep unobserved cells explicit, remove local probe additions before handoff and reconcile the plan. Do not claim the migration delivered from the prototype.
-```
 
 ## Stage 2: consolidate row state and action dispatch
 

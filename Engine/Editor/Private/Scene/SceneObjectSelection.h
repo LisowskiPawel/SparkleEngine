@@ -23,7 +23,5 @@ struct SceneObjectSelection final
 	static SceneObjectSelection Light(EntityId entity) noexcept;
 	static SceneObjectSelection Mesh(EntityId entity) noexcept;
 
-	bool IsNone() const noexcept;
-
 	bool operator==(const SceneObjectSelection& other) const noexcept;
 };

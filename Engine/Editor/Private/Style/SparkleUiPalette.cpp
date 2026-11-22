@@ -189,11 +189,6 @@ namespace SparkleUiPalette
 		return IM_COL32(44, 46, 50, 255);
 	}
 
-	ImU32 SectionHeaderBorder() noexcept
-	{
-		return IM_COL32(70, 74, 80, 255);
-	}
-
 	ImU32 SceneOutlinerBadgeBackground() noexcept
 	{
 		return IM_COL32(58, 64, 74, 220);

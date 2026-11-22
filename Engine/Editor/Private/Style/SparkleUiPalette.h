@@ -56,7 +56,6 @@ namespace SparkleUiPalette
 	ImU32 PanelHeaderBackground() noexcept;
 	ImU32 PanelHeaderBorder() noexcept;
 	ImU32 SectionHeaderBackground() noexcept;
-	ImU32 SectionHeaderBorder() noexcept;
 	ImU32 SceneOutlinerBadgeBackground() noexcept;
 	ImU32 SceneOutlinerBadgeText() noexcept;
 	ImVec4 ConsoleScrollbackBackground() noexcept;

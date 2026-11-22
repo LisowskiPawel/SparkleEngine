@@ -83,7 +83,7 @@ namespace SparkleLauncher
 			return std::nullopt;
 		}
 
-		const BuildToolchainStatus refreshedToolchain = DetectBuildToolchain(plan.Request.WorkspaceRoot, plan.Request.PreferredIde, plan.Request.Compiler);
+		const BuildToolchainStatus refreshedToolchain = DetectBuildToolchain(plan.Request.PreferredIde, plan.Request.Compiler);
 
 		const auto installedTool = std::find_if(
 		    refreshedToolchain.Items.begin(),

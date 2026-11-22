@@ -37,11 +37,6 @@ std::uint32_t VulkanRhi::GetQueueFamilyIndex(ERhiQueueType queueType) const noex
 	return m_queueTopology.Get(queueType).FamilyIndex;
 }
 
-std::uint32_t VulkanRhi::GetQueueIndex(ERhiQueueType queueType) const noexcept
-{
-	return m_queueTopology.Get(queueType).QueueIndex;
-}
-
 bool VulkanRhi::HasIndependentQueue(ERhiQueueType queueType) const noexcept
 {
 	return m_queueTopology.HasIndependentQueue(queueType);

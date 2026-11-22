@@ -351,8 +351,7 @@ void D3D12DescriptorService::DestroyDescriptorAllocation(ERhiDescriptorAllocator
 
 	m_descriptorHeapManager->FreeHandle(
 	    D3D12TypeConversions::ToDescriptorHeapType(descriptorType),
-	    D3D12_CPU_DESCRIPTOR_HANDLE{allocation.CpuHandle.Value},
-	    D3D12_GPU_DESCRIPTOR_HANDLE{allocation.GpuHandle.Value});
+	    D3D12_CPU_DESCRIPTOR_HANDLE{allocation.CpuHandle.Value});
 }
 
 void D3D12DescriptorService::DestroyDescriptorTable(ERhiDescriptorAllocatorType descriptorType, const D3D12DescriptorHandle& nativeHandle, std::uint32_t descriptorCount) noexcept

@@ -4,7 +4,6 @@
 
 #include <QtGui/QLinearGradient>
 #include <QtGui/QPainter>
-#include <QtGui/QPaintEvent>
 
 #include <algorithm>
 #include <cmath>
@@ -184,42 +183,4 @@ namespace SparkleLauncher
 		painter.restore();
 	}
 
-	LauncherArtworkWidget::LauncherArtworkWidget(QPixmap source, LauncherArtworkSpec spec, QSize designSize, QWidget* parent) :
-	    QWidget(parent),
-	    m_source(std::move(source)),
-	    m_spec(std::move(spec)),
-	    m_designSize(designSize.isEmpty() ? QSize(360, 180) : designSize)
-	{
-		setAttribute(Qt::WA_StyledBackground, true);
-		setAttribute(Qt::WA_OpaquePaintEvent, false);
-		setMinimumSize(1, 1);
-		QSizePolicy policy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-		policy.setHeightForWidth(true);
-		setSizePolicy(policy);
-	}
-
-	bool LauncherArtworkWidget::hasHeightForWidth() const
-	{
-		return true;
-	}
-
-	int LauncherArtworkWidget::heightForWidth(int width) const
-	{
-		if (width <= 0 || m_spec.AspectRatio <= 0.0)
-		{
-			return QWidget::heightForWidth(width);
-		}
-		return std::max(1, static_cast<int>(std::round(static_cast<double>(width) / m_spec.AspectRatio)));
-	}
-
-	QSize LauncherArtworkWidget::sizeHint() const
-	{
-		return QSize(m_designSize.width(), heightForWidth(m_designSize.width()));
-	}
-
-	void LauncherArtworkWidget::paintEvent(QPaintEvent*)
-	{
-		QPainter painter(this);
-		PaintLauncherArtwork(painter, rect(), m_source, m_spec);
-	}
 }

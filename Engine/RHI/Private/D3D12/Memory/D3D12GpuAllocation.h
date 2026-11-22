@@ -16,7 +16,6 @@
 namespace D3D12MA
 {
 	class Allocation;
-	class Pool;
 }
 
 class D3D12GpuMemoryAllocator;
@@ -24,9 +23,8 @@ struct D3D12GpuHeapRecord;
 
 struct D3D12GpuAllocationRecord final
 {
+	Microsoft::WRL::ComPtr<D3D12MA::Allocation> Allocation;
 	Microsoft::WRL::ComPtr<ID3D12Resource> Resource;
-	D3D12MA::Allocation* Allocation = nullptr;
-	D3D12MA::Pool* Pool = nullptr;
 	D3D12GpuHeapRecord* ParentHeap = nullptr;
 	RhiMemoryCategory Category = RhiMemoryCategory::Other;
 	RhiMemoryResidencyClass ResidencyClass = RhiMemoryResidencyClass::DeviceLocal;
@@ -49,9 +47,7 @@ struct D3D12GpuAllocationRecord final
 
 struct D3D12GpuHeapRecord final
 {
-	Microsoft::WRL::ComPtr<ID3D12Heap> NativeHeap;
-	D3D12MA::Allocation* Allocation = nullptr;
-	D3D12MA::Pool* Pool = nullptr;
+	Microsoft::WRL::ComPtr<D3D12MA::Allocation> Allocation;
 	RhiMemoryCategory Category = RhiMemoryCategory::TransientResource;
 	RhiMemoryResidencyClass ResidencyClass = RhiMemoryResidencyClass::Transient;
 	std::wstring DebugName;

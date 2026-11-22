@@ -9,20 +9,6 @@
 
 namespace SparkleLauncher
 {
-	QString SyncItemStateText(SyncItemState state)
-	{
-		switch (state)
-		{
-			case SyncItemState::Missing:
-				return "Missing";
-			case SyncItemState::Syncing:
-				return "Syncing";
-			case SyncItemState::Synced:
-				return "Synced";
-		}
-		return "Missing";
-	}
-
 	QString SyncItemStateStyle(SyncItemState state)
 	{
 		switch (state)
@@ -55,11 +41,6 @@ namespace SparkleLauncher
 		button.setProperty("ActionState", state);
 		button.style()->unpolish(&button);
 		button.style()->polish(&button);
-	}
-
-	void ApplySyncStateLabel(QLabel& label, SyncItemState state)
-	{
-		ApplyInlineStatusLabel(label, SyncItemStateText(state), SyncItemStateStyle(state));
 	}
 
 	void ApplySyncActionButtonState(QPushButton& button, SyncItemState state, const QString& displayName)

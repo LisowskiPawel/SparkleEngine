@@ -32,8 +32,6 @@ public:
 	VulkanGpuMemoryAllocator(VulkanGpuMemoryAllocator&&) = delete;
 	VulkanGpuMemoryAllocator& operator=(VulkanGpuMemoryAllocator&&) = delete;
 
-	bool IsInitialized() const noexcept;
-	bool SupportsBudgetQueries() const noexcept;
 	void SetCurrentFrameIndex(std::uint32_t frameIndex) noexcept;
 	RhiMemoryUsageSnapshot CreateMemoryUsageSnapshot() const;
 
@@ -90,16 +88,12 @@ private:
 	void DestroyMemoryBlock(VulkanGpuMemoryBlockRecord& record) noexcept;
 	void* MapUploadPage(VulkanGpuAllocationRecord& record) noexcept;
 	bool FlushUploadPage(VulkanGpuAllocationRecord& record, std::size_t offsetInBytes, std::size_t sizeInBytes) noexcept;
-	void* MapHostAllocation(VulkanGpuAllocationRecord& record, RhiMemoryResidencyClass residencyClass) noexcept;
-	void UnmapAllocation(VulkanGpuAllocationRecord& record) noexcept;
 	void SetAllocationDebugName(VulkanGpuAllocationRecord& record, std::wstring_view debugName) noexcept;
 	void SetMemoryBlockDebugName(VulkanGpuMemoryBlockRecord& record, std::wstring_view debugName) noexcept;
 	void RegisterAllocationRecord(VulkanGpuAllocationRecord& record) noexcept;
 	void UnregisterAllocationRecord(VulkanGpuAllocationRecord& record) noexcept;
 	void RegisterMemoryBlockRecord(VulkanGpuMemoryBlockRecord& record) noexcept;
 	void UnregisterMemoryBlockRecord(VulkanGpuMemoryBlockRecord& record) noexcept;
-	static std::uint32_t ResolveVmaMemoryUsage(RhiMemoryResidencyClass residencyClass) noexcept;
-	static std::uint32_t ResolveVmaAllocationFlags(RhiMemoryResidencyClass residencyClass) noexcept;
 	VkResult AllocateMemoryBlock(VulkanGpuMemoryBlockRecord& memoryBlock, VkMemoryRequirements& memoryRequirements) noexcept;
 	bool CompleteMemoryBlockAllocation(VulkanGpuMemoryBlockRecord& memoryBlock, VkResult allocationResult) noexcept;
 	bool EnsureMemoryBlockAllocationForImage(VulkanGpuMemoryBlockRecord& memoryBlock, const VkImageCreateInfo& imageCreateInfo) noexcept;

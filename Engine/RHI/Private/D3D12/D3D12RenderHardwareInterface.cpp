@@ -173,11 +173,6 @@ void D3D12RenderHardwareInterface::SetCommandRecordingContext(D3D12CommandRecord
 	m_presentationService->GetImplementation().SetCommandRecordingContext(commandContext);
 }
 
-RhiRayTracingCapabilities D3D12RenderHardwareInterface::GetRayTracingCapabilities() const noexcept
-{
-	return m_rayTracingServices->GetCapabilities();
-}
-
 RenderDiagnostics& D3D12RenderHardwareInterface::GetDiagnostics() noexcept
 {
 	return *m_diagnostics;
@@ -191,31 +186,6 @@ const RenderDiagnostics& D3D12RenderHardwareInterface::GetDiagnostics() const no
 RhiImGuiRenderer& D3D12RenderHardwareInterface::GetImGuiRenderer() noexcept
 {
 	return *m_imguiBackend;
-}
-
-RhiRayTracingAccelerationStructurePrebuildInfo D3D12RenderHardwareInterface::GetBottomLevelAccelerationStructurePrebuildInfo(const RhiRayTracingGeometryDesc& geometry) const noexcept
-{
-	return m_rayTracingServices->GetBottomLevelAccelerationStructurePrebuildInfo(geometry);
-}
-
-RhiRayTracingAccelerationStructurePrebuildInfo D3D12RenderHardwareInterface::GetTlasPrebuildInfo(std::uint32_t instanceCount, ERhiTlasBuildFlags buildFlags) const noexcept
-{
-	return m_rayTracingServices->GetTlasPrebuildInfo(instanceCount, buildFlags);
-}
-
-RhiOwnedResourceHandle D3D12RenderHardwareInterface::CreateRayTracingScratchBuffer(std::uint64_t sizeInBytes, std::wstring_view debugName)
-{
-	return m_rayTracingServices->CreateScratchBuffer(sizeInBytes, debugName);
-}
-
-RhiOwnedResourceHandle D3D12RenderHardwareInterface::CreateRayTracingAccelerationStructureBuffer(std::uint64_t sizeInBytes, ERhiRayTracingAccelerationStructureType type, std::wstring_view debugName)
-{
-	return m_rayTracingServices->CreateAccelerationStructureBuffer(sizeInBytes, type, debugName);
-}
-
-RhiOwnedResourceHandle D3D12RenderHardwareInterface::CreateRayTracingInstanceBuffer(const RhiRayTracingInstanceDesc* instances, std::uint32_t instanceCount, std::wstring_view debugName)
-{
-	return m_rayTracingServices->CreateInstanceBuffer(instances, instanceCount, debugName);
 }
 
 void D3D12RenderHardwareInterface::SetSamplerTableHandle(RhiDescriptorTableHandle samplerTableHandle) noexcept
