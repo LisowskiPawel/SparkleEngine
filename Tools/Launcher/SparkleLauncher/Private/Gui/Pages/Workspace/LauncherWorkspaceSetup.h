@@ -12,6 +12,8 @@
 class QLabel;
 class QPushButton;
 class QVBoxLayout;
+class QTreeWidget;
+class QTreeWidgetItem;
 
 namespace SparkleLauncher
 {
@@ -49,8 +51,7 @@ namespace SparkleLauncher
 
 	private:
 		void AddSyncDependencies(QVBoxLayout& layout, bool bOptional);
-		QPushButton* CreateSourceDependencyActionButton(const ThirdPartyDependencyUiEntry& dependency);
-		void ApplySourceDependencyRowState(const ThirdPartyDependencyUiEntry& dependency, const ThirdPartyDependencyUiStatus& status, QLabel& statusLabel, QPushButton& button);
+		void ActivateSourceDependency(QTreeWidgetItem* item);
 		void RefreshSourceDependencyRows();
 		void SyncSourceDependency(const ThirdPartyDependencyUiEntry& dependency);
 		void CleanSourceDependency(const ThirdPartyDependencyUiEntry& dependency);
@@ -77,8 +78,7 @@ namespace SparkleLauncher
 		std::function<QString(LauncherOperationRequest, const QString&)> m_startOperation;
 		QWidget& m_dialogParent;
 		QHash<QString, QString> m_sourceDependencyRunIds;
-		QHash<QString, QPointer<QLabel>> m_sourceDependencyStatusLabels;
-		QHash<QString, QPointer<QPushButton>> m_sourceDependencyActionButtons;
+		QList<QPointer<QTreeWidget>> m_sourceDependencyViews;
 		QSet<QString> m_cleaningSourceDependencyRunIds;
 	};
 }

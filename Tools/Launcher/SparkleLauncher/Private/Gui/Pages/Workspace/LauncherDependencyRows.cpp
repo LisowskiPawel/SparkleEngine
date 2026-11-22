@@ -3,10 +3,9 @@
 #include "Gui/Operations/LauncherOperationConfirmation.h"
 #include <utility>
 
-#include "Gui/Widgets/LauncherActionWidgets.h"
+#include "Gui/Style/LauncherUiDesign.h"
 #include "Gui/Models/LauncherContentModel.h"
 #include "Gui/Models/LauncherDependencyUiModel.h"
-#include "Gui/Models/LauncherLevelUiModel.h"
 #include "Gui/Models/LauncherOperationRequestFactory.h"
 #include "Gui/App/LauncherSettings.h"
 
@@ -14,10 +13,15 @@
 #include "SparkleLauncher/MaintenanceOperations.h"
 #include "SparkleLauncher/SourceDependencyState.h"
 
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QPushButton>
+#include <QtGui/QAction>
+#include <QtGui/QClipboard>
+#include <QtGui/QGuiApplication>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QTreeWidget>
+#include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 
+#include <algorithm>
 #include <filesystem>
 #include <string>
 #include <system_error>
@@ -26,8 +30,18 @@ namespace SparkleLauncher
 {
 	void LauncherWorkspaceSetup::AddSyncDependencies(QVBoxLayout& layout, bool bOptional)
 	{
-		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(m_workspaceRoot);
-		const std::filesystem::path dependencyCachePath = workspaceOutputs.DependencyCacheRoot;
+		auto* view = new QTreeWidget(layout.parentWidget());
+		view->setObjectName("SourceDependencyView");
+		view->setAccessibleName(bOptional ? "Optional source dependencies" : "Source dependencies");
+		view->setAccessibleDescription("Select a dependency and press Enter, or click its Action cell, to sync or clean. Ctrl+C copies its details.");
+		view->setHeaderLabels({"Dependency", "Status", "Action", "Details"});
+		view->setRootIsDecorated(false);
+		view->setSelectionMode(QAbstractItemView::SingleSelection);
+		view->setEditTriggers(QAbstractItemView::NoEditTriggers);
+		view->setMinimumHeight(180);
+		view->setColumnWidth(0, 190);
+		view->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+		view->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
 		for (const ThirdPartyDependencyUiEntry& dependency : GetTrackedThirdPartyDependencies())
 		{
 			if (dependency.bRequired == bOptional)
@@ -35,81 +49,94 @@ namespace SparkleLauncher
 				continue;
 			}
 
-			const bool bOperationActive = m_sourceDependencyRunIds.contains(dependency.Id);
-			const ThirdPartyDependencyUiStatus status = bOperationActive ? ThirdPartyDependencyUiStatus{} : BuildThirdPartyDependencyStatus(dependency, dependencyCachePath);
-			QPushButton* actionButton = CreateSourceDependencyActionButton(dependency);
-
-			QLabel* statusLabel = AddStatusRow(layout, dependency.Label, status.Text, status.Detail, status.State, actionButton);
-
-			ApplySourceDependencyRowState(dependency, status, *statusLabel, *actionButton);
-			m_sourceDependencyStatusLabels.insert(dependency.Id, statusLabel);
-			m_sourceDependencyActionButtons.insert(dependency.Id, actionButton);
+			auto* item = new QTreeWidgetItem(view, {dependency.Label});
+			item->setData(0, Qt::UserRole, dependency.Id);
 		}
-	}
-
-	QPushButton* LauncherWorkspaceSetup::CreateSourceDependencyActionButton(const ThirdPartyDependencyUiEntry& dependency)
-	{
-		QPushButton* button = new QPushButton(&m_dialogParent);
-		emit FocusableWidgetCreated(button);
-
-		connect(
-		    button,
-		    &QPushButton::clicked,
-		    this,
-		    [this, dependency, button]()
-		    {
-			    const QString actionIntent = button->property("ActionIntent").toString();
-			    if (actionIntent == QStringLiteral("clean"))
-			    {
-				    CleanSourceDependency(dependency);
-			    }
-			    else if (actionIntent == QStringLiteral("sync"))
-			    {
-				    SyncSourceDependency(dependency);
-			    }
-		    });
-
-		return button;
-	}
-
-	void LauncherWorkspaceSetup::ApplySourceDependencyRowState(const ThirdPartyDependencyUiEntry& dependency, const ThirdPartyDependencyUiStatus& status, QLabel& statusLabel, QPushButton& button)
-	{
-		const QString runId = m_sourceDependencyRunIds.value(dependency.Id);
-		const bool bCleaning = !runId.isEmpty() && m_cleaningSourceDependencyRunIds.contains(runId);
-		const bool bSyncing = !runId.isEmpty() && !bCleaning;
-		const SyncItemState state = bSyncing ? SyncItemState::Syncing : status.bHasCache ? SyncItemState::Synced : SyncItemState::Missing;
-
-		ApplyInlineStatusLabel(
-		    statusLabel,
-		    bCleaning      ? QStringLiteral("Cleaning")
-		        : bSyncing ? QStringLiteral("Syncing")
-		                   : status.Text,
-		    bCleaning || bSyncing ? QStringLiteral("running") : status.State);
-
-		ApplySyncActionButtonState(button, state, dependency.Label);
-		if (bCleaning)
+		connect(view, &QTreeWidget::itemActivated, this, [this](QTreeWidgetItem* item) { ActivateSourceDependency(item); });
+		connect(view, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem* item, int column) { if (column == 2) { ActivateSourceDependency(item); } });
+		auto* activate = view->addAction("Sync or clean selected dependency", view, [this, view]() { ActivateSourceDependency(view->currentItem()); });
+		auto* actionButton = new QToolButton(layout.parentWidget());
+		actionButton->setDefaultAction(activate);
+		const auto updateAction = [this, view, activate, actionButton]()
 		{
-			button.setText("Cleaning...");
-			button.setProperty("ActionIntent", "none");
-			button.setEnabled(false);
-			button.setAccessibleName("Cleaning " + dependency.Label);
-			button.setToolTip("Clean is in progress.");
-		}
+			const auto* item = view->currentItem();
+			activate->setText(item != nullptr ? item->text(2) + " " + item->text(0) : "Select a dependency");
+			activate->setEnabled(item != nullptr && !m_sourceDependencyRunIds.contains(item->data(0, Qt::UserRole).toString()));
+			actionButton->setAccessibleName(activate->text());
+		};
+		connect(view, &QTreeWidget::currentItemChanged, view, updateAction);
+		connect(view->model(), &QAbstractItemModel::dataChanged, view, updateAction);
+		auto* copy = view->addAction("Copy dependency details", QKeySequence::Copy, view, [view]()
+		{
+			if (const auto* item = view->currentItem())
+			{
+				QGuiApplication::clipboard()->setText(item->text(0) + "\n" + item->text(1) + "\n" + item->text(3));
+			}
+		});
+		copy->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+		view->setContextMenuPolicy(Qt::ActionsContextMenu);
+		m_sourceDependencyViews.push_back(view);
+		RefreshSourceDependencyRows();
+		view->setCurrentItem(view->topLevelItem(0));
+		updateAction();
+		layout.addWidget(view);
+		layout.addWidget(actionButton, 0, Qt::AlignLeft);
+		emit FocusableWidgetCreated(view);
+		emit FocusableWidgetCreated(actionButton);
 	}
 
 	void LauncherWorkspaceSetup::RefreshSourceDependencyRows()
 	{
 		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(m_workspaceRoot);
-		for (const ThirdPartyDependencyUiEntry& dependency : GetTrackedThirdPartyDependencies())
+		const auto& dependencies = GetTrackedThirdPartyDependencies();
+		for (const auto& view : m_sourceDependencyViews)
 		{
-			QLabel* statusLabel = m_sourceDependencyStatusLabels.value(dependency.Id, nullptr);
-			QPushButton* actionButton = m_sourceDependencyActionButtons.value(dependency.Id, nullptr);
-			if (statusLabel != nullptr && actionButton != nullptr)
+			if (view == nullptr)
 			{
-				const bool bOperationActive = m_sourceDependencyRunIds.contains(dependency.Id);
-				const ThirdPartyDependencyUiStatus status = bOperationActive ? ThirdPartyDependencyUiStatus{} : BuildThirdPartyDependencyStatus(dependency, workspaceOutputs.DependencyCacheRoot);
-				ApplySourceDependencyRowState(dependency, status, *statusLabel, *actionButton);
+				continue;
 			}
+			for (int row = 0; row < view->topLevelItemCount(); ++row)
+			{
+				auto* item = view->topLevelItem(row);
+				const auto dependency = std::ranges::find(dependencies, item->data(0, Qt::UserRole).toString(), &ThirdPartyDependencyUiEntry::Id);
+				const QString runId = m_sourceDependencyRunIds.value(dependency->Id);
+				const bool bActive = !runId.isEmpty();
+				const bool bCleaning = bActive && m_cleaningSourceDependencyRunIds.contains(runId);
+				const auto status = bActive ? ThirdPartyDependencyUiStatus{} : BuildThirdPartyDependencyStatus(*dependency, workspaceOutputs.DependencyCacheRoot);
+				item->setText(1, bActive ? (bCleaning ? "Cleaning" : "Syncing") : status.Text);
+				item->setText(2, bActive ? "In progress" : status.bHasCache ? "Clean" : "Sync");
+				item->setText(3, bActive ? dependency->Version + " · " + dependency->Purpose : status.Detail);
+				const auto* color = bActive ? LauncherUi::Color::StateRunning : status.State == "ok" ? LauncherUi::Color::StateSuccess : LauncherUi::Color::StateWarning;
+				item->setForeground(1, QColor(color));
+				item->setData(2, Qt::AccessibleTextRole, item->text(2) + " " + dependency->Label);
+				item->setToolTip(3, item->text(3));
+				item->setData(0, Qt::AccessibleDescriptionRole, item->text(1) + ". " + item->text(3));
+			}
+		}
+	}
+
+	void LauncherWorkspaceSetup::ActivateSourceDependency(QTreeWidgetItem* item)
+	{
+		if (item == nullptr)
+		{
+			return;
+		}
+		const QString id = item->data(0, Qt::UserRole).toString();
+		const auto& dependencies = GetTrackedThirdPartyDependencies();
+		const auto dependency = std::ranges::find(dependencies, id, &ThirdPartyDependencyUiEntry::Id);
+		if (dependency == dependencies.end() || m_sourceDependencyRunIds.contains(id))
+		{
+			return;
+		}
+		const auto outputs = SparkleTools::ResolveToolOutputPaths(m_workspaceRoot);
+		const auto status = BuildThirdPartyDependencyStatus(*dependency, outputs.DependencyCacheRoot);
+		if (status.bHasCache)
+		{
+			CleanSourceDependency(*dependency);
+		}
+		else
+		{
+			SyncSourceDependency(*dependency);
 		}
 	}
 

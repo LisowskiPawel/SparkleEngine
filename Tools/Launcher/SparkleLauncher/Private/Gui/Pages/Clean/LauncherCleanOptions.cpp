@@ -1,20 +1,15 @@
 #include "Gui/Pages/Clean/LauncherCleanOptions.h"
 #include "Gui/Widgets/LauncherOptionWidgets.h"
-#include "Gui/Widgets/LauncherSelectionWidgets.h"
-#include "Gui/Widgets/LauncherLayoutWidgets.h"
 #include "Gui/Models/LauncherCleanUiModel.h"
 #include "Gui/App/LauncherSettings.h"
-#include "Gui/Style/LauncherUiDesign.h"
 
 #include <QtCore/QRegularExpression>
 #include <QtCore/QStringList>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QFrame>
+#include <QtCore/QSignalBlocker>
+#include <QtWidgets/QTreeWidget>
+#include <QtWidgets/QTreeWidgetItemIterator>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QStyle>
 
 #include <array>
 #include <system_error>
@@ -28,108 +23,24 @@ namespace SparkleLauncher
 		return QString::fromStdString((!errorCode && !relative.empty()) ? relative.generic_string() : path.generic_string());
 	}
 
-	static QString FormatDirectoryInventory(const std::filesystem::path& path)
+	static void AddCleanScopeItem(QTreeWidgetItem& parent, const CleanScopeUiOption& scope, const QString& contentId, const QStringList& selectedScopes, const std::filesystem::path& workspaceRoot)
 	{
-		std::error_code errorCode;
-		if (!std::filesystem::exists(path, errorCode) || errorCode)
+		QString preview = scope.Preview;
+		if (scope.Value == "cooked" || preview.isEmpty())
 		{
-			return "not present";
+			MaintenanceCleanTarget target{.Path = ResolveCleanScopePreviewPath(workspaceRoot, contentId, scope.Value)};
+			InspectMaintenanceCleanTarget(target);
+			const QString path = scope.Value == "cooked" ? QStringLiteral("Generated content") : ToDisplayPath(workspaceRoot, target.Path);
+			const QString inventory = target.bExists ? QStringLiteral("%1 files, %2 folders").arg(target.FileCount).arg(target.DirectoryCount) : QStringLiteral("not present");
+			preview = path + " - " + inventory;
 		}
-		if (std::filesystem::is_regular_file(path, errorCode))
-		{
-			return "1 file";
-		}
-
-		std::uintmax_t fileCount = 0;
-		std::uintmax_t directoryCount = 0;
-		if (std::filesystem::is_directory(path, errorCode))
-		{
-			std::filesystem::recursive_directory_iterator iterator(path, std::filesystem::directory_options::skip_permission_denied, errorCode);
-			const std::filesystem::recursive_directory_iterator end;
-			while (iterator != end)
-			{
-				const std::filesystem::directory_entry entry = *iterator;
-				if (entry.is_directory(errorCode))
-				{
-					++directoryCount;
-				}
-				else if (entry.is_regular_file(errorCode))
-				{
-					++fileCount;
-				}
-				errorCode.clear();
-				iterator.increment(errorCode);
-				errorCode.clear();
-			}
-		}
-
-		return QStringLiteral("%1 files, %2 folders").arg(fileCount).arg(directoryCount);
-	}
-
-	static void AddCleanScopeRow(
-	    QVBoxLayout& layout,
-	    const CleanScopeUiOption& scope,
-	    const QString& contentId,
-	    const QStringList& selectedScopes,
-	    QVector<QCheckBox*>& scopeBoxes,
-	    const std::filesystem::path& workspaceRoot,
-	    const std::function<void(QWidget*)>& registerFocusable)
-	{
-		QFrame* scopeRow = new QFrame(layout.parentWidget());
-		scopeRow->setObjectName("CleanScopeRow");
-		QHBoxLayout* scopeRowLayout = new QHBoxLayout(scopeRow);
-		scopeRowLayout->setContentsMargins(LauncherUi::Clean::RowMargins);
-		scopeRowLayout->setSpacing(LauncherUi::Clean::RowSpacing);
-
-		QVBoxLayout* descriptionLayout = new QVBoxLayout();
-		descriptionLayout->setContentsMargins(0, 0, 0, 0);
-		descriptionLayout->setSpacing(2);
-
-		QCheckBox* scopeBox = new QCheckBox(scope.Label, scopeRow);
-		scopeBox->setObjectName("CleanScopeCheckBox");
-		scopeBox->setToolTip(scope.Detail);
-		scopeBox->setProperty("ScopeValue", scope.Value);
-		scopeBox->setChecked(selectedScopes.contains("clean-all") || selectedScopes.contains(scope.Value));
-		registerFocusable(scopeBox);
-		descriptionLayout->addWidget(scopeBox);
-
-		QLabel* scopeDescription = new QLabel(scope.Detail, scopeRow);
-		scopeDescription->setObjectName("CleanScopeDescription");
-		scopeDescription->setWordWrap(true);
-		descriptionLayout->addWidget(scopeDescription);
-		scopeRowLayout->addLayout(descriptionLayout, 3);
-
-		const std::filesystem::path previewPath = ResolveCleanScopePreviewPath(workspaceRoot, contentId, scope.Value);
-
-		const bool bCookedScope = scope.Value == "cooked";
-		QString previewText = scope.Preview;
-		if (bCookedScope || previewText.isEmpty())
-		{
-			const auto displayPath = bCookedScope ? QStringLiteral("Generated content") : ToDisplayPath(workspaceRoot, previewPath);
-			const auto inventory = FormatDirectoryInventory(previewPath);
-			previewText = displayPath + " - " + inventory;
-		}
-		ElidedLabel* scopeDetail = new ElidedLabel(previewText, scopeRow);
-		scopeDetail->setObjectName("CleanScopePreview");
-		scopeDetail->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		scopeDetail->setMaximumWidth(380);
-		scopeRowLayout->addWidget(scopeDetail, 2);
-
-		scopeRow->setProperty("Selected", scopeBox->isChecked());
-
-		QObject::connect(
-		    scopeBox,
-		    &QCheckBox::toggled,
-		    scopeRow,
-		    [scopeRow](bool bSelected)
-		    {
-			    scopeRow->setProperty("Selected", bSelected);
-			    scopeRow->style()->unpolish(scopeRow);
-			    scopeRow->style()->polish(scopeRow);
-		    });
-
-		layout.addWidget(scopeRow);
-		scopeBoxes.push_back(scopeBox);
+		auto* item = new QTreeWidgetItem(&parent, {scope.Label, scope.Detail, preview});
+		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
+		item->setData(0, Qt::UserRole, scope.Value);
+		item->setCheckState(0, selectedScopes.contains("clean-all") || selectedScopes.contains(scope.Value) ? Qt::Checked : Qt::Unchecked);
+		item->setToolTip(1, scope.Detail);
+		item->setToolTip(2, preview);
+		item->setData(0, Qt::AccessibleDescriptionRole, scope.Detail + ". Directory inventory: " + preview);
 	}
 
 	void BuildLauncherCleanOptions(
@@ -168,65 +79,72 @@ namespace SparkleLauncher
 		    "Local state and caches",
 		}};
 
-		QVector<QCheckBox*> scopeBoxes;
-		QStringList selectedScopes = settings.CleanScope().split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts);
-
+		const QStringList selectedScopes = settings.CleanScope().split(QRegularExpression("[,;\\n]"), Qt::SkipEmptyParts);
 		QVBoxLayout* cleanLayout = AddOptionGroup(
 		    layout,
 		    "Choose generated data",
-		    "Select only what should be regenerated. Project source files and synced levels are preserved. You will confirm before "
-		    "cleaning.");
+		    "Select only what should be regenerated. Project source files and synced levels are preserved. You will confirm before cleaning. Directory inventories include any preserved files.");
 
-		QFrame* selectionPanel = new QFrame(cleanLayout->parentWidget());
-		selectionPanel->setObjectName("CleanSelectionPanel");
-		selectionPanel->setMinimumWidth(LauncherUi::ScopeSelection::ContentMinWidth);
-		selectionPanel->setMaximumWidth(LauncherUi::ScopeSelection::ContentMaxWidth);
-		QVBoxLayout* selectionLayout = new QVBoxLayout(selectionPanel);
-		selectionLayout->setContentsMargins(0, 0, 0, 0);
-		selectionLayout->setSpacing(0);
-		QVector<QCheckBox*> selectAllBoxes;
-
-		AddCleanScopeRow(
-		    *selectionLayout,
-		    {"All",
-		        "clean-all",
-		        "Remove build and cooked outputs, dependency caches, logs, and product user state including settings and captures. "
-		        "Confirmation is required.",
-		        "All generated data",
-		        QString()},
-		    contentId,
-		    selectedScopes,
-		    selectAllBoxes,
-		    workspaceRoot,
-		    registerFocusable);
-
-		QCheckBox* selectAllBox = selectAllBoxes.front();
-
-		for (const QString& cleanGroup : cleanGroups)
+		auto* view = new QTreeWidget(cleanLayout->parentWidget());
+		view->setObjectName("CleanScopeView");
+		view->setAccessibleName("Generated data to clean");
+		view->setAccessibleDescription("Use arrows to select a scope and Space to change its check state. All also includes product user state and captures. Cleaning requires confirmation.");
+		view->setHeaderLabels({"Scope", "Description", "Directory inventory"});
+		view->setEditTriggers(QAbstractItemView::NoEditTriggers);
+		view->setRootIsDecorated(false);
+		view->setWordWrap(true);
+		view->setMinimumHeight(380);
+		view->setColumnWidth(0, 200);
+		view->setColumnWidth(1, 400);
+		auto* all = new QTreeWidgetItem(view, {"All", "Remove build and cooked outputs, dependency caches, logs, and product user state including settings and captures. Confirmation is required.", "All generated data"});
+		all->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
+		all->setCheckState(0, selectedScopes.contains("clean-all") ? Qt::Checked : Qt::Unchecked);
+		all->setToolTip(1, all->text(1));
+		for (const QString& groupName : cleanGroups)
 		{
-			QLabel* groupTitle = CreateSectionLabel(cleanGroup);
-			groupTitle->setObjectName("CleanScopeGroupTitle");
-			selectionLayout->addWidget(groupTitle);
+			auto* group = new QTreeWidgetItem(view, {groupName});
+			group->setFlags(Qt::ItemIsEnabled);
 			for (const CleanScopeUiOption& scope : cleanScopes)
 			{
-				if (scope.Group != cleanGroup)
+				if (scope.Group == groupName)
+				{
+					AddCleanScopeItem(*group, scope, contentId, selectedScopes, workspaceRoot);
+				}
+			}
+		}
+		view->expandAll();
+		const auto commitSelection = [view, all, &settings, selectionChanged](QTreeWidgetItem* changed)
+		{
+			const QSignalBlocker blocker(view);
+			const bool bCleanAllRequested = changed == all && all->checkState(0) == Qt::Checked;
+			QStringList selected;
+			int availableCount = 0;
+			for (QTreeWidgetItemIterator iterator(view); *iterator; ++iterator)
+			{
+				auto* item = *iterator;
+				const QString value = item->data(0, Qt::UserRole).toString();
+				const bool bAvailable = !item->isDisabled() && !value.isEmpty();
+				if (!bAvailable)
 				{
 					continue;
 				}
-
-				AddCleanScopeRow(*selectionLayout, scope, contentId, selectedScopes, scopeBoxes, workspaceRoot, registerFocusable);
+				++availableCount;
+				if (changed == all)
+				{
+					item->setCheckState(0, all->checkState(0));
+				}
+				if (item->checkState(0) == Qt::Checked)
+				{
+					selected.push_back(value);
+				}
 			}
-		}
-		cleanLayout->addWidget(selectionPanel);
-
-		const auto commitSelection = [&settings, scopeBoxes, selectionChanged](bool bCleanAllRequested)
-		{
-			const QStringList selectedValues = CollectSelectedScopeValues(scopeBoxes);
-			settings.SetCleanScope(bCleanAllRequested ? QStringLiteral("clean-all") : selectedValues.join(';'));
+			all->setCheckState(0, availableCount > 0 && selected.size() == availableCount ? Qt::Checked : Qt::Unchecked);
+			settings.SetCleanScope(bCleanAllRequested ? QStringLiteral("clean-all") : selected.join(';'));
 			selectionChanged();
 		};
-
-		ConnectSelectAllScopeBox(selectAllBox, scopeBoxes, layout.parentWidget(), commitSelection);
-		commitSelection(selectedScopes.contains("clean-all"));
+		QObject::connect(view, &QTreeWidget::itemChanged, view, [commitSelection](QTreeWidgetItem* item, int) { commitSelection(item); });
+		cleanLayout->addWidget(view);
+		registerFocusable(view);
+		commitSelection(selectedScopes.contains("clean-all") ? all : nullptr);
 	}
 }
