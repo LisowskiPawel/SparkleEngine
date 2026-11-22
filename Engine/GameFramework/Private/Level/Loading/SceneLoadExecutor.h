@@ -20,6 +20,7 @@ namespace Assets
 		LevelLoadOperationStage Stage = LevelLoadOperationStage::Idle;
 		std::string Diagnostic;
 	};
+
 	class SceneLoadExecutor final
 	{
 	public:

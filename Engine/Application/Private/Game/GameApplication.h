@@ -69,7 +69,6 @@ private:
 
 	void InitializeExecution();
 	void ShutdownExecution() noexcept;
-	static enkiTaskScheduler* CreateExecutionScheduler(std::uint32_t workers, void (*threadStart)(std::uint32_t));
 	void InitializeHost();
 	void InitializeInput();
 	void InitializeGameWorld();

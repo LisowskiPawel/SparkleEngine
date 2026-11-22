@@ -4,7 +4,7 @@
 
 Sources behind the project guides, including dated role and professional studies. Pinned links identify the studied revision; check current prerequisites, licenses and fixes before reuse. Project rules and decisions remain in their owning guides.
 
-The [repository footprint study](RepositoryFootprint.md) owns measured peer comparisons and local structural findings, with source pins and scope limits.
+The [repository footprint review](RepositoryFootprint.md) connects repository-wide complexity and named cut candidates to these practices, with a dated size baseline and peer comparison.
 
 ## Contents
 

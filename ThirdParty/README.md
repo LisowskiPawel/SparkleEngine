@@ -10,7 +10,7 @@ Shared acquisition, admission and cache locking live in [CMake/Dependencies](../
 | --- | --- |
 | Core logging, JSON, processes and math | [spdlog](spdlog/Dependency.cmake), [nlohmann/json](nlohmann_json/Dependency.cmake), [Boost.Process](boost-process/Dependency.cmake), [DirectXMath](directxmath/Dependency.cmake) |
 | Host/tool command lines | [CLI11](cli11/Dependency.cmake) |
-| Task execution | [enkiTS](enkits/Dependency.cmake) |
+| Task execution | [enkiTS target composition](enkits/Dependency.cmake), [qualified source materialization/admission](enkits/RuntimeSource.cmake) |
 | Platform windows/input | [SDL3](sdl3/Dependency.cmake) |
 | Editor and runtime UI | [ImGui](imgui/Dependency.cmake), selected [graphics backends](imgui/Backends.cmake), [Font Awesome](editor-icons/Dependency.cmake) |
 | Source import | [cgltf](cgltf/Dependency.cmake), [Assimp](assimp/Dependency.cmake), [MikkTSpace](mikktspace/Dependency.cmake) |

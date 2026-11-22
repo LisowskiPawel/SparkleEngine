@@ -19,6 +19,6 @@ SparkleEngine is a Windows rendering project with D3D12 and Vulkan backends. It 
 | [Engineering](Engineering.md) | Setup, module ownership, development, validation and packaging |
 | [Code style](CodeStyle.md) | Formatting, naming, C++, shaders and coordinate conventions |
 | [References](References.md) | Papers, SDK guides, examples and archived professional sources |
-| [Repository footprint](RepositoryFootprint.md) | Module sizes, peer targets, workflow diagrams, structural findings and cuts |
+| [Repository footprint](RepositoryFootprint.md) | Repository-wide complexity, named cut candidates and reference practices |
 
 Each guide owns the subject listed above. Active plans and qualification results live temporarily in `Docs/Implementation/`; follow the [documentation rules](Engineering.md#writing-documentation). Readiness depends on recorded results for the actual build and inputs.

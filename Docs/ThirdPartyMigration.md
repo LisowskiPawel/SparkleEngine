@@ -12,7 +12,7 @@ Reduce native support code so the owned rendering work is easier to review. Repl
 
 ## Total native removal
 
-**The fresh whole-repository count shows native shrinkage, not an aggregate integration-saving result.** At the 22 November frozen worktree before task-runtime publication, first-party native source is **136,684 code / 159,505 physical lines in 2,151 files**: **967 fewer code / 1,420 fewer physical lines / seven fewer files** than the original footprint inventory. Automation grew by 1,061 code lines and shaders by five; the complete owned footprint is **150,211 code lines, up 99**. See [before/after counts and the committed/local split](RepositoryFootprint.md#change-since-the-previous-assessment).
+**The historical whole-repository count shows native shrinkage, not an aggregate integration-saving result.** At the 22 November frozen worktree before task-runtime publication, first-party native source is **136,684 code / 159,505 physical lines in 2,151 files**: **967 fewer code / 1,420 fewer physical lines / seven fewer files** than the original footprint inventory. Automation grew by 1,061 code lines and shaders by five; the complete owned footprint is **150,211 code lines, up 99**. See the [footprint baseline and counting scope](RepositoryFootprint.md#footprint-baseline).
 
 ### Delivered integrations versus savings
 
@@ -40,7 +40,7 @@ future scoped native removal = 1,145 - retained scoped lines - new/relocated nat
 
 Charge first-party bindings, callers/templates, build/scripts and maintained patches separately and once. There is no complete future net forecast. Numerical targets are review results, not substitutes for correctness decisions.
 
-Image-provider swaps, retained-format conversion and RTXDI host work still have zero identified new native retirement. The [50% graphics checkpoint](RepositoryFootprint.md#proportions-after-cuts) now requires **9,659 net supporting code lines**, so these named scopes cannot establish it. Reduce real support/adapter burden rather than enlarge the denominator or add SDKs to improve a ratio.
+Image-provider swaps, retained-format conversion and RTXDI host work still have zero identified new native retirement. These small scopes do not explain the larger supporting surface; the [repository cut candidates](RepositoryFootprint.md#cut-candidates) address host coordination, integration glue and repeated policy. Reduce real maintenance burden rather than add SDKs to improve a code ratio.
 
 ## Principal rendering evidence
 
@@ -81,7 +81,7 @@ Keep **Sparkle RHI, frame graph and independent Reference renderer**. Own device
 
 ### Decisions by module footprint
 
-The [footprint map](RepositoryFootprint.md#every-native-owner) puts **47.0% of native code in RHI/Renderer** and **20.8% in Launcher/Editor**. Keep graphics authority while delegating generic mechanisms. Review Launcher presentation/build coordination and Editor state duplication before growing supporting tools.
+The historical [footprint baseline](RepositoryFootprint.md#footprint-baseline) puts **47.0% of native code in RHI/Renderer** and **20.8% in Launcher/Editor**. Keep graphics authority while delegating generic mechanisms. Review Launcher presentation/build coordination and Editor state duplication before growing supporting tools.
 
 The remaining preprocessor pair contains **221 code / 253 physical lines** before integration costs. Tasks and SDL3 are delivered and are excluded from future cuts. Larger reductions need cheaper complete caller boundaries, not more dependency names.
 
@@ -112,7 +112,7 @@ The remaining preprocessor pair contains **221 code / 253 physical lines** befor
 
 **Physical lines** include headers, comments and blanks; **code lines** exclude blanks/comment-only lines, using cloc 2.06. The table gives both. **≤** marks a reviewed mixed-code ceiling. Catalogue **G / N** remains physical gross/net; **unproved** means no supported net estimate. Zero means no identified current retirement or no new credit for existing/external use. Capability additions can grow native code. Delivered W/P/A/T rows retain historical retirement/result figures and are excluded from the pending union. C is recounted at its current size; all other pending ranges retain their verified original fragments.
 
-Use identical formatting and inputs. Report shaders, scripts/CMake, schemas/generated output, upstream source and build/runtime/package costs separately. Moving code or changing language earns no ownership-transfer credit. The [footprint study](RepositoryFootprint.md#code-distribution) owns repository totals and distinguishes physical lines from comment-excluding code lines.
+Use identical formatting and inputs. Report shaders, scripts/CMake, schemas/generated output, upstream source and build/runtime/package costs separately. Moving code or changing language earns no ownership-transfer credit. The [footprint baseline](RepositoryFootprint.md#footprint-baseline) identifies the dated repository totals and counting rules. Physical lines include comments and blanks; code lines exclude blank and comment-only lines.
 
 **Bold entries mark the five largest reviewed replacement scopes**, here and in the catalogue. Rank reflects gross targets/ceilings; net savings remain unproved. SDL3 and GLFW share one scope.
 
