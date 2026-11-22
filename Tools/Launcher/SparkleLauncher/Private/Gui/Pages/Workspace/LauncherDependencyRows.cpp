@@ -54,7 +54,7 @@ namespace SparkleLauncher
 			item->setData(0, Qt::UserRole, dependency.Id);
 		}
 		connect(view, &QTreeWidget::itemActivated, this, [this](QTreeWidgetItem* item) { ActivateSourceDependency(item); });
-		auto* activate = view->addAction("Sync or clean selected dependency", view, [this, view]() { ActivateSourceDependency(view->currentItem()); });
+		auto* activate = view->addAction("Sync or clean selected dependency", this, [this, view]() { ActivateSourceDependency(view->currentItem()); });
 		auto* actionButton = new QToolButton(layout.parentWidget());
 		actionButton->setObjectName("StatusActionButton");
 		actionButton->setProperty("ActionState", "neutral");
@@ -69,8 +69,8 @@ namespace SparkleLauncher
 			activate->setEnabled(bCanActivate);
 			actionButton->setAccessibleName(activate->text());
 		};
-		connect(view, &QTreeWidget::currentItemChanged, view, updateAction);
-		connect(view->model(), &QAbstractItemModel::dataChanged, view, updateAction);
+		connect(view, &QTreeWidget::currentItemChanged, this, updateAction);
+		connect(view->model(), &QAbstractItemModel::dataChanged, this, updateAction);
 		auto* copy = view->addAction(
 		    "Copy dependency details",
 		    QKeySequence::Copy,
