@@ -1,6 +1,8 @@
 #include "Process/Windows/ChildProcessWindows.h"
 
 #if defined(_WIN32)
+  #include <boost/system/error_code.hpp>
+
 namespace Process
 {
 	std::string FormatWindowsProcessError(DWORD code)

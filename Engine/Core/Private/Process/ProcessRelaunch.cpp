@@ -5,7 +5,6 @@
 #include "Core/Public/Paths/FileSystemPaths.h"
 
 #include <filesystem>
-#include <string>
 #include <system_error>
 
 #if defined(_WIN32)
