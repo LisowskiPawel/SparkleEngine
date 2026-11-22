@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QListView>
+#include <QtCore/QPersistentModelIndex>
 
 #include <functional>
 #include <cstdint>
@@ -44,8 +45,7 @@ namespace SparkleLauncher
 		QString m_currentLevelId;
 		QString m_resetContentId;
 		int m_previousRow = 0;
-		QString m_pressedLevelId;
-		QString m_pressedContentId;
+		QPersistentModelIndex m_pressedIndex;
 		QPoint m_pressPosition;
 	};
 }

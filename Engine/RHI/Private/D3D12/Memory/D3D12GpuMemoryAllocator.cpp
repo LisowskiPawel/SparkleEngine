@@ -168,13 +168,8 @@ std::unique_ptr<D3D12GpuAllocationRecord> D3D12GpuMemoryAllocator::CreateResourc
 
 	Microsoft::WRL::ComPtr<D3D12MA::Allocation> allocation;
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
-	const HRESULT hr = m_impl->allocator->CreateResource(
-	    &allocationDesc,
-	    &resourceDesc,
-	    initialState,
-	    optimizedClearValue,
-	    allocation.ReleaseAndGetAddressOf(),
-	    IID_PPV_ARGS(resource.ReleaseAndGetAddressOf()));
+	const HRESULT hr = m_impl->allocator
+	                       ->CreateResource(&allocationDesc, &resourceDesc, initialState, optimizedClearValue, allocation.ReleaseAndGetAddressOf(), IID_PPV_ARGS(resource.ReleaseAndGetAddressOf()));
 	if (FAILED(hr) || allocation == nullptr || resource == nullptr)
 	{
 		std::size_t liveAllocationCount = 0;

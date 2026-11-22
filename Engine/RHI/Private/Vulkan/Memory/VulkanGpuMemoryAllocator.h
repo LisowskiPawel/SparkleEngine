@@ -113,7 +113,6 @@ private:
 	    VkImage image,
 	    VulkanGpuMemoryBlockRecord& memoryBlock,
 	    std::wstring_view debugName) noexcept;
-	static std::uint32_t ResolveMemoryHeapIndex(const VkPhysicalDeviceMemoryProperties& memoryProperties, std::uint32_t memoryTypeIndex) noexcept;
 	static VkImageAspectFlags ResolveImageAspectMask(VkFormat format) noexcept;
 
 	friend struct VulkanGpuAllocationRecord;

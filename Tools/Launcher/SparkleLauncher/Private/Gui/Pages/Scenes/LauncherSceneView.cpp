@@ -16,6 +16,7 @@
 #include <QtWidgets/QStyleOptionButton>
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 
 namespace SparkleLauncher
@@ -162,8 +163,6 @@ namespace SparkleLauncher
 		m_primaryButton = new QPushButton(parent);
 		m_sourceButton->setObjectName("MapCardSourceButton");
 		m_primaryButton->setObjectName("MapCardActionButton");
-		m_sourceButton->setAutoDefault(true);
-		m_primaryButton->setAutoDefault(true);
 		m_sourceButton->installEventFilter(this);
 		m_primaryButton->installEventFilter(this);
 		connect(m_sourceButton, &QPushButton::clicked, this, [this]() { Activate(LauncherLevelAction::Source); });
@@ -189,7 +188,6 @@ namespace SparkleLauncher
 		    {
 			    m_resetContentId = m_model.ContentId();
 			    m_previousRow = std::max(0, currentIndex().row());
-			    m_pressedLevelId.clear();
 		    });
 		connect(
 		    &model,
@@ -210,10 +208,28 @@ namespace SparkleLauncher
 			    setCurrentIndex(m_model.index(row));
 			    UpdateActions();
 		    });
-		auto* activate = new QShortcut(QList<QKeySequence>{Qt::Key_Return, Qt::Key_Enter, Qt::Key_Space}, this);
-		activate->setContext(Qt::WidgetShortcut);
-		activate->setAutoRepeat(false);
-		connect(activate, &QShortcut::activated, m_primaryButton, &QPushButton::click);
+		for (QWidget* widget : std::array<QWidget*, 3>{this, m_sourceButton, m_primaryButton})
+		{
+			auto* activate = new QShortcut(widget);
+			activate->setKeys(QList<QKeySequence>{Qt::Key_Return, Qt::Key_Enter, Qt::Key_Space});
+			activate->setContext(Qt::WidgetShortcut);
+			activate->setAutoRepeat(false);
+			connect(
+			    activate,
+			    &QShortcut::activated,
+			    this,
+			    [this, widget]()
+			    {
+				    if (widget == m_sourceButton)
+				    {
+					    Activate(LauncherLevelAction::Source);
+				    }
+				    else
+				    {
+					    m_primaryButton->click();
+				    }
+			    });
+		}
 		auto* copy = new QAction("Copy details", this);
 		copy->setShortcut(QKeySequence::Copy);
 		copy->setShortcutContext(Qt::WidgetShortcut);
@@ -285,6 +301,7 @@ namespace SparkleLauncher
 
 	void LauncherSceneView::UpdateActions()
 	{
+		m_pressedIndex = QModelIndex();
 		const auto* level = m_model.Level(currentIndex());
 		m_sourceButton->setVisible(level != nullptr && !level->SourcePageUrl.isEmpty() && isVisible());
 		m_primaryButton->setVisible(level != nullptr && isVisible());
@@ -320,29 +337,20 @@ namespace SparkleLauncher
 
 	void LauncherSceneView::mousePressEvent(QMouseEvent* event)
 	{
-		m_pressedLevelId.clear();
-		if (event->button() == Qt::LeftButton)
-		{
-			if (const auto* level = m_model.Level(indexAt(event->position().toPoint())))
-			{
-				m_pressedLevelId = level->Id;
-			}
-			m_pressedContentId = m_model.ContentId();
-			m_pressPosition = event->position().toPoint();
-		}
+		const QPersistentModelIndex pressedIndex = event->button() == Qt::LeftButton ? indexAt(event->position().toPoint()) : QModelIndex();
 		QListView::mousePressEvent(event);
+		m_pressedIndex = pressedIndex;
+		m_pressPosition = event->position().toPoint();
 	}
 
 	void LauncherSceneView::mouseReleaseEvent(QMouseEvent* event)
 	{
 		QListView::mouseReleaseEvent(event);
 		const QModelIndex index = indexAt(event->position().toPoint());
-		const auto* level = m_model.Level(index);
-		const bool bLeftRelease = event->button() == Qt::LeftButton && level != nullptr;
-		const bool bSameLevel = bLeftRelease && level->Id == m_pressedLevelId;
-		const bool bClick = bSameLevel && m_model.ContentId() == m_pressedContentId;
+		const bool bLeftRelease = event->button() == Qt::LeftButton && index.isValid();
+		const bool bClick = bLeftRelease && index == m_pressedIndex;
 		const bool bStationary = (event->position().toPoint() - m_pressPosition).manhattanLength() < QApplication::startDragDistance();
-		m_pressedLevelId.clear();
+		m_pressedIndex = QModelIndex();
 		if (!bClick || !bStationary)
 		{
 			return;
@@ -352,12 +360,13 @@ namespace SparkleLauncher
 		{
 			return;
 		}
+		const auto* level = m_model.Level(index);
 		Activate(geometry.Source.contains(event->position().toPoint()) && !level->SourcePageUrl.isEmpty() ? LauncherLevelAction::Source : level->Action);
 	}
 
 	void LauncherSceneView::mouseDoubleClickEvent(QMouseEvent* event)
 	{
-		m_pressedLevelId.clear();
+		m_pressedIndex = QModelIndex();
 		event->accept();
 	}
 

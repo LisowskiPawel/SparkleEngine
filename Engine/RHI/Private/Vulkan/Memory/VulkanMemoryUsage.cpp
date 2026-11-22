@@ -4,16 +4,19 @@
 #include "Vulkan/Memory/VulkanGpuAllocation.h"
 
 #include <vk_mem_alloc.h>
+#include <algorithm>
 
 namespace VulkanMemoryUsage
 {
-	void QueryBudget(VmaAllocator_T* allocator, const VkPhysicalDeviceMemoryProperties& memoryProperties, std::span<VmaBudget, VK_MAX_MEMORY_HEAPS> heapBudgets, RhiMemoryUsageSnapshot& snapshot)
+	void QueryBudget(VmaAllocator_T* allocator, std::span<VmaBudget, VK_MAX_MEMORY_HEAPS> heapBudgets, RhiMemoryUsageSnapshot& snapshot)
 	{
+		const VkPhysicalDeviceMemoryProperties* memoryProperties = nullptr;
+		vmaGetMemoryProperties(allocator, &memoryProperties);
 		vmaGetHeapBudgets(allocator, heapBudgets.data());
 		snapshot.AllocatorBackend = ERhiMemoryAllocatorBackend::VulkanManaged;
 		snapshot.bHasBudgetData = true;
 		snapshot.bHasDelayedDestructionTracking = true;
-		for (std::uint32_t heapIndex = 0; heapIndex < memoryProperties.memoryHeapCount; ++heapIndex)
+		for (std::uint32_t heapIndex = 0; heapIndex < memoryProperties->memoryHeapCount; ++heapIndex)
 		{
 			snapshot.TotalUsedBytes += heapBudgets[heapIndex].statistics.allocationBytes;
 			snapshot.TotalAllocatedBytes += heapBudgets[heapIndex].statistics.blockBytes;
@@ -23,6 +26,7 @@ namespace VulkanMemoryUsage
 	}
 
 	static VulkanMemoryCategoryAggregation& AccumulateCategoryUsage(
+	    VmaAllocator_T* allocator,
 	    const auto& record,
 	    std::span<const VmaBudget> heapBudgets,
 	    std::vector<VulkanMemoryCategoryAggregation>& aggregations,
@@ -36,14 +40,27 @@ namespace VulkanMemoryUsage
 		{
 			snapshot.TransientUsageBytes += record.AllocatedBytes;
 		}
-		if (record.MemoryHeapIndex < heapBudgets.size())
+		VmaAllocationInfo allocationInfo{};
+		vmaGetAllocationInfo(allocator, record.Allocation, &allocationInfo);
+		const VkPhysicalDeviceMemoryProperties* memoryProperties = nullptr;
+		vmaGetMemoryProperties(allocator, &memoryProperties);
+		const std::uint32_t heapIndex = memoryProperties->memoryTypes[allocationInfo.memoryType].heapIndex;
+		const bool bHeapCounted = std::any_of(
+		    aggregation.UniqueBlocks.begin(),
+		    aggregation.UniqueBlocks.end(),
+		    [heapIndex](const VulkanMemoryBlockIdentity& block) noexcept { return block.HeapIndex == heapIndex; });
+
+		if (heapIndex < heapBudgets.size())
 		{
-			RhiMemoryCategoryAggregationPolicy::AddUniqueBlock(aggregation, record.MemoryHeapIndex, heapBudgets[record.MemoryHeapIndex].budget);
+			const std::uint64_t budgetBytes = bHeapCounted ? 0 : heapBudgets[heapIndex].budget;
+			const VulkanMemoryBlockIdentity block{.Memory = allocationInfo.deviceMemory, .HeapIndex = heapIndex};
+			RhiMemoryCategoryAggregationPolicy::AddUniqueBlock(aggregation, block, budgetBytes);
 		}
 		return aggregation;
 	}
 
 	void AccumulateAllocations(
+	    VmaAllocator_T* allocator,
 	    std::span<VulkanGpuAllocationRecord* const> records,
 	    std::span<const VmaBudget> heapBudgets,
 	    std::vector<VulkanMemoryCategoryAggregation>& aggregations,
@@ -55,13 +72,14 @@ namespace VulkanMemoryUsage
 			{
 				continue;
 			}
-			VulkanMemoryCategoryAggregation& aggregation = AccumulateCategoryUsage(*record, heapBudgets, aggregations, snapshot);
+			VulkanMemoryCategoryAggregation& aggregation = AccumulateCategoryUsage(allocator, *record, heapBudgets, aggregations, snapshot);
 			++aggregation.Stats.ResourceCount;
 			snapshot.CommittedUsageBytes += record->AllocatedBytes;
 		}
 	}
 
 	void AccumulateBlocks(
+	    VmaAllocator_T* allocator,
 	    std::span<VulkanGpuMemoryBlockRecord* const> records,
 	    std::span<const VmaBudget> heapBudgets,
 	    std::vector<VulkanMemoryCategoryAggregation>& aggregations,
@@ -73,7 +91,7 @@ namespace VulkanMemoryUsage
 			{
 				continue;
 			}
-			VulkanMemoryCategoryAggregation& aggregation = AccumulateCategoryUsage(*record, heapBudgets, aggregations, snapshot);
+			VulkanMemoryCategoryAggregation& aggregation = AccumulateCategoryUsage(allocator, *record, heapBudgets, aggregations, snapshot);
 			aggregation.Stats.ResourceCount += record->AliasingResourceCount;
 			snapshot.PlacedUsageBytes += record->AllocatedBytes;
 		}

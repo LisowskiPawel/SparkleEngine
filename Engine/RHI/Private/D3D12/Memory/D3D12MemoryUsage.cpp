@@ -71,7 +71,7 @@ void D3D12MemoryUsage::AccumulateAllocations(
 {
 	for (const D3D12GpuAllocationRecord* record : records)
 	{
-		if (record == nullptr || record->Allocation == nullptr)
+		if (record == nullptr || record->Allocation == nullptr || record->ParentHeap != nullptr)
 		{
 			continue;
 		}

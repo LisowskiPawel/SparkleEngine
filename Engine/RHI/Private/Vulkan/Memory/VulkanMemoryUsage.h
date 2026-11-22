@@ -12,18 +12,28 @@ struct VmaBudget;
 struct VulkanGpuAllocationRecord;
 struct VulkanGpuMemoryBlockRecord;
 
-using VulkanMemoryCategoryAggregation = RhiMemoryCategoryAggregation<std::uint32_t>;
+struct VulkanMemoryBlockIdentity final
+{
+	VkDeviceMemory Memory = VK_NULL_HANDLE;
+	std::uint32_t HeapIndex = 0;
+
+	bool operator==(const VulkanMemoryBlockIdentity&) const = default;
+};
+
+using VulkanMemoryCategoryAggregation = RhiMemoryCategoryAggregation<VulkanMemoryBlockIdentity>;
 
 namespace VulkanMemoryUsage
 {
-	void QueryBudget(VmaAllocator_T* allocator, const VkPhysicalDeviceMemoryProperties& memoryProperties, std::span<VmaBudget, VK_MAX_MEMORY_HEAPS> heapBudgets, RhiMemoryUsageSnapshot& snapshot);
+	void QueryBudget(VmaAllocator_T* allocator, std::span<VmaBudget, VK_MAX_MEMORY_HEAPS> heapBudgets, RhiMemoryUsageSnapshot& snapshot);
 	// Live record spans remain borrowed under the allocator's records mutex.
 	void AccumulateAllocations(
+	    VmaAllocator_T* allocator,
 	    std::span<VulkanGpuAllocationRecord* const> records,
 	    std::span<const VmaBudget> heapBudgets,
 	    std::vector<VulkanMemoryCategoryAggregation>& aggregations,
 	    RhiMemoryUsageSnapshot& snapshot);
 	void AccumulateBlocks(
+	    VmaAllocator_T* allocator,
 	    std::span<VulkanGpuMemoryBlockRecord* const> records,
 	    std::span<const VmaBudget> heapBudgets,
 	    std::vector<VulkanMemoryCategoryAggregation>& aggregations,
