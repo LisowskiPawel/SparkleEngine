@@ -13,7 +13,7 @@ namespace SparkleLauncher
 	{
 		label.setObjectName("InlineStatusValue");
 		label.setFixedWidth(LauncherUi::Row::InlineStatusWidth);
-		label.setText(QStringLiteral("â—Ź %1").arg(text));
+		label.setText(QStringLiteral("● %1").arg(text));
 		label.setProperty("State", state);
 		label.style()->unpolish(&label);
 		label.style()->polish(&label);
