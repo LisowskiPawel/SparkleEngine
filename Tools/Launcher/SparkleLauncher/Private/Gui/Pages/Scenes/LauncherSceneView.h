@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtWidgets/QListView>
-#include <QtCore/QPersistentModelIndex>
 
 #include <functional>
 #include <cstdint>
@@ -29,15 +28,14 @@ namespace SparkleLauncher
 		bool event(QEvent* event) override;
 		void resizeEvent(QResizeEvent* event) override;
 		void currentChanged(const QModelIndex& current, const QModelIndex& previous) override;
-		void mousePressEvent(QMouseEvent* event) override;
 		void mouseReleaseEvent(QMouseEvent* event) override;
-		void mouseDoubleClickEvent(QMouseEvent* event) override;
 		bool eventFilter(QObject* object, QEvent* event) override;
 
 	private:
 		void UpdateCellSize();
 		void UpdateActions();
 		void Activate(LauncherLevelAction action);
+		void ActivateCard(const QModelIndex& index);
 
 		LauncherLevelUiModel& m_model;
 		QPushButton* m_sourceButton = nullptr;
@@ -45,7 +43,6 @@ namespace SparkleLauncher
 		QString m_currentLevelId;
 		QString m_resetContentId;
 		int m_previousRow = 0;
-		QPersistentModelIndex m_pressedIndex;
-		QPoint m_pressPosition;
+		QPoint m_clickPosition;
 	};
 }

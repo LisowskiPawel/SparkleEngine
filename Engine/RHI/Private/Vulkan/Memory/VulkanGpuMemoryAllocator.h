@@ -12,14 +12,10 @@
 #include <cstdint>
 #include <memory>
 #include <string_view>
-#include <vector>
 
 class VulkanRhi;
-class VulkanRenderTimingDiagnostics;
 class VulkanRecordingUploadPage;
 class VulkanRecordingResourceTable;
-
-struct VmaAllocator_T;
 
 class VulkanGpuMemoryAllocator final
 {
@@ -70,7 +66,6 @@ public:
 private:
 	friend class VulkanRenderCommandList;
 	friend class VulkanRenderDeviceServices;
-	friend class VulkanRenderTimingDiagnostics;
 
 	struct Impl;
 	using PendingAllocationRelease = std::unique_ptr<VulkanGpuAllocationRecord>;

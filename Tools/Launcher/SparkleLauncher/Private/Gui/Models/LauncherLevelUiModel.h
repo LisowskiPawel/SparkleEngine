@@ -49,7 +49,7 @@ namespace SparkleLauncher
 	class LauncherLevelUiModel final : public QAbstractListModel
 	{
 	public:
-		explicit LauncherLevelUiModel(QObject* parent = nullptr);
+		using QAbstractListModel::QAbstractListModel;
 		void Refresh(const LauncherContentSummary* content, const LauncherSettings& settings, const QString& openingLevelId);
 		int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 		QVariant data(const QModelIndex& index, int role) const override;

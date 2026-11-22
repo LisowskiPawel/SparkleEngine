@@ -15,6 +15,7 @@ sparkle_add_source_package(Vulkan::Vulkan Vulkan-Headers "${Vulkan_VERSION}"
     Apache-2.0 "https://github.com/KhronosGroup/Vulkan-Headers/tree/v${Vulkan_VERSION}")
 
 add_library(SparkleVMA STATIC "${CMAKE_CURRENT_LIST_DIR}/Bindings/VmaImplementation.cpp")
+target_compile_features(SparkleVMA PRIVATE cxx_std_14)
 sparkle_prepare_patched_dependency_files("${sparkle_vma_SOURCE_DIR}" "${sparkle_vma_BINARY_DIR}"
     "${_vma_patch}" _vma_patched include/vk_mem_alloc.h)
 target_include_directories(SparkleVMA

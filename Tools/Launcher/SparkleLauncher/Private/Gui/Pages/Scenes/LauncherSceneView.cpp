@@ -2,8 +2,8 @@
 
 #include "Gui/Models/LauncherLevelUiModel.h"
 #include "Gui/Style/LauncherUiDesign.h"
+#include "Gui/Widgets/LauncherArtworkWidgets.h"
 
-#include <QtGui/QKeyEvent>
 #include <QtGui/QKeySequence>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
@@ -27,9 +27,6 @@ namespace SparkleLauncher
 		QRect Card;
 		QRect Artwork;
 		QRect Body;
-		QRect Title;
-		QRect Description;
-		QRect Metadata;
 		QRect Source;
 		QRect Primary;
 	};
@@ -42,9 +39,6 @@ namespace SparkleLauncher
 		const int actionWidth = std::min(LauncherUi::Row::StatusActionWidth, std::max(1, (Body.width() - 8) / 2));
 		Primary = QRect(Body.right() - actionWidth + 1, Body.bottom() - LauncherUi::Row::StatusActionHeight + 1, actionWidth, LauncherUi::Row::StatusActionHeight);
 		Source = QRect(Body.left(), Primary.top(), actionWidth, Primary.height());
-		Title = QRect(Body.left(), Body.top(), Body.width(), 22);
-		Metadata = QRect(Body.left(), Primary.top() - 23, Body.width(), 16);
-		Description = QRect(Body.left(), Title.bottom() + 7, Body.width(), std::max(0, Metadata.top() - Title.bottom() - 14));
 	}
 
 	class SceneCardDelegate final : public QStyledItemDelegate
@@ -88,39 +82,34 @@ namespace SparkleLauncher
 		painter->save();
 		painter->setClipRect(geometry.Card);
 		painter->fillRect(geometry.Card, QColor(LauncherUi::Color::Panel));
-		if (!level->Artwork.isNull())
-		{
-			const QSizeF sourceSize = level->Artwork.deviceIndependentSize();
-			const double scale = std::max(geometry.Artwork.width() / sourceSize.width(), geometry.Artwork.height() / sourceSize.height());
-			const QSizeF drawnSize = sourceSize * scale;
-			const QPointF imageOrigin = QPointF(geometry.Artwork.center()) - QPointF(drawnSize.width() / 2, drawnSize.height() / 2);
-			painter->setClipRect(geometry.Artwork, Qt::IntersectClip);
-			painter->drawPixmap(QRectF(imageOrigin, drawnSize), level->Artwork, QRectF(level->Artwork.rect()));
-			painter->setClipRect(geometry.Card);
-		}
+		const LauncherArtworkSpec artworkSpec{.BaseColor = QColor(LauncherUi::Color::Panel)};
+		PaintLauncherArtwork(*painter, geometry.Artwork, level->Artwork, artworkSpec);
 		painter->setPen(bCurrent ? accent : QColor(LauncherUi::Color::BorderSoft));
 		painter->drawRect(geometry.Card.adjusted(0, 0, -1, -1));
-		painter->fillRect(QRect(geometry.Title.topLeft(), QSize(2, geometry.Title.height())), accent);
+		const QRect titleArea(geometry.Body.left(), geometry.Body.top(), geometry.Body.width(), 22);
+		painter->fillRect(QRect(titleArea.topLeft(), QSize(2, titleArea.height())), accent);
 		QFont titleFont = option.font;
 		titleFont.setPointSizeF(10.5);
 		titleFont.setBold(true);
 		painter->setFont(titleFont);
 		painter->setPen(QColor(LauncherUi::Color::TextPrimary));
-		const QRect title = geometry.Title.adjusted(11, 0, 0, 0);
+		const QRect title = titleArea.adjusted(11, 0, 0, 0);
 		painter->drawText(title, Qt::AlignVCenter, QFontMetrics(titleFont).elidedText(level->DisplayName, Qt::ElideRight, title.width()));
 		QFont bodyFont = option.font;
 		bodyFont.setPointSizeF(8.75);
 		painter->setFont(bodyFont);
 		painter->setPen(QColor(LauncherUi::Color::TextBody));
-		painter->drawText(geometry.Description, Qt::TextWordWrap | Qt::AlignTop, level->Description);
+		const QRect metadata(geometry.Body.left(), geometry.Primary.top() - 23, geometry.Body.width(), 16);
+		const QRect description(geometry.Body.left(), titleArea.bottom() + 7, geometry.Body.width(), std::max(0, metadata.top() - titleArea.bottom() - 14));
+		painter->drawText(description, Qt::TextWordWrap | Qt::AlignTop, level->Description);
 		bodyFont.setPointSizeF(8);
 		painter->setFont(bodyFont);
 		const QFontMetrics metrics(bodyFont);
-		const int statusWidth = std::min(geometry.Metadata.width(), metrics.horizontalAdvance(level->Status) + 10);
+		const int statusWidth = std::min(metadata.width(), metrics.horizontalAdvance(level->Status) + 10);
 		painter->setPen(accent);
-		painter->drawText(geometry.Metadata, Qt::AlignVCenter, level->Status);
+		painter->drawText(metadata, Qt::AlignVCenter, level->Status);
 		painter->setPen(QColor(LauncherUi::Color::TextMuted));
-		const QRect detail = geometry.Metadata.adjusted(statusWidth, 0, 0, 0);
+		const QRect detail = metadata.adjusted(statusWidth, 0, 0, 0);
 		painter->drawText(detail, Qt::AlignVCenter, metrics.elidedText(level->Detail, Qt::ElideRight, std::max(0, detail.width())));
 		const auto drawButton = [&](QPushButton& button, QRect rect, const QString& text, bool bEnabled)
 		{
@@ -179,6 +168,7 @@ namespace SparkleLauncher
 		    });
 		setItemDelegate(new SceneCardDelegate(*this, model, *m_sourceButton, *m_primaryButton));
 		setModel(&model);
+		connect(this, &QListView::clicked, this, &LauncherSceneView::ActivateCard);
 		connect(&model, &QAbstractItemModel::dataChanged, this, [this]() { UpdateActions(); });
 		connect(
 		    &model,
@@ -301,7 +291,6 @@ namespace SparkleLauncher
 
 	void LauncherSceneView::UpdateActions()
 	{
-		m_pressedIndex = QModelIndex();
 		const auto* level = m_model.Level(currentIndex());
 		m_sourceButton->setVisible(level != nullptr && !level->SourcePageUrl.isEmpty() && isVisible());
 		m_primaryButton->setVisible(level != nullptr && isVisible());
@@ -335,39 +324,25 @@ namespace SparkleLauncher
 		}
 	}
 
-	void LauncherSceneView::mousePressEvent(QMouseEvent* event)
-	{
-		const QPersistentModelIndex pressedIndex = event->button() == Qt::LeftButton ? indexAt(event->position().toPoint()) : QModelIndex();
-		QListView::mousePressEvent(event);
-		m_pressedIndex = pressedIndex;
-		m_pressPosition = event->position().toPoint();
-	}
-
 	void LauncherSceneView::mouseReleaseEvent(QMouseEvent* event)
 	{
+		m_clickPosition = event->position().toPoint();
 		QListView::mouseReleaseEvent(event);
-		const QModelIndex index = indexAt(event->position().toPoint());
-		const bool bLeftRelease = event->button() == Qt::LeftButton && index.isValid();
-		const bool bClick = bLeftRelease && index == m_pressedIndex;
-		const bool bStationary = (event->position().toPoint() - m_pressPosition).manhattanLength() < QApplication::startDragDistance();
-		m_pressedIndex = QModelIndex();
-		if (!bClick || !bStationary)
+	}
+
+	void LauncherSceneView::ActivateCard(const QModelIndex& index)
+	{
+		const auto* level = m_model.Level(index);
+		if (level == nullptr)
 		{
 			return;
 		}
 		const SceneCardGeometry geometry(visualRect(index));
-		if (!geometry.Card.contains(event->position().toPoint()))
+		if (!geometry.Card.contains(m_clickPosition))
 		{
 			return;
 		}
-		const auto* level = m_model.Level(index);
-		Activate(geometry.Source.contains(event->position().toPoint()) && !level->SourcePageUrl.isEmpty() ? LauncherLevelAction::Source : level->Action);
-	}
-
-	void LauncherSceneView::mouseDoubleClickEvent(QMouseEvent* event)
-	{
-		m_pressedIndex = QModelIndex();
-		event->accept();
+		Activate(geometry.Source.contains(m_clickPosition) && !level->SourcePageUrl.isEmpty() ? LauncherLevelAction::Source : level->Action);
 	}
 
 	bool LauncherSceneView::eventFilter(QObject* object, QEvent* event)

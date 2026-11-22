@@ -4,7 +4,6 @@
 #include "Gui/App/LauncherSettings.h"
 #include "Cook/CookedContentReadiness.h"
 #include "Levels/LevelPreparation.h"
-#include "Workspace/LauncherProductPaths.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "ProjectLevelCatalog.h"
@@ -108,19 +107,13 @@ namespace SparkleLauncher
 
 	static QString ResolveLevelState(const LauncherLevelUiEntry& level)
 	{
-		if (!level.bGameSupported || !level.bCanSelect)
+		const bool bUnavailable = !level.bGameSupported || !level.bCanSelect;
+		const bool bDownloadRequired = level.bSelected && !level.bReady;
+		if (bUnavailable || bDownloadRequired)
 		{
 			return "warning";
 		}
-		if (level.bReady)
-		{
-			return "ok";
-		}
-		if (level.bSelected)
-		{
-			return "warning";
-		}
-		return level.bSourceReady ? QStringLiteral("ok") : QStringLiteral("neutral");
+		return level.bReady || level.bSourceReady ? QStringLiteral("ok") : QStringLiteral("neutral");
 	}
 
 	static LauncherLevelUiEntry BuildLevel(const ProjectLevelCatalog& catalog, const ProjectLevelCatalogEntry& level, const CookedContentReadiness& cooked, bool bHasSourceTools)
@@ -240,11 +233,6 @@ namespace SparkleLauncher
 		return CreateMapPlaceholder(level);
 	}
 
-	LauncherLevelUiModel::LauncherLevelUiModel(QObject* parent) :
-	    QAbstractListModel(parent)
-	{
-	}
-
 	void LauncherLevelUiModel::Refresh(const LauncherContentSummary* content, const LauncherSettings& settings, const QString& openingLevelId)
 	{
 		QString error;
@@ -299,7 +287,10 @@ namespace SparkleLauncher
 
 	const LauncherLevelUiEntry* LauncherLevelUiModel::Level(const QModelIndex& index) const
 	{
-		return index.isValid() && index.model() == this && index.column() == 0 && index.row() >= 0 && index.row() < m_levels.size() ? &m_levels[index.row()] : nullptr;
+		const bool bOwnRow = index.model() == this && index.column() == 0;
+		const int row = index.row();
+		const bool bInRange = row >= 0 && row < m_levels.size();
+		return bOwnRow && bInRange ? &m_levels[row] : nullptr;
 	}
 
 	QVariant LauncherLevelUiModel::data(const QModelIndex& index, int role) const

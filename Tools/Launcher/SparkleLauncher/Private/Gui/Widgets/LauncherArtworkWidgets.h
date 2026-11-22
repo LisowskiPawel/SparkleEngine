@@ -34,7 +34,6 @@ namespace SparkleLauncher
 	struct LauncherArtworkSpec
 	{
 		QColor BaseColor;
-		double AspectRatio = 16.0 / 9.0;
 		double AccentLineX = -1.0;
 		qreal AccentLineWidth = 2.0;
 		QColor AccentLineColor;

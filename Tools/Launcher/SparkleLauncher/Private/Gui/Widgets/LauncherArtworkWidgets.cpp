@@ -6,9 +6,7 @@
 #include <QtGui/QPainter>
 
 #include <algorithm>
-#include <cmath>
 #include <initializer_list>
-#include <utility>
 
 namespace SparkleLauncher
 {
@@ -85,23 +83,16 @@ namespace SparkleLauncher
 			return;
 		}
 
-		const int targetWidth = std::max(1, static_cast<int>(std::ceil(targetRect.width())));
-		const int targetHeight = std::max(1, static_cast<int>(std::ceil(targetRect.height())));
-		const QSize targetSize(targetWidth, targetHeight);
-		const QPixmap scaled = source.scaled(targetSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-		const int cropLeft = std::max(0, (scaled.width() - targetWidth) / 2);
-		const int cropTop = std::max(0, (scaled.height() - targetHeight) / 2);
-		const QRect cropRect(cropLeft, cropTop, targetWidth, targetHeight);
-		painter.drawPixmap(targetRect.toRect(), scaled, cropRect);
+		const double scale = std::max(targetRect.width() / source.width(), targetRect.height() / source.height());
+		const QSizeF cropSize(targetRect.width() / scale, targetRect.height() / scale);
+		const QPointF cropOrigin((source.width() - cropSize.width()) / 2, (source.height() - cropSize.height()) / 2);
+		painter.drawPixmap(targetRect, source, QRectF(cropOrigin, cropSize));
 	}
 
 	LauncherArtworkSpec LauncherArtworkSpec::ForSceneHero()
 	{
 		LauncherArtworkSpec spec;
 		spec.BaseColor = HeroColor();
-		spec.AspectRatio = 16.0 / 9.0;
-
-		spec.AspectRatio = static_cast<double>(LauncherUi::Hero::DesignWidth) / static_cast<double>(LauncherUi::Hero::DesignHeight);
 
 		spec.AccentLineX = static_cast<double>(LauncherUi::Hero::CopyDividerX) / static_cast<double>(LauncherUi::Hero::DesignWidth);
 		spec.AccentLineColor = AccentColor(105);
