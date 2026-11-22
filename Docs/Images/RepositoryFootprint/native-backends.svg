@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" width="737.273963pt" height="686.799687pt" viewBox="0 0 737.273963 686.799687" version="1.1" role="img" aria-label="RHI: inside the two native backends">
- <desc>Vulkan: Commands 2532 lines in 12 files, Device 1794 lines in 19 files, Memory 1605 lines in 9 files, Descriptors 1556 lines in 10 files, Pipeline 1177 lines in 12 files, RayTracing 1035 lines in 12 files, Resources 863 lines in 6 files, Root files 819 lines in 7 files, SwapChain 736 lines in 4 files, Diagnostics 690 lines in 12 files, Other private / root 834 lines in 12 files; D3D12: Commands 1564 lines in 12 files, Diagnostics 1428 lines in 13 files, Descriptors 1103 lines in 10 files, Device 1095 lines in 12 files, RayTracing 1008 lines in 12 files, Pipeline 987 lines in 12 files, Memory 935 lines in 9 files, Resources 933 lines in 7 files, Root files 605 lines in 5 files, SwapChain 403 lines in 4 files, Other private / root 742 lines in 11 files</desc><title>RHI: inside the two native backends</title>
+ <desc>Vulkan: Commands 2532 lines in 12 files, Device 1785 lines in 19 files, Memory 1602 lines in 9 files, Descriptors 1556 lines in 10 files, Pipeline 1177 lines in 12 files, RayTracing 1035 lines in 12 files, Resources 863 lines in 6 files, Root files 819 lines in 7 files, SwapChain 734 lines in 4 files, Diagnostics 532 lines in 12 files, Other private / root 834 lines in 12 files; D3D12: Commands 1564 lines in 12 files, Diagnostics 1274 lines in 13 files, Descriptors 1103 lines in 10 files, Device 1091 lines in 12 files, RayTracing 1008 lines in 12 files, Pipeline 986 lines in 12 files, Memory 935 lines in 9 files, Resources 932 lines in 7 files, Root files 614 lines in 6 files, SwapChain 410 lines in 4 files, Other private / root 733 lines in 10 files</desc><title>RHI: inside the two native backends</title>
  <metadata>
   <rdf:RDF>
    <ns2:Work>
@@ -140,10 +140,10 @@
     <path d="M 192.96 70.2  L 600.96 70.2  L 600.96 82.833962  L 192.96 82.833962  z " clip-path="url(#p7fcfff54d8)" style="fill: #326fa8" />
    </g>
    <g id="patch_4">
-    <path d="M 192.96 91.256604  L 482.040569 91.256604  L 482.040569 103.890566  L 192.96 103.890566  z " clip-path="url(#p7fcfff54d8)" style="fill: #326fa8" />
+    <path d="M 192.96 91.256604  L 480.590332 91.256604  L 480.590332 103.890566  L 192.96 103.890566  z " clip-path="url(#p7fcfff54d8)" style="fill: #326fa8" />
    </g>
    <g id="patch_5">
-    <path d="M 192.96 112.313208  L 451.585592 112.313208  L 451.585592 124.94717  L 192.96 124.94717  z " clip-path="url(#p7fcfff54d8)" style="fill: #326fa8" />
+    <path d="M 192.96 112.313208  L 451.10218 112.313208  L 451.10218 124.94717  L 192.96 124.94717  z " clip-path="url(#p7fcfff54d8)" style="fill: #326fa8" />
    </g>
    <g id="patch_6">
     <path d="M 192.96 133.369811  L 443.689858 133.369811  L 443.689858 146.003774  L 192.96 146.003774  z " clip-path="url(#p7fcfff54d8)" style="fill: #326fa8" />
@@ -161,10 +161,10 @@
     <path d="M 192.96 217.596226  L 324.931564 217.596226  L 324.931564 230.230189  L 192.96 230.230189  z " clip-path="url(#p7fcfff54d8)" style="fill: #326fa8" />
    </g>
    <g id="patch_11">
-    <path d="M 192.96 238.65283  L 311.557156 238.65283  L 311.557156 251.286792  L 192.96 251.286792  z " clip-path="url(#p7fcfff54d8)" style="fill: #326fa8" />
+    <path d="M 192.96 238.65283  L 311.234882 238.65283  L 311.234882 251.286792  L 192.96 251.286792  z " clip-path="url(#p7fcfff54d8)" style="fill: #326fa8" />
    </g>
    <g id="patch_12">
-    <path d="M 192.96 259.709434  L 304.144834 259.709434  L 304.144834 272.343396  L 192.96 272.343396  z " clip-path="url(#p7fcfff54d8)" style="fill: #326fa8" />
+    <path d="M 192.96 259.709434  L 278.685118 259.709434  L 278.685118 272.343396  L 192.96 272.343396  z " clip-path="url(#p7fcfff54d8)" style="fill: #326fa8" />
    </g>
    <g id="patch_13">
     <path d="M 192.96 280.766038  L 327.348626 280.766038  L 327.348626 293.4  L 192.96 293.4  z " clip-path="url(#p7fcfff54d8)" style="fill: #98a2b3" />
@@ -173,10 +173,10 @@
     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="79.276356" transform="rotate(-0 649.0224 79.276356)">2,532  /  12 files</text>
    </g>
    <g id="text_18">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="100.33296" transform="rotate(-0 649.0224 100.33296)">1,794  /  19 files</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="100.33296" transform="rotate(-0 649.0224 100.33296)">1,785  /  19 files</text>
    </g>
    <g id="text_19">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="121.389564" transform="rotate(-0 649.0224 121.389564)">1,605  /  9 files</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="121.389564" transform="rotate(-0 649.0224 121.389564)">1,602  /  9 files</text>
    </g>
    <g id="text_20">
     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="142.446167" transform="rotate(-0 649.0224 142.446167)">1,556  /  10 files</text>
@@ -194,16 +194,16 @@
     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="226.672583" transform="rotate(-0 649.0224 226.672583)">819  /  7 files</text>
    </g>
    <g id="text_25">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="247.729186" transform="rotate(-0 649.0224 247.729186)">736  /  4 files</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="247.729186" transform="rotate(-0 649.0224 247.729186)">734  /  4 files</text>
    </g>
    <g id="text_26">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="268.78579" transform="rotate(-0 649.0224 268.78579)">690  /  12 files</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="268.78579" transform="rotate(-0 649.0224 268.78579)">532  /  12 files</text>
    </g>
    <g id="text_27">
     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="289.842394" transform="rotate(-0 649.0224 289.842394)">834  /  12 files</text>
    </g>
    <g id="text_28">
-    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="192.96" y="45.04" transform="rotate(-0 192.96 45.04)">Vulkan  |  13,641 lines  |  115 files</text>
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="192.96" y="45.04" transform="rotate(-0 192.96 45.04)">Vulkan  |  13,469 lines  |  115 files</text>
    </g>
   </g>
   <g id="axes_2">
@@ -323,70 +323,70 @@
     <path d="M 192.96 391.32  L 444.978957 391.32  L 444.978957 403.953962  L 192.96 403.953962  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
    </g>
    <g id="patch_16">
-    <path d="M 192.96 412.376604  L 423.064265 412.376604  L 423.064265 425.010566  L 192.96 425.010566  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
+    <path d="M 192.96 412.376604  L 398.2491 412.376604  L 398.2491 425.010566  L 192.96 425.010566  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
    </g>
    <g id="patch_17">
     <path d="M 192.96 433.433208  L 370.694597 433.433208  L 370.694597 446.06717  L 192.96 446.06717  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
    </g>
    <g id="patch_18">
-    <path d="M 192.96 454.489811  L 369.405498 454.489811  L 369.405498 467.123774  L 192.96 467.123774  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
+    <path d="M 192.96 454.489811  L 368.760948 454.489811  L 368.760948 467.123774  L 192.96 467.123774  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
    </g>
    <g id="patch_19">
     <path d="M 192.96 475.546415  L 355.38654 475.546415  L 355.38654 488.180377  L 192.96 488.180377  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
    </g>
    <g id="patch_20">
-    <path d="M 192.96 496.603019  L 352.002654 496.603019  L 352.002654 509.236981  L 192.96 509.236981  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
+    <path d="M 192.96 496.603019  L 351.841517 496.603019  L 351.841517 509.236981  L 192.96 509.236981  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
    </g>
    <g id="patch_21">
     <path d="M 192.96 517.659623  L 343.623507 517.659623  L 343.623507 530.293585  L 192.96 530.293585  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
    </g>
    <g id="patch_22">
-    <path d="M 192.96 538.716226  L 343.301232 538.716226  L 343.301232 551.350189  L 192.96 551.350189  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
+    <path d="M 192.96 538.716226  L 343.140095 538.716226  L 343.140095 551.350189  L 192.96 551.350189  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
    </g>
    <g id="patch_23">
-    <path d="M 192.96 559.77283  L 290.448152 559.77283  L 290.448152 572.406792  L 192.96 572.406792  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
+    <path d="M 192.96 559.77283  L 291.898389 559.77283  L 291.898389 572.406792  L 192.96 572.406792  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
    </g>
    <g id="patch_24">
-    <path d="M 192.96 580.829434  L 257.898389 580.829434  L 257.898389 593.463396  L 192.96 593.463396  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
+    <path d="M 192.96 580.829434  L 259.026351 580.829434  L 259.026351 593.463396  L 192.96 593.463396  z " clip-path="url(#p5cf5f9bae4)" style="fill: #326fa8" />
    </g>
    <g id="patch_25">
-    <path d="M 192.96 601.886038  L 312.523981 601.886038  L 312.523981 614.52  L 192.96 614.52  z " clip-path="url(#p5cf5f9bae4)" style="fill: #98a2b3" />
+    <path d="M 192.96 601.886038  L 311.073744 601.886038  L 311.073744 614.52  L 192.96 614.52  z " clip-path="url(#p5cf5f9bae4)" style="fill: #98a2b3" />
    </g>
    <g id="text_45">
     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="400.396356" transform="rotate(-0 649.0224 400.396356)">1,564  /  12 files</text>
    </g>
    <g id="text_46">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="421.45296" transform="rotate(-0 649.0224 421.45296)">1,428  /  13 files</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="421.45296" transform="rotate(-0 649.0224 421.45296)">1,274  /  13 files</text>
    </g>
    <g id="text_47">
     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="442.509564" transform="rotate(-0 649.0224 442.509564)">1,103  /  10 files</text>
    </g>
    <g id="text_48">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="463.566167" transform="rotate(-0 649.0224 463.566167)">1,095  /  12 files</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="463.566167" transform="rotate(-0 649.0224 463.566167)">1,091  /  12 files</text>
    </g>
    <g id="text_49">
     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="484.622771" transform="rotate(-0 649.0224 484.622771)">1,008  /  12 files</text>
    </g>
    <g id="text_50">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="505.679375" transform="rotate(-0 649.0224 505.679375)">987  /  12 files</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="505.679375" transform="rotate(-0 649.0224 505.679375)">986  /  12 files</text>
    </g>
    <g id="text_51">
     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="526.735979" transform="rotate(-0 649.0224 526.735979)">935  /  9 files</text>
    </g>
    <g id="text_52">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="547.792583" transform="rotate(-0 649.0224 547.792583)">933  /  7 files</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="547.792583" transform="rotate(-0 649.0224 547.792583)">932  /  7 files</text>
    </g>
    <g id="text_53">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="568.849186" transform="rotate(-0 649.0224 568.849186)">605  /  5 files</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="568.849186" transform="rotate(-0 649.0224 568.849186)">614  /  6 files</text>
    </g>
    <g id="text_54">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="589.90579" transform="rotate(-0 649.0224 589.90579)">403  /  4 files</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="589.90579" transform="rotate(-0 649.0224 589.90579)">410  /  4 files</text>
    </g>
    <g id="text_55">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="610.962394" transform="rotate(-0 649.0224 610.962394)">742  /  11 files</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="610.962394" transform="rotate(-0 649.0224 610.962394)">733  /  10 files</text>
    </g>
    <g id="text_56">
-    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="192.96" y="366.16" transform="rotate(-0 192.96 366.16)">D3D12  |  10,803 lines  |  107 files</text>
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="192.96" y="366.16" transform="rotate(-0 192.96 366.16)">D3D12  |  10,650 lines  |  107 files</text>
    </g>
   </g>
   <g id="text_57">

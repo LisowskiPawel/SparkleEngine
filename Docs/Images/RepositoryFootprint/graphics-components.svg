@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" width="737.273963pt" height="717.759687pt" viewBox="0 0 737.273963 717.759687" version="1.1" role="img" aria-label="Renderer: one level deeper">
- <desc>FrameGraph: Compiler 1594 lines in 14 files, Resources 1421 lines in 12 files, Root files 1075 lines in 22 files, Execution 861 lines in 11 files, Builder 546 lines in 7 files, Diagnostics 90 lines in 2 files; Scene: GpuScene 1374 lines in 23 files, Preparation 1061 lines in 25 files, Root files 804 lines in 8 files, Materials 504 lines in 14 files, RayTracing 268 lines in 5 files, Geometry 86 lines in 4 files, Lighting 79 lines in 6 files; Passes: Lighting 2808 lines in 97 files, GBuffer 722 lines in 24 files, Presentation 482 lines in 36 files, PostProcessing 292 lines in 20 files, Visualization 139 lines in 10 files, Core 137 lines in 5 files, Scene 107 lines in 5 files</desc><title>Renderer: one level deeper</title>
+ <desc>FrameGraph: Compiler 1559 lines in 14 files, Resources 1421 lines in 12 files, Root files 1075 lines in 22 files, Execution 861 lines in 11 files, Builder 546 lines in 7 files, Diagnostics 90 lines in 2 files; Scene: GpuScene 1374 lines in 23 files, Preparation 1061 lines in 25 files, Root files 804 lines in 8 files, Materials 504 lines in 14 files, RayTracing 268 lines in 5 files, Geometry 86 lines in 4 files, Lighting 79 lines in 6 files; Passes: Lighting 2808 lines in 97 files, GBuffer 722 lines in 24 files, Presentation 482 lines in 36 files, PostProcessing 292 lines in 20 files, Visualization 139 lines in 10 files, Core 137 lines in 5 files, Scene 107 lines in 5 files</desc><title>Renderer: one level deeper</title>
  <metadata>
   <rdf:RDF>
    <ns2:Work>
@@ -107,7 +107,7 @@
     </g>
    </g>
    <g id="patch_3">
-    <path d="M 192.96 65.127273  L 424.566838 65.127273  L 424.566838 78.171429  L 192.96 78.171429  z " clip-path="url(#p4c63730380)" style="fill: #326fa8" />
+    <path d="M 192.96 65.127273  L 419.481368 65.127273  L 419.481368 78.171429  L 192.96 78.171429  z " clip-path="url(#p4c63730380)" style="fill: #326fa8" />
    </g>
    <g id="patch_4">
     <path d="M 192.96 86.867532  L 399.430085 86.867532  L 399.430085 99.911688  L 192.96 99.911688  z " clip-path="url(#p4c63730380)" style="fill: #326fa8" />
@@ -125,7 +125,7 @@
     <path d="M 192.96 173.828571  L 206.036923 173.828571  L 206.036923 186.872727  L 192.96 186.872727  z " clip-path="url(#p4c63730380)" style="fill: #326fa8" />
    </g>
    <g id="text_12">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="74.408726" transform="rotate(-0 649.0224 74.408726)">1,594  /  14 files</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="74.408726" transform="rotate(-0 649.0224 74.408726)">1,559  /  14 files</text>
    </g>
    <g id="text_13">
     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="96.148985" transform="rotate(-0 649.0224 96.148985)">1,421  /  12 files</text>
@@ -143,7 +143,7 @@
     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="649.0224" y="183.110024" transform="rotate(-0 649.0224 183.110024)">90  /  2 files</text>
    </g>
    <g id="text_18">
-    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="192.96" y="45.04" transform="rotate(-0 192.96 45.04)">FrameGraph  |  5,587 lines  |  68 files</text>
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18243c" x="192.96" y="45.04" transform="rotate(-0 192.96 45.04)">FrameGraph  |  5,552 lines  |  68 files</text>
    </g>
   </g>
   <g id="axes_2">

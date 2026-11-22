@@ -13,17 +13,17 @@ bool BindParameterField(PassParameterSet& parameterSet, const char* name, const 
 
 bool BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderAccelerationStructure& field)
 {
-	return field.IsBound() && parameterSet.SetAccelerationStructure(name, field.GetHandle());
+	return parameterSet.SetAccelerationStructure(name, field.GetHandle());
 }
 
 bool BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderRenderTarget& field)
 {
-	return field.IsBound() && parameterSet.SetAttachment(name, field.GetBinding());
+	return parameterSet.SetAttachment(name, field.GetBinding());
 }
 
 bool BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderDepthTarget& field)
 {
-	return field.IsBound() && parameterSet.SetAttachment(name, field.GetBinding());
+	return parameterSet.SetAttachment(name, field.GetBinding());
 }
 
 bool BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderSamplerSet& field)

@@ -39,19 +39,6 @@ namespace ShaderParameterFields
 
 		std::vector<THandle> ToVector() const { return std::vector<THandle>(m_values.begin(), m_values.end()); }
 
-		bool IsBound() const noexcept
-		{
-			for (const THandle& value : m_values)
-			{
-				if (!value.IsValid())
-				{
-					return false;
-				}
-			}
-
-			return true;
-		}
-
 	private:
 		std::array<THandle, ArrayCount> m_values = {};
 	};
@@ -102,8 +89,6 @@ public:
 
 	RhiDescriptorTableBinding GetDescriptorTable() const noexcept { return m_descriptorTable; }
 
-	bool IsBound() const noexcept { return static_cast<bool>(m_descriptorTable); }
-
 	void Reset() noexcept { m_descriptorTable = {}; }
 
 private:
@@ -128,8 +113,6 @@ public:
 
 	RhiDescriptorTableBinding GetDescriptorTable() const noexcept { return m_descriptorTable; }
 
-	bool IsBound() const noexcept { return static_cast<bool>(m_descriptorTable); }
-
 	void Reset() noexcept { m_descriptorTable = {}; }
 
 private:
@@ -150,8 +133,6 @@ public:
 	}
 
 	FrameGraphAccelerationStructureHandle GetHandle() const noexcept { return m_handle; }
-
-	bool IsBound() const noexcept { return m_handle.IsValid(); }
 
 	void Reset() noexcept { m_handle = FrameGraphAccelerationStructureHandle::Invalid(); }
 
@@ -182,8 +163,6 @@ public:
 
 	const FrameGraphTextureHandle& operator[](std::size_t) const noexcept { return m_binding.Handle; }
 
-	bool IsBound() const noexcept { return m_binding.Handle.IsValid(); }
-
 	const FrameGraphAttachmentBinding& GetBinding() const noexcept { return m_binding; }
 
 private:
@@ -202,8 +181,6 @@ public:
 	}
 
 	const FrameGraphTextureHandle& operator[](std::size_t) const noexcept { return m_binding.Handle; }
-
-	bool IsBound() const noexcept { return m_binding.Handle.IsValid(); }
 
 	const FrameGraphAttachmentBinding& GetBinding() const noexcept { return m_binding; }
 
