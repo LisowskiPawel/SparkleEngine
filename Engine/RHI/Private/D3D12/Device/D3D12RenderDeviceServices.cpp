@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "Platform/Public/Window/Win32WindowInterop.h"
 
 #include "Device/RenderDeviceBackendFactory.h"
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
@@ -283,6 +284,6 @@ void D3D12RenderDeviceServices::AdvanceFrameInFlight() noexcept
 void D3D12RenderDeviceServices::BindExternalCapture(RhiExternalCapture& capture) noexcept
 {
 	// Bind the native device and the window owned by its presentation swapchain.
-	RhiExternalCaptureBinding::Bind(capture, m_rhi->GetDevice().Get(), m_swapChain->GetHostWindow().GetHWND());
+	RhiExternalCaptureBinding::Bind(capture, m_rhi->GetDevice().Get(), GetWin32WindowHandle(m_swapChain->GetHostWindow()));
 }
 #endif

@@ -1,5 +1,6 @@
 #include "Process/Windows/ChildProcessWindows.h"
 #include "Process/ProcessReadinessEnvironment.h"
+#include "Strings/StringUtils.h"
 
 #include <algorithm>
 #include <array>
@@ -76,7 +77,7 @@ namespace Process
 	static std::vector<EnvironmentOverride> BuildReadinessEnvironment(const ChildProcessRequest& request, std::wstring_view eventName)
 	{
 		std::vector<Process::EnvironmentOverride> environmentOverrides = request.Environment;
-		environmentOverrides.push_back({ReadinessEventEnvironmentVariable, WideToUtf8(eventName)});
+		environmentOverrides.push_back({ReadinessEventEnvironmentVariable, Strings::ToNarrow(eventName)});
 		environmentOverrides.push_back({ReadinessValueEnvironmentVariable, *request.ReadinessValue});
 		return environmentOverrides;
 	}

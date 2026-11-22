@@ -91,16 +91,9 @@ void DrawTitleBarWindowControls(Window* window) noexcept
 	}
 
 	ImGui::SameLine();
-	ImGui::InvisibleButton("##TitleBarDragRegion", ImVec2(dragRegionWidth, buttonHeight));
-	if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-	{
-		window->ToggleMaximizeRestore();
-	}
-	else if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left, 0.0f))
-	{
-		window->BeginDragMove();
-		ImGui::GetIO().MouseDown[ImGuiMouseButton_Left] = false;
-	}
+	const ImVec2 dragStart = ImGui::GetCursorScreenPos();
+	window->SetTitleBarDragRegion(dragStart.x, dragStart.y, dragStart.x + dragRegionWidth, dragStart.y + buttonHeight);
+	ImGui::Dummy(ImVec2(dragRegionWidth, buttonHeight));
 
 	ImGui::SameLine(0.0f, style.ItemSpacing.x);
 

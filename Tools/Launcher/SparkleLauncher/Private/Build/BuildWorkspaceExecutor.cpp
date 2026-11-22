@@ -61,7 +61,7 @@ namespace SparkleLauncher
 		}
 
 		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(plan.Request.WorkspaceRoot);
-		const SourceDependencyValidation validation = ValidateSourceDependency(*dependency, workspaceOutputs.DependencyCacheRoot);
+		const SourceDependencyValidation validation = InspectSourceDependencyAvailability(*dependency, workspaceOutputs.DependencyCacheRoot);
 		if (validation.bReady)
 		{
 			return std::nullopt;

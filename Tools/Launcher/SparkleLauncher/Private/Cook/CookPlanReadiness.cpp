@@ -20,6 +20,16 @@ namespace SparkleLauncher
 		}
 		const std::filesystem::path toolDirectory = toolPath.parent_path();
 		std::error_code errorCode;
+		const auto requireRuntimeFile = [&](std::string_view name)
+		{
+			errorCode.clear();
+			const bool bFileAvailable = std::filesystem::is_regular_file(toolDirectory / name, errorCode) && !errorCode;
+			if (!bFileAvailable)
+			{
+				missingEntries.emplace_back(name);
+			}
+		};
+		requireRuntimeFile("ShaderMake.exe");
 		for (std::string_view sdkFile : GetShaderCompilerRequiredSdkFiles())
 		{
 			constexpr std::string_view binaryPrefix = "Bin/";
@@ -27,14 +37,7 @@ namespace SparkleLauncher
 			{
 				continue;
 			}
-			const std::string_view runtimeFileName = sdkFile.substr(binaryPrefix.size());
-			errorCode.clear();
-			if (std::filesystem::is_regular_file(toolDirectory / runtimeFileName, errorCode) && !errorCode)
-			{
-				continue;
-			}
-
-			missingEntries.emplace_back(runtimeFileName);
+			requireRuntimeFile(sdkFile.substr(binaryPrefix.size()));
 		}
 
 		if (!HasShaderCompilerStandardModules(toolDirectory))
@@ -124,8 +127,8 @@ namespace SparkleLauncher
 		for (const std::filesystem::path& toolPath : plan.RequiredToolPaths)
 		{
 			std::error_code errorCode;
-			const bool bToolExists = std::filesystem::exists(toolPath, errorCode);
-			if (!bToolExists || errorCode)
+			const bool bToolAvailable = std::filesystem::is_regular_file(toolPath, errorCode) && !errorCode;
+			if (!bToolAvailable)
 			{
 				bRequiredCookToolsAvailable = false;
 				plan.ReadinessMessages.push_back("Cook tool is missing; sync products or build cooking tools: " + toolPath.string());

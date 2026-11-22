@@ -1,24 +1,32 @@
 set(SPARKLE_NLOHMANN_JSON_REVISION "d732d616badc771ab1e85876b3a9eb8191fdf4c0")
-set(SPARKLE_NLOHMANN_JSON_VERSION "3.13.0-dev.d732d616 (unreleased)")
+set(SPARKLE_NLOHMANN_JSON_VERSION "3.12.0+git.d732d616 (unreleased)")
 sparkle_declare_git_dependency(nlohmann_json
     https://github.com/nlohmann/json.git
-    ${SPARKLE_NLOHMANN_JSON_REVISION})
-FetchContent_Populate(nlohmann_json)
-sparkle_prepare_git_fetchcontent_source(nlohmann_json
-    EXPECTED_REVISION "${SPARKLE_NLOHMANN_JSON_REVISION}"
-    REQUIRED_PATHS CMakeLists.txt include/nlohmann/json.hpp include/nlohmann/json_fwd.hpp LICENSE.MIT)
+    ${SPARKLE_NLOHMANN_JSON_REVISION}
+    ID nlohmann_json VERSION "${SPARKLE_NLOHMANN_JSON_VERSION}" PACKAGE_NAME "nlohmann/json" LICENSE_ID "MIT"
+    REQUIRED_PATHS CMakeLists.txt include/nlohmann/json.hpp include/nlohmann/json_fwd.hpp LICENSE.MIT
+        include/nlohmann/thirdparty/hedley/hedley.hpp LICENSES/CC0-1.0.txt
+        include/nlohmann/detail/conversions/to_chars.hpp include/nlohmann/detail/conversions/zmij.hpp)
 
-if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
+if(SPARKLE_SOURCE_DEPENDENCY_METADATA_ONLY OR NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
     return()
 endif()
 
-set(JSON_BuildTests OFF CACHE BOOL "" FORCE)
-set(JSON_Install OFF CACHE BOOL "" FORCE)
-set(JSON_CI OFF CACHE BOOL "" FORCE)
-set(JSON_ImplicitConversions OFF CACHE BOOL "" FORCE)
-set(JSON_Diagnostics OFF CACHE BOOL "" FORCE)
-set(JSON_Diagnostic_Positions OFF CACHE BOOL "" FORCE)
-set(JSON_LegacyDiscardedValueComparison OFF CACHE BOOL "" FORCE)
-sparkle_add_dependency_subdirectory(${nlohmann_json_SOURCE_DIR} ${nlohmann_json_BINARY_DIR})
-sparkle_set_source_package(nlohmann_json "nlohmann/json" "${SPARKLE_NLOHMANN_JSON_VERSION}"
-    "MIT" "https://github.com/nlohmann/json/archive/${SPARKLE_NLOHMANN_JSON_REVISION}.tar.gz")
+block(SCOPE_FOR VARIABLES)
+    set(JSON_BuildTests OFF)
+    set(JSON_Install OFF)
+    set(JSON_CI OFF)
+    set(JSON_ImplicitConversions OFF)
+    set(JSON_Diagnostics OFF)
+    set(JSON_Diagnostic_Positions OFF)
+    set(JSON_LegacyDiscardedValueComparison OFF)
+    sparkle_add_dependency_subdirectory(${nlohmann_json_SOURCE_DIR} ${nlohmann_json_BINARY_DIR})
+endblock()
+
+sparkle_add_dependency_source_package(nlohmann_json nlohmann_json)
+sparkle_add_bundled_source_package(nlohmann_json nlohmann_json "nlohmann/json bundled Hedley" "MIT AND CC0-1.0"
+    include/nlohmann/thirdparty/hedley/hedley.hpp LICENSES/CC0-1.0.txt)
+sparkle_add_bundled_source_package(nlohmann_json nlohmann_json "nlohmann/json bundled Grisu2" MIT
+    include/nlohmann/detail/conversions/to_chars.hpp LICENSE.MIT)
+sparkle_add_bundled_source_package(nlohmann_json nlohmann_json "nlohmann/json bundled Zmij" MIT
+    include/nlohmann/detail/conversions/zmij.hpp LICENSE.MIT)

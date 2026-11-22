@@ -82,7 +82,12 @@ void UI::Implementation::HandleTransactionShortcuts(bool bDisableInteraction)
 void UI::Implementation::BeginInputRouting(bool bDisableInteraction)
 {
 	const ImGuiIO& io = ImGui::GetIO();
-	m_inputSystem.BeginInputRoutingFrame(bDisableInteraction, io.WantTextInput || io.WantCaptureKeyboard);
+	const bool bPopupOpen = ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
+	const bool bInteractionBlocked = bDisableInteraction || bPopupOpen;
+	// Keyboard navigation can claim a focused viewport even while camera look owns the pointer.
+	const bool bUiKeyboardCapture = io.WantCaptureKeyboard && !m_inputSystem.IsMouseCaptured();
+	const bool bTextInputActive = io.WantTextInput || bUiKeyboardCapture;
+	m_inputSystem.BeginInputRoutingFrame(bInteractionBlocked, bTextInputActive);
 }
 
 float UI::Implementation::BuildMainMenuBar()

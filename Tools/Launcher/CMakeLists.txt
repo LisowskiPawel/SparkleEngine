@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.30)
 
 get_filename_component(SPARKLE_REPOSITORY_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
 include(${SPARKLE_REPOSITORY_ROOT}/CMake/SparkleArtifactContract.cmake)

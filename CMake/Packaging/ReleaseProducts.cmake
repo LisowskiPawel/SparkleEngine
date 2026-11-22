@@ -31,27 +31,10 @@ foreach(_product IN ITEMS
     set(_source_packages "")
     if(TARGET ${_target})
 
-        # Follow the declared graph, including private object libraries that own header-only SDK use.
-        set(_pending_targets ${_target})
-        set(_visited_targets)
-        while(_pending_targets)
-            list(POP_FRONT _pending_targets _dependency)
-            if(NOT TARGET ${_dependency} OR _dependency IN_LIST _visited_targets)
-                continue()
-            endif()
-            list(APPEND _visited_targets ${_dependency})
-            get_target_property(_source_package ${_dependency} SPARKLE_SOURCE_PACKAGE)
-            if(_source_package)
-                list(APPEND _source_packages "${_source_package}")
-            endif()
-            foreach(_link_property IN ITEMS LINK_LIBRARIES INTERFACE_LINK_LIBRARIES)
-                get_target_property(_dependencies ${_dependency} ${_link_property})
-                if(_dependencies)
-                    list(APPEND _pending_targets ${_dependencies})
-                endif()
-            endforeach()
-        endwhile()
-        list(REMOVE_DUPLICATES _source_packages)
+        # Let CMake select conditional, private/static and LINK_ONLY contributors.
+        set_property(TARGET ${_target} APPEND PROPERTY TRANSITIVE_LINK_PROPERTIES SPARKLE_SOURCE_PACKAGES)
+        set(_source_packages "$<REMOVE_DUPLICATES:$<TARGET_GENEX_EVAL:${_target},$<TARGET_PROPERTY:${_target},SPARKLE_SOURCE_PACKAGES>>>")
+        set(_source_packages "$<JOIN:${_source_packages},,>")
 
         string(TOUPPER "${_profile}" _profile_upper)
         get_target_property(_runtime_directory ${_target} RUNTIME_OUTPUT_DIRECTORY_${_profile_upper})
@@ -75,7 +58,6 @@ foreach(_product IN ITEMS
 
     endif()
     list(JOIN _runtime_json "," _runtime_json)
-    list(JOIN _source_packages "," _source_packages)
     list(APPEND _sparkle_release_products_${_profile}
         "{\"Component\":\"${_component}\",\"Target\":\"${_target}\",\"Configuration\":\"${_profile}\",\"Source\":\"${_source}\",\"Symbols\":\"${_symbols}\",\"MSVCRuntime\":[${_runtime_json}],\"RuntimeSupport\":[${_support_json}],\"SourcePackages\":[${_source_packages}],\"Path\":\"${_directory}/${_target}.exe\"}")
 endforeach()

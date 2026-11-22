@@ -1,21 +1,18 @@
 #include "PCH.h"
-#include "Window/Window.h"
+#include "Window/WindowNativeState.h"
+#include "Window/Win32WindowInterop.h"
 
-Window::Window(std::string_view windowTitle)
+Window::Window(std::string_view windowTitle) :
+    m_native(std::make_unique<NativeState>(*this))
 {
-	InitializeNativeWindow(windowTitle);
-	ApplyInitialWindowState();
+	m_native->Initialize(windowTitle);
+	RefreshNativeState();
 }
 
 Window::~Window()
 {
-	DestroyNativeWindow();
-}
-
-void Window::PollEvents() noexcept
-{
-	ApplyPendingShowCommand();
-	PumpNativeMessages();
+	// Detach native callbacks while all of the Window's published state is still alive.
+	m_native->Shutdown();
 }
 
 bool Window::HasValidSize() const noexcept
@@ -23,56 +20,37 @@ bool Window::HasValidSize() const noexcept
 	return GetWidth() > 0 && GetHeight() > 0;
 }
 
-Window::State Window::GetState() const noexcept
+void* GetWin32WindowHandle(const Window& window) noexcept
 {
-	if (IsMinimized())
-	{
-		return State::Minimized;
-	}
-
-	return IsFullScreen() ? State::FullScreen : m_state;
+	return window.m_native->NativeHandle;
 }
 
-bool Window::IsMaximized() const noexcept
+SDL_Window* GetSdlWindow(const Window& window) noexcept
 {
-	return GetState() == State::Maximized;
+	window.m_native->Thread.AssertAccess();
+	return window.m_native->Handle;
 }
 
-void Window::SetFullScreen(bool bFullScreen)
+Event<void(const SdlWindowEvent&), 16>& GetSdlWindowEvents(Window& window) noexcept
 {
-	if (IsFullScreen() == bFullScreen)
-	{
-		return;
-	}
-
-	if (bFullScreen)
-	{
-		EnterFullScreen();
-	}
-	else
-	{
-		RestoreWindowedMode();
-	}
+	window.m_native->Thread.AssertAccess();
+	return window.m_native->Events;
 }
 
-void Window::ToggleFullScreen()
+bool IsSdlWindowEventCurrent(const Window& window, const SdlWindowEvent& event) noexcept
 {
-	SetFullScreen(!IsFullScreen());
+	window.m_native->Thread.AssertAccess();
+	const bool bPointerEvent = event.Value.type >= SDL_EVENT_MOUSE_MOTION && event.Value.type <= SDL_EVENT_MOUSE_WHEEL;
+	const bool bPointerCurrent = !bPointerEvent || window.m_native->PointerCancellationEpoch == event.PointerCancellationEpoch;
+	return window.m_native->CancellationEpoch == event.CancellationEpoch && bPointerCurrent;
 }
 
-void Window::ToggleMaximizeRestore() noexcept
+void Window::RequestClose() noexcept
 {
-	if (IsFullScreen())
+	m_native->Thread.AssertAccess();
+	if (!m_bShouldClose)
 	{
-		return;
-	}
-
-	if (IsMaximized())
-	{
-		Restore();
-	}
-	else
-	{
-		Maximize();
+		m_bShouldClose = true;
+		CancelInput(InputCancellation::All);
 	}
 }

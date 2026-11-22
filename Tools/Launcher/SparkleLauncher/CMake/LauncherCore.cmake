@@ -18,6 +18,8 @@ set(SPARKLE_LAUNCHER_CORE_PUBLIC_HEADERS
 )
 
 set(SPARKLE_LAUNCHER_CORE_FOUNDATION_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dependencies/SourceDependencyCacheAccess.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dependencies/SourceDependencyCacheAccess.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Operations/LauncherOperationExecution.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Operations/LauncherOperationExecution.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/BuildProfileCatalog.cpp
@@ -167,18 +169,9 @@ sparkle_target_precompile_headers(SparkleLauncherCore
     <vector>
 )
 
-list(JOIN SPARKLE_BOOST_REQUIRED_PATHS "\", \"" _sparkle_boost_required_cpp)
+include("${CMAKE_CURRENT_LIST_DIR}/SourceDependencyFacts.cmake")
+
 target_compile_definitions(SparkleLauncherCore
-    PRIVATE
-        SPARKLE_NLOHMANN_JSON_REVISION="${SPARKLE_NLOHMANN_JSON_REVISION}"
-        SPARKLE_NLOHMANN_JSON_VERSION="${SPARKLE_NLOHMANN_JSON_VERSION}"
-        SPARKLE_BOOST_REVISION="${SPARKLE_BOOST_REVISION}"
-        SPARKLE_BOOST_VERSION="${SPARKLE_BOOST_VERSION}"
-        "SPARKLE_BOOST_REQUIRED_FILES=\"${_sparkle_boost_required_cpp}\""
-        SPARKLE_DIRECTXTEX_REVISION="${SPARKLE_DIRECTXTEX_REVISION}"
-        SPARKLE_KTX_REVISION="${SPARKLE_KTX_REVISION}"
-        SPARKLE_OZZ_ANIMATION_REVISION="${SPARKLE_OZZ_ANIMATION_REVISION}"
-        SPARKLE_SHADERMAKE_REVISION="${SPARKLE_SHADERMAKE_REVISION}"
     PUBLIC
         SPARKLE_ENABLE_CONTENT_PIPELINE=$<BOOL:${SPARKLE_ENABLE_CONTENT_PIPELINE}>
         SPARKLE_ENABLE_SHADER_COMPILER=$<BOOL:${SPARKLE_ENABLE_SHADER_COMPILER}>

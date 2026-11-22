@@ -1,15 +1,9 @@
 include(FetchContent)
 
-# Suppress the CMP0169 warning in CMake 4.x - we need FetchContent_Populate()
-# because several deps have no usable top-level CMakeLists.txt.
-if(POLICY CMP0169)
-    cmake_policy(SET CMP0169 OLD)
-endif()
-
 function(sparkle_add_dependency_subdirectory source_dir binary_dir)
     # Keep upstream status chatter out of normal workspace configuration.
     set(CMAKE_MESSAGE_LOG_LEVEL WARNING)
-    add_subdirectory("${source_dir}" "${binary_dir}" ${ARGN})
+    add_subdirectory("${source_dir}" "${binary_dir}" SYSTEM ${ARGN})
 endfunction()
 
 # Locate Git once - used by FetchContent, cache verification, and sparse checkout.

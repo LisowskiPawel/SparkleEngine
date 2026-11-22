@@ -1,6 +1,7 @@
 
-set(_sparkle_streamline_url "https://github.com/NVIDIA-RTX/Streamline/releases/download/v2.11.1/streamline-sdk-v2.11.1.zip")
-set(_sparkle_streamline_zip "${FETCHCONTENT_BASE_DIR}/streamline-sdk-v2.11.1.zip")
+set(_sparkle_streamline_version "2.11.1")
+set(_sparkle_streamline_url "https://github.com/NVIDIA-RTX/Streamline/releases/download/v${_sparkle_streamline_version}/streamline-sdk-v${_sparkle_streamline_version}.zip")
+set(_sparkle_streamline_zip "${FETCHCONTENT_BASE_DIR}/streamline-sdk-v${_sparkle_streamline_version}.zip")
 set(_sparkle_streamline_root "${FETCHCONTENT_BASE_DIR}/streamline-sdk-src")
 set(_sparkle_streamline_runtime_files
     "bin/x64/sl.interposer.dll"
@@ -22,14 +23,24 @@ set(_sparkle_streamline_notice_files
     "bin/x64/reflex.license.txt"
 )
 
+set(_sparkle_streamline_required_paths "include/sl.h" "lib/x64/sl.interposer.lib"
+    ${_sparkle_streamline_runtime_files} ${_sparkle_streamline_notice_files})
+get_filename_component(_cache_directory "${_sparkle_streamline_root}" NAME)
+get_filename_component(_archive_name "${_sparkle_streamline_zip}" NAME)
+sparkle_record_source_dependency(nvidia-streamline VERSION "${_sparkle_streamline_version}"
+    PACKAGE_NAME "NVIDIA Streamline" LICENSE_ID "MIT AND LicenseRef-NVIDIA-RTX-SDK" LOCATION "${_sparkle_streamline_url}"
+    CACHE_DIRECTORY "${_cache_directory}" REQUIRED_PATHS ${_sparkle_streamline_required_paths} CACHE_FILES "${_archive_name}")
+if(SPARKLE_SOURCE_DEPENDENCY_METADATA_ONLY)
+    return()
+endif()
+
 sparkle_ensure_archive_dependency(
     DISPLAY_NAME "NVIDIA Streamline SDK"
     URL "${_sparkle_streamline_url}"
     ARCHIVE_PATH "${_sparkle_streamline_zip}"
     ROOT_PATH "${_sparkle_streamline_root}"
     EXPECTED_HASH "SHA256=0C1D562E59557434CABFB8997157CB8C04FC7D23F077C8BDF5260975B73DFB89"
-    REQUIRED_PATHS "include/sl.h" "lib/x64/sl.interposer.lib"
-        ${_sparkle_streamline_runtime_files} ${_sparkle_streamline_notice_files}
+    REQUIRED_PATHS ${_sparkle_streamline_required_paths}
 )
 
 if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
@@ -44,6 +55,7 @@ if(NOT TARGET NVIDIA::Streamline)
     )
 endif()
 
+sparkle_add_dependency_source_package(NVIDIA::Streamline nvidia-streamline)
 list(TRANSFORM _sparkle_streamline_runtime_files PREPEND "${_sparkle_streamline_root}/")
 list(TRANSFORM _sparkle_streamline_notice_files PREPEND "${_sparkle_streamline_root}/")
 set_target_properties(NVIDIA::Streamline PROPERTIES

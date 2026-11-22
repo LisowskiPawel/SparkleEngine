@@ -17,7 +17,7 @@
 #include "Viewport/ViewportPanel.h"
 #include "Viewport/ViewportToolbar.h"
 #include "Settings/EngineRenderingSettingsController.h"
-#include "Renderer/Public/UI/ImGuiRenderPacketBuilder.h"
+#include "ImGui/ImGuiRenderPacketBuilder.h"
 #include "Style/SparkleUiTheme.h"
 #include "Viewport/EditorViewportSession.h"
 
@@ -97,7 +97,7 @@ void UI::Implementation::ConfigureMainMenuBarWindowActions()
 
 void UI::Implementation::InitializeImGuiContext()
 {
-	m_imguiContext = std::make_unique<EditorImGuiContext>(m_window);
+	m_imguiContext = std::make_unique<EditorImGuiContext>(m_window, m_inputSystem);
 	m_imguiContext->Initialize();
 	ImGuiRenderPacketBuilder::ConfigureProducerContext();
 	SparkleUiTheme::ConfigureTypography();

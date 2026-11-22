@@ -9,23 +9,19 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
-#include <variant>
 
-struct WindowMessageEvent;
-struct InputFocusLost;
-struct InputCaptureLost;
+struct SdlWindowEvent;
 
 struct InputSystem::State final
 {
 	static constexpr std::size_t RoutedLayerCount = static_cast<std::size_t>(InputLayer::Count) - 1;
 
-	void HandleWindowMessage(const WindowMessageEvent& event);
+	void HandleWindowEvent(const SdlWindowEvent& event);
 	InputState& GetRoutedState(InputLayer layer) noexcept;
 	void SetActiveLayer(InputLayer layer);
-	void UpdateMouseMoveDelta(MouseMoveEvent& event) noexcept;
 
-	void ReleaseMouse();
-	void SetCursorVisibility(bool bVisible);
+	bool ReleaseRelativeMode();
+	bool DisableNativeRelativeMode();
 
 	void CancelInput();
 	void CancelPointerInput();
@@ -36,9 +32,6 @@ struct InputSystem::State final
 	void ReleaseStateMouseButtons(const InputState& state, InputLayer layer);
 
 	template <typename TEvent> void ProcessEvent(const TEvent& event);
-	void ProcessEvent(const std::monostate&) noexcept;
-	void ProcessEvent(const InputFocusLost&);
-	void ProcessEvent(const InputCaptureLost&);
 
 	static void UpdateStateFromEvent(InputState& state, const KeyboardEvent& event);
 	static void UpdateStateFromEvent(InputState& state, const MouseButtonEvent& event);
@@ -51,9 +44,7 @@ struct InputSystem::State final
 	std::array<InputState, RoutedLayerCount> LayerStates;
 	InputLayer MouseCaptureLayer = InputLayer::System;
 	std::uint64_t CancellationEpoch = 0;
-	std::int32_t LastMouseX = 0;
-	std::int32_t LastMouseY = 0;
-	bool bHasLastMousePosition = false;
-	void* WindowHandle = nullptr;
-	ScopedEventHandle WindowMessageHandle;
+	Window* BoundWindow = nullptr;
+	ScopedEventHandle WindowEventHandle;
+	ScopedEventHandle WindowCancellationHandle;
 };

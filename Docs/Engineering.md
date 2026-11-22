@@ -20,7 +20,9 @@ The recorded Windows toolchain is:
 
 Other combinations need separate testing. These versions describe the recorded setup, not the latest available releases.
 
-The project minimum is CMake 3.30; the [Visual Studio 18 2026 generator](https://cmake.org/cmake/help/latest/generator/Visual%20Studio%2018%202026.html) below requires 4.2+. Launcher uses four build jobs; direct builds select `--parallel`. Private PCHs do not replace explicit includes.
+The offline shader tool stages ShaderMake, `dxc.exe`, `slangc.exe` and their DLL/module payloads through its CMake owner. `DXC_SDK_ROOT`, `SLANG_SDK_ROOT` and `SPIRV_TOOLS_SDK_ROOT` select explicit SDK inputs; ShaderMake does not acquire compilers. The tool's `slang-standard-module-*` trees are managed SDK payload: unchanged preparation preserves them; SDK changes repair/prune their contents. Slang 2026.8 full-PDB CLI export needs the pinned [loop-location](../CMake/Dependencies/Patches/SlangLoopSourceLocations.patch) and [debug-format](../CMake/Dependencies/Patches/SlangDebugInformationFormat.patch) corrections. Use short paths: the SDK directory exporter can omit long-path artifacts, which the cooker rejects. Ordinary SDK setup does not amend qualified GPU-crash receipts.
+
+The project and standalone Launcher minimum is CMake 3.30, including its configuration-aware transitive dependency metadata; the [Visual Studio 18 2026 generator](https://cmake.org/cmake/help/latest/generator/Visual%20Studio%2018%202026.html) below requires 4.2+. Launcher uses four build jobs; direct builds select `--parallel`. Private PCHs do not replace explicit includes.
 
 ### Build Launcher
 
@@ -74,7 +76,7 @@ Put stable contracts in `Public` and implementation in `Private`. New public API
 
 Core is the base dependency. GameFramework does not depend on Renderer or RHI; RHI does not depend on Renderer. Native types remain inside the backend or an explicit interop interface. Dependencies follow actual public use, not convenient transitive includes.
 
-Use the [dependency workflow](ThirdPartyMigration.md#ownership-and-dependency-workflow) for external source separation, pinning, sync and distribution metadata.
+Use the [integration contract](ThirdPartyMigration.md#ownership-and-dependency-workflow) for identifiable vendor source, Sparkle build bindings and native adapters. Linkage, public usage and allocator/context lifetime follow the actual library/module boundary. Prepared cooking uses existing tools; build reuse, verified input admission, runtime repair and configuration-correct distribution metadata require their own checks. Existing exceptions follow the [staged refinement](Implementation/ThirdPartyIntegration.md).
 
 For replacements, name the mechanism being retired and the policy retained. Assess the complete producer-to-consumer change, including callers and adapters. Moving code earns no removal credit; report non-native, generated, dependency and build/runtime costs separately. Keep capability additions distinct from simplification.
 
@@ -111,7 +113,7 @@ The source owners are:
 | `Engine/Assets` | Shader passes, shared shader mathematics/material rules and default textures |
 | `Tools/Import/SourceImporters` | Offline source-format adapters and imported scene contracts |
 | `Tools/Cooking` | Asset discovery/dispatch and asset-family processing/publication |
-| `Tools/Shaders/ShaderCompiler` | Compiler backends, source resolution, verification and cooked shader publication |
+| `Tools/Shaders/ShaderCompiler` | ShaderMake batch integration, source identity, metadata/ABI verification and cooked shader publication |
 | `Tools/Support/ToolSupport` | Shared catalogs, paths and console/progress contracts |
 | `Tools/Launcher/SparkleLauncher` | Workspace/build/cook/run operations, shell, GUI and scene selection |
 | `Projects/Showcase` | Thin product entry points, project assets/levels and offline conversion |

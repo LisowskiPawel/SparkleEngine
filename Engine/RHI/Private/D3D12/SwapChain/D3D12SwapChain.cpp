@@ -1,4 +1,5 @@
 #include "PCH.h"
+#include "Platform/Public/Window/Win32WindowInterop.h"
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "D3D12/Diagnostics/GpuCrash/D3D12GpuCrash.h"
 #endif
@@ -105,7 +106,7 @@ void D3D12SwapChain::Create()
 
 		const HRESULT createResult = externalFactory->CreateSwapChainForHwnd(
 		    m_rhi.GetPresentationCommandQueue(),
-		    m_window->GetHWND(),
+		    static_cast<HWND>(GetWin32WindowHandle(*m_window)),
 		    &swapChainDesc,
 		    &swapChainFullsceenDesc,
 		    nullptr,
@@ -127,7 +128,13 @@ void D3D12SwapChain::Create()
 	}
 
 	ComPtr<IDXGISwapChain1> swapChain;
-	CHECK(m_rhi.GetDxgiFactory()->CreateSwapChainForHwnd(m_rhi.GetCommandQueue().Get(), m_window->GetHWND(), &swapChainDesc, &swapChainFullsceenDesc, nullptr, swapChain.ReleaseAndGetAddressOf()));
+	CHECK(m_rhi.GetDxgiFactory()->CreateSwapChainForHwnd(
+	    m_rhi.GetCommandQueue().Get(),
+	    static_cast<HWND>(GetWin32WindowHandle(*m_window)),
+	    &swapChainDesc,
+	    &swapChainFullsceenDesc,
+	    nullptr,
+	    swapChain.ReleaseAndGetAddressOf()));
 	CHECK(swapChain.As(&m_swapChain));
 	m_rhi.NotifyInterposerPresentationReady(false);
 }

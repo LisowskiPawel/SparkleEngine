@@ -78,12 +78,7 @@ void CameraInputIntentCollector::OnMouseButton(const MouseButtonEvent& event) no
 	}
 	if (event.IsPressed() && !m_bMouseLookActive)
 	{
-		m_inputSystem.CaptureMouse();
-		m_bMouseLookActive = m_inputSystem.IsMouseCaptured();
-		if (m_bMouseLookActive)
-		{
-			m_inputSystem.SetCursorVisibility(false);
-		}
+		m_bMouseLookActive = m_inputSystem.SetRelativeMouseMode(true);
 	}
 	else if (event.IsReleased() && m_bMouseLookActive)
 	{
@@ -106,9 +101,8 @@ void CameraInputIntentCollector::OnMouseMove(const MouseMoveEvent& event) noexce
 		return;
 	}
 
-	m_lookDeltaX += static_cast<float>(event.Delta.X);
-	m_lookDeltaY += static_cast<float>(event.Delta.Y);
-	m_inputSystem.CenterCursor();
+	m_lookDeltaX += event.Delta.X;
+	m_lookDeltaY += event.Delta.Y;
 }
 
 void CameraInputIntentCollector::OnMouseWheel(const MouseWheelEvent& event) noexcept
@@ -129,6 +123,5 @@ void CameraInputIntentCollector::EndMouseLook() noexcept
 	m_bMouseLookActive = false;
 	m_lookDeltaX = 0.0f;
 	m_lookDeltaY = 0.0f;
-	m_inputSystem.ReleaseMouse();
-	m_inputSystem.SetCursorVisibility(true);
+	m_inputSystem.SetRelativeMouseMode(false);
 }

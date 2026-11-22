@@ -11,17 +11,32 @@
 set(_sparkle_zlib_revision 51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf)
 sparkle_declare_git_dependency(zlib
     https://github.com/madler/zlib.git
-    ${_sparkle_zlib_revision})
-FetchContent_Populate(zlib)
+    ${_sparkle_zlib_revision}
+    ID zlib VERSION "1.3.1" PACKAGE_NAME "zlib" LICENSE_ID "Zlib"
+    REQUIRED_PATHS CMakeLists.txt zlib.h LICENSE)
 
-if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
+if(SPARKLE_SOURCE_DEPENDENCY_METADATA_ONLY OR NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
     return()
 endif()
 
-set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-sparkle_add_dependency_subdirectory(${zlib_SOURCE_DIR} ${zlib_BINARY_DIR} EXCLUDE_FROM_ALL)
-sparkle_set_source_package(zlibstatic "zlib" "1.3.1"
-    "Zlib" "https://github.com/madler/zlib/tree/${_sparkle_zlib_revision}")
+# This upstream CMake renames its source zconf.h. Configure unchanged tracked
+# bytes in this tree's private copy, omitting that unused pregenerated header.
+set(_zlib_build_source "${zlib_BINARY_DIR}/source-${_sparkle_zlib_revision}")
+execute_process(COMMAND "${GIT_EXECUTABLE}" ls-files
+    WORKING_DIRECTORY "${zlib_SOURCE_DIR}" OUTPUT_VARIABLE _zlib_files
+    OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
+string(REPLACE "\n" ";" _zlib_files "${_zlib_files}")
+foreach(file IN LISTS _zlib_files)
+    if(NOT file STREQUAL zconf.h)
+        configure_file("${zlib_SOURCE_DIR}/${file}" "${_zlib_build_source}/${file}" COPYONLY)
+    endif()
+endforeach()
+block(SCOPE_FOR VARIABLES)
+    set(ZLIB_BUILD_EXAMPLES OFF)
+    sparkle_add_dependency_subdirectory("${_zlib_build_source}" "${zlib_BINARY_DIR}" EXCLUDE_FROM_ALL)
+endblock()
+
+sparkle_add_dependency_source_package(zlibstatic zlib)
 
 if(TARGET zlibstatic AND NOT TARGET ZLIB::ZLIB)
     add_library(ZLIB::ZLIB ALIAS zlibstatic)

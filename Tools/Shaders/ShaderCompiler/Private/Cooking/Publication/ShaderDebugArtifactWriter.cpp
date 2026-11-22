@@ -7,6 +7,7 @@
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Formatting/HexFormat.h"
 #include "Core/Public/Paths/PathUtils.h"
+#include "Core/Public/Strings/StringUtils.h"
 #include "Core/Public/Hash/HashUtils.h"
 #include "Cooking/Planning/ShaderCookPipelinePlan.h"
 #include "Core/Public/Paths/FileSystemPaths.h"
@@ -296,7 +297,7 @@ std::string ShaderDebugArtifactWriter::BuildCompileRequestJson(
 	    {"compilerInputPath", (std::filesystem::path("sources") / debugArtifacts.CompilerInputPath).generic_string()},
 	    {"configurationPath", (std::filesystem::path("sources") / debugArtifacts.Invocation->ConfigurationPath).generic_string()},
 	    {"compilerOutputPath", (std::filesystem::path("sources") / compilerOutputPath).generic_string()},
-	    {"executionWorkingDirectory", debugArtifacts.Invocation->WorkingDirectory.generic_string()},
+	    {"executionWorkingDirectory", Strings::ToNarrow(debugArtifacts.Invocation->WorkingDirectory.generic_wstring())},
 	    {"replayWorkingDirectory", "sources"},
 	    {"replayCompilerOverrideRequired", true},
 	    {"optimized", request.bEnableOptimizations},

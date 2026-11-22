@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UiRenderPacket.h"
+#include "Renderer/Public/UI/UiRenderPacket.h"
 
 #include <cstdint>
 
@@ -8,7 +8,7 @@ struct ImDrawData;
 struct ImDrawList;
 struct ImTextureData;
 
-class SPARKLE_RENDERER_API ImGuiRenderPacketBuilder final
+class ImGuiRenderPacketBuilder final
 {
 public:
 	static void ConfigureProducerContext() noexcept;

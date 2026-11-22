@@ -4,6 +4,7 @@
 
 #include "Core/Public/Diagnostics/Error.h"
 #include "ToolOutputPaths.h"
+#include "Core/Public/Files/FileSetPublication.h"
 #include "Core/Public/Files/FileUtils.h"
 
 #include <algorithm>
@@ -23,6 +24,7 @@ std::filesystem::path ShaderDependencyManifest::GetPath(const std::filesystem::p
 
 ShaderDependencyManifest ShaderDependencyManifest::Read(const std::filesystem::path& path)
 {
+	const Files::FileSetReadScope publication(path.parent_path());
 	std::vector<std::uint8_t> bytes;
 	std::string fileError;
 	if (!Files::TryReadAllBytes(path, bytes, fileError))

@@ -1,4 +1,5 @@
 #include "Vulkan/VulkanPCH.h"
+#include "Platform/Public/Window/Win32WindowInterop.h"
 
 #include "Vulkan/SwapChain/VulkanSwapChain.h"
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
@@ -181,12 +182,9 @@ RhiRect VulkanSwapChain::GetDefaultScissorRect() const noexcept
 
 void VulkanSwapChain::CreateSurface()
 {
-	const VkWin32SurfaceCreateInfoKHR createInfo{
-	    .sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
-	    .pNext = nullptr,
-	    .flags = 0,
-	    .hinstance = GetModuleHandleW(nullptr),
-	    .hwnd = m_window != nullptr ? m_window->GetHWND() : nullptr};
+	const HWND hostWindow = m_window != nullptr ? static_cast<HWND>(GetWin32WindowHandle(*m_window)) : nullptr;
+	const auto hostInstance = hostWindow != nullptr ? reinterpret_cast<HINSTANCE>(GetWindowLongPtrW(hostWindow, GWLP_HINSTANCE)) : nullptr;
+	const VkWin32SurfaceCreateInfoKHR createInfo{.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR, .pNext = nullptr, .flags = 0, .hinstance = hostInstance, .hwnd = hostWindow};
 
 	const VkResult result = vkCreateWin32SurfaceKHR(m_rhi.GetInstance(), &createInfo, nullptr, &m_surface);
 	if (!VulkanResult::Succeeded(result))

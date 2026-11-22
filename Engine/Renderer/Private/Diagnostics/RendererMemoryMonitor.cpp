@@ -7,24 +7,21 @@
 #include <utility>
 
 RendererMemoryMonitor::RendererMemoryMonitor(RenderDiagnostics& diagnostics, std::uint32_t pollIntervalFrames) noexcept :
-    m_diagnostics(&diagnostics)
+    m_diagnostics(diagnostics)
 {
 	m_latestSnapshot.PollIntervalFrames = pollIntervalFrames;
 }
 
 void RendererMemoryMonitor::Tick(std::uint64_t frameIndex)
 {
-	const bool bMemoryNotDueDiagnostics = m_diagnostics == nullptr;
-	const bool bMemoryNotDueHasPolled = !bMemoryNotDueDiagnostics && (m_bHasPolled);
-	const bool bMemoryNotDueIntervalFrames = bMemoryNotDueHasPolled && (!HasReachedPollInterval(frameIndex, m_latestSnapshot.LastPollFrame, m_latestSnapshot.PollIntervalFrames));
-	const bool bMemoryPollNotDue = bMemoryNotDueDiagnostics || bMemoryNotDueIntervalFrames;
+	const bool bPollDue = !m_bHasPolled || HasReachedPollInterval(frameIndex, m_latestSnapshot.LastPollFrame, m_latestSnapshot.PollIntervalFrames);
 
-	if (bMemoryPollNotDue)
+	if (!bPollDue)
 	{
 		return;
 	}
 
-	RenderMemoryDiagnostics* memoryDiagnostics = m_diagnostics->GetMemoryDiagnostics();
+	RenderMemoryDiagnostics* memoryDiagnostics = m_diagnostics.GetMemoryDiagnostics();
 	if (memoryDiagnostics == nullptr || !memoryDiagnostics->SupportsBudgetQueries())
 	{
 		m_latestSnapshot.bAvailable = false;

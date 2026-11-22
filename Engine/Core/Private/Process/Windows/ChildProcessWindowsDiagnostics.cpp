@@ -1,26 +1,11 @@
 #include "Process/Windows/ChildProcessWindows.h"
+#include "Strings/StringUtils.h"
+
+#include <memory>
 
 #if defined(_WIN32)
 namespace Process
 {
-	std::string WideToUtf8(std::wstring_view text)
-	{
-		if (text.empty())
-		{
-			return {};
-		}
-
-		const int length = WideCharToMultiByte(CP_UTF8, 0, text.data(), static_cast<int>(text.size()), nullptr, 0, nullptr, nullptr);
-		if (length <= 0)
-		{
-			return "Unknown Windows error";
-		}
-
-		std::string result(static_cast<std::size_t>(length), '\0');
-		WideCharToMultiByte(CP_UTF8, 0, text.data(), static_cast<int>(text.size()), result.data(), length, nullptr, nullptr);
-		return result;
-	}
-
 	std::string FormatWindowsProcessError(DWORD code)
 	{
 		LPWSTR raw = nullptr;
@@ -34,12 +19,9 @@ namespace Process
 		    0,
 		    nullptr);
 
-		const std::wstring_view systemMessage = raw != nullptr ? std::wstring_view(raw, length) : std::wstring_view{};
-		std::string message = systemMessage.empty() ? "Unknown Windows error" : WideToUtf8(systemMessage);
-		if (raw != nullptr)
-		{
-			LocalFree(raw);
-		}
+		const std::unique_ptr<wchar_t, decltype(&LocalFree)> buffer(raw, &LocalFree);
+		const std::wstring_view systemMessage = buffer != nullptr ? std::wstring_view(buffer.get(), length) : std::wstring_view{};
+		std::string message = systemMessage.empty() ? "Unknown Windows error" : Strings::ToNarrow(systemMessage);
 
 		const std::size_t lastContent = message.find_last_not_of(" \t\r\n");
 		message.erase(lastContent == std::string::npos ? 0 : lastContent + 1);

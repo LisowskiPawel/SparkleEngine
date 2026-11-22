@@ -1,104 +1,146 @@
 #include "PCH.h"
-#include "Window/Window.h"
+#include "Window/WindowNativeState.h"
 
-LRESULT CALLBACK Window::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+#include <commctrl.h>
+
+struct CanceledSdlInput final
 {
-	Window* window = nullptr;
-	if (msg == WM_NCCREATE)
-	{
-		const auto* create = reinterpret_cast<const CREATESTRUCTW*>(lParam);
-		window = static_cast<Window*>(create->lpCreateParams);
-		SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(window));
-		window->m_hWnd = hWnd;
-	}
-	else
-	{
-		window = reinterpret_cast<Window*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
-	}
-	if (window == nullptr)
-	{
-		return DefWindowProcW(hWnd, msg, wParam, lParam);
-	}
+	SDL_WindowID WindowId;
+	InputCancellation Scope;
+};
 
-	const LRESULT result = window->HandleMessage(msg, wParam, lParam);
-	if (msg == WM_NCDESTROY)
+static bool SDLCALL KeepPendingSdlEvent(void* userData, SDL_Event* event) noexcept
+{
+	const auto& canceled = *static_cast<const CanceledSdlInput*>(userData);
+	switch (event->type)
 	{
-		SetWindowLongPtrW(hWnd, GWLP_USERDATA, 0);
-		window->m_hWnd = nullptr;
-		window->RequestClose();
+		case SDL_EVENT_MOUSE_MOTION:
+			return event->motion.windowID != canceled.WindowId;
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
+			return event->button.windowID != canceled.WindowId;
+		case SDL_EVENT_MOUSE_WHEEL:
+			return event->wheel.windowID != canceled.WindowId;
+		case SDL_EVENT_KEY_DOWN:
+		case SDL_EVENT_KEY_UP:
+			return canceled.Scope != InputCancellation::All || event->key.windowID != canceled.WindowId;
+		case SDL_EVENT_TEXT_INPUT:
+			return canceled.Scope != InputCancellation::All || event->text.windowID != canceled.WindowId;
+		case SDL_EVENT_TEXT_EDITING:
+			return canceled.Scope != InputCancellation::All || event->edit.windowID != canceled.WindowId;
+		case SDL_EVENT_TEXT_EDITING_CANDIDATES:
+			return canceled.Scope != InputCancellation::All || event->edit_candidates.windowID != canceled.WindowId;
+		default:
+			return true;
 	}
-	return result;
 }
 
-LRESULT Window::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam)
+void Window::CancelInput(InputCancellation cancellation) noexcept
 {
-	WindowMessageEvent event{m_hWnd, msg, wParam, lParam, false};
-	OnWindowMessage.Broadcast(event);
-	// Subscribers can consume default handling, but cannot veto native state changes.
-	switch (msg)
+	++m_native->PointerCancellationEpoch;
+	if (cancellation == InputCancellation::All)
 	{
-		case WM_SIZE:
-			OnSizeChanged(wParam, lParam);
-			return 0;
-		case WM_DPICHANGED:
-			HandleDpiChanged(wParam, lParam);
-			return 0;
-		case WM_DESTROY:
-			RequestClose();
-			return 0;
+		++m_native->CancellationEpoch;
 	}
-
-	if (event.bHandled)
-	{
-		return 0;
-	}
-
-	switch (msg)
-	{
-		case WM_NCCALCSIZE:
-			return HandleNonClientSize(wParam, lParam);
-		case WM_NCHITTEST:
-			return HandleResizeHitTest(wParam, lParam);
-		case WM_GETMINMAXINFO:
-			return HandleTrackSizeConstraints(lParam);
-		case WM_CLOSE:
-			RequestClose();
-			return 0;
-		case WM_KEYDOWN:
-		case WM_SYSKEYDOWN:
-			if (HandleWindowShortcut(msg, wParam, lParam))
-			{
-				return 0;
-			}
-
-			break;
-		case WM_ERASEBKGND:
-			return 1;
-	}
-
-	return DefWindowProcW(event.hWnd, msg, wParam, lParam);
+	// Synchronous native cancellation can interrupt SDL's pump before its queued input is delivered.
+	// Discard that pending input as well as invalidating the event already borrowed by observers.
+	CanceledSdlInput canceled{SDL_GetWindowID(m_native->Handle), cancellation};
+	SDL_FilterEvents(KeepPendingSdlEvent, &canceled);
+	OnInputCanceled.Broadcast(cancellation);
 }
 
-void Window::PumpNativeMessages() noexcept
+void Window::PollEvents() noexcept
 {
-	MSG message{};
-	while (PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE))
+	m_native->Thread.AssertAccess();
+	ApplyPendingShowCommand();
+	SDL_Event event;
+	bool bNativeStateRefreshed = false;
+	while (SDL_PollEvent(&event))
 	{
-		if (message.message == WM_QUIT)
+		if (event.type == SDL_EVENT_QUIT)
 		{
 			RequestClose();
 			continue;
 		}
-		TranslateMessage(&message);
-		DispatchMessageW(&message);
+		if (SDL_GetWindowFromEvent(&event) != m_native->Handle)
+		{
+			continue;
+		}
+		// SDL acquires a batch first; publish its native state before the first observer.
+		const bool bWindowEvent = event.type >= SDL_EVENT_WINDOW_FIRST && event.type <= SDL_EVENT_WINDOW_LAST;
+		if (!bNativeStateRefreshed || bWindowEvent)
+		{
+			RefreshNativeState();
+			bNativeStateRefreshed = true;
+		}
+		switch (event.type)
+		{
+			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+				RequestClose();
+				break;
+			case SDL_EVENT_WINDOW_FOCUS_LOST:
+			case SDL_EVENT_WINDOW_MINIMIZED:
+				CancelInput(InputCancellation::All);
+				break;
+			case SDL_EVENT_KEY_DOWN:
+				if (!event.key.repeat)
+				{
+					const bool bAltReturn = event.key.key == SDLK_RETURN && (event.key.mod & SDL_KMOD_ALT) != 0;
+					if (event.key.key == SDLK_F11 || bAltReturn)
+					{
+						ToggleFullScreen();
+					}
+				}
+				break;
+			default:
+				break;
+		}
+		const SdlWindowEvent borrowed{event, m_native->CancellationEpoch, m_native->PointerCancellationEpoch};
+		m_native->Events.Broadcast(borrowed);
 	}
 }
 
 void Window::WaitForEvent() noexcept
 {
-	if (m_hWnd == nullptr || m_bShouldClose)
+	m_native->Thread.AssertAccess();
+	// A null destination waits without consuming the wake event; PollEvents delivers it once.
+	if (!m_native->CheckOperation(SDL_WaitEvent(nullptr), "SDL event wait"))
 	{
-		return;
+		RequestClose();
 	}
-	WaitMessage();
+}
+
+bool SetSdlWindowRelativeMode(Window& window, bool bEnabled) noexcept
+{
+	auto& native = *window.m_native;
+	native.Thread.AssertAccess();
+	if (bEnabled && SDL_GetKeyboardFocus() != native.Handle)
+	{
+		return false;
+	}
+	const bool bWasChangingMode = native.bChangingRelativeMode;
+	native.bChangingRelativeMode = true;
+	const bool bSucceeded = SDL_SetWindowRelativeMouseMode(native.Handle, bEnabled);
+	native.bChangingRelativeMode = bWasChangingMode;
+	return native.CheckOperation(bSucceeded, "SDL relative pointer mode");
+}
+
+LRESULT CALLBACK Window::NativeState::ObserveCancellation(HWND window, UINT message, WPARAM wParam, LPARAM lParam, UINT_PTR subclassId, DWORD_PTR userData) noexcept
+{
+	auto& native = *reinterpret_cast<NativeState*>(userData);
+	const bool bLostCapture = message == WM_CAPTURECHANGED && reinterpret_cast<HWND>(lParam) != window;
+	if (message == WM_CANCELMODE || (bLostCapture && !native.bChangingRelativeMode))
+	{
+		native.Owner.CancelInput(InputCancellation::Pointer);
+	}
+	if (message == WM_ENTERMENULOOP || message == WM_ENTERSIZEMOVE)
+	{
+		native.Owner.CancelInput(InputCancellation::All);
+	}
+	if (message == WM_NCDESTROY)
+	{
+		native.bObservingCancellation = false;
+		RemoveWindowSubclass(window, ObserveCancellation, subclassId);
+	}
+	return DefSubclassProc(window, message, wParam, lParam);
 }

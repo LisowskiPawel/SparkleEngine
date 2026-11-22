@@ -144,13 +144,13 @@ void InputState::SetMouseButtonState(MouseButton button, ButtonState state) noex
 	}
 }
 
-void InputState::SetMousePosition(std::int32_t x, std::int32_t y) noexcept
+void InputState::SetMousePosition(float x, float y) noexcept
 {
 	m_mousePosition.X = x;
 	m_mousePosition.Y = y;
 }
 
-void InputState::AccumulateMouseDelta(std::int32_t deltaX, std::int32_t deltaY) noexcept
+void InputState::AccumulateMouseDelta(float deltaX, float deltaY) noexcept
 {
 	m_mouseDelta.X += deltaX;
 	m_mouseDelta.Y += deltaY;

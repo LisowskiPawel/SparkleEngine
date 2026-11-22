@@ -26,13 +26,11 @@ endforeach()
 sparkle_declare_git_dependency(boost-process
     https://github.com/boostorg/boost.git ${SPARKLE_BOOST_REVISION}
     GIT_SUBMODULES ${_sparkle_boost_modules} tools/cmake
-    GIT_SUBMODULES_RECURSE FALSE GIT_CONFIG submodule.fetchJobs=4)
-FetchContent_Populate(boost-process)
-sparkle_prepare_git_fetchcontent_source(boost-process
-    EXPECTED_REVISION "${SPARKLE_BOOST_REVISION}"
+    GIT_SUBMODULES_RECURSE FALSE GIT_CONFIG submodule.fetchJobs=4
+    ID boost-process VERSION "${SPARKLE_BOOST_VERSION}" PACKAGE_NAME "Boost" LICENSE_ID "BSL-1.0"
     REQUIRED_PATHS ${SPARKLE_BOOST_REQUIRED_PATHS})
 
-if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
+if(SPARKLE_SOURCE_DEPENDENCY_METADATA_ONLY OR NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
     return()
 endif()
 
@@ -53,8 +51,8 @@ function(sparkle_add_boost_process)
     endif()
     foreach(_target IN ITEMS boost_process boost_container boost_context boost_date_time)
         set_target_properties(${_target} PROPERTIES FOLDER "ThirdParty/Boost")
-        sparkle_set_source_package(${_target} "Boost" "${SPARKLE_BOOST_VERSION}"
-            "BSL-1.0" "https://github.com/boostorg/boost/tree/${SPARKLE_BOOST_REVISION}")
+
+        sparkle_add_dependency_source_package(${_target} boost-process)
     endforeach()
 endfunction()
 sparkle_add_boost_process()

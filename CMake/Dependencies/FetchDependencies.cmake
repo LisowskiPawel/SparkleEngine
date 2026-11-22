@@ -3,6 +3,7 @@ set(_sparkle_source_dependencies
     cli11
     nlohmann_json
     nvidia-nvapi
+    sdl3
     imgui
     cgltf
     mikktspace
@@ -20,14 +21,20 @@ set(_sparkle_source_dependencies
     editor-icons
     nvidia-streamline
     winpixeventruntime
+    vma
+    d3d12ma
 )
 
-if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
+if(SPARKLE_SOURCE_DEPENDENCY_METADATA_ONLY)
+    # Read the same recipe declarations, without selecting or acquiring their sources.
+elseif(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
     if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY IN_LIST _sparkle_source_dependencies)
         message(FATAL_ERROR "Unknown source dependency '${SPARKLE_SYNC_SOURCE_DEPENDENCY}'.")
     endif()
     set(_sparkle_source_dependencies "${SPARKLE_SYNC_SOURCE_DEPENDENCY}")
 else()
+    # Graphics owners compose these recipes only when their backend is selected.
+    list(REMOVE_ITEM _sparkle_source_dependencies vma d3d12ma)
     if(DEFINED SPARKLE_SOURCE_DEPENDENCY_ALLOWLIST)
         foreach(_dependency IN LISTS SPARKLE_SOURCE_DEPENDENCY_ALLOWLIST)
             if(NOT _dependency IN_LIST _sparkle_source_dependencies)

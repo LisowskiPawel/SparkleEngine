@@ -4,9 +4,6 @@
 #include "Processing/TextureProcessor.h"
 #include "Core/Public/Diagnostics/Error.h"
 
-#define TINYEXR_USE_MINIZ 0
-#define TINYEXR_IMPLEMENTATION
-#include <zlib.h>
 #include <tinyexr.h>
 
 #include <cstdlib>

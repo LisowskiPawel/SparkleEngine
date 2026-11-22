@@ -1,4 +1,5 @@
 function(download_sparkle_editor_asset url output_path display_name expected_sha256)
+    set_property(GLOBAL APPEND PROPERTY SPARKLE_ADMITTED_SOURCE_FILES "${expected_sha256}|${output_path}")
     if(EXISTS "${output_path}")
         file(SHA256 "${output_path}" _asset_sha256)
         if(NOT _asset_sha256 STREQUAL expected_sha256)
@@ -10,6 +11,14 @@ function(download_sparkle_editor_asset url output_path display_name expected_sha
     get_filename_component(_asset_dir "${output_path}" DIRECTORY)
     file(MAKE_DIRECTORY "${_asset_dir}")
     set(_temporary_path "${output_path}.download")
+    if(EXISTS "${_temporary_path}")
+        file(SHA256 "${_temporary_path}" temporary_hash)
+        if(NOT temporary_hash STREQUAL expected_sha256)
+            message(FATAL_ERROR "Incomplete ${display_name} download preserved at '${_temporary_path}'. Inspect it, then explicitly Clean and Sync.")
+        endif()
+        file(RENAME "${_temporary_path}" "${output_path}" NO_REPLACE)
+        return()
+    endif()
     message(STATUS "    Downloading ${display_name}...")
     file(DOWNLOAD "${url}" "${_temporary_path}"
         STATUS _download_status TLS_VERIFY ON SHOW_PROGRESS
@@ -17,7 +26,6 @@ function(download_sparkle_editor_asset url output_path display_name expected_sha
     list(GET _download_status 0 _download_code)
     list(GET _download_status 1 _download_message)
     if(NOT _download_code EQUAL 0)
-        file(REMOVE "${_temporary_path}")
         message(FATAL_ERROR "Failed to download ${display_name}: ${_download_message}")
     endif()
     file(RENAME "${_temporary_path}" "${output_path}")
@@ -26,8 +34,13 @@ endfunction()
 function(sparkle_collect_missing_relative_paths root_path out_missing_paths)
     set(missing_paths "")
     foreach(relative_path IN LISTS ARGN)
-        if(NOT EXISTS "${root_path}/${relative_path}")
+        if(NOT EXISTS "${root_path}/${relative_path}" OR IS_DIRECTORY "${root_path}/${relative_path}")
             list(APPEND missing_paths "${relative_path}")
+        else()
+            file(SIZE "${root_path}/${relative_path}" size)
+            if(size EQUAL 0)
+                list(APPEND missing_paths "${relative_path}")
+            endif()
         endif()
     endforeach()
     set(${out_missing_paths} "${missing_paths}" PARENT_SCOPE)
@@ -70,8 +83,8 @@ function(sparkle_prepare_git_fetchcontent_source dependency_name)
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET)
 
-    # zlib 1.3.1 moves its tracked header aside during out-of-source configure.
-    # Admit only that exact rename, with the original Git blob still intact.
+    # Accept the historical zlib 1.3.1 source-header rename without rewriting it.
+    # New builds configure a private source copy and never create this exception.
     if(dependency_name STREQUAL "zlib" AND source_status STREQUAL " D zconf.h" AND EXISTS "${ARG_SOURCE_DIR}/zconf.h.included")
         execute_process(
             COMMAND "${GIT_EXECUTABLE}" rev-parse HEAD:zconf.h
@@ -105,54 +118,126 @@ function(sparkle_prepare_git_fetchcontent_source dependency_name)
     set(${source_cache_key} "${ARG_SOURCE_DIR}" CACHE PATH "" FORCE)
 endfunction()
 
-function(sparkle_set_source_package target_name package_name version license location)
-    set_property(TARGET ${target_name} PROPERTY SPARKLE_SOURCE_PACKAGE
-        "{\"name\":\"${package_name}\",\"versionInfo\":\"${version}\",\"licenseDeclared\":\"${license}\",\"downloadLocation\":\"${location}\"}")
+function(sparkle_add_source_package target_name package_name version license location)
+    cmake_parse_arguments(ARG "" "CONDITION" "" ${ARGN})
+    set(package "{\"name\":\"${package_name}\",\"versionInfo\":\"${version}\",\"licenseDeclared\":\"${license}\",\"downloadLocation\":\"${location}\"}")
+    if(ARG_CONDITION)
+        set(package "$<${ARG_CONDITION}:${package}>")
+    endif()
+    set_property(TARGET ${target_name} APPEND PROPERTY SPARKLE_SOURCE_PACKAGES "${package}")
+    set_property(TARGET ${target_name} PROPERTY INTERFACE_SPARKLE_SOURCE_PACKAGES "$<TARGET_PROPERTY:${target_name},SPARKLE_SOURCE_PACKAGES>")
+    set_property(TARGET ${target_name} APPEND PROPERTY TRANSITIVE_LINK_PROPERTIES SPARKLE_SOURCE_PACKAGES)
+endfunction()
+
+# Shipped helper executables and data do not necessarily appear in the link graph.
+function(sparkle_target_source_package_dependencies target_name)
+    foreach(dependency IN LISTS ARGN)
+        set_property(TARGET ${target_name} APPEND PROPERTY SPARKLE_SOURCE_PACKAGES
+            "$<TARGET_PROPERTY:${dependency},SPARKLE_SOURCE_PACKAGES>")
+    endforeach()
+endfunction()
+
+function(sparkle_record_source_dependency dependency_name)
+    cmake_parse_arguments(ARG "" "VERSION;REVISION;CACHE_DIRECTORY;PACKAGE_NAME;LICENSE_ID;LOCATION" "REQUIRED_PATHS;CACHE_FILES" ${ARGN})
+    set(ARG_LICENSE "${ARG_LICENSE_ID}")
+    foreach(field IN ITEMS VERSION CACHE_DIRECTORY PACKAGE_NAME LICENSE LOCATION REQUIRED_PATHS)
+        if("${ARG_${field}}" STREQUAL "")
+            message(FATAL_ERROR "${dependency_name} is missing its ${field} declaration.")
+        endif()
+    endforeach()
+    get_property(dependencies GLOBAL PROPERTY SPARKLE_SOURCE_DEPENDENCIES)
+    if(NOT dependency_name IN_LIST dependencies)
+        set_property(GLOBAL APPEND PROPERTY SPARKLE_SOURCE_DEPENDENCIES "${dependency_name}")
+    endif()
+    foreach(field IN ITEMS VERSION REVISION CACHE_DIRECTORY PACKAGE_NAME LICENSE LOCATION REQUIRED_PATHS CACHE_FILES)
+        set_property(GLOBAL PROPERTY SPARKLE_SOURCE_DEPENDENCY_${dependency_name}_${field} "${ARG_${field}}")
+    endforeach()
+endfunction()
+
+function(sparkle_add_dependency_source_package target_name dependency_name)
+    foreach(field IN ITEMS PACKAGE_NAME VERSION LICENSE LOCATION)
+        get_property(${field} GLOBAL PROPERTY SPARKLE_SOURCE_DEPENDENCY_${dependency_name}_${field})
+        if("${${field}}" STREQUAL "")
+            message(FATAL_ERROR "Missing ${field} for source dependency '${dependency_name}'.")
+        endif()
+    endforeach()
+    sparkle_add_source_package(${target_name} "${PACKAGE_NAME}" "${VERSION}" "${LICENSE}" "${LOCATION}" ${ARGN})
+endfunction()
+
+# Patch only named build inputs. The final copy preserves timestamps when the
+# effective source is unchanged; the admitted shared checkout remains read-only.
+function(sparkle_prepare_patched_dependency_files source_dir binary_dir patch_file out_directory)
+    set(input_root "${binary_dir}/patched-input")
+    set(output_root "${binary_dir}/patched-source")
+    foreach(path IN LISTS ARGN)
+        configure_file("${source_dir}/${path}" "${input_root}/${path}" COPYONLY)
+    endforeach()
+    execute_process(COMMAND "${GIT_EXECUTABLE}" -C "${source_dir}" rev-parse --absolute-git-dir
+        OUTPUT_VARIABLE git_directory OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
+    execute_process(COMMAND "${GIT_EXECUTABLE}" "--git-dir=${git_directory}" "--work-tree=${input_root}" apply "${patch_file}"
+        WORKING_DIRECTORY "${input_root}" RESULT_VARIABLE result ERROR_VARIABLE error)
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "Dependency patch failed against its admitted base: ${patch_file}: ${error}")
+    endif()
+    foreach(path IN LISTS ARGN)
+        configure_file("${input_root}/${path}" "${output_root}/${path}" COPYONLY)
+    endforeach()
+    set(${out_directory} "${output_root}" PARENT_SCOPE)
+endfunction()
+
+# Bundled components retain their parent's admitted source identity and license inputs.
+function(sparkle_add_bundled_source_package target_name dependency_name component license)
+    get_property(directory GLOBAL PROPERTY SPARKLE_SOURCE_DEPENDENCY_${dependency_name}_CACHE_DIRECTORY)
+    get_property(revision GLOBAL PROPERTY SPARKLE_SOURCE_DEPENDENCY_${dependency_name}_REVISION)
+    get_property(location GLOBAL PROPERTY SPARKLE_SOURCE_DEPENDENCY_${dependency_name}_LOCATION)
+    sparkle_collect_missing_relative_paths("${FETCHCONTENT_BASE_DIR}/${directory}" missing ${ARGN})
+    if(missing)
+        message(FATAL_ERROR "Bundled ${component} source/license inputs are missing: ${missing}")
+    endif()
+    sparkle_add_source_package(${target_name} "${component}" "${revision}" "${license}" "${location}")
 endfunction()
 
 function(sparkle_declare_git_dependency dependency_name repository revision)
+    cmake_parse_arguments(ARG "" "ID;VERSION;LICENSE_ID;PACKAGE_NAME;GIT_SUBMODULES_RECURSE" "REQUIRED_PATHS;GIT_SUBMODULES;GIT_CONFIG" ${ARGN})
+    if(ARG_UNPARSED_ARGUMENTS OR NOT ARG_VERSION OR NOT ARG_LICENSE_ID OR NOT ARG_REQUIRED_PATHS)
+        message(FATAL_ERROR "${dependency_name} requires version, license and consumed-file admission facts; unexpected arguments: ${ARG_UNPARSED_ARGUMENTS}")
+    endif()
+    if(NOT ARG_ID)
+        set(ARG_ID "${dependency_name}")
+    endif()
+    if(NOT ARG_PACKAGE_NAME)
+        set(ARG_PACKAGE_NAME "${dependency_name}")
+    endif()
+    string(REGEX REPLACE "[.]git$" "" location "${repository}")
+    sparkle_record_source_dependency("${ARG_ID}"
+        VERSION "${ARG_VERSION}" REVISION "${revision}" LICENSE_ID "${ARG_LICENSE_ID}"
+        PACKAGE_NAME "${ARG_PACKAGE_NAME}" LOCATION "${location}/tree/${revision}"
+        CACHE_DIRECTORY "${dependency_name}-src" REQUIRED_PATHS ${ARG_REQUIRED_PATHS})
+    if(SPARKLE_SOURCE_DEPENDENCY_METADATA_ONLY)
+        return()
+    endif()
+    set_property(GLOBAL APPEND PROPERTY SPARKLE_ADMITTED_GIT_DEPENDENCIES "${dependency_name}")
+    set_property(GLOBAL PROPERTY SPARKLE_GIT_DEPENDENCY_${dependency_name}_ID "${ARG_ID}")
+    set(git_options)
+    foreach(option IN ITEMS GIT_SUBMODULES GIT_CONFIG GIT_SUBMODULES_RECURSE)
+        if(DEFINED ARG_${option})
+            list(APPEND git_options ${option} ${ARG_${option}})
+        endif()
+    endforeach()
     FetchContent_Declare(${dependency_name}
+        SOURCE_SUBDIR sparkle-source-only
         BINARY_DIR "${CMAKE_BINARY_DIR}/_deps/${dependency_name}-build"
         GIT_REPOSITORY "${repository}"
         GIT_TAG "${revision}"
         GIT_SHALLOW FALSE
-        GIT_PROGRESS FALSE ${ARGN})
-    sparkle_prepare_git_fetchcontent_source("${dependency_name}" EXPECTED_REVISION "${revision}")
+        GIT_PROGRESS FALSE ${git_options})
+    sparkle_prepare_git_fetchcontent_source("${dependency_name}" EXPECTED_REVISION "${revision}" REQUIRED_PATHS ${ARG_REQUIRED_PATHS})
+    FetchContent_MakeAvailable(${dependency_name})
+    # Check cold acquisition too, including consumed license/source files.
+    sparkle_prepare_git_fetchcontent_source("${dependency_name}" EXPECTED_REVISION "${revision}" REQUIRED_PATHS ${ARG_REQUIRED_PATHS})
+    set(${dependency_name}_SOURCE_DIR "${${dependency_name}_SOURCE_DIR}" PARENT_SCOPE)
+    set(${dependency_name}_BINARY_DIR "${${dependency_name}_BINARY_DIR}" PARENT_SCOPE)
 endfunction()
 
-function(sparkle_ensure_archive_dependency)
-    set(options)
-    set(oneValueArgs DISPLAY_NAME URL ARCHIVE_PATH ROOT_PATH EXPECTED_HASH)
-    set(multiValueArgs REQUIRED_PATHS)
-    cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-
-    sparkle_collect_missing_relative_paths("${ARG_ROOT_PATH}" missing_paths ${ARG_REQUIRED_PATHS})
-    if(missing_paths)
-        file(MAKE_DIRECTORY "${FETCHCONTENT_BASE_DIR}")
-        file(DOWNLOAD
-            "${ARG_URL}"
-            "${ARG_ARCHIVE_PATH}"
-            EXPECTED_HASH "${ARG_EXPECTED_HASH}"
-            STATUS download_status
-            TLS_VERIFY ON
-            SHOW_PROGRESS
-        )
-        list(GET download_status 0 download_code)
-        list(GET download_status 1 download_message)
-        if(NOT download_code EQUAL 0)
-            file(REMOVE "${ARG_ARCHIVE_PATH}")
-            message(FATAL_ERROR "Failed to download ${ARG_DISPLAY_NAME}: ${download_message}")
-        endif()
-
-        file(REMOVE_RECURSE "${ARG_ROOT_PATH}")
-        file(MAKE_DIRECTORY "${ARG_ROOT_PATH}")
-        file(ARCHIVE_EXTRACT INPUT "${ARG_ARCHIVE_PATH}" DESTINATION "${ARG_ROOT_PATH}")
-
-        sparkle_collect_missing_relative_paths("${ARG_ROOT_PATH}" missing_paths ${ARG_REQUIRED_PATHS})
-    endif()
-
-    if(missing_paths)
-        list(JOIN missing_paths ", " missing_paths_text)
-        message(FATAL_ERROR "${ARG_DISPLAY_NAME} recovery is incomplete. Missing: ${missing_paths_text} under '${ARG_ROOT_PATH}'.")
-    endif()
-endfunction()
+include("${CMAKE_CURRENT_LIST_DIR}/ArchiveDependency.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/SourceDependencyAdmission.cmake")

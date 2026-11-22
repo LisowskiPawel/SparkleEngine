@@ -14,7 +14,7 @@ SparkleEngine is a Windows rendering project with D3D12 and Vulkan backends. It 
 | --- | --- |
 | [Goals](Goals.md) | Engineering direction, product scope, capabilities and portfolio |
 | [Roadmap](Roadmap.md) | Current problem, delivery order and release requirements |
-| [Third-party migration](ThirdPartyMigration.md) | Recommended replacements, categorized options, existing components and adoption rules |
+| [Third-party migration](ThirdPartyMigration.md) | Replacement decisions, existing components, source/target separation and build/cook reuse contracts |
 | [Rendering](Rendering.md) | Features, current limits, test scenes and planned research |
 | [Engineering](Engineering.md) | Setup, module ownership, development, validation and packaging |
 | [Code style](CodeStyle.md) | Formatting, naming, C++, shaders and coordinate conventions |

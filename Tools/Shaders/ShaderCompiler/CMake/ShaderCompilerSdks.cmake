@@ -58,3 +58,40 @@ set_target_properties(SPIRVTools::SPIRVTools PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${SPIRV_TOOLS_INCLUDE_DIR}"
     INTERFACE_COMPILE_DEFINITIONS SPIRV_TOOLS_SHAREDLIB
 )
+
+# Bind consumed headers/import libraries and shipped tools/runtime, without
+# inventing an upstream revision for a locally installed SDK.
+file(GLOB_RECURSE SPIRV_TOOLS_IDENTITY_HEADERS CONFIGURE_DEPENDS "${SPIRV_TOOLS_INCLUDE_DIR}/spirv-tools/*.h" "${SPIRV_TOOLS_INCLUDE_DIR}/spirv-tools/*.hpp")
+set(DXC_IDENTITY_INPUTS "${DXC_RUNTIME_LIBRARY}" "${DXC_IMPORT_LIBRARY}" "${DXC_TOOL_EXECUTABLE}" "${DXC_INCLUDE_DIR}/dxcapi.h")
+set(SPIRV_TOOLS_IDENTITY_INPUTS "${SPIRV_TOOLS_RUNTIME_LIBRARY}" "${SPIRV_TOOLS_IMPORT_LIBRARY}" ${SPIRV_TOOLS_IDENTITY_HEADERS})
+foreach(component IN ITEMS DXC SPIRV_TOOLS)
+    set(identity)
+    foreach(input IN LISTS ${component}_IDENTITY_INPUTS)
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${input}")
+        file(SHA256 "${input}" hash)
+        string(APPEND identity "${hash}\n")
+    endforeach()
+    string(SHA256 identity "${identity}")
+    if(component STREQUAL DXC)
+        sparkle_add_source_package(Dxc::Dxc "Microsoft DXC runtime" "sha256:${identity}"
+            LicenseRef-DXC-ThirdPartyNotices "https://github.com/microsoft/DirectXShaderCompiler")
+    else()
+        sparkle_add_source_package(SPIRVTools::SPIRVTools SPIRV-Tools "sha256:${identity}"
+            Apache-2.0 "https://github.com/KhronosGroup/SPIRV-Tools")
+    endif()
+endforeach()
+set(_slang_identity)
+set(_slang_module_inputs)
+foreach(directory IN LISTS SLANG_STANDARD_MODULE_DIRECTORIES)
+    file(GLOB_RECURSE files CONFIGURE_DEPENDS LIST_DIRECTORIES false "${directory}/*")
+    list(APPEND _slang_module_inputs ${files})
+endforeach()
+foreach(input IN ITEMS "${SLANG_TOOL_EXECUTABLE}" "${SLANG_RUNTIME_LIBRARY}" ${SLANG_RUNTIME_SUPPORT_FILES} ${_slang_module_inputs})
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${input}")
+    file(SHA256 "${input}" hash)
+    string(APPEND _slang_identity "${hash}\n")
+endforeach()
+string(SHA256 _slang_identity "${_slang_identity}")
+sparkle_add_source_package(ShaderCompiler "Slang compiler and runtime" "sha256:${_slang_identity}"
+    "Apache-2.0 WITH LLVM-exception AND LicenseRef-Slang-ThirdPartyNotices"
+    "https://github.com/shader-slang/slang")

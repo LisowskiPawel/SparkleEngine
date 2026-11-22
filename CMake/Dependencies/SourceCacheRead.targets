@@ -1,0 +1,36 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask TaskName="SparkleAcquireSourceCacheRead" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <LockPath ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="Microsoft.Build.Framework" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var engine = (IBuildEngine4)BuildEngine;
+        var key = "SparkleSourceCache:" + Path.GetFullPath(LockPath).ToUpperInvariant();
+        if (engine.GetRegisteredTaskObject(key, RegisteredTaskObjectLifetime.Build) == null)
+        {
+            FileStream reader;
+            try
+            {
+                reader = new FileStream(LockPath, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Inheritable);
+            }
+            catch (IOException error)
+            {
+                Log.LogError("Source dependency cache is being configured or cleaned. Retry after it settles. " + error.Message);
+                return false;
+            }
+            engine.RegisterTaskObject(key, reader, RegisteredTaskObjectLifetime.Build, false);
+            if (!Object.ReferenceEquals(engine.GetRegisteredTaskObject(key, RegisteredTaskObjectLifetime.Build), reader))
+                reader.Dispose();
+        }
+      ]]></Code>
+    </Task>
+  </UsingTask>
+  <!-- MSBuild disposes the shared reader at build completion, including failure/cancel. -->
+  <Target Name="SparkleProtectSourceCache" BeforeTargets="ClCompile;ResourceCompile;MASM;Lib;Link" Condition="'$(DesignTimeBuild)' != 'true'">
+    <SparkleAcquireSourceCacheRead LockPath="$(SparkleSourceCacheLock)" />
+  </Target>
+</Project>

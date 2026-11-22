@@ -1,6 +1,8 @@
 #include "SparkleLauncher/MaintenanceOperations.h"
 
 #include "Core/Public/Diagnostics/Logger.h"
+#include "Core/Public/Paths/PathUtils.h"
+#include "Dependencies/SourceDependencyCacheAccess.h"
 #include "Maintenance/MaintenanceCleanExecution.h"
 #include "Maintenance/MaintenanceCleanSteps.h"
 #include "Levels/LevelSelectionCommit.h"
@@ -8,6 +10,7 @@
 #include "Workspace/LauncherProductPaths.h"
 
 #include <optional>
+#include <algorithm>
 #include <system_error>
 
 namespace SparkleLauncher
@@ -47,6 +50,27 @@ namespace SparkleLauncher
 			}
 		}
 		const std::vector<MaintenanceCleanStep> steps = BuildMaintenanceCleanSteps(plan);
+		const auto cacheRoot = plan.Request.WorkspaceRoot / "build" / "_deps";
+		const bool bTouchesSourceCache = std::any_of(
+		    steps.begin(),
+		    steps.end(),
+		    [&cacheRoot](const MaintenanceCleanStep& step)
+		    {
+			    const bool bContainsCache = Paths::TryMakeRelativeUnderRoot(cacheRoot, step.DestructivePath).has_value();
+			    const bool bInsideCache = Paths::TryMakeRelativeUnderRoot(step.DestructivePath, cacheRoot).has_value();
+			    return bContainsCache || bInsideCache;
+		    });
+		std::optional<SourceDependencyCacheAccess> cacheAccess;
+		if (bTouchesSourceCache)
+		{
+			cacheAccess.emplace(plan.Request.WorkspaceRoot, SourceDependencyCacheAccessMode::Write);
+			if (!cacheAccess->IsAcquired())
+			{
+				SetOperationFailure(operation, OperationProblemKind::Filesystem, cacheAccess->GetErrorMessage(), "Wait for source-cache readers or writers to settle, then retry Clean.");
+				MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
+				return operation;
+			}
+		}
 		for (std::size_t stepIndex = 0; stepIndex < steps.size(); ++stepIndex)
 		{
 			const MaintenanceCleanStep& step = steps[stepIndex];

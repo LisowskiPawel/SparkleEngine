@@ -1,63 +1,92 @@
 #include "PCH.h"
-#include "Window/Window.h"
-
+#include "Window/WindowNativeState.h"
 #include "Diagnostics/Logger.h"
-#include "Diagnostics/Verify.h"
-#include "Strings/StringUtils.h"
 
-#include <dwmapi.h>
+#define SDL_MAIN_HANDLED
+#include <SDL3/SDL_main.h>
+#include <SDL3/SDL_revision.h>
+#include <commctrl.h>
+#include <stdexcept>
 
-SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_platformLogger, "Platform");
+SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_windowLogger, "Window");
 
-void Window::InitializeNativeWindow(std::string_view title)
+static void RequireSdlOperation(bool bSucceeded, const char* operation)
 {
-	const std::wstring wideTitle = Strings::ToWide(title);
-	m_hInstance = GetModuleHandleW(nullptr);
-	RegisterWindowClass();
-	CreateWindowHandle(wideTitle.c_str());
-}
-
-void Window::DestroyNativeWindow() noexcept
-{
-	if (m_hWnd)
+	if (!bSucceeded)
 	{
-		DestroyWindow(m_hWnd);
-	}
-	UnregisterClassW(kWindowClassName, m_hInstance);
-}
-
-void Window::RegisterWindowClass()
-{
-	WNDCLASSEXW windowClass{};
-	windowClass.cbSize = sizeof(WNDCLASSEXW);
-	windowClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-	windowClass.lpfnWndProc = &Window::WindowProc;
-	windowClass.hInstance = m_hInstance;
-	windowClass.hIcon = LoadIconW(nullptr, MAKEINTRESOURCEW(32512));
-	windowClass.hCursor = LoadCursorW(nullptr, MAKEINTRESOURCEW(32512));
-	windowClass.lpszClassName = kWindowClassName;
-	windowClass.hIconSm = LoadIconW(nullptr, MAKEINTRESOURCEW(32512));
-
-	const ATOM windowClassAtom = RegisterClassExW(&windowClass);
-	if (!windowClassAtom)
-	{
-		Diagnostics::Fatal(g_platformLogger, __FILE__, __LINE__, "Window: Failed to register window class");
+		throw std::runtime_error(std::string(operation) + ": " + SDL_GetError());
 	}
 }
 
-void Window::CreateWindowHandle(const wchar_t* title)
+Window::NativeState::NativeState(Window& owner) noexcept :
+    Owner(owner)
 {
-	m_hWnd = CreateWindowExW(kWindowedExStyle, kWindowClassName, title, kWindowedStyle, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, nullptr, nullptr, m_hInstance, this);
-	if (!m_hWnd)
-	{
-		Diagnostics::Fatal(g_platformLogger, __FILE__, __LINE__, "Window: Failed to create window");
-	}
-
-	const MARGINS margins{-1, -1, -1, -1};
-	DwmExtendFrameIntoClientArea(m_hWnd, &margins);
 }
 
-void Window::ApplyInitialWindowState()
+void Window::NativeState::Initialize(std::string_view title)
 {
-	ShowWindow(m_hWnd, SW_SHOWMAXIMIZED);
+	Thread.AssertAccess();
+	const bool bMatchingVersion = SDL_GetVersion() == SDL_VERSION;
+	const bool bMatchingRevision = std::string_view(SDL_GetRevision()) == SDL_REVISION;
+	if (!bMatchingVersion || !bMatchingRevision)
+	{
+		throw std::runtime_error(std::string("SDL runtime does not match the compiled window backend. Expected ") + SDL_REVISION + "; loaded " + SDL_GetRevision());
+	}
+	SDL_SetMainReady();
+	RequireSdlOperation(SDL_SetHint(SDL_HINT_MOUSE_AUTO_CAPTURE, "0"), "SDL disable automatic pointer capture");
+	RequireSdlOperation(SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SYSTEM_SCALE, "1"), "SDL system-scaled relative motion");
+	RequireSdlOperation(SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_SPEED_SCALE, "1"), "SDL relative motion sensitivity");
+	RequireSdlOperation(SDL_InitSubSystem(SDL_INIT_VIDEO), "SDL video initialization");
+	bVideoInitialized = true;
+
+	const std::string ownedTitle(title);
+	const SDL_WindowFlags flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_HIGH_PIXEL_DENSITY;
+	Handle = SDL_CreateWindow(ownedTitle.c_str(), 1280, 800, flags);
+	RequireSdlOperation(Handle != nullptr, "SDL native window creation");
+	RequireSdlOperation(SDL_GetWindowDisplayScale(Handle) > 0.0f, "SDL initial display scale");
+	const SDL_PropertiesID properties = SDL_GetWindowProperties(Handle);
+	NativeHandle = static_cast<HWND>(SDL_GetPointerProperty(properties, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
+	RequireSdlOperation(NativeHandle != nullptr, "SDL borrowed Win32 presentation handle");
+	RequireSdlOperation(SDL_SetWindowHitTest(Handle, HitTest, this), "SDL borderless hit testing");
+	if (!SetWindowSubclass(NativeHandle, ObserveCancellation, 1, reinterpret_cast<DWORD_PTR>(this)))
+	{
+		throw std::runtime_error("Window cancellation observer installation failed: " + std::to_string(GetLastError()));
+	}
+	bObservingCancellation = true;
+}
+
+Window::NativeState::~NativeState()
+{
+	Shutdown();
+}
+
+void Window::NativeState::Shutdown() noexcept
+{
+	Thread.AssertAccess();
+	if (bObservingCancellation)
+	{
+		RemoveWindowSubclass(NativeHandle, ObserveCancellation, 1);
+		bObservingCancellation = false;
+	}
+	if (Handle != nullptr)
+	{
+		SDL_SetWindowHitTest(Handle, nullptr, nullptr);
+		SDL_DestroyWindow(Handle);
+		Handle = nullptr;
+		NativeHandle = nullptr;
+	}
+	if (bVideoInitialized)
+	{
+		SDL_QuitSubSystem(SDL_INIT_VIDEO);
+		bVideoInitialized = false;
+	}
+}
+
+bool Window::NativeState::CheckOperation(bool bSucceeded, const char* operation) noexcept
+{
+	if (!bSucceeded)
+	{
+		SPDLOG_LOGGER_ERROR(g_windowLogger, "{}: {}", operation, SDL_GetError());
+	}
+	return bSucceeded;
 }

@@ -7,6 +7,7 @@ if(NOT DEFINED SPARKLE_REPOSITORY_ROOT)
     set(SPARKLE_REPOSITORY_ROOT "${CMAKE_SOURCE_DIR}")
 endif()
 get_filename_component(SPARKLE_REPOSITORY_ROOT "${SPARKLE_REPOSITORY_ROOT}" ABSOLUTE)
+include("${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/SourceCacheAccess.cmake")
 
 set(_sparkle_canonical_build_root "${SPARKLE_REPOSITORY_ROOT}/build")
 get_filename_component(_sparkle_canonical_build_root "${_sparkle_canonical_build_root}" ABSOLUTE)

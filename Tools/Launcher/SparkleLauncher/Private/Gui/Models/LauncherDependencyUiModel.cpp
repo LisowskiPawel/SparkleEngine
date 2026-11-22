@@ -14,11 +14,12 @@ namespace SparkleLauncher
 
 	static ThirdPartyDependencyUiEntry ToUiDependency(const SourceDependencyEntry& dependency)
 	{
+		const std::string purpose = dependency.ExpectedGitRevision.empty() ? dependency.Purpose : dependency.Purpose + "\nSource pin: " + dependency.ExpectedGitRevision;
 		return {
 		    ToQString(dependency.Id),
 		    ToQString(dependency.Label),
 		    ToQString(dependency.Version),
-		    ToQString(dependency.Purpose),
+		    ToQString(purpose),
 		    ToQString(dependency.CacheDirectoryName),
 		    dependency.bRequired,
 		    dependency.bEnabled,
@@ -29,7 +30,7 @@ namespace SparkleLauncher
 	{
 		if (const SourceDependencyEntry* sourceDependency = FindSourceDependency(dependency.Id.toStdString()))
 		{
-			return ValidateSourceDependency(*sourceDependency, dependencyCachePath);
+			return InspectSourceDependencyAvailability(*sourceDependency, dependencyCachePath);
 		}
 
 		SourceDependencyValidation validation;
@@ -56,11 +57,11 @@ namespace SparkleLauncher
 	ThirdPartyDependencyUiStatus BuildThirdPartyDependencyStatus(const ThirdPartyDependencyUiEntry& dependency, const std::filesystem::path& dependencyCachePath)
 	{
 		const SourceDependencyValidation validation = ValidateDependency(dependency, dependencyCachePath);
-		const QString description = dependency.Purpose.isEmpty() ? dependency.Version : QStringLiteral("%1 · %2").arg(dependency.Version, dependency.Purpose);
-		const QString detail = validation.IdentityFailure.empty() ? description : ToQString(validation.IdentityFailure);
+		const QString description = dependency.Purpose.isEmpty() ? dependency.Version : QStringLiteral("%1 \u00b7 %2").arg(dependency.Version, dependency.Purpose);
+		const QString detail = validation.FailureReason.empty() ? description : ToQString(validation.FailureReason);
 		std::error_code errorCode;
 		const bool bHasCache = std::filesystem::exists(validation.CachePath, errorCode);
-		const QString unavailableState = bHasCache ? "Invalid" : "Missing";
-		return validation.bReady ? ThirdPartyDependencyUiStatus{"Synced", detail, "ok", bHasCache} : ThirdPartyDependencyUiStatus{unavailableState, detail, "warning", bHasCache};
+		const QString unavailableState = !validation.FailureReason.empty() ? "Unavailable" : (bHasCache ? "Incomplete" : "Missing");
+		return validation.bReady ? ThirdPartyDependencyUiStatus{"Available", detail, "ok", bHasCache} : ThirdPartyDependencyUiStatus{unavailableState, detail, "warning", bHasCache};
 	}
 }

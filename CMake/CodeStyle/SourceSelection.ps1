@@ -35,8 +35,7 @@ function Get-SelectedSourcePaths
     {
         $extension = [IO.Path]::GetExtension($relativePath)
         if ($extension -notin @('.c', '.cc', '.cpp', '.cxx', '.h', '.hh', '.hpp', '.hxx', '.hlsl', '.hlsli') -or
-            $relativePath -notmatch '^(CMake|Engine|Tools|Projects)/' -or
-            $relativePath.StartsWith('Engine/RHI/Private/D3D12/ThirdParty/', [StringComparison]::OrdinalIgnoreCase))
+            $relativePath -notmatch '^(CMake|Engine|Tools|Projects)/')
         {
             continue
         }

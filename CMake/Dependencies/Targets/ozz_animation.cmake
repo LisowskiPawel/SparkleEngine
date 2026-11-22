@@ -1,17 +1,12 @@
+set(SPARKLE_OZZ_ANIMATION_REVISION 744eb9d99f606eda849acb0b1204f7a3dc20bca1)
+
 sparkle_declare_git_dependency(ozz_animation
     https://github.com/guillaumeblanc/ozz-animation.git
-    ${SPARKLE_OZZ_ANIMATION_REVISION})
-FetchContent_Populate(ozz_animation)
-sparkle_prepare_git_fetchcontent_source(ozz_animation
-    EXPECTED_REVISION "${SPARKLE_OZZ_ANIMATION_REVISION}"
-    REQUIRED_PATHS CMakeLists.txt LICENSE.md
-    include/ozz/animation/runtime/skeleton.h
-    include/ozz/animation/runtime/animation.h
-    include/ozz/animation/runtime/sampling_job.h
-    include/ozz/animation/offline/skeleton_builder.h
-    include/ozz/animation/offline/animation_builder.h
-    include/ozz/base/memory/allocator.h)
-if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
+    ${SPARKLE_OZZ_ANIMATION_REVISION}
+    ID ozz_animation VERSION "0.17.0" PACKAGE_NAME "ozz-animation" LICENSE_ID "MIT"
+    REQUIRED_PATHS CMakeLists.txt LICENSE.md include/ozz/animation/runtime/skeleton.h include/ozz/animation/runtime/animation.h include/ozz/animation/runtime/sampling_job.h include/ozz/animation/offline/skeleton_builder.h include/ozz/animation/offline/animation_builder.h include/ozz/base/memory/allocator.h)
+
+if(SPARKLE_SOURCE_DEPENDENCY_METADATA_ONLY OR NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
     return()
 endif()
 
@@ -32,8 +27,8 @@ function(sparkle_add_ozz_animation)
             # Upstream recognizes Debug; Sparkle has DebugEditor/DebugGame profiles.
             set_target_properties(${target} PROPERTIES MSVC_RUNTIME_LIBRARY "${CMAKE_MSVC_RUNTIME_LIBRARY}")
         endif()
-        sparkle_set_source_package(${target} "ozz-animation" "0.17.0"
-            "MIT" "https://github.com/guillaumeblanc/ozz-animation/tree/${SPARKLE_OZZ_ANIMATION_REVISION}")
+
+        sparkle_add_dependency_source_package(${target} ozz_animation)
     endforeach()
 endfunction()
 sparkle_add_ozz_animation()

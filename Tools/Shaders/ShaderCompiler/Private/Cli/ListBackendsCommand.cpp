@@ -4,114 +4,89 @@
 
 #include "Backend/ShaderBackends.h"
 #include "Constants/ShaderCompilerConstants.h"
+#include "Core/Public/Strings/StringUtils.h"
 
+#include <exception>
 #include <iostream>
-
-static std::string BuildStringList(std::span<const std::string_view> values)
-{
-	std::string result;
-	for (const std::string_view value : values)
-	{
-		if (!result.empty())
-		{
-			result += ", ";
-		}
-		result += value;
-	}
-	if (result.empty())
-	{
-		result = "none";
-	}
-	return result;
-}
+#include <span>
+#include <string>
+#include <string_view>
+#include <vector>
 
 static std::string BuildTargetList(std::span<const ShaderTarget> targets)
 {
-	std::string result;
+	std::vector<std::string_view> names;
 	for (const ShaderTarget target : targets)
 	{
-		if (!result.empty())
-		{
-			result += ", ";
-		}
-		result += GetShaderTargetName(target);
+		names.emplace_back(GetShaderTargetName(target));
 	}
-	if (result.empty())
-	{
-		result = "none";
-	}
-	return result;
+	return names.empty() ? "none" : Strings::Join(names, ", ");
 }
 
 static std::string BuildRayTracingFeatureList(const ShaderBackendCapabilities& capabilities)
 {
-	std::string features;
+	std::vector<std::string_view> features;
 	if (capabilities.bSupportsDxilRayTracingLibrary)
 	{
-		features = "dxil-rt-library";
+		features.emplace_back("dxil-rt-library");
 	}
 	if (capabilities.bSupportsSpirVRayTracingLibrary)
 	{
-		if (!features.empty())
-		{
-			features += ", ";
-		}
-		features += "spirv-rt-library";
+		features.emplace_back("spirv-rt-library");
 	}
 	if (capabilities.bSupportsDxilInlineRayQuery)
 	{
-		if (!features.empty())
-		{
-			features += ", ";
-		}
-		features += "dxil-inline-ray-query";
+		features.emplace_back("dxil-inline-ray-query");
 	}
 	if (capabilities.bSupportsSpirVInlineRayQuery)
 	{
-		if (!features.empty())
-		{
-			features += ", ";
-		}
-		features += "spirv-inline-ray-query";
+		features.emplace_back("spirv-inline-ray-query");
 	}
-	if (features.empty())
-	{
-		features = "none";
-	}
-	return features;
+	return features.empty() ? "none" : Strings::Join(features, ", ");
 }
 
 int ListBackends()
 {
-	const std::vector<ShaderBackendDescriptor> backends = ListShaderBackends();
-	std::cout << "ShaderCompiler: " << backends.size() << " backend(s) registered\n";
-	for (const ShaderBackendDescriptor& backend : backends)
+	try
 	{
-		std::cout << "  name='" << backend.Name << "'"
-		          << " available=true sourceExtensions='" << backend.SourceExtension << "'"
-		          << " codegenTargets='" << BuildTargetList(ListShaderCodegenTargets()) << "'"
-		          << " binaryFormats='" << BuildStringList(ListShaderBinaryFormats()) << "'"
-		          << " rt='" << BuildRayTracingFeatureList(backend.Capabilities) << "'"
-		          << " version=" << backend.Version;
-		std::cout << "\n";
-	}
+		const std::vector<ShaderBackendDescriptor> backends = ListShaderBackends();
+		const std::string targets = BuildTargetList(ListShaderCodegenTargets());
+		const std::string formats = Strings::Join(ListShaderBinaryFormats(), ", ");
+		std::cout << "ShaderCompiler: " << backends.size() << " backend(s) registered\n";
+		for (const ShaderBackendDescriptor& backend : backends)
+		{
+			const std::string features = BuildRayTracingFeatureList(backend.Capabilities);
+			std::cout << "  name='" << backend.Name << "'"
+			          << " available=true sourceExtensions='" << backend.SourceExtension << "'"
+			          << " codegenTargets='" << targets << "'"
+			          << " binaryFormats='" << formats << "'"
+			          << " rt='" << features << "'"
+			          << " version=" << backend.Version;
+			std::cout << "\n";
+		}
 
-	const std::span<const std::string_view> binaryFormats = ListShaderBinaryFormats();
-	std::cout << "ShaderCompiler: " << binaryFormats.size() << " binary format(s) registered\n";
-	for (const std::string_view binaryFormat : binaryFormats)
+		const std::span<const std::string_view> binaryFormats = ListShaderBinaryFormats();
+		std::cout << "ShaderCompiler: " << binaryFormats.size() << " binary format(s) registered\n";
+		for (const std::string_view binaryFormat : binaryFormats)
+		{
+			std::cout << "  name='" << binaryFormat << "'"
+			          << " available=true\n";
+		}
+
+		const std::span<const ShaderTarget> codegenTargets = ListShaderCodegenTargets();
+		std::cout << "ShaderCompiler: " << codegenTargets.size() << " codegen target(s) registered\n";
+		for (const ShaderTarget codegenTarget : codegenTargets)
+		{
+			std::cout << "  name='" << GetShaderTargetName(codegenTarget) << "'"
+			          << " binaryFormat='" << (IsDxilTarget(codegenTarget) ? "Dxil" : "SpirV") << "'"
+			          << " available=true\n";
+		}
+
+		return kExitCodeSuccess;
+	}
+	catch (const std::exception& error)
 	{
-		std::cout << "  name='" << binaryFormat << "'"
-		          << " available=true\n";
+		std::cerr << "ShaderCompiler: list-backends failed - " << error.what() << "\n";
+		return kExitCodeCookFailure;
 	}
-
-	const std::span<const ShaderTarget> codegenTargets = ListShaderCodegenTargets();
-	std::cout << "ShaderCompiler: " << codegenTargets.size() << " codegen target(s) registered\n";
-	for (const ShaderTarget codegenTarget : codegenTargets)
-	{
-		std::cout << "  name='" << GetShaderTargetName(codegenTarget) << "'"
-		          << " binaryFormat='" << (IsDxilTarget(codegenTarget) ? "Dxil" : "SpirV") << "'"
-		          << " available=true\n";
-	}
-
-	return kExitCodeSuccess;
 }

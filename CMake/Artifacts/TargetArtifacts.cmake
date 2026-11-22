@@ -5,6 +5,7 @@ function(_sparkle_set_target_artifact_directories target_name runtime_root symbo
         LIBRARY_OUTPUT_DIRECTORY "${runtime_root}/$<CONFIG>"
         ARCHIVE_OUTPUT_DIRECTORY "${_sparkle_library_artifact_root}/${symbol_owner}/$<CONFIG>"
         PDB_OUTPUT_DIRECTORY "${_sparkle_symbol_artifact_root}/${symbol_owner}/$<CONFIG>"
+        COMPILE_PDB_NAME "${target_name}"
         COMPILE_PDB_OUTPUT_DIRECTORY "${_sparkle_symbol_artifact_root}/${symbol_owner}/$<CONFIG>/obj"
     )
 

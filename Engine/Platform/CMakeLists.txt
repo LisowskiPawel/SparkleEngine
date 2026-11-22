@@ -41,7 +41,8 @@ target_link_libraries(SparklePlatform
     PUBLIC
         SparkleCore
     PRIVATE
-        dwmapi
+        SDL3::SDL3-shared
+        comctl32
 )
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${SPARKLE_PLATFORM_PUBLIC_HEADERS})

@@ -12,10 +12,6 @@
 #include <limits>
 #include <utility>
 
-#define TINYEXR_USE_MINIZ 0
-#define TINYEXR_USE_ZFP 0
-#include <zlib.h>
-#define TINYEXR_IMPLEMENTATION
 #include <tinyexr.h>
 
 enum class ImagePixelEncoding : std::uint8_t

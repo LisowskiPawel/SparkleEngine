@@ -84,7 +84,7 @@ endforeach()
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:DebugEditor,DebugGame>:Debug>DLL")
 
-add_compile_definitions(
+set(SPARKLE_NATIVE_COMPILE_DEFINITIONS
     "SPARKLE_BUILD_DEBUG=$<CONFIG:DebugEditor,DebugGame>"
     "SPARKLE_BUILD_DEVELOPMENT=$<CONFIG:DevelopmentEditor,DevelopmentGame>"
     "SPARKLE_BUILD_SHIPPING=$<CONFIG:ShippingEditor,ShippingGame>"

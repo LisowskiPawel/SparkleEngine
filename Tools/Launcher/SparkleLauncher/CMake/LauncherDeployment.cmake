@@ -1,60 +1,124 @@
-add_custom_command(TARGET SparkleLauncher POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/Assets/Visuals"
-        "$<TARGET_FILE_DIR:SparkleLauncher>/Visuals"
-    COMMENT "Deploying SparkleLauncher visual artwork"
-)
+# First-party artwork has the same stable repair behavior as runtime support.
+file(GLOB_RECURSE _visual_files CONFIGURE_DEPENDS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/Assets/Visuals"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Assets/Visuals/*")
+set(_visual_inputs)
+foreach(file IN LISTS _visual_files)
+    list(APPEND _visual_inputs "${CMAKE_CURRENT_SOURCE_DIR}/Assets/Visuals/${file}|Visuals/${file}")
+endforeach()
+sparkle_stage_runtime_files(SparkleLauncher Visuals FILES ${_visual_inputs})
+sparkle_target_source_package_dependencies(SparkleLauncher SparkleEditorIcons)
 
 if(WIN32)
-    get_target_property(SPARKLE_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
-    get_filename_component(SPARKLE_QT_BIN_DIR "${SPARKLE_QMAKE_EXECUTABLE}" DIRECTORY)
-
-    find_program(SPARKLE_WINDEPLOYQT_EXECUTABLE
-        NAMES windeployqt windeployqt6
-        HINTS "${SPARKLE_QT_BIN_DIR}"
-        REQUIRED
-    )
-
-    set(_sparkle_qt_deploy_command "${SPARKLE_WINDEPLOYQT_EXECUTABLE}")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/QtSourcePackages.ps1")
+    get_target_property(_qmake Qt6::qmake IMPORTED_LOCATION)
+    get_filename_component(_qt_bin "${_qmake}" DIRECTORY)
+    get_filename_component(_qt_root "${_qt_bin}/.." ABSOLUTE)
+    unset(SPARKLE_WINDEPLOYQT_EXECUTABLE)
+    unset(SPARKLE_WINDEPLOYQT_EXECUTABLE CACHE)
+    find_program(SPARKLE_WINDEPLOYQT_EXECUTABLE NAMES windeployqt windeployqt6
+        HINTS "${_qt_bin}" REQUIRED NO_DEFAULT_PATH)
+    set(_deploy_command "${SPARKLE_WINDEPLOYQT_EXECUTABLE}")
     if(CMAKE_GENERATOR MATCHES "^Visual Studio" AND CMAKE_GENERATOR_INSTANCE)
-        string(REGEX REPLACE ",.*$" "" _sparkle_visual_studio_root "${CMAKE_GENERATOR_INSTANCE}")
-        set(_sparkle_qt_deploy_command
-            "${CMAKE_COMMAND}" -E env "VCINSTALLDIR=${_sparkle_visual_studio_root}/VC/"
-            "${SPARKLE_WINDEPLOYQT_EXECUTABLE}")
+        string(REGEX REPLACE ",.*$" "" _vs_root "${CMAKE_GENERATOR_INSTANCE}")
+        set(_deploy_command "${CMAKE_COMMAND}" -E env "VCINSTALLDIR=${_vs_root}/VC/" "${SPARKLE_WINDEPLOYQT_EXECUTABLE}")
     endif()
-
-    set(_sparkle_qt_notice_files
-        "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/Qt/README.md"
-        "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/Qt/ThirdPartyNotices.txt"
-        "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/Qt/LGPL-3.0-only.txt"
-        "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/Qt/GPL-3.0-only.txt")
-    foreach(_notice IN LISTS _sparkle_qt_notice_files)
-        if(NOT EXISTS "${_notice}")
-            message(FATAL_ERROR "Qt deployment notice is missing: '${_notice}'")
+    set(_qt_inputs)
+    set(_qt_support)
+    set(_qt_roots)
+    foreach(profile IN LISTS SPARKLE_BUILD_CONFIGURATIONS)
+        string(TOUPPER "${profile}" upper_profile)
+        get_target_property(mapping Qt6::Widgets MAP_IMPORTED_CONFIG_${upper_profile})
+        if(NOT mapping)
+            set(mapping "${CMAKE_MAP_IMPORTED_CONFIG_${upper_profile}}")
         endif()
+        set(_widgets)
+        foreach(candidate IN LISTS mapping)
+            string(TOUPPER "${candidate}" upper_candidate)
+            if(upper_candidate)
+                get_target_property(location Qt6::Widgets IMPORTED_LOCATION_${upper_candidate})
+            else()
+                get_target_property(location Qt6::Widgets IMPORTED_LOCATION)
+            endif()
+            if(location)
+                set(_widgets "${location}")
+                break()
+            endif()
+        endforeach()
+        if(NOT _widgets)
+            message(FATAL_ERROR "The selected Qt kit cannot satisfy ${profile}'s imported configuration mapping.")
+        endif()
+        list(FIND _qt_roots "${_widgets}" index)
+        if(index LESS 0)
+            list(LENGTH _qt_roots index)
+            list(APPEND _qt_roots "${_widgets}")
+        endif()
+        list(APPEND _qt_profiles_${index} "${profile}")
     endforeach()
-    file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/QtRuntimeVersion.txt"
-        CONTENT "${Qt6_VERSION}\n")
-
-    add_custom_target(SparkleLauncherQtNotices
-        COMMAND "${CMAKE_COMMAND}" -E copy_directory
-            "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/Qt"
-            "$<TARGET_FILE_DIR:SparkleLauncher>/Notices/Qt"
-        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-            "${CMAKE_CURRENT_BINARY_DIR}/QtRuntimeVersion.txt"
-            "$<TARGET_FILE_DIR:SparkleLauncher>/Notices/Qt/QtRuntimeVersion.txt"
-        DEPENDS ${_sparkle_qt_notice_files} "${CMAKE_CURRENT_BINARY_DIR}/QtRuntimeVersion.txt"
-        COMMENT "Deploying Qt notices"
-        VERBATIM
-    )
-    add_dependencies(SparkleLauncher SparkleLauncherQtNotices)
-
-    add_custom_command(TARGET SparkleLauncher POST_BUILD
-        COMMAND ${_sparkle_qt_deploy_command}
-            --verbose 0
-            --no-compiler-runtime
-            --dir "$<TARGET_FILE_DIR:SparkleLauncher>"
-            "$<TARGET_FILE:SparkleLauncher>"
-        COMMENT "Deploying Qt runtime for SparkleLauncher artifact"
-    )
+    set(index -1)
+    foreach(_widgets IN LISTS _qt_roots)
+        math(EXPR index "${index} + 1")
+        set(flavor "${index}")
+        list(JOIN _qt_profiles_${index} "," configurations)
+        # Widgets is Launcher's sole direct Qt module. Its SDK binary is available
+        # before a cold native link, and windeployqt owns the plugin/module closure.
+        execute_process(COMMAND ${_deploy_command} --verbose 0 --dry-run --json --no-patchqt --no-compiler-runtime
+                --dir "${CMAKE_CURRENT_BINARY_DIR}/qt-discovery" "${_widgets}"
+            RESULT_VARIABLE result OUTPUT_VARIABLE deployment ERROR_VARIABLE diagnostic)
+        if(NOT result EQUAL 0)
+            message(FATAL_ERROR "Qt deployment discovery failed: ${diagnostic}")
+        endif()
+        # This Qt release prints system-library diagnostics before its JSON object.
+        string(FIND "${deployment}" "{" json_start)
+        if(json_start LESS 0)
+            message(FATAL_ERROR "Qt deployment discovery produced no JSON: ${deployment}")
+        endif()
+        string(SUBSTRING "${deployment}" ${json_start} -1 deployment)
+        string(JSON count LENGTH "${deployment}" files)
+        math(EXPR last "${count} - 1")
+        set(_qt_sources "${_widgets}")
+        list(APPEND _qt_inputs "$<$<CONFIG:${configurations}>:${_widgets}>")
+        list(APPEND _qt_support "$<$<CONFIG:${configurations}>:$<PATH:GET_FILENAME,${_widgets}>>")
+        foreach(index RANGE ${last})
+            string(JSON source GET "${deployment}" files ${index} source)
+            string(JSON destination GET "${deployment}" files ${index} target)
+            file(TO_CMAKE_PATH "${source}" source)
+            file(TO_CMAKE_PATH "${destination}" destination)
+            get_filename_component(name "${source}" NAME)
+            file(RELATIVE_PATH relative "${CMAKE_CURRENT_BINARY_DIR}/qt-discovery" "${destination}/${name}")
+            list(APPEND _qt_inputs "$<$<CONFIG:${configurations}>:${source}|${relative}>")
+            list(APPEND _qt_support "$<$<CONFIG:${configurations}>:${relative}>")
+            list(APPEND _qt_sources "${source}")
+        endforeach()
+        file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/generated/QtSources-${flavor}.txt"
+            CONTENT "${_qt_sources}" @ONLY)
+        execute_process(COMMAND "${SPARKLE_POWERSHELL_EXECUTABLE}" -NoProfile -ExecutionPolicy Bypass
+                -File "${CMAKE_CURRENT_LIST_DIR}/QtSourcePackages.ps1" -QtRoot "${_qt_root}" -Version "${Qt6_VERSION}"
+                -SourceList "${CMAKE_CURRENT_BINARY_DIR}/generated/QtSources-${flavor}.txt"
+                -OutputPath "${CMAKE_CURRENT_BINARY_DIR}/generated/QtPackages-${flavor}.json"
+            RESULT_VARIABLE result OUTPUT_VARIABLE diagnostic ERROR_VARIABLE error)
+        if(NOT result EQUAL 0)
+            message(FATAL_ERROR "Qt source attribution failed: ${diagnostic} ${error}")
+        endif()
+        file(READ "${CMAKE_CURRENT_BINARY_DIR}/generated/QtPackages-${flavor}.json" packages)
+        string(JSON count LENGTH "${packages}")
+        math(EXPR last "${count} - 1")
+        foreach(index RANGE ${last})
+            string(JSON package GET "${packages}" ${index})
+            set_property(TARGET SparkleLauncher APPEND PROPERTY SPARKLE_SOURCE_PACKAGES "$<$<CONFIG:${configurations}>:${package}>")
+        endforeach()
+    endforeach()
+    # Preserve publisher DLL bytes; qt.conf provides executable-relative paths.
+    file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/generated/qt.conf"
+        CONTENT "[Paths]\nPrefix=.\nPlugins=.\nTranslations=translations\n" @ONLY)
+    list(APPEND _qt_inputs "${CMAKE_CURRENT_BINARY_DIR}/generated/qt.conf|qt.conf")
+    list(APPEND _qt_support qt.conf)
+    file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/generated/QtRuntimeVersion.txt" CONTENT "${Qt6_VERSION}\n" @ONLY)
+    list(APPEND _qt_inputs "${CMAKE_CURRENT_BINARY_DIR}/generated/QtRuntimeVersion.txt|Notices/Qt/QtRuntimeVersion.txt")
+    file(GLOB _notices CONFIGURE_DEPENDS "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/Qt/*")
+    foreach(notice IN LISTS _notices)
+        get_filename_component(name "${notice}" NAME)
+        list(APPEND _qt_inputs "${notice}|Notices/Qt/${name}")
+    endforeach()
+    sparkle_stage_runtime_files(SparkleLauncher Qt FILES ${_qt_inputs})
+    set_property(TARGET SparkleLauncher APPEND PROPERTY SPARKLE_RUNTIME_SUPPORT_FILES ${_qt_support})
 endif()

@@ -27,15 +27,17 @@ function(sparkle_stage_aftermath_runtime target_name)
     if(NOT SPARKLE_WITH_GPU_CRASH_DEBUGGING)
         return()
     endif()
-    set(_destination "${_sparkle_product_root}/Engine/Binaries/Aftermath/$<CONFIG>")
-    add_custom_target(${target_name}AftermathRuntime
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${_destination}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${SPARKLE_AFTERMATH_SDK_ROOT}/lib/x64/GFSDK_Aftermath_Lib.x64.dll" "${_destination}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${SPARKLE_AFTERMATH_SDK_ROOT}/LICENSE" "${_destination}/LICENSE"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${SPARKLE_AFTERMATH_SDK_ROOT}/nsight-aftermath-usage-guidelines.txt" "${_destination}/nsight-aftermath-usage-guidelines.txt"
-        VERBATIM)
-    add_dependencies(${target_name} ${target_name}AftermathRuntime)
+    # Several products share this admitted variant payload. Give it one writer.
+    if(NOT TARGET SparkleAftermathRuntime)
+        add_custom_target(SparkleAftermathRuntime)
+        set_target_properties(SparkleAftermathRuntime PROPERTIES FOLDER "Runtime")
+        sparkle_stage_runtime_files(SparkleAftermathRuntime Vendor
+            DESTINATION_DIRECTORY "${_sparkle_product_root}/Engine/Binaries/Aftermath/$<CONFIG>"
+            FILES "${SPARKLE_AFTERMATH_SDK_ROOT}/lib/x64/GFSDK_Aftermath_Lib.x64.dll"
+                "${SPARKLE_AFTERMATH_SDK_ROOT}/LICENSE"
+                "${SPARKLE_AFTERMATH_SDK_ROOT}/nsight-aftermath-usage-guidelines.txt")
+    endif()
+    add_dependencies(${target_name} SparkleAftermathRuntime)
+    sparkle_add_source_package(${target_name} "NVIDIA Aftermath" "${SPARKLE_AFTERMATH_VERSION}"
+        LicenseRef-NVIDIA-Aftermath-SDK "https://developer.nvidia.com/nsight-aftermath")
 endfunction()

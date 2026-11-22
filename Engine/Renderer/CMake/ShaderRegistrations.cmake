@@ -8,7 +8,7 @@ foreach(_registration IN ITEMS Shader ShaderCook)
     set(_object_target SparkleRenderer${_registration}Registrations)
     set(_interface_target SparkleRenderer${_registration}RegistrationObjects)
     add_library(${_object_target} OBJECT ${SPARKLE_RENDERER_SHADER_REGISTRATION_SOURCES})
-    sparkle_enable_parallel_compilation(${_object_target})
+    sparkle_configure_native_target(${_object_target})
     target_include_directories(${_object_target} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Public
         ${CMAKE_CURRENT_SOURCE_DIR}/Private

@@ -18,6 +18,7 @@ namespace SparkleLauncher
 		bool bRequired = false;
 		bool bEnabled = false;
 		std::string ExpectedGitRevision;
+		std::vector<std::string> AdditionalCacheFiles;
 	};
 
 	struct SourceDependencyValidation
@@ -25,7 +26,7 @@ namespace SparkleLauncher
 		std::filesystem::path CachePath;
 		bool bReady = false;
 		std::vector<std::string> MissingRelativePaths;
-		std::string IdentityFailure;
+		std::string FailureReason;
 	};
 
 	struct SourceDependencyInventoryStatus
@@ -39,7 +40,7 @@ namespace SparkleLauncher
 
 	const std::vector<SourceDependencyEntry>& GetSourceDependencies();
 	const SourceDependencyEntry* FindSourceDependency(std::string_view id);
-	SourceDependencyValidation ValidateSourceDependency(const SourceDependencyEntry& dependency, const std::filesystem::path& dependencyCacheRoot);
+	SourceDependencyValidation InspectSourceDependencyAvailability(const SourceDependencyEntry& dependency, const std::filesystem::path& dependencyCacheRoot);
 	std::vector<std::filesystem::path> GetSourceDependencyCachePaths(const SourceDependencyEntry& dependency, const std::filesystem::path& dependencyCacheRoot);
 	SourceDependencyInventoryStatus InspectSourceDependencyCache(const std::filesystem::path& dependencyCacheRoot);
 }

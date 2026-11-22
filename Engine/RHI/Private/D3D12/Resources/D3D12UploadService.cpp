@@ -1,5 +1,5 @@
 #include "PCH.h"
-#include "RHI/Private/D3D12/ThirdParty/D3DX12Includes.h"
+#include "RHI/Private/D3D12/D3DX12Includes.h"
 
 #include "D3D12/Resources/D3D12UploadService.h"
 
@@ -10,7 +10,6 @@
 #include "D3D12/Device/D3D12Rhi.h"
 #include "D3D12/Memory/D3D12GpuAllocation.h"
 #include "D3D12/Memory/D3D12GpuMemoryAllocator.h"
-#include "D3D12/ThirdParty/D3DX12Includes.h"
 
 #include <algorithm>
 #include <array>

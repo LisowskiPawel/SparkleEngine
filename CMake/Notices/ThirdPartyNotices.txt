@@ -28,13 +28,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-nlohmann/json 3.13.0-dev.d732d616 (unreleased)
+nlohmann/json 3.12.0+git.d732d616 (unreleased)
 Source: build/_deps/nlohmann_json-src/LICENSE.MIT
 Revision: d732d616badc771ab1e85876b3a9eb8191fdf4c0
 License: MIT
 SHA-256: 9756d15550eb16ca4b44b68e62150bbf1627114f0f8277bb6479d2d0aac566ea
 
-MIT License 
+MIT License
 
 Copyright (c) 2013-2026 Niels Lohmann
 
@@ -120,7 +120,7 @@ SHA-256: 4ccecab18d1ff0b61174fe3d6c430541625d3ddb865b0d5887db296f883c76e7
 
 The MIT License (MIT)
 
-Copyright (c) 2016 Gabi Melman.                                       
+Copyright (c) 2016 Gabi Melman.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1046,26 +1046,26 @@ SHA-256: 7b7fc5046e474378f4fe0bde65508e0d2b3146b58568ebc7cc192aea85ff91b8
 Notices and licenses file
 _________________________
 
-AMD copyrighted code (MIT) 
-Copyright (c) 2019 Advanced Micro Devices, Inc. All rights reserved. 
+AMD copyrighted code (MIT)
+Copyright (c) 2019 Advanced Micro Devices, Inc. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation 
-files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, 
-modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the 
-Software is furnished to do so, subject to the following conditions: 
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
+modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the 
-Software. 
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
-WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR 
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-Dependecnies on microsoft-directx-graphics-samples v-u (MIT) 
+Dependecnies on microsoft-directx-graphics-samples v-u (MIT)
 
-Copyright (c) 2019 Advanced Micro Devices, Inc. All rights reserved. 
+Copyright (c) 2019 Advanced Micro Devices, Inc. All rights reserved.
 Copyright (c) Microsoft. All rights reserved.
 
 This code is licensed under the MIT License (MIT).
@@ -1075,25 +1075,25 @@ IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
 PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 
-gpuopen-librariesandsdks-vulkanmemoryallocator v-u (MIT) 
-Copyright (c) 2019-2022 Advanced Micro Devices, Inc. All rights reserved. 
+gpuopen-librariesandsdks-vulkanmemoryallocator v-u (MIT)
+Copyright (c) 2019-2022 Advanced Micro Devices, Inc. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy 
-of this software and associated documentation files (the "Software"), to deal 
-in the Software without restriction, including without limitation the rights 
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions: 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in 
-all copies or substantial portions of the Software. 
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 VMA
@@ -1129,7 +1129,7 @@ nvapi.lib and nvapi64.lib are licensed under the following terms:
 SPDX-FileCopyrightText: Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: MIT
 
-Permission is hereby granted, free of charge, to any person obtaining a 
+Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation
 the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -1214,7 +1214,7 @@ copyright statement(s).
 distributed by the Copyright Holder(s).
 
 "Modified Version" refers to any derivative made by adding to, deleting,
-or substituting — in part or in whole — any of the components of the
+or substituting Ă˘â‚¬â€ť in part or in whole Ă˘â‚¬â€ť any of the components of the
 Original Version, by changing formats or by porting the Font Software to a
 new environment.
 
@@ -1356,17 +1356,17 @@ AND DISTRIBUTION
 
    1. Definitions.
 
-      
+
 
 "License" shall mean the terms and conditions for use, reproduction, and distribution
 as defined by Sections 1 through 9 of this document.
 
-      
+
 
 "Licensor" shall mean the copyright owner or entity authorized by the copyright
 owner that is granting the License.
 
-      
+
 
 "Legal Entity" shall mean the union of the acting entity and all other entities
 that control, are controlled by, or are under common control with that entity.
@@ -1375,31 +1375,31 @@ or indirect, to cause the direction or management of such entity, whether
 by contract or otherwise, or (ii) ownership of fifty percent (50%) or more
 of the outstanding shares, or (iii) beneficial ownership of such entity.
 
-      
+
 
 "You" (or "Your") shall mean an individual or Legal Entity exercising permissions
 granted by this License.
 
-      
+
 
 "Source" form shall mean the preferred form for making modifications, including
 but not limited to software source code, documentation source, and configuration
 files.
 
-      
+
 
 "Object" form shall mean any form resulting from mechanical transformation
 or translation of a Source form, including but not limited to compiled object
 code, generated documentation, and conversions to other media types.
 
-      
+
 
 "Work" shall mean the work of authorship, whether in Source or Object form,
 made available under the License, as indicated by a copyright notice that
 is included in or attached to the work (an example is provided in the Appendix
 below).
 
-      
+
 
 "Derivative Works" shall mean any work, whether in Source or Object form,
 that is based on (or derived from) the Work and for which the editorial revisions,
@@ -1408,7 +1408,7 @@ original work of authorship. For the purposes of this License, Derivative
 Works shall not include works that remain separable from, or merely link (or
 bind by name) to the interfaces of, the Work and Derivative Works thereof.
 
-      
+
 
 "Contribution" shall mean any work of authorship, including the original version
 of the Work and any modifications or additions to that Work or Derivative
@@ -1423,7 +1423,7 @@ for the purpose of discussing and improving the Work, but excluding communicatio
 that is conspicuously marked or otherwise designated in writing by the copyright
 owner as "Not a Contribution."
 
-      
+
 
 "Contributor" shall mean Licensor and any individual or Legal Entity on behalf
 of whom a Contribution has been received by Licensor and subsequently incorporated
@@ -1719,7 +1719,7 @@ LICENSE file for the KhronosGroup/KTX-Software project    {#license}
 
 <!--
  Can't put at start. Doxygen requires page title on first line.
- Copyright 2013-2020 Mark Callow 
+ Copyright 2013-2020 Mark Callow
  SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -2757,7 +2757,7 @@ SHA-256: d557539df68e771cc1eedcc91d13f70fca930e508d11eedcafa4b15db49e3744
 
 Creative Commons Attribution 4.0 International
 
- Creative Commons Corporation (“Creative Commons”) is not a law firm and does not provide legal services or legal advice. Distribution of Creative Commons public licenses does not create a lawyer-client or other relationship. Creative Commons makes its licenses and related information available on an “as-is” basis. Creative Commons gives no warranties regarding its licenses, any material licensed under their terms and conditions, or any related information. Creative Commons disclaims all liability for damages resulting from their use to the fullest extent possible.
+ Creative Commons Corporation (Ă˘â‚¬Ĺ›Creative CommonsĂ˘â‚¬ĹĄ) is not a law firm and does not provide legal services or legal advice. Distribution of Creative Commons public licenses does not create a lawyer-client or other relationship. Creative Commons makes its licenses and related information available on an Ă˘â‚¬Ĺ›as-isĂ˘â‚¬ĹĄ basis. Creative Commons gives no warranties regarding its licenses, any material licensed under their terms and conditions, or any related information. Creative Commons disclaims all liability for damages resulting from their use to the fullest extent possible.
 
 Using Creative Commons Public Licenses
 
@@ -2765,13 +2765,13 @@ Creative Commons public licenses provide a standard set of terms and conditions 
 
 Considerations for licensors: Our public licenses are intended for use by those authorized to give the public permission to use material in ways otherwise restricted by copyright and certain other rights. Our licenses are irrevocable. Licensors should read and understand the terms and conditions of the license they choose before applying it. Licensors should also secure all rights necessary before applying our licenses so that the public can reuse the material as expected. Licensors should clearly mark any material not subject to the license. This includes other CC-licensed material, or material used under an exception or limitation to copyright. More considerations for licensors.
 
-Considerations for the public: By using one of our public licenses, a licensor grants the public permission to use the licensed material under specified terms and conditions. If the licensor’s permission is not necessary for any reason–for example, because of any applicable exception or limitation to copyright–then that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public.
+Considerations for the public: By using one of our public licenses, a licensor grants the public permission to use the licensed material under specified terms and conditions. If the licensorĂ˘â‚¬â„˘s permission is not necessary for any reasonĂ˘â‚¬â€śfor example, because of any applicable exception or limitation to copyrightĂ˘â‚¬â€śthen that use is not regulated by the license. Our licenses grant only permissions under copyright and certain other rights that a licensor has authority to grant. Use of the licensed material may still be restricted for other reasons, including because others have copyright or other rights in the material. A licensor may make special requests, such as asking that all changes be marked or described. Although not required by our licenses, you are encouraged to respect those requests where reasonable. More considerations for the public.
 
 Creative Commons Attribution 4.0 International Public License
 
 By exercising the Licensed Rights (defined below), You accept and agree to be bound by the terms and conditions of this Creative Commons Attribution 4.0 International Public License ("Public License"). To the extent this Public License may be interpreted as a contract, You are granted the Licensed Rights in consideration of Your acceptance of these terms and conditions, and the Licensor grants You such rights in consideration of benefits the Licensor receives from making the Licensed Material available under these terms and conditions.
 
-Section 1 – Definitions.
+Section 1 Ă˘â‚¬â€ś Definitions.
 
      a.	Adapted Material means material subject to Copyright and Similar Rights that is derived from or based upon the Licensed Material and in which the Licensed Material is translated, altered, arranged, transformed, or otherwise modified in a manner requiring permission under the Copyright and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.
 
@@ -2795,7 +2795,7 @@ Section 1 – Definitions.
 
      k.	You means the individual or entity exercising the Licensed Rights under this Public License. Your has a corresponding meaning.
 
-Section 2 – Scope.
+Section 2 Ă˘â‚¬â€ś Scope.
 
      a.	License grant.
 
@@ -2813,7 +2813,7 @@ Section 2 – Scope.
 
           5. Downstream recipients.
 
-               A. Offer from the Licensor – Licensed Material. Every recipient of the Licensed Material automatically receives an offer from the Licensor to exercise the Licensed Rights under the terms and conditions of this Public License.
+               A. Offer from the Licensor Ă˘â‚¬â€ś Licensed Material. Every recipient of the Licensed Material automatically receives an offer from the Licensor to exercise the Licensed Rights under the terms and conditions of this Public License.
 
                B. No downstream restrictions. You may not offer or impose any additional or different terms or conditions on, or apply any Effective Technological Measures to, the Licensed Material if doing so restricts exercise of the Licensed Rights by any recipient of the Licensed Material.
 
@@ -2827,7 +2827,7 @@ b. Other rights.
 
           3. To the extent possible, the Licensor waives any right to collect royalties from You for the exercise of the Licensed Rights, whether directly or through a collecting society under any voluntary or waivable statutory or compulsory licensing scheme. In all other cases the Licensor expressly reserves any right to collect such royalties.
 
-Section 3 – License Conditions.
+Section 3 Ă˘â‚¬â€ś License Conditions.
 
 Your exercise of the Licensed Rights is expressly made subject to the following conditions.
 
@@ -2857,7 +2857,7 @@ Your exercise of the Licensed Rights is expressly made subject to the following 
 
           4. If You Share Adapted Material You produce, the Adapter's License You apply must not prevent recipients of the Adapted Material from complying with this Public License.
 
-Section 4 – Sui Generis Database Rights.
+Section 4 Ă˘â‚¬â€ś Sui Generis Database Rights.
 
 Where the Licensed Rights include Sui Generis Database Rights that apply to Your use of the Licensed Material:
 
@@ -2868,7 +2868,7 @@ Where the Licensed Rights include Sui Generis Database Rights that apply to Your
      c.	You must comply with the conditions in Section 3(a) if You Share all or a substantial portion of the contents of the database.
 For the avoidance of doubt, this Section 4 supplements and does not replace Your obligations under this Public License where the Licensed Rights include other Copyright and Similar Rights.
 
-Section 5 – Disclaimer of Warranties and Limitation of Liability.
+Section 5 Ă˘â‚¬â€ś Disclaimer of Warranties and Limitation of Liability.
 
      a.	Unless otherwise separately undertaken by the Licensor, to the extent possible, the Licensor offers the Licensed Material as-is and as-available, and makes no representations or warranties of any kind concerning the Licensed Material, whether express, implied, statutory, or other. This includes, without limitation, warranties of title, merchantability, fitness for a particular purpose, non-infringement, absence of latent or other defects, accuracy, or the presence or absence of errors, whether or not known or discoverable. Where disclaimers of warranties are not allowed in full or in part, this disclaimer may not apply to You.
 
@@ -2876,7 +2876,7 @@ Section 5 – Disclaimer of Warranties and Limitation of Liability.
 
      c.	The disclaimer of warranties and limitation of liability provided above shall be interpreted in a manner that, to the extent possible, most closely approximates an absolute disclaimer and waiver of all liability.
 
-Section 6 – Term and Termination.
+Section 6 Ă˘â‚¬â€ś Term and Termination.
 
      a.	This Public License applies for the term of the Copyright and Similar Rights licensed here. However, if You fail to comply with this Public License, then Your rights under this Public License terminate automatically.
 
@@ -2892,13 +2892,13 @@ Section 6 – Term and Termination.
 
      e.	Sections 1, 5, 6, 7, and 8 survive termination of this Public License.
 
-Section 7 – Other Terms and Conditions.
+Section 7 Ă˘â‚¬â€ś Other Terms and Conditions.
 
      a.	The Licensor shall not be bound by any additional or different terms or conditions communicated by You unless expressly agreed.
 
      b.	Any arrangements, understandings, or agreements regarding the Licensed Material not stated herein are separate from and independent of the terms and conditions of this Public License.
 
-Section 8 – Interpretation.
+Section 8 Ă˘â‚¬â€ś Interpretation.
 
      a.	For the avoidance of doubt, this Public License does not, and shall not be interpreted to, reduce, limit, restrict, or impose conditions on any use of the Licensed Material that could lawfully be made without permission under this Public License.
 
@@ -2908,7 +2908,7 @@ Section 8 – Interpretation.
 
      d.	Nothing in this Public License constitutes or may be interpreted as a limitation upon, or waiver of, any privileges and immunities that apply to the Licensor or You, including from the legal processes of any jurisdiction or authority.
 
-Creative Commons is not a party to its public licenses. Notwithstanding, Creative Commons may elect to apply one of its public licenses to material it publishes and in those instances will be considered the “Licensor.” Except for the limited purpose of indicating that material is shared under a Creative Commons public license or as otherwise permitted by the Creative Commons policies published at creativecommons.org/policies, Creative Commons does not authorize the use of the trademark “Creative Commons” or any other trademark or logo of Creative Commons without its prior written consent including, without limitation, in connection with any unauthorized modifications to any of its public licenses or any other arrangements, understandings, or agreements concerning use of licensed material. For the avoidance of doubt, this paragraph does not form part of the public licenses.
+Creative Commons is not a party to its public licenses. Notwithstanding, Creative Commons may elect to apply one of its public licenses to material it publishes and in those instances will be considered the Ă˘â‚¬Ĺ›Licensor.Ă˘â‚¬ĹĄ Except for the limited purpose of indicating that material is shared under a Creative Commons public license or as otherwise permitted by the Creative Commons policies published at creativecommons.org/policies, Creative Commons does not authorize the use of the trademark Ă˘â‚¬Ĺ›Creative CommonsĂ˘â‚¬ĹĄ or any other trademark or logo of Creative Commons without its prior written consent including, without limitation, in connection with any unauthorized modifications to any of its public licenses or any other arrangements, understandings, or agreements concerning use of licensed material. For the avoidance of doubt, this paragraph does not form part of the public licenses.
 
 Creative Commons may be contacted at creativecommons.org.
 
@@ -3984,7 +3984,7 @@ Section 8 -- Interpretation.
 Creative Commons is not a party to its public
 licenses. Notwithstanding, Creative Commons may elect to apply one of
 its public licenses to material it publishes and in those instances
-will be considered the “Licensor.” The text of the Creative Commons
+will be considered the Ă˘â‚¬Ĺ›Licensor.Ă˘â‚¬ĹĄ The text of the Creative Commons
 public licenses is dedicated to the public domain under the CC0 Public
 Domain Dedication. Except for the limited purpose of indicating that
 material is shared under a Creative Commons public license or as
@@ -5230,7 +5230,9 @@ NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 === Microsoft Visual Studio Community 2026 ===
 Source: https://visualstudio.microsoft.com/license-terms/vs2026-ga-community/
-SHA-256: ef616cae10d627cdc97238749de23ba1fcae68c329879c7b63ec65bfadc89c0b
+Publisher document: https://visualstudio.microsoft.com/wp-content/uploads/2025/10/Visual_Studio_2026-License-Community_ENU.docx
+Document SHA-256: 02ac07637f4a513a807cd3721c7620433fc483bc049d25784b0c10c54b05e1fb
+Extracted text SHA-256: 9173a2d23ef9ff0addf9e83cbdec02241a7336f15a867d8ea23dea93c274ca60
 
 MICROSOFT SOFTWARE LICENSE TERMS
 
@@ -5238,17 +5240,17 @@ MICROSOFT VISUAL STUDIO COMMUNITY 2026
 
 Last Updated: October 1, 2025.
 
-These license terms are an agreement between you and Microsoft Corporation (or based on where you live, one of its affiliates). They apply to the software named above. The terms also apply to any Microsoft services or updates for the software, except to the extent those have additional terms.  
+These license terms are an agreement between you and Microsoft Corporation (or based on where you live, one of its affiliates). They apply to the software named above. The terms also apply to any Microsoft services or updates for the software, except to the extent those have additional terms.
 
-Unless otherwise stated, these license terms remain in effect for this version of Visual Studio and any updates or revisions released. Microsoft may update or modify these license terms at any time. It is your responsibility to regularly review the license terms and any related announcements. The most current version of the license terms will always be available at https://aka.ms/VisualStudioLicenses. By continuing to use the software after changes are posted, you agree to the updated terms. 
+Unless otherwise stated, these license terms remain in effect for this version of Visual Studio and any updates or revisions released. Microsoft may update or modify these license terms at any time. It is your responsibility to regularly review the license terms and any related announcements. The most current version of the license terms will always be available at https://aka.ms/VisualStudioLicenses. By continuing to use the software after changes are posted, you agree to the updated terms.
 
-IF YOU COMPLY WITH THESE LICENSE TERMS, YOU HAVE THE RIGHTS BELOW. 
+IF YOU COMPLY WITH THESE LICENSE TERMS, YOU HAVE THE RIGHTS BELOW.
 
-OVERVIEW 
+OVERVIEW
 
-Software. The software includes developmental tools, applications, and documentation. 
+Software. The software includes developmental tools, applications, and documentation.
 
-License Model. The software is licensed on a per user basis. 
+License Model. The software is licensed on a per user basis.
 
 INSTALLATION AND USE RIGHTS.
 
@@ -5258,11 +5260,11 @@ Individual License. If you are an individual working on your own applications, e
 
 Organizational License. If you are an organization, your users may use the software as follows:
 
-Any number of your users may use the software to develop and test: 
+Any number of your users may use the software to develop and test:
 
 applications released under Open Source Initiative (OSI) approved open source software licenses;
 
-extensions to Visual Studio; 
+extensions to Visual Studio;
 
 device drivers for the Windows operating system;
 
@@ -5272,11 +5274,11 @@ Microsoft SQL Server database projects or Analysis Services, Reporting Services,
 
 If none of (i) through (v) above apply, and you are also not an enterprise (defined below), then up to 5 of your individual users can use the software concurrently to develop and test your applications.
 
-Enterprise use. 
+Enterprise use.
 
 An “enterprise” is any organization and its affiliates who collectively have either (a) more than 250 PCs or users or (b) one million U.S. dollars (or the equivalent in other currencies) in annual revenues, and “affiliates” means those entities that control (via majority ownership), are controlled by, or are under common control with an organization.
 
-If you are an enterprise, your employees and contractors may not use the software to develop or test your applications, except for the uses listed in Section 2(c) above. 
+If you are an enterprise, your employees and contractors may not use the software to develop or test your applications, except for the uses listed in Section 2(c) above.
 
 Workloads. These license terms apply to your use of the workloads made available to you within the software, except to the extent a workload, or a workload component comes with different license terms and support policies.
 
@@ -5284,15 +5286,15 @@ Backup Copy. You may make one backup copy of the software, for reinstalling the 
 
 Demo Use. The uses permitted above include use of the software to demonstrate your applications.
 
-INSIDERS, PREVIEWS, AND PRE-RELEASE SOFTWARE. Microsoft may make the software available to you through the Insiders Channel (“Insiders Channel Software”) or may make available to you pre-release or preview features or components (“Preview Features”) through the Stable Channel. Insiders Channel Software and Preview Features (collectively, “Previews”), the Insiders Channel, and Stable Channel are further described at https://aka.ms/vs/18/channels-overview. 
+INSIDERS, PREVIEWS, AND PRE-RELEASE SOFTWARE. Microsoft may make the software available to you through the Insiders Channel (“Insiders Channel Software”) or may make available to you pre-release or preview features or components (“Preview Features”) through the Stable Channel. Insiders Channel Software and Preview Features (collectively, “Previews”), the Insiders Channel, and Stable Channel are further described at https://aka.ms/vs/18/channels-overview.
 
-You may use any number of copies of Insiders Channel Software only for internal evaluation purposes. 
+You may use any number of copies of Insiders Channel Software only for internal evaluation purposes.
 
-Preview Features may be used consistent with your use rights to the software. 
+Preview Features may be used consistent with your use rights to the software.
 
-Previews are experimental and may be substantially different from the commercially released version. They may not operate correctly or work the way a final version will. Microsoft may change Previews for the final, commercial version, if any. 
+Previews are experimental and may be substantially different from the commercially released version. They may not operate correctly or work the way a final version will. Microsoft may change Previews for the final, commercial version, if any.
 
-Microsoft is not obligated to provide maintenance, technical support or updates to you for Previews. 
+Microsoft is not obligated to provide maintenance, technical support or updates to you for Previews.
 
 Any separate components, such as frameworks, runtimes, or compilers, that are marked as “insiders”, “preview”, “pre-release”, or “beta” (collectively, “Unreleased Components”) included with Previews are solely for internal evaluation purposes. You may not distribute or deploy into production software that depends on them. Unreleased Components may be subject to separate terms.
 
@@ -5310,7 +5312,7 @@ Separation of Components; Workloads. Except as otherwise stated in these license
 
 Utilities. The software contains items on the Utilities List at https://aka.ms/vs/18/utilities (“Utilities”). You may copy and install those items onto your devices to debug and deploy your applications and databases you developed with the software. The Utilities are designed for temporary use. Microsoft may not be able to patch or update Utilities separately from the rest of the software. Some Utilities by their nature may make it possible for others to access the devices on which the Utilities are installed. You should delete all Utilities you have installed after you finish debugging or deploying your applications and databases. Microsoft is not responsible for any third party use or access of devices, or of the applications or databases on devices, on which Utilities have been installed.
 
-Build Devices and Visual Studio Build Tools. You may copy and install files from the software or from Visual Studio Build Tools onto your build devices, including physical devices and virtual machines or containers on those devices, whether on-premises or remote machines that are (i) owned by you, (ii) hosted on Microsoft Azure for you, or (iii) under the day-to-day management and control of an Authorized Outsourcer (as defined below) and dedicated solely to your use (collectively, “Build Devices”). You and others in your organization may use these files on your Build Devices solely to compile, build, and verify applications developed by using the software, or run quality or performance tests of those applications as part of the build process. 
+Build Devices and Visual Studio Build Tools. You may copy and install files from the software or from Visual Studio Build Tools onto your build devices, including physical devices and virtual machines or containers on those devices, whether on-premises or remote machines that are (i) owned by you, (ii) hosted on Microsoft Azure for you, or (iii) under the day-to-day management and control of an Authorized Outsourcer (as defined below) and dedicated solely to your use (collectively, “Build Devices”). You and others in your organization may use these files on your Build Devices solely to compile, build, and verify applications developed by using the software, or run quality or performance tests of those applications as part of the build process.
 
 “Authorized Outsourcer” means any third party service provider that is not a Listed Provider and is not using Listed Provider as a Data Center Provider as part of the outsourcing service.
 
@@ -5324,9 +5326,9 @@ Fonts. While the software is running, you may use its fonts to display and print
 
 IntelliSense Service. This service provides a base model trained on publicly available open source code that enables you to receive AI-assisted IntelliSense suggestions. You may only use the base model, in whole or in part, with the software. AI-assisted IntelliSense analyzes your application locally to generate a summary file with metadata on the types and their usage across your application which illustrate your patterns of usage. The summary file contains information about the names of classes, methods, and how often they are used in your application (“Your Data”). You retain ownership of all aspects of Your Data, including, but not limited to, all right, title and interest in and to the underlying application code.
 
-Licenses for Other Components. 
+Licenses for Other Components.
 
-Microsoft Platforms. The software may include components from Microsoft Windows, Microsoft Windows Server, Microsoft SQL Server, Microsoft Exchange, Microsoft Office, Microsoft SharePoint, Microsoft Visual C++, or other Microsoft software. These components are governed by separate agreements and their own product support policies, as described in the Microsoft “Licenses” folder accompanying the software, or at https://aka.ms/vs/18/AdditionalLicenses, except that, if license terms for those components are also included in the associated installation directly, those license terms control. 
+Microsoft Platforms. The software may include components from Microsoft Windows, Microsoft Windows Server, Microsoft SQL Server, Microsoft Exchange, Microsoft Office, Microsoft SharePoint, Microsoft Visual C++, or other Microsoft software. These components are governed by separate agreements and their own product support policies, as described in the Microsoft “Licenses” folder accompanying the software, or at https://aka.ms/vs/18/AdditionalLicenses, except that, if license terms for those components are also included in the associated installation directly, those license terms control.
 
 Third Party or Open Source Components. The software may include third party or open source components with separate legal notices or governed by other agreements, as may be described in the notices file(s) accompanying the software.
 
@@ -5336,7 +5338,7 @@ DISTRIBUTABLE CODE. The software contains code that you may distribute in applic
 
 Right to Use and Distribute. The code and text files listed in (i) and (ii) below are “Distributable Code”.
 
-Distributable List. You may copy and distribute the object code form of code listed on the Distributable List located at https://aka.ms/vs/18/redistribution. 
+Distributable List. You may copy and distribute the object code form of code listed on the Distributable List located at https://aka.ms/vs/18/redistribution.
 
 Sample Code, Templates, and Styles. You may copy, modify and distribute the source and object code form of code marked as “sample”, “template”, “simple styles” and “sketch styles”.
 
@@ -5344,7 +5346,7 @@ Third Party Distribution. You may permit distributors of your applications to co
 
 Distribution Requirements. For any Distributable Code you distribute, you must:
 
-add significant primary functionality to it in your applications; 
+add significant primary functionality to it in your applications;
 
 require distributors and external end users to agree to terms that protect the Distributable Code at least as much as these license terms; and
 
@@ -5354,7 +5356,7 @@ Distribution Restrictions. You may not:
 
 distribute Unreleased Components;
 
-distribute software developed with Insiders Channel Software or that depends on Unreleased Components; 
+distribute software developed with Insiders Channel Software or that depends on Unreleased Components;
 
 use Microsoft’s trademarks in your applications’ names or in a way that suggests your applications come from or are endorsed by Microsoft; or
 
@@ -5366,7 +5368,7 @@ Limits on Extensions. You may not develop or enable others to develop extensions
 
 No Degrading the Software. If you develop an extension for the software (or any other component of the Visual Studio family of products), you must test the installation, uninstallation, and operation of your extension to ensure that such processes do not disable any features or adversely affect the functionality of the software (or such component) or of any previous version or edition thereof.
 
-DATA. 
+DATA.
 
 Data Collection. The software may collect information about you and your use of the software, and send that information to Microsoft (“Usage Data”). Microsoft may use this information to provide services and improve our products and services. You may opt-out of many of these scenarios, but not all, as described in the software documentation. There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft’s privacy statement. Our privacy statement is located at https://aka.ms/privacy. You can learn more about data collection and its use from the software documentation and our privacy statement. Your use of the software operates as your consent to these practices.
 
@@ -5382,9 +5384,9 @@ reverse engineer, decompile, or disassemble the software, or otherwise attempt t
 
 remove, minimize, block or modify any notices of Microsoft or its suppliers in the software;
 
-use the software in any way that is against the law; 
+use the software in any way that is against the law;
 
-share, publish, rent or lease the software; or 
+share, publish, rent or lease the software; or
 
 provide the software as a stand-alone offering or combine it with any of your applications for others to use, or transfer the software or these license terms to any third party.
 
@@ -5428,8 +5430,6 @@ This limitation applies to (a) anything related to the software, services, conte
 
 It also applies even if Microsoft knew or should have known about the possibility of the damages. The above limitation or exclusion may not apply to you because your state or country may not allow the exclusion or limitation of incidental, consequential or other damages.
 
-
-
 Please note: As this software is distributed in Canada, some of the clauses in this agreement are provided below in French.
 
 Remarque: Ce logiciel étant distribué au Canada, certaines des clauses dans ce contrat sont fournies ci-dessous en français.
@@ -5448,17 +5448,17 @@ Elle s’applique également, même si Microsoft connaissait ou devrait connaît
 
 EFFET JURIDIQUE. Le présent contrat décrit certains droits juridiques. Vous pourriez avoir d’autres droits prévus par les lois de votre pays. Le présent contrat ne modifie pas les droits que vous confèrent les lois de votre pays si celles-ci ne le permettent pas.
 
-
-
 EULAID: VS2026_Comm_ENU.1033
 
 === Microsoft Visual C++ Runtime 2026 ===
 Source: https://visualstudio.microsoft.com/license-terms/vs2026-ga-visualcpp-v14-redist-runtime/
-SHA-256: fcd3649a1ea1ed04d849521aca4950ca3db98b3a69f542b51d94cf71f4f17b64
+Publisher document: https://visualstudio.microsoft.com/wp-content/uploads/2025/10/Visual-C-V14-License-Redistributable_and_Runtime_ENU.docx
+Document SHA-256: 08651651a7602fc7c0e2763de0fde1ff9f868df2780597cd1775ee9d6441c783
+Extracted text SHA-256: 54300741255267c6ad7af36673145563099941a3c37df5b23c062571b94f2f09
 
 MICROSOFT SOFTWARE LICENSE TERMS
 
-MICROSOFT VISUAL C++ V14 REDISTRIBUTABLE and RUNTIME 
+MICROSOFT VISUAL C++ V14 REDISTRIBUTABLE and RUNTIME
 
 Last Updated: October 1, 2025
 
@@ -5470,7 +5470,7 @@ BY USING THE SOFTWARE, YOU ACCEPT THESE TERMS. IF YOU DO NOT ACCEPT THEM, DO NOT
 
 IF YOU COMPLY WITH THESE LICENSE TERMS, YOU HAVE THE RIGHTS BELOW.
 
-INSTALLATION AND USE RIGHTS. 
+INSTALLATION AND USE RIGHTS.
 
 You may install and use any number of copies of the software.
 
@@ -5478,7 +5478,7 @@ FEEDBACK. If you give feedback, suggestions, or recommendations (collectively, �
 
 TERMS FOR SPECIFIC COMPONENTS.
 
-Third Party or Open Source Components. The software may include third party or open source components with separate legal notices or governed by other agreements, as may be described in the notices file(s) accompanying the software. 
+Third Party or Open Source Components. The software may include third party or open source components with separate legal notices or governed by other agreements, as may be described in the notices file(s) accompanying the software.
 
 SCOPE OF LICENSE. The software is licensed, not sold. These license terms only give you some rights to use the software. Microsoft reserves all other rights. Unless applicable law gives you more rights despite this limitation, you may use the software only as expressly permitted in these license terms. In doing so, you must comply with any technical limitations in the software that only allow you to use it in certain ways. For example, if Microsoft technically limits or disables extensibility for the software, you may not extend the software by, among other things, loading or injecting into the software any non-Microsoft add-ins, macros, or packages; modifying the software registry settings; or adding features or functionality equivalent to that found in Microsoft products and services. You may not
 
@@ -5486,11 +5486,11 @@ work around any technical limitations in the software;
 
 reverse engineer, decompile or disassemble the software, or otherwise attempt to derive the source code for the software, except and only to the extent required by third party licensing terms governing use of certain open source components that may be included in the software;
 
-remove, minimize, block or modify any notices of Microsoft or its suppliers in the software; 
+remove, minimize, block or modify any notices of Microsoft or its suppliers in the software;
 
-use the software in any way that is against the law; 
+use the software in any way that is against the law;
 
-share, publish, rent, lease, or otherwise distribute the software or any of its code; or 
+share, publish, rent, lease, or otherwise distribute the software or any of its code; or
 
 provide the software as a stand-alone offering or combined with any of your applications for others to use, or transfer the software or these license terms to any third party.
 
@@ -5534,27 +5534,23 @@ This limitation applies to (a) anything related to the software, services, conte
 
 It also applies even if Microsoft knew or should have known about the possibility of the damages. The above limitation or exclusion may not apply to you because your country may not allow the exclusion or limitation of incidental, consequential or other damages.
 
+Please note: As this software is distributed in Canada, some of the clauses in this agreement are provided below in French.
 
+Remarque: Ce logiciel étant distribué au Canada, certaines des clauses dans ce contrat sont fournies ci-dessous en français.
 
-Please note: As this software is distributed in Canada, some of the clauses in this agreement are provided below in French. 
+EXONÉRATION DE GARANTIE. Le logiciel visé par une licence est offert « tel quel ». Toute utilisation de ce logiciel est à votre seule risque et péril. Microsoft n’accorde aucune autre garantie expresse. Vous pouvez bénéficier de droits additionnels en vertu du droit local sur la protection des consommateurs, que ce contrat ne peut modifier. La ou elles sont permises par le droit locale, les garanties implicites de qualité marchande, d’adéquation à un usage particulier et d’absence de contrefaçon sont exclues.
 
-Remarque: Ce logiciel étant distribué au Canada, certaines des clauses dans ce contrat sont fournies ci-dessous en français. 
+LIMITATION DES DOMMAGES-INTÉRÊTS ET EXCLUSION DE RESPONSABILITÉ POUR LES DOMMAGES. Vous pouvez obtenir de Microsoft et de ses fournisseurs une indemnisation en cas de dommages directs uniquement à hauteur de 5,00 $ US. Vous ne pouvez prétendre à aucune indemnisation pour les autres dommages, y compris les dommages spéciaux, indirects ou accessoires et pertes de bénéfices.
 
-EXONÉRATION DE GARANTIE. Le logiciel visé par une licence est offert « tel quel ». Toute utilisation de ce logiciel est à votre seule risque et péril. Microsoft n’accorde aucune autre garantie expresse. Vous pouvez bénéficier de droits additionnels en vertu du droit local sur la protection des consommateurs, que ce contrat ne peut modifier. La ou elles sont permises par le droit locale, les garanties implicites de qualité marchande, d’adéquation à un usage particulier et d’absence de contrefaçon sont exclues. 
+Cette limitation concerne:
 
-LIMITATION DES DOMMAGES-INTÉRÊTS ET EXCLUSION DE RESPONSABILITÉ POUR LES DOMMAGES. Vous pouvez obtenir de Microsoft et de ses fournisseurs une indemnisation en cas de dommages directs uniquement à hauteur de 5,00 $ US. Vous ne pouvez prétendre à aucune indemnisation pour les autres dommages, y compris les dommages spéciaux, indirects ou accessoires et pertes de bénéfices. 
+tout ce qui est relié au logiciel, aux services ou au contenu (y compris le code) figurant sur des sites Internet tiers ou dans des programmes tiers; et
 
-Cette limitation concerne: 
+les réclamations au titre de violation de contrat ou de garantie, ou au titre de responsabilité stricte, de négligence ou d’une autre faute dans la limite autorisée par la loi en vigueur.
 
-tout ce qui est relié au logiciel, aux services ou au contenu (y compris le code) figurant sur des sites Internet tiers ou dans des programmes tiers; et 
-
-les réclamations au titre de violation de contrat ou de garantie, ou au titre de responsabilité stricte, de négligence ou d’une autre faute dans la limite autorisée par la loi en vigueur. 
-
-Elle s’applique également, même si Microsoft connaissait ou devrait connaître l’éventualité d’un tel dommage. Si votre pays n’autorise pas l’exclusion ou la limitation de responsabilité pour les dommages indirects, accessoires ou de quelque nature que ce soit, il se peut que la limitation ou l’exclusion ci-dessus ne s’appliquera pas à votre égard. 
+Elle s’applique également, même si Microsoft connaissait ou devrait connaître l’éventualité d’un tel dommage. Si votre pays n’autorise pas l’exclusion ou la limitation de responsabilité pour les dommages indirects, accessoires ou de quelque nature que ce soit, il se peut que la limitation ou l’exclusion ci-dessus ne s’appliquera pas à votre égard.
 
 EFFET JURIDIQUE. Le présent contrat décrit certains droits juridiques. Vous pourriez avoir d’autres droits prévus par les lois de votre pays. Le présent contrat ne modifie pas les droits que vous confèrent les lois de votre pays si celles-ci ne le permettent pas.
-
-
 
 EULA ID: Cpp_v14_ENU.1033
 
@@ -5667,3 +5663,280 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+
+SDL3
+Version: 3.4.20
+Source: https://github.com/libsdl-org/SDL/tree/f00dc919ca35b9756316e86c4777392de442f9b2
+License: Zlib
+
+Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
+
+This software is provided 'as-is', without any express or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgment in the product documentation would be
+   appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+
+
+SDL3 bundled fdlibm (src/libm; SunPro and public-domain contributions)
+Source: https://github.com/libsdl-org/SDL/tree/f00dc919ca35b9756316e86c4777392de442f9b2/src/libm
+
+Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+
+Developed at SunPro, a Sun Microsystems, Inc. business.
+Permission to use, copy, modify, and distribute this
+software is freely granted, provided that this notice
+is preserved.
+
+s_isinf.c and s_isinff.c: Written by J.T. Conklin <jtc@netbsd.org>.
+s_isinf.c: Changed to return -1 for -Inf by Ulrich Drepper <drepper@cygnus.com>.
+Public domain.
+
+D3DX12
+Source: ThirdParty/D3DX12/d3dx12.h
+Identity: SHA-256 bc48e96fe3995e8181a5ecd1cab5840b095dba58044523abacbacb52fd7ead2b (historical upstream revision unrecorded)
+License: MIT
+
+Copyright (c) Microsoft Corporation.
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+DirectXMath
+Source: selected Windows SDK um/DirectXMath.h and DirectXMath*.inl
+Upstream: https://github.com/microsoft/DirectXMath
+Identity: configured SparkleDirectXMath source-package SHA-256 of the consumed SDK headers
+License: MIT
+
+Copyright (c) Microsoft Corporation.
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+nlohmann/json bundled header contributors
+Source: build/_deps/nlohmann_json-src/include/nlohmann
+
+thirdparty/hedley/hedley.hpp
+SHA-256: 193072e3d257d0992b3c049fb21ef4ba80789337ac5b1b5a9b9d708cddc25dff
+#pragma once
+
+//     __ _____ _____ _____
+//  __|  |   __|     |   | |  JSON for Modern C++
+// |  |  |__   |  |  | | | |  version 3.12.0
+// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+//
+// SPDX-FileCopyrightText: 2013-2026 Niels Lohmann <https://nlohmann.me>
+// SPDX-FileCopyrightText: 2016-2021 Evan Nemerson <evan@nemerson.com>
+// SPDX-License-Identifier: MIT
+
+/* Hedley - https://nemequ.github.io/hedley
+ * Created by Evan Nemerson <evan@nemerson.com>
+ * SPDX-License-Identifier: CC0-1.0
+ */
+
+detail/conversions/to_chars.hpp
+SHA-256: 5571d759fa0603f9827bca1ddcd2fd6d9b44cdcf9f09ab81d59d151d25eb0c8d
+//     __ _____ _____ _____
+//  __|  |   __|     |   | |  JSON for Modern C++
+// |  |  |__   |  |  | | | |  version 3.12.0
+// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+//
+// SPDX-FileCopyrightText: 2009 Florian Loitsch <https://florian.loitsch.com/>
+// SPDX-FileCopyrightText: 2025 Victor Zverovich <https://github.com/vitaut/zmij>
+// SPDX-FileCopyrightText: 2013-2026 Niels Lohmann <https://nlohmann.me>
+// SPDX-License-Identifier: MIT
+
+
+detail/conversions/zmij.hpp
+SHA-256: ef502542d3c1b267bede9ed45a9263c5bdc0e04d566ea896460fb00e8d14e0be
+//     __ _____ _____ _____
+//  __|  |   __|     |   | |  JSON for Modern C++
+// |  |  |__   |  |  | | | |  version 3.12.0
+// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+//
+// SPDX-FileCopyrightText: 2025 Victor Zverovich <https://github.com/vitaut/zmij>
+// SPDX-FileCopyrightText: 2013-2026 Niels Lohmann <https://nlohmann.me>
+// SPDX-License-Identifier: MIT
+
+
+Hedley CC0-1.0 text
+Source: build/_deps/nlohmann_json-src/LICENSES/CC0-1.0.txt
+SHA-256: f4e7f373b9b996950337e8d41a4a2939c2d90b7725e9baf3d5084a22717ad328
+
+Creative Commons Legal Code
+
+CC0 1.0 Universal
+
+    CREATIVE COMMONS CORPORATION IS NOT A LAW FIRM AND DOES NOT PROVIDE
+    LEGAL SERVICES. DISTRIBUTION OF THIS DOCUMENT DOES NOT CREATE AN
+    ATTORNEY-CLIENT RELATIONSHIP. CREATIVE COMMONS PROVIDES THIS
+    INFORMATION ON AN "AS-IS" BASIS. CREATIVE COMMONS MAKES NO WARRANTIES
+    REGARDING THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS
+    PROVIDED HEREUNDER, AND DISCLAIMS LIABILITY FOR DAMAGES RESULTING FROM
+    THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS PROVIDED
+    HEREUNDER.
+
+Statement of Purpose
+
+The laws of most jurisdictions throughout the world automatically confer
+exclusive Copyright and Related Rights (defined below) upon the creator
+and subsequent owner(s) (each and all, an "owner") of an original work of
+authorship and/or a database (each, a "Work").
+
+Certain owners wish to permanently relinquish those rights to a Work for
+the purpose of contributing to a commons of creative, cultural and
+scientific works ("Commons") that the public can reliably and without fear
+of later claims of infringement build upon, modify, incorporate in other
+works, reuse and redistribute as freely as possible in any form whatsoever
+and for any purposes, including without limitation commercial purposes.
+These owners may contribute to the Commons to promote the ideal of a free
+culture and the further production of creative, cultural and scientific
+works, or to gain reputation or greater distribution for their Work in
+part through the use and efforts of others.
+
+For these and/or other purposes and motivations, and without any
+expectation of additional consideration or compensation, the person
+associating CC0 with a Work (the "Affirmer"), to the extent that he or she
+is an owner of Copyright and Related Rights in the Work, voluntarily
+elects to apply CC0 to the Work and publicly distribute the Work under its
+terms, with knowledge of his or her Copyright and Related Rights in the
+Work and the meaning and intended legal effect of CC0 on those rights.
+
+1. Copyright and Related Rights. A Work made available under CC0 may be
+protected by copyright and related or neighboring rights ("Copyright and
+Related Rights"). Copyright and Related Rights include, but are not
+limited to, the following:
+
+  i. the right to reproduce, adapt, distribute, perform, display,
+     communicate, and translate a Work;
+ ii. moral rights retained by the original author(s) and/or performer(s);
+iii. publicity and privacy rights pertaining to a person's image or
+     likeness depicted in a Work;
+ iv. rights protecting against unfair competition in regards to a Work,
+     subject to the limitations in paragraph 4(a), below;
+  v. rights protecting the extraction, dissemination, use and reuse of data
+     in a Work;
+ vi. database rights (such as those arising under Directive 96/9/EC of the
+     European Parliament and of the Council of 11 March 1996 on the legal
+     protection of databases, and under any national implementation
+     thereof, including any amended or successor version of such
+     directive); and
+vii. other similar, equivalent or corresponding rights throughout the
+     world based on applicable law or treaty, and any national
+     implementations thereof.
+
+2. Waiver. To the greatest extent permitted by, but not in contravention
+of, applicable law, Affirmer hereby overtly, fully, permanently,
+irrevocably and unconditionally waives, abandons, and surrenders all of
+Affirmer's Copyright and Related Rights and associated claims and causes
+of action, whether now known or unknown (including existing as well as
+future claims and causes of action), in the Work (i) in all territories
+worldwide, (ii) for the maximum duration provided by applicable law or
+treaty (including future time extensions), (iii) in any current or future
+medium and for any number of copies, and (iv) for any purpose whatsoever,
+including without limitation commercial, advertising or promotional
+purposes (the "Waiver"). Affirmer makes the Waiver for the benefit of each
+member of the public at large and to the detriment of Affirmer's heirs and
+successors, fully intending that such Waiver shall not be subject to
+revocation, rescission, cancellation, termination, or any other legal or
+equitable action to disrupt the quiet enjoyment of the Work by the public
+as contemplated by Affirmer's express Statement of Purpose.
+
+3. Public License Fallback. Should any part of the Waiver for any reason
+be judged legally invalid or ineffective under applicable law, then the
+Waiver shall be preserved to the maximum extent permitted taking into
+account Affirmer's express Statement of Purpose. In addition, to the
+extent the Waiver is so judged Affirmer hereby grants to each affected
+person a royalty-free, non transferable, non sublicensable, non exclusive,
+irrevocable and unconditional license to exercise Affirmer's Copyright and
+Related Rights in the Work (i) in all territories worldwide, (ii) for the
+maximum duration provided by applicable law or treaty (including future
+time extensions), (iii) in any current or future medium and for any number
+of copies, and (iv) for any purpose whatsoever, including without
+limitation commercial, advertising or promotional purposes (the
+"License"). The License shall be deemed effective as of the date CC0 was
+applied by Affirmer to the Work. Should any part of the License for any
+reason be judged legally invalid or ineffective under applicable law, such
+partial invalidity or ineffectiveness shall not invalidate the remainder
+of the License, and in such case Affirmer hereby affirms that he or she
+will not (i) exercise any of his or her remaining Copyright and Related
+Rights in the Work or (ii) assert any associated claims and causes of
+action with respect to the Work, in either case contrary to Affirmer's
+express Statement of Purpose.
+
+4. Limitations and Disclaimers.
+
+ a. No trademark or patent rights held by Affirmer are waived, abandoned,
+    surrendered, licensed or otherwise affected by this document.
+ b. Affirmer offers the Work as-is and makes no representations or
+    warranties of any kind concerning the Work, express, implied,
+    statutory or otherwise, including without limitation warranties of
+    title, merchantability, fitness for a particular purpose, non
+    infringement, or the absence of latent or other defects, accuracy, or
+    the present or absence of errors, whether or not discoverable, all to
+    the greatest extent permissible under applicable law.
+ c. Affirmer disclaims responsibility for clearing rights of other persons
+    that may apply to the Work or any use thereof, including without
+    limitation any person's Copyright and Related Rights in the Work.
+    Further, Affirmer disclaims responsibility for obtaining any necessary
+    consents, permissions or other rights required for any use of the
+    Work.
+ d. Affirmer understands and acknowledges that Creative Commons is not a
+    party to this document and has no duty or obligation with respect to
+    this CC0 or use of the Work.
+
+Maintained parser bounds patches
+
+cgltf 1.15: CMake/Dependencies/Patches/CgltfAccessorBounds.patch
+Backport of open upstream proposal 8211a9f12a729e7c2998bcc68f43c2ed2e5462d9 (PR 293); validation hunks only.
+
+Assimp 5.4.3: CMake/Dependencies/Patches/AssimpMaterialKeyBounds.patch
+Local bounds check for oversized material keys (CVE-2025-70067).
+
+Both retain the upstream license texts above. Configured source-package versions bind the base identity and exact patch SHA-256. These corrections do not claim that every upstream advisory is resolved.

@@ -198,7 +198,7 @@ static std::shared_ptr<const ShaderCompileInvocation> RunShaderMake(
 	Process::ChildProcessRequest process;
 	process.ExecutablePath = Filesystem::GetExecutableDirectory() / "ShaderMake.exe";
 	const std::filesystem::path compiler = Filesystem::GetExecutableDirectory() / (group.Backend == "dxc" ? "dxc.exe" : "slangc.exe");
-	const std::string compilerPath = compiler.lexically_relative(staging.Directory).generic_string();
+	const std::string compilerPath = Strings::ToNarrow(compiler.lexically_relative(staging.Directory).generic_wstring());
 	const bool bShellSafe = !compilerPath.empty()
 	    && std::ranges::all_of(
 	        compilerPath,
@@ -213,7 +213,7 @@ static std::shared_ptr<const ShaderCompileInvocation> RunShaderMake(
 	}
 	process.Arguments = BuildShaderMakeArguments(job, invocation->ConfigurationPath.generic_string(), compilerPath, workers, operation);
 	process.WorkingDirectory = staging.Directory;
-	invocation->Arguments.push_back(process.ExecutablePath.generic_string());
+	invocation->Arguments.push_back(Strings::ToNarrow(process.ExecutablePath.generic_wstring()));
 	invocation->Arguments.insert(invocation->Arguments.end(), process.Arguments.begin(), process.Arguments.end());
 	staging.bCanRemove = false;
 	Process::ChildProcessResult result = Process::RunChildProcess(process);
@@ -221,7 +221,13 @@ static std::shared_ptr<const ShaderCompileInvocation> RunShaderMake(
 	if (!result.Succeeded())
 	{
 		throw Diagnostics::Error(
-		    std::format("ShaderMake {} batch failed (exit {}): {}\n{}\nInvocation: {}", group.Backend, result.ExitCode, result.FailureReason, result.CapturedOutput, staging.Directory.string()));
+		    std::format(
+		        "ShaderMake {} batch failed (exit {}): {}\n{}\nInvocation: {}",
+		        group.Backend,
+		        result.ExitCode,
+		        result.FailureReason,
+		        result.CapturedOutput,
+		        Strings::ToNarrow(staging.Directory.native())));
 	}
 	invocation->WorkingDirectory = process.WorkingDirectory;
 	invocation->CompilerOutput = std::move(result.CapturedOutput);

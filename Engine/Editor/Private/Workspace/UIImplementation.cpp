@@ -19,7 +19,7 @@
 #include "Viewport/ViewportToolbar.h"
 #include "Renderer/Public/UI/UiTextureHandle.h"
 #include "Renderer/Public/Settings/EngineRenderingSettings.h"
-#include "Renderer/Public/UI/ImGuiRenderPacketBuilder.h"
+#include "ImGui/ImGuiRenderPacketBuilder.h"
 #include "Renderer/Public/UI/UiRenderPacket.h"
 #include "Renderer/Public/Viewport/ViewportContracts.h"
 #include "Viewport/EditorViewportSession.h"

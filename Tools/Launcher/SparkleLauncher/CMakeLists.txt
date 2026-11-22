@@ -175,7 +175,7 @@ set_target_properties(SparkleLauncher PROPERTIES
 sparkle_configure_launcher_artifacts(SparkleLauncher)
 sparkle_stage_msvc_runtime(SparkleLauncher)
 sparkle_configure_product_identity(SparkleLauncher "Sparkle Launcher")
-sparkle_stage_linked_runtime(SparkleLauncher)
+sparkle_stage_linked_runtime(SparkleLauncher EXCLUDE_REGEX "/Qt6[^/]+[.]dll$")
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/LauncherDeployment.cmake")
 

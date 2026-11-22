@@ -1,4 +1,3 @@
-#define CGLTF_IMPLEMENTATION
 #include "PCH.h"
 
 #include "Gltf/GltfScene.h"

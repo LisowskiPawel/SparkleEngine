@@ -49,7 +49,6 @@ namespace Process
 		DWORD TerminationError = ERROR_IO_PENDING;
 	};
 
-	std::string WideToUtf8(std::wstring_view text);
 	std::string FormatWindowsProcessError(DWORD code);
 	void TerminateOwnedWindowsProcess(WindowsOwnedProcess& process) noexcept;
 	void AppendWindowsProcessTerminationFailure(const WindowsOwnedProcess& process, ChildProcessResult& result);

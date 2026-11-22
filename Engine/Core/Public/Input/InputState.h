@@ -56,8 +56,8 @@ public:
 	void SetKeyState(Key key, ButtonState state) noexcept;
 	void SetMouseButtonState(MouseButton button, ButtonState state) noexcept;
 
-	void SetMousePosition(std::int32_t x, std::int32_t y) noexcept;
-	void AccumulateMouseDelta(std::int32_t deltaX, std::int32_t deltaY) noexcept;
+	void SetMousePosition(float x, float y) noexcept;
+	void AccumulateMouseDelta(float deltaX, float deltaY) noexcept;
 	void AccumulateWheelDelta(float delta) noexcept;
 	void AccumulateWheelHorizontalDelta(float delta) noexcept;
 

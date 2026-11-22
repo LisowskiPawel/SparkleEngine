@@ -17,7 +17,10 @@ namespace SparkleLauncher
 	{
 		const std::string fileName = path.filename().string();
 		const std::string extension = path.extension().string();
-		return fileName == "CMakeLists.txt" || fileName == Filesystem::kProjectMarker || extension == ".cmake";
+		static const std::array<std::string_view, 5> buildInputExtensions = {".cmake", ".in", ".targets", ".patch", ".ps1"};
+		const bool bBuildExtension = std::find(buildInputExtensions.begin(), buildInputExtensions.end(), extension) != buildInputExtensions.end();
+		const bool bProjectMarker = fileName == "CMakeLists.txt" || fileName == Filesystem::kProjectMarker;
+		return bProjectMarker || bBuildExtension;
 	}
 
 	static bool IsSourceFile(const std::filesystem::path& path)
@@ -25,12 +28,6 @@ namespace SparkleLauncher
 		static const std::array<std::string_view, 9> extensions = {".c", ".cc", ".cpp", ".cxx", ".h", ".hh", ".hpp", ".hxx", ".inl"};
 		const std::string extension = Strings::ToLowerCopy(path.extension().string());
 		return std::any_of(extensions.begin(), extensions.end(), [&extension](std::string_view candidate) { return extension == candidate; });
-	}
-
-	static bool IsUnderThirdParty(const std::filesystem::path& path)
-	{
-		const std::string normalized = Strings::ToLowerCopy(path.generic_string());
-		return normalized.find("/third_party/") != std::string::npos || normalized.find("\\third_party\\") != std::string::npos;
 	}
 
 	std::string MakeFreshnessSignaturePath(const std::filesystem::path& workspaceRoot, const std::filesystem::path& path)
@@ -80,7 +77,7 @@ namespace SparkleLauncher
 	std::optional<std::string> ComputeSourceListHash(const std::filesystem::path& workspaceRoot)
 	{
 		std::vector<std::string> relativePaths;
-		static const std::array<std::string_view, 3> directories = {"Engine", "Tools", "Projects"};
+		static const std::array<std::string_view, 5> directories = {"Engine", "Tools", "Projects", "ThirdParty", "CMake/Dependencies/Bindings"};
 		for (std::string_view directory : directories)
 		{
 			const std::filesystem::path root = workspaceRoot / std::string(directory);
@@ -95,7 +92,7 @@ namespace SparkleLauncher
 			while (iterator != endIterator)
 			{
 				const std::filesystem::directory_entry entry = *iterator;
-				if (entry.is_regular_file(errorCode) && IsSourceFile(entry.path()) && !IsUnderThirdParty(entry.path()))
+				if (entry.is_regular_file(errorCode) && IsSourceFile(entry.path()))
 				{
 					relativePaths.push_back(MakeFreshnessSignaturePath(workspaceRoot, entry.path()));
 				}

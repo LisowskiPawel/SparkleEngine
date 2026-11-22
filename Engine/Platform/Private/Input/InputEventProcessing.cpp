@@ -1,22 +1,29 @@
 #include "PCH.h"
 #include "Input/InputSystemState.h"
-#include "Input/Backends/Win32InputBackend.h"
+#include "Input/SdlKeyboardInput.h"
+#include "Window/SdlWindowInterop.h"
+#include <SDL3/SDL.h>
 #include "Window/Window.h"
 
 #include <type_traits>
-#include <variant>
-
-void InputSystem::State::UpdateMouseMoveDelta(MouseMoveEvent& event) noexcept
-{
-	event.Delta.X = bHasLastMousePosition ? event.Position.X - LastMouseX : 0;
-	event.Delta.Y = bHasLastMousePosition ? event.Position.Y - LastMouseY : 0;
-	LastMouseX = event.Position.X;
-	LastMouseY = event.Position.Y;
-	bHasLastMousePosition = true;
-}
 
 template <typename TEvent> void InputSystem::State::ProcessEvent(const TEvent& event)
 {
+	// Native releases queued before an interruption must not repeat its logical releases.
+	if constexpr (std::is_same_v<TEvent, KeyboardEvent>)
+	{
+		if (!event.bPressed && !GlobalState.IsKeyDown(event.KeyCode))
+		{
+			return;
+		}
+	}
+	if constexpr (std::is_same_v<TEvent, MouseButtonEvent>)
+	{
+		if (!event.bPressed && !GlobalState.IsMouseButtonDown(event.Button))
+		{
+			return;
+		}
+	}
 	InputLayer targetLayer = GlobalState.IsMouseCaptured() ? MouseCaptureLayer : FocusRouter.ResolveTargetLayer(event);
 	if constexpr (std::is_same_v<TEvent, MouseButtonEvent>)
 	{
@@ -43,28 +50,68 @@ template <typename TEvent> void InputSystem::State::ProcessEvent(const TEvent& e
 	Dispatcher.DispatchImmediate(event, targetLayer);
 }
 
-void InputSystem::State::HandleWindowMessage(const WindowMessageEvent& message)
+void InputSystem::State::HandleWindowEvent(const SdlWindowEvent& message)
 {
-	Win32InputEvent input = ProcessWin32InputMessage(message);
-	if (auto* move = std::get_if<MouseMoveEvent>(&input))
+	if (BoundWindow->ShouldClose() || !IsSdlWindowEventCurrent(*BoundWindow, message))
 	{
-		UpdateMouseMoveDelta(*move);
+		return;
 	}
-	std::visit([this](const auto& event) { ProcessEvent(event); }, input);
-}
-
-void InputSystem::State::ProcessEvent(const std::monostate&) noexcept
-{
-}
-
-void InputSystem::State::ProcessEvent(const InputFocusLost&)
-{
-	CancelInput();
-}
-
-void InputSystem::State::ProcessEvent(const InputCaptureLost&)
-{
-	CancelPointerInput();
+	const SDL_Event& event = message.Value;
+	switch (event.type)
+	{
+		case SDL_EVENT_WINDOW_FOCUS_GAINED:
+			GlobalState.SetModifiers(TranslateSdlModifiers(SDL_GetModState()));
+			break;
+		case SDL_EVENT_KEY_DOWN:
+		case SDL_EVENT_KEY_UP:
+		{
+			const KeyboardEvent key{.KeyCode = TranslateSdlKey(event.key.key), .Modifiers = TranslateSdlModifiers(event.key.mod), .bPressed = event.key.down, .bRepeat = event.key.repeat};
+			ProcessEvent(key);
+			break;
+		}
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
+		{
+			MouseButton button;
+			switch (event.button.button)
+			{
+				case SDL_BUTTON_LEFT:
+					button = MouseButton::Left;
+					break;
+				case SDL_BUTTON_MIDDLE:
+					button = MouseButton::Middle;
+					break;
+				case SDL_BUTTON_RIGHT:
+					button = MouseButton::Right;
+					break;
+				default:
+					return;
+			}
+			// SDL's pump may already have acquired later keys; retain the preceding key event's modifiers.
+			const MouseButtonEvent mouse{.Button = button, .Position = {event.button.x, event.button.y}, .Modifiers = GlobalState.GetModifiers(), .bPressed = event.button.down};
+			ProcessEvent(mouse);
+			break;
+		}
+		case SDL_EVENT_MOUSE_MOTION:
+			ProcessEvent(MouseMoveEvent{.Position = {event.motion.x, event.motion.y}, .Delta = {event.motion.xrel, event.motion.yrel}, .Modifiers = GlobalState.GetModifiers()});
+			break;
+		case SDL_EVENT_MOUSE_WHEEL:
+		{
+			const float direction = event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -1.0f : 1.0f;
+			const MousePosition position{event.wheel.mouse_x, event.wheel.mouse_y};
+			if (event.wheel.y != 0.0f)
+			{
+				ProcessEvent(MouseWheelEvent{event.wheel.y * direction, position, false});
+			}
+			if (event.wheel.x != 0.0f && IsSdlWindowEventCurrent(*BoundWindow, message))
+			{
+				ProcessEvent(MouseWheelEvent{event.wheel.x * direction, position, true});
+			}
+			break;
+		}
+		default:
+			break;
+	}
 }
 
 void InputSystem::State::UpdateStateFromEvent(InputState& state, const KeyboardEvent& event)

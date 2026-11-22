@@ -1,129 +1,155 @@
 #include "PCH.h"
-#include "Window/Window.h"
+#include "Window/WindowNativeState.h"
 
-MONITORINFO Window::GetCurrentMonitorInfo() const noexcept
+#include <cmath>
+
+float Window::GetDpiScale() const noexcept
 {
-	MONITORINFO info{};
-	info.cbSize = sizeof(MONITORINFO);
-	const HMONITOR monitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
-	GetMonitorInfoW(monitor, &info);
-	return info;
+	m_native->Thread.AssertAccess();
+	return m_native->DpiScale;
 }
 
-void Window::EnterFullScreen()
+Window::State Window::GetState() const noexcept
 {
-	if (!GetWindowPlacement(m_hWnd, &m_windowedPlacement))
+	m_native->Thread.AssertAccess();
+	const SDL_WindowFlags flags = SDL_GetWindowFlags(m_native->Handle);
+	if ((flags & SDL_WINDOW_MINIMIZED) != 0)
 	{
-		return;
+		return State::Minimized;
 	}
-
-	m_bFullScreen = true;
-	SetWindowLongW(m_hWnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
-	SetWindowLongW(m_hWnd, GWL_EXSTYLE, WS_EX_APPWINDOW);
-	const RECT bounds = GetCurrentMonitorInfo().rcMonitor;
-	SetWindowPos(m_hWnd, HWND_TOP, bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, SWP_FRAMECHANGED | SWP_NOACTIVATE);
-	ShowWindow(m_hWnd, SW_SHOW);
+	if ((flags & SDL_WINDOW_FULLSCREEN) != 0)
+	{
+		return State::FullScreen;
+	}
+	return (flags & SDL_WINDOW_MAXIMIZED) != 0 ? State::Maximized : State::Normal;
 }
 
-void Window::RestoreWindowedMode()
+bool Window::IsFullScreen() const noexcept
 {
-	m_bFullScreen = false;
-	SetWindowLongW(m_hWnd, GWL_STYLE, kWindowedStyle | WS_VISIBLE);
-	SetWindowLongW(m_hWnd, GWL_EXSTYLE, kWindowedExStyle);
-	SetWindowPlacement(m_hWnd, &m_windowedPlacement);
-	SetWindowPos(m_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+	return (SDL_GetWindowFlags(GetSdlWindow(*this)) & SDL_WINDOW_FULLSCREEN) != 0;
+}
+
+bool Window::IsMinimized() const noexcept
+{
+	return GetState() == State::Minimized;
+}
+
+bool Window::IsMaximized() const noexcept
+{
+	return GetState() == State::Maximized;
+}
+
+void Window::SetFullScreen(bool bFullScreen)
+{
+	m_native->Thread.AssertAccess();
+	if (IsFullScreen() != bFullScreen)
+	{
+		m_native->CheckOperation(SDL_SetWindowFullscreen(m_native->Handle, bFullScreen), "SDL fullscreen transition");
+		RefreshNativeState();
+	}
+}
+
+void Window::ToggleFullScreen()
+{
+	SetFullScreen(!IsFullScreen());
 }
 
 void Window::Minimize() noexcept
 {
-	m_pendingShowCommand = SW_MINIMIZE;
+	m_native->Thread.AssertAccess();
+	m_native->PendingShow = State::Minimized;
+	m_native->bHasPendingShow = true;
 }
 
 void Window::Maximize() noexcept
 {
-	m_pendingShowCommand = SW_MAXIMIZE;
+	m_native->Thread.AssertAccess();
+	m_native->PendingShow = State::Maximized;
+	m_native->bHasPendingShow = true;
 }
 
 void Window::Restore() noexcept
 {
-	m_pendingShowCommand = SW_RESTORE;
+	m_native->Thread.AssertAccess();
+	m_native->PendingShow = State::Normal;
+	m_native->bHasPendingShow = true;
 }
 
-void Window::BeginDragMove() noexcept
+void Window::ToggleMaximizeRestore() noexcept
 {
-	if (m_hWnd == nullptr || IsFullScreen())
+	if (!IsFullScreen())
 	{
-		return;
+		if (IsMaximized())
+		{
+			Restore();
+		}
+		else
+		{
+			Maximize();
+		}
 	}
-	ReleaseCapture();
-	SendMessageW(m_hWnd, WM_NCLBUTTONDOWN, HTCAPTION, 0);
-}
-
-bool Window::HandleWindowShortcut(UINT message, WPARAM key, LPARAM flags)
-{
-	const bool bToggleKey = message == WM_KEYDOWN && key == VK_F11;
-	const bool bAltReturn = message == WM_SYSKEYDOWN && key == VK_RETURN;
-	const bool bAltHeld = (flags & (LPARAM{1} << 29)) != 0;
-	const bool bAltEnter = bAltReturn && bAltHeld;
-	if (!bToggleKey && !bAltEnter)
-	{
-		return false;
-	}
-	const bool bPreviouslyDown = (flags & (LPARAM{1} << 30)) != 0;
-	if (!bPreviouslyDown)
-	{
-		ToggleFullScreen();
-	}
-	return true;
-}
-
-UINT Window::GetDpi() const noexcept
-{
-	const UINT dpi = GetDpiForWindow(m_hWnd);
-	return dpi != 0 ? dpi : USER_DEFAULT_SCREEN_DPI;
-}
-
-float Window::GetDpiScale() const noexcept
-{
-	return static_cast<float>(GetDpi()) / static_cast<float>(USER_DEFAULT_SCREEN_DPI);
-}
-
-void Window::HandleDpiChanged(WPARAM wParam, LPARAM lParam)
-{
-	const auto* suggested = reinterpret_cast<const RECT*>(lParam);
-	const RECT bounds = IsFullScreen() ? GetCurrentMonitorInfo().rcMonitor : *suggested;
-	SetWindowPos(m_hWnd, nullptr, bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top, SWP_NOACTIVATE | SWP_NOZORDER);
-	const float scale = static_cast<float>(LOWORD(wParam)) / static_cast<float>(USER_DEFAULT_SCREEN_DPI);
-	OnDpiScaleChanged.Broadcast(scale);
-}
-
-void Window::OnSizeChanged(WPARAM sizeType, LPARAM dimensions)
-{
-	m_clientWidth.store(LOWORD(dimensions), std::memory_order_release);
-	m_clientHeight.store(HIWORD(dimensions), std::memory_order_release);
-	switch (sizeType)
-	{
-		case SIZE_MINIMIZED:
-			m_state = State::Minimized;
-			break;
-		case SIZE_RESTORED:
-			m_state = State::Normal;
-			break;
-		case SIZE_MAXIMIZED:
-			m_state = State::Maximized;
-			break;
-	}
-	OnResized.Broadcast();
 }
 
 void Window::ApplyPendingShowCommand() noexcept
 {
-	if (m_pendingShowCommand == kNoShowCommand || m_hWnd == nullptr)
+	if (!m_native->bHasPendingShow)
 	{
 		return;
 	}
+	m_native->bHasPendingShow = false;
+	switch (m_native->PendingShow)
+	{
+		case State::Minimized:
+			CancelInput(InputCancellation::All);
+			m_native->CheckOperation(SDL_MinimizeWindow(m_native->Handle), "SDL minimize");
+			break;
+		case State::Maximized:
+			m_native->CheckOperation(SDL_MaximizeWindow(m_native->Handle), "SDL maximize");
+			break;
+		default:
+			m_native->CheckOperation(SDL_RestoreWindow(m_native->Handle), "SDL restore");
+			break;
+	}
+	RefreshNativeState();
+}
 
-	const int command = m_pendingShowCommand;
-	m_pendingShowCommand = kNoShowCommand;
-	ShowWindow(m_hWnd, command);
+void Window::RefreshNativeState() noexcept
+{
+	const float dpiScale = SDL_GetWindowDisplayScale(m_native->Handle);
+	const bool bDpiChanged = dpiScale > 0.0f && dpiScale != m_native->DpiScale;
+	if (bDpiChanged)
+	{
+		m_native->DpiScale = dpiScale;
+		const int minimumWidth = static_cast<int>(std::lround(320.0f * dpiScale));
+		const int minimumHeight = static_cast<int>(std::lround(240.0f * dpiScale));
+		m_native->CheckOperation(SDL_SetWindowMinimumSize(m_native->Handle, minimumWidth, minimumHeight), "SDL minimum window extent");
+	}
+	int width = 0;
+	int height = 0;
+	if (!m_native->CheckOperation(SDL_GetWindowSizeInPixels(m_native->Handle, &width, &height), "SDL drawable dimensions"))
+	{
+		RequestClose();
+		return;
+	}
+	const auto pixelWidth = static_cast<uint32_t>(std::max(width, 0));
+	const auto pixelHeight = static_cast<uint32_t>(std::max(height, 0));
+	const bool bExtentChanged = GetWidth() != pixelWidth || GetHeight() != pixelHeight;
+	const SDL_WindowFlags flags = SDL_GetWindowFlags(m_native->Handle);
+	const bool bMinimized = (flags & SDL_WINDOW_MINIMIZED) != 0;
+	const bool bVisibilityChanged = bMinimized != m_native->bPublishedMinimized;
+	m_clientWidth.store(pixelWidth, std::memory_order_release);
+	m_clientHeight.store(pixelHeight, std::memory_order_release);
+	m_native->bPublishedMinimized = bMinimized;
+	if (bExtentChanged || bDpiChanged)
+	{
+		m_native->TitleBar = {};
+	}
+	if (bDpiChanged)
+	{
+		OnDpiScaleChanged.Broadcast(dpiScale);
+	}
+	if (bExtentChanged || bVisibilityChanged)
+	{
+		OnResized.Broadcast();
+	}
 }

@@ -59,15 +59,9 @@ public:
 
 	void Unsubscribe(EventHandle handle);
 
-	void CaptureMouse();
-
-	void ReleaseMouse();
-
+	// Successful relative mode owns camera routing and cursor hiding together.
+	bool SetRelativeMouseMode(bool bEnabled);
 	bool IsMouseCaptured() const noexcept;
-
-	void SetCursorVisibility(bool bVisible);
-
-	void CenterCursor();
 
 private:
 	struct State;

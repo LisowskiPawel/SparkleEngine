@@ -5,33 +5,8 @@
 #include "RHI/Public/Shaders/ShaderStage.h"
 #include "Core/Public/Diagnostics/Error.h"
 
-#include <cstdint>
 #include <string>
-
-static std::uint32_t GetProfileShaderModelMinor(ShaderTarget target) noexcept
-{
-	switch (target)
-	{
-		case ShaderTarget::DxilSm60:
-			return 0;
-		case ShaderTarget::DxilSm61:
-			return 1;
-		case ShaderTarget::DxilSm62:
-			return 2;
-		case ShaderTarget::DxilSm63:
-			return 3;
-		case ShaderTarget::DxilSm64:
-			return 4;
-		case ShaderTarget::DxilSm65:
-			return 5;
-		case ShaderTarget::DxilSm66:
-			return 6;
-		case ShaderTarget::DxilSm67:
-			return 7;
-		default:
-			return 6;
-	}
-}
+#include <string_view>
 
 const char* GetShaderModelProfileName(ShaderTarget target)
 {
@@ -117,8 +92,7 @@ std::string BuildShaderTargetProfile(const ShaderCompileRequest& request)
 	profile.reserve(8);
 	profile += request.UnitKind == ShaderCompileUnitKind::Library ? "lib" : GetShaderStagePrefix(request.Stage);
 	profile += '_';
-	profile += '6';
-	profile += '_';
-	profile += std::to_string(GetProfileShaderModelMinor(request.Target));
+	const std::string_view shaderModel = GetShaderModelProfileName(request.Target);
+	profile += shaderModel.substr(3);
 	return profile;
 }

@@ -219,3 +219,11 @@ Renderer labels passes and recording work; RHI owns native marker/timestamp supp
 World updates and extraction finish before immutable publication; structural edits wait for workers. Animation-only publication preserves edit history and viewport navigation.
 
 Shader compilation uses Launcher Cook or Editor **Recompile Shaders** / `CompileShaders [symbols]`. `ReloadShaders` reloads existing output. Dependency-directed Apply Changed is unfinished. See [References](References.md) for papers and SDK guides.
+
+The offline cooker delegates compatible DXC/Slang batches and worker dispatch to ShaderMake. Sparkle retains the typed catalog, virtual/captured source and content/tool identity, declaration reflection, SPIR-V normalization, every-consumer ABI checks, debug export and transactional publication. Application/RHI retain successful reload and GPU-delayed shader retirement. A shared compiler does not replace independent Reference validation.
+
+Every compilation runs through ShaderMake. The retained DXC API reads reflection/PDB data and disassembles DXIL; Slang reflection comes from CLI JSON.
+
+Renderer generation loading, CLI inspection and incremental dependency reads acquire Core's publication read scope before opening published shader records. Incomplete output is refused and requires cleaning the generated directory and cooking again.
+
+Launcher checks that the staged cooker, ShaderMake and compiler runtime files are available. The cooker verifies their exact bytes before constructing compile identities.

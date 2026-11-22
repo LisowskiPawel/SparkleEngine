@@ -6,6 +6,7 @@
 # names everywhere, because this repository contains real source directories such
 # as `Tools/Launcher/SparkleLauncher/Private/Build`.
 /build/
+/.sparkle-source-cache.lock
 
 # Generated artifact and package roots introduced by the release architecture.
 /artifacts/

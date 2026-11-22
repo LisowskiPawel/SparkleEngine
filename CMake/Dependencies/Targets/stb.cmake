@@ -3,20 +3,24 @@
 #
 # Provides: stb_image.h for source formats outside native DirectXTex loaders.
 #
-# Target:  stb (INTERFACE)
+# Target:  stb (STATIC)
 # Usage:   target_link_libraries(YourTarget PRIVATE stb)
-#          #define STB_IMAGE_IMPLEMENTATION  (in exactly one .cpp)
 set(_sparkle_stb_revision 2c980bb59875b0d32144a71867fbdebb2f77cd20)
 sparkle_declare_git_dependency(stb
     https://github.com/nothings/stb.git
-    ${_sparkle_stb_revision})
-FetchContent_Populate(stb)
+    ${_sparkle_stb_revision}
+    ID stb VERSION "${_sparkle_stb_revision}" PACKAGE_NAME "stb" LICENSE_ID "MIT"
+    REQUIRED_PATHS stb_image.h LICENSE)
 
-if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
+if(SPARKLE_SOURCE_DEPENDENCY_METADATA_ONLY OR NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
     return()
 endif()
 
-add_library(stb INTERFACE)
-sparkle_set_source_package(stb "stb" "${_sparkle_stb_revision}"
-    "MIT" "https://github.com/nothings/stb/tree/${_sparkle_stb_revision}")
-target_include_directories(stb INTERFACE ${stb_SOURCE_DIR})
+add_library(stb STATIC "${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/Bindings/stb/StbImageImplementation.cpp")
+set_target_properties(stb PROPERTIES FOLDER "ThirdParty/stb")
+if(MSVC)
+    target_compile_options(stb PRIVATE /W0)
+endif()
+
+sparkle_add_dependency_source_package(stb stb)
+target_include_directories(stb SYSTEM PUBLIC ${stb_SOURCE_DIR})

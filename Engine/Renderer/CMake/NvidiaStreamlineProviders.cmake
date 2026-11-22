@@ -56,7 +56,7 @@ target_include_directories(SparkleRendererNvidiaStreamlineProviders
 )
 
 target_compile_features(SparkleRendererNvidiaStreamlineProviders PUBLIC cxx_std_20)
-sparkle_enable_parallel_compilation(SparkleRendererNvidiaStreamlineProviders)
+sparkle_configure_native_target(SparkleRendererNvidiaStreamlineProviders)
 
 target_link_libraries(SparkleRendererNvidiaStreamlineProviders
     PUBLIC
@@ -82,13 +82,28 @@ function(sparkle_stage_nvidia_streamline_runtime product_target)
         message(FATAL_ERROR "Unknown Sparkle product target '${product_target}'")
     endif()
 
+    # Read the same declared payload when disabled, so old owned files can retire.
+    set(SPARKLE_SOURCE_DEPENDENCY_METADATA_ONLY TRUE)
+    include("${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/Targets/nvidia-streamline.cmake")
+    set(_stale_files)
+    foreach(_runtime IN LISTS _sparkle_streamline_runtime_files)
+        get_filename_component(_name "${_runtime}" NAME)
+        list(APPEND _stale_files "${_name}")
+    endforeach()
+    foreach(_notice IN LISTS _sparkle_streamline_notice_files)
+        get_filename_component(_name "${_notice}" NAME)
+        list(APPEND _stale_files "Notices/NVIDIA/${_name}")
+    endforeach()
+    list(APPEND _stale_files "Notices/NVIDIA/README.md")
     if(NOT SPARKLE_ENABLE_NVIDIA_STREAMLINE)
+        sparkle_stage_runtime_files(${product_target} Nvidia STALE_FILES ${_stale_files})
         return()
     endif()
 
     if(NOT TARGET NVIDIA::Streamline)
         message(FATAL_ERROR "NVIDIA Streamline SDK target is unavailable for ${product_target}")
     endif()
+    sparkle_target_source_package_dependencies(${product_target} NVIDIA::Streamline)
     get_target_property(_runtime_files NVIDIA::Streamline SPARKLE_STREAMLINE_RUNTIME_FILES)
     get_target_property(_notice_sources NVIDIA::Streamline SPARKLE_STREAMLINE_NOTICE_FILES)
     if(_runtime_files STREQUAL "_runtime_files-NOTFOUND" OR NOT _notice_sources)
@@ -101,30 +116,18 @@ function(sparkle_stage_nvidia_streamline_runtime product_target)
         endif()
     endforeach()
 
-    set(_notice_directory "$<TARGET_FILE_DIR:${product_target}>/Notices/NVIDIA")
-    add_custom_target(${product_target}NvidiaNotices
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${_notice_directory}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_notice_sources} "${_notice_directory}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/NVIDIA/README.md"
-            "${_notice_directory}/README.md"
-        COMMENT "Staging NVIDIA runtime notices for ${product_target}"
-        COMMAND_EXPAND_LISTS
-        VERBATIM
-    )
-    add_dependencies(${product_target} ${product_target}NvidiaNotices)
-
     foreach(runtime_dll IN LISTS _runtime_files)
         if(NOT EXISTS "${runtime_dll}")
             message(FATAL_ERROR "NVIDIA Streamline runtime DLL is missing: '${runtime_dll}'")
         endif()
     endforeach()
-    if(_runtime_files)
-        add_custom_command(TARGET ${product_target} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                ${_runtime_files} "$<TARGET_FILE_DIR:${product_target}>"
-            COMMENT "Staging NVIDIA Streamline runtime for ${product_target}"
-            COMMAND_EXPAND_LISTS
-            VERBATIM)
-    endif()
+    set(_staging_files ${_runtime_files})
+    foreach(_notice IN LISTS _notice_sources)
+        get_filename_component(_name "${_notice}" NAME)
+        list(APPEND _staging_files "${_notice}|Notices/NVIDIA/${_name}")
+    endforeach()
+    list(APPEND _staging_files "${SPARKLE_REPOSITORY_ROOT}/CMake/Notices/NVIDIA/README.md|Notices/NVIDIA/README.md")
+    sparkle_stage_runtime_files(${product_target} Nvidia FILES ${_staging_files} STALE_FILES ${_stale_files})
+    set_property(TARGET ${product_target} APPEND PROPERTY SPARKLE_RUNTIME_SUPPORT_FILES
+        "$<PATH:GET_FILENAME,${_runtime_files}>")
 endfunction()

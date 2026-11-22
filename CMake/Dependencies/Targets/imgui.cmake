@@ -1,34 +1,37 @@
+set(SPARKLE_IMGUI_VERSION 1.92.5)
+set(SPARKLE_IMGUI_REVISION 6d910d5487d11ca567b61c7824b0c78c569d62f0)
+set(SPARKLE_IMGUI_REQUIRED_FILES imgui.h imgui.cpp imgui_draw.cpp imgui_tables.cpp
+    imgui_widgets.cpp imgui_demo.cpp imgui_internal.h imstb_rectpack.h imstb_textedit.h
+    imstb_truetype.h LICENSE.txt backends/imgui_impl_sdl3.cpp backends/imgui_impl_sdl3.h
+    backends/imgui_impl_dx12.cpp backends/imgui_impl_dx12.h
+    backends/imgui_impl_vulkan.cpp backends/imgui_impl_vulkan.h)
+
 sparkle_declare_git_dependency(imgui
     https://github.com/ocornut/imgui.git
-    6d910d5487d11ca567b61c7824b0c78c569d62f0)
-FetchContent_Populate(imgui)
+    ${SPARKLE_IMGUI_REVISION}
+    ID imgui VERSION "${SPARKLE_IMGUI_VERSION}" PACKAGE_NAME "Dear ImGui" LICENSE_ID "MIT"
+    REQUIRED_PATHS ${SPARKLE_IMGUI_REQUIRED_FILES})
 
-if(NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
+if(SPARKLE_SOURCE_DEPENDENCY_METADATA_ONLY OR NOT SPARKLE_SYNC_SOURCE_DEPENDENCY STREQUAL "")
     return()
 endif()
 
 add_library(imgui STATIC
-    ${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/ImGui/SparkleImGuiConfig.h
-    ${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/ImGui/SparkleImGuiContext.cpp
+    ${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/Bindings/imgui/SparkleImGuiConfig.h
+    ${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/Bindings/imgui/SparkleImGuiContext.cpp
     ${imgui_SOURCE_DIR}/imgui.cpp
     ${imgui_SOURCE_DIR}/imgui_demo.cpp
     ${imgui_SOURCE_DIR}/imgui_draw.cpp
     ${imgui_SOURCE_DIR}/imgui_tables.cpp
     ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-    # Platform backend shared by editor/game UI. Renderer backends are owned by RHI implementations.
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp
 )
 
 target_include_directories(imgui PUBLIC
-    ${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/ImGui
+    ${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/Bindings/imgui
+)
+target_include_directories(imgui SYSTEM PUBLIC
     ${imgui_SOURCE_DIR}
     ${imgui_SOURCE_DIR}/backends
-)
-
-target_link_libraries(imgui PUBLIC
-    user32
-    imm32
-    winmm
 )
 
 target_compile_features(imgui PUBLIC cxx_std_20)
@@ -41,4 +44,14 @@ if(MSVC)
     target_compile_options(imgui PRIVATE /W0)
 endif()
 
-set_target_properties(imgui PROPERTIES FOLDER "ThirdParty")
+set_target_properties(imgui PROPERTIES FOLDER "ThirdParty/ImGui")
+
+sparkle_add_dependency_source_package(imgui imgui)
+sparkle_add_bundled_source_package(imgui imgui "Dear ImGui bundled stb" MIT
+    imstb_rectpack.h imstb_textedit.h imstb_truetype.h LICENSE.txt)
+
+if(TARGET SDL3::SDL3-shared)
+    add_library(imgui_sdl3 STATIC ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp)
+    target_link_libraries(imgui_sdl3 PUBLIC imgui SDL3::SDL3-shared)
+    set_target_properties(imgui_sdl3 PROPERTIES FOLDER "ThirdParty/ImGui")
+endif()

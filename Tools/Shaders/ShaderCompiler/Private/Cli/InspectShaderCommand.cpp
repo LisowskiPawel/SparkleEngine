@@ -6,6 +6,7 @@
 #include "Constants/ShaderCompilerConstants.h"
 #include "Contracts/ShaderContractCatalogBuilder.h"
 #include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Files/FileSetPublication.h"
 #include "Core/Public/Formatting/HexFormat.h"
 #include "RHI/Public/Shaders/GlobalShaderMap.h"
 
@@ -17,6 +18,7 @@ int InspectShader(std::string_view shaderId)
 	{
 		const ShaderContractCatalog catalog = BuildShaderContractCatalog(ShaderContractSelectionKind::ShaderId, shaderId);
 		const ShaderContract& shader = catalog.front();
+		const Files::FileSetReadScope publication(Filesystem::GetCookedShaderRootPath());
 		const CookedShaderLibrary library = CookedShaderLibrary::Open(Filesystem::GetCookedShaderLibraryPath());
 		const GlobalShaderMap map = GlobalShaderMap::Open(Filesystem::GetGlobalShaderMapPath(), library);
 		std::cout << shader.shaderName << " type=" << Formatting::FormatPrefixedHexUInt64(shader.shaderTypeId) << " stage=" << GetShaderStagePrefix(shader.stage) << " source=" << shader.sourcePath

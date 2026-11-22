@@ -1,0 +1,28 @@
+Assimp material-key bounds correction
+Base: c35200e38ea8f058812b83de2ef32c6093b0ece2 (5.4.3)
+Local narrow correction for CVE-2025-70067: reject oversized keys before mutation/allocation.
+Source: https://github.com/CVEProject/cvelistV5/blob/main/cves/2025/70xxx/CVE-2025-70067.json
+Valid keys and the upstream API remain unchanged; this is not an upstream merged fix.
+
+diff --git a/code/Material/MaterialSystem.cpp b/code/Material/MaterialSystem.cpp
+--- a/code/Material/MaterialSystem.cpp
++++ b/code/Material/MaterialSystem.cpp
+@@ -545,7 +545,8 @@
+     ai_assert(pKey != nullptr);
+     ai_assert(0 != pSizeInBytes);
+ 
+-    if (0 == pSizeInBytes) {
++    const size_t keyLength = ::strlen(pKey);
++    if (0 == pSizeInBytes || keyLength >= AI_MAXLEN) {
+         return AI_FAILURE;
+     }
+ 
+@@ -574,7 +575,7 @@
+     pcNew->mData = new char[pSizeInBytes];
+     memcpy(pcNew->mData, pInput, pSizeInBytes);
+ 
+-    pcNew->mKey.length = static_cast<ai_uint32>(::strlen(pKey));
++    pcNew->mKey.length = static_cast<ai_uint32>(keyLength);
+     ai_assert(AI_MAXLEN > pcNew->mKey.length);
+     strcpy(pcNew->mKey.data, pKey);
+ 

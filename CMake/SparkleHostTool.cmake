@@ -1,5 +1,9 @@
 function(sparkle_configure_host_tool_target target_name)
-	sparkle_enable_parallel_compilation(${target_name})
+	if("UPSTREAM" IN_LIST ARGN)
+		sparkle_enable_parallel_compilation(${target_name})
+	else()
+		sparkle_configure_native_target(${target_name})
+	endif()
 
 	foreach(game_config IN LISTS SPARKLE_GAME_CONFIGURATIONS)
 		string(TOUPPER "${game_config}" game_config_upper)

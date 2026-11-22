@@ -48,7 +48,7 @@ add_library(SparkleRHICommon OBJECT
 )
 
 function(sparkle_configure_rhi_implementation_target target_name)
-    sparkle_enable_parallel_compilation(${target_name})
+    sparkle_configure_native_target(${target_name})
 
     target_include_directories(${target_name}
         PUBLIC
@@ -196,13 +196,11 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private/Diagnostics PREFIX "Privat
 
 if(SPARKLE_RHI_WITH_D3D12)
     source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private/D3D12 PREFIX "Private\\D3D12" FILES ${SPARKLE_RHI_D3D12_SOURCES} ${SPARKLE_RHI_D3D12_HEADERS})
-    source_group("ThirdParty\\ImGui\\D3D12" FILES ${SPARKLE_RHI_D3D12_THIRD_PARTY_SOURCES})
     source_group("ThirdParty\\D3D12MA" FILES ${SPARKLE_D3D12MA_SOURCES})
 endif()
 
 if(SPARKLE_RHI_WITH_VULKAN)
     source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Private/Vulkan PREFIX "Private\\Vulkan" FILES ${SPARKLE_RHI_VULKAN_SOURCES} ${SPARKLE_RHI_VULKAN_HEADERS})
-    source_group("ThirdParty\\ImGui\\Vulkan" FILES ${SPARKLE_RHI_VULKAN_THIRD_PARTY_SOURCES})
 endif()
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/ExternalCapture.cmake")

@@ -5,15 +5,14 @@ License: MIT (upstream LICENSE.txt and ThirdPartyLicenses.txt)
 Expose explicit precision/profile/extension/define policy controls and include
 them in the upstream signature. Preserve relative compiler/source paths when
 requested, use native filesystem cwd discovery and encode diagnostic paths as
-UTF-8. Sparkle supplies contained ASCII paths to the nested shell; this option
+UTF-8; discover executable metadata with the native Windows path. Sparkle supplies contained ASCII paths to the nested shell; this option
 is not a general shell-argument serializer. No compiler/process implementation
 is added. Keep the shared source cache unmodified.
 
 diff --git a/ShaderMake/ShaderMake.cpp b/ShaderMake/ShaderMake.cpp
-index e3e25ea..fbad0fb 100644
 --- a/ShaderMake/ShaderMake.cpp
 +++ b/ShaderMake/ShaderMake.cpp
-@@ -103,7 +103,7 @@ struct Options {
+@@ -103,7 +103,7 @@
      vector<fs::path> includeDirs;
      vector<fs::path> relaxedIncludes;
      vector<string> defines;
@@ -22,7 +21,7 @@ index e3e25ea..fbad0fb 100644
      vector<string> compilerOptions;
      vector<string> metalShaderConverterOptions;
      vector<string> compilerAliasArgs;
-@@ -148,6 +148,11 @@ struct Options {
+@@ -148,6 +148,11 @@
      bool stripReflection = false;
      bool matrixRowMajor = false;
      bool hlsl2021 = false;
@@ -34,7 +33,7 @@ index e3e25ea..fbad0fb 100644
      bool verbose = false;
      bool colorize = false;
      bool slang = false;
-@@ -301,7 +306,7 @@ static uint64_t HashString(const string& value) {
+@@ -301,7 +306,7 @@
  }
  
  static string PathToString(fs::path path) {
@@ -43,7 +42,7 @@ index e3e25ea..fbad0fb 100644
  }
  
  static fs::path RemoveLeadingDotDots(const fs::path& path) {
-@@ -667,6 +672,11 @@ static string GetBuildSignature() {
+@@ -667,6 +672,11 @@
      AppendBuildSignatureValue(signature, "stripReflection", to_string(g_Options.stripReflection));
      AppendBuildSignatureValue(signature, "matrixRowMajor", to_string(g_Options.matrixRowMajor));
      AppendBuildSignatureValue(signature, "hlsl2021", to_string(g_Options.hlsl2021));
@@ -55,7 +54,7 @@ index e3e25ea..fbad0fb 100644
      AppendBuildSignaturePaths(signature, "include", g_Options.includeDirs);
      AppendBuildSignaturePaths(signature, "relaxedInclude", g_Options.relaxedIncludes);
      AppendBuildSignatureValues(signature, "define", g_Options.defines);
-@@ -1272,6 +1282,11 @@ bool Options::Parse(int32_t argc, const char** argv) {
+@@ -1272,6 +1282,11 @@
          OPT_BOOLEAN(0, "stripReflection", &stripReflection, "Maps to '-Qstrip_reflect' DXC/FXC option: strip reflection information from a shader binary", nullptr, 0, 0),
          OPT_BOOLEAN(0, "matrixRowMajor", &matrixRowMajor, "Maps to '-Zpr' DXC/FXC option: pack matrices in row-major order", nullptr, 0, 0),
          OPT_BOOLEAN(0, "hlsl2021", &hlsl2021, "Maps to '-HV 2021' DXC option: enable HLSL 2021 standard", nullptr, 0, 0),
@@ -67,7 +66,7 @@ index e3e25ea..fbad0fb 100644
          OPT_BOOLEAN(0, "slang", &slang, "Compiler is Slang", nullptr, 0, 0),
          OPT_BOOLEAN(0, "slangHLSL", &slangHlsl, "Use HLSL compatibility mode when compiler is Slang", nullptr, 0, 0),
          OPT_GROUP("Defines & include directories:"),
-@@ -1322,6 +1337,9 @@ bool Options::Parse(int32_t argc, const char** argv) {
+@@ -1322,6 +1337,9 @@
      argparse_describe(&argparse, nullptr, "\nMulti-threaded shader compiling & processing tool");
      argparse_parse(&argparse, argc, argv);
  
@@ -77,7 +76,7 @@ index e3e25ea..fbad0fb 100644
      if (!config) {
          Printf(RED "ERROR: Config file not specified!\n");
          return false;
-@@ -1511,18 +1529,8 @@ bool Options::Parse(int32_t argc, const char** argv) {
+@@ -1511,18 +1529,8 @@
          return false;
      }
  
@@ -98,7 +97,7 @@ index e3e25ea..fbad0fb 100644
  
      configFile = fs::path(cd) / fs::path(config);
  
-@@ -1792,7 +1800,7 @@ static void ExeCompile() {
+@@ -1792,7 +1800,7 @@
                  }
  
                  // Profile
@@ -107,7 +106,7 @@ index e3e25ea..fbad0fb 100644
  
                  // Target/platform
                  cmd << " -target " << g_PlatformSlangTargets[g_Options.platform];
-@@ -1908,7 +1916,7 @@ static void ExeCompile() {
+@@ -1908,7 +1916,7 @@
                  cmd << optimizationLevelRemap[taskData.optimizationLevel];
  
                  uint32_t smMajor = 0, smMinor = 0;
@@ -116,7 +115,7 @@ index e3e25ea..fbad0fb 100644
                      cmd << " -enable-16bit-types";
  
                  if (g_Options.warningsAreErrors)
-@@ -2437,14 +2445,14 @@ static bool ProcessConfigLine(uint32_t lineIndex, const string& line, const fs::
+@@ -2437,14 +2445,14 @@
      taskData.profile = configLine.profile;
      taskData.shaderModel = configLine.shaderModel;
      fs::path compilerPath = compilerAlias ? compilerAlias->path : fs::path(g_Options.compiler);
@@ -134,3 +133,19 @@ index e3e25ea..fbad0fb 100644
          AddImplicitDefine(taskData.defines, "__spirv__");
      taskData.compilerOptions = configLine.compilerOptions;
      taskData.compilerOptionsDXIL = configLine.compilerOptionsDXIL;
+@@ -2581,7 +2589,15 @@
+ 
+     // Parse command line
+ #if DEVMODE
++#ifdef _WIN32
++    wchar_t executablePath[32768] = {};
++    DWORD pathLength = GetModuleFileNameW(nullptr, executablePath, COUNT_OF(executablePath));
++    if (!pathLength || pathLength == COUNT_OF(executablePath))
++        return 1;
++    const fs::path self(executablePath);
++#else
+     const char* self = argv[0];
++#endif
+ #endif
+     if (!g_Options.Parse(argc, argv))
+         return 1;

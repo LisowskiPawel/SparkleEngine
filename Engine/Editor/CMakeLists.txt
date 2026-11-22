@@ -59,6 +59,8 @@ target_link_libraries(SparkleEditor
         nlohmann_json::nlohmann_json
         SparklePlatform
         imgui
+        imgui_sdl3
+        SDL3::SDL3-shared
 )
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${SPARKLE_EDITOR_PUBLIC_HEADERS})

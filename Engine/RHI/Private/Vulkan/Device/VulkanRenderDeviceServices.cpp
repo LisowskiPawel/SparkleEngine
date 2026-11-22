@@ -1,4 +1,5 @@
 #include "Vulkan/VulkanPCH.h"
+#include "Platform/Public/Window/Win32WindowInterop.h"
 
 #include "Device/RenderDeviceBackendFactory.h"
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
@@ -276,6 +277,6 @@ void VulkanRenderDeviceServices::BindExternalCapture(RhiExternalCapture& capture
 {
 	// Vulkan uses the dispatch-table root inside VkInstance, as specified by
 	// RenderDoc's RENDERDOC_DEVICEPOINTER_FROM_VKINSTANCE, never VkDevice.
-	RhiExternalCaptureBinding::Bind(capture, *reinterpret_cast<void**>(m_rhi->GetInstance()), m_swapChain->GetHostWindow().GetHWND());
+	RhiExternalCaptureBinding::Bind(capture, *reinterpret_cast<void**>(m_rhi->GetInstance()), GetWin32WindowHandle(m_swapChain->GetHostWindow()));
 }
 #endif

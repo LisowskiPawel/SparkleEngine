@@ -24,7 +24,7 @@ private:
 	static SceneMemoryReport BuildSceneMemoryReport(const RhiMemoryUsageSnapshot& memoryUsage);
 	static bool HasReachedPollInterval(std::uint64_t frameIndex, std::uint64_t lastPollFrame, std::uint32_t pollIntervalFrames) noexcept;
 
-	RenderDiagnostics* m_diagnostics = nullptr;
+	RenderDiagnostics& m_diagnostics;
 	RendererMemoryDiagnosticsSnapshot m_latestSnapshot;
 	bool m_bHasPolled = false;
 };

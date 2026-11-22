@@ -52,9 +52,11 @@ sparkle_target_precompile_headers(SparkleCore
 # Core module has no engine dependencies (it's the base)
 # Add any system dependencies here if needed
 # SparkleCore owns spdlog bootstrap, sink policy, and named logger lifetime.
+include("${SPARKLE_REPOSITORY_ROOT}/CMake/Dependencies/Targets/directxmath.cmake")
 target_link_libraries(SparkleCore
     PUBLIC
         spdlog::spdlog
+        SparkleDirectXMath
     PRIVATE
         Boost::process
 )

@@ -21,16 +21,8 @@ void Process::SignalParentReadiness(std::string_view value) noexcept
 		return;
 	}
 
-	const int nameLength = MultiByteToWideChar(CP_UTF8, 0, eventName.data(), static_cast<int>(eventName.size()), nullptr, 0);
-	if (nameLength <= 0)
-	{
-		return;
-	}
-
-	std::wstring wideEventName(static_cast<std::size_t>(nameLength), L'\0');
-	MultiByteToWideChar(CP_UTF8, 0, eventName.data(), static_cast<int>(eventName.size()), wideEventName.data(), nameLength);
-
-	const HANDLE eventHandle = OpenEventW(EVENT_MODIFY_STATE, FALSE, wideEventName.c_str());
+	// Core's parent generates ASCII names; match the native environment reader's encoding.
+	const HANDLE eventHandle = OpenEventA(EVENT_MODIFY_STATE, FALSE, eventName.c_str());
 	if (eventHandle == nullptr)
 	{
 		return;

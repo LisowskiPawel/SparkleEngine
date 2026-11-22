@@ -37,12 +37,36 @@ function Test-PackageMetadata
         if ([string]::IsNullOrWhiteSpace($component.name) -or [string]::IsNullOrWhiteSpace($component.versionInfo) -or
             $component.licenseDeclared -match '^(|NONE|NOASSERTION)$') { throw 'Unqualified SPDX software component.' }
     }
+    $licenseDefinitions = @{}
+    if ($sbom.PSObject.Properties.Name -contains 'hasExtractedLicensingInfos')
+    {
+        foreach ($definition in $sbom.hasExtractedLicensingInfos)
+        {
+            if ($licenseDefinitions.ContainsKey($definition.licenseId) -or
+                [string]::IsNullOrWhiteSpace($definition.extractedText) -or $definition.extractedText -in @('NONE','NOASSERTION'))
+            {
+                throw "Missing/duplicate SPDX license definition: '$($definition.licenseId)'."
+            }
+            $licenseDefinitions[$definition.licenseId] = $definition.extractedText
+        }
+    }
+    $licenses = @($sbom.packages | ForEach-Object licenseDeclared) + @($sbom.files | ForEach-Object licenseConcluded)
+    foreach ($license in $licenses)
+    {
+        foreach ($reference in [regex]::Matches($license, '(?<![A-Za-z0-9.-])LicenseRef-[A-Za-z0-9.-]+'))
+        {
+            if (!$licenseDefinitions.ContainsKey($reference.Value))
+            {
+                throw "Unresolved SPDX license reference '$($reference.Value)' in '$license'."
+            }
+        }
+    }
     foreach ($product in $Manifest.Products)
     {
         foreach ($required in $product.SourcePackages)
         {
-            $matches = @($sbom.packages | Where-Object name -ceq $required.name)
-            if ($matches.Count -ne 1) { throw "Missing/duplicate SPDX dependency: '$($required.name)'." }
+            $matches = @($sbom.packages | Where-Object { $_.name -ceq $required.name -and $_.versionInfo -ceq $required.versionInfo })
+            if ($matches.Count -ne 1) { throw "Missing/duplicate SPDX dependency: '$($required.name)' version '$($required.versionInfo)'." }
             foreach ($field in @('versionInfo','licenseDeclared','downloadLocation'))
             {
                 if ($matches[0].$field -cne $required.$field)

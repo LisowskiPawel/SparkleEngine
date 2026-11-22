@@ -1,6 +1,6 @@
 #include "PCH.h"
 #include "Input/InputSystemState.h"
-#include "Input/Backends/Win32PointerControl.h"
+#include "Window/Window.h"
 
 #include <utility>
 
@@ -15,17 +15,12 @@ void InputSystem::State::CancelInput()
 	GlobalState = InputState{};
 	LayerStates = {};
 	MouseCaptureLayer = InputLayer::System;
-	bHasLastMousePosition = false;
 	FocusRouter.ResetFocus();
 	Dispatcher.CancelAllEvents();
 
 	if (canceledGlobal.IsMouseCaptured())
 	{
-		ReleaseWin32MouseCapture(WindowHandle);
-	}
-	if (canceledGlobal.IsCursorHidden())
-	{
-		ShowWin32Cursor();
+		DisableNativeRelativeMode();
 	}
 
 	for (std::size_t index = 0; index < RoutedLayerCount; ++index)
@@ -69,16 +64,11 @@ void InputSystem::State::CancelPointerInput()
 	}
 
 	MouseCaptureLayer = InputLayer::System;
-	bHasLastMousePosition = false;
 	Dispatcher.CancelPointerEvents();
 
 	if (canceledGlobal.IsMouseCaptured())
 	{
-		ReleaseWin32MouseCapture(WindowHandle);
-	}
-	if (canceledGlobal.IsCursorHidden())
-	{
-		ShowWin32Cursor();
+		DisableNativeRelativeMode();
 	}
 
 	for (std::size_t index = 0; index < RoutedLayerCount; ++index)
@@ -97,8 +87,7 @@ void InputSystem::State::CancelLayer(InputLayer layer)
 	Dispatcher.CancelLayerEvents(layer);
 	if (MouseCaptureLayer == layer)
 	{
-		ReleaseMouse();
-		SetCursorVisibility(true);
+		ReleaseRelativeMode();
 	}
 
 	ReleaseStateKeys(canceled, layer);

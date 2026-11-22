@@ -1,66 +1,67 @@
 #include "PCH.h"
 #include "Input/InputSystemState.h"
-#include "Input/Backends/Win32PointerControl.h"
+#include "Window/Window.h"
+#include "Window/SdlWindowInterop.h"
 
-void InputSystem::CaptureMouse()
+bool InputSystem::SetRelativeMouseMode(bool bEnabled)
 {
-	if (CaptureWin32Mouse(m_state->WindowHandle))
+	if (!bEnabled)
 	{
-		m_state->GlobalState.SetMouseCaptured(true);
-		m_state->MouseCaptureLayer = m_state->FocusRouter.GetActiveTargetLayer();
+		return m_state->ReleaseRelativeMode();
 	}
+	if (m_state->GlobalState.IsMouseCaptured())
+	{
+		return true;
+	}
+	Window* window = m_state->BoundWindow;
+	if (window == nullptr || window->ShouldClose())
+	{
+		return false;
+	}
+	const auto epoch = m_state->CancellationEpoch;
+	if (!SetSdlWindowRelativeMode(*window, true))
+	{
+		return false;
+	}
+	if (m_state->CancellationEpoch != epoch)
+	{
+		if (!SetSdlWindowRelativeMode(*window, false))
+		{
+			window->RequestClose();
+		}
+		return false;
+	}
+	m_state->GlobalState.SetMouseCaptured(true);
+	m_state->GlobalState.SetCursorHidden(true);
+	m_state->MouseCaptureLayer = m_state->FocusRouter.GetActiveTargetLayer();
+	return true;
 }
 
-void InputSystem::ReleaseMouse()
-{
-	m_state->ReleaseMouse();
-}
-
-void InputSystem::State::ReleaseMouse()
+bool InputSystem::State::ReleaseRelativeMode()
 {
 	const bool bWasCaptured = GlobalState.IsMouseCaptured();
 	GlobalState.SetMouseCaptured(false);
+	GlobalState.SetCursorHidden(false);
 	MouseCaptureLayer = InputLayer::System;
-	if (bWasCaptured)
+	return !bWasCaptured || DisableNativeRelativeMode();
+}
+
+bool InputSystem::State::DisableNativeRelativeMode()
+{
+	if (BoundWindow == nullptr)
 	{
-		ReleaseWin32MouseCapture(WindowHandle);
+		return true;
 	}
+	if (SetSdlWindowRelativeMode(*BoundWindow, false))
+	{
+		return true;
+	}
+	// Stop admitting camera work if native recovery failed; retain the owning SDL diagnostic.
+	BoundWindow->RequestClose();
+	return false;
 }
 
 bool InputSystem::IsMouseCaptured() const noexcept
 {
 	return m_state->GlobalState.IsMouseCaptured();
-}
-
-void InputSystem::CenterCursor()
-{
-	if (const std::optional<MousePosition> center = CenterWin32Cursor(m_state->WindowHandle))
-	{
-		m_state->LastMouseX = center->X;
-		m_state->LastMouseY = center->Y;
-		m_state->bHasLastMousePosition = true;
-	}
-}
-
-void InputSystem::SetCursorVisibility(bool bVisible)
-{
-	m_state->SetCursorVisibility(bVisible);
-}
-
-void InputSystem::State::SetCursorVisibility(bool bVisible)
-{
-	if (GlobalState.IsCursorHidden() == !bVisible)
-	{
-		return;
-	}
-
-	if (bVisible)
-	{
-		ShowWin32Cursor();
-	}
-	else
-	{
-		HideWin32Cursor();
-	}
-	GlobalState.SetCursorHidden(!bVisible);
 }
