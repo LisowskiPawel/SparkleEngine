@@ -111,16 +111,7 @@ std::optional<ConsoleOutputRecord> EditorViewportCaptureCoordinator::Update(Rend
 		try
 		{
 			auto write = std::make_unique<Write>(std::move(readback), m_outputPath, m_stop);
-			if (m_io)
-			{
-				const auto config = enkiGetTaskSchedulerConfig(m_io);
-				write->Task = enkiCreatePinnedTask(m_io, WriteCapture, config.numExternalTaskThreads + 1);
-				if (!write->Task)
-				{
-					throw std::bad_alloc();
-				}
-				enkiSetArgsPinnedTask(write->Task, write.get());
-			}
+			PrepareNativeWork(*write);
 			m_write = std::move(write);
 			if (m_io)
 			{
@@ -163,4 +154,20 @@ std::filesystem::path EditorViewportCaptureCoordinator::BuildOutputPath(std::uin
 {
 	const Filesystem::ProductUserStatePaths& userState = Filesystem::GetProductUserStatePaths();
 	return userState.CapturesRoot / ("Viewport_" + std::to_string(frameId) + ".bmp");
+}
+
+void EditorViewportCaptureCoordinator::PrepareNativeWork(Write& write)
+{
+	if (!m_io)
+	{
+		return;
+	}
+
+	const auto config = enkiGetTaskSchedulerConfig(m_io);
+	write.Task = enkiCreatePinnedTask(m_io, WriteCapture, config.numExternalTaskThreads + 1);
+	if (!write.Task)
+	{
+		throw std::bad_alloc();
+	}
+	enkiSetArgsPinnedTask(write.Task, &write);
 }

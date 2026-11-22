@@ -6,9 +6,7 @@
   #include "Diagnostics/GpuCrash/GpuCrashIncidentSink.h"
 #endif
 #include "Core/Public/Diagnostics/Error.h"
-#include <TaskScheduler_c.h>
 #include "Core/Public/Console/CVar.h"
-#include "Core/Public/Threading/ThreadOwnership.h"
 #include "GameFramework/Public/Rendering/RenderFrameSubmission.h"
 #include "GameFramework/Public/Rendering/RenderViewCameraData.h"
 #include "GameFramework/Public/Scene/Camera/CameraInputIntent.h"
@@ -22,20 +20,10 @@
 #include "Window/Window.h"
 #include "World/GameWorld.h"
 
-#include <array>
 #include <chrono>
 #include <cstdint>
 #include <memory>
-#include <new>
 #include <utility>
-
-namespace TaskRuntimeCVars
-{
-	static ConsoleVariable<std::uint32_t> g_frameCriticalWorkerCount{"task.FrameCriticalWorkerCount", 1, "Frame-critical task workers. Sweep explicitly before changing the product default."};
-	static ConsoleVariable<std::uint32_t> g_backgroundWorkerCount{"task.BackgroundWorkerCount", 1, "Background task workers. Sweep independently from frame-critical work."};
-	static ConsoleVariable<std::uint32_t> g_blockingIoWorkerCount{"task.BlockingIoWorkerCount", 1, "Blocking-I/O task workers. Keep bounded independently from CPU task lanes."};
-	static ConsoleVariable<bool> g_bSerialExecution{"task.SerialExecution", false, "Run task kernels directly on their deterministic caller-thread path."};
-}
 
 namespace ConcurrencyLaunchCVars
 {
@@ -176,72 +164,11 @@ void GameApplication::Shutdown()
 	m_levelSession.reset();
 	m_cameraInputIntentCollector.reset();
 	m_gameWorld.reset();
-	SettleExecution();
+	ShutdownExecution();
 	m_inputSystem.reset();
 	m_window.reset();
 	m_timer.reset();
 	m_bIsInitialized = false;
-}
-
-void GameApplication::InitializeExecution()
-{
-	m_stop = std::stop_source{};
-	const bool bSerial = TaskRuntimeCVars::g_bSerialExecution.Get();
-	const auto frameWorkers = bSerial ? 0u : TaskRuntimeCVars::g_frameCriticalWorkerCount.Get();
-	const auto backgroundWorkers = bSerial ? 0u : TaskRuntimeCVars::g_backgroundWorkerCount.Get();
-	const auto ioWorkers = bSerial ? 0u : TaskRuntimeCVars::g_blockingIoWorkerCount.Get();
-	const std::uint64_t totalWorkers = static_cast<std::uint64_t>(frameWorkers) + backgroundWorkers + ioWorkers;
-	const bool bSomeDisabled = frameWorkers == 0 || backgroundWorkers == 0;
-	const bool bAnyDisabled = bSomeDisabled || ioWorkers == 0;
-	const bool bMixedCounts = totalWorkers != 0 && bAnyDisabled;
-	if (totalWorkers > 256 || bMixedCounts)
-	{
-		throw Diagnostics::Error("Native task capacities require all zero or positive frame/background/I/O counts, with at most 256 workers in total.");
-	}
-	const std::array capacities{std::pair{&m_frameScheduler, frameWorkers}, std::pair{&m_backgroundScheduler, backgroundWorkers}, std::pair{&m_ioScheduler, ioWorkers}};
-	for (const auto& [scheduler, workers] : capacities)
-	{
-		if (workers == 0)
-		{
-			continue;
-		}
-		*scheduler = enkiNewTaskScheduler();
-		if (!*scheduler)
-		{
-			throw std::bad_alloc();
-		}
-		auto config = enkiGetTaskSchedulerConfig(*scheduler);
-		config.numTaskThreadsToCreate = workers;
-		config.numExternalTaskThreads = 1;
-		config.profilerCallbacks.threadStart = scheduler == &m_frameScheduler
-		    ? +[](std::uint32_t) { Threading::SetCurrentThreadRole("Sparkle.Task.FrameCritical"); }
-		    : scheduler == &m_backgroundScheduler
-		    ? +[](std::uint32_t) { Threading::SetCurrentThreadRole("Sparkle.Task.Background"); }
-		    : +[](std::uint32_t) { Threading::SetCurrentThreadRole("Sparkle.Task.BlockingIo"); };
-		char error[256]{};
-		if (!enkiTryInitTaskSchedulerWithConfig(*scheduler, config, error, sizeof(error)))
-		{
-			enkiDeleteTaskScheduler(*scheduler);
-			*scheduler = nullptr;
-			throw Diagnostics::Error(error);
-		}
-	}
-}
-
-void GameApplication::SettleExecution() noexcept
-{
-	// Renderer destruction has already sealed provider callbacks and settled the
-	// incident writer. Root cancellation cannot precede that native borrow fence.
-	m_stop.request_stop();
-	for (auto* scheduler : {&m_frameScheduler, &m_backgroundScheduler, &m_ioScheduler})
-	{
-		if (*scheduler)
-		{
-			enkiWaitforAllAndShutdown(*scheduler);
-			enkiDeleteTaskScheduler(*scheduler);
-			*scheduler = nullptr;
-		}
-	}
 }
 
 void GameApplication::InitializeHost()

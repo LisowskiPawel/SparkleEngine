@@ -97,12 +97,22 @@ namespace ECS
 		{
 			return false;
 		}
+		UpdateCamera();
+		return UpdateAnimation(scheduler) && UpdateTransformsAndExtract(scheduler);
+	}
+
+	void GameWorldSystemExecution::UpdateCamera()
+	{
 		const EntityId changed = m_camera.Update();
 		if (changed.IsValid())
 		{
 			m_state.MarkTransformDirty(changed);
 			m_state.RecordChange(changed);
 		}
+	}
+
+	bool GameWorldSystemExecution::UpdateAnimation(enkiTaskScheduler* scheduler)
+	{
 		if (!scheduler)
 		{
 			if (!m_animation.RunPlayback(0, m_animation.GetPlaybackCount()))
@@ -120,20 +130,7 @@ namespace ECS
 		}
 		else
 		{
-			std::atomic<bool> bSucceeded{true};
-			WorldSystemRange playback{m_animation, &AnimationSystemExecution::RunPlayback, m_animation.GetPlaybackCount(), bSucceeded};
-			WorldSystemRange pose{m_animation, &AnimationSystemExecution::RunPose, m_animation.GetPoseCount(), bSucceeded};
-			WorldSystemRange morph{m_animation, &AnimationSystemExecution::RunMorphSamples, m_animation.GetMorphSampleCount(), bSucceeded};
-			auto playbackTask = CreateSystemRange(scheduler, playback, 8, 16);
-			auto poseTask = CreateSystemRange(scheduler, pose, 2, 4);
-			auto morphTask = CreateSystemRange(scheduler, morph, 8, 16);
-			auto poseDependency = DependOnSystem(scheduler, playbackTask.get(), poseTask.get());
-			auto morphDependency = DependOnSystem(scheduler, playbackTask.get(), morphTask.get());
-
-			enkiAddTaskSet(scheduler, playbackTask.get());
-			enkiWaitForTaskSet(scheduler, poseTask.get());
-			enkiWaitForTaskSet(scheduler, morphTask.get());
-			if (!bSucceeded.load())
+			if (!ExecuteAnimationRanges(scheduler))
 			{
 				return false;
 			}
@@ -142,6 +139,29 @@ namespace ECS
 		{
 			return false;
 		}
+		return true;
+	}
+
+	bool GameWorldSystemExecution::ExecuteAnimationRanges(enkiTaskScheduler* scheduler)
+	{
+		std::atomic<bool> bSucceeded{true};
+		WorldSystemRange playback{m_animation, &AnimationSystemExecution::RunPlayback, m_animation.GetPlaybackCount(), bSucceeded};
+		WorldSystemRange pose{m_animation, &AnimationSystemExecution::RunPose, m_animation.GetPoseCount(), bSucceeded};
+		WorldSystemRange morph{m_animation, &AnimationSystemExecution::RunMorphSamples, m_animation.GetMorphSampleCount(), bSucceeded};
+		auto playbackTask = CreateSystemRange(scheduler, playback, 8, 16);
+		auto poseTask = CreateSystemRange(scheduler, pose, 2, 4);
+		auto morphTask = CreateSystemRange(scheduler, morph, 8, 16);
+		auto poseDependency = DependOnSystem(scheduler, playbackTask.get(), poseTask.get());
+		auto morphDependency = DependOnSystem(scheduler, playbackTask.get(), morphTask.get());
+
+		enkiAddTaskSet(scheduler, playbackTask.get());
+		enkiWaitForTaskSet(scheduler, poseTask.get());
+		enkiWaitForTaskSet(scheduler, morphTask.get());
+		return bSucceeded.load();
+	}
+
+	bool GameWorldSystemExecution::UpdateTransformsAndExtract(enkiTaskScheduler* scheduler)
+	{
 		m_state.PrepareTransformWork();
 		const auto dirtyCount = m_transform.GetDirtyTransformCount();
 		if (!scheduler)
@@ -161,25 +181,30 @@ namespace ECS
 		}
 		else
 		{
-			std::atomic<bool> bSucceeded{true};
-			WorldSystemRange transforms{m_transform, &TransformSystemExecution::RunTransforms, dirtyCount, bSucceeded};
-			WorldSystemRange cameras{m_transform, &TransformSystemExecution::RunCameraDerivedState, dirtyCount, bSucceeded};
-			WorldSystemRange meshes{m_extraction, &MeshExtractionSystemExecution::Run, m_extraction.GetMeshCount(), bSucceeded};
-			auto transformTask = CreateSystemRange(scheduler, transforms, 64, 128);
-			auto cameraTask = CreateSystemRange(scheduler, cameras, 64, 128);
-			auto meshTask = CreateSystemRange(scheduler, meshes, 64, 128);
-			auto cameraDependency = DependOnSystem(scheduler, transformTask.get(), cameraTask.get());
-			auto meshDependency = DependOnSystem(scheduler, cameraTask.get(), meshTask.get());
-
-			enkiAddTaskSet(scheduler, transformTask.get());
-			enkiWaitForTaskSet(scheduler, meshTask.get());
-			if (!bSucceeded.load())
+			if (!ExecuteTransformRanges(scheduler, dirtyCount))
 			{
 				return false;
 			}
 		}
 		m_state.CommitExtraction();
 		return true;
+	}
+
+	bool GameWorldSystemExecution::ExecuteTransformRanges(enkiTaskScheduler* scheduler, std::uint32_t dirtyCount)
+	{
+		std::atomic<bool> bSucceeded{true};
+		WorldSystemRange transforms{m_transform, &TransformSystemExecution::RunTransforms, dirtyCount, bSucceeded};
+		WorldSystemRange cameras{m_transform, &TransformSystemExecution::RunCameraDerivedState, dirtyCount, bSucceeded};
+		WorldSystemRange meshes{m_extraction, &MeshExtractionSystemExecution::Run, m_extraction.GetMeshCount(), bSucceeded};
+		auto transformTask = CreateSystemRange(scheduler, transforms, 64, 128);
+		auto cameraTask = CreateSystemRange(scheduler, cameras, 64, 128);
+		auto meshTask = CreateSystemRange(scheduler, meshes, 64, 128);
+		auto cameraDependency = DependOnSystem(scheduler, transformTask.get(), cameraTask.get());
+		auto meshDependency = DependOnSystem(scheduler, cameraTask.get(), meshTask.get());
+
+		enkiAddTaskSet(scheduler, transformTask.get());
+		enkiWaitForTaskSet(scheduler, meshTask.get());
+		return bSucceeded.load();
 	}
 
 	bool GameWorldState::ExecuteSystems(const GameWorldSystemExecutionContext& context)

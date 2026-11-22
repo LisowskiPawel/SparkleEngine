@@ -64,4 +64,44 @@ namespace SparkleLauncher
 		    },
 		    std::move(plan));
 	}
+
+	OperationRecord ExecuteLauncherOperation(
+	    std::string_view operationId,
+	    const LauncherOperationInputs& inputs,
+	    IProcessRunner& processRunner,
+	    std::stop_token cancellation,
+	    const Process::ChildProcessOutputCallback& outputCallback)
+	{
+		LauncherOperationPlan plan = PlanLauncherOperation(operationId, inputs);
+
+		auto blockedOperation = std::visit(
+		    [](auto& typedPlan) -> std::optional<OperationRecord>
+		    {
+			    if (typedPlan.bCanRun)
+			    {
+				    return std::nullopt;
+			    }
+
+			    OperationRecord record = std::move(typedPlan.Operation);
+			    if (!record.Failure.has_value())
+			    {
+				    SetOperationFailure(
+				        record,
+				        OperationProblemKind::Prerequisite,
+				        typedPlan.ReadinessMessages.empty() ? "Operation readiness failed." : typedPlan.ReadinessMessages.back(),
+				        "Resolve the reported prerequisite, refresh the workflow, then retry.");
+			    }
+			    MarkOperationFinished(record, OperationStatus::Skipped, std::nullopt);
+			    return record;
+		    },
+		    plan);
+
+		if (blockedOperation.has_value())
+		{
+			return std::move(*blockedOperation);
+		}
+
+		return RunLauncherOperationPlan(std::move(plan), processRunner, outputCallback, cancellation);
+	}
+
 }

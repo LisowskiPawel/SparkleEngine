@@ -28,6 +28,7 @@ public:
 	const std::vector<std::exception_ptr>& Execute();
 
 private:
+	void CookParallel(std::uint32_t workers);
 	static void CookRange(std::uint32_t begin, std::uint32_t end, std::uint32_t thread, void* argument) noexcept;
 	void CookRequest(std::uint32_t index);
 	static std::uint32_t ResolveBackgroundWorkerCount();

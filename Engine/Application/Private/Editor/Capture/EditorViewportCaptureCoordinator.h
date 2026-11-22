@@ -26,6 +26,7 @@ private:
 	std::filesystem::path BuildOutputPath(std::uint64_t frameId) const;
 
 	struct Write;
+	void PrepareNativeWork(Write& write);
 	static void WriteCapture(void* argument) noexcept;
 	enkiTaskScheduler* m_io;
 	std::stop_token m_stop;

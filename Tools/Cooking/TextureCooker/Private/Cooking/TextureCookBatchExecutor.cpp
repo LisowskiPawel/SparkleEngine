@@ -69,6 +69,12 @@ const std::vector<std::exception_ptr>& TextureCookBatchExecutor::Execute()
 		return m_results;
 	}
 
+	CookParallel(workers);
+	return m_results;
+}
+
+void TextureCookBatchExecutor::CookParallel(std::uint32_t workers)
+{
 	auto scheduler = std::unique_ptr<enkiTaskScheduler, decltype(&enkiDeleteTaskScheduler)>(enkiNewTaskScheduler(), enkiDeleteTaskScheduler);
 	if (!scheduler)
 	{
@@ -95,8 +101,6 @@ const std::vector<std::exception_ptr>& TextureCookBatchExecutor::Execute()
 	enkiSetParamsTaskSet(range.get(), {this, static_cast<std::uint32_t>(m_requests.size()), 1, 0});
 	enkiAddTaskSet(scheduler.get(), range.get());
 	enkiWaitForTaskSet(scheduler.get(), range.get());
-
-	return m_results;
 }
 
 void TextureCookBatchExecutor::CookRange(std::uint32_t begin, std::uint32_t end, std::uint32_t, void* argument) noexcept

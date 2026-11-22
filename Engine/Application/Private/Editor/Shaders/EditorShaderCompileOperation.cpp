@@ -91,17 +91,7 @@ ConsoleCommandResult EditorShaderCompileOperation::Request(bool bGenerateSymbols
 	try
 	{
 		auto compile = std::make_unique<Compile>(m_compile, bGenerateSymbols, m_stop);
-		if (m_io)
-		{
-			const auto config = enkiGetTaskSchedulerConfig(m_io);
-			const auto worker = config.numExternalTaskThreads + 1 + 2 % config.numTaskThreadsToCreate;
-			compile->Task = enkiCreatePinnedTask(m_io, CompileShaders, worker);
-			if (!compile->Task)
-			{
-				throw std::bad_alloc();
-			}
-			enkiSetArgsPinnedTask(compile->Task, compile.get());
-		}
+		PrepareNativeWork(*compile);
 		m_operation = std::move(compile);
 		if (m_io)
 		{
@@ -147,4 +137,21 @@ void EditorShaderCompileOperation::Update(UI& ui, Renderer& renderer)
 		ui.AppendConsoleOutput({result.Severity, std::move(result.Message)}, !result.bSucceeded);
 	}
 	ui.SetShaderCompileStatus(m_operation != nullptr);
+}
+
+void EditorShaderCompileOperation::PrepareNativeWork(Compile& compile)
+{
+	if (!m_io)
+	{
+		return;
+	}
+
+	const auto config = enkiGetTaskSchedulerConfig(m_io);
+	const auto worker = config.numExternalTaskThreads + 1 + 2 % config.numTaskThreadsToCreate;
+	compile.Task = enkiCreatePinnedTask(m_io, CompileShaders, worker);
+	if (!compile.Task)
+	{
+		throw std::bad_alloc();
+	}
+	enkiSetArgsPinnedTask(compile.Task, &compile);
 }

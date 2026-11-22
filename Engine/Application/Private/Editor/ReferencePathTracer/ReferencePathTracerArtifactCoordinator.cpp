@@ -214,17 +214,7 @@ void ReferencePathTracerArtifactCoordinator::StartPublication(ReferencePathTrace
 	try
 	{
 		auto write = std::make_unique<Write>(std::move(request), m_stop);
-		if (m_io)
-		{
-			const auto config = enkiGetTaskSchedulerConfig(m_io);
-			const auto worker = config.numExternalTaskThreads + 1 + 1 % config.numTaskThreadsToCreate;
-			write->Task = enkiCreatePinnedTask(m_io, WriteArtifact, worker);
-			if (!write->Task)
-			{
-				throw std::bad_alloc();
-			}
-			enkiSetArgsPinnedTask(write->Task, write.get());
-		}
+		PrepareNativeWork(*write);
 		m_write = std::move(write);
 		if (m_io)
 		{
@@ -329,4 +319,21 @@ std::filesystem::path ReferencePathTracerArtifactCoordinator::DefaultOutputRoot(
 {
 	const Filesystem::ProductUserStatePaths& userState = Filesystem::GetProductUserStatePaths();
 	return userState.CapturesRoot / "ReferencePathTracer";
+}
+
+void ReferencePathTracerArtifactCoordinator::PrepareNativeWork(Write& write)
+{
+	if (!m_io)
+	{
+		return;
+	}
+
+	const auto config = enkiGetTaskSchedulerConfig(m_io);
+	const auto worker = config.numExternalTaskThreads + 1 + 1 % config.numTaskThreadsToCreate;
+	write.Task = enkiCreatePinnedTask(m_io, WriteArtifact, worker);
+	if (!write.Task)
+	{
+		throw std::bad_alloc();
+	}
+	enkiSetArgsPinnedTask(write.Task, &write);
 }

@@ -17,6 +17,13 @@ namespace SparkleLauncher
 	using LauncherOperationInputs = std::variant<BuildWorkspaceOperationRequest, LevelOperationRequest, LevelRunOperationRequest, CookOperationRequest, MaintenanceOperationRequest>;
 	using LauncherOperationPlan = std::variant<BuildWorkspaceOperationPlan, LevelOperationPlan, LevelRunOperationPlan, CookOperationPlan, MaintenanceOperationPlan>;
 
+	OperationRecord ExecuteLauncherOperation(
+	    std::string_view operationId,
+	    const LauncherOperationInputs& inputs,
+	    IProcessRunner& processRunner,
+	    std::stop_token cancellation,
+	    const Process::ChildProcessOutputCallback& outputCallback);
+
 	LauncherOperationPlan PlanLauncherOperation(std::string_view operationId, const LauncherOperationInputs& inputs);
 	OperationRecord RunLauncherOperationPlan(LauncherOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation = {});
 }

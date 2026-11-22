@@ -46,6 +46,7 @@ public:
 	const GpuMesh* Find(const Mesh& cpuMesh) const noexcept;
 
 private:
+	void SettlePreparations() noexcept;
 	using CacheKey = std::pair<std::uint64_t, std::uint32_t>;
 
 	struct ActiveMesh final

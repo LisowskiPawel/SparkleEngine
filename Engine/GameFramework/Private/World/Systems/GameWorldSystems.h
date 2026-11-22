@@ -29,6 +29,12 @@ namespace ECS
 		bool Execute(enkiTaskScheduler* scheduler);
 
 	private:
+		void UpdateCamera();
+		bool UpdateAnimation(enkiTaskScheduler* scheduler);
+		bool UpdateTransformsAndExtract(enkiTaskScheduler* scheduler);
+		bool ExecuteAnimationRanges(enkiTaskScheduler* scheduler);
+		bool ExecuteTransformRanges(enkiTaskScheduler* scheduler, std::uint32_t dirtyCount);
+
 		// Component storage stays fixed until every submitted task settles.
 		CameraMovementSystem m_camera;
 		AnimationSystemExecution m_animation;

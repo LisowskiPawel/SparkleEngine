@@ -21,6 +21,16 @@ GpuMeshCache::GpuMeshCache(RenderHardwareInterface& renderHardwareInterface, Rhi
 
 GpuMeshCache::~GpuMeshCache() noexcept
 {
+	SettlePreparations();
+
+	m_requests.clear();
+	m_sourceHandles.clear();
+	m_handles.clear();
+	m_cache.clear();
+}
+
+void GpuMeshCache::SettlePreparations() noexcept
+{
 	m_stop.request_stop();
 	bool bRegistered = false;
 	for (auto& [key, request] : m_requests)
@@ -51,11 +61,6 @@ GpuMeshCache::~GpuMeshCache() noexcept
 	{
 		enkiDeRegisterExternalTaskThread(m_cpu);
 	}
-
-	m_requests.clear();
-	m_sourceHandles.clear();
-	m_handles.clear();
-	m_cache.clear();
 }
 
 GpuMeshHandle GpuMeshCache::Request(const ImmutableRenderMeshHandle& mesh)

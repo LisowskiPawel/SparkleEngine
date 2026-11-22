@@ -41,6 +41,7 @@ private:
 	static std::filesystem::path DefaultOutputRoot();
 
 	struct Write;
+	void PrepareNativeWork(Write& write);
 	static void WriteArtifact(void* argument) noexcept;
 	enkiTaskScheduler* m_io;
 	std::stop_token m_stop;

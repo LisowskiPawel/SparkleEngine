@@ -50,6 +50,13 @@ void CookedTextureLoad::Start(std::uint32_t admissionIndex)
 		Decode(this);
 		return;
 	}
+	PrepareNativeWork(admissionIndex);
+	m_bSubmitted = true;
+	enkiAddPinnedTask(m_io, m_read);
+}
+
+void CookedTextureLoad::PrepareNativeWork(std::uint32_t admissionIndex)
+{
 	if (!m_io || !m_cpu)
 	{
 		throw Diagnostics::Error("Texture loading requires both native resources, or neither.");
@@ -70,8 +77,6 @@ void CookedTextureLoad::Start(std::uint32_t admissionIndex)
 	enkiSetArgsPinnedTask(m_read, this);
 	enkiSetArgsPinnedTask(m_decode, this);
 	enkiSetParamsCompletionAction(m_readComplete, {this, nullptr, enkiGetCompletableFromPinnedTask(m_read)});
-	m_bSubmitted = true;
-	enkiAddPinnedTask(m_io, m_read);
 }
 
 void CookedTextureLoad::Cancel() noexcept

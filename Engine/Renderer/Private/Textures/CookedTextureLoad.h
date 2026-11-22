@@ -25,6 +25,7 @@ public:
 	LoadedTextureData TakeTexture();
 
 private:
+	void PrepareNativeWork(std::uint32_t admissionIndex);
 	static void Read(void* argument) noexcept;
 	static void AdmitDecode(void* argument, std::uint32_t) noexcept;
 	static void Decode(void* argument) noexcept;

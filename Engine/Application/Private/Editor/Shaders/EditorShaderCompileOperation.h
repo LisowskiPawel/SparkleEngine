@@ -21,6 +21,7 @@ public:
 private:
 	const EditorShaderCompileAction& m_compile;
 	struct Compile;
+	void PrepareNativeWork(Compile& compile);
 	static void CompileShaders(void* argument) noexcept;
 	enkiTaskScheduler* m_io;
 	std::stop_token m_stop;

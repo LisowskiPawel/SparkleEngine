@@ -28,82 +28,95 @@ GpuCrashIncidentSink::GpuCrashIncidentSink(enkiTaskScheduler* scheduler, std::st
 		{
 			throw Diagnostics::Error("GPU crash collection requires an admitted native I/O worker.");
 		}
-		Hash::Sha256Digest executableHash;
-		std::string error;
-		const auto executablePath = Filesystem::GetExecutablePath();
-		if (!Hash::TrySha256File(executablePath, executableHash, error))
-		{
-			throw Diagnostics::Error(error);
-		}
-		m_executableHash = Hash::Sha256ToHex(executableHash);
-		m_identity = startup.SessionId;
-		ReserveSlot();
-		const auto manifestFile = m_directory / "incident.json";
-		const auto manifestPath = Strings::ToNarrow(manifestFile.wstring());
-		const auto quotedManifest = nlohmann::json(manifestPath).dump();
-		std::cout << "SPARKLE_GPU_CRASH_INCIDENT " << quotedManifest << std::endl;
-		m_inputs = std::make_unique<GpuCrashInputs>(startup, api);
-		WriteManifest("Preparing");
-
-		m_writer = enkiCreatePinnedTask(
-		    m_scheduler,
-		    [](void* argument)
-		    {
-			    auto& sink = *static_cast<GpuCrashIncidentSink*>(argument);
-			    {
-				    std::lock_guard lock(sink.m_mutex);
-				    sink.m_writerPhase = WriterPhase::Running;
-			    }
-			    try
-			    {
-				    sink.Drain();
-			    }
-			    catch (...)
-			    {
-				    sink.MarkIncomplete();
-				    sink.m_bWriteFailed.store(true, std::memory_order_relaxed);
-				    sink.CloseWriter();
-			    }
-		    },
-		    enkiGetTaskSchedulerConfig(m_scheduler).numExternalTaskThreads + 1);
-		if (!m_writer)
-		{
-			throw std::bad_alloc();
-		}
-		enkiSetArgsPinnedTask(m_writer, this);
-		m_completion = enkiCreateCompletionAction(m_scheduler, nullptr, CompleteWriter);
-		if (!m_completion)
-		{
-			throw std::bad_alloc();
-		}
-		enkiSetParamsCompletionAction(m_completion, {nullptr, this, enkiGetCompletableFromPinnedTask(m_writer)});
+		PrepareIncident(startup, api);
+		PrepareWriter();
 	}
 	catch (...)
 	{
-		if (!m_directory.empty())
-		{
-			m_bKeepSlot = true;
-			try
-			{
-				WriteManifest("Unavailable");
-			}
-			catch (...)
-			{
-			}
-		}
-		CloseWriter();
-		WaitForWriter(std::chrono::seconds(10));
-		if (m_completion)
-		{
-			enkiDeleteCompletionAction(m_scheduler, m_completion);
-		}
-		if (m_writer)
-		{
-			enkiDeletePinnedTask(m_scheduler, m_writer);
-		}
-		RemoveUnusedSlot();
+		RollbackPreparation();
 		throw;
 	}
+}
+
+void GpuCrashIncidentSink::PrepareIncident(const GpuCrashStartup& startup, ERhiBackendApi api)
+{
+	Hash::Sha256Digest executableHash;
+	std::string error;
+	const auto executablePath = Filesystem::GetExecutablePath();
+	if (!Hash::TrySha256File(executablePath, executableHash, error))
+	{
+		throw Diagnostics::Error(error);
+	}
+	m_executableHash = Hash::Sha256ToHex(executableHash);
+	m_identity = startup.SessionId;
+	ReserveSlot();
+	const auto manifestFile = m_directory / "incident.json";
+	const auto manifestPath = Strings::ToNarrow(manifestFile.wstring());
+	const auto quotedManifest = nlohmann::json(manifestPath).dump();
+	std::cout << "SPARKLE_GPU_CRASH_INCIDENT " << quotedManifest << std::endl;
+	m_inputs = std::make_unique<GpuCrashInputs>(startup, api);
+	WriteManifest("Preparing");
+}
+
+void GpuCrashIncidentSink::PrepareWriter()
+{
+	m_writer = enkiCreatePinnedTask(m_scheduler, RunWriter, enkiGetTaskSchedulerConfig(m_scheduler).numExternalTaskThreads + 1);
+	if (!m_writer)
+	{
+		throw std::bad_alloc();
+	}
+	enkiSetArgsPinnedTask(m_writer, this);
+	m_completion = enkiCreateCompletionAction(m_scheduler, nullptr, CompleteWriter);
+	if (!m_completion)
+	{
+		throw std::bad_alloc();
+	}
+	enkiSetParamsCompletionAction(m_completion, {nullptr, this, enkiGetCompletableFromPinnedTask(m_writer)});
+}
+
+void GpuCrashIncidentSink::RunWriter(void* argument)
+{
+	auto& sink = *static_cast<GpuCrashIncidentSink*>(argument);
+	{
+		std::lock_guard lock(sink.m_mutex);
+		sink.m_writerPhase = WriterPhase::Running;
+	}
+	try
+	{
+		sink.Drain();
+	}
+	catch (...)
+	{
+		sink.MarkIncomplete();
+		sink.m_bWriteFailed.store(true, std::memory_order_relaxed);
+		sink.CloseWriter();
+	}
+}
+
+void GpuCrashIncidentSink::RollbackPreparation() noexcept
+{
+	if (!m_directory.empty())
+	{
+		m_bKeepSlot = true;
+		try
+		{
+			WriteManifest("Unavailable");
+		}
+		catch (...)
+		{
+		}
+	}
+	CloseWriter();
+	WaitForWriter(std::chrono::seconds(10));
+	if (m_completion)
+	{
+		enkiDeleteCompletionAction(m_scheduler, m_completion);
+	}
+	if (m_writer)
+	{
+		enkiDeletePinnedTask(m_scheduler, m_writer);
+	}
+	RemoveUnusedSlot();
 }
 
 bool GpuCrashIncidentSink::IsReadyPublished() const

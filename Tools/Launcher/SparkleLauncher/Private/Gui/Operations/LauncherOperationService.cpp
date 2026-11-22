@@ -21,45 +21,6 @@ namespace SparkleLauncher
 {
 	SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_operationLogger, "Launcher.Operations");
 
-	static OperationRecord ExecuteLauncherOperation(
-	    const LauncherOperationRequest& request,
-	    IProcessRunner& processRunner,
-	    std::stop_token cancellation,
-	    const Process::ChildProcessOutputCallback& outputCallback)
-	{
-		const std::string operationId = request.OperationId.toStdString();
-		LauncherOperationPlan plan = PlanLauncherOperation(operationId, request.Inputs);
-
-		auto blockedOperation = std::visit(
-		    [](auto& typedPlan) -> std::optional<OperationRecord>
-		    {
-			    if (typedPlan.bCanRun)
-			    {
-				    return std::nullopt;
-			    }
-
-			    OperationRecord record = std::move(typedPlan.Operation);
-			    if (!record.Failure.has_value())
-			    {
-				    SetOperationFailure(
-				        record,
-				        OperationProblemKind::Prerequisite,
-				        typedPlan.ReadinessMessages.empty() ? "Operation readiness failed." : typedPlan.ReadinessMessages.back(),
-				        "Resolve the reported prerequisite, refresh the workflow, then retry.");
-			    }
-			    MarkOperationFinished(record, OperationStatus::Skipped, std::nullopt);
-			    return record;
-		    },
-		    plan);
-
-		if (blockedOperation.has_value())
-		{
-			return std::move(*blockedOperation);
-		}
-
-		return RunLauncherOperationPlan(std::move(plan), processRunner, outputCallback, cancellation);
-	}
-
 	struct LauncherOperationService::Implementation final
 	{
 		static constexpr std::size_t MaximumRuns = 16;
@@ -165,7 +126,8 @@ namespace SparkleLauncher
 				{
 					throw std::runtime_error("No process runner is available for this Launcher operation.");
 				}
-				run.Record = ExecuteLauncherOperation(run.Request, *runner, run.Stop.get_token(), run.Output);
+				const auto operationId = run.Request.OperationId.toStdString();
+				run.Record = ExecuteLauncherOperation(operationId, run.Request.Inputs, *runner, run.Stop.get_token(), run.Output);
 			}
 			catch (const std::exception& error)
 			{
@@ -290,7 +252,9 @@ namespace SparkleLauncher
 		run->Completion = std::move(completion);
 		std::unique_lock lock(owner.Mutex);
 		const bool bDuplicate = std::any_of(owner.Runs.begin(), owner.Runs.end(), [&id](const auto& active) { return active->Id == id; });
-		if (owner.bClosing || owner.bBusy || bDuplicate || owner.Runs.size() == Implementation::MaximumRuns)
+		const bool bUnavailable = owner.bClosing || owner.bBusy;
+		const bool bCapacityReached = bDuplicate || owner.Runs.size() == Implementation::MaximumRuns;
+		if (bUnavailable || bCapacityReached)
 		{
 			lock.unlock();
 			SetOperationFailure(run->Record, OperationProblemKind::Prerequisite, "Another Launcher operation is running.", "Wait for the running operation or cancel it, then retry.");

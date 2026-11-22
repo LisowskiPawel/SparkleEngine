@@ -50,6 +50,10 @@ private:
 		std::size_t Bytes = 0;
 	};
 
+	void PrepareIncident(const GpuCrashStartup& startup, ERhiBackendApi api);
+	void PrepareWriter();
+	void RollbackPreparation() noexcept;
+	static void RunWriter(void* argument);
 	void Drain();
 	bool NotifyWriter(bool bCleanup = false) noexcept;
 	void CloseWriter() noexcept;
