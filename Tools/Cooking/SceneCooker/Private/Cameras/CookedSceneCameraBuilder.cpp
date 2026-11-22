@@ -8,54 +8,34 @@
 #include <cstring>
 #include <format>
 
-class CookedCameraTranslation final
+namespace CookedSceneCameraBuilder
 {
-public:
-	static Assets::CookedSceneCameraProjectionKind ToCookedCameraProjectionKind(ImportedCameraProjectionKind projectionKind) noexcept
+	void BuildCameras(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild)
 	{
-		switch (projectionKind)
+		outBuild.manifest.cameras.clear();
+		outBuild.manifest.cameras.reserve(importOutput.scene.cameras.size());
+
+		for (std::size_t cameraIndex = 0; cameraIndex < importOutput.scene.cameras.size(); ++cameraIndex)
 		{
-			case ImportedCameraProjectionKind::Perspective:
-				return Assets::CookedSceneCameraProjectionKind::Perspective;
-			case ImportedCameraProjectionKind::Orthographic:
-				return Assets::CookedSceneCameraProjectionKind::Orthographic;
-			case ImportedCameraProjectionKind::Unknown:
-			default:
-				return Assets::CookedSceneCameraProjectionKind::Unknown;
+			const ImportedCamera& importedCamera = importOutput.scene.cameras[cameraIndex];
+			const bool bInvalidCameraDescription = importedCamera.name.size() >= Assets::kCookedSceneCameraNameCapacity || importedCamera.projectionKind != ImportedCameraProjectionKind::Perspective;
+
+			if (bInvalidCameraDescription)
+			{
+				throw Diagnostics::Error(std::format("Imported camera {} exceeds the cooked camera contract.", cameraIndex));
+			}
+			Assets::CookedSceneCameraRecord cameraRecord;
+			if (!importedCamera.name.empty())
+			{
+				std::memcpy(cameraRecord.name, importedCamera.name.data(), importedCamera.name.size());
+			}
+			cameraRecord.worldTransform = importedCamera.worldTransform;
+			cameraRecord.projectionKind = Assets::CookedSceneCameraProjectionKind::Perspective;
+			cameraRecord.fovYRadians = importedCamera.fovYRadians;
+			cameraRecord.nearZ = importedCamera.nearZ;
+			cameraRecord.farZ = importedCamera.farZ;
+			cameraRecord.sourceNodeIndex = importedCamera.sourceNodeIndex;
+			outBuild.manifest.cameras.push_back(cameraRecord);
 		}
-	}
-
-	static Assets::CookedSceneCameraRecord BuildCameraRecord(const ImportedCamera& importedCamera)
-	{
-		Assets::CookedSceneCameraRecord cameraRecord;
-		if (!importedCamera.name.empty())
-		{
-			std::memcpy(cameraRecord.name, importedCamera.name.data(), importedCamera.name.size());
-		}
-		cameraRecord.worldTransform = importedCamera.worldTransform;
-		cameraRecord.projectionKind = ToCookedCameraProjectionKind(importedCamera.projectionKind);
-		cameraRecord.fovYRadians = importedCamera.fovYRadians;
-		cameraRecord.nearZ = importedCamera.nearZ;
-		cameraRecord.farZ = importedCamera.farZ;
-		cameraRecord.sourceNodeIndex = importedCamera.sourceNodeIndex;
-		return cameraRecord;
-	}
-};
-
-void CookedSceneCameraBuilder::BuildCameras(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild)
-{
-	outBuild.manifest.cameras.clear();
-	outBuild.manifest.cameras.reserve(importOutput.scene.cameras.size());
-
-	for (std::size_t cameraIndex = 0; cameraIndex < importOutput.scene.cameras.size(); ++cameraIndex)
-	{
-		const ImportedCamera& importedCamera = importOutput.scene.cameras[cameraIndex];
-		const bool bInvalidCameraDescription = importedCamera.name.size() >= Assets::kCookedSceneCameraNameCapacity || importedCamera.projectionKind != ImportedCameraProjectionKind::Perspective;
-
-		if (bInvalidCameraDescription)
-		{
-			throw Diagnostics::Error(std::format("Imported camera {} exceeds the cooked camera contract.", cameraIndex));
-		}
-		outBuild.manifest.cameras.push_back(CookedCameraTranslation::BuildCameraRecord(importedCamera));
 	}
 }

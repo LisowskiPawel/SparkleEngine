@@ -12,9 +12,8 @@
 #include <unordered_set>
 #include <utility>
 
-class CookedAnimationTranslation final
+namespace CookedAnimationAssetBuilder
 {
-public:
 	static Assets::CookedAssetId BuildAnimationAssetId(std::string_view sceneAssetId, std::uint32_t sourceAnimationIndex)
 	{
 		return Hash::Fnv1a64(std::string(sceneAssetId) + "#animation#" + std::to_string(sourceAnimationIndex));
@@ -38,9 +37,50 @@ public:
 		throw Diagnostics::Error("Imported animation uses an unsupported target path.");
 	}
 
-	static Assets::CookedAssetId ResolveTargetSkeletonAssetId(const CookedSceneBuild& build, const ImportedAnimationClip& clip) noexcept
+	static void AppendChannel(
+	    const ImportedAnimationClip& importedClip,
+	    const ImportedAnimationChannel& importedChannel,
+	    std::size_t clipIndex,
+	    std::size_t channelIndex,
+	    const CookedSkeletonAssetBuild& skeleton,
+	    CookedAnimationAssetBuild& asset)
 	{
-		return build.manifest.skeletonRefs[clip.targetSkeletonIndex].skeletonAssetId;
+		if (importedChannel.samplerIndex >= importedClip.samplers.size())
+		{
+			throw Diagnostics::Error(std::format("Imported animation clip {} channel {} references an invalid sampler.", clipIndex, channelIndex));
+		}
+
+		const ImportedAnimationSampler& sampler = importedClip.samplers[importedChannel.samplerIndex];
+		if (!sampler.IsValid())
+		{
+			throw Diagnostics::Error(std::format("Imported animation clip {} channel {} has incomplete sampler data.", clipIndex, channelIndex));
+		}
+		const Assets::CookedAnimationTargetPath targetPath = ToCookedTargetPath(importedChannel.targetPath);
+		const auto bakedKeys = AnimationPreviewBaker::Bake(sampler, importedChannel.targetPath, importedClip.durationSeconds);
+		const bool bInvalidAnimationJoint = importedChannel.targetPath != ImportedAnimationTargetPath::Weights && importedChannel.targetJointIndex >= skeleton.joints.size();
+
+		if (bInvalidAnimationJoint)
+		{
+			throw Diagnostics::Error(std::format("Imported animation clip {} channel {} references an invalid target joint.", clipIndex, channelIndex));
+		}
+
+		const bool bKeyframeStorageOverflow = asset.keyframes.size() > (std::numeric_limits<std::uint32_t>::max)()
+		    || bakedKeys.size() > (std::numeric_limits<std::uint32_t>::max)() - asset.keyframes.size();
+
+		if (bKeyframeStorageOverflow)
+		{
+			throw Diagnostics::Error(std::format("Imported animation clip {} channel {} has too many keyframes.", clipIndex, channelIndex));
+		}
+
+		const auto firstKeyframe = static_cast<std::uint32_t>(asset.keyframes.size());
+		asset.keyframes.insert(asset.keyframes.end(), bakedKeys.begin(), bakedKeys.end());
+
+		asset.channels.push_back(
+		    {.targetPath = targetPath,
+		        .targetNodeIndex = importedChannel.targetNodeIndex,
+		        .targetJointIndex = importedChannel.targetJointIndex,
+		        .firstKeyframe = firstKeyframe,
+		        .keyframeCount = static_cast<std::uint32_t>(bakedKeys.size())});
 	}
 
 	static CookedAnimationAssetBuild BuildAsset(
@@ -48,118 +88,58 @@ public:
 	    std::string_view sceneAssetId,
 	    const ImportedAnimationClip& importedClip,
 	    std::size_t clipIndex,
-	    const CookedSceneBuild& build);
-	static void AppendChannel(
-	    const ImportedAnimationClip& importedClip,
-	    const ImportedAnimationChannel& importedChannel,
-	    std::size_t clipIndex,
-	    std::size_t channelIndex,
-	    const CookedSkeletonAssetBuild& skeleton,
-	    CookedAnimationAssetBuild& asset);
-};
-
-CookedAnimationAssetBuild CookedAnimationTranslation::BuildAsset(
-    const SourceImportOutput& importOutput,
-    std::string_view sceneAssetId,
-    const ImportedAnimationClip& importedClip,
-    std::size_t clipIndex,
-    const CookedSceneBuild& build)
-{
-	const bool bAnimationClipInvalidName = !importedClip.IsValid() || importedClip.name.size() >= sizeof(Assets::CookedAnimationAssetHeader::name);
-	const bool bClipInvalidSkeletonAssetsSize = bAnimationClipInvalidName || (importedClip.targetSkeletonIndex >= build.outputs.skeletonAssets.size());
-	const bool bAnimationClipInvalid = bClipInvalidSkeletonAssetsSize || (importedClip.targetSkeletonIndex >= build.manifest.skeletonRefs.size());
-
-	if (bAnimationClipInvalid)
+	    const CookedSceneBuild& build)
 	{
-		throw Diagnostics::Error(std::format("Imported animation clip {} is invalid.", clipIndex));
-	}
+		const bool bAnimationClipInvalidName = !importedClip.IsValid() || importedClip.name.size() >= sizeof(Assets::CookedAnimationAssetHeader::name);
+		const bool bClipInvalidSkeletonAssetsSize = bAnimationClipInvalidName || (importedClip.targetSkeletonIndex >= build.outputs.skeletonAssets.size());
+		const bool bAnimationClipInvalid = bClipInvalidSkeletonAssetsSize || (importedClip.targetSkeletonIndex >= build.manifest.skeletonRefs.size());
 
-	CookedAnimationAssetBuild asset;
-	asset.assetId = BuildAnimationAssetId(sceneAssetId, importedClip.sourceAnimationIndex);
-	asset.targetSkeletonAssetId = ResolveTargetSkeletonAssetId(build, importedClip);
-	if (asset.targetSkeletonAssetId == Assets::InvalidCookedAssetId)
-	{
-		throw Diagnostics::Error(std::format("Imported animation clip {} has no target skeleton.", clipIndex));
-	}
-	asset.sourceAnimationIndex = importedClip.sourceAnimationIndex;
-	asset.durationSeconds = importedClip.durationSeconds;
-	asset.name = importedClip.name;
-	asset.sourcePath = importOutput.GetSourcePath();
-	asset.channels.reserve(importedClip.channels.size());
-
-	const CookedSkeletonAssetBuild& skeleton = build.outputs.skeletonAssets[importedClip.targetSkeletonIndex];
-	for (std::size_t channelIndex = 0; channelIndex < importedClip.channels.size(); ++channelIndex)
-	{
-		AppendChannel(importedClip, importedClip.channels[channelIndex], clipIndex, channelIndex, skeleton, asset);
-	}
-	return asset;
-}
-
-void CookedAnimationTranslation::AppendChannel(
-    const ImportedAnimationClip& importedClip,
-    const ImportedAnimationChannel& importedChannel,
-    std::size_t clipIndex,
-    std::size_t channelIndex,
-    const CookedSkeletonAssetBuild& skeleton,
-    CookedAnimationAssetBuild& asset)
-{
-	if (importedChannel.samplerIndex >= importedClip.samplers.size())
-	{
-		throw Diagnostics::Error(std::format("Imported animation clip {} channel {} references an invalid sampler.", clipIndex, channelIndex));
-	}
-
-	const ImportedAnimationSampler& sampler = importedClip.samplers[importedChannel.samplerIndex];
-	if (!sampler.IsValid())
-	{
-		throw Diagnostics::Error(std::format("Imported animation clip {} channel {} has incomplete sampler data.", clipIndex, channelIndex));
-	}
-	const Assets::CookedAnimationTargetPath targetPath = ToCookedTargetPath(importedChannel.targetPath);
-	const auto bakedKeys = AnimationPreviewBaker::Bake(sampler, importedChannel.targetPath, importedClip.durationSeconds);
-	const bool bInvalidAnimationJoint = importedChannel.targetPath != ImportedAnimationTargetPath::Weights && importedChannel.targetJointIndex >= skeleton.joints.size();
-
-	if (bInvalidAnimationJoint)
-	{
-		throw Diagnostics::Error(std::format("Imported animation clip {} channel {} references an invalid target joint.", clipIndex, channelIndex));
-	}
-
-	const bool bKeyframeStorageOverflow = asset.keyframes.size() > (std::numeric_limits<std::uint32_t>::max)()
-	    || bakedKeys.size() > (std::numeric_limits<std::uint32_t>::max)() - asset.keyframes.size();
-
-	if (bKeyframeStorageOverflow)
-	{
-		throw Diagnostics::Error(std::format("Imported animation clip {} channel {} has too many keyframes.", clipIndex, channelIndex));
-	}
-
-	const auto firstKeyframe = static_cast<std::uint32_t>(asset.keyframes.size());
-	asset.keyframes.insert(asset.keyframes.end(), bakedKeys.begin(), bakedKeys.end());
-
-	asset.channels.push_back(
-	    {.targetPath = targetPath,
-	        .targetNodeIndex = importedChannel.targetNodeIndex,
-	        .targetJointIndex = importedChannel.targetJointIndex,
-	        .firstKeyframe = firstKeyframe,
-	        .keyframeCount = static_cast<std::uint32_t>(bakedKeys.size())});
-}
-
-void CookedAnimationAssetBuilder::Build(const SourceImportOutput& importOutput, std::string_view sceneAssetId, CookedSceneBuild& outBuild)
-{
-	outBuild.outputs.animationAssets.clear();
-	outBuild.manifest.animationReferences.clear();
-	outBuild.outputs.animationAssets.reserve(importOutput.scene.animations.size());
-	outBuild.manifest.animationReferences.reserve(importOutput.scene.animations.size());
-
-	std::unordered_set<std::uint32_t> sourceAnimationIndices;
-	for (std::size_t clipIndex = 0; clipIndex < importOutput.scene.animations.size(); ++clipIndex)
-	{
-		const ImportedAnimationClip& importedClip = importOutput.scene.animations[clipIndex];
-		if (!sourceAnimationIndices.insert(importedClip.sourceAnimationIndex).second)
+		if (bAnimationClipInvalid)
 		{
-			throw Diagnostics::Error(std::format("Imported animation clip {} duplicates a source animation index.", clipIndex));
+			throw Diagnostics::Error(std::format("Imported animation clip {} is invalid.", clipIndex));
 		}
 
-		CookedAnimationAssetBuild animationAsset = CookedAnimationTranslation::BuildAsset(importOutput, sceneAssetId, importedClip, clipIndex, outBuild);
+		CookedAnimationAssetBuild asset;
+		asset.assetId = BuildAnimationAssetId(sceneAssetId, importedClip.sourceAnimationIndex);
+		asset.targetSkeletonAssetId = build.manifest.skeletonRefs[importedClip.targetSkeletonIndex].skeletonAssetId;
+		if (asset.targetSkeletonAssetId == Assets::InvalidCookedAssetId)
+		{
+			throw Diagnostics::Error(std::format("Imported animation clip {} has no target skeleton.", clipIndex));
+		}
+		asset.sourceAnimationIndex = importedClip.sourceAnimationIndex;
+		asset.durationSeconds = importedClip.durationSeconds;
+		asset.name = importedClip.name;
+		asset.sourcePath = importOutput.GetSourcePath();
+		asset.channels.reserve(importedClip.channels.size());
 
-		outBuild.manifest.animationReferences.push_back({.animationAssetId = animationAsset.assetId, .sourceAnimationIndex = importedClip.sourceAnimationIndex, .flags = 0});
-		outBuild.outputs.animationAssets.push_back(std::move(animationAsset));
+		const CookedSkeletonAssetBuild& skeleton = build.outputs.skeletonAssets[importedClip.targetSkeletonIndex];
+		for (std::size_t channelIndex = 0; channelIndex < importedClip.channels.size(); ++channelIndex)
+		{
+			AppendChannel(importedClip, importedClip.channels[channelIndex], clipIndex, channelIndex, skeleton, asset);
+		}
+		return asset;
+	}
+
+	void Build(const SourceImportOutput& importOutput, std::string_view sceneAssetId, CookedSceneBuild& outBuild)
+	{
+		outBuild.outputs.animationAssets.clear();
+		outBuild.manifest.animationReferences.clear();
+		outBuild.outputs.animationAssets.reserve(importOutput.scene.animations.size());
+		outBuild.manifest.animationReferences.reserve(importOutput.scene.animations.size());
+
+		std::unordered_set<std::uint32_t> sourceAnimationIndices;
+		for (std::size_t clipIndex = 0; clipIndex < importOutput.scene.animations.size(); ++clipIndex)
+		{
+			const ImportedAnimationClip& importedClip = importOutput.scene.animations[clipIndex];
+			if (!sourceAnimationIndices.insert(importedClip.sourceAnimationIndex).second)
+			{
+				throw Diagnostics::Error(std::format("Imported animation clip {} duplicates a source animation index.", clipIndex));
+			}
+
+			CookedAnimationAssetBuild animationAsset = BuildAsset(importOutput, sceneAssetId, importedClip, clipIndex, outBuild);
+
+			outBuild.manifest.animationReferences.push_back({.animationAssetId = animationAsset.assetId, .sourceAnimationIndex = importedClip.sourceAnimationIndex, .flags = 0});
+			outBuild.outputs.animationAssets.push_back(std::move(animationAsset));
+		}
 	}
 }

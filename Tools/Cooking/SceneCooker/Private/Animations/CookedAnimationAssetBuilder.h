@@ -5,8 +5,7 @@
 
 #include <string_view>
 
-class CookedAnimationAssetBuilder final
+namespace CookedAnimationAssetBuilder
 {
-public:
-	static void Build(const SourceImportOutput& importOutput, std::string_view sceneAssetId, CookedSceneBuild& outBuild);
-};
+	void Build(const SourceImportOutput& importOutput, std::string_view sceneAssetId, CookedSceneBuild& outBuild);
+}

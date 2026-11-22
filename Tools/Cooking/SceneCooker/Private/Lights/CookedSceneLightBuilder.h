@@ -3,8 +3,7 @@
 #include "CookedSceneBuild.h"
 #include "SourceImportOutput.h"
 
-class CookedSceneLightBuilder final
+namespace CookedSceneLightBuilder
 {
-public:
-	static void BuildLights(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild);
-};
+	void BuildLights(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild);
+}

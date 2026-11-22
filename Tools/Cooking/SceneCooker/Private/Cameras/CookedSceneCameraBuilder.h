@@ -3,8 +3,7 @@
 #include "CookedSceneBuild.h"
 #include "SourceImportOutput.h"
 
-class CookedSceneCameraBuilder final
+namespace CookedSceneCameraBuilder
 {
-public:
-	static void BuildCameras(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild);
-};
+	void BuildCameras(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild);
+}

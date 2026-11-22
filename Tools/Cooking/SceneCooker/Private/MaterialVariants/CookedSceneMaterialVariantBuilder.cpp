@@ -10,19 +10,8 @@
 #include <format>
 #include <string_view>
 
-class CookedMaterialVariantTranslation final
+namespace CookedSceneMaterialVariantBuilder
 {
-public:
-	static void CopyVariantName(std::string_view sourceName, char (&outName)[Assets::kCookedSceneMaterialVariantNameCapacity]) noexcept { std::memcpy(outName, sourceName.data(), sourceName.size()); }
-
-	static Assets::CookedSceneMaterialVariantRecord BuildVariantRecord(const ImportedMaterialVariant& importedVariant)
-	{
-		Assets::CookedSceneMaterialVariantRecord record;
-		CopyVariantName(importedVariant.name, record.name);
-		record.sourceVariantIndex = importedVariant.sourceVariantIndex;
-		return record;
-	}
-
 	static std::uint32_t ResolveCookedMeshAssetIndex(const SourceImportOutput& importOutput, const ImportedMaterialVariantMapping& importedMapping)
 	{
 		for (std::size_t primitiveIndex = 0; primitiveIndex < importOutput.scene.meshPrimitives.size(); ++primitiveIndex)
@@ -65,26 +54,29 @@ public:
 
 		return Assets::CookedSceneMaterialVariantMappingRecord{.meshAssetIndex = meshAssetIndex, .variantIndex = importedMapping.variantIndex, .materialAssetIndex = importedMapping.materialIndex};
 	}
-};
 
-void CookedSceneMaterialVariantBuilder::BuildMaterialVariants(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild)
-{
-	outBuild.manifest.materialVariants.clear();
-	outBuild.manifest.materialVariantMappings.clear();
-	outBuild.manifest.materialVariants.reserve(importOutput.scene.materialVariants.size());
-	outBuild.manifest.materialVariantMappings.reserve(importOutput.scene.materialVariantMappings.size());
-
-	for (const ImportedMaterialVariant& importedVariant : importOutput.scene.materialVariants)
+	void BuildMaterialVariants(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild)
 	{
-		if (importedVariant.name.empty() || importedVariant.name.size() >= Assets::kCookedSceneMaterialVariantNameCapacity)
+		outBuild.manifest.materialVariants.clear();
+		outBuild.manifest.materialVariantMappings.clear();
+		outBuild.manifest.materialVariants.reserve(importOutput.scene.materialVariants.size());
+		outBuild.manifest.materialVariantMappings.reserve(importOutput.scene.materialVariantMappings.size());
+
+		for (const ImportedMaterialVariant& importedVariant : importOutput.scene.materialVariants)
 		{
-			throw Diagnostics::Error("Imported material variant has an invalid name.");
+			if (importedVariant.name.empty() || importedVariant.name.size() >= Assets::kCookedSceneMaterialVariantNameCapacity)
+			{
+				throw Diagnostics::Error("Imported material variant has an invalid name.");
+			}
+			Assets::CookedSceneMaterialVariantRecord record;
+			std::memcpy(record.name, importedVariant.name.data(), importedVariant.name.size());
+			record.sourceVariantIndex = importedVariant.sourceVariantIndex;
+			outBuild.manifest.materialVariants.push_back(record);
 		}
-		outBuild.manifest.materialVariants.push_back(CookedMaterialVariantTranslation::BuildVariantRecord(importedVariant));
-	}
 
-	for (const ImportedMaterialVariantMapping& importedMapping : importOutput.scene.materialVariantMappings)
-	{
-		outBuild.manifest.materialVariantMappings.push_back(CookedMaterialVariantTranslation::BuildMappingRecord(importOutput, outBuild, importedMapping));
+		for (const ImportedMaterialVariantMapping& importedMapping : importOutput.scene.materialVariantMappings)
+		{
+			outBuild.manifest.materialVariantMappings.push_back(BuildMappingRecord(importOutput, outBuild, importedMapping));
+		}
 	}
 }

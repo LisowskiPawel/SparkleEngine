@@ -3,8 +3,7 @@
 #include "CookedSceneBuild.h"
 #include "SourceImportOutput.h"
 
-class CookedSceneMaterialVariantBuilder final
+namespace CookedSceneMaterialVariantBuilder
 {
-public:
-	static void BuildMaterialVariants(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild);
-};
+	void BuildMaterialVariants(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild);
+}

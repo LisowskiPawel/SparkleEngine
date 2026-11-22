@@ -3,8 +3,7 @@
 #include "CookedSceneBuild.h"
 #include "SourceImportOutput.h"
 
-class CookedSceneInstanceBuilder final
+namespace CookedSceneInstanceBuilder
 {
-public:
-	static void BuildInstances(const SourceImportOutput& importOutput, CookedSceneBuild& build);
-};
+	void BuildInstances(const SourceImportOutput& importOutput, CookedSceneBuild& build);
+}

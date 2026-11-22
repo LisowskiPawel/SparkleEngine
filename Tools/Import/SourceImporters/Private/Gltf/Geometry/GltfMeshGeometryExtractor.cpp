@@ -50,15 +50,15 @@ namespace GltfMeshGeometryExtractor
 	static Attributes CollectAttributes(const cgltf_primitive& primitive) noexcept
 	{
 		return Attributes{
-		    .Positions = GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_position),
-		    .Normals = GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_normal),
-		    .TextureCoordinates = GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_texcoord),
-		    .Tangents = GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_tangent),
-		    .Colors = GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_color),
-		    .Joints0 = GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_joints, 0),
-		    .Weights0 = GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_weights, 0),
-		    .Joints1 = GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_joints, 1),
-		    .Weights1 = GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_weights, 1)};
+		    .Positions = cgltf_find_accessor(&primitive, cgltf_attribute_type_position, 0),
+		    .Normals = cgltf_find_accessor(&primitive, cgltf_attribute_type_normal, 0),
+		    .TextureCoordinates = cgltf_find_accessor(&primitive, cgltf_attribute_type_texcoord, 0),
+		    .Tangents = cgltf_find_accessor(&primitive, cgltf_attribute_type_tangent, 0),
+		    .Colors = cgltf_find_accessor(&primitive, cgltf_attribute_type_color, 0),
+		    .Joints0 = cgltf_find_accessor(&primitive, cgltf_attribute_type_joints, 0),
+		    .Weights0 = cgltf_find_accessor(&primitive, cgltf_attribute_type_weights, 0),
+		    .Joints1 = cgltf_find_accessor(&primitive, cgltf_attribute_type_joints, 1),
+		    .Weights1 = cgltf_find_accessor(&primitive, cgltf_attribute_type_weights, 1)};
 	}
 
 	static bool HasValidTangentFrame(const ImportedMeshGeometry& geometry) noexcept
@@ -134,8 +134,8 @@ namespace GltfMeshGeometryExtractor
 		const bool bSecondaryPaired = (attributes.Joints1 == nullptr) == (attributes.Weights1 == nullptr);
 		const bool bSkinSetsPaired = bPrimaryPaired && bSecondaryPaired;
 		const bool bAttributeShapesValid = bShapesValid && bSkinSetsPaired;
-		const bool bJointSetsSupported = bAttributeShapesValid && GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_joints, 2) == nullptr;
-		const bool bWeightSetsSupported = bJointSetsSupported && GltfAccessorReader::FindAttribute(primitive, cgltf_attribute_type_weights, 2) == nullptr;
+		const bool bJointSetsSupported = bAttributeShapesValid && cgltf_find_accessor(&primitive, cgltf_attribute_type_joints, 2) == nullptr;
+		const bool bWeightSetsSupported = bJointSetsSupported && cgltf_find_accessor(&primitive, cgltf_attribute_type_weights, 2) == nullptr;
 
 		if (!bWeightSetsSupported)
 		{

@@ -9,19 +9,6 @@
 #include <format>
 #include <limits>
 
-const cgltf_accessor* GltfAccessorReader::FindAttribute(const cgltf_primitive& primitive, int type, int index)
-{
-	for (cgltf_size attributeIndex = 0; attributeIndex < primitive.attributes_count; ++attributeIndex)
-	{
-		if (primitive.attributes[attributeIndex].type == static_cast<cgltf_attribute_type>(type) && primitive.attributes[attributeIndex].index == index)
-		{
-			return primitive.attributes[attributeIndex].data;
-		}
-	}
-
-	return nullptr;
-}
-
 std::vector<std::uint32_t> GltfAccessorReader::ReadIndices(const cgltf_accessor* accessor)
 {
 	if (accessor == nullptr || accessor->count > (std::numeric_limits<std::uint32_t>::max)())
@@ -30,14 +17,14 @@ std::vector<std::uint32_t> GltfAccessorReader::ReadIndices(const cgltf_accessor*
 	}
 
 	std::vector<std::uint32_t> indices(accessor->count);
-	for (cgltf_size index = 0; index < accessor->count; ++index)
+	if (accessor->buffer_view == nullptr && !accessor->is_sparse)
 	{
-		const cgltf_size value = cgltf_accessor_read_index(accessor, index);
-		if (value > (std::numeric_limits<std::uint32_t>::max)())
-		{
-			throw Diagnostics::Error(std::format("glTF index accessor element {} exceeds the engine index range.", index));
-		}
-		indices[index] = static_cast<std::uint32_t>(value);
+		return indices;
+	}
+	const cgltf_size decodedCount = cgltf_accessor_unpack_indices(accessor, indices.data(), sizeof(std::uint32_t), indices.size());
+	if (decodedCount != indices.size())
+	{
+		throw Diagnostics::Error("Cannot decode glTF index accessor data.");
 	}
 	return indices;
 }
