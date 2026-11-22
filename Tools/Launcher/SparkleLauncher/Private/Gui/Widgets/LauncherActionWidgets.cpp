@@ -9,25 +9,11 @@
 
 namespace SparkleLauncher
 {
-	QString SyncItemStateStyle(SyncItemState state)
-	{
-		switch (state)
-		{
-			case SyncItemState::Missing:
-				return "warning";
-			case SyncItemState::Syncing:
-				return "running";
-			case SyncItemState::Synced:
-				return "ok";
-		}
-		return "warning";
-	}
-
 	void ApplyInlineStatusLabel(QLabel& label, const QString& text, const QString& state)
 	{
 		label.setObjectName("InlineStatusValue");
 		label.setFixedWidth(LauncherUi::Row::InlineStatusWidth);
-		label.setText(QStringLiteral("● %1").arg(text));
+		label.setText(QStringLiteral("â—Ź %1").arg(text));
 		label.setProperty("State", state);
 		label.style()->unpolish(&label);
 		label.style()->polish(&label);
@@ -41,34 +27,6 @@ namespace SparkleLauncher
 		button.setProperty("ActionState", state);
 		button.style()->unpolish(&button);
 		button.style()->polish(&button);
-	}
-
-	void ApplySyncActionButtonState(QPushButton& button, SyncItemState state, const QString& displayName)
-	{
-		switch (state)
-		{
-			case SyncItemState::Missing:
-				ApplyStatusActionButtonPresentation(button, "Sync", SyncItemStateStyle(state));
-				button.setProperty("ActionIntent", "sync");
-				button.setEnabled(true);
-				button.setAccessibleName("Sync " + displayName);
-				button.setToolTip("Sync " + displayName + ".");
-				break;
-			case SyncItemState::Syncing:
-				ApplyStatusActionButtonPresentation(button, "Syncing...", SyncItemStateStyle(state));
-				button.setProperty("ActionIntent", "none");
-				button.setEnabled(false);
-				button.setAccessibleName("Syncing " + displayName);
-				button.setToolTip("Sync is in progress.");
-				break;
-			case SyncItemState::Synced:
-				ApplyStatusActionButtonPresentation(button, "Clean", SyncItemStateStyle(state));
-				button.setProperty("ActionIntent", "clean");
-				button.setEnabled(true);
-				button.setAccessibleName("Clean " + displayName);
-				button.setToolTip("Clean " + displayName + ".");
-				break;
-		}
 	}
 
 	QString PrimaryActionLabelForOperationId(const QString& operationId)

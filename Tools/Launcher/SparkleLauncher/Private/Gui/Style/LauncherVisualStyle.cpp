@@ -157,19 +157,9 @@ namespace SparkleLauncher
 		addRule("#OptionHelpText", "color: " + textSecondary + "; font-size: 9pt; line-height: 132%; padding: 0 0 9px 0;");
 		addRule("#CleanPlanText", "color: " + textSecondary + "; background: #1d201d; border-top: 1px solid " + divider + "; padding: 8px 10px; font-size: 8pt;");
 		addRule("#CleanSelectionSummary", "color: " + textBody + "; font-size: 8.25pt; font-weight: 750; padding: 1px 0 7px 0;");
-		addRule("#CleanSelectionPanel", "background: #171917; border: 1px solid " + divider + "; border-radius: 4px;");
-
-		addRule(
-		    "#CleanScopeGroupTitle",
-		    "background: #1b1e1c; color: " + textSecondary + "; border: none; border-bottom: 1px solid " + divider + "; padding: 8px 15px 6px 15px; font-size: 8.25pt; font-weight: 700;");
-
-		addRule("#CleanScopeRow", "background: transparent; border: none; border-bottom: 1px solid " + divider + ";");
-		addRule("#CleanScopeRow:hover", "background: #1d211e;");
-		addRule("#CleanScopeRow[Selected=\"true\"]", "background: #221c1b; border-left: 2px solid #94524d;");
-		addRule("#CleanScopeCheckBox", "color: " + textPrimary + "; font-size: 9.25pt; font-weight: 700;");
-		addRule("#CleanScopeCheckBox::indicator:checked", "background: #b64f48; border: 1px solid #dc7067;");
-		addRule("#CleanScopeDescription", "color: " + textSecondary + "; font-size: 8.5pt;");
-		addRule("#CleanScopePreview", "color: " + textMuted + "; font-size: 8.25pt; padding-left: 14px;");
+		addRule("#CleanScopeView, #SourceDependencyView", "background: #171917; border: 1px solid " + divider + "; border-radius: 4px; alternate-background-color: #1d211e;");
+		addRule("QTreeView::item", "padding: 7px 4px;");
+		addRule("QHeaderView::section", "background: #1b1e1c; color: " + textSecondary + "; border: none; padding: 7px 4px;");
 		addRule("#WorkflowSelectionPanel", "background: #171917; border: 1px solid " + divider + "; border-radius: 4px;");
 		addRule("#WorkflowScopeRow", "background: transparent; border: none; border-bottom: 1px solid " + divider + ";");
 		addRule("#WorkflowScopeRow:hover", "background: #1d211e;");

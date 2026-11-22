@@ -10,15 +10,6 @@
 
 namespace SparkleLauncher
 {
-	struct CleanScopeUiOption
-	{
-		QString Label;
-		QString Value;
-		QString Detail;
-		QString Preview;
-		QString Group;
-	};
-
 	std::filesystem::path ResolveCleanScopePreviewPath(const std::filesystem::path& workspaceRoot, const QString& projectId, const QString& scope);
 
 	QString CleanScopeDisplayName(const QString& scopeValue);

@@ -16,6 +16,15 @@
 
 namespace SparkleLauncher
 {
+	struct CleanScopeUiOption
+	{
+		QString Label;
+		QString Value;
+		QString Detail;
+		QString Preview;
+		QString Group;
+	};
+
 	static QString ToDisplayPath(const std::filesystem::path& workspaceRoot, const std::filesystem::path& path)
 	{
 		std::error_code errorCode;
@@ -96,7 +105,9 @@ namespace SparkleLauncher
 		view->setMinimumHeight(380);
 		view->setColumnWidth(0, 200);
 		view->setColumnWidth(1, 400);
-		auto* all = new QTreeWidgetItem(view, {"All", "Remove build and cooked outputs, dependency caches, logs, and product user state including settings and captures. Confirmation is required.", "All generated data"});
+		auto* all = new QTreeWidgetItem(
+		    view,
+		    {"All", "Remove build and cooked outputs, dependency caches, logs, and product user state including settings and captures. Confirmation is required.", "All generated data"});
 		all->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
 		all->setCheckState(0, selectedScopes.contains("clean-all") ? Qt::Checked : Qt::Unchecked);
 		all->setToolTip(1, all->text(1));

@@ -16,6 +16,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QClipboard>
 #include <QtGui/QGuiApplication>
+#include <QtGui/QColor>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QToolButton>
@@ -33,7 +34,7 @@ namespace SparkleLauncher
 		auto* view = new QTreeWidget(layout.parentWidget());
 		view->setObjectName("SourceDependencyView");
 		view->setAccessibleName(bOptional ? "Optional source dependencies" : "Source dependencies");
-		view->setAccessibleDescription("Select a dependency and press Enter, or click its Action cell, to sync or clean. Ctrl+C copies its details.");
+		view->setAccessibleDescription("Select a dependency and use its action button or press Enter to sync or clean. Ctrl+C copies its details.");
 		view->setHeaderLabels({"Dependency", "Status", "Action", "Details"});
 		view->setRootIsDecorated(false);
 		view->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -53,26 +54,31 @@ namespace SparkleLauncher
 			item->setData(0, Qt::UserRole, dependency.Id);
 		}
 		connect(view, &QTreeWidget::itemActivated, this, [this](QTreeWidgetItem* item) { ActivateSourceDependency(item); });
-		connect(view, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem* item, int column) { if (column == 2) { ActivateSourceDependency(item); } });
 		auto* activate = view->addAction("Sync or clean selected dependency", view, [this, view]() { ActivateSourceDependency(view->currentItem()); });
 		auto* actionButton = new QToolButton(layout.parentWidget());
 		actionButton->setDefaultAction(activate);
 		const auto updateAction = [this, view, activate, actionButton]()
 		{
 			const auto* item = view->currentItem();
+			const QString id = item != nullptr ? item->data(0, Qt::UserRole).toString() : QString();
+			const bool bCanActivate = item != nullptr && !m_sourceDependencyRunIds.contains(id);
 			activate->setText(item != nullptr ? item->text(2) + " " + item->text(0) : "Select a dependency");
-			activate->setEnabled(item != nullptr && !m_sourceDependencyRunIds.contains(item->data(0, Qt::UserRole).toString()));
+			activate->setEnabled(bCanActivate);
 			actionButton->setAccessibleName(activate->text());
 		};
 		connect(view, &QTreeWidget::currentItemChanged, view, updateAction);
 		connect(view->model(), &QAbstractItemModel::dataChanged, view, updateAction);
-		auto* copy = view->addAction("Copy dependency details", QKeySequence::Copy, view, [view]()
-		{
-			if (const auto* item = view->currentItem())
-			{
-				QGuiApplication::clipboard()->setText(item->text(0) + "\n" + item->text(1) + "\n" + item->text(3));
-			}
-		});
+		auto* copy = view->addAction(
+		    "Copy dependency details",
+		    QKeySequence::Copy,
+		    view,
+		    [view]()
+		    {
+			    if (const auto* item = view->currentItem())
+			    {
+				    QGuiApplication::clipboard()->setText(item->text(0) + "\n" + item->text(1) + "\n" + item->text(3));
+			    }
+		    });
 		copy->setShortcutContext(Qt::WidgetWithChildrenShortcut);
 		view->setContextMenuPolicy(Qt::ActionsContextMenu);
 		m_sourceDependencyViews.push_back(view);
@@ -99,6 +105,10 @@ namespace SparkleLauncher
 			{
 				auto* item = view->topLevelItem(row);
 				const auto dependency = std::ranges::find(dependencies, item->data(0, Qt::UserRole).toString(), &ThirdPartyDependencyUiEntry::Id);
+				if (dependency == dependencies.end())
+				{
+					continue;
+				}
 				const QString runId = m_sourceDependencyRunIds.value(dependency->Id);
 				const bool bActive = !runId.isEmpty();
 				const bool bCleaning = bActive && m_cleaningSourceDependencyRunIds.contains(runId);

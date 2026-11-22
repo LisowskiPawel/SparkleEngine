@@ -3,7 +3,6 @@
 #include <QtCore/QString>
 #include <QtGui/QPixmap>
 #include <QtWidgets/QFrame>
-#include <QtWidgets/QLabel>
 #include <QtWidgets/QWidget>
 
 class QPaintEvent;
@@ -11,20 +10,6 @@ class QResizeEvent;
 
 namespace SparkleLauncher
 {
-	class ElidedLabel final : public QLabel
-	{
-	public:
-		explicit ElidedLabel(QString fullText, QWidget* parent = nullptr);
-
-	protected:
-		void resizeEvent(QResizeEvent* event) override;
-
-	private:
-		void RefreshDisplayedText();
-
-		QString m_fullText;
-	};
-
 	class SceneHeroCardWidget final : public QFrame
 	{
 	public:

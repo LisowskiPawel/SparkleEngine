@@ -2,6 +2,7 @@
 
 #include "Gui/Operations/LauncherOperationRequest.h"
 #include <QtCore/QHash>
+#include <QtCore/QList>
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 #include <QtCore/QSet>
@@ -9,7 +10,6 @@
 #include <filesystem>
 #include <functional>
 
-class QLabel;
 class QPushButton;
 class QVBoxLayout;
 class QTreeWidget;
@@ -21,7 +21,6 @@ namespace SparkleLauncher
 	class LauncherSettings;
 	struct LauncherOperationResult;
 	struct ThirdPartyDependencyUiEntry;
-	struct ThirdPartyDependencyUiStatus;
 	struct ToolchainItemStatus;
 	struct BuildFilesFreshnessStatus;
 	struct BuildWorkspaceOperationRequest;

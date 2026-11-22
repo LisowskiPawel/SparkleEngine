@@ -153,12 +153,6 @@ namespace SparkleLauncher::LauncherUi
 		inline constexpr int MaxHeight = 220;
 	}
 
-	namespace Clean
-	{
-		inline constexpr int RowSpacing = 14;
-		inline const QMargins RowMargins{16, 11, 16, 11};
-	}
-
 	namespace ScopeSelection
 	{
 		inline constexpr int ContentMinWidth = 760;
