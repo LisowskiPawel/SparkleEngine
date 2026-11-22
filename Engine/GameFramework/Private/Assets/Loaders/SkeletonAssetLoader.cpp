@@ -1,19 +1,32 @@
 #include "PCH.h"
 
 #include "Assets/Loaders/SkeletonAssetLoader.h"
-#include "Assets/Cooked/LoadedSkeletonAsset.h"
+#include "GameFramework/Public/Assets/Cooked/CookedSkeletonAsset.h"
+#include "Animation/SkeletonResource.h"
 
 #include "Assets/Loaders/CookedAssetByteReader.h"
+#include "Assets/Loaders/OzzConstructionBudget.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "GameFramework/Public/Scene/Animations/SkeletonTransformContract.h"
 
 #include <array>
 #include <cmath>
+#include <vector>
+#include <ozz/animation/offline/raw_skeleton.h>
+#include <ozz/animation/offline/skeleton_builder.h>
+#include <utility>
 
 namespace Assets
 {
-	static void ValidateEvaluationJoints(const LoadedSkeletonAsset& asset)
+	struct SkeletonRecords final
+	{
+		CookedSkeletonAssetHeader header;
+		std::vector<CookedSkeletonJointRecord> joints;
+		std::vector<CookedSkeletonEvaluationJointRecord> evaluationJoints;
+	};
+
+	static void ValidateEvaluationJoints(const SkeletonRecords& asset)
 	{
 		std::array<std::uint32_t, kMaxAnimationEvaluationJoints> ancestors;
 		std::size_t depth = 0;
@@ -53,7 +66,7 @@ namespace Assets
 		}
 	}
 
-	static void ValidateSkinJoints(const LoadedSkeletonAsset& asset)
+	static void ValidateSkinJoints(const SkeletonRecords& asset)
 	{
 		std::array<bool, kMaxAnimationEvaluationJoints> mapped{};
 		for (std::size_t index = 0; index < asset.joints.size(); ++index)
@@ -87,10 +100,53 @@ namespace Assets
 		}
 	}
 
-	LoadedSkeletonAsset SkeletonAssetLoader::Decode(std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget)
+	static SkeletonResource BuildSkeleton(const SkeletonRecords& asset, CookedAssetId skeletonAssetId, CookedAssetAllocationBudget& budget)
+	{
+		ReserveOzzConstruction(budget, asset.evaluationJoints.size(), 0);
+		ozz::animation::offline::RawSkeleton raw;
+		std::array<std::uint32_t, kMaxAnimationEvaluationJoints + 1> childCounts{};
+		std::array<std::uint32_t, kMaxAnimationEvaluationJoints + 1> nextChild{};
+		std::array<ozz::animation::offline::RawSkeleton::Joint*, kMaxAnimationEvaluationJoints> nodes{};
+		for (const auto& joint : asset.evaluationJoints)
+		{
+			const auto parent = joint.parentJointIndex == kInvalidCookedSkeletonJointIndex ? kMaxAnimationEvaluationJoints : joint.parentJointIndex;
+			++childCounts[parent];
+		}
+		raw.roots.resize(childCounts[kMaxAnimationEvaluationJoints]);
+		for (std::uint32_t index = 0; index < asset.evaluationJoints.size(); ++index)
+		{
+			const auto& joint = asset.evaluationJoints[index];
+			const auto parent = joint.parentJointIndex == kInvalidCookedSkeletonJointIndex ? kMaxAnimationEvaluationJoints : joint.parentJointIndex;
+			auto& siblings = parent == kMaxAnimationEvaluationJoints ? raw.roots : nodes[parent]->children;
+			auto& node = siblings[nextChild[parent]++];
+			nodes[index] = &node;
+			node.children.resize(childCounts[index]);
+			node.transform.translation = {joint.translation.x, joint.translation.y, joint.translation.z};
+			node.transform.rotation = {joint.rotation.x, joint.rotation.y, joint.rotation.z, joint.rotation.w};
+			node.transform.scale = {joint.scale.x, joint.scale.y, joint.scale.z};
+		}
+		ozz::animation::offline::SkeletonBuilder builder;
+		auto evaluation = builder(raw);
+		if (!evaluation || evaluation->num_joints() != asset.evaluationJoints.size())
+		{
+			throw Diagnostics::Error("Could not construct the animation-preview skeleton");
+		}
+
+		SkeletonResource skeleton;
+		skeleton.assetId = skeletonAssetId;
+		skeleton.evaluation = std::move(*evaluation);
+		skeleton.joints.reserve(asset.joints.size());
+		for (const auto& record : asset.joints)
+		{
+			skeleton.joints.push_back({record.sourceNodeIndex, record.evaluationJointIndex, record.inverseBindMatrix});
+		}
+		return skeleton;
+	}
+
+	SkeletonResource SkeletonAssetLoader::Load(std::span<const std::uint8_t> bytes, CookedAssetId skeletonAssetId, CookedAssetAllocationBudget& budget)
 	{
 		CookedAssetByteReader reader(bytes, budget);
-		LoadedSkeletonAsset asset;
+		SkeletonRecords asset;
 		asset.header = reader.Read<CookedSkeletonAssetHeader>();
 		const auto& header = asset.header;
 		const bool bSkinLayout = header.fileHeader.HasMagic(kCookedSkeletonAssetMagic) && header.jointStride == sizeof(CookedSkeletonJointRecord);
@@ -109,6 +165,7 @@ namespace Assets
 		{
 			throw Diagnostics::Error("Cooked skeleton asset contains unexpected trailing bytes");
 		}
-		return asset;
+		budget.ReserveArray<SkeletonJoint>(asset.joints.size());
+		return BuildSkeleton(asset, skeletonAssetId, budget);
 	}
 }

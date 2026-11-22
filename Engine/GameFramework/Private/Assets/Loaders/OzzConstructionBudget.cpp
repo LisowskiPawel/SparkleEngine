@@ -1,6 +1,6 @@
 #include "PCH.h"
 
-#include "Assets/Translators/OzzConstructionBudget.h"
+#include "Assets/Loaders/OzzConstructionBudget.h"
 
 #include "Assets/Loaders/CookedAssetAllocationBudget.h"
 

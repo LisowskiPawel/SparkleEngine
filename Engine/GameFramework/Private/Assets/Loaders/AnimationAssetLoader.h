@@ -1,15 +1,19 @@
 #pragma once
 
+#include "GameFramework/Public/Assets/Cooked/CookedAssetCommon.h"
+
 #include <cstdint>
 #include <span>
+
+struct AnimationClipResource;
+struct SkeletonResource;
 
 namespace Assets
 {
 	class CookedAssetAllocationBudget;
-	struct LoadedAnimationAsset;
 
 	namespace AnimationAssetLoader
 	{
-		LoadedAnimationAsset Decode(std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget);
+		AnimationClipResource Load(std::span<const std::uint8_t> bytes, CookedAssetId animationAssetId, std::span<const SkeletonResource> skeletons, CookedAssetAllocationBudget& budget);
 	}
 }
