@@ -3,10 +3,20 @@
 #include "Assets/Loaders/AnimationAssetLoader.h"
 
 #include "GameFramework/Public/Assets/Cooked/CookedAnimationAsset.h"
+#include "GameFramework/Public/Assets/Cooked/CookedSkeletonAsset.h"
 #include "Animation/AnimationClipResource.h"
+#include "Animation/SkeletonResource.h"
 #include "Assets/Loaders/CookedAssetByteReader.h"
+#include "Assets/Loaders/OzzConstructionBudget.h"
+#include "Assets/Loaders/CookedAssetAllocationBudget.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
+
+#include <ozz/animation/offline/raw_animation.h>
+#include <ozz/animation/offline/raw_track.h>
+#include <ozz/animation/offline/animation_builder.h>
+#include <ozz/animation/offline/track_builder.h>
+#include <ozz/animation/runtime/skeleton_utils.h>
 
 #include <span>
 #include <vector>
@@ -18,23 +28,13 @@
 #include <format>
 #include <limits>
 
-#include "GameFramework/Public/Assets/Cooked/CookedSkeletonAsset.h"
-#include "Assets/Loaders/OzzConstructionBudget.h"
-#include "Assets/Loaders/CookedAssetAllocationBudget.h"
-#include <ozz/animation/offline/raw_animation.h>
-#include <ozz/animation/offline/raw_track.h>
-#include <ozz/animation/offline/animation_builder.h>
-#include <ozz/animation/offline/track_builder.h>
-#include <ozz/animation/runtime/skeleton_utils.h>
 #include <array>
 #include <algorithm>
 #include <unordered_set>
 #include <utility>
-#include "Animation/SkeletonResource.h"
 
 namespace Assets
 {
-
 	struct AnimationRecords final
 	{
 		CookedAnimationAssetHeader header;
