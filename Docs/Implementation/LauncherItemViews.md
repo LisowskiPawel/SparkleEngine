@@ -2,7 +2,7 @@
 
 [Migration decision](../ThirdPartyMigration.md#native-removal-estimates) | [Cut candidate](../RepositoryFootprint.md#launcher-presentation-machinery) | [Engineering](../Engineering.md) | [Code style](../CodeStyle.md)
 
-**Next: Stage 0.** All stages below are unstarted. This is an implementation plan, not evidence that Qt fits, the UI has changed or code has been saved.
+**Next: Stage 1.** The [frozen baseline and contract](../../build/validation/launcher-item-views/candidate-20261122/STAGE-0.md) bind the source snapshot, current UI observations, removal boundary and trial controls. Qt fit and production delivery remain unproved.
 
 The deliverable is a simpler Launcher scene catalogue: Qt owns item placement, scrolling and index navigation; a small scene model and delegate replace the custom grid and per-card widget assembly. Preserve scene information, responsive sizing, DPI, keyboard/accessibility, Source and primary actions, readiness and operation feedback. The complete connected UI must be smaller and easier to reason about. The historical **Q ceiling is 160 physical / 140 code lines**, not a promised saving or the whole implementation budget.
 
@@ -41,29 +41,6 @@ Use three independent verdicts: **technical delivery**, **simplification**, and 
 - Fix defects and unnecessary machinery, then review a numerical miss once under the [delivery policy](../ThirdPartyMigration.md#code-delivery-and-qualification). If the complete candidate still fails the simplification exit, record NO-GO for this design. Do not quietly waive the promise, reduce supported behavior or repeat arbitrary tuning to hit a line count.
 
 At every stage exit, record the exact candidate, passed/missing controls, commands/artifacts, limitations, invalidation triggers and next runnable action. Remove completed stages, prompts and individual completed actions in the same run under the [documentation rules](../Engineering.md#writing-documentation); preserve stage numbers and keep receipts outside the active plan. Reuse matching evidence. A named-stage request includes its necessary prerequisites and ends at its verified exit; a full-delivery request continues through closure. A concrete unavailable input needs its owner and resume action, not another identical trial.
-
-## Stage 0: establish the real UI contract
-
-**Purpose:** make the full replacement boundary and its failure cases explicit before building the candidate.
-
-- [ ] Read the live guides linked above, [Roadmap](../Roadmap.md#supporting-system-simplification), the complete source owners and their build membership. Record dirty work and frozen identities. Recheck all current consumers; the source map is a starting inventory, not permission to remove every helper in a shared file.
-- [ ] Follow one card from `LauncherLevelUiModel::Build` through `InspectLevelPreparation`, action presentation, request factory, `StartOperation`, `levels.run` planning/execution and responsive child readiness; follow sync/clean completion back through `DisplayOperationFinished` and refresh. Also trace settings changes, content rediscovery and page destruction. Record which owner may mutate each state and how long references/callbacks live.
-- [ ] Capture current catalogue ordering, Empty behavior, artwork/fallbacks, elision/tooltips, selectable metadata, status and disabled/Opening states. Record actual mouse, tab/shift-tab, Return/Enter/Space, Source and accessible name/action behavior. Distinguish intended contracts from existing defects; preserve defects as observations and repair causes within scope rather than freeze them as requirements.
-- [ ] Freeze geometry in logical pixels from `LauncherUi::MapCatalog`: currently minimum/maximum card widths **400/620**, maximum **four columns**, horizontal/vertical gaps **14/14**, aspect **2.42**. Include margins, scrollbar consumption and partial final rows. For catalogue width W and N > 0, the current column choice is `clamp(floor((W + 14) / 414), 1, min(4, N))`; card width divides the remaining width, caps at 620 and can shrink below 400 in a narrow viewport. Height is rounded from width / 2.42. Verify observed behavior at boundaries; do not assume fixed-size Qt icons reproduce it.
-- [ ] Freeze the controls in the matrix below and useful before captures. Include N = 0, 1, 2, 4, 5 and a larger local catalogue; widths immediately below/at/above each reachable column threshold; very wide and minimum supported windows; long text and missing artwork. Set any startup/resize/scroll responsiveness tolerances before measuring. Keep the timing sample small and relevant to a UI change.
-- [ ] Record the full cost denominator and proposed model/view/delegate ownership, action contract, scroll strategy, invalidation rules and deletion list. Confirm the selected kit headers/source match APIs used: online 6.11 documentation may describe a newer patch. Identify an available Windows accessibility inspector and physical display coverage; unavailable hardware must remain an explicit qualification gap.
-
-**Do:** separate view current/selection state from persisted `Levels.catalog` selection. Treat content ID plus level ID as dispatch identity. **Avoid:** a new readiness cache, speculative asynchronous thumbnail pipeline, broad Launcher cleanup or pre-emptive Qt upgrade.
-
-**Failures to expose:** stale captured entries after refresh, status changes without content identity changes, misdirected actions after row reorder, inaccessible Source action, hidden focus, and outer-scroll width feedback.
-
-**Exit:** the identity-bound contract, baseline, cost boundary and decisive trial cases exist. This stage passes on an actionable design/validation record; it does not establish Qt fit or runtime parity.
-
-Ready-to-use prompt:
-
-```text
-Execute Stage 0 of Docs/Implementation/LauncherItemViews.md. Deeply trace the current scene UI, readiness/action/operation path, refresh and destruction through their actual owners. Freeze source/product/input identities, the complete UI cost boundary and the focused behavior matrix. Read the live Engineering, CodeStyle, Roadmap, ThirdPartyMigration and RepositoryFootprint guidance. Preserve concurrent work. Record intended contracts and existing defects separately, propose the smallest Qt ownership split and next decisive trial, and update the plan before handoff. Do not start production cutover or claim savings.
-```
 
 ## Stage 1: prove responsive layout and usable actions together
 

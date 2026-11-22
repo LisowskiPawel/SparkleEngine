@@ -18,7 +18,8 @@ set(SPARKLE_BOOST_REQUIRED_PATHS
     libs/process/include/boost/process/v2/process.hpp
     libs/process/src/windows/default_launcher.cpp
     libs/asio/include/boost/asio/awaitable.hpp
-    libs/asio/include/boost/asio/readable_pipe.hpp)
+    libs/asio/include/boost/asio/readable_pipe.hpp
+    libs/scope/include/boost/scope/unique_resource.hpp)
 foreach(_module IN LISTS _sparkle_boost_modules)
     list(APPEND SPARKLE_BOOST_REQUIRED_PATHS "${_module}/CMakeLists.txt")
 endforeach()

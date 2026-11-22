@@ -2,6 +2,8 @@
 
 #include "Animation/AnimationEvaluationStorage.h"
 
+#include <array>
+
 namespace AnimationPreviewEvaluator
 {
 	bool EvaluatePose(const AnimationClipResource& clip, const SkeletonResource& skeleton, float timeSeconds, ECS::AnimationEvaluationStorage::PoseWorkSlot& output);

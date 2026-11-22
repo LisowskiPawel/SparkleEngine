@@ -48,7 +48,7 @@ The existing two-file review scope is 221 code lines before replacement costs. P
 
 **Cut candidate: redundant adapter state and translations left around adopted mechanisms.** Native enkiTS, SDL3, Boost.Process, ozz, JSON and ShaderMake already have selected owners. Review actual callers for overlapping stop/completion flags, repeated callback/result conversion or a wrapper that merely recreates the former local API. The [delivery and cost ledger](ThirdPartyMigration.md#delivered-integrations-versus-savings) identifies which transfers grew native code and where further review is justified.
 
-Remove only demonstrated overlap. Domain admission, partitioning, process-tree policy, animation mapping, publication and physical settlement still need owners. Prefer a focused change at an existing consumer over another general integration layer. Count all adapters, callers, maintained bindings and patches; upstream adoption alone earns no simplification claim.
+The [SDL3/Boost/ozz follow-up](../build/validation/integration-savings-20261122/REPORT.md) retires custom handle RAII and event-window decoding, the one-pointer pose wrapper and unused skeleton metadata copies; four morph weights now live inline. Its 81-line native reduction is delivered, with two added CMake lines, and is excluded from future cuts. Domain admission, partitioning, process-tree policy, animation mapping, publication and physical settlement still need owners. Review remaining dependencies at actual consumers and charge every adapter, caller, binding and patch; upstream adoption alone earns no simplification claim.
 
 ### Dependency and build policy
 
