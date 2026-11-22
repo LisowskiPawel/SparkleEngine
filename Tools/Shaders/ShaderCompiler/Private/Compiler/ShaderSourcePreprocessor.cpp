@@ -20,12 +20,13 @@ static void CaptureSourceFile(const std::string& pathKey, const std::string& sou
 static void VisitFile(std::string_view filePath, const ShaderCompileRequest& request, ShaderPreprocessContext& context, std::string& outSource);
 static std::string ReadSourceText(std::string_view virtualPath, const ShaderCompileRequest& request);
 static bool ContainsPragmaOnce(std::string_view sourceText);
-static std::string MakeLinePath(std::string_view path);
+static std::string MakeLinePath(std::string_view path, ShaderSourceLinePaths linePaths);
 static void AppendLineDirective(std::string& outSource, std::uint32_t lineNumber, std::string_view linePath);
 static void AppendExpandedInclude(std::string_view includerPath, std::string_view includeSpec, const ShaderCompileRequest& request, ShaderPreprocessContext& context, std::string& outSource);
 
 struct ShaderPreprocessContext final
 {
+	ShaderSourceLinePaths LinePaths = ShaderSourceLinePaths::Virtual;
 	std::unordered_set<std::string> OncePathKeys;
 	std::unordered_set<std::string> ActivePathKeys;
 	std::vector<ShaderSourceFile>* SourceFiles = nullptr;
@@ -48,7 +49,7 @@ static void VisitFile(std::string_view filePath, const ShaderCompileRequest& req
 	}
 	CaptureSourceFile(pathKey, sourceText, context.SourceFiles);
 
-	const std::string linePath = MakeLinePath(pathKey);
+	const std::string linePath = MakeLinePath(pathKey, context.LinePaths);
 	AppendLineDirective(outSource, 1u, linePath);
 
 	static const std::regex includeRegex(R"(^\s*#\s*include\s*["<]([^">]+)[">])", std::regex::icase);
@@ -129,9 +130,9 @@ static bool ContainsPragmaOnce(std::string_view sourceText)
 	return false;
 }
 
-static std::string MakeLinePath(std::string_view path)
+static std::string MakeLinePath(std::string_view path, ShaderSourceLinePaths linePaths)
 {
-	std::string linePath(path);
+	std::string linePath(linePaths == ShaderSourceLinePaths::RootRelative ? path.substr(1) : path);
 	for (std::size_t index = 0; index < linePath.size(); ++index)
 	{
 		if (linePath[index] == '"')
@@ -163,20 +164,57 @@ static void AppendExpandedInclude(std::string_view includerPath, std::string_vie
 	VisitFile(*includePath, request, context, outSource);
 }
 
-std::string PreprocessShaderSource(std::string_view sourcePath, const ShaderCompileRequest& request, std::vector<ShaderSourceFile>* sourceFiles)
+static bool IsShaderIdentifier(std::string_view name)
 {
-	std::string sourceText;
+	const auto isLetter = [](unsigned char value)
+	{
+		return (value >= 'a' && value <= 'z') || (value >= 'A' && value <= 'Z') || value == '_';
+	};
+	if (name.empty() || !isLetter(name.front()))
+	{
+		return false;
+	}
+	return std::ranges::all_of(name, [&isLetter](unsigned char value) { return isLetter(value) || (value >= '0' && value <= '9'); });
+}
+
+static std::string BuildShaderDefines(const ShaderCompileRequest& request)
+{
+	if (!IsShaderIdentifier(request.EntryPoint))
+	{
+		throw Diagnostics::Error("Shader entry point must be an ASCII identifier.");
+	}
+	std::string prefix;
+	for (const std::string& define : request.Defines)
+	{
+		const std::size_t separator = define.find('=');
+		const std::string_view name(define.data(), separator == std::string::npos ? define.size() : separator);
+		const std::string_view value = separator == std::string::npos ? "1" : std::string_view(define).substr(separator + 1u);
+		const bool bHasControl = std::ranges::any_of(value, [](char character) { return character == '\0' || character == '\r' || character == '\n'; });
+		const std::size_t lastToken = value.find_last_not_of(" \t");
+		const bool bContinuesLine = lastToken != std::string_view::npos && value[lastToken] == '\\';
+		if (!IsShaderIdentifier(name) || bHasControl || bContinuesLine)
+		{
+			throw Diagnostics::Error("Shader define requires an identifier and a single-line replacement value.");
+		}
+		prefix += std::format("#undef {}\n#define {} {}\n", name, name, value);
+	}
+	return prefix;
+}
+
+std::string PreprocessShaderSource(std::string_view sourcePath, const ShaderCompileRequest& request, std::vector<ShaderSourceFile>* sourceFiles, ShaderSourceLinePaths linePaths)
+{
+	std::string sourceText = BuildShaderDefines(request);
 	if (request.ParameterStruct && !request.ParameterStruct->Values.empty())
 	{
 		const auto& descriptor = *request.ParameterStruct;
-		sourceText = "cbuffer " + descriptor.AutoParametersName + "\n{\n";
+		sourceText += "cbuffer " + descriptor.AutoParametersName + "\n{\n";
 		for (const auto& value : descriptor.Values)
 		{
 			sourceText += value.HlslType + " " + value.Name + " : packoffset(c" + std::to_string(value.OffsetInBytes / 16u) + "." + "xyzw"[value.OffsetInBytes % 16u / 4u] + ");\n";
 		}
 		sourceText += "};\n";
 	}
-	ShaderPreprocessContext context{.SourceFiles = sourceFiles};
+	ShaderPreprocessContext context{.LinePaths = linePaths, .SourceFiles = sourceFiles};
 	VisitFile(sourcePath, request, context, sourceText);
 	return sourceText;
 }

@@ -12,7 +12,7 @@
 #include "Core/Public/Paths/FileSystemPaths.h"
 #include "RHI/Public/Shaders/GlobalShaderMap.h"
 
-#include <Windows.h>
+#include "Compiler/ShaderCompilerToolchain.h"
 #include <chrono>
 #include <format>
 #include <algorithm>
@@ -88,48 +88,27 @@ std::string ShaderDebugArtifactWriter::WriteText(const std::filesystem::path& pa
 	return WriteBytes(path, std::as_bytes(std::span(contents.data(), contents.size())));
 }
 
-void ShaderDebugArtifactWriter::RecordCompiler(std::string_view backendName)
+void ShaderDebugArtifactWriter::RecordCompiler(std::uint64_t version)
 {
-	if (backendName == "dxc")
-	{
-		RecordCompilerModule(L"dxcompiler.dll");
-	}
-	else if (backendName == "slang")
-	{
-		RecordCompilerModule(L"slang.dll");
-		RecordCompilerModule(L"slang-compiler.dll");
-	}
-	else
-	{
-		throw Diagnostics::Error("Shader debug export has no compiler identity route for this backend.");
-	}
-	RecordCompilerModule(L"SPIRV-Tools-shared.dll");
-}
-
-void ShaderDebugArtifactWriter::RecordCompilerModule(const wchar_t* name)
-{
-	const std::string key = std::filesystem::path(name).generic_string();
-	if (m_compilerModules.contains(key))
+	if (!m_compilerModules.empty())
 	{
 		return;
 	}
-	const HMODULE module = GetModuleHandleW(name);
-	std::wstring path(32768u, L'\0');
-	const DWORD length = module != nullptr ? GetModuleFileNameW(module, path.data(), static_cast<DWORD>(path.size())) : 0u;
-	if (length == 0u || length >= path.size())
+	const ShaderCompilerToolchain toolchain = ReadShaderCompilerToolchain();
+	if (toolchain.Version != version)
 	{
-		throw Diagnostics::Error("Cannot identify the loaded shader compiler module '" + key + "'.");
+		throw Diagnostics::Error("Shader compiler inputs changed before debug publication.");
 	}
-	path.resize(length);
-	const std::filesystem::path modulePath(path);
-	std::string moduleSha256 = HashFile(modulePath);
-	m_compilerModules.emplace(key, std::move(moduleSha256));
+	for (const ShaderCompilerInputFile& input : toolchain.Files)
+	{
+		m_compilerModules.emplace(input.Name, input.Sha256);
+	}
 }
 
 void ShaderDebugArtifactWriter::Write(const ShaderCompileRequest& request, const CookedStageBuild& compiledStage, const ShaderDebugArtifactSet& debugArtifacts)
 {
 	const bool bSourceReady = request.bEnableDebugInfo && !request.SourceFiles.empty();
-	const bool bCodeReady = !compiledStage.bytecode.empty() && !debugArtifacts.CompileArguments.empty();
+	const bool bCodeReady = !compiledStage.bytecode.empty() && debugArtifacts.Invocation != nullptr;
 	const bool bCoreReady = bSourceReady && bCodeReady;
 	const bool bSymbolsReady = !debugArtifacts.Symbols.empty() && !debugArtifacts.SymbolName.empty();
 	const bool bFormatReady = compiledStage.format != ShaderBinaryFormat::Dxil || bSymbolsReady;
@@ -140,7 +119,7 @@ void ShaderDebugArtifactWriter::Write(const ShaderCompileRequest& request, const
 		throw Diagnostics::Error("Shader debug export is missing requested code, source or compiler debug data.");
 	}
 
-	RecordCompiler(compiledStage.backendName);
+	RecordCompiler(compiledStage.backendVersion);
 	const std::filesystem::path bundleDirectory = BuildBundleDirectoryName(request, compiledStage);
 	const std::filesystem::path codePath = bundleDirectory / (compiledStage.format == ShaderBinaryFormat::SpirV ? "shader.spv" : "shader.dxil");
 	const std::string codeSha256 = WriteBytes(codePath, std::as_bytes(std::span(compiledStage.bytecode)));
@@ -154,7 +133,7 @@ void ShaderDebugArtifactWriter::Write(const ShaderCompileRequest& request, const
 		WriteText(sourcePath, source.Contents);
 	}
 
-	const std::string compilerInputSha256 = WriteText(bundleDirectory / "compiler-input.hlsl", request.SourceCode);
+	const std::string compilerInputSha256 = WriteText(std::filesystem::path("sources") / debugArtifacts.CompilerInputPath, request.SourceCode);
 	WriteCompilerOutputs(bundleDirectory, debugArtifacts, compiledStage);
 	const nlohmann::json parameterReport{{"status", request.ParameterStruct.has_value() ? "matched" : "skipped"}};
 	WriteText(bundleDirectory / "parameter-struct-match.json", parameterReport.dump());
@@ -175,7 +154,15 @@ void ShaderDebugArtifactWriter::WriteCompilerOutputs(const std::filesystem::path
 		WriteText(bundleDirectory / "disassembly.txt", debugArtifacts.Disassembly);
 	}
 	WriteText(bundleDirectory / "compiler-stderr.txt", debugArtifacts.CompilerOutput);
-	WriteText(bundleDirectory / "compile-args.json", nlohmann::json(debugArtifacts.CompileArguments).dump());
+	const ShaderCompileInvocation& invocation = *debugArtifacts.Invocation;
+	WriteText(bundleDirectory / "compile-args.json", nlohmann::json(invocation.Arguments).dump());
+	WriteText(std::filesystem::path("sources") / invocation.ConfigurationPath, invocation.Configuration);
+	if (debugArtifacts.PreprocessingInvocation)
+	{
+		const ShaderCompileInvocation& preprocessing = *debugArtifacts.PreprocessingInvocation;
+		WriteText(bundleDirectory / "preprocess-args.json", nlohmann::json(preprocessing.Arguments).dump());
+		WriteText(std::filesystem::path("sources") / preprocessing.ConfigurationPath, preprocessing.Configuration);
+	}
 
 	if (!debugArtifacts.Symbols.empty())
 	{
@@ -187,10 +174,6 @@ void ShaderDebugArtifactWriter::WriteCompilerOutputs(const std::filesystem::path
 			throw Diagnostics::Error("Shader compiler returned an unsafe PDB lookup name.");
 		}
 		WriteBytes(bundleDirectory / symbolName, std::as_bytes(std::span(debugArtifacts.Symbols)));
-	}
-	if (!debugArtifacts.CompilerLookupKey.empty())
-	{
-		WriteBytes(bundleDirectory / "compiler-lookup-key.bin", std::as_bytes(std::span(debugArtifacts.CompilerLookupKey)));
 	}
 }
 
@@ -303,6 +286,9 @@ std::string ShaderDebugArtifactWriter::BuildCompileRequestJson(
 	    {"compileInputHash", Formatting::FormatHexUInt64(compiledStage.compileInputHash)},
 	    {"codeSha256", codeSha256},
 	    {"compilerInputSha256", compilerInputSha256},
+	    {"compilerInputPath", (std::filesystem::path("sources") / debugArtifacts.CompilerInputPath).generic_string()},
+	    {"configurationPath", (std::filesystem::path("sources") / debugArtifacts.Invocation->ConfigurationPath).generic_string()},
+	    {"replayWorkingDirectory", "sources"},
 	    {"optimized", request.bEnableOptimizations},
 	    {"symbolName", symbolName},
 	    {"compilerLookupKeyKind", nullptr},
@@ -310,10 +296,6 @@ std::string ShaderDebugArtifactWriter::BuildCompileRequestJson(
 	    {"sourceMapping", "unqualified"},
 	    {"sources", nlohmann::json::array()}};
 
-	if (!debugArtifacts.CompilerLookupKey.empty())
-	{
-		document["compilerLookupKeyKind"] = compiledStage.backendName == "dxc" ? "DxcShaderHash" : "SlangEntryPointCacheKey";
-	}
 	for (const ShaderSourceFile& source : request.SourceFiles)
 	{
 		const std::filesystem::path sourcePath = std::filesystem::path("sources") / std::filesystem::path(source.VirtualPath).relative_path();

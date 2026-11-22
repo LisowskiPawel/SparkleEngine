@@ -21,7 +21,7 @@ public:
 
 private:
 	ShaderCompileRequest BuildRequest(const ShaderCookSettings& settings, const ShaderCookDesc& shader, ShaderTarget target) const;
-	static IncludeClosureHash PreprocessSource(ShaderCompileRequest& request);
+	static IncludeClosureHash PreprocessSource(ShaderCompileRequest& request, std::string_view backendName);
 	void AppendDescriptorBindingRemaps(const ShaderCookDesc& shader, ShaderCompileRequest& request) const;
 	static ShaderCompileFeatureFlags BuildRequiredFeatures(ShaderFeatureFlags features) noexcept;
 	static const ShaderSourceMountTable& GetSourceMounts();

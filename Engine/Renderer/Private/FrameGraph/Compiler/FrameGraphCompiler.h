@@ -36,10 +36,10 @@ private:
 	void DeduplicatePassDependencies() noexcept;
 	void CullDeadPasses() noexcept;
 	void MarkPassAliveRecursive(FrameGraphPassIndex passIndex) noexcept;
-	const char* GetRootPassReason(const FrameGraphPassNode& passRecord) const noexcept;
+	bool IsRootPass(const FrameGraphPassNode& passRecord) const noexcept;
 	bool WritesBackBuffer(const FrameGraphPassNode& passRecord) const noexcept;
 	bool WritesProductRoot(const FrameGraphPassNode& passRecord) const noexcept;
-	void BuildPassSuccessorsAndInDegrees() noexcept;
+	void BuildPassSuccessors() noexcept;
 	void BuildTopologicalExecutionOrder() noexcept;
 	void AssignPassQueues() noexcept;
 	void BuildSubmissionBatches() noexcept;

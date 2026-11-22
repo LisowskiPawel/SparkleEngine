@@ -163,24 +163,19 @@ void LevelSession::RejectLevelLoad(LevelAsset& level, std::string diagnostic) no
 	m_levelChangeEvents.OnLevelLoadFailed.Broadcast(level.GetName());
 }
 
-void LevelSession::NotifyLevelChanged(const std::string& previousName, const std::string& activeName)
-{
-	LevelChangedEventArgs args;
-	args.previousLevelName = previousName;
-	args.activeLevelName = activeName;
-	m_levelChangeEvents.OnLevelChanged.Broadcast(args);
-}
-
 void LevelSession::ActivateLoadedLevel(LevelAsset& level, Assets::SceneLoadPackage package) noexcept
 {
-	const std::string previousName = m_activeLevel ? std::string(m_activeLevel->GetName()) : std::string{};
-	const std::string loadedName(level.GetName());
+	LevelChangedEventArgs changedArgs;
+	changedArgs.previousLevelName = GetActiveLevelName();
+	changedArgs.activeLevelName = level.GetName();
+
 	m_gameWorld.CommitSceneLoadPackage(std::move(package));
 	m_gameWorld.FinalizeSceneLoadCommit();
 	m_activeLevel = &level;
 	m_bLevelChangeInProgress = false;
 	m_lastLoadDiagnostic.clear();
-	NotifyLevelChanged(previousName, loadedName);
+
+	m_levelChangeEvents.OnLevelChanged.Broadcast(changedArgs);
 }
 
 void LevelSession::CompleteLevelChange() noexcept

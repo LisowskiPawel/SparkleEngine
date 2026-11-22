@@ -55,8 +55,7 @@ private:
 	void VerifyCapturedSource(const ShaderCompileRequest& request, const ShaderSourceFile& source) const;
 #endif
 
-	void RecordCompiler(std::string_view backendName);
-	void RecordCompilerModule(const wchar_t* name);
+	void RecordCompiler(std::uint64_t version);
 
 	static std::string BuildBundleDirectoryName(const ShaderCompileRequest& request, const CookedStageBuild& compiledStage);
 	std::string BuildManifestJson(const ShaderCookPipelinePlan& plan, const std::filesystem::path& mapPath, const std::filesystem::path& libraryPath) const;

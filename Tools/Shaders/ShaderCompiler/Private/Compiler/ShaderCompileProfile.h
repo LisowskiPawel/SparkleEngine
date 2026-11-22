@@ -11,4 +11,5 @@ inline constexpr bool bSpirVUseUnknownStorageImageFormat = true;
 const char* GetShaderModelProfileName(ShaderTarget target);
 const char* GetSpirVProfileName(ShaderTarget target);
 const char* GetSlangTargetProfileName(ShaderTarget target);
+const char* GetSlangShaderStageName(ShaderStage stage);
 std::string BuildShaderTargetProfile(const ShaderCompileRequest& request);

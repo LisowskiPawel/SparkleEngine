@@ -3,6 +3,7 @@
 #include "Compiler/ShaderCompileProfile.h"
 
 #include "RHI/Public/Shaders/ShaderStage.h"
+#include "Core/Public/Diagnostics/Error.h"
 
 #include <cstdint>
 #include <string>
@@ -75,6 +76,39 @@ const char* GetSpirVProfileName(ShaderTarget target)
 const char* GetSlangTargetProfileName(ShaderTarget target)
 {
 	return IsSpirVTarget(target) ? GetSpirVProfileName(target) : GetShaderModelProfileName(target);
+}
+
+const char* GetSlangShaderStageName(ShaderStage stage)
+{
+	switch (stage)
+	{
+		case ShaderStage::Vertex:
+			return "vertex";
+		case ShaderStage::Pixel:
+			return "fragment";
+		case ShaderStage::Geometry:
+			return "geometry";
+		case ShaderStage::Hull:
+			return "hull";
+		case ShaderStage::Domain:
+			return "domain";
+		case ShaderStage::Compute:
+			return "compute";
+		case ShaderStage::RayGeneration:
+			return "raygeneration";
+		case ShaderStage::Miss:
+			return "miss";
+		case ShaderStage::ClosestHit:
+			return "closesthit";
+		case ShaderStage::AnyHit:
+			return "anyhit";
+		case ShaderStage::Intersection:
+			return "intersection";
+		case ShaderStage::Callable:
+			return "callable";
+		default:
+			throw Diagnostics::Error("Unsupported Slang shader stage.");
+	}
 }
 
 std::string BuildShaderTargetProfile(const ShaderCompileRequest& request)

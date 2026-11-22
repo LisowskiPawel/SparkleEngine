@@ -1,8 +1,7 @@
 #include "PCH.h"
 
-#include "Backend/ShaderBackendFactory.h"
-#include "Backend/Dxc/DxcShaderBackend.h"
-#include "Backend/Slang/SlangShaderBackend.h"
+#include "Backend/ShaderBackends.h"
+#include "Compiler/ShaderCompilerToolchain.h"
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <algorithm>
@@ -14,18 +13,12 @@ struct ShaderBackendEntry final
 	std::string_view Name;
 	std::string_view SourceExtension;
 	ShaderBackendCapabilities Capabilities;
-	std::uint64_t (*QueryVersion)();
-	std::unique_ptr<IShaderBackend> (*Create)();
 };
 
-template <typename TBackend> static std::unique_ptr<IShaderBackend> CreateBackend()
-{
-	return std::make_unique<TBackend>();
-}
-
 static const std::array<ShaderBackendEntry, 2> kShaderBackends = {{
-    {"dxc", ".hlsl", DxcShaderBackend::GetStaticCapabilities(), &DxcShaderBackend::QueryBackendVersion, &CreateBackend<DxcShaderBackend>},
-    {"slang", ".slang", SlangShaderBackend::GetStaticCapabilities(), &SlangShaderBackend::QueryBackendVersion, &CreateBackend<SlangShaderBackend>},
+    {"dxc", ".hlsl", {.bSupportsDxil = true, .bSupportsSpirV = true, .bSupportsDxilRayTracingLibrary = true,
+        .bSupportsSpirVRayTracingLibrary = true, .bSupportsDxilInlineRayQuery = true, .bSupportsSpirVInlineRayQuery = true}},
+    {"slang", ".slang", {.bSupportsDxil = true, .bSupportsSpirV = true, .bSupportsSpirVRayTracingLibrary = true, .bSupportsSpirVInlineRayQuery = true}},
 }};
 
 static constexpr std::array<std::string_view, 2> kShaderBinaryFormats = {"Dxil", "SpirV"};
@@ -89,11 +82,12 @@ static std::string SelectAutomaticShaderBackendName(std::string_view sourcePath,
 
 std::vector<ShaderBackendDescriptor> ListShaderBackends()
 {
+	const std::uint64_t version = ReadShaderCompilerToolchain().Version;
 	std::vector<ShaderBackendDescriptor> descriptors;
 	descriptors.reserve(kShaderBackends.size());
 	for (const ShaderBackendEntry& backend : kShaderBackends)
 	{
-		descriptors.push_back(QueryShaderBackend(backend.Name));
+		descriptors.push_back({.Name = backend.Name, .SourceExtension = backend.SourceExtension, .Capabilities = backend.Capabilities, .Version = version});
 	}
 	return descriptors;
 }
@@ -101,7 +95,7 @@ std::vector<ShaderBackendDescriptor> ListShaderBackends()
 ShaderBackendDescriptor QueryShaderBackend(std::string_view name)
 {
 	const ShaderBackendEntry& backend = GetShaderBackend(name);
-	return {.Name = backend.Name, .SourceExtension = backend.SourceExtension, .Capabilities = backend.Capabilities, .Version = backend.QueryVersion()};
+	return {.Name = backend.Name, .SourceExtension = backend.SourceExtension, .Capabilities = backend.Capabilities, .Version = ReadShaderCompilerToolchain().Version};
 }
 
 std::span<const std::string_view> ListShaderBinaryFormats() noexcept
@@ -112,12 +106,6 @@ std::span<const std::string_view> ListShaderBinaryFormats() noexcept
 std::span<const ShaderTarget> ListShaderCodegenTargets() noexcept
 {
 	return kShaderCodegenTargets;
-}
-
-std::unique_ptr<IShaderBackend> CreateShaderBackend(std::string_view name)
-{
-	const ShaderBackendEntry& backend = GetShaderBackend(name);
-	return backend.Create();
 }
 
 std::string ResolveShaderBackendName(std::string_view sourcePath, ShaderTarget target, std::string_view requestedName)

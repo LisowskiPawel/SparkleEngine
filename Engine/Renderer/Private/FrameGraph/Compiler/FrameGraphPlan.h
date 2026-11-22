@@ -73,7 +73,6 @@ struct FrameGraphPassNode
 	std::vector<FrameGraphPassIndex> dependsOn;
 	std::vector<FrameGraphPassIndex> synchronizationDependencies;
 	std::vector<FrameGraphPassIndex> successors;
-	std::uint32_t inDegree = 0;
 	bool bAlive = true;
 	std::vector<FrameGraphAliasingBarrier> transientAliasingBarriers;
 	std::vector<FrameGraphBarrier> compiledBarriers;
@@ -152,6 +151,7 @@ struct FrameGraphTransientResourcePlan
 struct FrameGraphTransientPhysicalBlockPlan
 {
 	std::uint32_t physicalBlockIndex = INVALID_FRAME_GRAPH_RESOURCE_INDEX;
+	// Assignment appends owners in lifetime order; alias barriers consume this order directly.
 	std::vector<FrameGraphResourceHandle> handles;
 };
 

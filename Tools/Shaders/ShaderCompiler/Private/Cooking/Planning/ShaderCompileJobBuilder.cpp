@@ -4,7 +4,7 @@
 
 #include "SourceAssetPaths.h"
 
-#include "Backend/ShaderBackendFactory.h"
+#include "Backend/ShaderBackends.h"
 #include "Compiler/ShaderCompileProfile.h"
 #include "Compiler/ShaderSourceMountTable.h"
 #include "Compiler/ShaderSourcePreprocessor.h"
@@ -68,7 +68,7 @@ ShaderCompileJob ShaderCompileJobBuilder::Build(const ShaderCookSettings& settin
 	try
 	{
 		backend.Capabilities.ValidateRequest(request);
-		IncludeClosureHash closure = PreprocessSource(request);
+		IncludeClosureHash closure = PreprocessSource(request, backend.Name);
 		const std::uint64_t sourceHash = Hash::Fnv1a64(request.SourceCode);
 		const std::uint64_t requestHash = HashShaderCompileRequest(request);
 		std::string backendName(backend.Name);
@@ -94,10 +94,15 @@ ShaderCompileJob ShaderCompileJobBuilder::Build(const ShaderCookSettings& settin
 	}
 }
 
-IncludeClosureHash ShaderCompileJobBuilder::PreprocessSource(ShaderCompileRequest& request)
+IncludeClosureHash ShaderCompileJobBuilder::PreprocessSource(ShaderCompileRequest& request, std::string_view backendName)
 {
 	const IncludeClosureHash before = HashShaderIncludeClosure(request);
-	request.SourceCode = PreprocessShaderSource(request.VirtualSourcePath, request, request.bCaptureDebugArtifacts ? &request.SourceFiles : nullptr);
+	// DXC's source-bearing SPIR-V debug emitter cannot validate some macro-expanded
+	// columns against materialized originals. Preserve its established virtual names;
+	// Slang needs root-relative names to embed the captured authored files.
+	const ShaderSourceLinePaths linePaths = backendName == "slang" ? ShaderSourceLinePaths::RootRelative : ShaderSourceLinePaths::Virtual;
+	std::vector<ShaderSourceFile>* capturedSources = request.bCaptureDebugArtifacts ? &request.SourceFiles : nullptr;
+	request.SourceCode = PreprocessShaderSource(request.VirtualSourcePath, request, capturedSources, linePaths);
 	IncludeClosureHash closure = HashShaderIncludeClosure(request);
 	if (before.sourceHash != closure.sourceHash || before.includeClosureHash != closure.includeClosureHash || before.virtualDependencies != closure.virtualDependencies)
 	{

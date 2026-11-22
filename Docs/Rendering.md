@@ -206,7 +206,7 @@ GameFramework privately uses ozz-animation for pose sampling, hierarchy evaluati
 
 Preview rigs admit at most 1,024 evaluation joints including helpers. Unsupported shear, helper overflow, nonfinite/half-float-overflow skeletal values and collapsed normalized sample times reject with an export/bake diagnostic. Cooked skeleton/animation layouts changed: rebuild and recook assets together. Sparkle retains bounded typed loading, complete-generation publication, immutable extraction and renderer/GPU current/previous deformation ownership. There is one runtime evaluator.
 
-The current Launcher has one imported skeletal clip, CesiumMan. Knight's bound FBX currently imports as static geometry without usable vertex weights; ozz cannot reconstruct a rig from that export. See the [animation implementation and qualification record](Implementation/Animation.md) for preserved content limits, verified GPU playback/replacement/reset and remaining comparison/package checks.
+The current Launcher has one imported skeletal clip, CesiumMan. Knight's bound FBX currently imports as static geometry without usable vertex weights; ozz cannot reconstruct a rig from that export. Independent live-run matched-time image equality remains unverified: animation uses wall-clock time without a supported fixed-time control. Broader image, performance and whole-product package checks remain with [release qualification](Roadmap.md#before-the-first-release).
 
 ## Source map
 

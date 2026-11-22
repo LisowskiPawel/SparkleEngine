@@ -137,28 +137,20 @@ static std::uint8_t PopMaskBits(std::uint8_t mask)
 	return count;
 }
 
-static Microsoft::WRL::ComPtr<ID3D12ShaderReflection> OpenShaderReflection(IDxcUtils& utils, IDxcResult* result, Microsoft::WRL::ComPtr<IDxcBlob>& reflectionBlob)
+static Microsoft::WRL::ComPtr<ID3D12ShaderReflection> OpenShaderReflection(IDxcUtils& utils, std::span<const std::uint8_t> reflectionBytes)
 {
-	if (result == nullptr)
+	if (reflectionBytes.empty())
 	{
-		throw Diagnostics::Error("DXIL reflection: null IDxcResult");
-	}
-
-	// DXC exposes reflection as a separate output blob.
-	// Query DXC_OUT_REFLECTION directly instead of walking the container.
-	HRESULT hr = result->GetOutput(DXC_OUT_REFLECTION, IID_PPV_ARGS(reflectionBlob.ReleaseAndGetAddressOf()), nullptr);
-	if (FAILED(hr) || !reflectionBlob || reflectionBlob->GetBufferSize() == 0)
-	{
-		throw Diagnostics::Error("DXIL reflection: DXC produced no reflection part");
+		throw Diagnostics::Error("DXIL reflection payload is empty.");
 	}
 
 	DxcBuffer reflectionBuffer{};
-	reflectionBuffer.Ptr = reflectionBlob->GetBufferPointer();
-	reflectionBuffer.Size = reflectionBlob->GetBufferSize();
+	reflectionBuffer.Ptr = reflectionBytes.data();
+	reflectionBuffer.Size = reflectionBytes.size();
 	reflectionBuffer.Encoding = 0;
 
 	Microsoft::WRL::ComPtr<ID3D12ShaderReflection> shaderReflection;
-	hr = utils.CreateReflection(&reflectionBuffer, IID_PPV_ARGS(shaderReflection.ReleaseAndGetAddressOf()));
+	const HRESULT hr = utils.CreateReflection(&reflectionBuffer, IID_PPV_ARGS(shaderReflection.ReleaseAndGetAddressOf()));
 	if (FAILED(hr) || !shaderReflection)
 	{
 		throw Diagnostics::Error("DXIL reflection: CreateReflection failed");
@@ -301,12 +293,11 @@ static void ReflectVertexInputs(ID3D12ShaderReflection& shader, UINT count, Shad
 	}
 }
 
-ShaderReflection ExtractDxilReflection(IDxcUtils& utils, IDxcResult* result, ShaderStage stage)
+ShaderReflection ExtractDxilReflection(IDxcUtils& utils, std::span<const std::uint8_t> reflectionBytes, ShaderStage stage)
 {
 	ShaderReflection reflection;
 
-	Microsoft::WRL::ComPtr<IDxcBlob> reflectionBlob;
-	auto shaderReflection = OpenShaderReflection(utils, result, reflectionBlob);
+	auto shaderReflection = OpenShaderReflection(utils, reflectionBytes);
 
 	D3D12_SHADER_DESC desc{};
 	if (FAILED(shaderReflection->GetDesc(&desc)))

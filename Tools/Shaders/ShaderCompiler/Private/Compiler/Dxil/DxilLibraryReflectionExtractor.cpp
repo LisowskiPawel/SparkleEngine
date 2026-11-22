@@ -113,16 +113,14 @@ static void ReflectLibraryBindings(ID3D12FunctionReflection& function, UINT coun
 	}
 }
 
-static Microsoft::WRL::ComPtr<ID3D12LibraryReflection> OpenLibraryReflection(IDxcUtils& utils, IDxcResult* result, Microsoft::WRL::ComPtr<IDxcBlob>& reflectionBlob)
+static Microsoft::WRL::ComPtr<ID3D12LibraryReflection> OpenLibraryReflection(IDxcUtils& utils, std::span<const std::uint8_t> reflectionBytes)
 {
-	const HRESULT reflectionStatus = result->GetOutput(DXC_OUT_REFLECTION, IID_PPV_ARGS(reflectionBlob.ReleaseAndGetAddressOf()), nullptr);
-
-	if (FAILED(reflectionStatus) || !reflectionBlob || reflectionBlob->GetBufferSize() == 0)
+	if (reflectionBytes.empty())
 	{
-		throw Diagnostics::Error("DXIL library reflection: DXC produced no reflection part.");
+		throw Diagnostics::Error("DXIL library reflection payload is empty.");
 	}
 
-	const DxcBuffer reflectionBuffer{.Ptr = reflectionBlob->GetBufferPointer(), .Size = reflectionBlob->GetBufferSize(), .Encoding = 0};
+	const DxcBuffer reflectionBuffer{.Ptr = reflectionBytes.data(), .Size = reflectionBytes.size(), .Encoding = 0};
 	Microsoft::WRL::ComPtr<ID3D12LibraryReflection> library;
 	const HRESULT createStatus = utils.CreateReflection(&reflectionBuffer, IID_PPV_ARGS(library.ReleaseAndGetAddressOf()));
 	if (FAILED(createStatus) || !library)
@@ -170,15 +168,14 @@ static ID3D12FunctionReflection* FindLibraryExport(ID3D12LibraryReflection& libr
 	return function;
 }
 
-ShaderReflection ExtractDxilLibraryReflection(IDxcUtils& utils, IDxcResult* result, std::string_view entryPoint)
+ShaderReflection ExtractDxilLibraryReflection(IDxcUtils& utils, std::span<const std::uint8_t> reflectionBytes, std::string_view entryPoint)
 {
-	if (result == nullptr || entryPoint.empty())
+	if (entryPoint.empty())
 	{
-		throw Diagnostics::Error("DXIL library reflection requires a compile result and export name.");
+		throw Diagnostics::Error("DXIL library reflection requires an export name.");
 	}
 
-	Microsoft::WRL::ComPtr<IDxcBlob> reflectionBlob;
-	auto library = OpenLibraryReflection(utils, result, reflectionBlob);
+	auto library = OpenLibraryReflection(utils, reflectionBytes);
 	D3D12_FUNCTION_DESC functionDesc{};
 	ID3D12FunctionReflection* function = FindLibraryExport(*library.Get(), entryPoint, functionDesc);
 

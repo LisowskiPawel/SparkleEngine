@@ -265,56 +265,35 @@ void FrameGraphCompiler::BuildTransientAliasingBarriers() noexcept
 			continue;
 		}
 
-		std::vector<const FrameGraphTransientResourcePlan*> orderedPlans;
-		orderedPlans.reserve(block.handles.size());
-		for (const FrameGraphResourceHandle handle : block.handles)
+		const FrameGraphTransientResourcePlan* firstOwner = FindTransientResourcePlan(block.handles.front());
+		assert(firstOwner != nullptr);
+		const FrameGraphTransientResourcePlan* previousOwner = firstOwner;
+
+		for (std::size_t ownerIndex = 1; ownerIndex < block.handles.size(); ++ownerIndex)
 		{
-			const FrameGraphTransientResourcePlan* transientPlan = FindTransientResourcePlan(handle);
-			assert(transientPlan != nullptr);
-			orderedPlans.push_back(transientPlan);
-		}
-
-		std::sort(
-		    orderedPlans.begin(),
-		    orderedPlans.end(),
-		    [](const FrameGraphTransientResourcePlan* lhs, const FrameGraphTransientResourcePlan* rhs)
-		    {
-			    if (lhs->lifetime.firstExecutionIndex != rhs->lifetime.firstExecutionIndex)
-			    {
-				    return lhs->lifetime.firstExecutionIndex < rhs->lifetime.firstExecutionIndex;
-			    }
-
-			    return lhs->handle.index < rhs->handle.index;
-		    });
-
-		for (std::size_t ownerIndex = 1; ownerIndex < orderedPlans.size(); ++ownerIndex)
-		{
-			const FrameGraphTransientResourcePlan& previousOwner = *orderedPlans[ownerIndex - 1];
-			const FrameGraphTransientResourcePlan& nextOwner = *orderedPlans[ownerIndex];
-
-			assert(previousOwner.lifetime.lastExecutionIndex < nextOwner.lifetime.firstExecutionIndex);
+			const FrameGraphTransientResourcePlan* nextOwner = FindTransientResourcePlan(block.handles[ownerIndex]);
+			assert(nextOwner != nullptr);
+			assert(previousOwner->lifetime.lastExecutionIndex < nextOwner->lifetime.firstExecutionIndex);
 
 			FrameGraphAliasingBarrier barrier{
 			    .physicalBlockIndex = block.physicalBlockIndex,
-			    .beforeHandle = previousOwner.handle,
-			    .afterHandle = nextOwner.handle,
-			    .executeBeforePass = previousOwner.lifetime.lastUserPass,
-			    .executeAfterPass = nextOwner.lifetime.firstUserPass};
+			    .beforeHandle = previousOwner->handle,
+			    .afterHandle = nextOwner->handle,
+			    .executeBeforePass = previousOwner->lifetime.lastUserPass,
+			    .executeAfterPass = nextOwner->lifetime.firstUserPass};
 
 			assert(barrier.executeAfterPass != INVALID_FRAME_GRAPH_PASS_INDEX);
 			assert(barrier.executeAfterPass < m_plan.passes.size());
 			m_plan.passes[barrier.executeAfterPass].transientAliasingBarriers.push_back(barrier);
+			previousOwner = nextOwner;
 		}
-
-		const FrameGraphTransientResourcePlan& lastOwner = *orderedPlans.back();
-		const FrameGraphTransientResourcePlan& firstOwner = *orderedPlans.front();
 
 		m_plan.initialTransientAliasingBarriers.push_back(
 		    FrameGraphAliasingBarrier{
 		        .physicalBlockIndex = block.physicalBlockIndex,
-		        .beforeHandle = lastOwner.handle,
-		        .afterHandle = firstOwner.handle,
-		        .executeBeforePass = lastOwner.lifetime.lastUserPass,
-		        .executeAfterPass = firstOwner.lifetime.firstUserPass});
+		        .beforeHandle = previousOwner->handle,
+		        .afterHandle = firstOwner->handle,
+		        .executeBeforePass = previousOwner->lifetime.lastUserPass,
+		        .executeAfterPass = firstOwner->lifetime.firstUserPass});
 	}
 }

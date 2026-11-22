@@ -2,7 +2,7 @@
 
 #include "Cli/ListBackendsCommand.h"
 
-#include "Backend/ShaderBackendFactory.h"
+#include "Backend/ShaderBackends.h"
 #include "Constants/ShaderCompilerConstants.h"
 
 #include <iostream>

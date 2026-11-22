@@ -3,18 +3,10 @@
 #include "Cooking/Compilation/ShaderCompileBatch.h"
 
 #include "Cooking/Compilation/ShaderCompileJob.h"
-#include "Cooking/Compilation/ShaderCompileJobExecutor.h"
+#include "Cooking/Compilation/ShaderMake/ShaderMakeBatch.h"
 #include "Cooking/ShaderCookSettings.h"
-#include "Core/Public/Diagnostics/Error.h"
-#include "TaskExecutor.h"
 #include "Verification/ShaderParameterStructVerifier.h"
 
-#include <algorithm>
-#include <atomic>
-#include <cstdint>
-#include <exception>
-#include <string>
-#include <thread>
 #include <unordered_map>
 #include <utility>
 
@@ -53,77 +45,6 @@ static ProducerMap SelectProducers(std::span<const ShaderCompileJob> jobs)
 		result.ProducerForJob[jobIndex] = producerIndex;
 	}
 	return result;
-}
-
-static std::vector<ShaderCompileResult> CompileProducers(
-    const ShaderCookSettings& settings,
-    std::span<const ShaderCompileJob> jobs,
-    const ProducerMap& producerMap,
-    std::size_t totalWork,
-    const ToolWorkProgressCallback& progress)
-{
-	const std::span<const std::size_t> producerJobIndices = producerMap.ProducerJobIndices;
-	std::vector<std::size_t> consumerCountByProducer(producerJobIndices.size());
-	for (const std::size_t producerIndex : producerMap.ProducerForJob)
-	{
-		++consumerCountByProducer[producerIndex];
-	}
-
-	std::atomic<std::size_t> completedWork{0};
-	const std::uint32_t hardwareThreads = std::max(1u, std::thread::hardware_concurrency());
-	const std::uint32_t workerLimit = std::min(hardwareThreads, 8u);
-	const std::uint32_t compileWorkers = std::clamp(settings.maximumParallelCompiles, 1u, workerLimit);
-	TaskExecutor executor(
-	    TaskExecutorConfig{
-	        .FrameCriticalWorkerCount = 1,
-	        .BackgroundWorkerCount = compileWorkers,
-	        .MaximumTasksPerExecution = static_cast<std::uint32_t>(producerJobIndices.size()),
-	        .MaximumEdgesPerExecution = 1,
-	        .MaximumActiveExecutions = 1});
-	std::vector<ShaderCompileResult> results(producerJobIndices.size());
-	TaskGraphBuilder graph(TaskGraphLimits{.MaximumTasks = static_cast<std::uint32_t>(producerJobIndices.size()), .MaximumEdges = 1});
-	for (std::uint32_t producerIndex = 0; producerIndex < producerJobIndices.size(); ++producerIndex)
-	{
-		graph.Add(
-		    TaskDesc{"Compile shader", TaskLane::Background},
-		    [&, producerIndex](TaskExecutionContext& context)
-		    {
-			    if (context.IsCancellationRequested())
-			    {
-				    return TaskResult::Cancelled("Shader cook was cancelled.");
-			    }
-			    const std::size_t jobIndex = producerJobIndices[producerIndex];
-			    try
-			    {
-				    results[producerIndex] = ShaderCompileJobExecutor::Execute(jobs[jobIndex]);
-				    if (progress)
-				    {
-					    const std::size_t work = consumerCountByProducer[producerIndex];
-					    const std::size_t completed = completedWork.fetch_add(work) + work;
-					    progress({.Action = "Compiled shader", .Item = jobs[jobIndex].Request.ShaderTypeName, .Completed = completed, .Total = totalWork});
-				    }
-				    return TaskResult::Success();
-			    }
-			    catch (const std::exception& error)
-			    {
-				    return TaskResult::Failure(error.what());
-			    }
-		    });
-	}
-
-	TaskExecutionContext context;
-	const TaskExecution execution = executor.Submit(graph.Compile(), context);
-	if (execution.GetStatus() == TaskExecutionStatus::Succeeded)
-	{
-		return results;
-	}
-
-	const TaskResult result = execution.GetResult();
-	if (result.GetDiagnostic().empty())
-	{
-		throw Diagnostics::Error("Shader compile task failed without a diagnostic.");
-	}
-	throw Diagnostics::Error(std::string(result.GetDiagnostic()));
 }
 
 static std::vector<ShaderCompileResult> FanOutResults(std::span<const ShaderCompileJob> jobs, std::span<ShaderCompileResult> producerResults, std::span<const std::size_t> producerForJob)
@@ -176,7 +97,7 @@ std::vector<ShaderCompileResult> CompileShaderBatch(const ShaderCookSettings& se
 	}
 
 	const ProducerMap producerMap = SelectProducers(jobs);
-	std::vector<ShaderCompileResult> producerResults = CompileProducers(settings, jobs, producerMap, totalWork, progress);
+	std::vector<ShaderCompileResult> producerResults = CompileShaderMakeProducers(settings, jobs, producerMap.ProducerJobIndices, totalWork, progress);
 	std::vector<ShaderCompileResult> results = FanOutResults(jobs, producerResults, producerMap.ProducerForJob);
 	FinalizeResults(jobs, results, totalWork, progress);
 	return results;

@@ -59,13 +59,11 @@ target_link_libraries(ShaderCompiler
         nlohmann_json::nlohmann_json
         ToolSupport
         SparkleCore
-        SparkleTasks
         SparkleRHI
         SparkleRendererShaderCookRegistrationObjects
         Dxc::Dxc
         spirv_reflect
         SPIRVTools::SPIRVTools
-        slang::slang
 )
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/CMake/ShaderCompilerRuntime.cmake")

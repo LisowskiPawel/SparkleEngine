@@ -11,4 +11,3 @@ inline constexpr int kExitCodeCookFailure = 6;
 inline constexpr std::size_t kSourceIdentityCanonicalReserveBytes = 256;
 inline constexpr std::size_t kBinaryBlobInitialReserveBytes = 4096;
 
-inline constexpr std::string_view kDxcCompilerLoggerCategory = "Tools.ShaderCompiler";

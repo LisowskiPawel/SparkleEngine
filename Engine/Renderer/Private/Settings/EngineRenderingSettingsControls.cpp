@@ -13,38 +13,45 @@
 #include "Renderer/Public/ExternalCapture/ExternalCaptureStartup.h"
 #include "RHI/Public/Diagnostics/RhiExternalCapture.h"
 
+template <typename TState, typename TVisitor> static void VisitControlledSettings(TState& state, TVisitor&& visit) noexcept
+{
+	visit(CVarVSync, state.bVSync);
+	visit(CVarVignette, state.bVignette);
+	visit(CVarChromaticAberration, state.bChromaticAberration);
+	visit(CVarBackBufferFormat, state.BackBufferFormat);
+	visit(CVarPreferHighPerformanceAdapter, state.bPreferHighPerformanceAdapter);
+	visit(CVarToneMapper, state.ToneMapper);
+	visit(CVarExposureMode, state.ExposureMode);
+	visit(CVarExposureMeteringMethod, state.ExposureMeteringMethod);
+	visit(CVarOutputColorEncoding, state.OutputColorEncoding);
+	visit(CVarManualExposure, state.ManualExposure);
+	visit(CVarExposureCompensation, state.ExposureCompensation);
+	visit(CVarExposureTargetLuminance, state.ExposureTargetLuminance);
+	visit(CVarExposureMin, state.ExposureMin);
+	visit(CVarExposureMax, state.ExposureMax);
+	visit(CVarExposureAdaptationSpeedUp, state.ExposureAdaptationSpeedUp);
+	visit(CVarExposureAdaptationSpeedDown, state.ExposureAdaptationSpeedDown);
+	visit(CVarUpscalerProvider, state.UpscalerProvider);
+	visit(CVarUpscalerQualityMode, state.UpscalerQualityMode);
+	visit(CVarRayReconstructionMode, state.RayReconstructionMode);
+	visit(CVarGBufferAlgorithm, state.SelectedGBufferAlgorithm);
+	visit(CVarRendererMeshAutoBatching, state.bMeshAutoBatching);
+	visit(CVarRayTracingTlasRefit, state.bRefitTlas);
+	visit(CVarRayTracingPreferPtlas, state.bPtlasActive);
+	visit(CVarRayTracingPartitionsPerAxis, state.PtlasPartitionsPerAxis);
+	visit(CVarRayTracingPtlasPartitionUpdateMode, state.PtlasPartitionUpdateMode);
+	visit(CVarRayTracingPtlasMarkAllDynamicInPartition, state.bPtlasMarkAllDynamicInPartition);
+	visit(CVarRayTracingPtlasModeChangeDistance, state.PtlasModeChangeDistance);
+#if SPARKLE_WITH_EXTERNAL_CAPTURE
+	visit(CVarExternalCaptureStartupProvider, state.StartupCaptureProvider);
+#endif
+}
+
 EngineRenderingSettingsState CaptureEngineRenderingSettings() noexcept
 {
 	EngineRenderingSettingsState state;
-	state.bVSync = CVarVSync.Get();
-	state.bVignette = CVarVignette.Get();
-	state.bChromaticAberration = CVarChromaticAberration.Get();
-	state.BackBufferFormat = CVarBackBufferFormat.Get();
-	state.bPreferHighPerformanceAdapter = CVarPreferHighPerformanceAdapter.Get();
-	state.ToneMapper = CVarToneMapper.Get();
-	state.ExposureMode = CVarExposureMode.Get();
-	state.ExposureMeteringMethod = CVarExposureMeteringMethod.Get();
-	state.OutputColorEncoding = CVarOutputColorEncoding.Get();
-	state.ManualExposure = CVarManualExposure.Get();
-	state.ExposureCompensation = CVarExposureCompensation.Get();
-	state.ExposureTargetLuminance = CVarExposureTargetLuminance.Get();
-	state.ExposureMin = CVarExposureMin.Get();
-	state.ExposureMax = CVarExposureMax.Get();
-	state.ExposureAdaptationSpeedUp = CVarExposureAdaptationSpeedUp.Get();
-	state.ExposureAdaptationSpeedDown = CVarExposureAdaptationSpeedDown.Get();
-	state.UpscalerProvider = CVarUpscalerProvider.Get();
-	state.UpscalerQualityMode = CVarUpscalerQualityMode.Get();
-	state.RayReconstructionMode = CVarRayReconstructionMode.Get();
-	state.SelectedGBufferAlgorithm = CVarGBufferAlgorithm.Get();
-	state.bMeshAutoBatching = CVarRendererMeshAutoBatching.Get();
-	state.bRefitTlas = CVarRayTracingTlasRefit.Get();
-	state.bPtlasActive = CVarRayTracingPreferPtlas.Get();
-	state.PtlasPartitionsPerAxis = CVarRayTracingPartitionsPerAxis.Get();
-	state.PtlasPartitionUpdateMode = CVarRayTracingPtlasPartitionUpdateMode.Get();
-	state.bPtlasMarkAllDynamicInPartition = CVarRayTracingPtlasMarkAllDynamicInPartition.Get();
-	state.PtlasModeChangeDistance = CVarRayTracingPtlasModeChangeDistance.Get();
+	VisitControlledSettings(state, [](const auto& cvar, auto& value) noexcept { value = cvar.Get(); });
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
-	state.StartupCaptureProvider = CVarExternalCaptureStartupProvider.Get();
 	state.bCaptureToolsInstalled = HasInstalledExternalCaptureProvider();
 #endif
 	return state;
@@ -52,42 +59,13 @@ EngineRenderingSettingsState CaptureEngineRenderingSettings() noexcept
 
 void ApplyEngineRenderingSettings(const EngineRenderingSettingsState& state) noexcept
 {
-	const auto setCVarIfChanged = []<typename TCVar, typename TValue>(TCVar& cvar, const TValue& value) noexcept
-	{
-		if (cvar.Get() != value)
-		{
-			cvar.Set(value);
-		}
-	};
-
-	setCVarIfChanged(CVarVSync, state.bVSync);
-	setCVarIfChanged(CVarVignette, state.bVignette);
-	setCVarIfChanged(CVarChromaticAberration, state.bChromaticAberration);
-	setCVarIfChanged(CVarBackBufferFormat, state.BackBufferFormat);
-	setCVarIfChanged(CVarPreferHighPerformanceAdapter, state.bPreferHighPerformanceAdapter);
-	setCVarIfChanged(CVarToneMapper, state.ToneMapper);
-	setCVarIfChanged(CVarExposureMode, state.ExposureMode);
-	setCVarIfChanged(CVarExposureMeteringMethod, state.ExposureMeteringMethod);
-	setCVarIfChanged(CVarOutputColorEncoding, state.OutputColorEncoding);
-	setCVarIfChanged(CVarManualExposure, state.ManualExposure);
-	setCVarIfChanged(CVarExposureCompensation, state.ExposureCompensation);
-	setCVarIfChanged(CVarExposureTargetLuminance, state.ExposureTargetLuminance);
-	setCVarIfChanged(CVarExposureMin, state.ExposureMin);
-	setCVarIfChanged(CVarExposureMax, state.ExposureMax);
-	setCVarIfChanged(CVarExposureAdaptationSpeedUp, state.ExposureAdaptationSpeedUp);
-	setCVarIfChanged(CVarExposureAdaptationSpeedDown, state.ExposureAdaptationSpeedDown);
-	setCVarIfChanged(CVarUpscalerProvider, state.UpscalerProvider);
-	setCVarIfChanged(CVarUpscalerQualityMode, state.UpscalerQualityMode);
-	setCVarIfChanged(CVarRayReconstructionMode, state.RayReconstructionMode);
-	setCVarIfChanged(CVarGBufferAlgorithm, state.SelectedGBufferAlgorithm);
-	setCVarIfChanged(CVarRendererMeshAutoBatching, state.bMeshAutoBatching);
-	setCVarIfChanged(CVarRayTracingTlasRefit, state.bRefitTlas);
-	setCVarIfChanged(CVarRayTracingPreferPtlas, state.bPtlasActive);
-	setCVarIfChanged(CVarRayTracingPartitionsPerAxis, state.PtlasPartitionsPerAxis);
-	setCVarIfChanged(CVarRayTracingPtlasPartitionUpdateMode, state.PtlasPartitionUpdateMode);
-	setCVarIfChanged(CVarRayTracingPtlasMarkAllDynamicInPartition, state.bPtlasMarkAllDynamicInPartition);
-	setCVarIfChanged(CVarRayTracingPtlasModeChangeDistance, state.PtlasModeChangeDistance);
-#if SPARKLE_WITH_EXTERNAL_CAPTURE
-	setCVarIfChanged(CVarExternalCaptureStartupProvider, state.StartupCaptureProvider);
-#endif
+	VisitControlledSettings(
+	    state,
+	    [](auto& cvar, const auto& value) noexcept
+	    {
+		    if (cvar.Get() != value)
+		    {
+			    cvar.Set(value);
+		    }
+	    });
 }

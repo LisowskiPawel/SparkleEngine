@@ -17,7 +17,7 @@ void FrameGraphCompiler::FinalizePassDependencies() noexcept
 {
 	DeduplicatePassDependencies();
 	CullDeadPasses();
-	BuildPassSuccessorsAndInDegrees();
+	BuildPassSuccessors();
 	BuildTopologicalExecutionOrder();
 }
 
@@ -25,8 +25,7 @@ void FrameGraphCompiler::DeduplicatePassDependencies() noexcept
 {
 	for (FrameGraphPassNode& passRecord : m_plan.passes)
 	{
-		std::vector<FrameGraphPassIndex> deduplicated;
-		deduplicated.reserve(passRecord.dependsOn.size());
+		auto uniqueEnd = passRecord.dependsOn.begin();
 
 		for (const FrameGraphPassIndex dependency : passRecord.dependsOn)
 		{
@@ -35,34 +34,31 @@ void FrameGraphCompiler::DeduplicatePassDependencies() noexcept
 				continue;
 			}
 
-			const auto it = std::find(deduplicated.begin(), deduplicated.end(), dependency);
-			if (it == deduplicated.end())
+			const auto it = std::find(passRecord.dependsOn.begin(), uniqueEnd, dependency);
+			if (it == uniqueEnd)
 			{
-				deduplicated.push_back(dependency);
+				*uniqueEnd = dependency;
+				++uniqueEnd;
 			}
 		}
 
-		passRecord.dependsOn = std::move(deduplicated);
+		passRecord.dependsOn.erase(uniqueEnd, passRecord.dependsOn.end());
 	}
 }
 
 void FrameGraphCompiler::CullDeadPasses() noexcept
 {
-	std::vector<FrameGraphPassIndex> rootPasses;
-	rootPasses.reserve(m_plan.passes.size());
-
 	for (FrameGraphPassNode& passRecord : m_plan.passes)
 	{
 		passRecord.bAlive = false;
-		if (GetRootPassReason(passRecord) != nullptr)
-		{
-			rootPasses.push_back(passRecord.index);
-		}
 	}
 
-	for (const FrameGraphPassIndex rootPass : rootPasses)
+	for (const FrameGraphPassNode& passRecord : m_plan.passes)
 	{
-		MarkPassAliveRecursive(rootPass);
+		if (IsRootPass(passRecord))
+		{
+			MarkPassAliveRecursive(passRecord.index);
+		}
 	}
 }
 
@@ -87,19 +83,9 @@ void FrameGraphCompiler::MarkPassAliveRecursive(FrameGraphPassIndex passIndex) n
 	}
 }
 
-const char* FrameGraphCompiler::GetRootPassReason(const FrameGraphPassNode& passRecord) const noexcept
+bool FrameGraphCompiler::IsRootPass(const FrameGraphPassNode& passRecord) const noexcept
 {
-	if (WritesBackBuffer(passRecord))
-	{
-		return "backbuffer-output";
-	}
-
-	if (WritesProductRoot(passRecord))
-	{
-		return "product-output";
-	}
-
-	return nullptr;
+	return WritesBackBuffer(passRecord) || WritesProductRoot(passRecord);
 }
 
 bool FrameGraphCompiler::WritesBackBuffer(const FrameGraphPassNode& passRecord) const noexcept
@@ -140,12 +126,11 @@ bool FrameGraphCompiler::WritesProductRoot(const FrameGraphPassNode& passRecord)
 	return false;
 }
 
-void FrameGraphCompiler::BuildPassSuccessorsAndInDegrees() noexcept
+void FrameGraphCompiler::BuildPassSuccessors() noexcept
 {
 	for (FrameGraphPassNode& passRecord : m_plan.passes)
 	{
 		passRecord.successors.clear();
-		passRecord.inDegree = 0;
 	}
 
 	for (FrameGraphPassNode& passRecord : m_plan.passes)
@@ -161,7 +146,6 @@ void FrameGraphCompiler::BuildPassSuccessorsAndInDegrees() noexcept
 			FrameGraphPassNode& dependencyPass = m_plan.passes[dependency];
 			assert(dependencyPass.bAlive);
 			dependencyPass.successors.push_back(passRecord.index);
-			++passRecord.inDegree;
 		}
 	}
 }
@@ -175,24 +159,21 @@ void FrameGraphCompiler::BuildTopologicalExecutionOrder() noexcept
 	remainingInDegree.reserve(m_plan.passes.size());
 	for (const FrameGraphPassNode& passRecord : m_plan.passes)
 	{
-		remainingInDegree.push_back(passRecord.inDegree);
+		remainingInDegree.push_back(static_cast<std::uint32_t>(passRecord.dependsOn.size()));
 	}
 
-	std::vector<FrameGraphPassIndex> ready;
-	ready.reserve(m_plan.passes.size());
 	for (const FrameGraphPassNode& passRecord : m_plan.passes)
 	{
-		if (passRecord.bAlive && passRecord.inDegree == 0)
+		if (passRecord.bAlive && remainingInDegree[passRecord.index] == 0)
 		{
-			ready.push_back(passRecord.index);
+			m_plan.executionOrder.push_back(passRecord.index);
 		}
 	}
 
-	for (std::size_t readyIndex = 0; readyIndex < ready.size(); ++readyIndex)
+	// Appending newly ready passes makes this both the traversal queue and the execution order.
+	for (std::size_t executionIndex = 0; executionIndex < m_plan.executionOrder.size(); ++executionIndex)
 	{
-		const FrameGraphPassIndex passIndex = ready[readyIndex];
-		m_plan.executionOrder.push_back(passIndex);
-
+		const FrameGraphPassIndex passIndex = m_plan.executionOrder[executionIndex];
 		const FrameGraphPassNode& passRecord = m_plan.passes[passIndex];
 		for (const FrameGraphPassIndex successor : passRecord.successors)
 		{
@@ -201,7 +182,7 @@ void FrameGraphCompiler::BuildTopologicalExecutionOrder() noexcept
 			--remainingInDegree[successor];
 			if (remainingInDegree[successor] == 0 && m_plan.passes[successor].bAlive)
 			{
-				ready.push_back(successor);
+				m_plan.executionOrder.push_back(successor);
 			}
 		}
 	}

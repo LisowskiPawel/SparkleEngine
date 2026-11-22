@@ -63,7 +63,6 @@ private:
 	LevelAsset& TakeLoadingLevel(std::uint64_t requestId) noexcept;
 	void RejectLevelLoad(LevelAsset& level, std::string diagnostic) noexcept;
 	void ActivateLoadedLevel(LevelAsset& level, Assets::SceneLoadPackage package) noexcept;
-	void NotifyLevelChanged(const std::string& previousName, const std::string& activeName);
 
 	GameWorld& m_gameWorld;
 	std::unique_ptr<LevelRegistry> m_levelRegistry;

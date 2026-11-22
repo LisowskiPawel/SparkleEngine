@@ -52,7 +52,6 @@ void FrameGraphCompiler::InitializeCompilation() noexcept
 	{
 		passRecord.dependsOn.clear();
 		passRecord.successors.clear();
-		passRecord.inDegree = 0;
 		passRecord.bAlive = true;
 		passRecord.compiledBarriers.clear();
 		passRecord.compiledReleaseBarriers.clear();
