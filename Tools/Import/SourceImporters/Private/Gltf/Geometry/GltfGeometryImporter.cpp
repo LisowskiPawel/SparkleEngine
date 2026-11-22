@@ -106,10 +106,10 @@ void GltfGeometryImporter::ImportPrimitive(const NodeImportContext& context, con
 	const ImportedMeshPrimitiveIndex importedPrimitiveIndex = ResolveImportedPrimitive(context, primitive, primitiveIndex, primitiveLabel, importedScene);
 
 	const ImportedMeshGeometry& geometry = importedScene.meshPrimitives[importedPrimitiveIndex].geometry;
-	ValidateDeformation(geometry, primitive, context.SkeletonIndex, primitiveLabel, importedScene);
+	ValidateDeformation(geometry, context.SkeletonIndex, primitiveLabel, importedScene);
 
 	const ImportedMaterialIndex materialIndex = ResolveMaterialIndex(context.Data, primitive, primitiveLabel, importedScene);
-	const std::vector<float> morphWeights = BuildMorphWeights(context, geometry, primitiveLabel);
+	const std::vector<float> morphWeights = geometry.HasMorphTargets() ? GltfMorphTargetImporter::BuildNodeMorphWeights(context.Node, geometry.deformation.morphTargets.size()) : std::vector<float>{};
 	AppendInstances(context, importedPrimitiveIndex, materialIndex, morphWeights, importedScene);
 }
 
@@ -155,17 +155,8 @@ ImportedMeshPrimitiveIndex GltfGeometryImporter::ResolveImportedPrimitive(
 	return importedPrimitiveIndex;
 }
 
-void GltfGeometryImporter::ValidateDeformation(
-    const ImportedMeshGeometry& geometry,
-    const cgltf_primitive& primitive,
-    ImportedSkeletonIndex skeletonIndex,
-    std::string_view primitiveLabel,
-    const ImportedScene& scene)
+void GltfGeometryImporter::ValidateDeformation(const ImportedMeshGeometry& geometry, ImportedSkeletonIndex skeletonIndex, std::string_view primitiveLabel, const ImportedScene& scene)
 {
-	if (geometry.deformation.morphTargets.size() != primitive.targets_count)
-	{
-		throw Diagnostics::Error(std::format("glTF {} has incomplete morph-target data.", primitiveLabel));
-	}
 	if (geometry.HasMorphTargets() && !geometry.HasSkinInfluences())
 	{
 		throw Diagnostics::Error(std::format("glTF {} has morph targets but no skin; morph-only deformation is unsupported.", primitiveLabel));
@@ -178,21 +169,6 @@ void GltfGeometryImporter::ValidateDeformation(
 		}
 		ValidateSkinInfluences(geometry, scene.skeletons[skeletonIndex], primitiveLabel);
 	}
-}
-
-std::vector<float> GltfGeometryImporter::BuildMorphWeights(const NodeImportContext& context, const ImportedMeshGeometry& geometry, std::string_view primitiveLabel)
-{
-	if (!geometry.HasSkinInfluences() || !geometry.HasMorphTargets())
-	{
-		return {};
-	}
-
-	std::vector<float> morphWeights = GltfMorphTargetImporter::BuildNodeMorphWeights(*context.Node.mesh, context.Node.weights, context.Node.weights_count, geometry.deformation.morphTargets.size());
-	if (morphWeights.size() != geometry.deformation.morphTargets.size())
-	{
-		throw Diagnostics::Error(std::format("glTF {} has an invalid morph-weight assignment.", primitiveLabel));
-	}
-	return morphWeights;
 }
 
 void GltfGeometryImporter::AppendInstances(

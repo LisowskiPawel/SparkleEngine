@@ -94,8 +94,8 @@ namespace GltfSkinImporter
 		for (std::size_t influenceIndex = 0; influenceIndex < 8; ++influenceIndex)
 		{
 			const bool bJointOutOfRange = jointValues[influenceIndex] > maxJointIndex;
-			const bool bNegativeWeight = weightValues[influenceIndex] < 0.0f;
-			const bool bInfluenceInvalid = bJointOutOfRange || bNegativeWeight;
+			const bool bWeightInvalid = !std::isfinite(weightValues[influenceIndex]) || weightValues[influenceIndex] < 0.0f;
+			const bool bInfluenceInvalid = bJointOutOfRange || bWeightInvalid;
 			if (bInfluenceInvalid)
 			{
 				throw Diagnostics::Error(std::format("glTF skin influence {} at vertex {} is invalid.", influenceIndex, vertexIndex));
@@ -105,9 +105,9 @@ namespace GltfSkinImporter
 			weightSum += weightValues[influenceIndex];
 		}
 
-		if (weightSum <= 0.0f)
+		if (!std::isfinite(weightSum) || weightSum <= 0.0f)
 		{
-			throw Diagnostics::Error(std::format("glTF skin weights at vertex {} have zero total weight.", vertexIndex));
+			throw Diagnostics::Error(std::format("glTF skin weights at vertex {} have an invalid total weight.", vertexIndex));
 		}
 
 		for (float& weight : influence.jointWeights)

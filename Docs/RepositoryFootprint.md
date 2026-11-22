@@ -2,9 +2,33 @@
 
 [Documentation](README.md) | [Goals](Goals.md) | [Rendering](Rendering.md) | [Roadmap](Roadmap.md) | [Third-party migration](ThirdPartyMigration.md)
 
-**Frozen source snapshot: 21 November 2026, `719f89ec1` plus assessed local changes.** Native, shader and automation counts, history and chart partitions were independently rechecked against that baseline. Later concurrent source changes are recorded under [Measurement basis](#measurement-basis). This map covers native modules, shaders, automation, content/configuration, dependencies, documentation and the workflows connecting them.
+**Assessed source snapshot: 22 November 2026, 19:05 Warsaw / 18:05 UTC, `d5bf01d53` plus recorded local changes.** Counts, source identities and charts are frozen together; later concurrent edits are outside this assessment. Native, shader, automation, content/configuration, dependency and documentation coverage follows the original method.
 
-[Targets and deltas](#target-and-delta) | [Module map](#code-distribution) | [Complexity signals](#complexity-signals) | [Workflows](#complexity-across-module-boundaries) | [Structural actions](#structural-priorities-and-actions) | [Measurement basis](#measurement-basis)
+[Change since baseline](#change-since-the-previous-assessment) | [Targets and deltas](#target-and-delta) | [Module map](#code-distribution) | [Complexity signals](#complexity-signals) | [Workflows](#complexity-across-module-boundaries) | [Structural actions](#structural-priorities-and-actions) | [Measurement basis](#measurement-basis)
+
+## Change since the previous assessment
+
+**The whole owned footprint has not become smaller in code lines.** Native C/C++ fell by **967 code lines**, while automation grew by **1,061** and shaders by **5**. The net is **99 more code lines and seven more files**; physical lines fell by 272. This is a whole-repository comparison, not an attribution of every change to third-party work.
+
+| Same counting method | 21 November baseline | 22 November assessed worktree | Change |
+| --- | ---: | ---: | ---: |
+| Native files | 2,158 | 2,151 | −7 |
+| Native code lines | 137,651 | 136,684 | −967 (−0.70%) |
+| Native physical lines | 160,925 | 159,505 | −1,420 |
+| Shader code lines | 6,385 | 6,390 | +5 |
+| Automation code lines | 6,076 | 7,137 | +1,061 |
+| **All owned code lines** | **150,112** | **150,211** | **+99 (+0.07%)** |
+| **All owned files** | **2,422** | **2,429** | **+7** |
+| All owned physical lines | 175,517 | 175,245 | −272 |
+| Graphics share: RHI + Renderer + shaders | 47.3% | 46.8% | −0.52 percentage points |
+
+![Change in native, automation, shader and total code lines since the original baseline](Images/RepositoryFootprint/footprint-change.svg)
+
+**Committed versus local work matters:** the assessed commit alone contains **150,818 code lines / 2,433 files**: +706 lines / +11 files from the original assessment. Its native subtotal is **137,291 code lines**, down 360. The captured uncommitted native changes contribute **−607 code / −721 physical lines / −4 files**, chiefly RHI and content-owner work. They are included in the current worktree charts but are not credited as delivered migration savings.
+
+The [integration delivery ledger](ThirdPartyMigration.md#delivered-integrations-versus-savings) separates mechanism delegation from native removal. ShaderMake records a scoped **374 physical / 194 code-line reduction**. SDL3, Boost.Process and ozz have delivered code but their conservative delivery ledgers record native growth. These independent ledgers overlap and use different frozen inputs; do not sum them into a fabricated aggregate. Tasks remains a production retirement target: its 40-file implementation is still present.
+
+The direction is therefore **successful transfer of several mechanisms, modest native shrinkage, and no whole-footprint code reduction yet**. Do not add SDKs merely to improve a percentage or roll back a useful dependency solely on LOC. Finish the [remaining mechanism cuts](#cuts-before-expansion), reduce demonstrated bridge/host duplication and complete the rendering cases.
 
 ## Target and delta
 
@@ -16,24 +40,24 @@ The [ranked structural priorities](#structural-priorities-and-actions) connect l
 
 ### Measured peer proportions
 
-**Measured on 21 November 2026: nine public rendering/framework projects and three related libraries, each pinned to a Git revision.** This is a selected engineering-reference sample, not a ranking, hiring study or statistical industry norm. Counts use the same code-line denominator as Sparkle: owned C/C++/headers, shaders and build/scripts; fetched/vendored dependencies, assets and reviewed numerical tables are excluded. All checked-in source variants count, whether enabled in a particular build or not.
+**Peers measured on 21 November 2026; Sparkle refreshed on 22 November.** Nine public rendering/framework projects and three related libraries remain pinned to their original revisions. This is a selected engineering-reference sample, not a ranking, hiring study or statistical industry norm. Counts use the same code-line denominator as Sparkle: owned C/C++/headers, shaders and build/scripts; fetched/vendored dependencies, assets and reviewed numerical tables are excluded. All checked-in source variants count, whether enabled in a particular build or not.
 
 ![Measured rendering, RHI, shader, scene, foundation and supporting-code shares across vendor and engineer repositories](Images/RepositoryFootprint/peer-proportions.svg)
 
-The **four-system context group** is Falcor, RTXPT with Donut/NVRHI, Cauldron and VEngine2. It covers research frameworks, an SDK sample with selected platform components, and a hobby engine with owned D3D12/Vulkan backends. Their combined **Rendering + RHI + Shaders share is 51.7-72.4%**, versus Sparkle's **47.3%**. Product scope differs: Sparkle also owns offline cooking, Launcher and package reproduction. Use the ranges to choose reviews, not to require identical implementations.
+The **four-system context group** is Falcor, RTXPT with Donut/NVRHI, Cauldron and VEngine2. It covers research frameworks, an SDK sample with selected platform components, and a hobby engine with owned D3D12/Vulkan backends. Their combined **Rendering + RHI + Shaders share is 51.7-72.4%**, versus Sparkle's **46.8%**. Product scope differs: Sparkle also owns offline cooking, Launcher and package reproduction. Use the ranges to choose reviews, not to require identical implementations.
 
 | Responsibility | Sparkle | Four-system observed range | Target implication |
 | --- | ---: | ---: | --- |
-| Rendering | **21.1%** | 16.0-34.1% | Inside the observed range. Finish correct results; remove demonstrated duplicate pass policy while preserving per-shader files. No general shrink target. |
-| RHI | **21.9%** | 10.9-27.5% | Inside the range; API scope/delegation differs. Review lifetime/state organization and file fragmentation, preserving the owned RHI. |
+| Rendering | **21.0%** | 16.0-34.1% | Inside the observed range. Finish correct results; remove demonstrated duplicate pass policy while preserving per-shader files. No general shrink target. |
+| RHI | **21.6%** | 10.9-27.5% | Inside the range; API scope/delegation differs. Review lifetime/state organization and file fragmentation, preserving the owned RHI. |
 | Shaders | **4.3%** | 8.7-24.8% | Below this group. Close the selected Reference/model/operator gaps with checked results; do not manufacture shader lines. |
-| Scene/world | **7.3%** | 5.7-13.4% | Inside the range. Keep scene/material/animation semantics; avoid new gameplay breadth or a new ECS just for its size. |
-| Core/foundations | **8.0%** | 4.6-13.8% | Inside the range. Keep the targeted Tasks/SDL/JSON investigations; no evidence supports a blanket Core quota. |
-| Rest | **37.4%** | 13.6-23.2% | Above this group. Prioritize host/UI/state and tooling cuts, while preserving reproduction, diagnostics and meaningful verification. |
+| Scene/world | **7.2%** | 5.7-13.4% | Inside the range. Keep scene/material/animation semantics; avoid new gameplay breadth or a new ECS just for its size. |
+| Core/foundations | **7.9%** | 4.6-13.8% | Inside the range. Keep the targeted Tasks/SDL/JSON investigations; no evidence supports a blanket Core quota. |
+| Rest | **38.1%** | 13.6-23.2% | Above this group. Prioritize host/UI/state and tooling cuts, while preserving reproduction, diagnostics and meaningful verification. |
 
-These are component-wise observed bounds; their endpoints are not a budget that sums to 100%. Core/foundations groups generic utilities, platform/input and job mechanisms: Sparkle's **Core alone is 6,150 lines / 4.1%**; adding Tasks, Platform and ToolSupport gives **11,977 / 8.0%** here. Scene/world includes native scene/material/animation representation and mixed render-scene code, so it is broader than a universal gameplay/ECS definition. GPU kernels and shared shader-directory declarations count as Shaders once. Compiler/scene boundaries and mixed files make the detailed split approximate.
+These are component-wise observed bounds; their endpoints are not a budget that sums to 100%. Core/foundations groups generic utilities, platform/input and job mechanisms: Sparkle's **Core alone is 6,197 lines / 4.1%**; adding Tasks, Platform and ToolSupport gives **11,908 / 8.0%** here. Scene/world includes native scene/material/animation representation and mixed render-scene code, so it is broader than a universal gameplay/ECS definition. GPU kernels and shared shader-directory declarations count as Shaders once. Compiler/scene boundaries and mixed files make the detailed split approximate.
 
-**Where the cut evidence points:** Sparkle has **33,009 host/UI/composition lines** and **17,112 content/shader-tool lines**, within its 56,203-line Rest category. Its RHI is **32,893 lines in 370 files**, compared with NVRHI's **30,885 in 69**; its Renderer is **31,739 in 622**, compared with Falcor's mapped rendering code **27,294 in 175**. Scope and header strategy differ. These numbers justify reviewing change paths and redundant state/forwarding before imposing file-count or LOC quotas.
+**Where the cut evidence points:** Sparkle has **33,084 host/UI/composition lines** and **16,955 content/shader-tool lines**, within its 57,196-line Rest category. Its RHI is **32,371 lines in 370 files**, compared with NVRHI's **30,885 in 69**; its Renderer is **31,515 in 622**, compared with Falcor's mapped rendering code **27,294 in 175**. Scope and header strategy differ. These numbers justify reviewing change paths and redundant state/forwarding before imposing file-count or LOC quotas.
 
 ![Absolute supporting-code composition for Sparkle, Falcor, VEngine2 and PTStudio](Images/RepositoryFootprint/peer-support-composition.svg)
 
@@ -46,7 +70,7 @@ Project links below open the measured revisions. The downloadable [CSV](Images/R
 
 | Pinned project/view | Code lines | Render | RHI | Shaders | Scene/world | Core/found. | Rest |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| **SparkleEngine** | 150,112 | 21.1% | 21.9% | 4.3% | 7.3% | 8.0% | 37.4% |
+| **SparkleEngine** | **150,211** | 21.0% | 21.6% | 4.3% | 7.2% | 7.9% | 38.1% |
 | [Falcor](https://github.com/NVIDIAGameWorks/Falcor/tree/759aad033ff610fb0d82c74f7e0a508d0096d5f2) | 170,780 | 16.0% | 10.9% | 24.8% | 12.0% | 13.0% | 23.2% |
 | [RTXPT](https://github.com/NVIDIA-RTX/RTXPT/tree/303b408ab81790a5051abd7573830b7a4112eb8e) | 53,569 | 31.8% | 0.0% | 44.8% | 3.2% | 0.0% | 20.1% |
 | [RTXPT](https://github.com/NVIDIA-RTX/RTXPT/tree/303b408ab81790a5051abd7573830b7a4112eb8e) + [Donut](https://github.com/NVIDIA-RTX/Donut/tree/e50042f4bbd762971cc90431261e967404855b81) + [NVRHI](https://github.com/NVIDIA-RTX/NVRHI/tree/6b96fb03e07539f08327aea76c56d55f1de9d906) | 126,670 | 23.8% | 24.4% | 22.4% | 5.7% | 5.1% | 18.6% |
@@ -92,61 +116,60 @@ The same cloc 2.06 counter was applied to each selected source list, with duplic
 
 Shader-file classification takes precedence; automation is always Rest in the comparison. Directory-name exclusions alone were insufficient: **12,481 D3D12MA/volk code lines inside VEngine2's backend directories** were excluded as upstream implementation. Vendored Lua, ImGui, meshoptimizer, MikkTSpace, SDK headers, Falcor's Bottle dependency and numerical LTC/spectral tables were also excluded. Adaptation code around these components stays counted. Reviewed source lists include Capsaicin's nonstandard `.mesh`/`.task` shader files.
 
-File-level responsibility assignment is an analytical judgment. The broad graphics-plus-scene share remains lower in Sparkle (**54.6%**) than this four-system group's **63.7-78.1%**, so moving mixed scene code between Rendering and Scene/world does not remove that directional gap. Capability, workflow and delegation differences still prevent equating the gap with deletable waste. Inspect the named cut paths and preserve their existing gates.
+File-level responsibility assignment is an analytical judgment. The broad graphics-plus-scene share remains lower in Sparkle (**54.0%**) than this four-system group's **63.7-78.1%**, so moving mixed scene code between Rendering and Scene/world does not remove that directional gap. Capability, workflow and delegation differences still prevent equating the gap with deletable waste. Inspect the named cut paths and preserve their existing gates.
 
-As a denominator check, omitting classified automation and standalone native-test files leaves Sparkle's Rest share at **34.8%**, against **11.9-15.8%** in the same four-system group. Embedded tool validation remains inside its owning files. This sensitivity supports investigating host/tool maintenance; it does not make testing or automation a deletion target.
+As a denominator check, omitting classified automation and standalone native-test files leaves Sparkle's Rest share at **35.0%**, against **11.9-15.8%** in the same four-system group. Embedded tool validation remains inside its owning files. This sensitivity supports investigating host/tool maintenance; it does not make testing or automation a deletion target.
 
 </details>
 
 ### Current proportions and desired direction
 
-These five responsibility groups partition **all 150,112 owned code lines and 2,422 files** once, including shaders and automation. They measure maintained source, not time spent, defects or capability strength. Supporting code can be essential to a graphics result.
+These five responsibility groups partition **all 150,211 owned code lines and 2,429 files** once, including shaders and automation. They measure maintained source, not time spent, defects or capability strength. Supporting code can be essential to a graphics result.
 
 ![Current code proportions and proposed allocation of engineering attention, shown separately](Images/RepositoryFootprint/principal-proportions.svg)
 
 | Responsibility | Included owners | Files | Code lines | Share | Desired complexity direction |
 | --- | --- | ---: | ---: | ---: | --- |
-| Graphics systems and shaders | RHI, Renderer, all shaders | 1,137 | 71,017 | **47.3%** | Protect API/lifetime, estimator depth and visible per-shader pass construction; finish correctness and measured results. |
-| Hosts and interaction | Launcher, Editor, Application, Showcase entry points | 408 | 33,009 | **22.0%** | Bound to build/cook/run, inspection, supported edits and delivery. Remove duplicate operation state and forwarding where demonstrated. |
-| Content and world | GameFramework, SourceImporters, all five cookers | 436 | 20,919 | **13.9%** | Keep one content/material interpretation; delegate decoding/processing. Do not grow general gameplay or broad authoring. |
-| Shared foundations | Core, Tasks, Platform, ToolSupport, native CMake glue | 216 | 11,983 | **8.0%** | Retire selected general mechanisms under existing gates; retain domain policy, cancellation, publication and lifetime guarantees. |
-| Shader tooling and automation | ShaderCompiler, all build/scripts/CI | 225 | 13,184 | **8.8%** | Reuse compiler facilities and existing build/dependency tools; retain ABI, source identity, offline reproduction and useful checks. |
+| Graphics systems and shaders | RHI, Renderer, all shaders | 1,131 | 70,276 | **46.8%** | Protect API/lifetime, estimator depth and visible per-shader pass construction; finish correctness and measured results. |
+| Hosts and interaction | Launcher, Editor, Application, Showcase entry points | 413 | 33,084 | **22.0%** | Bound to build/cook/run, inspection, supported edits and delivery. Remove duplicate operation state and forwarding where demonstrated. |
+| Content and world | GameFramework, SourceImporters, all five cookers | 434 | 20,952 | **13.9%** | Keep one content/material interpretation; delegate decoding/processing. Do not grow general gameplay or broad authoring. |
+| Shared foundations | Core, Tasks, Platform, ToolSupport, native CMake glue | 217 | 11,928 | **7.9%** | Retire selected general mechanisms under existing gates; retain domain policy, cancellation, publication and lifetime guarantees. |
+| Shader tooling and automation | ShaderCompiler, all build/scripts/CI | 234 | 13,971 | **9.3%** | Reuse compiler facilities and existing build/dependency tools; retain ABI, source identity, offline reproduction and useful checks. |
 
 The graphics share can rise through genuine support retirement and selected graphics work. The [cut-only scenarios](#proportions-after-cuts) below show how much actual removal would change that balance. The measured peers supply comparative context; each checkpoint remains a proposal under Sparkle's scope. The [owner map](#every-native-owner) and [component figures](#module-breakdowns) locate costs inside each group.
 
-The **6,385 shader lines are 4.3%** of owned source; this is not a completeness measure. Treat the absent owned-model path and incomplete correctness, performance and transfer evidence as development gaps. Evaluate supporting complexity by the maintained mechanisms and coordination needed for those outcomes.
+The **6,390 shader lines are 4.3%** of owned source; this is not a completeness measure. Treat the absent owned-model path and incomplete correctness, performance and transfer evidence as development gaps. Evaluate supporting complexity by the maintained mechanisms and coordination needed for those outcomes.
 
 ### Cuts before expansion
 
-Start with **retiring maintained mechanisms and bounding supporting scope**. The table separates named retirement scopes from structural review candidates. Code lines exclude comments/blanks; physical lines include them. Gross scope is the current implementation under review; **net saving must subtract all replacement, adapter, caller and relocated code**. Fit and behavior remain open where stated.
+**Delegate complete mechanisms, then reduce the bridge.** Delivered SDL3/Boost/ozz are no longer future savings to add to a forecast. ShaderMake owns compiler execution, but Sparkle still owns its expanded preprocessor and identity/reflection/publication policy. The current [remaining review ceiling](ThirdPartyMigration.md#total-native-removal) is **4,711 physical / 4,014 code lines across 62 files**, before retained policy and replacement costs; it is not an expected net saving.
 
-| Priority / cut | Delete or simplify | Preserve | Scope and completion target |
+| Next cut | Remove or simplify | Preserve | Current scope and exit |
 | --- | --- | --- | --- |
-| **1. Custom task execution** | Retire the Tasks module and `RenderScenePreparationTasks.*`; convert callers directly to the qualified upstream owner. Remove its API, target/DLL, scheduler and compatibility facade. | Domain admission, stop/results, settlement, frame coordination, caller-thread controls and GPU lifetime. | **3,017 code / 3,566 physical lines in 42 files**: 2,959 module code lines plus 58 adapter lines. The authorized enkiTS rollback fork passed scoped first-owner fit; production integration/conversion and Tasks removal remain open. The [comparison/review targets](Implementation/TaskRuntime.md#delivery-constraints-and-fixed-budgets) remain **>=1,528 net physical infrastructure lines removed**, **<=2,065 added/relocated lines**, **<=10 public execution declarations**, **<=12 mutable infrastructure fields** and **<=12 rejection/cleanup sites**. [Code completion and broader qualification](ThirdPartyMigration.md#code-delivery-and-qualification) have separate exits. |
-| **2. Native window/input mechanism** | SDL3 owns native mechanics; the eight Win32 decoder/pointer files and old window/message APIs are retired. Keep routing and policy with their existing owners. | Focus/capture/cancellation, float camera input, DPI behavior, borrowed native handles and RHI presentation. | **Code delivery complete.** Fixed scope: **752 code / 868 physical lines in 13 files**. Charging 110 retained old lines and 1,155 new/relocated integration/caller lines gives **397 physical lines of scoped growth**. The complete producer move and concurrent Launcher metadata are charged conservatively; no net saving is claimed. [Contracts and broader qualification](ThirdPartyMigration.md#window-and-input). |
-| **3. Custom shader include expansion** | Retire the regex-based `ShaderSourcePreprocessor` pair; use existing DXC/Slang facilities. | Source mounts/capture, include-closure identity, generated parameters, reflection/ABI, publication and reload lifetime. | **161 code / 190 physical lines in two files**. Complete connected net saving is unproved; this work can proceed independently under [compiler reuse](ThirdPartyMigration.md#native-removal-estimates). |
-| **4. Launcher presentation/discovery mechanics** | Trial existing Qt item layout and standard CMake/vswhere queries in place of custom card reflow and duplicate discovery. | Scene/actions/readiness, sizing/DPI/focus, admitted toolchains/overrides, offline use and useful failure/cancellation output. | Reviewed gross ceilings: **160 physical lines** for `ResponsiveCardGridWidget`, **24** for CMake cache lookup and **24** for VS installation scanning. Source project-name parsing and shared generator discovery are uncredited. Charge models/delegates/query handling and all callers; [reject comparable replacement machinery](ThirdPartyMigration.md#native-removal-estimates). |
-| **5. Distributed host/panel state** | In Launcher, Editor and Application, remove demonstrated duplicate mutable operation facts, copied readiness/output state, forwarding-only helpers and panel-owned copies of domain logic. | One operation owner, derived presentation, typed edits/undo, inspection, source correlation and safe shutdown. | Launcher dispatch and Activity cuts are [delivered](#launcher-operations); remaining cross-host state is unmeasured. Follow one build/cook/run or shader-reload path. Target **one writable authority per fact** and deletion of the old path; record owners/files/state touched before and after. |
-| **6. Graphics setup and duplicated mechanisms** | Preserve per-shader declarations, registrations and `Add...Pass` files. Remove proven duplicate state or unnecessary forwarding within that pattern. Retire a replaced production algorithm when an SDK path qualifies. | Owned RHI, FrameGraph, API state/barriers, GPU retirement, material meaning and independent Reference. | **Review candidate, no measured saving.** Renderer Passes has 123 of 197 files at most 20 code lines; small files do not establish waste. RTXDI has **zero identified native savings** here; its 365-line Direct host family is an integration surface. Keep Reference separate from the single selected production path. |
+| **1. Complete Task ownership transfer** | Retire Tasks, its public execution API/target/DLL and scene-preparation adapter; convert real owners directly to the selected upstream resource. Remove displaced execution plumbing rather than moving it. | Domain partitioning/admission, stop/results, settlement, caller-thread controls and RHI/GPU lifetime. | **3,017 code / 3,566 physical lines in 42 files**, unchanged. Production Tasks still has 40 files / 2,959 code lines. Keep the [original comparison/review targets](Implementation/TaskRuntime.md#delivery-constraints-and-fixed-budgets) and [separate code/qualification exits](ThirdPartyMigration.md#code-delivery-and-qualification); no savings before retirement. |
+| **2. Reassess compiler preprocessing after ShaderMake** | Replace custom expansion through real compiler include/preprocess facilities where the complete identity/debug boundary becomes smaller. | Virtual roots, exact source closure, typed reflection, debug ABI, accepted publication and reload. | The remaining pair is now **221 code / 253 physical lines**, versus **161 / 190** originally. ShaderMake's delivered execution saving does not retire this mechanism. Require real conditional/include/source-identity checks and a net ledger. |
+| **3. Reduce host/UI coordination** | Start with one GUI/shell operation; remove duplicate request/plan/run dispatch and writable mirrors. Trial ordinary Qt item layout instead of bespoke reflow/presentation. | Scene selection/readiness, useful errors, cancellation, dry-run, inspection, typed edits/undo and DPI. | Host source is **33,084 lines / 413 files**, up 75 code lines. This is exposure, not a deletion estimate. Qt's reviewed reflow scope remains only **160 physical lines**; no 33k host-saving claim. |
+| **4. Slim delivered integrations and build policy** | Review adapter/caller state and duplicated recipe/cache/staging facts after proving the current owner. Share upstream implementations through the existing build graph. | Actual process-tree/output policy, input publication, animation mapping/baking, compiler identity and prepared offline delivery. | Automation grew **1,061 code lines**. [Delivery ledgers](ThirdPartyMigration.md#delivered-integrations-versus-savings) identify native-growth boundaries. First-party bindings and maintained patches stay charged; moving them outside Engine earns no deletion credit. |
+| **5. Remove demonstrated rendering duplication** | Simplify repeated policy, redundant conversions and no-consumer forwarding after tracing a real frame/material change. | Owned APIs/FrameGraph, typed shader files/registration, resource state, histories, retirement and independent Reference. | One-shader/one-header structure is intentional. Direct's 17 native files / 365 lines do not justify merging it. RTXDI still has zero identified native savings. Profile recurring work before adding another cache or manager. |
 
-**A concrete optional scope cut:** use a plain Qt scene list and basic operation presentation instead of bespoke hero/card presentation if visual polish prevents a worthwhile reduction. This keeps scene selection, actions, readiness, errors, cancellation and DPI. It is a proposed product choice; update the existing trial's presentation requirements if selected, and measure the whole change. The 160-line figure above covers only the reviewed reflow widget, not all visual code. [Qt list/icon layout](https://doc.qt.io/qt-6/qlistview.html) and [Microsoft's vswhere query](https://github.com/microsoft/vswhere/wiki/Find-MSBuild) are existing-mechanism precedents, not local fit proof.
+For the next slice, name the old owner, current consumer, exact mechanism to disappear, retained invariants and all new/relocated code. Judge code closure and broader qualification separately under the existing guides. A useful ownership transfer may legitimately grow code; describe that outcome honestly instead of labelling the gross deletion as a saving.
 
-**Cut proposed work as well:** keep Boost.Process, EnTT, ozz-animation and FlatBuffers conditional until they solve a demonstrated problem with a cheaper complete boundary. Their reviewed native gross ceilings are only **342, 317, 235 and 82 physical lines** respectively. Prefer existing dependencies and direct code when a new library would add comparable glue. Broad authoring/diagnostic suites, a general ML runtime and extra gameplay systems stay outside Goals. Avoided work earns no deletion credit. Preserve Core publication/admission, canonical content semantics and the small cookers.
+**Avoid new work that cannot repay its boundary.** EnTT, FlatBuffers, ufbx and other small candidates remain conditional. A new dependency with comparable glue is not a simplification. Broad authoring, another runtime/framework, extra gameplay and general ML infrastructure remain outside Goals. The active Sponza, material and release repairs continue; this is not an engine-wide rewrite prerequisite.
 
 ### Proportions after cuts
 
-These scenarios hold graphics at **71,017 code lines** and remove only from the other **79,095**. They separate simplification from adding code that changes the denominator. The three disjoint native scopes above cover **3,930 code lines in 57 files**, including **58 Renderer adapter lines**. This unchanged-graphics model credits only their **3,872 supporting code lines in 55 files**, before replacement costs; JSON and other reviews are uncredited.
+These proposals hold graphics at **70,276 code lines** and remove only from the other **79,935**. Tasks plus the current preprocessor pair cover **3,238 code lines in 44 files**, including 58 Renderer adapter lines. The unchanged-graphics illustration can credit only **3,180 supporting code lines in 42 files**, before integration. Delivered SDL3 is excluded from future removal.
 
-![Cut-only footprint scenarios with unchanged graphics code, retained supporting code and removals](Images/RepositoryFootprint/cut-only-targets.svg)
+![Cut-only scenarios with unchanged graphics, retained supporting source and removals](Images/RepositoryFootprint/cut-only-targets.svg)
 
-| Scenario | Net code lines removed | Remaining total | Graphics share | Meaning |
+| Scenario | Net supporting code removed | Remaining owned code | Graphics share | Meaning |
 | --- | ---: | ---: | ---: | --- |
-| Frozen snapshot | 0 | 150,112 | 47.3% | Measured baseline. |
-| Supporting portion of three scopes, zero integration cost | 3,872 | 146,240 | 48.6% | **Optimistic gross ceiling**, not a net forecast: excludes the 58 Renderer adapter lines and assumes no replacement cost. |
-| **50% investigation checkpoint** | **8,078** | **142,034** | **50.0%** | Requires **10.2% net reduction** of supporting source. Existing named scopes cannot establish this; wider review of host/state/tooling paths must identify the remaining cuts. |
-| **52% peer-context checkpoint** | **13,541** | **136,571** | **52.0%** | Requires **17.1% net reduction** of supporting source. Approximates the four-system group's lowest observed graphics share, **51.7%**; feasibility remains unproved. |
+| **Current snapshot** | 0 | 150,211 | 46.8% | Current assessed worktree, including recorded local changes. |
+| **Tasks + preprocessing, zero integration cost** | 3,180 | 147,031 | 47.8% | Optimistic gross support ceiling, not a forecast. New/retained code lowers the actual saving. |
+| **50% investigation checkpoint** | 9,659 | 140,552 | 50.0% | Requires 12.1% net support removal; 6,479 beyond that optimistic named ceiling. |
+| **52% peer-context checkpoint** | 15,065 | 135,146 | 52.0% | Requires 18.8% net support removal. The selected peers start at 51.7%; this is context, not an optimum or hiring criterion. |
 
-Use **50% as an initial cut-review checkpoint** and **52% as a peer-context reference**, subject to findings. Neither is an accepted removal budget or release prerequisite. The latter still needs at least **9,669 supporting code lines beyond the three scopes' optimistic supporting-only ceiling**, before charging their replacements. Count only useful, capability-preserving net retirements; if review cannot justify enough cuts, retain the supported footprint. Do not add or relabel code to meet a checkpoint. If graphics code also shrinks, recalculate numerator and denominator and judge the change by its outcomes and ownership. Keep each migration's correctness/removal exit and fixed cost accounting authoritative under [code delivery and qualification](ThirdPartyMigration.md#code-delivery-and-qualification); report SLOC separately before recalculating proportions.
+The earlier 50% checkpoint needed 8,078 net code lines; it now needs 9,659. This is not evidence of poorer rendering: local graphics cleanup also lowers the graphics numerator. Do not add rendering code or cut evidence/automation simply to meet a ratio. Review quality, useful output, ownership and complete maintenance cost.
 
 ### Proposed allocation of engineering attention
 
@@ -190,40 +213,40 @@ Migration gates count their fixed physical scopes; charts count comment-excludin
 
 | Owned source | Files | Code lines | Physical lines |
 | --- | ---: | ---: | ---: |
-| Native C++ | 2,158 | 137,651 | 160,925 |
-| Shaders | 145 | 6,385 | 7,539 |
-| Build, scripts and CI | 119 | 6,076 | 7,053 |
-| **Total** | **2,422** | **150,112** | **175,517** |
+| Native C++ | 2,151 | 136,684 | 159,505 |
+| Shaders | 145 | 6,390 | 7,544 |
+| Build, scripts and CI | 133 | 7,137 | 8,196 |
+| **Total** | **2,429** | **150,211** | **175,245** |
 
-Headers account for **33,896 native code lines, 24.6%** of native source. Checked-in upstream `d3dx12.h` has **3,677 code / 4,065 physical lines** outside the owned total; fetched dependencies and generated outputs are excluded.
+Headers account for **33,648 native code lines, 24.6%** of native source. Checked-in upstream D3DX12 remains outside the owned total; its move to `ThirdParty/` earns no saving. First-party compile bindings under `CMake/Dependencies/Bindings` remain counted. Maintained patches are reported separately below; fetched/generated code is excluded.
 
 ![Native code lines and file counts for every module](Images/RepositoryFootprint/native-owners.svg)
 
 ### Every native owner
 
-The last column combines maintained responsibility with the target action above. Small systems can have substantial lifetime or failure contracts. Commits cover **24 August-21 November 2026**, counting each non-merge commit once per owner when it touches a current native path.
+The last column combines maintained responsibility with the target action above. Small systems can have substantial lifetime or failure contracts. Commits cover **25 August-22 November 2026**, counting each non-merge commit once per owner when it touches a current native path.
 
 | Owner | Files | Code lines | Commits | Responsibility and goal delta |
 | --- | ---: | ---: | ---: | --- |
-| [RHI](../Engine/RHI) | 370 | 32,893 | 68 | **KEEP + PROVE.** Two API backends; device capabilities, commands, descriptors, barriers, allocation, presentation and GPU retirement; target: checked resources, queues and retirement on both APIs. |
-| [Renderer](../Engine/Renderer) | 622 | 31,739 | 116 | **REVIEW + PROVE.** Scene/view preparation, residency, frame admission, frame graphs, pass composition, histories, shader bindings and SDK lifetime; target: correct pixels; cohesive passes and frame composition. |
-| [Launcher](../Tools/Launcher/SparkleLauncher) | 197 | 18,132 | 73 | **REVIEW / BOUND.** Dependency/content acquisition, readiness, toolchains, build/cook/run planning, child processes, cancellation and GUI operation state; target: one authority per mutable operation fact. |
-| [GameFramework](../Engine/GameFramework) | 249 | 10,915 | 41 | **KEEP + PROVE.** Authored levels, cooked loading, entity/resource identity, animation, structural edits, immutable publication and render extraction; target: material, animation and extraction semantics agree. |
-| [Editor](../Engine/Editor) | 148 | 10,472 | 60 | **REVIEW / BOUND.** Scene edits, inspection, viewport navigation, settings, console and shader controls; accepted-state and save behavior; target: graphics inspection and selected editing workflows. |
-| [ShaderCompiler](../Tools/Shaders/ShaderCompiler) | 106 | 7,108 | 45 | **REUSE + PROVE.** DXC/Slang, source mounts/includes, reflection and ABI checks, debug/source identity, verification and publication; target: compiler-owned include expansion; retain ABI and identity. |
-| [Core](../Engine/Core) | 129 | 6,150 | 59 | **REVIEW / BOUND.** Files and paths, publication/read coordination, process trees/readiness/output, input values, events, JSON admission and diagnostics; target: thin file, process and publication mechanisms. |
-| [SourceImporters](../Tools/Import/SourceImporters) | 88 | 5,038 | 21 | **KEEP + PROVE.** glTF/FBX/PLY adaptation; geometry, transforms, materials, skins and animation converted into engine semantics; target: one canonical scene and material interpretation. |
-| [Application](../Engine/Application) | 61 | 4,388 | 36 | **BOUND + PROVE.** Game/Editor startup and shutdown, runtime composition, task capacity, input routing, operations, Reference exports and GPU incidents; target: host composition; settle owned operations. |
+| [RHI](../Engine/RHI) | 366 | 32,371 | 67 | **KEEP + PROVE.** Two API backends; device capabilities, commands, descriptors, barriers, allocation, presentation and GPU retirement; target: checked resources, queues and retirement on both APIs. |
+| [Renderer](../Engine/Renderer) | 620 | 31,515 | 116 | **REVIEW + PROVE.** Scene/view preparation, residency, frame admission, frame graphs, pass composition, histories, shader bindings and SDK lifetime; target: correct pixels; cohesive passes and frame composition. |
+| [Launcher](../Tools/Launcher/SparkleLauncher) | 200 | 18,018 | 76 | **REVIEW / BOUND.** Dependency/content acquisition, readiness, toolchains, build/cook/run planning, child processes, cancellation and GUI operation state; target: one authority per mutable operation fact. |
+| [GameFramework](../Engine/GameFramework) | 245 | 10,831 | 41 | **KEEP + PROVE.** Authored levels, cooked loading, entity/resource identity, animation, structural edits, immutable publication and render extraction; target: material, animation and extraction semantics agree. |
+| [Editor](../Engine/Editor) | 150 | 10,672 | 61 | **REVIEW / BOUND.** Scene edits, inspection, viewport navigation, settings, console and shader controls; accepted-state and save behavior; target: graphics inspection and selected editing workflows. |
+| [ShaderCompiler](../Tools/Shaders/ShaderCompiler) | 101 | 6,834 | 49 | **REUSE + PROVE.** DXC/Slang, source mounts/includes, reflection and ABI checks, debug/source identity, verification and publication; target: compiler-owned include expansion; retain ABI and identity. |
+| [Core](../Engine/Core) | 129 | 6,197 | 61 | **REVIEW / BOUND.** Files and paths, publication/read coordination, process trees/readiness/output, input values, events, JSON admission and diagnostics; target: thin file, process and publication mechanisms. |
+| [SourceImporters](../Tools/Import/SourceImporters) | 88 | 5,020 | 22 | **KEEP + PROVE.** glTF/FBX/PLY adaptation; geometry, transforms, materials, skins and animation converted into engine semantics; target: one canonical scene and material interpretation. |
+| [Application](../Engine/Application) | 61 | 4,377 | 37 | **BOUND + PROVE.** Game/Editor startup and shutdown, runtime composition, task capacity, input routing, operations, Reference exports and GPU incidents; target: host composition; settle owned operations. |
 | [Tasks](../Engine/Tasks) | 40 | 2,959 | 21 | **RETIRE TARGET.** Graph construction, runnable scheduling, lanes, dispatch/coalescing, failure propagation, cancellation, settlement and scope destruction; target: no local execution module, scheduler or compatibility API. |
-| [TextureCooker](../Tools/Cooking/TextureCooker) | 30 | 1,823 | 31 | **KEEP + PROVE.** Source admission, DirectXTex adaptation, mip/format intent, requests, memory limits, worker COM lifetime and publication; target: upstream processing; accepted material/reference pixels. |
-| [Platform](../Engine/Platform) | 27 | 1,667 | 20 | **SDL3 INTEGRATION.** Snapshot counts predate conversion. SDL3 owns native window/input mechanics; Platform retains atomic drawable publication, synchronous cancellation and routed input policy. Core values stay SDL-free and RHI retains presentation/GPU lifetime. [Measured scope and qualification](ThirdPartyMigration.md#window-and-input). |
-| [AssetCooker](../Tools/Cooking/AssetCooker) | 29 | 1,365 | 28 | **BOUND + PROVE.** Catalog discovery, cook planning, family-tool dispatch, texture-request coordination, diagnostics and staged results; target: plan and dispatch through existing family owners. |
+| [TextureCooker](../Tools/Cooking/TextureCooker) | 30 | 1,814 | 32 | **KEEP + PROVE.** Source admission, DirectXTex adaptation, mip/format intent, requests, memory limits, worker COM lifetime and publication; target: upstream processing; accepted material/reference pixels. |
+| [Platform](../Engine/Platform) | 24 | 1,551 | 19 | **SDL3 INTEGRATION.** Current counts include conversion. SDL3 owns native window/input mechanics; Platform retains atomic drawable publication, synchronous cancellation and routed input policy. Core values stay SDL-free and RHI retains presentation/GPU lifetime. [Measured scope and qualification](ThirdPartyMigration.md#window-and-input). |
+| [AssetCooker](../Tools/Cooking/AssetCooker) | 29 | 1,366 | 29 | **BOUND + PROVE.** Catalog discovery, cook planning, family-tool dispatch, texture-request coordination, diagnostics and staged results; target: plan and dispatch through existing family owners. |
 | [ToolSupport](../Tools/Support/ToolSupport) | 18 | 1,201 | 9 | **KEEP / BOUND.** Shared catalog identity/containment, source/output paths, console output and producer/consumer progress protocol; target: one catalog, output-path and progress contract. |
-| [SceneCooker](../Tools/Cooking/SceneCooker) | 27 | 1,139 | 10 | **KEEP + PROVE.** Scene identity/manifests, instances, lights, cameras, animation, skeletons and generation publication; target: complete scene, skeleton and animation meaning. |
+| [SceneCooker](../Tools/Cooking/SceneCooker) | 29 | 1,282 | 11 | **KEEP + PROVE.** Scene identity/manifests, instances, lights, cameras, animation, skeletons and generation publication; target: complete scene, skeleton and animation meaning. |
 | [MaterialCooker](../Tools/Cooking/MaterialCooker) | 7 | 358 | 11 | **KEEP + PROVE.** Material/default interpretation, cooked records and texture-policy request generation; target: material intent and texture requests stay thin. |
 | [MeshCooker](../Tools/Cooking/MeshCooker) | 6 | 281 | 12 | **KEEP + PROVE.** Packed mesh construction and serialization of engine geometry contracts; target: packed geometry and admitted allocation contracts. |
 | [Showcase entry points](../Projects/Showcase) | 2 | 17 | 1 | **KEEP THIN.** Thin Game/Editor host composition; project conversion scripts and content are counted separately; target: entry points compose the product. |
-| [Shared CMake native glue](../CMake/Dependencies/Bindings/imgui) | 2 | 6 | 0 | **KEEP THIN.** Owned ImGui configuration/context integration; target: only required native upstream integration. |
+| [Shared CMake native glue](../CMake/Dependencies/Bindings) | 6 | 20 | 1 | **KEEP THIN.** First-party implementation carriers and ImGui configuration/context integration. Upstream implementation is compiled separately; these bindings stay counted. |
 
 ### Module breakdowns
 
@@ -287,25 +310,25 @@ Bar length measures **code lines**, with file counts beside each bar. Panels wit
 
 ### Shaders and automation
 
-These groups account for all **6,385 shader** and **6,076 automation** code lines. The two categories remain separate from native C++.
+These groups account for all **6,390 shader** and **7,137 automation** code lines. The two categories remain separate from native C++.
 
 | Source group | Files | Code lines | Maintained complexity |
 | --- | ---: | ---: | --- |
 | [Shader passes](../Engine/Assets/Shaders/Passes) | 66 | 3,008 | Lighting estimators, reservoirs, Reference transport, GBuffer, exposure and display passes |
 | [Shared ray tracing](../Engine/Assets/Shaders/RayTracing) | 27 | 1,354 | Intersection/hit behavior, material evaluation and traversal-facing data |
 | [Lighting](../Engine/Assets/Shaders/Lighting) and [BRDF](../Engine/Assets/Shaders/BRDF) | 18 | 1,115 | Sampling/evaluation/PDF agreement, units, energy and numerical assumptions |
-| Other shared shader code | 34 | 908 | Geometry, materials, resources, common mathematics and display contracts |
-| [Shared CMake and scripts](../CMake), including root CMake | 64 | 2,950 | Dependency pins/cache protection, profiles, artifact identity, staging, packaging, diagnostics and style tooling |
-| Module, tool and project automation | 54 | 3,089 | Target/backend composition, SDK discovery/deployment, shader registration, content acquisition and asset conversion |
+| Other shared shader code | 34 | 913 | Geometry, materials, resources, common mathematics and display contracts |
+| [Shared CMake and scripts](../CMake), including root CMake | 76 | 3,784 | Dependency pins/cache protection, profiles, artifact identity, staging, packaging, diagnostics and style tooling |
+| Module, tool and project automation | 56 | 3,316 | Target/backend composition, SDK discovery/deployment, shader registration, content acquisition and asset conversion |
 | [CI workflow](../.github/workflows/repository-checks.yml) | 1 | 37 | Candidate/tool reporting and whitespace checks |
 
-Automation comprises **3,921 CMake**, **1,531 PowerShell**, **543 Python**, **44 batch** and **37 YAML** lines. Within it, packaging owns 896 shared script lines and dependency acquisition 722. Showcase's 12 Python converters contain 543 lines; Launcher asset-pack acquisition contains 338 CMake lines. These are subsets, not additional code.
+Automation comprises **4,830 CMake**, **1,683 PowerShell**, **543 Python**, **44 batch** and **37 YAML** code lines. Shared recipes/cache/staging policy and module SDK/target composition remain first-party maintenance. These categories reconcile to 7,137 lines; dependency code is excluded.
 
 Build complexity also lives in the target graph: public/private dependencies, shared/static composition, backend selection, optional SDKs, generated shaders, DLL staging and source/prebuilt delivery. A source-line reduction can still increase compile time, dependencies or package size; those costs were not measured here.
 
 ### Content, configuration, dependencies and documentation
 
-The original inventory contains **2,616 tracked files**, including **53 data/notice/configuration texts**, **25 Markdown files**, one upstream header and **115 binary/other files**, beyond the 2,422 owned source files.
+The assessed snapshot contains **2,653 tracked paths**, with **four tracked deletions** absent from the checkout. Its **2,649 present files** comprise **2,429 owned source files**, **60 data/notice/configuration texts**, **26 Markdown files**, **three excluded checked-in upstream texts** and **131 binary/other files**. Deleted paths are excluded from source counts; ignored outputs/dependencies are outside this inventory.
 
 | Surface | Complexity to account for |
 | --- | --- |
@@ -314,18 +337,18 @@ The original inventory contains **2,616 tracked files**, including **53 data/not
 | [Dependency recipes](../CMake/Dependencies/Targets) and SDK integration | Distinguishable vendor source, first-party bindings and native adapters; versions/options/transitives, build reuse, runtime binaries, notices and offline use. Counts cover maintained integration and policy; upstream implementation and its build/delivery costs remain separate. See the [boundary review](#third-party-separation-and-build-reuse). |
 | [Documentation](README.md) and [active plans](Implementation) | One owner per decision; consistency between advertised capabilities, source, acceptance status and reproduction instructions. Avoid copying migration decisions into this study. |
 
-At the original snapshot, tracked checkout files occupied about **398 MiB**, dominated by assets; four EXRs alone accounted for about 336 MiB. The inventory predates this report and its figures. Storage footprint is distinct from code complexity; ignored build outputs, fetched upstream trees, generated products and Git object storage are outside it.
+At the assessed snapshot, tracked checkout files occupy about **398.5 MiB**, dominated by assets. Storage is distinct from code complexity; ignored build outputs, fetched upstream trees, generated products and Git object storage are outside it.
 
 ## Complexity signals
 
 | Dimension | Measured signal | Interpretation |
 | --- | --- | --- |
-| File structure | Median native file **34 lines**; **742 files (34.4%)** at most 20; only three above 500 | Investigate navigation and changes spanning many small files before imposing file-size limits. |
-| Function shape | **7,400** detected functions; median **9 non-comment lines**; eight exceed 100 | Large functions are uncommon; complexity can reside in distributed state and orchestration. |
-| Decisions | **70 functions (0.95%)** have estimated cyclomatic complexity above 15; four exceed 30 | Review selected functions in context. Enum switches and compile-time bindings have different runtime behavior and maintenance costs. The cutoff of 15 is a study review signal, not a project acceptance threshold. |
-| Public surface | **275 files / 10,103 lines**, or **7.3%** of native source | Much complexity is private. Review the meaning and consumer reach of contracts as well as their size. |
-| Dependency reach | Incoming native owners: Core **16**, ToolSupport **8**, Tasks **7**, RHI **6**, GameFramework **6** | Foundation and runtime replacements affect more code than their own directories. These are resolved textual includes, not a semantic call or build graph. |
-| Change activity | **291 non-merge commits** in the window; **47** touch more than 100 paths | Owner commit counts overlap. Moves and broad refactors bias attention estimates; they do not measure hours or defects. |
+| File structure | Median native file **33 code lines**; **744 files (34.6%)** at most 20; 2 above 500 | Small files can be valid shader/ABI boundaries. Investigate change spread and duplicate state rather than imposing file-size quotas. |
+| Function shape | **7,283** detected functions; median **9 non-comment lines**; 9 exceed 100 | Distributed state and orchestration still need workflow review. |
+| Decisions | **79 functions (1.08%)** have estimated complexity above 15; 4 exceed 30 | A lexical review signal, not a defect or acceptance score. Enum switches and compile-time bindings need context. |
+| Public surface | **276 files / 10,015 code lines**, or **7.3%** of native source | Review meaning, consumer reach and necessary module boundaries. |
+| Dependency reach | Incoming native owners: Core **16**, ToolSupport **8**, Tasks **6**, RHI **6**, GameFramework **6** | Resolved textual includes, not a semantic call/build graph; replacements reach beyond their own directories. |
+| Change activity | **298 non-merge commits** in the window; **49** touch more than 100 paths | Owner counts overlap; moves/refactors bias attention estimates and do not measure hours. |
 
 Renderer's pass area deliberately exposes individual shaders and pass construction: **123 of 197 files** have at most 20 code lines. [Direct-light setup](../Engine/Renderer/Private/Passes/Lighting/Direct) uses **17 native files / 365 lines**. These counts do not establish harmful fragmentation or justify merging pass families. Review actual duplicate policy, unnecessary work and binding/lifetime defects while preserving the [shader pass pattern](CodeStyle.md#runtime-cvars-and-shader-rules).
 
@@ -337,9 +360,9 @@ Selected files combine substantial size with repeated changes in the study windo
 
 | File | Code lines | Revisions | Investigate |
 | --- | ---: | ---: | --- |
-| [VulkanGpuMemoryAllocator.cpp](../Engine/RHI/Private/Vulkan/Memory/VulkanGpuMemoryAllocator.cpp) | 881 | 13 | Records, delayed destruction, recording resources and memory reporting around VMA |
-| [FramePipeline.cpp](../Engine/Renderer/Private/Frame/FramePipeline.cpp) | 249 | 32 | Frame preparation, recording, submission and retirement |
-| [LauncherActivityPanel.cpp](../Tools/Launcher/SparkleLauncher/Private/Gui/Shell/LauncherActivityPanel.cpp) | 534 | 13 | Operation presentation and output state |
+| [VulkanGpuMemoryAllocator.cpp](../Engine/RHI/Private/Vulkan/Memory/VulkanGpuMemoryAllocator.cpp) | 880 | 14 | Records, delayed destruction, recording resources and memory reporting around VMA |
+| [FramePipeline.cpp](../Engine/Renderer/Private/Frame/FramePipeline.cpp) | 249 | 31 | Frame preparation, recording, submission and retirement |
+| [LauncherActivityPanel.cpp](../Tools/Launcher/SparkleLauncher/Private/Gui/Shell/LauncherActivityPanel.cpp) | 473 | 14 | Operation presentation and output state |
 | [LauncherMainWindow.cpp](../Tools/Launcher/SparkleLauncher/Private/Gui/Shell/LauncherMainWindow.cpp) | 463 | 14 | Shell coordination and ownership of UI state |
 | [VulkanDescriptorService.cpp](../Engine/RHI/Private/Vulkan/Descriptors/VulkanDescriptorService.cpp) | 494 | 12 | Descriptor allocation, binding and lifetime |
 | [BuildWorkspacePlanner.cpp](../Tools/Launcher/SparkleLauncher/Private/Build/BuildWorkspacePlanner.cpp) | 309 | 19 | Readiness, planning and execution authority |
@@ -512,7 +535,7 @@ The [Activity panel](../Tools/Launcher/SparkleLauncher/Private/Gui/Shell/Launche
 
 [ShaderSourcePreprocessor](../Tools/Shaders/ShaderCompiler/Private/Compiler/ShaderSourcePreprocessor.cpp) expands includes during [job construction](../Tools/Shaders/ShaderCompiler/Private/Cooking/Planning/ShaderCompileJobBuilder.cpp), before the [DXC/Slang invocation](../Tools/Shaders/ShaderCompiler/Private/Cooking/Compilation/ShaderMake/ShaderMakeBatch.cpp). Its regex-based expansion does not implement compiler conditional evaluation. An include inside a disabled conditional can therefore reach the custom expansion path before the compiler decides it is inactive. No current failing shader was demonstrated.
 
-**Replace:** use compiler preprocessing/include facilities directly. Keep virtual roots, generated typed parameters, dependency/debug source identity and staged accepted-output publication in their existing owners. Retire the replaced two-file preprocessor rather than rebuilding a parser adapter framework. Its **161 code / 190 physical lines** are a gross scope, not a net saving after compiler integration.
+**Replace:** use compiler preprocessing/include facilities directly. Keep virtual roots, generated typed parameters, dependency/debug source identity and staged accepted-output publication in their existing owners. Retire the replaced two-file preprocessor rather than rebuilding a parser adapter framework. Its current **221 code / 253 physical lines** (originally 161 / 190) are a gross scope, not a net saving after compiler integration.
 
 **Check:** conditional/macro includes, repeated includes, virtual paths, exact debug source identity and failed compilation through real DXIL/SPIR-V compilation and reload. Preserve reflection/layout and active shaders on failure. [ThirdPartyMigration](ThirdPartyMigration.md#native-removal-estimates) remains the decision owner.
 
@@ -583,7 +606,7 @@ The measured Falcor revision [skips graph compilation when its recompile flag is
 | Raw Reference output | [Coordinator](../Engine/Application/Private/Editor/ReferencePathTracer/ReferencePathTracerArtifactCoordinator.cpp) checks immutable sample prefixes; [encoding](../Engine/Application/Private/Editor/ReferencePathTracer/ReferencePathTracerArtifactEncoding.cpp) writes scene-linear EXR and identified manifests using existing TinyEXR support. | Raw export is implemented. Finish correctness/reproduction qualification instead of adding another exporter. Implementation does not certify unbiased pixels. |
 | Package identity | [Prepared inputs](../CMake/Packaging/Payload/PreparedProducts.ps1) check binary/symbol identity; [stage validation](../CMake/Packaging/Publication/PackageStage.ps1) verifies hashes, membership and stored manifest. | Preserve identified offline products. Source checks do not establish clean-machine package acceptance. |
 | Artifact path composition | [Launcher paths](../Tools/Launcher/SparkleLauncher/Private/Workspace/LauncherProductPaths.cpp) reuse [ToolOutputPaths](../Tools/Support/ToolSupport/Private/ToolOutputPaths.cpp); [CMake layout](../CMake/Artifacts/WorkspaceLayout.cmake) enforces build/variant placement. | Multiple language representations alone do not prove competing authority. Share declarations only if the full integration is smaller and clearer. |
-| Module direction | Frozen lexical scan: no Renderer/RHI includes from GameFramework, no Renderer-module includes from RHI and no private includes in 275 public headers. | Preserve those directions; lexical success does not prove semantic/DLL/build correctness. |
+| Module direction | Frozen lexical scan: no Renderer/RHI includes from GameFramework, no Renderer-module includes from RHI and no private includes in 275 public headers at the earlier review. | Preserve those directions; lexical success does not prove semantic/DLL/build correctness. |
 
 The pinned [NVRHI resource guide](https://github.com/NVIDIA-RTX/NVRHI/blob/6b96fb03e07539f08327aea76c56d55f1de9d906/doc/ProgrammingGuide.md#bindless-resources) explicitly leaves descriptor-table resource lifetime and synchronization to the application. This supports retaining explicit ownership around bindless resources; adopting an upstream component does not eliminate that responsibility.
 
@@ -595,14 +618,20 @@ For each chosen change, record its consumer, owner, invariant, lifetime/failure 
 
 ## Measurement basis
 
-The study used [cloc 2.06](https://github.com/AlDanial/cloc/tree/v2.06), [Lizard 1.17.31](https://github.com/terryyin/lizard), Git history and lexical include analysis. A fresh count reproduced all native/shader/automation per-file counts, detected-function metrics and 90-day history values. All 27 chart partitions reconcile with the per-file source records. The [migration guide](ThirdPartyMigration.md#native-removal-estimates) separately counts and qualifies physical-line retirement proposals; those scopes are smaller than the owner totals here.
+The refreshed source inventory was frozen at **18:05:13 UTC / 19:05 Warsaw on 22 November 2026**, revision `d5bf01d53791407de8bf691a8bf54cb404c69226` plus its recorded local changes. The [refresh evidence](../artifacts/analysis/footprint-refresh-20261122) retains source bytes/hashes, a separate commit-only reconciliation, cloc/Lizard outputs, per-file/module tables, pending-scope checks and chart data. Source files were counted from that snapshot rather than a moving worktree; later edits/commits are outside its figures.
 
-The [peer comparison](#measured-peer-proportions) separately counts 12 pinned public repositories using cloc and reviewed file assignments. Its [published CSV](Images/RepositoryFootprint/peer-proportions.csv) carries exact category code/physical/file totals; the local ignored [peer evidence](../artifacts/analysis/peers-20261121) retains source snapshots, Git/blob identities, exclusions, per-file classification and acquisition/measurement scripts. Observed ranges, proposed code checkpoints and proposed effort allocations have different meanings. No peer LOC ratio establishes hiring readiness, quality, optimal complexity or Sparkle acceptance.
+Comparison uses the [original 21 November inventory](../artifacts/analysis/repository-footprint-2026-11-21), **150,112 code lines / 175,517 physical lines / 2,422 files**, captured at 11:21:18 UTC against `719f89ec1` plus its recorded edits. Native C/C++ then had 137,651 code / 160,925 physical lines in 2,158 files. The migration scope audit's separate native baseline is four Launcher lines larger; neither baseline is silently rewritten.
 
-**Structural source review:** 21 November 2026, HEAD `719f89ec1b52968abaa139b8b9b70867b90df254` plus preserved dirty-worktree files. The ignored [deep-scan evidence](../artifacts/analysis/deep-structure-20261121) stores 87 source/config snapshots and source-claim checks; combined with the preceding 34-file review, these cover 116 unique paths. Some files were inspected in selected ranges, with inspected-range records where available. This adds workflow depth to the [complete owner inventory](#code-distribution); it is not a semantic audit of every function. Source findings and inventory counts retain their separate snapshots.
+The same **cloc 2.06**, uniqueness policy, source extensions and ownership rules are used on both sides. Code excludes blank/comment-only lines; physical includes them. Sparkle-owned bindings remain native source even outside Engine/Tools. Checked-in upstream D3DX12 and fetched/generated implementations are excluded on both sides. Moving vendor bytes or relocating a first-party mechanism earns no removal credit. The five responsibility groups and all component chart partitions reconcile to per-file records.
 
-History excludes merges and paths absent from the snapshot; rename identities were not followed. Function complexity is a lexical estimate, not compiler control flow. Duplicate-code volume, cognitive complexity, development time, defect incidence, runtime contention, build cost and GPU performance were not measured. No engine code was changed, built or run for this study; no GUI, GPU, interruption, package or release qualification was performed. Runtime and delivery acceptance remain in their owning guides.
+There are **five maintained patch files / 373 physical patch lines**, containing **107 added and 26 removed upstream source lines**. Patch-file context is not native code or an additional net saving. ShaderMake's 54 changed-source-line correction and Slang's three-line debug-format correction are separately charged in their delivery evidence; the native 374-line result is not an all-infrastructure saving.
 
-The method combines [separate maintainability measures](https://www.softwareimprovementgroup.com/wp-content/uploads/APracticalModelForMeasuringMaintainability.pdf), [function decision complexity](https://www.nist.gov/publications/structured-testing-testing-methodology-using-cyclomatic-complexity-metric), [relative code churn](https://www.microsoft.com/en-us/research/publication/use-of-relative-code-churn-measures-to-predict-system-defect-density/) and [size/change hotspots](https://docs.enterprise.codescene.io/versions/2.6.6/guides/technical/hotspots.html). These sources inform metric selection; no published rating or defect-prediction model was reproduced.
+The [peer CSV](Images/RepositoryFootprint/peer-proportions.csv) and diagrams refresh Sparkle only. The 12 public repository revisions, classifications, exclusions and alternative framework views remain the [pinned 21 November study](../artifacts/analysis/peers-20261121). They were not reacquired or built for this update. New percentages do not establish optimal size, quality, capability parity or hiring readiness.
 
-Original evidence and fact-check results remain in the local ignored [analysis folder](../artifacts/analysis/repository-footprint-2026-11-21). Pinned upstream files, source hashes and the qualitative owner targets remain under `goal-delta/`; the disjoint responsibility groups and proposed effort allocations are under `principal-alignment/`. The full 57-file migration scope manifest remains under `cut-targets/`; the corrected unchanged-graphics scenario and fact checks are under `build/validation/docs-full-fact-check-20261121/`. The Sparkle source inventory was captured at **11:21:18 UTC on 21 November**. Later concurrent JSON/GPU/tooling changes are excluded from the frozen figures; changed paths and observed hashes are recorded in the [peer evidence](../artifacts/analysis/peers-20261121). The role mapping uses the dated archive in References; the linked principal vacancy returned no readable description during that check, so its current status and qualifications were not reverified. This source study did not build or qualify the upstream repositories.
+Lizard 1.17.31 function metrics and lexical includes were rerun. History now covers **25 August-22 November**, non-merge commits reaching the frozen revision and current paths; renames are not followed. This window is not identical to the old one, so churn differences are not integration savings. Decision counts are lexical estimates, not compiler control flow. Duplicate-code volume, cognitive complexity, development time, defect incidence, runtime/build/GPU cost were not measured.
+
+The earlier [structural source review](../artifacts/analysis/deep-structure-20261121) covered 116 unique paths across two passes, some in selected ranges, at its own hashes. Its source hypotheses remain separate from this size refresh. Known retired compiler paths/estimates have been updated, but this is not a fresh semantic audit or requalification of every finding.
+
+The method draws on [separate maintainability measures](https://www.softwareimprovementgroup.com/wp-content/uploads/APracticalModelForMeasuringMaintainability.pdf), [function decision complexity](https://www.nist.gov/publications/structured-testing-testing-methodology-using-cyclomatic-complexity-metric), [relative code churn](https://www.microsoft.com/en-us/research/publication/use-of-relative-code-churn-measures-to-predict-system-defect-density/) and [size/change hotspots](https://docs.enterprise.codescene.io/versions/2.6.6/guides/technical/hotspots.html). No published rating or defect-prediction model was reproduced. Role claims retain References' dated archive; current vacancy status was not reverified.
+
+No engine code was changed, built or run for this documentation update. Earlier migration reports keep their own source/product identities, executed checks and failed/unverified cells. This recount does not promote them to GUI, GPU, interruption, package, clean-machine or release acceptance.

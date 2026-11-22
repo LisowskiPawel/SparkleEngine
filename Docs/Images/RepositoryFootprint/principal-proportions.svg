@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns2="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" width="1065.6pt" height="604.8pt" viewBox="0 0 1065.6 604.8" version="1.1" role="img" aria-labelledby="principal-proportions-title principal-proportions-description">
- <title id="principal-proportions-title">Measured source proportions and proposed principal-role engineering focus</title><desc id="principal-proportions-description">The five code groups sum to 150112 code lines: graphics 47.3 percent, hosts 22.0, content/world 13.9, foundations 8.0 and tooling/automation 8.8. A separate effort proposal allocates release closeout 50 percent graphics, zero new model implementation, 30 evidence and 20 support. After release and classical prerequisites it proposes 40 graphics, 25 model, 25 evidence and 10 support. These effort targets are recommendations, not NVIDIA requirements or target code ratios.</desc><title>Measured source proportions and proposed principal-role engineering focus</title>
+ <title id="principal-proportions-title">Measured source proportions and proposed principal-role engineering focus</title><desc id="principal-proportions-description">The five code groups sum to 150211 code lines: graphics 46.8 percent, hosts 22.0, content/world 13.9, foundations 7.9 and tooling/automation 9.3. A separate effort proposal allocates release closeout 50 percent graphics, zero new model implementation, 30 evidence and 20 support. After release and classical prerequisites it proposes 40 graphics, 25 model, 25 evidence and 10 support. These effort targets are recommendations, not NVIDIA requirements or target code ratios.</desc><title>Measured source proportions and proposed principal-role engineering focus</title>
  <metadata>
   <rdf:RDF>
    <ns2:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
     <dc:title>Measured source proportions and proposed principal-role engineering focus</dc:title>
-    <dc:description>The five code groups sum to 150112 code lines: graphics 47.3 percent, hosts 22.0, content/world 13.9, foundations 8.0 and tooling/automation 8.8. A separate effort proposal allocates release closeout 50 percent graphics, zero new model implementation, 30 evidence and 20 support. After release and classical prerequisites it proposes 40 graphics, 25 model, 25 evidence and 10 support. These effort targets are recommendations, not NVIDIA requirements or target code ratios.</dc:description>
+    <dc:description>The five code groups sum to 150211 code lines: graphics 46.8 percent, hosts 22.0, content/world 13.9, foundations 7.9 and tooling/automation 9.3. A separate effort proposal allocates release closeout 50 percent graphics, zero new model implementation, 30 evidence and 20 support. After release and classical prerequisites it proposes 40 graphics, 25 model, 25 evidence and 10 support. These effort targets are recommendations, not NVIDIA requirements or target code ratios.</dc:description>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <ns2:Agent>
@@ -28,19 +28,19 @@
     <path d="M 21.312 269.136  L 1044.288 269.136  L 1044.288 84.672  L 21.312 84.672  z " clip-path="url(#pe87542b3ef)" style="fill: #f2f5f9" />
    </g>
    <g id="patch_3">
-    <path d="M 42.624 172.368  L 506.422084 172.368  L 506.422084 131.2416  L 42.624 131.2416  z " clip-path="url(#pe87542b3ef)" style="fill: #24679a; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter" />
+    <path d="M 42.624 172.368  L 501.280271 172.368  L 501.280271 131.2416  L 42.624 131.2416  z " clip-path="url(#pe87542b3ef)" style="fill: #24679a; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter" />
    </g>
    <g id="patch_4">
-    <path d="M 506.422084 172.368  L 721.997382 172.368  L 721.997382 131.2416  L 506.422084 131.2416  z " clip-path="url(#pe87542b3ef)" style="fill: #536f95; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter" />
+    <path d="M 501.280271 172.368  L 717.202977 172.368  L 717.202977 131.2416  L 501.280271 131.2416  z " clip-path="url(#pe87542b3ef)" style="fill: #536f95; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter" />
    </g>
    <g id="patch_5">
-    <path d="M 721.997382 172.368  L 858.615264 172.368  L 858.615264 131.2416  L 721.997382 131.2416  z " clip-path="url(#pe87542b3ef)" style="fill: #318475; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter" />
+    <path d="M 717.202977 172.368  L 853.946192 172.368  L 853.946192 131.2416  L 717.202977 131.2416  z " clip-path="url(#pe87542b3ef)" style="fill: #318475; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter" />
    </g>
    <g id="patch_6">
-    <path d="M 858.615264 172.368  L 936.873884 172.368  L 936.873884 131.2416  L 858.615264 131.2416  z " clip-path="url(#pe87542b3ef)" style="fill: #a56b20; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter" />
+    <path d="M 853.946192 172.368  L 931.794277 172.368  L 931.794277 131.2416  L 853.946192 131.2416  z " clip-path="url(#pe87542b3ef)" style="fill: #a56b20; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter" />
    </g>
    <g id="patch_7">
-    <path d="M 936.873884 172.368  L 1022.976 172.368  L 1022.976 131.2416  L 936.873884 131.2416  z " clip-path="url(#pe87542b3ef)" style="fill: #7959a1; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter" />
+    <path d="M 931.794277 172.368  L 1022.976 172.368  L 1022.976 131.2416  L 931.794277 131.2416  z " clip-path="url(#pe87542b3ef)" style="fill: #7959a1; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter" />
    </g>
    <g id="patch_8">
     <path d="M 42.624 205.0272  L 55.4112 205.0272  L 55.4112 195.3504  L 42.624 195.3504  z " clip-path="url(#pe87542b3ef)" style="fill: #24679a" />
@@ -100,37 +100,37 @@
     <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="42.624" y="109.15125" transform="rotate(-0 42.624 109.15125)">MEASURED CODE FOOTPRINT</text>
    </g>
    <g id="text_4">
-    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #516278" x="1022.976" y="109.010625" transform="rotate(-0 1022.976 109.010625)">150,112 code lines  |  2,422 files</text>
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #516278" x="1022.976" y="109.010625" transform="rotate(-0 1022.976 109.010625)">150,211 code lines  |  2,429 files</text>
    </g>
    <g id="text_5">
-    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="274.523042" y="155.11605" transform="rotate(-0 274.523042 155.11605)">47.3%</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="271.952136" y="155.11605" transform="rotate(-0 271.952136 155.11605)">46.8%</text>
    </g>
    <g id="text_6">
-    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="614.209733" y="155.11605" transform="rotate(-0 614.209733 155.11605)">22.0%</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="609.241624" y="155.11605" transform="rotate(-0 609.241624 155.11605)">22.0%</text>
    </g>
    <g id="text_7">
-    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="790.306323" y="155.11605" transform="rotate(-0 790.306323 155.11605)">13.9%</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="785.574585" y="155.11605" transform="rotate(-0 785.574585 155.11605)">13.9%</text>
    </g>
    <g id="text_8">
-    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="897.744574" y="155.11605" transform="rotate(-0 897.744574 155.11605)">8.0%</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="892.870235" y="155.11605" transform="rotate(-0 892.870235 155.11605)">7.9%</text>
    </g>
    <g id="text_9">
-    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="979.924942" y="155.11605" transform="rotate(-0 979.924942 155.11605)">8.8%</text>
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="977.385139" y="155.11605" transform="rotate(-0 977.385139 155.11605)">9.3%</text>
    </g>
    <g id="text_10">
-    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="65.0016" y="203.095206" transform="rotate(-0 65.0016 203.095206)">Graphics systems and shaders  |  71,017 lines</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="65.0016" y="203.095206" transform="rotate(-0 65.0016 203.095206)">Graphics systems and shaders  |  70,276 lines</text>
    </g>
    <g id="text_11">
-    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="576.4896" y="203.095206" transform="rotate(-0 576.4896 203.095206)">Hosts and interaction  |  33,009 lines</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="576.4896" y="203.095206" transform="rotate(-0 576.4896 203.095206)">Hosts and interaction  |  33,084 lines</text>
    </g>
    <g id="text_12">
-    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="65.0016" y="227.892006" transform="rotate(-0 65.0016 227.892006)">Content and world  |  20,919 lines</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="65.0016" y="227.892006" transform="rotate(-0 65.0016 227.892006)">Content and world  |  20,952 lines</text>
    </g>
    <g id="text_13">
-    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="576.4896" y="227.892006" transform="rotate(-0 576.4896 227.892006)">Shared foundations  |  11,983 lines</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="576.4896" y="227.892006" transform="rotate(-0 576.4896 227.892006)">Shared foundations  |  11,928 lines</text>
    </g>
    <g id="text_14">
-    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="65.0016" y="252.688806" transform="rotate(-0 65.0016 252.688806)">Shader tooling and automation  |  13,184 lines</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="65.0016" y="252.688806" transform="rotate(-0 65.0016 252.688806)">Shader tooling and automation  |  13,971 lines</text>
    </g>
    <g id="text_15">
     <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #21324b" x="42.624" y="300.87285" transform="rotate(-0 42.624 300.87285)">PROPOSED ENGINEERING EFFORT</text>
@@ -190,7 +190,7 @@
     <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #516278" x="42.624" y="558.241713" transform="rotate(-0 42.624 558.241713)">Keep required graphics and support contracts. Reduce maintained mechanisms; finish verified, usable results.</text>
    </g>
    <g id="text_34">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #516278" x="42.624" y="577.924175" transform="rotate(-0 42.624 577.924175)">Source: 21 Nov 2026 snapshot. Effort mix is a proposal; existing release and migration gates govern delivery.</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #516278" x="42.624" y="577.924175" transform="rotate(-0 42.624 577.924175)">Source: 22 Nov 2026 snapshot. Effort mix is a proposal; existing release and migration gates govern delivery.</text>
    </g>
   </g>
  </g>

@@ -34,13 +34,7 @@ private:
 	    std::uint32_t primitiveIndex,
 	    std::string_view primitiveLabel,
 	    ImportedScene& importedScene);
-	static void ValidateDeformation(
-	    const ImportedMeshGeometry& geometry,
-	    const cgltf_primitive& primitive,
-	    ImportedSkeletonIndex skeletonIndex,
-	    std::string_view primitiveLabel,
-	    const ImportedScene& scene);
-	static std::vector<float> BuildMorphWeights(const NodeImportContext& context, const ImportedMeshGeometry& geometry, std::string_view primitiveLabel);
+	static void ValidateDeformation(const ImportedMeshGeometry& geometry, ImportedSkeletonIndex skeletonIndex, std::string_view primitiveLabel, const ImportedScene& scene);
 	static void AppendInstances(
 	    const NodeImportContext& context,
 	    ImportedMeshPrimitiveIndex primitiveIndex,

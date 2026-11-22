@@ -48,24 +48,6 @@ namespace GltfAnimationImporter
 		return 4u;
 	}
 
-	static std::uint32_t FindSamplerIndex(const cgltf_animation& animation, const cgltf_animation_sampler* sampler) noexcept
-	{
-		if (sampler == nullptr)
-		{
-			return (std::numeric_limits<std::uint32_t>::max)();
-		}
-
-		for (cgltf_size samplerIndex = 0; samplerIndex < animation.samplers_count; ++samplerIndex)
-		{
-			if (&animation.samplers[samplerIndex] == sampler)
-			{
-				return static_cast<std::uint32_t>(samplerIndex);
-			}
-		}
-
-		return (std::numeric_limits<std::uint32_t>::max)();
-	}
-
 	static ImportedSkeletonIndex FindSkeletonForSkin(const ImportedScene& importedScene, const cgltf_data& data, const cgltf_skin* skin) noexcept
 	{
 		if (skin == nullptr)
@@ -98,11 +80,11 @@ namespace GltfAnimationImporter
 	    ImportedAnimationClip& clip)
 	{
 		const ImportedAnimationTargetPath targetPath = ToImportedTargetPath(channel.target_path);
-		const std::uint32_t samplerIndex = FindSamplerIndex(animation, channel.sampler);
-		const bool bInvalidAnimationChannelSamplers = targetPath == ImportedAnimationTargetPath::Unknown || samplerIndex >= clip.samplers.size();
-		const bool bInvalidAnimationChannel = bInvalidAnimationChannelSamplers || (channel.target_node == nullptr);
+		const cgltf_size samplerIndex = channel.sampler != nullptr ? cgltf_animation_sampler_index(&animation, channel.sampler) : animation.samplers_count;
+		const bool bInvalidSampler = samplerIndex >= clip.samplers.size() || samplerIndex > (std::numeric_limits<std::uint32_t>::max)();
+		const bool bInvalidTarget = targetPath == ImportedAnimationTargetPath::Unknown || channel.target_node == nullptr;
 
-		if (bInvalidAnimationChannel)
+		if (bInvalidSampler || bInvalidTarget)
 		{
 			throw Diagnostics::Error(std::format("glTF animation channel {} has an invalid target or sampler.", channelIndex));
 		}
@@ -145,7 +127,8 @@ namespace GltfAnimationImporter
 			throw Diagnostics::Error(std::format("glTF animation channel {} duplicates an existing target path.", channelIndex));
 		}
 
-		clip.channels.push_back(ImportedAnimationChannel{.targetPath = targetPath, .targetNodeIndex = targetNodeIndex, .targetJointIndex = targetJointIndex, .samplerIndex = samplerIndex});
+		clip.channels.push_back(
+		    ImportedAnimationChannel{.targetPath = targetPath, .targetNodeIndex = targetNodeIndex, .targetJointIndex = targetJointIndex, .samplerIndex = static_cast<std::uint32_t>(samplerIndex)});
 	}
 }
 

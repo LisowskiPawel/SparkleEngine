@@ -293,7 +293,8 @@ void AssimpSkinImporter::CollectSkinWeights(const aiMesh& mesh, const ImportedSk
 		for (unsigned int weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex)
 		{
 			const aiVertexWeight& sourceWeight = bone->mWeights[weightIndex];
-			if (sourceWeight.mVertexId >= mesh.mNumVertices || sourceWeight.mWeight < 0.0f)
+			const bool bWeightInvalid = !std::isfinite(sourceWeight.mWeight) || sourceWeight.mWeight < 0.0f;
+			if (sourceWeight.mVertexId >= mesh.mNumVertices || bWeightInvalid)
 			{
 				throw Diagnostics::Error(std::format("FBX mesh '{}' has an invalid weight for bone '{}'.", FbxSkinTranslation::MeshName(mesh), bone->mName.C_Str()));
 			}
@@ -322,9 +323,9 @@ void AssimpSkinImporter::WriteSkinInfluences(const aiMesh& mesh, ImportedMeshGeo
 		{
 			weightSum += weight.second;
 		}
-		if (weightSum <= 1.0e-8f)
+		if (!std::isfinite(weightSum) || weightSum <= 1.0e-8f)
 		{
-			throw Diagnostics::Error(std::format("FBX mesh '{}' vertex {} has zero total skin weight.", FbxSkinTranslation::MeshName(mesh), vertexIndex));
+			throw Diagnostics::Error(std::format("FBX mesh '{}' vertex {} has an invalid total skin weight.", FbxSkinTranslation::MeshName(mesh), vertexIndex));
 		}
 
 		ImportedSkinInfluence& influence = geometry.deformation.skinInfluences[vertexIndex];

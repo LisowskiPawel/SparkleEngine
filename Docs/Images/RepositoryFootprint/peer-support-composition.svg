@@ -25,16 +25,16 @@
   </g>
   <g id="axes_1">
    <g id="patch_2">
-    <path d="M 205.128 133.956  L 576.321996 133.956  L 576.321996 103.212  L 205.128 103.212  z " clip-path="url(#p0a3440c4c1)" style="fill: #89729b; stroke: #ffffff; stroke-linejoin: miter" />
+    <path d="M 205.128 133.956  L 577.165388 133.956  L 577.165388 103.212  L 205.128 103.212  z " clip-path="url(#p0a3440c4c1)" style="fill: #89729b; stroke: #ffffff; stroke-linejoin: miter" />
    </g>
    <g id="patch_3">
-    <path d="M 576.321996 133.956  L 768.750475 133.956  L 768.750475 103.212  L 576.321996 103.212  z " clip-path="url(#p0a3440c4c1)" style="fill: #b08334; stroke: #ffffff; stroke-linejoin: miter" />
+    <path d="M 577.165388 133.956  L 767.828365 133.956  L 767.828365 103.212  L 577.165388 103.212  z " clip-path="url(#p0a3440c4c1)" style="fill: #b08334; stroke: #ffffff; stroke-linejoin: miter" />
    </g>
    <g id="patch_4">
-    <path d="M 768.750475 133.956  L 837.076529 133.956  L 837.076529 103.212  L 768.750475 103.212  z " clip-path="url(#p0a3440c4c1)" style="fill: #2875a8; stroke: #ffffff; stroke-linejoin: miter" />
+    <path d="M 767.828365 133.956  L 848.085615 133.956  L 848.085615 103.212  L 767.828365 103.212  z " clip-path="url(#p0a3440c4c1)" style="fill: #2875a8; stroke: #ffffff; stroke-linejoin: miter" />
    </g>
    <g id="patch_5">
-    <path d="M 837.076529 133.956  L 837.144 133.956  L 837.144 103.212  L 837.076529 103.212  z " clip-path="url(#p0a3440c4c1)" style="fill: #718293; stroke: #ffffff; stroke-linejoin: miter" />
+    <path d="M 848.085615 133.956  L 848.310519 133.956  L 848.310519 103.212  L 848.085615 103.212  z " clip-path="url(#p0a3440c4c1)" style="fill: #718293; stroke: #ffffff; stroke-linejoin: miter" />
    </g>
    <g id="patch_6">
     <path d="M 205.128 195.444  L 295.326038 195.444  L 295.326038 164.7  L 205.128 164.7  z " clip-path="url(#p0a3440c4c1)" style="fill: #89729b; stroke: #ffffff; stroke-linejoin: miter" />
@@ -97,19 +97,19 @@
     <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #24344a" x="33.264" y="121.89525" transform="rotate(-0 33.264 121.89525)">SparkleEngine</text>
    </g>
    <g id="text_4">
-    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="390.724998" y="121.343375" transform="rotate(-0 390.724998 121.343375)">33,009</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="391.146694" y="121.343375" transform="rotate(-0 391.146694 121.343375)">33,084</text>
    </g>
    <g id="text_5">
-    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="672.536235" y="121.343375" transform="rotate(-0 672.536235 121.343375)">17,112</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="672.496877" y="121.343375" transform="rotate(-0 672.496877 121.343375)">16,955</text>
    </g>
    <g id="text_6">
-    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="802.913502" y="121.343375" transform="rotate(-0 802.913502 121.343375)">6,076</text>
+    <text style="font-weight: 700; font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="807.95699" y="121.343375" transform="rotate(-0 807.95699 121.343375)">7,137</text>
    </g>
    <g id="text_7">
-    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #24344a" x="953.568" y="116.18565" transform="rotate(-0 953.568 116.18565)">56,203 lines</text>
+    <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #24344a" x="953.568" y="116.18565" transform="rotate(-0 953.568 116.18565)">57,196 lines</text>
    </g>
    <g id="text_8">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #526176" x="953.568" y="131.444975" transform="rotate(-0 953.568 131.444975)">37.4% of own source</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #526176" x="953.568" y="131.444975" transform="rotate(-0 953.568 131.444975)">38.1% of own source</text>
    </g>
    <g id="text_9">
     <text style="font-weight: 500; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #24344a" x="33.264" y="183.38325" transform="rotate(-0 33.264 183.38325)">Falcor</text>
