@@ -77,7 +77,7 @@ void PrepareRenderSceneRanges(enkiTaskScheduler* scheduler, RenderScenePreparati
 	const std::array thresholds{128u, 64u, 64u, 32u};
 	const std::array grains{64u, 16u, 16u, 16u};
 	const std::array maximumPartitions{8u, 8u, 8u, 4u};
-	auto destroy = [scheduler = scheduler](enkiTaskSet* task)
+	auto destroy = [scheduler](enkiTaskSet* task)
 	{
 		enkiDeleteTaskSet(scheduler, task);
 	};

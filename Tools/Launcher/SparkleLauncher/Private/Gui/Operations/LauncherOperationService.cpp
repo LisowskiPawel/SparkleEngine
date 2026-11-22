@@ -12,7 +12,6 @@
 #include <mutex>
 #include <new>
 #include <optional>
-#include <variant>
 #include <stop_token>
 #include <stdexcept>
 #include <utility>

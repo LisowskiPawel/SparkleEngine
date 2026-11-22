@@ -5,7 +5,6 @@
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
   #include "Diagnostics/GpuCrash/GpuCrashIncidentSink.h"
 #endif
-#include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Console/CVar.h"
 #include "GameFramework/Public/Rendering/RenderFrameSubmission.h"
 #include "GameFramework/Public/Rendering/RenderViewCameraData.h"
@@ -20,7 +19,6 @@
 #include "Window/Window.h"
 #include "World/GameWorld.h"
 
-#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <utility>

@@ -20,8 +20,6 @@ namespace Assets
 		LevelLoadOperationStage Stage = LevelLoadOperationStage::Idle;
 		std::string Diagnostic;
 	};
-	struct SceneLoadWorkState;
-
 	class SceneLoadExecutor final
 	{
 	public:
