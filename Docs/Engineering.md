@@ -76,7 +76,7 @@ Put stable contracts in `Public` and implementation in `Private`. New public API
 
 Core is the base dependency. GameFramework does not depend on Renderer or RHI; RHI does not depend on Renderer. Native types remain inside the backend or an explicit interop interface. Dependencies follow actual public use, not convenient transitive includes.
 
-Use the [integration contract](ThirdPartyMigration.md#ownership-and-dependency-workflow) and [dependency navigation](../ThirdParty/README.md) for recipes, vendor source, Sparkle compile bindings and native adapters. Linkage, public usage and allocator/context lifetime follow the actual library/module boundary. Prepared cooking uses existing tools; build reuse, verified input admission, runtime repair and configuration-correct distribution metadata require their own checks. Existing exceptions follow the [staged refinement](Implementation/ThirdPartyIntegration.md).
+Use the [integration contract](ThirdPartyMigration.md#ownership-and-dependency-workflow) and [dependency navigation](../ThirdParty/README.md) for recipes, vendor source, Sparkle compile bindings and native adapters. Linkage, public usage and allocator/context lifetime follow the actual library/module boundary. Prepared cooking uses existing tools; build reuse, verified input admission, runtime repair and configuration-correct distribution metadata require their own checks.
 
 For replacements, name the mechanism being retired and the policy retained. Assess the complete producer-to-consumer change, including callers and adapters. Moving code earns no removal credit; report non-native, generated, dependency and build/runtime costs separately. Keep capability additions distinct from simplification.
 

@@ -10,12 +10,27 @@ These support the existing roadmap; they add no first-release prerequisites. Con
 
 | Action | Ownership to transfer or simplify | Completion condition |
 | --- | --- | --- |
-| **Finish integration reuse checks** | Continue the [remaining integration plan](Implementation/ThirdPartyIntegration.md). Recipes/source separation and generated Launcher facts are already implemented. | Close missing incremental build/cook, runtime repair/offline and cleanup checks. Keep final package/legal/clean-machine acceptance with Roadmap. |
 | **Complete Qt scene item views** | The isolated fit trial passed. Finish production conversion so existing Qt owns Launcher placement/scrolling/navigation. [Active plan](Implementation/LauncherItemViews.md). | Retire custom reflow/per-card widget assembly; preserve information, sizing, DPI, focus/actions and readiness. Prove the complete connected UI is smaller and clearer. |
 | **Trial compiler preprocessing** | Let DXC/Slang evaluate includes and conditions; retire Sparkle's recursive [include expander](../Tools/Shaders/ShaderCompiler/Private/Compiler/ShaderSourcePreprocessor.cpp). Independent of the Qt trial. | Preserve virtual roots, generated parameters, dependency/debug source identity, typed ABI, accepted publication and reload on both shader targets. |
 | **Integrate selected rendering SDKs** | Follow the [rendering choices below](#rendering-sdks-worth-considering) in [Roadmap order](Roadmap.md#after-release). | Deliver a measured rendering benefit; retire any production algorithm being replaced. Record complete integration costs. |
 
-EnTT, FlatBuffers, importer replacements, hashing and API helpers remain conditional ideas without a scheduled migration. Reopen one only for a named consumer and a complete maintenance win. A larger dependency catalogue is not an action plan.
+New EnTT, FlatBuffers, importer-replacement and hashing dependencies remain conditional ideas without a scheduled migration. Reopen one only for a named consumer and a complete maintenance win. First check the libraries and helpers already available below.
+
+## Reuse already available code
+
+The [November 22 source/API audit](../build/validation/third-party-reuse-20261122/REPORT.md) covers all 26 dependency recipes, installed Qt/compiler APIs and existing Sparkle helpers. It identifies the following remaining opportunities; these are research findings, with no verified net saving or additional release prerequisite.
+
+| Priority and consumer | Existing mechanism to use | Local responsibility to remove or retain |
+| --- | --- | --- |
+| **First: Editor text input** | ImGui's shipped [`std::string` overloads](https://github.com/ocornut/imgui/blob/v1.92.5/misc/cpp/imgui_stdlib.h), compiled once through the existing recipe. | Remove temporary character buffers and copy-back code in Outliner, Inspector, Settings and `EditDetailsText`. Retain change/reset behavior and any intentional input limits. |
+| **First: SPIR-V module lifetime** | The pinned SPIRV-Reflect header already supplies `spv_reflect::ShaderModule`. | Replace seven explicit destroy calls across reflection extraction and binding normalization with upstream stack ownership. Retain result checks, binding meaning and cooked ABI; do not introduce another wrapper. |
+| **Small, direct reuse** | Core's raw FNV/string helpers, Qt's `QHash::removeIf`, and DirectXMath's `XMVectorHermite`. | Remove duplicate hashing/lowercasing, the dependency-run erase loop and handwritten Hermite basis arithmetic. Preserve reserved-zero identity rejection, operation completion and time-scaled animation tangents. The separate trim near-match needs its whitespace contract checked first. |
+| **Bounded trial: named logging** | spdlog already has named lookup/registration and logger cloning. | Retire the local named-logger map and duplicated construction where a complete reduction is demonstrated. Keep bootstrap, sink/file policy, atomic creation and failure handling inside Core; static linkage makes module ownership significant. |
+| **Next Qt fit trials: Workspace/Clean rows** | Existing Qt item models/views, standard check roles and delegates; reuse the current clean-plan inventory owner. | Investigate replacing dependency label/button maps, string-valued action properties, repeated row trees and the second directory scan. Retain readiness, run identity, exact clean targets and confirmation. Count model/delegate/accessibility costs; Qt does not supply Sparkle's select-all or cleanup policy. |
+
+Complete the existing scene-view work before broadening Qt conversion. Compiler preprocessing remains the larger independent mechanism trial above. Plain-text log widgets and ImGui list clipping are conditional responsiveness ideas, without an established code-removal benefit.
+
+The audit also checked already delegated import/texture/animation/allocation paths. Do not credit those deliveries again or replace domain validation with a similarly named utility. The report records per-library coverage, precise source fragments and rejected near-matches; a fetched transitive module or SDK header is not automatically an enabled dependency.
 
 ## Native removal estimates
 
@@ -76,7 +91,9 @@ Remove completed actions/stages from the active plan at each verified exit; keep
 | Acquisition and build state | [CMake/Dependencies](../CMake/Dependencies) owns admission and cache protection. Share admitted source in ignored `build/_deps`; each configured tree owns objects and private patched/generated copies. Preserve the shared source cache. |
 | Metadata and delivery | Generate Launcher facts from recipes. [Runtime deployment](../CMake/Artifacts/RuntimeDeployment.cmake) and [Packaging](../CMake/Packaging) consume declared payload/contributor facts, selected configuration, notices and license/source obligations. Retire declarations with their last consumer. |
 
-Sync/configure and cache-affecting Clean use the source-cache writer lock; builds/staging use readers. Build admission is read-only and cannot fetch/repair inputs. Prepared cook/run uses existing products; tool preparation is a separate incremental build. An unchanged compatible build does no dependency compile/archive work; changed source/patch/toolchain/ABI or explicit build cleaning legitimately rebuilds. Verify runtime repair/pruning separately from linking. Continue the [remaining qualification](Implementation/ThirdPartyIntegration.md); no package manager or shared writable binary cache is selected.
+Sync/configure and cache-affecting Clean use the source-cache writer lock; builds/staging use readers. Build admission is read-only and cannot fetch/repair inputs. Prepared cook/run uses existing products; tool preparation is a separate incremental build. An unchanged compatible build does no dependency compile/archive work; changed source/patch/toolchain/ABI or explicit build cleaning legitimately rebuilds. Verify runtime repair/pruning separately from linking. No package manager or shared writable binary cache is selected.
+
+Review bundled code, installed SDKs, plugins and data independently; matching declared source-package lists cannot discover undeclared contributors. The [qualification receipt](../build/validation/third-party-integration-20261122/stage4/REPORT.md) retains identified implementation results and the accepted cleanup disposition. Final package/legal/clean-machine acceptance stays with [Roadmap](Roadmap.md#before-the-first-release).
 
 ## Retained decisions
 

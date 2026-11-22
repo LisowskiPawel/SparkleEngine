@@ -47,7 +47,6 @@ namespace SparkleLauncher
 
 	private:
 		void DispatchAction(const QString& contentId, const QString& levelId, LauncherLevelAction action);
-		void StartLevel(const LauncherContentSummary& content, const LauncherLevelUiEntry& level);
 
 		const std::filesystem::path& m_workspaceRoot;
 		LauncherContentModel& m_contentModel;

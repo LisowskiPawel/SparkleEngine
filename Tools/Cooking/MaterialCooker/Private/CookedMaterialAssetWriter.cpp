@@ -28,20 +28,6 @@ static Assets::CookedMaterialAssetHeader BuildHeader(const CookedMaterialAssetBu
 	return header;
 }
 
-static void WriteMaterialName(std::ofstream& output, const CookedMaterialAssetBuild& materialAsset)
-{
-	if (materialAsset.name.empty())
-	{
-		return;
-	}
-
-	output.write(materialAsset.name.data(), static_cast<std::streamsize>(materialAsset.name.size()));
-	if (!output.good())
-	{
-		throw Diagnostics::Error("Failed to write cooked material asset name payload.");
-	}
-}
-
 static std::vector<Assets::CookedTextureReferenceRecord> BuildTextureReferenceRecords(const CookedMaterialAssetBuild& materialAsset)
 {
 	std::vector<Assets::CookedTextureReferenceRecord> records;
@@ -92,7 +78,10 @@ static void WriteMaterialAsset(const CookedMaterialAssetBuild& materialAsset, co
 		throw Diagnostics::Error(errorMessage);
 	}
 
-	WriteMaterialName(output, materialAsset);
+	if (!Files::BinaryStreamWriter::WriteBytes(output, materialAsset.name.data(), materialAsset.name.size(), errorMessage))
+	{
+		throw Diagnostics::Error("Failed to write cooked material asset name payload.");
+	}
 	if (!Files::BinaryStreamWriter::WriteArray(output, records, errorMessage))
 	{
 		throw Diagnostics::Error(errorMessage);

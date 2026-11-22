@@ -12,7 +12,6 @@
 
 namespace SparkleUiTheme
 {
-	ImFont* g_bodyFont = nullptr;
 	ImFont* g_headingFont = nullptr;
 	ImFont* g_monoFont = nullptr;
 
@@ -126,36 +125,36 @@ namespace SparkleUiTheme
 		constexpr float headingSize = 15.0f;
 		constexpr float monoSize = 13.0f;
 
-		g_bodyFont = LoadFirstAvailableFont({"C:/Windows/Fonts/segoeui.ttf", "C:/Windows/Fonts/Inter-Regular.ttf", nullptr, nullptr}, bodySize);
-		if (g_bodyFont == nullptr)
+		ImFont* bodyFont = LoadFirstAvailableFont({"C:/Windows/Fonts/segoeui.ttf", "C:/Windows/Fonts/Inter-Regular.ttf", nullptr, nullptr}, bodySize);
+		if (bodyFont == nullptr)
 		{
-			g_bodyFont = io.Fonts->AddFontDefault();
+			bodyFont = io.Fonts->AddFontDefault();
 		}
 		MergeEditorIconsIntoLastFont(bodySize);
 
 		g_headingFont = LoadFirstAvailableFont({"C:/Windows/Fonts/seguisb.ttf", "C:/Windows/Fonts/segoeuib.ttf", "C:/Windows/Fonts/Inter-SemiBold.ttf", nullptr}, headingSize);
-		if (g_headingFont != nullptr && g_headingFont != g_bodyFont)
+		if (g_headingFont != nullptr && g_headingFont != bodyFont)
 		{
 			MergeEditorIconsIntoLastFont(headingSize);
 		}
 
 		if (g_headingFont == nullptr)
 		{
-			g_headingFont = g_bodyFont;
+			g_headingFont = bodyFont;
 		}
 
 		g_monoFont = LoadFirstAvailableFont({"C:/Windows/Fonts/JetBrainsMono-Regular.ttf", "C:/Windows/Fonts/JetBrainsMonoNL-Regular.ttf", "C:/Windows/Fonts/consola.ttf", nullptr}, monoSize);
-		if (g_monoFont != nullptr && g_monoFont != g_bodyFont)
+		if (g_monoFont != nullptr && g_monoFont != bodyFont)
 		{
 			MergeEditorIconsIntoLastFont(monoSize);
 		}
 
 		if (g_monoFont == nullptr)
 		{
-			g_monoFont = g_bodyFont;
+			g_monoFont = bodyFont;
 		}
 
-		io.FontDefault = g_bodyFont;
+		io.FontDefault = bodyFont;
 	}
 
 	ImFont* GetHeadingFont()

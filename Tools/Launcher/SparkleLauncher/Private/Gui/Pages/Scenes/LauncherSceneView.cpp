@@ -4,12 +4,13 @@
 #include "Gui/Style/LauncherUiDesign.h"
 #include "Gui/Widgets/LauncherArtworkWidgets.h"
 
+#include <QtCore/QEvent>
+
 #include <QtGui/QKeySequence>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QAction>
 #include <QtGui/QShortcut>
-#include <QtWidgets/QApplication>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QStyledItemDelegate>
@@ -167,9 +168,7 @@ namespace SparkleLauncher
 			    }
 		    });
 		setItemDelegate(new SceneCardDelegate(*this, model, *m_sourceButton, *m_primaryButton));
-		setModel(&model);
-		connect(this, &QListView::clicked, this, &LauncherSceneView::ActivateCard);
-		connect(&model, &QAbstractItemModel::dataChanged, this, [this]() { UpdateActions(); });
+		// Capture identity before Qt clears selection and transfers focus from the shared action buttons.
 		connect(
 		    &model,
 		    &QAbstractItemModel::modelAboutToBeReset,
@@ -181,6 +180,20 @@ namespace SparkleLauncher
 			    m_restoreLevelId = level != nullptr ? level->Id : QString();
 			    m_previousRow = std::max(0, currentIndex().row());
 		    });
+		setModel(&model);
+		connect(
+		    selectionModel(),
+		    &QItemSelectionModel::selectionChanged,
+		    this,
+		    [this](const QItemSelection& selected)
+		    {
+			    if (!selected.isEmpty())
+			    {
+				    selectionModel()->setCurrentIndex(selected.first().topLeft(), QItemSelectionModel::NoUpdate);
+			    }
+		    });
+		connect(this, &QListView::clicked, this, &LauncherSceneView::ActivateCard);
+		connect(&model, &QAbstractItemModel::dataChanged, this, [this]() { UpdateActions(); });
 		connect(
 		    &model,
 		    &QAbstractItemModel::modelReset,
@@ -325,6 +338,12 @@ namespace SparkleLauncher
 	{
 		m_clickPosition = event->position().toPoint();
 		QListView::mouseReleaseEvent(event);
+	}
+
+	QItemSelectionModel::SelectionFlags LauncherSceneView::selectionCommand(const QModelIndex& index, const QEvent* event) const
+	{
+		// Select on press so a reset cannot replay a deferred selection against a different row at release.
+		return event != nullptr && event->type() == QEvent::MouseButtonPress ? QItemSelectionModel::ClearAndSelect : QListView::selectionCommand(index, event);
 	}
 
 	void LauncherSceneView::ActivateCard(const QModelIndex& index)

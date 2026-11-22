@@ -184,6 +184,11 @@ namespace SparkleLauncher
 		}
 		// Use the current row only until request construction; no row reference survives dispatch.
 		const LauncherLevelUiEntry& level = *found;
+		if (action == LauncherLevelAction::Run && !m_startingLevelRunId.isEmpty())
+		{
+			m_activityPanel->ShowRunOutput(m_startingLevelRunId);
+			return;
+		}
 		if (action == LauncherLevelAction::Source)
 		{
 			if (!level.SourcePageUrl.isEmpty())
@@ -197,7 +202,18 @@ namespace SparkleLauncher
 		}
 		else if (action == level.Action && action == LauncherLevelAction::Run)
 		{
-			StartLevel(*content, level);
+			LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, QStringLiteral("levels.run"));
+			auto& inputs = std::get<LevelRunOperationRequest>(request.Inputs);
+			inputs.ContentId = content->Id.toStdString();
+			inputs.LevelId = level.Id.toStdString();
+			const QString titlePrefix = m_settings.RunMode() == QStringLiteral("game") ? QStringLiteral("Run ") : QStringLiteral("Open ");
+			m_startingLevelId = level.Id;
+			m_startingLevelRunId = m_startOperation(std::move(request), titlePrefix + level.DisplayName);
+			if (m_startingLevelRunId.isEmpty())
+			{
+				m_startingLevelId.clear();
+			}
+			Refresh();
 		}
 		else if (action == level.Action && action == LauncherLevelAction::Sync)
 		{
@@ -211,29 +227,4 @@ namespace SparkleLauncher
 		}
 	}
 
-	void LauncherSceneCatalog::StartLevel(const LauncherContentSummary& content, const LauncherLevelUiEntry& level)
-	{
-		if (!m_startingLevelRunId.isEmpty())
-		{
-			m_activityPanel->ShowRunOutput(m_startingLevelRunId);
-			return;
-		}
-		if (!level.bGameSupported || !level.bCanSelect)
-		{
-			return;
-		}
-
-		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, QStringLiteral("levels.run"));
-		auto& inputs = std::get<LevelRunOperationRequest>(request.Inputs);
-		inputs.ContentId = content.Id.toStdString();
-		inputs.LevelId = level.Id.toStdString();
-		const QString action = m_settings.RunMode() == QStringLiteral("game") ? QStringLiteral("Run ") : QStringLiteral("Open ");
-		m_startingLevelId = level.Id;
-		m_startingLevelRunId = m_startOperation(std::move(request), action + level.DisplayName);
-		if (m_startingLevelRunId.isEmpty())
-		{
-			m_startingLevelId.clear();
-		}
-		Refresh();
-	}
 }

@@ -2,6 +2,7 @@
 
 #include "Gltf/Animation/GltfAnimationImporter.h"
 #include "Gltf/Animation/GltfAnimationSampler.h"
+#include "Types/FindImportedSkeletonForSourceSkin.h"
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <cgltf.h>
@@ -55,19 +56,13 @@ namespace GltfAnimationImporter
 			return kInvalidImportedSkeletonIndex;
 		}
 		const cgltf_size sourceSkinIndex = cgltf_skin_index(&data, skin);
-		if (sourceSkinIndex >= data.skins_count)
+		constexpr auto maximumSkinIndex = (std::numeric_limits<std::uint32_t>::max)();
+		if (sourceSkinIndex >= data.skins_count || sourceSkinIndex > maximumSkinIndex)
 		{
 			return kInvalidImportedSkeletonIndex;
 		}
 
-		for (std::size_t skeletonIndex = 0; skeletonIndex < importedScene.skeletons.size(); ++skeletonIndex)
-		{
-			if (importedScene.skeletons[skeletonIndex].sourceSkinIndex == sourceSkinIndex)
-			{
-				return static_cast<ImportedSkeletonIndex>(skeletonIndex);
-			}
-		}
-		return kInvalidImportedSkeletonIndex;
+		return FindImportedSkeletonForSourceSkin(importedScene, static_cast<std::uint32_t>(sourceSkinIndex));
 	}
 
 	static void ImportChannel(

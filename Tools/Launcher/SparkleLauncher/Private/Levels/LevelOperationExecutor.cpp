@@ -17,15 +17,6 @@ namespace SparkleLauncher
 		    && planned.DisplayCommandLine == BuildDisplayCommandLine(executable.Request.ExecutablePath, executable.Request.Arguments) && planned.LogPath == executable.Request.LogPath;
 	}
 
-	static std::string MakeLevelOperationFailureSummary(const LevelOperationProcessStep& step, const Process::ChildProcessResult& result)
-	{
-		if (!result.FailureReason.empty())
-		{
-			return result.FailureReason;
-		}
-		return "Asset pack acquisition failed.";
-	}
-
 	bool LevelOperationExecutionPlanMatches(const LevelOperationPlan& plan, const std::vector<LevelOperationProcessStep>& processSteps)
 	{
 		return plan.Steps.size() == processSteps.size()
@@ -101,11 +92,8 @@ namespace SparkleLauncher
 				}
 				else
 				{
-					SetProcessOperationFailure(
-					    operation,
-					    result.StartFailure,
-					    MakeLevelOperationFailureSummary(step, result),
-					    "Correct the first asset acquisition error in the named log, then retry Sync.");
+					const std::string summary = result.FailureReason.empty() ? "Asset pack acquisition failed." : result.FailureReason;
+					SetProcessOperationFailure(operation, result.StartFailure, summary, "Correct the first asset acquisition error in the named log, then retry Sync.");
 				}
 				MarkOperationFinished(operation, result.bCancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
 				return false;

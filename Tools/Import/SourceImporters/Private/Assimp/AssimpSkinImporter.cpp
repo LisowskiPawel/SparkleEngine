@@ -3,6 +3,7 @@
 #include "Assimp/AssimpSkinImporter.h"
 
 #include "Assimp/AssimpNodeTransformConverter.h"
+#include "Types/FindImportedSkeletonForSourceSkin.h"
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <DirectXMath.h>
@@ -254,12 +255,10 @@ ImportedSkeletonIndex AssimpSkinImporter::ImportSkeleton(const aiScene& scene, c
 		return kInvalidImportedSkeletonIndex;
 	}
 
-	for (std::size_t skeletonIndex = 0; skeletonIndex < importedScene.skeletons.size(); ++skeletonIndex)
+	const ImportedSkeletonIndex existingSkeleton = FindImportedSkeletonForSourceSkin(importedScene, sourceMeshIndex);
+	if (existingSkeleton != kInvalidImportedSkeletonIndex)
 	{
-		if (importedScene.skeletons[skeletonIndex].sourceSkinIndex == sourceMeshIndex)
-		{
-			return static_cast<ImportedSkeletonIndex>(skeletonIndex);
-		}
+		return existingSkeleton;
 	}
 
 	SkeletonBuildState state;
