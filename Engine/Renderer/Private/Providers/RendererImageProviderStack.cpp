@@ -15,7 +15,6 @@
 #include "Upscaling/UpscalerSettings.h"
 
 #include <algorithm>
-#include <array>
 #include <limits>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_rendererImageProviderStackLogger, "Renderer.ImageProviders");
@@ -116,11 +115,7 @@ void RendererImageProviderStack::Refresh() noexcept
 		Diagnostics::Fatal(g_rendererImageProviderStackLogger, __FILE__, __LINE__, "Renderer image-provider generation exhausted.");
 	}
 
-	RhiSubmissionState lastUse;
-	for (std::size_t queueIndex = 0; queueIndex < RhiQueueTypeCount; ++queueIndex)
-	{
-		lastUse.MarkUsed(m_deviceServices.GetLastSubmittedToken(static_cast<ERhiQueueType>(queueIndex)));
-	}
+	const RhiSubmissionState lastUse = m_deviceServices.CaptureLastSubmittedState();
 
 	m_retiredGenerations.push_back(RetiredGeneration{.LastUse = lastUse, .Upscaler = std::move(m_upscaler), .RayReconstruction = std::move(m_rayReconstruction)});
 
@@ -136,14 +131,9 @@ void RendererImageProviderStack::PollRetiredGenerations() noexcept
 	        m_retiredGenerations.end(),
 	        [this](RetiredGeneration& generation) noexcept
 	        {
-		        std::array<RhiSubmissionToken, RhiQueueTypeCount> tokens{};
-		        const std::size_t tokenCount = generation.LastUse.CopyTokens(tokens);
-		        for (std::size_t tokenIndex = 0; tokenIndex < tokenCount; ++tokenIndex)
+		        if (!m_deviceServices.IsSubmissionStateComplete(generation.LastUse))
 		        {
-			        if (!m_deviceServices.IsSubmissionComplete(tokens[tokenIndex]))
-			        {
-				        return false;
-			        }
+			        return false;
 		        }
 		        ShutdownProviders(generation.Upscaler, generation.RayReconstruction);
 		        return true;

@@ -34,7 +34,7 @@ public:
 		auto& holder = GetOrCreateRuntimeStorageHolder<RenderPassRuntimeStorage::Compute<TShader>>();
 		try
 		{
-			holder.Materialize(*m_renderHardwareInterface, *m_activeGeneration);
+			holder.Materialize(m_renderHardwareInterface, *m_activeGeneration);
 		}
 		catch (const Diagnostics::Error& error)
 		{
@@ -55,7 +55,7 @@ public:
 		auto& holder = GetOrCreateRuntimeStorageHolder<RenderPassRuntimeStorage::Graphics<TVertexShader, TPixelShader>>();
 		try
 		{
-			holder.Materialize(*m_renderHardwareInterface, *m_activeGeneration, request);
+			holder.Materialize(m_renderHardwareInterface, *m_activeGeneration, request);
 		}
 		catch (const Diagnostics::Error& error)
 		{
@@ -86,7 +86,7 @@ public:
 		{
 			try
 			{
-				holder.Materialize(*m_renderHardwareInterface, *m_activeGeneration, composition);
+				holder.Materialize(m_renderHardwareInterface, *m_activeGeneration, composition);
 			}
 			catch (const Diagnostics::Error& error)
 			{
@@ -115,7 +115,7 @@ public:
 
 		try
 		{
-			return runtime.CreateShaderTable(*m_renderHardwareInterface, composition, resolveHitGroups());
+			return runtime.CreateShaderTable(m_renderHardwareInterface, composition, resolveHitGroups());
 		}
 		catch (const Diagnostics::Error& error)
 		{
@@ -167,16 +167,14 @@ private:
 		return *runtime;
 	}
 
-	RhiSubmissionState CaptureLastSubmittedState() const noexcept;
 	std::unique_ptr<RenderPassRuntimeStorage::ShaderGeneration> OpenGeneration(std::uint64_t generation) const;
 	std::unique_ptr<RenderPassRuntimeStorage::ShaderGeneration> CreateReplacementGeneration(std::uint64_t generation) const;
 	void ActivateGeneration(std::unique_ptr<RenderPassRuntimeStorage::ShaderGeneration> replacement);
 	static void ValidateGenerationContracts(const RenderPassRuntimeStorage::ShaderGeneration& generation);
-	bool IsComplete(const RhiSubmissionState& state) const noexcept;
 	[[noreturn]] void HandleRuntimeCreationFailure(std::string_view errorMessage) const;
 
-	RenderDeviceServices* m_deviceServices = nullptr;
-	RenderHardwareInterface* m_renderHardwareInterface = nullptr;
+	RenderDeviceServices& m_deviceServices;
+	RenderHardwareInterface& m_renderHardwareInterface;
 	mutable std::unique_ptr<RenderPassRuntimeStorage::ShaderGeneration> m_activeGeneration;
 	std::vector<RetiredShaderRuntimeGeneration> m_retiredGenerations;
 };

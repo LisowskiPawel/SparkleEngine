@@ -11,7 +11,6 @@
 #include "RHI/Public/Shaders/ShaderParameterLayoutBuilder.h"
 
 #include <algorithm>
-#include <array>
 #include <format>
 #include <string>
 #include <unordered_set>
@@ -19,8 +18,8 @@
 RenderPassRuntimeStorage::Holder::~Holder() noexcept = default;
 
 RenderPassRuntimeCache::RenderPassRuntimeCache(RenderDeviceServices& deviceServices) :
-    m_deviceServices(&deviceServices),
-    m_renderHardwareInterface(&deviceServices.GetRenderHardwareInterface()),
+    m_deviceServices(deviceServices),
+    m_renderHardwareInterface(deviceServices.GetRenderHardwareInterface()),
     m_activeGeneration(OpenGeneration(1))
 {
 }
@@ -59,7 +58,7 @@ ShaderDiagnosticsSnapshot RenderPassRuntimeCache::CaptureShaderDiagnostics() con
 void RenderPassRuntimeCache::ReloadShaders()
 {
 	PollRetiredGenerations();
-	if (m_activeGeneration == nullptr || m_renderHardwareInterface == nullptr)
+	if (m_activeGeneration == nullptr)
 	{
 		HandleRuntimeCreationFailure("Shader runtime generation has no active renderer owner.");
 	}
@@ -90,7 +89,7 @@ std::unique_ptr<RenderPassRuntimeStorage::ShaderGeneration> RenderPassRuntimeCac
 		{
 			HandleRuntimeCreationFailure("Shader runtime cache contains an empty shader holder.");
 		}
-		auto holder = activeHolder->CreateReplacement(*m_renderHardwareInterface, *replacement);
+		auto holder = activeHolder->CreateReplacement(m_renderHardwareInterface, *replacement);
 		replacement->RuntimeStorageByType.emplace(storageType, std::move(holder));
 	}
 	return replacement;
@@ -98,7 +97,7 @@ std::unique_ptr<RenderPassRuntimeStorage::ShaderGeneration> RenderPassRuntimeCac
 
 void RenderPassRuntimeCache::ActivateGeneration(std::unique_ptr<RenderPassRuntimeStorage::ShaderGeneration> replacement)
 {
-	m_retiredGenerations.push_back(RetiredShaderRuntimeGeneration{.LastUse = CaptureLastSubmittedState(), .Runtime = std::move(m_activeGeneration)});
+	m_retiredGenerations.push_back(RetiredShaderRuntimeGeneration{.LastUse = m_deviceServices.CaptureLastSubmittedState(), .Runtime = std::move(m_activeGeneration)});
 	m_activeGeneration = std::move(replacement);
 }
 
@@ -107,7 +106,7 @@ std::unique_ptr<RenderPassRuntimeStorage::ShaderGeneration> RenderPassRuntimeCac
 	const Files::FileSetReadScope publication(Filesystem::GetCookedShaderRootPath());
 	auto result = std::make_unique<RenderPassRuntimeStorage::ShaderGeneration>();
 	result->Generation = generation;
-	result->Target = GetRuntimeShaderTarget(m_renderHardwareInterface->GetCapabilities().RuntimeShaderBinaryFormat);
+	result->Target = GetRuntimeShaderTarget(m_renderHardwareInterface.GetCapabilities().RuntimeShaderBinaryFormat);
 	result->Library = CookedShaderLibrary::Open(Filesystem::GetCookedShaderLibraryPath());
 	result->Map = GlobalShaderMap::Open(Filesystem::GetGlobalShaderMapPath(), result->Library);
 	ValidateGenerationContracts(*result);
@@ -162,42 +161,11 @@ void RenderPassRuntimeCache::ValidateGenerationContracts(const RenderPassRuntime
 void RenderPassRuntimeCache::PollRetiredGenerations() noexcept
 {
 	m_retiredGenerations.erase(
-	    std::remove_if(m_retiredGenerations.begin(), m_retiredGenerations.end(), [this](const RetiredShaderRuntimeGeneration& generation) noexcept { return IsComplete(generation.LastUse); }),
+	    std::remove_if(
+	        m_retiredGenerations.begin(),
+	        m_retiredGenerations.end(),
+	        [this](const RetiredShaderRuntimeGeneration& generation) noexcept { return m_deviceServices.IsSubmissionStateComplete(generation.LastUse); }),
 	    m_retiredGenerations.end());
-}
-
-RhiSubmissionState RenderPassRuntimeCache::CaptureLastSubmittedState() const noexcept
-{
-	RhiSubmissionState state;
-	if (m_deviceServices == nullptr)
-	{
-		return state;
-	}
-
-	for (std::size_t queueIndex = 0; queueIndex < RhiQueueTypeCount; ++queueIndex)
-	{
-		state.MarkUsed(m_deviceServices->GetLastSubmittedToken(static_cast<ERhiQueueType>(queueIndex)));
-	}
-	return state;
-}
-
-bool RenderPassRuntimeCache::IsComplete(const RhiSubmissionState& state) const noexcept
-{
-	if (m_deviceServices == nullptr)
-	{
-		return true;
-	}
-
-	std::array<RhiSubmissionToken, RhiQueueTypeCount> tokens{};
-	const std::size_t tokenCount = state.CopyTokens(tokens);
-	for (std::size_t tokenIndex = 0; tokenIndex < tokenCount; ++tokenIndex)
-	{
-		if (!m_deviceServices->IsSubmissionComplete(tokens[tokenIndex]))
-		{
-			return false;
-		}
-	}
-	return true;
 }
 
 [[noreturn]] void RenderPassRuntimeCache::HandleRuntimeCreationFailure(std::string_view errorMessage) const

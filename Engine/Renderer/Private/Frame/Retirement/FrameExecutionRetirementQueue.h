@@ -31,8 +31,5 @@ private:
 		std::vector<std::unique_ptr<RenderFrame>> RenderFrames;
 	};
 
-	static RhiSubmissionState CaptureLastSubmittedState(const RenderDeviceServices& deviceServices) noexcept;
-	static bool IsSubmissionStateComplete(const RenderDeviceServices& deviceServices, const RhiSubmissionState& state) noexcept;
-
 	std::vector<RetiredFrameExecution> m_retiredExecutions;
 };

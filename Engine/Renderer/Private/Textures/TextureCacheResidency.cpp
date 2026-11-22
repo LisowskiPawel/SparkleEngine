@@ -31,8 +31,8 @@ void TextureCache::UploadReadyTextures(RenderCommandList& commandList, std::vect
 		request.Uploaded = m_textureFactory.Create(request.Source.Path, *request.Decoded, commandList);
 
 		request.Decoded.reset();
-		request.UploadedResource = m_resourceService.GetResourceHandle(request.Uploaded->Resource);
-		uploadedResources.push_back(request.UploadedResource);
+		const RhiResourceHandle resource = m_resourceService.GetResourceHandle(request.Uploaded->Resource);
+		uploadedResources.push_back(resource);
 	}
 }
 
@@ -67,7 +67,7 @@ void TextureCache::ActivateResidentRequests() noexcept
 			request.Uploaded.reset();
 			continue;
 		}
-		if (!request.bWanted || m_residency.GetState(request.Generation) != AssetResidencyState::Resident)
+		if (!request.bWanted || state != AssetResidencyState::Resident)
 		{
 			continue;
 		}
@@ -116,22 +116,12 @@ void TextureCache::QueueTextureRetirement(ActiveTexture texture, std::uint64_t b
 
 void TextureCache::ReleaseActiveTexture(ActiveTexture& texture) noexcept
 {
-	const RhiSubmissionState lastUse = CaptureLastSubmittedState();
+	const RhiSubmissionState lastUse = m_submissions.CaptureLastSubmittedState();
 	if (!m_residency.BeginEviction(texture.Generation, lastUse))
 	{
 		Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "Resident texture could not enter eviction.");
 	}
 	m_textureFactory.Release(texture.Texture);
-}
-
-RhiSubmissionState TextureCache::CaptureLastSubmittedState() const noexcept
-{
-	RhiSubmissionState state;
-	for (std::size_t queueIndex = 0; queueIndex < RhiQueueTypeCount; ++queueIndex)
-	{
-		state.MarkUsed(m_submissions.GetLastSubmittedToken(static_cast<ERhiQueueType>(queueIndex)));
-	}
-	return state;
 }
 
 const RendererTexture* TextureCache::FindPathTexture(const std::filesystem::path& texturePath) const noexcept

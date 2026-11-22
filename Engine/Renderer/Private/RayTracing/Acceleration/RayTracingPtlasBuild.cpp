@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "RHI/Public/RayTracing/RhiRayTracingService.h"
+#include "RHI/Public/RayTracing/RhiPtlasService.h"
 #include "RHI/Public/Resources/RhiResourceService.h"
 
 #include "RayTracing/Acceleration/RayTracingPtlasStrategy.h"
@@ -130,20 +131,20 @@ void RayTracingPtlasStrategy::PreparePtlasOperationBuffer(PtlasBuildState& state
 	const RhiPtlasOperationHeader operation{.Type = ERhiPtlasOperationType::WriteInstance, .ArgumentCount = nativeWriteCount, .ArgumentData = 0, .ArgumentStrideInBytes = 0};
 	const RhiPtlasOperationPackDesc operationPack{.Operations = &operation, .OperationCount = 1, .InstanceWrites = state.InstanceWrites.data(), .InstanceWriteCount = nativeWriteCount};
 
-	RhiRayTracingService& rayTracingService = m_renderHardwareInterface.GetRayTracingService();
+	RhiPtlasService& ptlasService = m_renderHardwareInterface.GetRayTracingService().GetPtlasService();
 	RhiResourceService& resourceService = m_renderHardwareInterface.GetResourceService();
 	if (m_ptlasResources.NativeOperationData)
 	{
 		resourceService.ReleaseOwnedResource(m_ptlasResources.NativeOperationData);
 		m_ptlasResources.NativeOperationData = {};
 	}
-	m_ptlasResources.NativeOperationData = rayTracingService.CreatePtlasOperationBuffer(operationPack, L"RayTracingPtlasCpuPackedOperations");
+	m_ptlasResources.NativeOperationData = ptlasService.CreatePtlasOperationBuffer(operationPack, L"RayTracingPtlasCpuPackedOperations");
 	if (!m_ptlasResources.NativeOperationData)
 	{
 		Diagnostics::Fatal(g_rayTracingPtlasBuildLogger, __FILE__, __LINE__, "PTLAS operation-buffer allocation failed.");
 	}
 
-	state.NativeOperationLayout = rayTracingService.GetPtlasOperationBufferLayout(m_ptlasResources.Layout);
+	state.NativeOperationLayout = ptlasService.GetPtlasOperationBufferLayout(m_ptlasResources.Layout);
 	if (resourceService.GetResourceGpuVirtualAddress(m_ptlasResources.NativeOperationData) == 0)
 	{
 		Diagnostics::Fatal(g_rayTracingPtlasBuildLogger, __FILE__, __LINE__, "PTLAS operation buffer has no GPU address.");

@@ -5,7 +5,6 @@
 #include "RHI/Public/Commands/RhiCommandSubmissionService.h"
 
 #include <algorithm>
-#include <array>
 
 AssetResidency::AssetResidency(AssetResidencyBudget budget) noexcept :
     m_budget(budget)
@@ -104,15 +103,17 @@ bool AssetResidency::BeginUpload(AssetGenerationHandle handle) noexcept
 bool AssetResidency::RecordUploadSubmission(AssetGenerationHandle handle, RhiSubmissionToken completionToken, std::uint64_t residentBytes) noexcept
 {
 	AssetGenerationStatus* generation = FindMutable(handle);
-	const bool bCompletionRejectedGeneration = generation == nullptr;
-	const bool bResidencyCompletionRejectedState = !bCompletionRejectedGeneration && (generation->State != AssetResidencyState::Uploading);
-	const bool bUnexpectedState = bResidencyCompletionRejectedState && (generation->State != AssetResidencyState::Evicting);
-	const bool bGenerationRejected = bCompletionRejectedGeneration || bUnexpectedState;
-	const bool bCompletionRejectedValid = bGenerationRejected || (!completionToken.IsValid());
-	const bool bCompletionRejectedAccounted = bCompletionRejectedValid || (!generation->bResidentAccounted);
-	const bool bResidencyCompletionRejected = bCompletionRejectedAccounted || (residentBytes > m_budget.MaximumResidentBytes - (m_counters.ResidentBytes - generation->ResidentBytes));
-
-	if (bResidencyCompletionRejected)
+	if (generation == nullptr)
+	{
+		return false;
+	}
+	const bool bPendingSubmission = generation->State == AssetResidencyState::Uploading || generation->State == AssetResidencyState::Evicting;
+	const bool bHasReservation = completionToken.IsValid() && generation->bResidentAccounted;
+	if (!bPendingSubmission || !bHasReservation)
+	{
+		return false;
+	}
+	if (residentBytes > m_budget.MaximumResidentBytes - (m_counters.ResidentBytes - generation->ResidentBytes))
 	{
 		return false;
 	}
@@ -166,10 +167,10 @@ void AssetResidency::Poll(RhiCommandSubmissionService& submissions) noexcept
 {
 	for (AssetGenerationStatus& generation : m_generations)
 	{
-		const bool bUploadCompletedEnd = generation.State == AssetResidencyState::Uploading
+		const bool bUploadSubmitted = generation.State == AssetResidencyState::Uploading
 		    && std::any_of(generation.Completion.Values.begin(), generation.Completion.Values.end(), [](std::uint64_t value) { return value != 0; });
 
-		const bool bUploadCompleted = bUploadCompletedEnd && (IsComplete(generation.Completion, submissions));
+		const bool bUploadCompleted = bUploadSubmitted && submissions.IsSubmissionStateComplete(generation.Completion);
 
 		if (bUploadCompleted)
 		{
@@ -182,7 +183,7 @@ void AssetResidency::Poll(RhiCommandSubmissionService& submissions) noexcept
 			generation.State = AssetResidencyState::Resident;
 			ReleaseBacklog(generation);
 		}
-		else if (generation.State == AssetResidencyState::Evicting && IsComplete(generation.Completion, submissions))
+		else if (generation.State == AssetResidencyState::Evicting && submissions.IsSubmissionStateComplete(generation.Completion))
 		{
 			Retire(generation);
 		}
@@ -204,20 +205,6 @@ AssetResidencyState AssetResidency::GetState(AssetGenerationHandle handle) const
 AssetGenerationStatus* AssetResidency::FindMutable(AssetGenerationHandle handle) noexcept
 {
 	return const_cast<AssetGenerationStatus*>(std::as_const(*this).Find(handle));
-}
-
-bool AssetResidency::IsComplete(const RhiSubmissionState& completion, RhiCommandSubmissionService& submissions) const noexcept
-{
-	std::array<RhiSubmissionToken, RhiQueueTypeCount> tokens{};
-	const std::size_t tokenCount = completion.CopyTokens(tokens);
-	for (std::size_t tokenIndex = 0; tokenIndex < tokenCount; ++tokenIndex)
-	{
-		if (!submissions.IsSubmissionComplete(tokens[tokenIndex]))
-		{
-			return false;
-		}
-	}
-	return true;
 }
 
 void AssetResidency::ReleaseCpuBudget(AssetGenerationStatus& generation) noexcept

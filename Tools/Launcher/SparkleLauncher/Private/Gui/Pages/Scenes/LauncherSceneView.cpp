@@ -177,6 +177,8 @@ namespace SparkleLauncher
 		    [this]()
 		    {
 			    m_resetContentId = m_model.ContentId();
+			    const auto* level = m_model.Level(currentIndex());
+			    m_restoreLevelId = level != nullptr ? level->Id : QString();
 			    m_previousRow = std::max(0, currentIndex().row());
 		    });
 		connect(
@@ -185,11 +187,10 @@ namespace SparkleLauncher
 		    this,
 		    [this]()
 		    {
-			    const QString levelId = m_currentLevelId;
 			    int row = m_resetContentId == m_model.ContentId() ? std::min(m_previousRow, m_model.rowCount() - 1) : 0;
 			    for (int i = 0; m_resetContentId == m_model.ContentId() && i < m_model.rowCount(); ++i)
 			    {
-				    if (m_model.Level(m_model.index(i))->Id == levelId)
+				    if (m_model.Level(m_model.index(i))->Id == m_restoreLevelId)
 				    {
 					    row = i;
 				    }
@@ -278,10 +279,6 @@ namespace SparkleLauncher
 	void LauncherSceneView::currentChanged(const QModelIndex& current, const QModelIndex& previous)
 	{
 		QListView::currentChanged(current, previous);
-		if (const auto* level = m_model.Level(current))
-		{
-			m_currentLevelId = level->Id;
-		}
 		UpdateActions();
 		if (current.isValid())
 		{

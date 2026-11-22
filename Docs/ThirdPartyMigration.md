@@ -1,6 +1,6 @@
 # Third-party migration
 
-[Goals](Goals.md#the-three-cases) | [Code movement](RepositoryFootprint.md#cut-candidates) | [Roadmap](Roadmap.md#supporting-system-simplification) | [Dependency recipes](../ThirdParty/README.md)
+[Goals](Goals.md#the-three-cases) | [Engineering](Engineering.md#module-boundaries) | [Roadmap](Roadmap.md#supporting-system-simplification) | [Dependency recipes](../ThirdParty/README.md)
 
 Delegate generic mechanisms so more effort goes into correct pixels, measured frames and owned neural graphics. Keep Sparkle's RHI, frame graph, resource lifetime, scene/material meaning and independent Reference renderer.
 
@@ -24,7 +24,7 @@ EnTT, FlatBuffers, importer replacements, hashing and API helpers remain conditi
 | Compiler preprocessor pair | 253 physical / 221 code lines | Whole reviewed pair; exact source/debug and generated-input work still needs an owner. |
 | Qt custom reflow class | At most 160 physical / 140 code lines | Historical Q fragment only. Model/delegate/caller costs and any additional card retirement are counted separately by the active plan. |
 
-The historical pending inventory spans **992 physical / 873 code lines in 18 files across ten scopes**, excluding delivered migrations. It is a review ceiling, with **no supported future net forecast**. [Frozen source ranges](../build/validation/third-party-removal-triple-check-20261121/per-file-ledger.csv) retain the original identities; the preprocessor pair was subsequently recounted. Broader code movement belongs to [Repository footprint](RepositoryFootprint.md#cut-candidates).
+The historical pending inventory spans **992 physical / 873 code lines in 18 files across ten scopes**, excluding delivered migrations. It is a review ceiling, with **no supported future net forecast**. [Frozen source ranges](../build/validation/third-party-removal-triple-check-20261121/per-file-ledger.csv) retain the original identities; the preprocessor pair was subsequently recounted. Judge broader code movement through [module ownership](Engineering.md#module-boundaries).
 
 ## Delivered integrations versus savings
 
@@ -47,7 +47,7 @@ A separate [SDL3/Boost/ozz follow-up](../build/validation/integration-savings-20
 | --- | --- |
 | **RTXDI DI trial** | Replace one production sampling owner and compare equal-quality cost. Keep Reference and bounded owned research independent. GI/PT need separate decisions; no native host saving is identified. |
 | **Existing DLSS, then NRD/RELAX and AMD FSR upscaling** | Qualify DLSS through existing Streamline on D3D12; treat Vulkan separately and add no parallel NGX path. Integrate NRD through Sparkle RHI without NRI. Preserve temporal signals, history/reset, resources and failure behavior; consume/copy borrowed NRD dispatch data before requesting its next batch. Qualify actual FSR API/device paths and official signed payloads. |
-| **Later SHaRC, NRC and NTC** | Follow [Rendering](Rendering.md#reconstruction-and-caches). Finish SHaRC package/reproduction before NRC production. NTC requires classical-study results and does not wait for NRC. These add capability; they have no equivalent local cache/codec to retire. |
+| **Later SHaRC, NRC and NTC** | Follow the [post-release roadmap](Roadmap.md#after-release). Finish SHaRC package/reproduction before NRC production. NTC requires classical-study results and does not wait for NRC. These add capability; they have no equivalent local cache/codec to retire. |
 | **XeSS** | Deferred until a comparison question remains beyond DLSS/FSR. Frame generation stays excluded. |
 
 Use raw Reference controls and quality-equivalent whole-frame/memory comparisons. Attribute vendor algorithms separately from the [owned model case](Goals.md#the-three-cases). [References](References.md#integration-precedents) holds primary integration studies; exact SDK/tool/device support must be checked for implementation.

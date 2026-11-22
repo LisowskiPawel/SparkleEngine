@@ -6,7 +6,6 @@
 #include "Core/Public/Diagnostics/Verify.h"
 
 #include <algorithm>
-#include <array>
 #include <limits>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_gpuSceneSlotLogger, "Renderer.GpuScene");
@@ -39,10 +38,7 @@ void GpuSceneSlotAllocator::Retire(std::uint32_t slot)
 	RetiredSlot retired{.Slot = slot};
 	if (m_submissionService != nullptr)
 	{
-		for (std::size_t queueIndex = 0; queueIndex < RhiQueueTypeCount; ++queueIndex)
-		{
-			retired.LastUse.MarkUsed(m_submissionService->GetLastSubmittedToken(static_cast<ERhiQueueType>(queueIndex)));
-		}
+		retired.LastUse = m_submissionService->CaptureLastSubmittedState();
 	}
 
 	if (IsComplete(retired))
@@ -69,19 +65,5 @@ void GpuSceneSlotAllocator::DrainCompletedRetirements()
 
 bool GpuSceneSlotAllocator::IsComplete(const RetiredSlot& retired) const noexcept
 {
-	if (m_submissionService == nullptr)
-	{
-		return true;
-	}
-
-	std::array<RhiSubmissionToken, RhiQueueTypeCount> tokens;
-	const std::size_t tokenCount = retired.LastUse.CopyTokens(tokens);
-	for (std::size_t index = 0; index < tokenCount; ++index)
-	{
-		if (!m_submissionService->IsSubmissionComplete(tokens[index]))
-		{
-			return false;
-		}
-	}
-	return true;
+	return m_submissionService == nullptr || m_submissionService->IsSubmissionStateComplete(retired.LastUse);
 }

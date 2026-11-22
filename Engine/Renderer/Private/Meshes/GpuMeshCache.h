@@ -83,10 +83,9 @@ private:
 	void ActivateResidentMeshes() noexcept;
 	void RemoveTerminalRequests() noexcept;
 	void RetireActiveMesh(ActiveMesh& mesh) noexcept;
-	RhiSubmissionState CaptureLastSubmittedState() const noexcept;
 
-	RenderHardwareInterface* m_renderHardwareInterface = nullptr;
-	RhiCommandSubmissionService* m_submissions = nullptr;
+	RenderHardwareInterface& m_renderHardwareInterface;
+	RhiCommandSubmissionService& m_submissions;
 	enkiTaskScheduler* m_cpu;
 	std::stop_source m_stop;
 	AssetResidency m_residency;

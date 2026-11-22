@@ -9,7 +9,6 @@
 #include <new>
 
 #include <algorithm>
-#include <array>
 #include <utility>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_gpuMeshCacheLogger, "Renderer.GpuMeshCache");
@@ -122,9 +121,6 @@ void GpuMeshCache::LaunchPreparation(MeshRequest& request)
 			throw std::bad_alloc();
 		}
 		enkiSetArgsPinnedTask(request.Preparation, &request);
-	}
-	if (m_cpu)
-	{
 		enkiAddPinnedTask(m_cpu, request.Preparation);
 	}
 	else
@@ -246,20 +242,9 @@ void GpuMeshCache::RemoveTerminalRequests() noexcept
 
 void GpuMeshCache::RetireActiveMesh(ActiveMesh& mesh) noexcept
 {
-	if (!m_residency.BeginEviction(mesh.Generation, CaptureLastSubmittedState()))
+	if (!m_residency.BeginEviction(mesh.Generation, m_submissions.CaptureLastSubmittedState()))
 	{
 		Diagnostics::Fatal(g_gpuMeshCacheLogger, __FILE__, __LINE__, "Resident GPU mesh could not enter eviction.");
 	}
 	mesh.Mesh.reset();
-}
-
-RhiSubmissionState GpuMeshCache::CaptureLastSubmittedState() const noexcept
-{
-	RhiSubmissionState state;
-	for (std::size_t queueIndex = 0; queueIndex < RhiQueueTypeCount; ++queueIndex)
-	{
-		state.MarkUsed(m_submissions->GetLastSubmittedToken(static_cast<ERhiQueueType>(queueIndex)));
-	}
-
-	return state;
 }

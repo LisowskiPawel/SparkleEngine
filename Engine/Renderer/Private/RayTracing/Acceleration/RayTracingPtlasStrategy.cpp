@@ -1,6 +1,7 @@
 #include "PCH.h"
 #include "RHI/Public/Core/RhiCapabilities.h"
 #include "RHI/Public/RayTracing/RhiRayTracingService.h"
+#include "RHI/Public/RayTracing/RhiPtlasService.h"
 #include "RHI/Public/Resources/RhiResourceService.h"
 
 #include "RayTracing/Acceleration/RayTracingPtlasStrategy.h"
@@ -86,14 +87,15 @@ void RayTracingPtlasStrategy::EnsurePtlasResources(const RhiPtlasDesc& requiredL
 	}
 
 	RhiRayTracingService& rayTracingService = m_renderHardwareInterface.GetRayTracingService();
-	const RhiPtlasBuildSizes buildSizes = rayTracingService.GetPtlasBuildSizes(requiredLayout);
+	RhiPtlasService& ptlasService = rayTracingService.GetPtlasService();
+	const RhiPtlasBuildSizes buildSizes = ptlasService.GetPtlasBuildSizes(requiredLayout);
 	if (buildSizes.AccelerationStructureSizeInBytes == 0 || buildSizes.BuildScratchSizeInBytes == 0)
 	{
 		Diagnostics::Fatal(g_rayTracingPtlasStrategyLogger, __FILE__, __LINE__, "PTLAS build sizing produced zero-sized storage.");
 	}
 
 	ReleasePtlasResources();
-	m_ptlasResources.Storage = rayTracingService.CreatePtlasBuffer(buildSizes, L"RayTracingPtlas");
+	m_ptlasResources.Storage = ptlasService.CreatePtlasBuffer(buildSizes, L"RayTracingPtlas");
 	m_ptlasResources.Scratch = rayTracingService.CreateRayTracingScratchBuffer(buildSizes.BuildScratchSizeInBytes, L"RayTracingPtlasScratch");
 	m_ptlasResources.Layout = requiredLayout;
 	RhiResourceService& resources = m_renderHardwareInterface.GetResourceService();

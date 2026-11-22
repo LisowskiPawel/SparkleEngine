@@ -40,7 +40,7 @@ namespace SparkleLauncher
 		LauncherLevelUiModel& m_model;
 		QPushButton* m_sourceButton = nullptr;
 		QPushButton* m_primaryButton = nullptr;
-		QString m_currentLevelId;
+		QString m_restoreLevelId;
 		QString m_resetContentId;
 		int m_previousRow = 0;
 		QPoint m_clickPosition;

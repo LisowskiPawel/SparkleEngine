@@ -2,6 +2,7 @@
 
 #include "../RHIAPI.h"
 #include "RhiCommandRecordingLease.h"
+#include "RhiQueue.h"
 
 #include <cstdint>
 #include <span>
@@ -30,6 +31,9 @@ public:
 	virtual void WaitForSubmission(RhiSubmissionToken token) noexcept = 0;
 	virtual bool IsSubmissionComplete(RhiSubmissionToken token) const noexcept = 0;
 	virtual RhiSubmissionToken GetLastSubmittedToken(ERhiQueueType queueType) const noexcept = 0;
+
+	RhiSubmissionState CaptureLastSubmittedState() const noexcept;
+	bool IsSubmissionStateComplete(const RhiSubmissionState& state) const noexcept;
 
 protected:
 	RhiCommandSubmissionService() noexcept = default;

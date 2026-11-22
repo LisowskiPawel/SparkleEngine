@@ -86,7 +86,6 @@ public:
 
 private:
 	AssetGenerationStatus* FindMutable(AssetGenerationHandle handle) noexcept;
-	bool IsComplete(const RhiSubmissionState& completion, RhiCommandSubmissionService& submissions) const noexcept;
 	void ReleaseCpuBudget(AssetGenerationStatus& generation) noexcept;
 	void ReleaseBacklog(AssetGenerationStatus& generation) noexcept;
 	void Retire(AssetGenerationStatus& generation) noexcept;

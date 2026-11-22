@@ -93,7 +93,6 @@ private:
 		std::unique_ptr<CookedTextureLoad> Load;
 		std::optional<LoadedTextureData> Decoded;
 		std::optional<RendererTexture> Uploaded;
-		RhiResourceHandle UploadedResource;
 		std::uint64_t DecodeReservationBytes = 0;
 		bool bUploadSubmitted = false;
 		bool bWanted = true;
@@ -129,7 +128,6 @@ private:
 	void ActivateResidentRequests() noexcept;
 	void QueueTextureRetirement(ActiveTexture texture, std::uint64_t bindingRevision);
 	void ReleaseActiveTexture(ActiveTexture& texture) noexcept;
-	RhiSubmissionState CaptureLastSubmittedState() const noexcept;
 	const RendererTexture* FindPathTexture(const std::filesystem::path& texturePath) const noexcept;
 	bool HasPendingRequest(const std::filesystem::path& texturePath) const noexcept;
 	std::optional<ResolvedTexturePath> ResolveTexturePath(const std::filesystem::path& texturePath) const noexcept;

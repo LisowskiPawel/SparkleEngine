@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "RHI/Public/RayTracing/RhiRayTracingService.h"
+#include "RHI/Public/RayTracing/RhiTlasService.h"
 #include "RHI/Public/Resources/RhiResourceService.h"
 
 #include "RayTracing/Acceleration/RayTracingTlasBuilder.h"
@@ -86,7 +87,8 @@ RayTracingTlasBuilder::~RayTracingTlasBuilder() noexcept
 void RayTracingTlasBuilder::Prepare(std::uint32_t instanceCapacity) noexcept
 {
 	const ERhiTlasBuildFlags buildFlags = ResolveTlasBuildFlags(m_renderHardwareInterface);
-	const RhiRayTracingAccelerationStructurePrebuildInfo prebuildInfo = m_renderHardwareInterface.GetRayTracingService().GetTlasPrebuildInfo(instanceCapacity, buildFlags);
+	RhiTlasService& tlasService = m_renderHardwareInterface.GetRayTracingService().GetTlasService();
+	const RhiRayTracingAccelerationStructurePrebuildInfo prebuildInfo = tlasService.GetTlasPrebuildInfo(instanceCapacity, buildFlags);
 	if (prebuildInfo.ResultDataMaxSizeInBytes == 0 || ResolveScratchSize(prebuildInfo, buildFlags) == 0)
 	{
 		Diagnostics::Fatal(g_rayTracingTlasBuilderLogger, __FILE__, __LINE__, "TLAS prebuild sizing produced an unusable resource layout.");
@@ -166,7 +168,8 @@ void RayTracingTlasBuilder::CollectInstances(
 void RayTracingTlasBuilder::PrepareBuild(BuildState& state) noexcept
 {
 	state.RequestedFlags = m_bResourcesAllowUpdate ? ERhiTlasBuildFlags::AllowUpdate : ERhiTlasBuildFlags::None;
-	state.PrebuildInfo = m_renderHardwareInterface.GetRayTracingService().GetTlasPrebuildInfo(static_cast<std::uint32_t>(state.Instances.size()), state.RequestedFlags);
+	RhiTlasService& tlasService = m_renderHardwareInterface.GetRayTracingService().GetTlasService();
+	state.PrebuildInfo = tlasService.GetTlasPrebuildInfo(static_cast<std::uint32_t>(state.Instances.size()), state.RequestedFlags);
 	const std::uint64_t scratchSizeInBytes = ResolveScratchSize(state.PrebuildInfo, state.RequestedFlags);
 	if (state.PrebuildInfo.ResultDataMaxSizeInBytes == 0 || scratchSizeInBytes == 0)
 	{
@@ -181,10 +184,7 @@ void RayTracingTlasBuilder::PrepareBuild(BuildState& state) noexcept
 		m_instanceBuffer = {};
 	}
 
-	m_instanceBuffer = m_renderHardwareInterface.GetRayTracingService().CreateRayTracingInstanceBuffer(
-	    state.Instances.empty() ? nullptr : state.Instances.data(),
-	    static_cast<std::uint32_t>(state.Instances.size()),
-	    L"RayTracingTlasInstances");
+	m_instanceBuffer = tlasService.CreateTlasInstanceBuffer(state.Instances.empty() ? nullptr : state.Instances.data(), static_cast<std::uint32_t>(state.Instances.size()), L"RayTracingTlasInstances");
 
 	if (!m_instanceBuffer)
 	{

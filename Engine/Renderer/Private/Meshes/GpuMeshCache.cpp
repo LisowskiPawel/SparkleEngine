@@ -13,8 +13,8 @@
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_gpuMeshCacheLogger, "Renderer.GpuMeshCache");
 
 GpuMeshCache::GpuMeshCache(RenderHardwareInterface& renderHardwareInterface, RhiCommandSubmissionService& submissions, enkiTaskScheduler* cpu) :
-    m_renderHardwareInterface(&renderHardwareInterface),
-    m_submissions(&submissions),
+    m_renderHardwareInterface(renderHardwareInterface),
+    m_submissions(submissions),
     m_cpu(cpu)
 {
 }
@@ -150,7 +150,7 @@ void GpuMeshCache::UploadReadyMeshes(RenderCommandList& commandList)
 
 		request.ResidentBytes = request.Prepared->GetResidentByteSize();
 		auto gpuMesh = std::make_unique<GpuMesh>(request.Handle);
-		gpuMesh->Upload(*m_renderHardwareInterface, commandList, std::move(*request.Prepared));
+		gpuMesh->Upload(m_renderHardwareInterface, commandList, std::move(*request.Prepared));
 
 		request.Prepared.reset();
 		request.Uploaded = std::move(gpuMesh);
@@ -189,7 +189,7 @@ void GpuMeshCache::RecordUploadSubmission(RhiSubmissionToken token) noexcept
 void GpuMeshCache::PollResidency() noexcept
 {
 	ConsumeCompletedPreparations();
-	m_residency.Poll(*m_submissions);
+	m_residency.Poll(m_submissions);
 	ActivateResidentMeshes();
 	RemoveTerminalRequests();
 }
