@@ -1,117 +1,74 @@
 #include "PCH.h"
 #include "D3D12/Descriptors/D3D12DescriptorAllocator.h"
 
-#include <algorithm>
-
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(LogD3D12DescriptorAllocator, "RHI.D3D12.Descriptors");
 
 D3D12DescriptorAllocator::D3D12DescriptorAllocator(D3D12DescriptorHeap* heap) noexcept :
     m_heap(heap)
 {
+	D3D12MA::VIRTUAL_BLOCK_DESC blockDesc{};
+	blockDesc.Size = m_heap->GetNumDescriptors();
+	CHECK(D3D12MA::CreateVirtualBlock(&blockDesc, m_block.ReleaseAndGetAddressOf()));
 }
 
-std::optional<UINT> D3D12DescriptorAllocator::TryAllocateContiguousFromFreeListLocked(uint32_t count)
+D3D12DescriptorAllocator::~D3D12DescriptorAllocator() noexcept
 {
-	if (m_freeIndices.size() < count)
-	{
-		return std::nullopt;
-	}
-
-	std::sort(m_freeIndices.begin(), m_freeIndices.end());
-
-	for (std::size_t start = 0; start + count <= m_freeIndices.size(); ++start)
-	{
-		bool bIsContiguousRun = true;
-		for (std::size_t offset = 1; offset < count; ++offset)
-		{
-			if (m_freeIndices[start + offset] != m_freeIndices[start] + offset)
-			{
-				bIsContiguousRun = false;
-				break;
-			}
-		}
-
-		if (bIsContiguousRun)
-		{
-			const UINT startIndex = m_freeIndices[start];
-			m_freeIndices.erase(m_freeIndices.begin() + static_cast<std::ptrdiff_t>(start), m_freeIndices.begin() + static_cast<std::ptrdiff_t>(start + count));
-			return startIndex;
-		}
-	}
-
-	return std::nullopt;
-}
-
-D3D12DescriptorHandle D3D12DescriptorAllocator::AllocateContiguousFromLinearRangeLocked(uint32_t count)
-{
-	if (m_currentOffset + count > m_heap->GetNumDescriptors())
-	{
-		Diagnostics::Fatal(LogD3D12DescriptorAllocator, __FILE__, __LINE__, "Descriptor heap cannot allocate contiguous block (insufficient space).");
-	}
-
-	const UINT startIndex = m_currentOffset;
-	m_currentOffset += count;
-	return m_heap->GetHandleAt(startIndex);
+	m_block->Clear();
 }
 
 D3D12DescriptorHandle D3D12DescriptorAllocator::Allocate()
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
-	uint32_t index = ~0u;
-
-	if (!m_freeIndices.empty())
-	{
-		index = m_freeIndices.back();
-		m_freeIndices.pop_back();
-	}
-	else if (m_currentOffset < m_heap->GetNumDescriptors())
-	{
-		index = m_currentOffset++;
-	}
-	else
-	{
-		Diagnostics::Fatal(LogD3D12DescriptorAllocator, __FILE__, __LINE__, "Descriptor heap is full.");
-	}
-
-	return m_heap->GetHandleAt(index);
+	return AllocateContiguous(1);
 }
 
 D3D12DescriptorHandle D3D12DescriptorAllocator::AllocateContiguous(uint32_t count)
 {
 	if (count == 0)
 	{
-		return D3D12DescriptorHandle{};
+		return {};
 	}
 
 	std::lock_guard<std::mutex> lock(m_mutex);
-
-	if (const auto reusedStartIndex = TryAllocateContiguousFromFreeListLocked(count))
+	D3D12MA::VIRTUAL_ALLOCATION_DESC allocationDesc{};
+	allocationDesc.Size = count;
+	D3D12MA::VirtualAllocation allocation{};
+	UINT64 offset = 0;
+	const HRESULT result = m_block->Allocate(&allocationDesc, &allocation, &offset);
+	if (FAILED(result))
 	{
-		return m_heap->GetHandleAt(*reusedStartIndex);
+		Diagnostics::Fatal(LogD3D12DescriptorAllocator, __FILE__, __LINE__, "Descriptor heap cannot allocate the requested contiguous range.");
 	}
 
-	return AllocateContiguousFromLinearRangeLocked(count);
+	const UINT index = static_cast<UINT>(offset);
+	m_allocations.emplace(index, allocation);
+	return m_heap->GetHandleAt(index);
 }
 
 void D3D12DescriptorAllocator::Free(const D3D12DescriptorHandle& handle) noexcept
 {
-	if (handle.IsValid())
-	{
-		std::lock_guard<std::mutex> lock(m_mutex);
-		m_freeIndices.push_back(handle.GetIndex());
-	}
+	FreeContiguous(handle, 1);
 }
 
 void D3D12DescriptorAllocator::FreeContiguous(const D3D12DescriptorHandle& firstHandle, uint32_t count) noexcept
 {
-	if (firstHandle.IsValid() && count > 0)
+	if (!firstHandle.IsValid() || count == 0)
 	{
-		std::lock_guard<std::mutex> lock(m_mutex);
-		uint32_t startIndex = firstHandle.GetIndex();
-		for (uint32_t i = 0; i < count; ++i)
-		{
-			m_freeIndices.push_back(startIndex + i);
-		}
+		return;
 	}
+
+	std::lock_guard<std::mutex> lock(m_mutex);
+	const auto allocation = m_allocations.find(firstHandle.GetIndex());
+	if (allocation == m_allocations.end())
+	{
+		Diagnostics::Fatal(LogD3D12DescriptorAllocator, __FILE__, __LINE__, "Descriptor range is not allocated.");
+	}
+
+	D3D12MA::VIRTUAL_ALLOCATION_INFO allocationInfo{};
+	m_block->GetAllocationInfo(allocation->second, &allocationInfo);
+	if (allocationInfo.Size != count)
+	{
+		Diagnostics::Fatal(LogD3D12DescriptorAllocator, __FILE__, __LINE__, "Descriptor release must cover the complete allocated range.");
+	}
+	m_block->FreeAllocation(allocation->second);
+	m_allocations.erase(allocation);
 }

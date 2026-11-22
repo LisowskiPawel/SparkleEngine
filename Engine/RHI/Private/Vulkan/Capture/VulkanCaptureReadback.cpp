@@ -5,25 +5,8 @@
 #include "Capture/RhiCaptureFormat.h"
 #include "Vulkan/Commands/VulkanCommandQueue.h"
 #include "Vulkan/Device/VulkanRhi.h"
+#include "Vulkan/Memory/VulkanGpuMemoryAllocator.h"
 #include "Vulkan/VulkanTypeConversions.h"
-
-#include <cstring>
-
-static std::uint32_t FindMemoryType(VkPhysicalDevice physicalDevice, std::uint32_t typeBits, VkMemoryPropertyFlags requiredFlags) noexcept
-{
-	VkPhysicalDeviceMemoryProperties properties{};
-	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &properties);
-	for (std::uint32_t index = 0; index < properties.memoryTypeCount; ++index)
-	{
-		const bool bTypeAvailable = (typeBits & (1u << index)) != 0;
-		const bool bFlagsMatch = (properties.memoryTypes[index].propertyFlags & requiredFlags) == requiredFlags;
-		if (bTypeAvailable && bFlagsMatch)
-		{
-			return index;
-		}
-	}
-	return UINT32_MAX;
-}
 
 static void RecordTransition(VkCommandBuffer commandBuffer, VkImage image, ResourceState before, ResourceState after) noexcept
 {
@@ -62,14 +45,6 @@ VulkanCaptureService::PendingReadback::~PendingReadback() noexcept
 	{
 		vkDestroyCommandPool(Device, CommandPool, nullptr);
 	}
-	if (Memory != VK_NULL_HANDLE)
-	{
-		vkFreeMemory(Device, Memory, nullptr);
-	}
-	if (Buffer != VK_NULL_HANDLE)
-	{
-		vkDestroyBuffer(Device, Buffer, nullptr);
-	}
 }
 
 std::unique_ptr<VulkanCaptureService::PendingReadback> VulkanCaptureService::PrepareReadback(const RhiTextureCaptureRequest& request) noexcept
@@ -102,33 +77,9 @@ std::unique_ptr<VulkanCaptureService::PendingReadback> VulkanCaptureService::Pre
 
 bool VulkanCaptureService::AllocateReadbackBuffer(PendingReadback& pending) noexcept
 {
-	const VkDevice device = pending.Device;
-	const VkPhysicalDevice physicalDevice = m_rhi.GetPhysicalDevice();
 	const VkBufferCreateInfo bufferInfo{.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO, .size = pending.ByteCount, .usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT, .sharingMode = VK_SHARING_MODE_EXCLUSIVE};
-	if (vkCreateBuffer(device, &bufferInfo, nullptr, &pending.Buffer) != VK_SUCCESS || pending.Buffer == VK_NULL_HANDLE)
-	{
-		return false;
-	}
-
-	VkMemoryRequirements requirements{};
-	vkGetBufferMemoryRequirements(device, pending.Buffer, &requirements);
-	const std::uint32_t memoryType = FindMemoryType(physicalDevice, requirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-	if (memoryType == UINT32_MAX)
-	{
-		return false;
-	}
-
-	const VkMemoryAllocateInfo allocation{.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO, .allocationSize = requirements.size, .memoryTypeIndex = memoryType};
-	const VkResult allocationResult = vkAllocateMemory(device, &allocation, nullptr, &pending.Memory);
-	const bool bMemoryAllocated = allocationResult == VK_SUCCESS && pending.Memory != VK_NULL_HANDLE;
-	const bool bBufferBound = bMemoryAllocated && vkBindBufferMemory(device, pending.Buffer, pending.Memory, 0) == VK_SUCCESS;
-
-	if (!bBufferBound)
-	{
-		return false;
-	}
-
-	return true;
+	pending.Buffer = m_memoryAllocator.CreateBuffer(bufferInfo, RhiMemoryCategory::Readback, RhiMemoryResidencyClass::HostReadback, L"Texture capture readback");
+	return pending.Buffer != nullptr;
 }
 
 bool VulkanCaptureService::BeginReadbackCommands(PendingReadback& pending) noexcept
@@ -170,7 +121,7 @@ bool VulkanCaptureService::RecordReadbackCopy(PendingReadback& pending) noexcept
 	    .imageSubresource = VkImageSubresourceLayers{.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT, .mipLevel = 0, .baseArrayLayer = 0, .layerCount = 1},
 	    .imageExtent = VkExtent3D{.width = request.Width, .height = request.Height, .depth = 1}};
 
-	vkCmdCopyImageToBuffer(pending.CommandBuffer, sourceImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, pending.Buffer, 1, &copyRegion);
+	vkCmdCopyImageToBuffer(pending.CommandBuffer, sourceImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, pending.Buffer->Buffer, 1, &copyRegion);
 	RecordTransition(pending.CommandBuffer, sourceImage, ResourceState::CopySource, request.SourceState);
 	if (vkEndCommandBuffer(pending.CommandBuffer) != VK_SUCCESS)
 	{
@@ -188,15 +139,16 @@ bool VulkanCaptureService::SubmitReadback(PendingReadback& pending) noexcept
 
 void VulkanCaptureService::ReadPixels(PendingReadback& pending, RhiCaptureReadback& readback) noexcept
 {
-	void* mappedData = nullptr;
-	const VkResult mapResult = vkMapMemory(pending.Device, pending.Memory, 0, pending.ByteCount, 0, &mappedData);
-	if (mapResult != VK_SUCCESS || mappedData == nullptr)
+	readback.Pixels.resize(static_cast<std::size_t>(pending.ByteCount));
+	const bool bPixelsRead = m_memoryAllocator.ReadAllocation(*pending.Buffer, readback.Pixels.data(), readback.Pixels.size());
+	if (!bPixelsRead)
 	{
+		readback.Pixels.clear();
 		readback.Result = RhiCaptureResult{
 		    .Status = ERhiCaptureStatus::Failed,
 		    .BackendApi = ERhiBackendApi::Vulkan,
 		    .FrameId = pending.Request.FrameId,
-		    .FailureReason = "Vulkan texture readback memory could not be mapped"};
+		    .FailureReason = "Vulkan texture readback memory could not be copied to the CPU"};
 
 		return;
 	}
@@ -205,9 +157,6 @@ void VulkanCaptureService::ReadPixels(PendingReadback& pending, RhiCaptureReadba
 	readback.Height = pending.Request.Height;
 	readback.RowPitch = pending.RowPitch;
 	readback.Format = pending.Request.SourceFormat;
-	readback.Pixels.resize(static_cast<std::size_t>(pending.ByteCount));
-	std::memcpy(readback.Pixels.data(), mappedData, readback.Pixels.size());
-	vkUnmapMemory(pending.Device, pending.Memory);
 }
 
 bool VulkanCaptureService::IsReadbackComplete(const PendingReadback& pending) const noexcept

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Animation/AnimationEvaluationTypes.h"
 #include "GameFramework/Public/World/EntityId.h"
 #include "World/ECS/Components/AnimationComponents.h"
 #include "World/Resources/AnimationClipResourceStore.h"
 #include "World/Resources/SkeletonResourceStore.h"
 
 #include <cstdint>
+#include <array>
 #include <limits>
 #include <span>
 #include <vector>
@@ -42,7 +42,7 @@ namespace ECS
 			std::uint64_t SourceInstanceId = 0;
 			std::uint32_t TrackIndex = 0;
 			std::uint32_t TargetNodeIndex = (std::numeric_limits<std::uint32_t>::max)();
-			std::vector<float> Weights;
+			std::array<float, 4> Weights{};
 		};
 
 		struct MorphTargetBinding final

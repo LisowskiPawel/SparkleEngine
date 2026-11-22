@@ -7,11 +7,12 @@
 #include <vector>
 
 class D3D12Rhi;
+class D3D12GpuMemoryAllocator;
 
 class D3D12CaptureService final : public RhiCaptureService
 {
 public:
-	explicit D3D12CaptureService(D3D12Rhi& rhi) noexcept;
+	explicit D3D12CaptureService(D3D12Rhi& rhi, D3D12GpuMemoryAllocator& memoryAllocator) noexcept;
 	~D3D12CaptureService() noexcept override;
 
 	RhiCaptureTicket BeginTextureReadback(const RhiTextureCaptureRequest& request) noexcept override;
@@ -31,6 +32,7 @@ private:
 	void DrainCancelledReadbacks() noexcept;
 
 	D3D12Rhi& m_rhi;
+	D3D12GpuMemoryAllocator& m_memoryAllocator;
 	std::vector<std::unique_ptr<PendingReadback>> m_pendingReadbacks;
 	std::uint64_t m_nextTicket = 1;
 };

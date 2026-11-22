@@ -53,13 +53,11 @@ void D3D12MemoryUsage::QueryBudget(D3D12MA::Allocator& allocator, D3D12MA::Budge
 {
 	allocator.GetBudget(&localBudget, &nonLocalBudget);
 
-	D3D12MA::TotalStatistics totalStats = {};
-	allocator.CalculateStatistics(&totalStats);
 	snapshot.AllocatorBackend = ERhiMemoryAllocatorBackend::D3D12Managed;
 	snapshot.bHasBudgetData = true;
 	snapshot.bHasDelayedDestructionTracking = false;
-	snapshot.TotalUsedBytes = totalStats.Total.Stats.AllocationBytes;
-	snapshot.TotalAllocatedBytes = totalStats.Total.Stats.BlockBytes;
+	snapshot.TotalUsedBytes = localBudget.Stats.AllocationBytes + nonLocalBudget.Stats.AllocationBytes;
+	snapshot.TotalAllocatedBytes = localBudget.Stats.BlockBytes + nonLocalBudget.Stats.BlockBytes;
 	snapshot.TotalBudgetBytes = localBudget.BudgetBytes + nonLocalBudget.BudgetBytes;
 	snapshot.ApiUsageBytes = localBudget.UsageBytes + nonLocalBudget.UsageBytes;
 }

@@ -58,21 +58,18 @@ void Window::Minimize() noexcept
 {
 	m_native->Thread.AssertAccess();
 	m_native->PendingShow = State::Minimized;
-	m_native->bHasPendingShow = true;
 }
 
 void Window::Maximize() noexcept
 {
 	m_native->Thread.AssertAccess();
 	m_native->PendingShow = State::Maximized;
-	m_native->bHasPendingShow = true;
 }
 
 void Window::Restore() noexcept
 {
 	m_native->Thread.AssertAccess();
 	m_native->PendingShow = State::Normal;
-	m_native->bHasPendingShow = true;
 }
 
 void Window::ToggleMaximizeRestore() noexcept
@@ -92,12 +89,13 @@ void Window::ToggleMaximizeRestore() noexcept
 
 void Window::ApplyPendingShowCommand() noexcept
 {
-	if (!m_native->bHasPendingShow)
+	if (!m_native->PendingShow)
 	{
 		return;
 	}
-	m_native->bHasPendingShow = false;
-	switch (m_native->PendingShow)
+	const State pending = *m_native->PendingShow;
+	m_native->PendingShow.reset();
+	switch (pending)
 	{
 		case State::Minimized:
 			CancelInput(InputCancellation::All);

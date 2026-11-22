@@ -76,9 +76,9 @@ namespace ECS
 			}
 
 			const ResolvedAnimationClip clip = m_clips.Resolve(slot.Clip);
-			const SkeletonEvaluationData skeleton = m_skeletons.Resolve(slot.Skeleton);
-			const bool bInputsAvailable = clip.IsValid() && skeleton.IsValid();
-			const bool bPoseEvaluated = bInputsAvailable && AnimationPreviewEvaluator::EvaluatePose(*clip.Resource, *skeleton.Resource, state->TimeSeconds, slot);
+			const SkeletonResource* skeleton = m_skeletons.Resolve(slot.Skeleton);
+			const bool bInputsAvailable = clip.IsValid() && skeleton != nullptr;
+			const bool bPoseEvaluated = bInputsAvailable && AnimationPreviewEvaluator::EvaluatePose(*clip.Resource, *skeleton, state->TimeSeconds, slot);
 			if (!bPoseEvaluated)
 			{
 				return false;

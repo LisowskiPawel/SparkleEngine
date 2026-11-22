@@ -29,8 +29,7 @@ namespace Assets
 			const auto bytes = files.Get(skeletonAssetPath);
 			const LoadedSkeletonAsset skeletonAsset = SkeletonAssetLoader::Decode(bytes, budget);
 			budget.ReserveArray<SkeletonJoint>(skeletonAsset.joints.size());
-			budget.Reserve(skeletonAsset.joints.size(), sizeof(CookedSkeletonJointRecord{}.name));
-			SkeletonResource skeleton = BuildSceneAssetSkeleton(skeletonAsset, skeletonRef.skeletonAssetId, skeletonRef.sourceSkinIndex, budget);
+			SkeletonResource skeleton = BuildSceneAssetSkeleton(skeletonAsset, skeletonRef.skeletonAssetId, budget);
 			sceneAssetPayload.skeletons.push_back(std::move(skeleton));
 			files.Release(skeletonAssetPath);
 		}

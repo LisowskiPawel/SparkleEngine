@@ -34,6 +34,7 @@ public:
 
 	bool IsInitialized() const noexcept;
 	bool SupportsBudgetQueries() const noexcept;
+	void SetCurrentFrameIndex(std::uint32_t frameIndex) noexcept;
 	RhiMemoryUsageSnapshot CreateMemoryUsageSnapshot() const;
 
 	std::unique_ptr<VulkanGpuAllocationRecord> CreateBuffer(
@@ -59,6 +60,7 @@ public:
 	    const VkBufferCreateInfo& bufferCreateInfo,
 	    std::wstring_view debugName) noexcept;
 	bool WriteAllocation(VulkanGpuAllocationRecord& record, const void* data, std::size_t sizeInBytes, std::size_t destinationOffsetInBytes = 0) noexcept;
+	bool ReadAllocation(const VulkanGpuAllocationRecord& record, void* data, std::size_t sizeInBytes, std::size_t sourceOffsetInBytes = 0) noexcept;
 	VulkanGpuAllocationRecord* FindAllocationRecord(RhiResourceHandle resource) const noexcept;
 	VulkanGpuAllocationRecord* FindAllocationRecordByDeviceAddress(VkDeviceAddress deviceAddress) const noexcept;
 

@@ -40,7 +40,7 @@ D3D12RenderHardwareInterface::D3D12RenderHardwareInterface(
     m_uploadService(&uploadService)
 {
 	m_interopService = std::make_unique<D3D12InteropService>(*this);
-	m_captureService = std::make_unique<D3D12CaptureService>(rhi);
+	m_captureService = std::make_unique<D3D12CaptureService>(rhi, memoryAllocator);
 	m_pipelineService = std::make_unique<RhiPipelineServiceAdapter<D3D12Rhi, D3D12Pipeline, D3D12RayTracingPipeline, CompileD3D12BindingLayout>>(rhi);
 	m_descriptorService = std::make_unique<D3D12DescriptorService>(rhi, descriptorHeapManager, m_capabilities);
 	m_resourceService = std::make_unique<D3D12ResourceService>(rhi, memoryAllocator, m_capabilities);

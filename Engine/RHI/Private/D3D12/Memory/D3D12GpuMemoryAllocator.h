@@ -28,6 +28,7 @@ public:
 
 	bool IsInitialized() const noexcept;
 	bool SupportsBudgetQueries() const noexcept;
+	void SetCurrentFrameIndex(std::uint32_t frameIndex) noexcept;
 	RhiMemoryUsageSnapshot CreateMemoryUsageSnapshot() const;
 	std::unique_ptr<D3D12GpuAllocationRecord> CreateTexture(
 	    const D3D12_RESOURCE_DESC& resourceDesc,

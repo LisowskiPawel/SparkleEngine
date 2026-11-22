@@ -152,7 +152,7 @@ void VulkanRenderDeviceServices::ResizeSwapChain() noexcept
 
 void VulkanRenderDeviceServices::BeginFrame(std::uint64_t frameId) noexcept
 {
-	(void) frameId;
+	m_memoryAllocator->SetCurrentFrameIndex(static_cast<std::uint32_t>(frameId));
 	m_renderHardwareInterface->SetCurrentFrameIndex(m_currentFrameIndex);
 	BeginFrameRecording();
 	AcquireFrameBackBuffer();

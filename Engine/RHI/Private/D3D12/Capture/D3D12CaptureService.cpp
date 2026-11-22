@@ -6,8 +6,9 @@
 #include <algorithm>
 #include <utility>
 
-D3D12CaptureService::D3D12CaptureService(D3D12Rhi& rhi) noexcept :
-    m_rhi(rhi)
+D3D12CaptureService::D3D12CaptureService(D3D12Rhi& rhi, D3D12GpuMemoryAllocator& memoryAllocator) noexcept :
+    m_rhi(rhi),
+    m_memoryAllocator(memoryAllocator)
 {
 }
 

@@ -65,6 +65,12 @@ bool D3D12GpuMemoryAllocator::SupportsBudgetQueries() const noexcept
 	return IsInitialized();
 }
 
+void D3D12GpuMemoryAllocator::SetCurrentFrameIndex(std::uint32_t frameIndex) noexcept
+{
+	m_owner.AssertAccess();
+	m_impl->allocator->SetCurrentFrameIndex(frameIndex);
+}
+
 RhiMemoryUsageSnapshot D3D12GpuMemoryAllocator::CreateMemoryUsageSnapshot() const
 {
 	m_owner.AssertAccess();

@@ -188,6 +188,7 @@ void D3D12RenderDeviceServices::DrainPresentationQueue() noexcept
 void D3D12RenderDeviceServices::BeginFrame(std::uint64_t frameId) noexcept
 {
 	m_swapChain->WaitForPresentationSlot();
+	m_rhi->GetMemoryAllocator().SetCurrentFrameIndex(static_cast<std::uint32_t>(frameId));
 	m_rhi->NotifyFrameLatencyMarker(ERhiFrameLatencyMarker::RenderSubmitStart, frameId);
 	m_rhi->SetCurrentFrameIndex(m_currentFrameIndex);
 	m_commandRecordingContext->BeginFrame(m_currentFrameIndex);

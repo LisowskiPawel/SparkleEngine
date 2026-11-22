@@ -5,34 +5,21 @@
 
 struct CanceledSdlInput final
 {
-	SDL_WindowID WindowId;
+	SDL_Window* Window;
 	InputCancellation Scope;
 };
 
 static bool SDLCALL KeepPendingSdlEvent(void* userData, SDL_Event* event) noexcept
 {
 	const auto& canceled = *static_cast<const CanceledSdlInput*>(userData);
-	switch (event->type)
+	if (SDL_GetWindowFromEvent(event) != canceled.Window)
 	{
-		case SDL_EVENT_MOUSE_MOTION:
-			return event->motion.windowID != canceled.WindowId;
-		case SDL_EVENT_MOUSE_BUTTON_DOWN:
-		case SDL_EVENT_MOUSE_BUTTON_UP:
-			return event->button.windowID != canceled.WindowId;
-		case SDL_EVENT_MOUSE_WHEEL:
-			return event->wheel.windowID != canceled.WindowId;
-		case SDL_EVENT_KEY_DOWN:
-		case SDL_EVENT_KEY_UP:
-			return canceled.Scope != InputCancellation::All || event->key.windowID != canceled.WindowId;
-		case SDL_EVENT_TEXT_INPUT:
-			return canceled.Scope != InputCancellation::All || event->text.windowID != canceled.WindowId;
-		case SDL_EVENT_TEXT_EDITING:
-			return canceled.Scope != InputCancellation::All || event->edit.windowID != canceled.WindowId;
-		case SDL_EVENT_TEXT_EDITING_CANDIDATES:
-			return canceled.Scope != InputCancellation::All || event->edit_candidates.windowID != canceled.WindowId;
-		default:
-			return true;
+		return true;
 	}
+	const bool bPointerEvent = event->type >= SDL_EVENT_MOUSE_MOTION && event->type <= SDL_EVENT_MOUSE_WHEEL;
+	const bool bKeyboardEvent = event->type >= SDL_EVENT_KEY_DOWN && event->type <= SDL_EVENT_TEXT_EDITING_CANDIDATES;
+	const bool bCancelKeyboard = canceled.Scope == InputCancellation::All && bKeyboardEvent;
+	return !bPointerEvent && !bCancelKeyboard;
 }
 
 void Window::CancelInput(InputCancellation cancellation) noexcept
@@ -44,7 +31,7 @@ void Window::CancelInput(InputCancellation cancellation) noexcept
 	}
 	// Synchronous native cancellation can interrupt SDL's pump before its queued input is delivered.
 	// Discard that pending input as well as invalidating the event already borrowed by observers.
-	CanceledSdlInput canceled{SDL_GetWindowID(m_native->Handle), cancellation};
+	CanceledSdlInput canceled{m_native->Handle, cancellation};
 	SDL_FilterEvents(KeepPendingSdlEvent, &canceled);
 	OnInputCanceled.Broadcast(cancellation);
 }

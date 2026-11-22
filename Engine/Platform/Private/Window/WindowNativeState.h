@@ -5,6 +5,7 @@
 #include "Threading/ThreadOwnership.h"
 #include <SDL3/SDL.h>
 #include <Windows.h>
+#include <optional>
 
 struct Window::NativeState final
 {
@@ -26,8 +27,7 @@ struct Window::NativeState final
 	SDL_FRect TitleBar{};
 	bool bPublishedMinimized = false;
 	float DpiScale = 0.0f;
-	State PendingShow = State::Normal;
-	bool bHasPendingShow = false;
+	std::optional<State> PendingShow;
 	bool bVideoInitialized = false;
 	bool bChangingRelativeMode = false;
 	bool bObservingCancellation = false;

@@ -13,7 +13,7 @@
 
 namespace Assets
 {
-	SkeletonResource BuildSceneAssetSkeleton(const LoadedSkeletonAsset& asset, CookedAssetId skeletonAssetId, std::uint32_t sourceSkinIndex, CookedAssetAllocationBudget& budget)
+	SkeletonResource BuildSceneAssetSkeleton(const LoadedSkeletonAsset& asset, CookedAssetId skeletonAssetId, CookedAssetAllocationBudget& budget)
 	{
 		ReserveOzzConstruction(budget, asset.evaluationJoints.size(), 0);
 		ozz::animation::offline::RawSkeleton raw;
@@ -47,12 +47,11 @@ namespace Assets
 
 		SkeletonResource skeleton;
 		skeleton.assetId = skeletonAssetId;
-		skeleton.sourceSkinIndex = sourceSkinIndex;
 		skeleton.evaluation = std::move(*evaluation);
 		skeleton.joints.reserve(asset.joints.size());
 		for (const auto& record : asset.joints)
 		{
-			skeleton.joints.push_back({record.name, record.sourceNodeIndex, record.evaluationJointIndex, record.inverseBindMatrix});
+			skeleton.joints.push_back({record.sourceNodeIndex, record.evaluationJointIndex, record.inverseBindMatrix});
 		}
 		return skeleton;
 	}

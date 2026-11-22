@@ -23,7 +23,7 @@ namespace Process
 			return child.TerminationError;
 		}
 		const ULONGLONG deadline = GetTickCount64() + ProcessTerminationTimeoutMilliseconds;
-		if (!TerminateJobObject(child.Job.Get(), 1))
+		if (!TerminateJobObject(child.Job.get(), 1))
 		{
 			return child.TerminationError = GetLastError();
 		}
@@ -45,16 +45,16 @@ namespace Process
 			ULONG_PTR key = 0;
 			OVERLAPPED* data = nullptr;
 			const DWORD remaining = static_cast<DWORD>(deadline - now);
-			if (!GetQueuedCompletionStatus(child.JobCompletion.Get(), &message, &key, &data, remaining))
+			if (!GetQueuedCompletionStatus(child.JobCompletion.get(), &message, &key, &data, remaining))
 			{
 				const DWORD error = GetLastError();
 				return child.TerminationError = error == WAIT_TIMEOUT ? ERROR_TIMEOUT : error;
 			}
-			const bool bOwnJob = key == reinterpret_cast<ULONG_PTR>(child.Job.Get());
+			const bool bOwnJob = key == reinterpret_cast<ULONG_PTR>(child.Job.get());
 			if (bOwnJob && message == JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO)
 			{
 				JOBOBJECT_BASIC_ACCOUNTING_INFORMATION accounting{};
-				if (!QueryInformationJobObject(child.Job.Get(), JobObjectBasicAccountingInformation, &accounting, sizeof(accounting), nullptr))
+				if (!QueryInformationJobObject(child.Job.get(), JobObjectBasicAccountingInformation, &accounting, sizeof(accounting), nullptr))
 				{
 					return child.TerminationError = GetLastError();
 				}
@@ -76,7 +76,7 @@ namespace Process
 	{
 		WindowsOwnedProcess& Owner;
 		ChildProcessResult& Result;
-		HANDLE Job = Owner.Job.Get();
+		HANDLE Job = Owner.Job.get();
 		WindowsProcessHandle RawProcess;
 		std::vector<std::byte> AttributeStorage;
 		LPPROC_THREAD_ATTRIBUTE_LIST Attributes = nullptr;
@@ -85,7 +85,7 @@ namespace Process
 		{
 			if (RawProcess)
 			{
-				TerminateWindowsProcessTree(Owner, RawProcess.Get());
+				TerminateWindowsProcessTree(Owner, RawProcess.get());
 			}
 			if (Attributes)
 			{
@@ -122,7 +122,7 @@ namespace Process
 		void on_success(ChildProcess::windows::default_launcher& launcher, const std::filesystem::path&, std::wstring&) noexcept
 		{
 			// Guard native creation until the launcher's managed handle construction returns.
-			RawProcess.Reset(launcher.process_information.hProcess);
+			RawProcess.reset(launcher.process_information.hProcess);
 			Result.bLaunched = true;
 			Result.ProcessId = launcher.process_information.dwProcessId;
 		}
@@ -202,18 +202,18 @@ namespace Process
 	    ChildProcessResult& result,
 	    WindowsOwnedProcess& child)
 	{
-		child.Job.Reset(CreateJobObjectW(nullptr, nullptr));
+		child.Job.reset(CreateJobObjectW(nullptr, nullptr));
 		JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits{};
 		limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-		const bool bJobConfigured = child.Job && SetInformationJobObject(child.Job.Get(), JobObjectExtendedLimitInformation, &limits, sizeof(limits));
+		const bool bJobConfigured = child.Job && SetInformationJobObject(child.Job.get(), JobObjectExtendedLimitInformation, &limits, sizeof(limits));
 		if (!bJobConfigured)
 		{
 			result.FailureReason = "Failed to establish child process tree ownership: " + FormatWindowsProcessError(GetLastError());
 			return false;
 		}
-		child.JobCompletion.Reset(CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 1));
-		JOBOBJECT_ASSOCIATE_COMPLETION_PORT completion{child.Job.Get(), child.JobCompletion.Get()};
-		const bool bCompletionAssociated = child.JobCompletion && SetInformationJobObject(child.Job.Get(), JobObjectAssociateCompletionPortInformation, &completion, sizeof(completion));
+		child.JobCompletion.reset(CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 1));
+		JOBOBJECT_ASSOCIATE_COMPLETION_PORT completion{child.Job.get(), child.JobCompletion.get()};
+		const bool bCompletionAssociated = child.JobCompletion && SetInformationJobObject(child.Job.get(), JobObjectAssociateCompletionPortInformation, &completion, sizeof(completion));
 		if (!bCompletionAssociated)
 		{
 			result.FailureReason = "Failed to observe child process tree completion: " + FormatWindowsProcessError(GetLastError());
@@ -232,14 +232,14 @@ namespace Process
 					result.FailureReason = "Failed to inherit child input: " + FormatWindowsProcessError(GetLastError());
 					return false;
 				}
-				input.Reset(inheritedInput);
+				input.reset(inheritedInput);
 			}
 			auto commandLine = BuildWindowsChildCommandLine(request);
 			auto environment = BuildChildEnvironment(environmentOverrides);
 			ChildProcess::process_stdio stdio{{}, outputHandle, outputHandle};
 			if (input)
 			{
-				stdio.in = ChildProcess::process_stdio{input.Get(), outputHandle, outputHandle}.in;
+				stdio.in = ChildProcess::process_stdio{input.get(), outputHandle, outputHandle}.in;
 			}
 			WindowsChildLaunch launch{child, result};
 			ChildProcess::windows::default_launcher launcher;
@@ -254,7 +254,7 @@ namespace Process
 			    environment,
 			    ChildProcess::process_start_dir(request.WorkingDirectory),
 			    launch);
-			launch.RawProcess.Release();
+			launch.RawProcess.release();
 			if (error)
 			{
 				result.StartFailure = ClassifyStartFailure(error.value());

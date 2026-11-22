@@ -59,6 +59,7 @@ target_link_libraries(SparkleCore
         SparkleDirectXMath
     PRIVATE
         Boost::process
+        Boost::scope
 )
 
 if(WIN32)

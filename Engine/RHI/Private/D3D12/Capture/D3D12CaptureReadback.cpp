@@ -5,6 +5,7 @@
 #include "Capture/RhiCaptureFormat.h"
 #include "D3D12/D3D12TypeConversions.h"
 #include "D3D12/Device/D3D12Rhi.h"
+#include "D3D12/Memory/D3D12GpuMemoryAllocator.h"
 
 #include <cstring>
 
@@ -60,11 +61,6 @@ std::unique_ptr<D3D12CaptureService::PendingReadback> D3D12CaptureService::Prepa
 
 bool D3D12CaptureService::AllocateReadbackBuffer(PendingReadback& pending) noexcept
 {
-	ID3D12Device* const device = m_rhi.GetDevice().Get();
-	D3D12_HEAP_PROPERTIES heapProperties{};
-	heapProperties.Type = D3D12_HEAP_TYPE_READBACK;
-	heapProperties.CreationNodeMask = 1;
-	heapProperties.VisibleNodeMask = 1;
 	D3D12_RESOURCE_DESC readbackDesc{};
 	readbackDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 	readbackDesc.Width = pending.TotalBytes;
@@ -73,8 +69,8 @@ bool D3D12CaptureService::AllocateReadbackBuffer(PendingReadback& pending) noexc
 	readbackDesc.MipLevels = 1;
 	readbackDesc.SampleDesc.Count = 1;
 	readbackDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	const HRESULT result = device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &readbackDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&pending.Buffer));
-	return SUCCEEDED(result);
+	pending.Buffer = m_memoryAllocator.CreateBuffer(readbackDesc, D3D12_RESOURCE_STATE_COPY_DEST, RhiMemoryCategory::Readback, RhiMemoryResidencyClass::HostReadback, L"Texture capture readback");
+	return pending.Buffer != nullptr;
 }
 
 bool D3D12CaptureService::BeginReadbackCommands(PendingReadback& pending) noexcept
@@ -100,7 +96,7 @@ bool D3D12CaptureService::RecordReadbackCopy(PendingReadback& pending) noexcept
 	sourceLocation.pResource = sourceResource;
 	sourceLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
 	D3D12_TEXTURE_COPY_LOCATION destinationLocation{};
-	destinationLocation.pResource = pending.Buffer.Get();
+	destinationLocation.pResource = pending.Buffer->Resource.Get();
 	destinationLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
 	destinationLocation.PlacedFootprint = pending.Footprint;
 	pending.CommandList->CopyTextureRegion(&destinationLocation, 0, 0, 0, &sourceLocation, nullptr);
@@ -119,7 +115,8 @@ void D3D12CaptureService::ReadPixels(PendingReadback& pending, RhiCaptureReadbac
 {
 	void* mappedData = nullptr;
 	const D3D12_RANGE readRange{0, static_cast<SIZE_T>(pending.TotalBytes)};
-	if (FAILED(pending.Buffer->Map(0, &readRange, &mappedData)) || mappedData == nullptr)
+	const HRESULT mapResult = pending.Buffer->Resource->Map(0, &readRange, &mappedData);
+	if (FAILED(mapResult) || mappedData == nullptr)
 	{
 		readback.Result = RhiCaptureResult{
 		    .Status = ERhiCaptureStatus::Failed,
@@ -140,7 +137,7 @@ void D3D12CaptureService::ReadPixels(PendingReadback& pending, RhiCaptureReadbac
 	const std::byte* source = static_cast<const std::byte*>(mappedData) + pending.Footprint.Offset;
 	std::memcpy(readback.Pixels.data(), source, byteCount);
 	const D3D12_RANGE writeRange{0, 0};
-	pending.Buffer->Unmap(0, &writeRange);
+	pending.Buffer->Resource->Unmap(0, &writeRange);
 }
 
 bool D3D12CaptureService::IsReadbackComplete(const PendingReadback& pending) const noexcept

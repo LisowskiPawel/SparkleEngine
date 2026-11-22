@@ -34,7 +34,7 @@ The strongest bounded removal candidates come first. Later entries require a dem
 
 ### Launcher presentation machinery
 
-**Cut candidate: `ResponsiveCardGridWidget` and unnecessary presentation-owned state.** The [custom layout widgets](../Tools/Launcher/SparkleLauncher/Private/Gui/Widgets/LauncherLayoutWidgets.cpp) maintain card sizing, column selection and reflow. Trial the existing Qt item-view facilities against that complete responsibility. Remove the custom reflow implementation only if the model, delegate and caller changes are smaller and clearer.
+**Cut candidate: `ResponsiveCardGridWidget` and unnecessary presentation-owned state.** The [custom layout widgets](../Tools/Launcher/SparkleLauncher/Private/Gui/Widgets/LauncherLayoutWidgets.cpp) maintain card sizing, column selection and reflow. Trial the existing Qt item-view facilities against that complete responsibility through the [Launcher item-view plan](Implementation/LauncherItemViews.md). Remove the custom reflow implementation only if the model, delegate and caller changes are smaller and clearer.
 
 Keep scene selection, readiness, keyboard actions, useful progress/errors, cancellation and supported DPI behavior. Follow one operation through request construction and presentation before removing a state mirror. [Shared plan/run dispatch](../Tools/Launcher/SparkleLauncher/Private/Operations/LauncherOperationExecution.cpp) and the [Activity panel](../Tools/Launcher/SparkleLauncher/Private/Gui/Shell/LauncherActivityPanel.cpp) have already been simplified; they are not future savings. Launcher remains a selected product workflow.
 

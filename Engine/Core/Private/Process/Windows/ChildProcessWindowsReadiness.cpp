@@ -52,7 +52,7 @@ namespace Process
 		const auto readinessIdentity = nextReadinessIdentity.fetch_add(1, std::memory_order_relaxed);
 		eventName = L"Local\\Sparkle.ProcessReadiness." + std::to_wstring(processId) + L"." + std::to_wstring(readinessIdentity);
 		const HANDLE eventHandle = CreateEventW(nullptr, TRUE, FALSE, eventName.c_str());
-		readinessEvent.Reset(eventHandle);
+		readinessEvent.reset(eventHandle);
 		if (!readinessEvent)
 		{
 			result.FailureReason = "Failed to create the child readiness event: " + FormatWindowsProcessError(GetLastError());
@@ -65,7 +65,7 @@ namespace Process
 	{
 		SECURITY_ATTRIBUTES security{sizeof(SECURITY_ATTRIBUTES), nullptr, TRUE};
 		const HANDLE logHandle = CreateFileW(logPath.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, &security, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-		outputFile.Reset(logHandle);
+		outputFile.reset(logHandle);
 		if (!outputFile)
 		{
 			result.FailureReason = "Failed to open the child process log: " + FormatWindowsProcessError(GetLastError());
@@ -124,7 +124,7 @@ namespace Process
 	static bool ReleaseWindowsProcessOwnership(WindowsOwnedProcess& child, ChildProcessResult& result)
 	{
 		JOBOBJECT_EXTENDED_LIMIT_INFORMATION releasedLimits{};
-		const bool bLimitsReleased = SetInformationJobObject(child.Job.Get(), JobObjectExtendedLimitInformation, &releasedLimits, static_cast<DWORD>(sizeof(releasedLimits))) != FALSE;
+		const bool bLimitsReleased = SetInformationJobObject(child.Job.get(), JobObjectExtendedLimitInformation, &releasedLimits, static_cast<DWORD>(sizeof(releasedLimits))) != FALSE;
 
 		if (!bLimitsReleased)
 		{
@@ -134,7 +134,7 @@ namespace Process
 			return false;
 		}
 		JOBOBJECT_ASSOCIATE_COMPLETION_PORT releasedCompletion{};
-		const bool bCompletionReleased = SetInformationJobObject(child.Job.Get(), JobObjectAssociateCompletionPortInformation, &releasedCompletion, sizeof(releasedCompletion)) != FALSE;
+		const bool bCompletionReleased = SetInformationJobObject(child.Job.get(), JobObjectAssociateCompletionPortInformation, &releasedCompletion, sizeof(releasedCompletion)) != FALSE;
 		if (!bCompletionReleased)
 		{
 			const DWORD releaseError = GetLastError();
@@ -162,8 +162,8 @@ namespace Process
 			return;
 		}
 		child.Process.detach();
-		child.Job.Reset();
-		child.JobCompletion.Reset();
+		child.Job.reset();
+		child.JobCompletion.reset();
 		result.bReady = decision == ChildReadinessDecision::Ready;
 		result.ExitCode = result.bReady ? 0 : -1;
 	}
@@ -181,10 +181,10 @@ namespace Process
 			return;
 		}
 
-		std::stop_callback cancellationWake(request.Cancellation, [event = cancelEvent.Get()] { SetEvent(event); });
+		std::stop_callback cancellationWake(request.Cancellation, [event = cancelEvent.get()] { SetEvent(event); });
 
 		std::uint64_t consumedLogBytes = 0;
-		const std::array<HANDLE, 3> waits = {child.Process.native_handle(), readinessEvent.Get(), cancelEvent.Get()};
+		const std::array<HANDLE, 3> waits = {child.Process.native_handle(), readinessEvent.get(), cancelEvent.get()};
 		while (true)
 		{
 			const DWORD waitResult = WaitForMultipleObjects(static_cast<DWORD>(waits.size()), waits.data(), FALSE, 50);
@@ -247,11 +247,11 @@ namespace Process
 
 		const auto environmentOverrides = BuildReadinessEnvironment(request, eventName);
 		WindowsOwnedProcess child;
-		if (!LaunchOwnedWindowsProcess(request, environmentOverrides, outputFile.Get(), result, child))
+		if (!LaunchOwnedWindowsProcess(request, environmentOverrides, outputFile.get(), result, child))
 		{
 			return result;
 		}
-		outputFile.Reset();
+		outputFile.reset();
 		try
 		{
 			WaitForChildReadiness(request, child, readinessEvent, result);

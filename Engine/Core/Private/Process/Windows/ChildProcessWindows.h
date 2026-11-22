@@ -16,29 +16,18 @@
   #include <vector>
   #include <boost/asio/io_context.hpp>
   #include <boost/process/v2/process.hpp>
+  #include <boost/scope/unique_resource.hpp>
 
 namespace Process
 {
-	class WindowsProcessHandle final
+	struct WindowsProcessHandleTraits final
 	{
-	public:
-		WindowsProcessHandle() noexcept = default;
-		explicit WindowsProcessHandle(HANDLE handle) noexcept;
-		~WindowsProcessHandle();
-		WindowsProcessHandle(const WindowsProcessHandle&) = delete;
-		WindowsProcessHandle& operator=(const WindowsProcessHandle&) = delete;
-		WindowsProcessHandle(WindowsProcessHandle&& other) noexcept;
-		WindowsProcessHandle& operator=(WindowsProcessHandle&& other) noexcept;
-
-		HANDLE Get() const noexcept { return m_handle; }
-
-		explicit operator bool() const noexcept;
-		void Reset(HANDLE handle = nullptr) noexcept;
-		HANDLE Release() noexcept;
-
-	private:
-		HANDLE m_handle = nullptr;
+		static HANDLE make_default() noexcept;
+		static bool is_allocated(HANDLE handle) noexcept;
+		void operator()(HANDLE handle) const noexcept;
 	};
+
+	using WindowsProcessHandle = boost::scope::unique_resource<HANDLE, WindowsProcessHandleTraits, WindowsProcessHandleTraits>;
 
 	struct WindowsOwnedProcess final
 	{

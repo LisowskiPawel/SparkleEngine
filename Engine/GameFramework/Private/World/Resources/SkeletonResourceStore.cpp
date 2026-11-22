@@ -25,12 +25,12 @@ SkeletonResourceHandle SkeletonResourceStore::Find(Assets::CookedAssetId skeleto
 	return found == m_byAssetId.end() ? SkeletonResourceHandle{} : found->second;
 }
 
-ECS::SkeletonEvaluationData SkeletonResourceStore::Resolve(SkeletonResourceHandle handle) const noexcept
+const SkeletonResource* SkeletonResourceStore::Resolve(SkeletonResourceHandle handle) const noexcept
 {
 	if (!handle.IsValid() || handle.Slot >= m_entries.size())
 	{
-		return {};
+		return nullptr;
 	}
 	const Entry& entry = m_entries[handle.Slot];
-	return entry.Generation == handle.Generation ? ECS::SkeletonEvaluationData{&entry.Resource} : ECS::SkeletonEvaluationData{};
+	return entry.Generation == handle.Generation ? &entry.Resource : nullptr;
 }

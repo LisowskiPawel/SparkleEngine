@@ -6,8 +6,9 @@
 #include <algorithm>
 #include <utility>
 
-VulkanCaptureService::VulkanCaptureService(VulkanRhi& rhi) noexcept :
-    m_rhi(rhi)
+VulkanCaptureService::VulkanCaptureService(VulkanRhi& rhi, VulkanGpuMemoryAllocator& memoryAllocator) noexcept :
+    m_rhi(rhi),
+    m_memoryAllocator(memoryAllocator)
 {
 }
 

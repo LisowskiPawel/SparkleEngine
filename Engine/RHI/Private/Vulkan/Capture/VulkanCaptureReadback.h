@@ -3,6 +3,7 @@
 #include "Vulkan/Capture/VulkanCaptureService.h"
 #include "Commands/RhiQueue.h"
 #include "Vulkan/VulkanIncludes.h"
+#include "Vulkan/Memory/VulkanGpuAllocation.h"
 
 struct VulkanCaptureService::PendingReadback final
 {
@@ -17,8 +18,7 @@ struct VulkanCaptureService::PendingReadback final
 	RhiCaptureTicket Ticket;
 	RhiTextureCaptureRequest Request;
 	RhiSubmissionToken Submission;
-	VkBuffer Buffer = VK_NULL_HANDLE;
-	VkDeviceMemory Memory = VK_NULL_HANDLE;
+	std::unique_ptr<VulkanGpuAllocationRecord> Buffer;
 	VkCommandPool CommandPool = VK_NULL_HANDLE;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 	std::uint64_t ByteCount = 0;

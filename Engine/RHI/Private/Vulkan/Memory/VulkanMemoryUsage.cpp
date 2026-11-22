@@ -10,15 +10,13 @@ namespace VulkanMemoryUsage
 	void QueryBudget(VmaAllocator_T* allocator, const VkPhysicalDeviceMemoryProperties& memoryProperties, std::span<VmaBudget, VK_MAX_MEMORY_HEAPS> heapBudgets, RhiMemoryUsageSnapshot& snapshot)
 	{
 		vmaGetHeapBudgets(allocator, heapBudgets.data());
-		VmaTotalStatistics totalStats = {};
-		vmaCalculateStatistics(allocator, &totalStats);
 		snapshot.AllocatorBackend = ERhiMemoryAllocatorBackend::VulkanManaged;
 		snapshot.bHasBudgetData = true;
 		snapshot.bHasDelayedDestructionTracking = true;
-		snapshot.TotalUsedBytes = totalStats.total.statistics.allocationBytes;
-		snapshot.TotalAllocatedBytes = totalStats.total.statistics.blockBytes;
 		for (std::uint32_t heapIndex = 0; heapIndex < memoryProperties.memoryHeapCount; ++heapIndex)
 		{
+			snapshot.TotalUsedBytes += heapBudgets[heapIndex].statistics.allocationBytes;
+			snapshot.TotalAllocatedBytes += heapBudgets[heapIndex].statistics.blockBytes;
 			snapshot.TotalBudgetBytes += heapBudgets[heapIndex].budget;
 			snapshot.ApiUsageBytes += heapBudgets[heapIndex].usage;
 		}

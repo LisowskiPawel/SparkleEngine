@@ -43,6 +43,11 @@ D3D12DescriptorHandle D3D12DescriptorHeap::GetHandleAt(UINT index) const
 
 UINT D3D12DescriptorHeap::GetNumDescriptors() const
 {
+	if (m_desc.NumDescriptors != 0)
+	{
+		return m_desc.NumDescriptors;
+	}
+
 	switch (m_desc.Type)
 	{
 		case D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV:

@@ -7,11 +7,12 @@
 #include <vector>
 
 class VulkanRhi;
+class VulkanGpuMemoryAllocator;
 
 class VulkanCaptureService final : public RhiCaptureService
 {
 public:
-	explicit VulkanCaptureService(VulkanRhi& rhi) noexcept;
+	explicit VulkanCaptureService(VulkanRhi& rhi, VulkanGpuMemoryAllocator& memoryAllocator) noexcept;
 	~VulkanCaptureService() noexcept override;
 
 	RhiCaptureTicket BeginTextureReadback(const RhiTextureCaptureRequest& request) noexcept override;
@@ -31,6 +32,7 @@ private:
 	void DrainCancelledReadbacks() noexcept;
 
 	VulkanRhi& m_rhi;
+	VulkanGpuMemoryAllocator& m_memoryAllocator;
 	std::vector<std::unique_ptr<PendingReadback>> m_pendingReadbacks;
 	std::uint64_t m_nextTicket = 1;
 };

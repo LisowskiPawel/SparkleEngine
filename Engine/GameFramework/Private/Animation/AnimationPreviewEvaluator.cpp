@@ -59,10 +59,9 @@ namespace AnimationPreviewEvaluator
 		return true;
 	}
 
-	bool EvaluateMorph(const AnimationClipResource& clip, std::uint32_t trackIndex, float timeSeconds, std::span<float> output)
+	bool EvaluateMorph(const AnimationClipResource& clip, std::uint32_t trackIndex, float timeSeconds, std::array<float, 4>& output)
 	{
-		const bool bValidOutput = output.size() == 4 && std::isfinite(timeSeconds);
-		if (!bValidOutput || trackIndex >= clip.morphTracks.size())
+		if (!std::isfinite(timeSeconds) || trackIndex >= clip.morphTracks.size())
 		{
 			return false;
 		}
@@ -75,10 +74,7 @@ namespace AnimationPreviewEvaluator
 		{
 			return false;
 		}
-		output[0] = result.x;
-		output[1] = result.y;
-		output[2] = result.z;
-		output[3] = result.w;
+		output = {result.x, result.y, result.z, result.w};
 		return true;
 	}
 }

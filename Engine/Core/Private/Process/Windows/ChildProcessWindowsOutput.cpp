@@ -82,8 +82,8 @@ namespace Process
 	static void CollectChildProcessOutput(const ChildProcessRequest& request, WindowsOwnedProcess& child, WindowsProcessHandle& readPipe, std::ofstream& log, ChildProcessResult& result)
 	{
 		Asio::readable_pipe reader(child.Context);
-		reader.assign(readPipe.Get());
-		readPipe.Release();
+		reader.assign(readPipe.get());
+		readPipe.release();
 		WindowsProcessHandle nativeEvent(CreateEventW(nullptr, TRUE, FALSE, nullptr));
 		if (!nativeEvent)
 		{
@@ -92,8 +92,8 @@ namespace Process
 			result.FailureReason = "Failed to create child cancellation event: " + FormatWindowsProcessError(eventError);
 			return;
 		}
-		Asio::windows::object_handle event(child.Context, nativeEvent.Get());
-		nativeEvent.Release();
+		Asio::windows::object_handle event(child.Context, nativeEvent.get());
+		nativeEvent.release();
 		const auto signal = [handle = event.native_handle()]() noexcept
 		{
 			SetEvent(handle);
@@ -216,11 +216,11 @@ namespace Process
 			return result;
 		}
 		WindowsOwnedProcess child;
-		if (!LaunchOwnedWindowsProcess(request, request.Environment, writePipe.Get(), result, child))
+		if (!LaunchOwnedWindowsProcess(request, request.Environment, writePipe.get(), result, child))
 		{
 			return result;
 		}
-		writePipe.Reset();
+		writePipe.reset();
 		try
 		{
 			CollectChildProcessOutput(request, child, readPipe, log, result);
