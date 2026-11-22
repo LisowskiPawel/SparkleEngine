@@ -1,6 +1,5 @@
 #include "Process/Windows/ChildProcessWindows.h"
 #include "Process/Windows/ChildProcessWindowsArguments.h"
-#include "Strings/StringUtils.h"
 
 #if defined(_WIN32)
   #include <boost/process/v2/environment.hpp>
@@ -10,6 +9,7 @@
   #include <algorithm>
   #include <cstddef>
   #include <system_error>
+  #include <utility>
 
 namespace Process
 {
@@ -138,11 +138,10 @@ namespace Process
 		}
 		for (const EnvironmentOverride& overrideValue : overrides)
 		{
-			const auto name = Strings::ToWide(overrideValue.Name);
-			const auto value = Strings::ToWide(overrideValue.Value);
-			const ChildProcess::environment::key_view key(name.c_str());
+			ChildProcess::environment::key_value_pair value(std::pair{overrideValue.Name, overrideValue.Value});
+			const auto key = value.key();
 			std::erase_if(values, [&key](const auto& entry) { return entry.key() == key; });
-			values.emplace_back(key, ChildProcess::environment::value_view(value));
+			values.push_back(std::move(value));
 		}
 		return ChildProcess::process_environment(values);
 	}

@@ -11,14 +11,14 @@ void InputSystem::State::CancelInput()
 	// These snapshots outlive publication of empty state while cancellation callbacks run.
 	InputState canceledGlobal = std::move(GlobalState);
 	auto canceledLayers = std::move(LayerStates);
+	const auto capturedLayer = std::exchange(MouseCaptureLayer, std::nullopt);
 
 	GlobalState = InputState{};
 	LayerStates = {};
-	MouseCaptureLayer = InputLayer::System;
 	FocusRouter.ResetFocus();
 	Dispatcher.CancelAllEvents();
 
-	if (canceledGlobal.IsMouseCaptured())
+	if (capturedLayer)
 	{
 		DisableNativeRelativeMode();
 	}
@@ -34,39 +34,20 @@ void InputSystem::State::CancelInput()
 	ReleaseStateMouseButtons(canceledGlobal, InputLayer::System);
 }
 
-InputState InputSystem::State::TakePointerState(InputState& state) noexcept
-{
-	InputState canceled;
-	for (std::size_t index = 0; index < static_cast<std::size_t>(MouseButton::Count); ++index)
-	{
-		const auto button = static_cast<MouseButton>(index);
-		canceled.SetMouseButtonState(button, state.GetMouseButtonState(button));
-	}
-
-	const MousePosition position = state.GetMousePosition();
-	canceled.SetMousePosition(position.X, position.Y);
-	canceled.SetModifiers(state.GetModifiers());
-	canceled.SetMouseCaptured(state.IsMouseCaptured());
-	canceled.SetCursorHidden(state.IsCursorHidden());
-
-	state.ResetPointerState();
-	return canceled;
-}
-
 void InputSystem::State::CancelPointerInput()
 {
 	++CancellationEpoch;
-	InputState canceledGlobal = TakePointerState(GlobalState);
+	InputState canceledGlobal = GlobalState.ExtractPointerState();
 	std::array<InputState, RoutedLayerCount> canceledLayers;
 	for (std::size_t index = 0; index < RoutedLayerCount; ++index)
 	{
-		canceledLayers[index] = TakePointerState(LayerStates[index]);
+		canceledLayers[index] = LayerStates[index].ExtractPointerState();
 	}
 
-	MouseCaptureLayer = InputLayer::System;
+	const auto capturedLayer = std::exchange(MouseCaptureLayer, std::nullopt);
 	Dispatcher.CancelPointerEvents();
 
-	if (canceledGlobal.IsMouseCaptured())
+	if (capturedLayer)
 	{
 		DisableNativeRelativeMode();
 	}

@@ -18,19 +18,11 @@ New EnTT, FlatBuffers, importer-replacement and hashing dependencies remain cond
 
 ## Reuse already available code
 
-The [November 22 source/API audit](../build/validation/third-party-reuse-20261122/REPORT.md) covers all 26 dependency recipes, installed Qt/compiler APIs and existing Sparkle helpers. It identifies the following remaining opportunities; these are research findings, with no verified net saving or additional release prerequisite.
+The [source/API audit](../build/validation/third-party-reuse-20261122/REPORT.md) led to the [delivered reuse changes](../build/validation/third-party-reuse-20261122/delivery/REPORT.md). ImGui owns string-input resizing; SPIRV-Reflect owns module destruction; existing Core, Qt and DirectXMath functions replace duplicated hashing, string/path-list handling, run removal and Hermite arithmetic. Raw authored-identity hashes still reject zero, and animation tangents retain their time scaling.
 
-| Priority and consumer | Existing mechanism to use | Local responsibility to remove or retain |
-| --- | --- | --- |
-| **First: Editor text input** | ImGui's shipped [`std::string` overloads](https://github.com/ocornut/imgui/blob/v1.92.5/misc/cpp/imgui_stdlib.h), compiled once through the existing recipe. | Remove temporary character buffers and copy-back code in Outliner, Inspector, Settings and `EditDetailsText`. Retain change/reset behavior and any intentional input limits. |
-| **First: SPIR-V module lifetime** | The pinned SPIRV-Reflect header already supplies `spv_reflect::ShaderModule`. | Replace seven explicit destroy calls across reflection extraction and binding normalization with upstream stack ownership. Retain result checks, binding meaning and cooked ABI; do not introduce another wrapper. |
-| **Small, direct reuse** | Core's raw FNV/string helpers, Qt's `QHash::removeIf`, and DirectXMath's `XMVectorHermite`. | Remove duplicate hashing/lowercasing, the dependency-run erase loop and handwritten Hermite basis arithmetic. Preserve reserved-zero identity rejection, operation completion and time-scaled animation tangents. The separate trim near-match needs its whitespace contract checked first. |
-| **Bounded trial: named logging** | spdlog already has named lookup/registration and logger cloning. | Retire the local named-logger map and duplicated construction where a complete reduction is demonstrated. Keep bootstrap, sink/file policy, atomic creation and failure handling inside Core; static linkage makes module ownership significant. |
-| **Next Qt fit trials: Workspace/Clean rows** | Existing Qt item models/views, standard check roles and delegates; reuse the current clean-plan inventory owner. | Investigate replacing dependency label/button maps, string-valued action properties, repeated row trees and the second directory scan. Retain readiness, run identity, exact clean targets and confirmation. Count model/delegate/accessibility costs; Qt does not supply Sparkle's select-all or cleanup policy. |
+Launcher Workspace dependencies and Clean scopes use stock Qt item views. Each dependency view has one native action button; current identity and readiness are resolved again before dispatch. Operations outlive their widgets. Clean keeps its explicit `clean-all` meaning, available-row selection and confirmation; its directory inventory comes from the maintenance owner and can include preserved files. Keep filesystem inspection outside item data access and painting.
 
-Resolve the required scene-view cleanup before broadening Qt conversion. Compiler preprocessing remains the larger independent mechanism trial above. Plain-text log widgets and ImGui list clipping are conditional responsiveness ideas, without an established code-removal benefit.
-
-The audit also checked already delegated import/texture/animation/allocation paths. Do not credit those deliveries again or replace domain validation with a similarly named utility. The report records per-library coverage, precise source fragments and rejected near-matches; a fetched transitive module or SDK header is not automatically an enabled dependency.
+Retain Visual Studio's wider whitespace trimming and the separate zero/general/overflow-checked alignment contracts; similarly named Core functions are not exact replacements. Plain-text log widgets and ImGui list clipping remain conditional responsiveness ideas without an established code-removal benefit. Compiler preprocessing retains its independent trial above. New reuse work must identify an actual consumer and retire the displaced mechanism.
 
 ## Native removal estimates
 
@@ -46,6 +38,7 @@ These are frozen, differently scoped delivery results. **Do not add the rows int
 
 | Delivered owner | Recorded cost result | Evidence |
 | --- | --- | --- |
+| Existing API reuse | 246 fewer native physical / 200 fewer code lines across 23 complete changed owner/caller files; two CMake lines added. Includes named logging and Workspace/Clean presentation; upstream ImGui adapter compilation is separate. | [Delivery and limits](../build/validation/third-party-reuse-20261122/delivery/REPORT.md), [complete costs](../build/validation/third-party-reuse-20261122/delivery/costs.json) |
 | Qt Launcher scene views | 34 fewer native physical lines and one fewer code line across the complete connected UI; CMake physical count unchanged. This is a modest reduction. Required local cleanup remains open. | [Delivery and limits](../build/validation/launcher-item-views/candidate-20261122/REPORT.md), [complete costs](../build/validation/launcher-item-views/candidate-20261122/costs.json) |
 | enkiTS maintained fork | 2,118 fewer C++ physical lines; 2,005 fewer complete-infrastructure lines after maintained native additions. Added-code/API/state/cleanup targets missed. | [Cumulative review](../build/validation/task-runtime/srp-20261122/REPORT.md) |
 | ShaderMake | 374 fewer native physical / 194 fewer code lines. Maintained ShaderMake/Slang patches, build and payload costs are separate. | [Cost record](../build/validation/shadermake/launcher-workflow-20261122/costs.json) |
@@ -112,6 +105,10 @@ One shared SDL3 runtime and stock ImGui SDL3 backend own window/event/pointer me
 ### Child processes
 
 Core's synchronous [request/result](../Engine/Core/Public/Process/ChildProcess.h) uses private Boost.Process/Asio mechanics and Boost.Scope guards. Keep command-line compatibility, creation-time job membership, process-tree termination/readiness policy and physical settlement before borrowed state dies. Stop callbacks only signal; missing/error/timeout completion remains a reported failure, with no hard finite OS cleanup guarantee. Keep one caller-driven context and no fallback backend. [Recipe](../ThirdParty/boost-process/Dependency.cmake).
+
+### Logging
+
+Core owns bootstrap, sink/file policy and serialized named creation. spdlog's registry owns named loggers; clones share the configured base logger's sinks, level and error-flush policy. Acquire categories through Core even when other modules link their own static spdlog copy. Keep no parallel named-logger map.
 
 ### JSON
 

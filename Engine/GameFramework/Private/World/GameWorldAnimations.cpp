@@ -13,7 +13,7 @@ namespace ECS
 	{
 		for (AnimationClipResource& clip : clips)
 		{
-			const std::string name = clip.name;
+			const std::string name = clip.animation.name();
 			const std::uint32_t sourceAnimationIndex = clip.sourceAnimationIndex;
 			const Assets::CookedAssetId animationAssetId = clip.animationAssetId;
 			const AnimationResourceHandle resource = resources.Add(std::move(clip));

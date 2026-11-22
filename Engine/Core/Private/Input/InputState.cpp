@@ -1,6 +1,8 @@
 #include "PCH.h"
 #include "Core/Public/Input/InputState.h"
 
+#include <utility>
+
 InputState::InputState() = default;
 
 InputState::~InputState() = default;
@@ -116,16 +118,6 @@ bool InputState::IsAltDown() const noexcept
 	return HasModifier(ModifierFlags::Alt);
 }
 
-bool InputState::IsMouseCaptured() const noexcept
-{
-	return m_bMouseCaptured;
-}
-
-bool InputState::IsCursorHidden() const noexcept
-{
-	return m_bCursorHidden;
-}
-
 void InputState::SetKeyState(Key key, ButtonState state) noexcept
 {
 	const std::size_t index = static_cast<std::size_t>(key);
@@ -171,16 +163,6 @@ void InputState::SetModifiers(ModifierFlags modifiers) noexcept
 	m_modifiers = modifiers;
 }
 
-void InputState::SetMouseCaptured(bool bCaptured) noexcept
-{
-	m_bMouseCaptured = bCaptured;
-}
-
-void InputState::SetCursorHidden(bool bHidden) noexcept
-{
-	m_bCursorHidden = bHidden;
-}
-
 void InputState::BeginFrame() noexcept
 {
 	AdvanceButtonStates(m_keyStates);
@@ -188,12 +170,14 @@ void InputState::BeginFrame() noexcept
 	ResetFrameDeltas();
 }
 
-void InputState::ResetPointerState() noexcept
+InputState InputState::ExtractPointerState() noexcept
 {
-	m_mouseButtonStates.fill(ButtonState::Up);
+	InputState canceled;
+	canceled.m_mouseButtonStates = std::exchange(m_mouseButtonStates, {});
+	canceled.m_mousePosition = m_mousePosition;
+	canceled.m_modifiers = m_modifiers;
 	ResetFrameDeltas();
-	m_bMouseCaptured = false;
-	m_bCursorHidden = false;
+	return canceled;
 }
 
 void InputState::AdvanceButtonStates(std::span<ButtonState> states) noexcept

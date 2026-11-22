@@ -6,7 +6,6 @@
 #include <ozz/animation/runtime/track.h>
 
 #include <cstdint>
-#include <string>
 #include <vector>
 
 struct AnimationMorphTrack final
@@ -19,7 +18,6 @@ struct AnimationClipResource final
 {
 	Assets::CookedAssetId animationAssetId = Assets::InvalidCookedAssetId;
 	Assets::CookedAssetId targetSkeletonAssetId = Assets::InvalidCookedAssetId;
-	std::string name;
 	std::uint32_t sourceAnimationIndex = 0;
 	float durationSeconds = 0.0f;
 	ozz::animation::Animation animation;

@@ -47,6 +47,7 @@ namespace SparkleLauncher
 		item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
 		item->setData(0, Qt::UserRole, scope.Value);
 		item->setCheckState(0, selectedScopes.contains("clean-all") || selectedScopes.contains(scope.Value) ? Qt::Checked : Qt::Unchecked);
+		item->setToolTip(0, scope.Label);
 		item->setToolTip(1, scope.Detail);
 		item->setToolTip(2, preview);
 		item->setData(0, Qt::AccessibleDescriptionRole, scope.Detail + ". Directory inventory: " + preview);
@@ -107,7 +108,7 @@ namespace SparkleLauncher
 		view->setColumnWidth(1, 400);
 		auto* all = new QTreeWidgetItem(
 		    view,
-		    {"All", "Remove build and cooked outputs, dependency caches, logs, and product user state including settings and captures. Confirmation is required.", "All generated data"});
+		    {"All", "Remove build/cooked outputs, dependency caches and logs.\nIncludes product user state, settings and captures.\nConfirmation is required.", "All generated data"});
 		all->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
 		all->setCheckState(0, selectedScopes.contains("clean-all") ? Qt::Checked : Qt::Unchecked);
 		all->setToolTip(1, all->text(1));

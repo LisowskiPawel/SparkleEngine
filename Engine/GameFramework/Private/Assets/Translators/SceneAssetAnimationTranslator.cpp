@@ -14,12 +14,31 @@
 #include <ozz/animation/runtime/skeleton_utils.h>
 
 #include <array>
+#include <algorithm>
 #include <span>
+#include <type_traits>
 #include <unordered_set>
 #include <utility>
 
 namespace Assets
 {
+	template <typename TKey> static void CopyJointKeys(std::span<const CookedAnimationKeyframeRecord> keys, ozz::vector<TKey>& output)
+	{
+		output.resize(keys.size());
+		for (std::size_t index = 0; index < keys.size(); ++index)
+		{
+			const auto& key = keys[index];
+			if constexpr (std::is_same_v<TKey, ozz::animation::offline::RawAnimation::RotationKey>)
+			{
+				output[index] = {key.timeSeconds, {key.value.x, key.value.y, key.value.z, key.value.w}};
+			}
+			else
+			{
+				output[index] = {key.timeSeconds, {key.value.x, key.value.y, key.value.z}};
+			}
+		}
+	}
+
 	static AnimationMorphTrack BuildMorphTrack(const LoadedAnimationAsset& asset, const CookedAnimationChannelRecord& channel)
 	{
 		ozz::animation::offline::RawFloat4Track raw;
@@ -77,25 +96,19 @@ namespace Assets
 	{
 		ValidateTargets(asset, skeleton, budget);
 		ReserveOzzConstruction(budget, skeleton.evaluation.num_joints(), asset.keyframes.size());
-		budget.ReserveArray<AnimationMorphTrack>(asset.channels.size());
+		const auto morphCount = std::count_if(asset.channels.begin(), asset.channels.end(), [](const auto& channel) { return channel.targetPath == CookedAnimationTargetPath::Weights; });
+		budget.ReserveArray<AnimationMorphTrack>(morphCount);
 		ozz::animation::offline::RawAnimation raw;
+		raw.name = asset.header.name;
 		raw.duration = asset.header.durationSeconds > 0.0f ? asset.header.durationSeconds : 1.0f;
 		raw.tracks.resize(skeleton.evaluation.num_joints());
-		for (int joint = 0; joint < skeleton.evaluation.num_joints(); ++joint)
-		{
-			const auto rest = ozz::animation::GetJointRestPoseLocalSpace(skeleton.evaluation, joint);
-			raw.tracks[joint].translations.push_back({0.0f, rest.translation});
-			raw.tracks[joint].rotations.push_back({0.0f, rest.rotation});
-			raw.tracks[joint].scales.push_back({0.0f, rest.scale});
-		}
 
 		AnimationClipResource clip;
 		clip.animationAssetId = animationAssetId;
 		clip.targetSkeletonAssetId = asset.header.targetSkeletonAssetId;
-		clip.name = asset.header.name;
 		clip.sourceAnimationIndex = asset.header.sourceAnimationIndex;
 		clip.durationSeconds = asset.header.durationSeconds;
-		clip.morphTracks.reserve(asset.channels.size());
+		clip.morphTracks.reserve(morphCount);
 		for (const auto& channel : asset.channels)
 		{
 			if (channel.targetPath == CookedAnimationTargetPath::Weights)
@@ -110,31 +123,33 @@ namespace Assets
 			switch (channel.targetPath)
 			{
 				case CookedAnimationTargetPath::Translation:
-					track.translations.clear();
-					track.translations.reserve(keys.size());
-					for (const auto& key : keys)
-					{
-						track.translations.push_back({key.timeSeconds, {key.value.x, key.value.y, key.value.z}});
-					}
+					CopyJointKeys(keys, track.translations);
 					break;
 				case CookedAnimationTargetPath::Rotation:
-					track.rotations.clear();
-					track.rotations.reserve(keys.size());
-					for (const auto& key : keys)
-					{
-						track.rotations.push_back({key.timeSeconds, {key.value.x, key.value.y, key.value.z, key.value.w}});
-					}
+					CopyJointKeys(keys, track.rotations);
 					break;
 				case CookedAnimationTargetPath::Scale:
-					track.scales.clear();
-					track.scales.reserve(keys.size());
-					for (const auto& key : keys)
-					{
-						track.scales.push_back({key.timeSeconds, {key.value.x, key.value.y, key.value.z}});
-					}
+					CopyJointKeys(keys, track.scales);
 					break;
 				default:
 					throw Diagnostics::Error("Invalid animation preview component");
+			}
+		}
+		for (int joint = 0; joint < skeleton.evaluation.num_joints(); ++joint)
+		{
+			const auto rest = ozz::animation::GetJointRestPoseLocalSpace(skeleton.evaluation, joint);
+			auto& track = raw.tracks[joint];
+			if (track.translations.empty())
+			{
+				track.translations.push_back({0.0f, rest.translation});
+			}
+			if (track.rotations.empty())
+			{
+				track.rotations.push_back({0.0f, rest.rotation});
+			}
+			if (track.scales.empty())
+			{
+				track.scales.push_back({0.0f, rest.scale});
 			}
 		}
 		ozz::animation::offline::AnimationBuilder builder;

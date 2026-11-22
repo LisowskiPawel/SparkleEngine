@@ -22,14 +22,6 @@ enum class InputCancellation : std::uint8_t
 class SPARKLE_PLATFORM_API Window final
 {
 public:
-	enum class State : std::uint8_t
-	{
-		Normal,
-		Minimized,
-		Maximized,
-		FullScreen
-	};
-
 	explicit Window(std::string_view windowTitle);
 	~Window();
 	Window(const Window&) = delete;
@@ -50,15 +42,12 @@ public:
 
 	float GetDpiScale() const noexcept;
 	bool HasValidSize() const noexcept;
-	State GetState() const noexcept;
 
 	bool ShouldClose() const noexcept { return m_bShouldClose; }
 
 	bool IsFullScreen() const noexcept;
 	bool IsMinimized() const noexcept;
 	bool IsMaximized() const noexcept;
-	void SetFullScreen(bool bFullScreen);
-	void ToggleFullScreen();
 	void Minimize() noexcept;
 	void Maximize() noexcept;
 	void Restore() noexcept;
@@ -79,6 +68,7 @@ private:
 	void RefreshNativeState() noexcept;
 	void CancelInput(InputCancellation cancellation) noexcept;
 	void ApplyPendingShowCommand() noexcept;
+	void ToggleFullScreen() noexcept;
 
 	std::unique_ptr<NativeState> m_native;
 	std::atomic<uint32_t> m_clientWidth{0};

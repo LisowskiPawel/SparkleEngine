@@ -8,6 +8,12 @@
 #include <string>
 #include <system_error>
 
+#if defined(_WIN32)
+  #include <boost/asio/io_context.hpp>
+  #include <boost/process/v2/windows/default_launcher.hpp>
+  #include <boost/process/v2/process.hpp>
+#endif
+
 namespace Process
 {
 	bool RelaunchCurrentProcess()
@@ -21,18 +27,16 @@ namespace Process
 			return false;
 		}
 
-		std::wstring commandLine(GetCommandLineW());
-		STARTUPINFOW startup{};
-		startup.cb = sizeof(startup);
-		PROCESS_INFORMATION child{};
-		const bool bProcessRelaunchFailed = !CreateProcessW(executable.c_str(), commandLine.data(), nullptr, nullptr, FALSE, 0, nullptr, workingDirectory.c_str(), &startup, &child);
-
-		if (bProcessRelaunchFailed)
+		boost::asio::io_context context;
+		boost::process::v2::windows::default_launcher launcher;
+		launcher.current_directory = workingDirectory;
+		boost::system::error_code launchError;
+		auto child = launcher(context, launchError, executable, GetCommandLineW());
+		if (launchError)
 		{
 			return false;
 		}
-		CloseHandle(child.hThread);
-		CloseHandle(child.hProcess);
+		child.detach();
 		return true;
 #else
 		return false;

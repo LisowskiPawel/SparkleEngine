@@ -9,21 +9,6 @@ float Window::GetDpiScale() const noexcept
 	return m_native->DpiScale;
 }
 
-Window::State Window::GetState() const noexcept
-{
-	m_native->Thread.AssertAccess();
-	const SDL_WindowFlags flags = SDL_GetWindowFlags(m_native->Handle);
-	if ((flags & SDL_WINDOW_MINIMIZED) != 0)
-	{
-		return State::Minimized;
-	}
-	if ((flags & SDL_WINDOW_FULLSCREEN) != 0)
-	{
-		return State::FullScreen;
-	}
-	return (flags & SDL_WINDOW_MAXIMIZED) != 0 ? State::Maximized : State::Normal;
-}
-
 bool Window::IsFullScreen() const noexcept
 {
 	return (SDL_GetWindowFlags(GetSdlWindow(*this)) & SDL_WINDOW_FULLSCREEN) != 0;
@@ -31,45 +16,38 @@ bool Window::IsFullScreen() const noexcept
 
 bool Window::IsMinimized() const noexcept
 {
-	return GetState() == State::Minimized;
+	return (SDL_GetWindowFlags(GetSdlWindow(*this)) & SDL_WINDOW_MINIMIZED) != 0;
 }
 
 bool Window::IsMaximized() const noexcept
 {
-	return GetState() == State::Maximized;
+	const SDL_WindowFlags flags = SDL_GetWindowFlags(GetSdlWindow(*this));
+	return (flags & (SDL_WINDOW_MINIMIZED | SDL_WINDOW_FULLSCREEN | SDL_WINDOW_MAXIMIZED)) == SDL_WINDOW_MAXIMIZED;
 }
 
-void Window::SetFullScreen(bool bFullScreen)
+void Window::ToggleFullScreen() noexcept
 {
-	m_native->Thread.AssertAccess();
-	if (IsFullScreen() != bFullScreen)
-	{
-		m_native->CheckOperation(SDL_SetWindowFullscreen(m_native->Handle, bFullScreen), "SDL fullscreen transition");
-		RefreshNativeState();
-	}
-}
-
-void Window::ToggleFullScreen()
-{
-	SetFullScreen(!IsFullScreen());
+	const bool bFullScreen = IsFullScreen();
+	m_native->CheckOperation(SDL_SetWindowFullscreen(m_native->Handle, !bFullScreen), "SDL fullscreen transition");
+	RefreshNativeState();
 }
 
 void Window::Minimize() noexcept
 {
 	m_native->Thread.AssertAccess();
-	m_native->PendingShow = State::Minimized;
+	m_native->PendingShow = NativeState::ShowCommand::Minimize;
 }
 
 void Window::Maximize() noexcept
 {
 	m_native->Thread.AssertAccess();
-	m_native->PendingShow = State::Maximized;
+	m_native->PendingShow = NativeState::ShowCommand::Maximize;
 }
 
 void Window::Restore() noexcept
 {
 	m_native->Thread.AssertAccess();
-	m_native->PendingShow = State::Normal;
+	m_native->PendingShow = NativeState::ShowCommand::Restore;
 }
 
 void Window::ToggleMaximizeRestore() noexcept
@@ -93,15 +71,15 @@ void Window::ApplyPendingShowCommand() noexcept
 	{
 		return;
 	}
-	const State pending = *m_native->PendingShow;
+	const auto pending = *m_native->PendingShow;
 	m_native->PendingShow.reset();
 	switch (pending)
 	{
-		case State::Minimized:
+		case NativeState::ShowCommand::Minimize:
 			CancelInput(InputCancellation::All);
 			m_native->CheckOperation(SDL_MinimizeWindow(m_native->Handle), "SDL minimize");
 			break;
-		case State::Maximized:
+		case NativeState::ShowCommand::Maximize:
 			m_native->CheckOperation(SDL_MaximizeWindow(m_native->Handle), "SDL maximize");
 			break;
 		default:

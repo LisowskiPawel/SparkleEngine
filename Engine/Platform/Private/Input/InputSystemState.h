@@ -9,6 +9,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 
 struct SdlWindowEvent;
 
@@ -26,7 +27,6 @@ struct InputSystem::State final
 	void CancelInput();
 	void CancelPointerInput();
 	void CancelLayer(InputLayer layer);
-	static InputState TakePointerState(InputState& state) noexcept;
 
 	void ReleaseStateKeys(const InputState& state, InputLayer layer);
 	void ReleaseStateMouseButtons(const InputState& state, InputLayer layer);
@@ -42,7 +42,7 @@ struct InputSystem::State final
 	InputFocusRouter FocusRouter;
 	InputState GlobalState;
 	std::array<InputState, RoutedLayerCount> LayerStates;
-	InputLayer MouseCaptureLayer = InputLayer::System;
+	std::optional<InputLayer> MouseCaptureLayer;
 	std::uint64_t CancellationEpoch = 0;
 	Window* BoundWindow = nullptr;
 	ScopedEventHandle WindowEventHandle;

@@ -102,20 +102,18 @@ namespace Process
 
 	static bool VerifyChildAfterReadiness(WindowsOwnedProcess& child, ChildProcessResult& result)
 	{
-		const DWORD childState = WaitForSingleObject(child.Process.native_handle(), 0);
-		if (childState == WAIT_OBJECT_0)
+		boost::system::error_code error;
+		const bool bRunning = child.Process.running(error);
+		if (error)
 		{
-			DWORD exitCode = 1;
-			GetExitCodeProcess(child.Process.native_handle(), &exitCode);
-			result.ExitCode = static_cast<int>(exitCode);
-			result.FailureReason = "Child exited during readiness verification.";
+			TerminateOwnedWindowsProcess(child);
+			result.FailureReason = "Child process observation failed during readiness verification: " + error.message();
 			return false;
 		}
-		if (childState != WAIT_TIMEOUT)
+		if (!bRunning)
 		{
-			const DWORD waitError = GetLastError();
-			TerminateOwnedWindowsProcess(child);
-			result.FailureReason = "Child process observation failed during readiness verification: " + FormatWindowsProcessError(waitError);
+			result.ExitCode = child.Process.exit_code();
+			result.FailureReason = "Child exited during readiness verification.";
 			return false;
 		}
 		return true;
@@ -195,9 +193,7 @@ namespace Process
 			}
 			if (waitResult == WAIT_OBJECT_0)
 			{
-				DWORD exitCode = 1;
-				GetExitCodeProcess(child.Process.native_handle(), &exitCode);
-				result.ExitCode = static_cast<int>(exitCode);
+				result.ExitCode = child.Process.wait();
 				result.FailureReason = "Child process exited before reporting application readiness.";
 				return;
 			}

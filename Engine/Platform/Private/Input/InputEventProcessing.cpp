@@ -24,7 +24,7 @@ template <typename TEvent> void InputSystem::State::ProcessEvent(const TEvent& e
 			return;
 		}
 	}
-	InputLayer targetLayer = GlobalState.IsMouseCaptured() ? MouseCaptureLayer : FocusRouter.ResolveTargetLayer(event);
+	InputLayer targetLayer = MouseCaptureLayer ? *MouseCaptureLayer : FocusRouter.ResolveTargetLayer(event);
 	if constexpr (std::is_same_v<TEvent, MouseButtonEvent>)
 	{
 		if (event.bPressed)
@@ -37,7 +37,7 @@ template <typename TEvent> void InputSystem::State::ProcessEvent(const TEvent& e
 			}
 
 			// Focus cancellation can reenter routing, for example by opening a modal.
-			targetLayer = GlobalState.IsMouseCaptured() ? MouseCaptureLayer : FocusRouter.ResolveTargetLayer(event);
+			targetLayer = MouseCaptureLayer ? *MouseCaptureLayer : FocusRouter.ResolveTargetLayer(event);
 		}
 	}
 

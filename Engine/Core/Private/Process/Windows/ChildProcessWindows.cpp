@@ -3,6 +3,11 @@
 #if defined(_WIN32)
 namespace Process
 {
+	std::string FormatWindowsProcessError(DWORD code)
+	{
+		return boost::system::system_category().message(static_cast<int>(code));
+	}
+
 	ChildProcessResult RunWindowsChildProcess(const ChildProcessRequest& request)
 	{
 		ChildProcessResult result;

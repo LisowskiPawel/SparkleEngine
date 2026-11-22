@@ -9,6 +9,13 @@
 
 struct Window::NativeState final
 {
+	enum class ShowCommand : std::uint8_t
+	{
+		Restore,
+		Minimize,
+		Maximize
+	};
+
 	explicit NativeState(Window& owner) noexcept;
 	~NativeState();
 	void Initialize(std::string_view title);
@@ -27,7 +34,7 @@ struct Window::NativeState final
 	SDL_FRect TitleBar{};
 	bool bPublishedMinimized = false;
 	float DpiScale = 0.0f;
-	std::optional<State> PendingShow;
+	std::optional<ShowCommand> PendingShow;
 	bool bVideoInitialized = false;
 	bool bChangingRelativeMode = false;
 	bool bObservingCancellation = false;

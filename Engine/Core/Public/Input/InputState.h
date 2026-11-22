@@ -49,9 +49,6 @@ public:
 	bool IsCtrlDown() const noexcept;
 	bool IsAltDown() const noexcept;
 
-	bool IsMouseCaptured() const noexcept;
-	bool IsCursorHidden() const noexcept;
-
 	// The acquisition owner updates state between observed frames; readers borrow const state.
 	void SetKeyState(Key key, ButtonState state) noexcept;
 	void SetMouseButtonState(MouseButton button, ButtonState state) noexcept;
@@ -62,11 +59,8 @@ public:
 	void AccumulateWheelHorizontalDelta(float delta) noexcept;
 
 	void SetModifiers(ModifierFlags modifiers) noexcept;
-	void SetMouseCaptured(bool bCaptured) noexcept;
-	void SetCursorHidden(bool bHidden) noexcept;
-
 	void BeginFrame() noexcept;
-	void ResetPointerState() noexcept;
+	InputState ExtractPointerState() noexcept;
 
 private:
 	static void AdvanceButtonStates(std::span<ButtonState> states) noexcept;
@@ -84,6 +78,4 @@ private:
 	float m_wheelHorizontalDelta = 0.0f;
 
 	ModifierFlags m_modifiers = ModifierFlags::None;
-	bool m_bMouseCaptured = false;
-	bool m_bCursorHidden = false;
 };

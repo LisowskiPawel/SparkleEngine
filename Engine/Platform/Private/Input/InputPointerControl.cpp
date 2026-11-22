@@ -3,13 +3,15 @@
 #include "Window/Window.h"
 #include "Window/SdlWindowInterop.h"
 
+#include <utility>
+
 bool InputSystem::SetRelativeMouseMode(bool bEnabled)
 {
 	if (!bEnabled)
 	{
 		return m_state->ReleaseRelativeMode();
 	}
-	if (m_state->GlobalState.IsMouseCaptured())
+	if (m_state->MouseCaptureLayer)
 	{
 		return true;
 	}
@@ -31,19 +33,14 @@ bool InputSystem::SetRelativeMouseMode(bool bEnabled)
 		}
 		return false;
 	}
-	m_state->GlobalState.SetMouseCaptured(true);
-	m_state->GlobalState.SetCursorHidden(true);
 	m_state->MouseCaptureLayer = m_state->FocusRouter.GetActiveTargetLayer();
 	return true;
 }
 
 bool InputSystem::State::ReleaseRelativeMode()
 {
-	const bool bWasCaptured = GlobalState.IsMouseCaptured();
-	GlobalState.SetMouseCaptured(false);
-	GlobalState.SetCursorHidden(false);
-	MouseCaptureLayer = InputLayer::System;
-	return !bWasCaptured || DisableNativeRelativeMode();
+	const auto capturedLayer = std::exchange(MouseCaptureLayer, std::nullopt);
+	return !capturedLayer || DisableNativeRelativeMode();
 }
 
 bool InputSystem::State::DisableNativeRelativeMode()
@@ -63,5 +60,5 @@ bool InputSystem::State::DisableNativeRelativeMode()
 
 bool InputSystem::IsMouseCaptured() const noexcept
 {
-	return m_state->GlobalState.IsMouseCaptured();
+	return m_state->MouseCaptureLayer.has_value();
 }

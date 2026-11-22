@@ -240,7 +240,7 @@ namespace SparkleLauncher
 		addRule("#WorkflowButton:checked:focus", "background: transparent; color: #ffffff; border: none; border-bottom: 3px solid " + accent + ";");
 		addRule("QPushButton", "background: " + primary + "; color: #071006; border: 1px solid #92d83a; border-radius: 4px; padding: 6px 15px; font-weight: 700;");
 		addRule("QPushButton:hover", "background: " + primaryHover + ";");
-		addRule("QPushButton:focus", "border: 1px solid " + focus + ";");
+		addRule("QPushButton:focus, QToolButton:focus", "border: 1px solid " + focus + ";");
 		addRule("QPushButton:disabled", "background: #2d312d; border: 1px solid " + border + "; border-top-color: #41483e; color: " + textMuted + ";");
 		addRule("#PrimaryActionButton", "background: " + primary + "; color: #071006; padding: 0; font-weight: 700;");
 		addRule("#PrimaryActionButton:hover", "background: " + primaryHover + ";");

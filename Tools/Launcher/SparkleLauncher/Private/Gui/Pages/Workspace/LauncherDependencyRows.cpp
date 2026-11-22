@@ -35,7 +35,7 @@ namespace SparkleLauncher
 		view->setObjectName("SourceDependencyView");
 		view->setAccessibleName(bOptional ? "Optional source dependencies" : "Source dependencies");
 		view->setAccessibleDescription("Select a dependency and use its action button or press Enter to sync or clean. Ctrl+C copies its details.");
-		view->setHeaderLabels({"Dependency", "Status", "Action", "Details"});
+		view->setHeaderLabels({"Dependency", "Status", "Available action", "Details"});
 		view->setRootIsDecorated(false);
 		view->setSelectionMode(QAbstractItemView::SingleSelection);
 		view->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -56,6 +56,9 @@ namespace SparkleLauncher
 		connect(view, &QTreeWidget::itemActivated, this, [this](QTreeWidgetItem* item) { ActivateSourceDependency(item); });
 		auto* activate = view->addAction("Sync or clean selected dependency", view, [this, view]() { ActivateSourceDependency(view->currentItem()); });
 		auto* actionButton = new QToolButton(layout.parentWidget());
+		actionButton->setObjectName("StatusActionButton");
+		actionButton->setProperty("ActionState", "neutral");
+		actionButton->setMinimumHeight(LauncherUi::Row::StatusActionHeight);
 		actionButton->setDefaultAction(activate);
 		const auto updateAction = [this, view, activate, actionButton]()
 		{
