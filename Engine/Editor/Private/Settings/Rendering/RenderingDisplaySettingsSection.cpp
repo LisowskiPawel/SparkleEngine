@@ -37,7 +37,7 @@ void DrawDisplaySettingsSection(EngineRenderingSettingsController& settingsContr
 		const bool bVSyncEdited = RenderingSettingsUi::DrawBooleanRow("##VSync", "VSync", bVSync);
 		if (bVSyncEdited)
 		{
-			settingsController.SetVSync(bVSync);
+			settingsController.Set(&EngineRenderingSettingsState::bVSync, bVSync);
 		}
 
 		RenderingSettingsUi::DrawComboOptionRow(
@@ -45,13 +45,13 @@ void DrawDisplaySettingsSection(EngineRenderingSettingsController& settingsContr
 		    "Back buffer format",
 		    settings.BackBufferFormat,
 		    backBufferFormatOptions,
-		    [&settingsController](PixelFormat value) { settingsController.SetBackBufferFormat(value); });
+		    [&settingsController](PixelFormat value) { settingsController.Set(&EngineRenderingSettingsState::BackBufferFormat, value); });
 
 		bool bPreferHighPerformanceAdapter = settings.bPreferHighPerformanceAdapter;
 		const bool bPreferHighPerformanceAdapterEdited = RenderingSettingsUi::DrawBooleanRow("##PreferHighPerformanceAdapter", "Prefer high-performance adapter", bPreferHighPerformanceAdapter);
 		if (bPreferHighPerformanceAdapterEdited)
 		{
-			settingsController.SetPreferHighPerformanceAdapter(bPreferHighPerformanceAdapter);
+			settingsController.Set(&EngineRenderingSettingsState::bPreferHighPerformanceAdapter, bPreferHighPerformanceAdapter);
 		}
 
 		RenderingSettingsUi::DrawComboOptionRow(
@@ -59,7 +59,7 @@ void DrawDisplaySettingsSection(EngineRenderingSettingsController& settingsContr
 		    "Output encoding",
 		    settings.OutputColorEncoding,
 		    outputColorEncodingOptions,
-		    [&settingsController](EngineOutputColorEncoding value) { settingsController.SetOutputColorEncoding(value); });
+		    [&settingsController](EngineOutputColorEncoding value) { settingsController.Set(&EngineRenderingSettingsState::OutputColorEncoding, value); });
 
 		ImGui::EndTable();
 	}

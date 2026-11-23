@@ -23,13 +23,13 @@ void DrawGeometrySettingsSection(EngineRenderingSettingsController& settingsCont
 			    "GBuffer algorithm",
 			    settings.SelectedGBufferAlgorithm,
 			    gBufferAlgorithmOptions,
-			    [&settingsController](GBufferAlgorithm value) { settingsController.SetGBufferAlgorithm(value); });
+			    [&settingsController](GBufferAlgorithm value) { settingsController.Set(&EngineRenderingSettingsState::SelectedGBufferAlgorithm, value); });
 
 			bool bMeshAutoBatching = settings.bMeshAutoBatching;
 			const bool bMeshAutoBatchingEdited = RenderingSettingsUi::DrawBooleanRow("##MeshAutoBatching", "Mesh auto batching", bMeshAutoBatching);
 			if (bMeshAutoBatchingEdited)
 			{
-				settingsController.SetMeshAutoBatching(bMeshAutoBatching);
+				settingsController.Set(&EngineRenderingSettingsState::bMeshAutoBatching, bMeshAutoBatching);
 			}
 
 			ImGui::EndTable();

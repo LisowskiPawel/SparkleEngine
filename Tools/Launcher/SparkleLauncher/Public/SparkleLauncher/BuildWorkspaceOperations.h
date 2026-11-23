@@ -153,8 +153,7 @@ namespace SparkleLauncher
 	{
 		std::string Id;
 		std::string DisplayName;
-		std::string DisplayCommandLine;
-		std::filesystem::path LogPath;
+		Process::ChildProcessRequest Request;
 		bool bUpdatesBuildFilesFreshness = false;
 	};
 

@@ -8,14 +8,8 @@
 
 namespace SparkleLauncher
 {
-	std::vector<LevelRunOperationProcessStep> BuildLevelRunProcessStepsForPlan(const LevelRunOperationPlan& plan)
+	LevelRunOperationStep BuildLevelRunStep(const LevelRunOperationPlan& plan)
 	{
-		std::vector<LevelRunOperationProcessStep> steps;
-		if (!plan.bCanRun)
-		{
-			return steps;
-		}
-
 		Process::ChildProcessRequest request;
 		request.ExecutablePath = plan.ExecutablePath;
 		request.WorkingDirectory = plan.WorkingDirectory;
@@ -42,11 +36,9 @@ namespace SparkleLauncher
 		}
 		request.ReadinessValue = plan.Request.LevelId;
 
-		LevelRunOperationProcessStep step;
-		step.Id = "run-level";
+		LevelRunOperationStep step;
 		step.DisplayName = (plan.Request.RunMode == LevelRunMode::Editor ? "Open " : "Run ") + plan.Request.LevelId;
 		step.Request = std::move(request);
-		steps.push_back(std::move(step));
-		return steps;
+		return step;
 	}
 }

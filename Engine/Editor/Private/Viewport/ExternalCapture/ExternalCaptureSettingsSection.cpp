@@ -15,7 +15,7 @@ static void DrawStartupCaptureSelection(EngineRenderingSettingsController& setti
 		{
 			if (ImGui::Selectable(ExternalCaptureProviderDisplayName(candidate).data(), candidate == provider))
 			{
-				settings.SetStartupCaptureProvider(candidate);
+				settings.Set(&EngineRenderingSettingsState::StartupCaptureProvider, candidate);
 			}
 		}
 		ImGui::EndCombo();

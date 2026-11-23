@@ -30,7 +30,7 @@ void DrawRayReconstructionSettingsSection(EngineRenderingSettingsController& set
 		    "Mode",
 		    settings.RayReconstructionMode,
 		    rayReconstructionModeOptions,
-		    [&settingsController](EngineRayReconstructionMode value) { settingsController.SetRayReconstructionMode(value); });
+		    [&settingsController](EngineRayReconstructionMode value) { settingsController.Set(&EngineRenderingSettingsState::RayReconstructionMode, value); });
 
 		ImGui::EndTable();
 	}

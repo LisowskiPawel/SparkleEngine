@@ -9,8 +9,8 @@ namespace Process
 
 namespace SparkleLauncher
 {
-	struct BuildWorkspaceProcessStep;
+	struct BuildWorkspaceOperationStep;
 
-	std::string MakeBuildWorkspaceFailureSummary(const BuildWorkspaceProcessStep& step, const Process::ChildProcessResult& result);
-	std::string BuildWorkspaceRecoveryAction(const BuildWorkspaceProcessStep& step);
+	std::string MakeBuildWorkspaceFailureSummary(const BuildWorkspaceOperationStep& step, const Process::ChildProcessResult& result);
+	std::string BuildWorkspaceRecoveryAction(const BuildWorkspaceOperationStep& step);
 }

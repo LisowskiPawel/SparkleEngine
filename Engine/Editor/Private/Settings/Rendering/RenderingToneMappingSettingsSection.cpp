@@ -31,7 +31,7 @@ void DrawToneMappingSettingsSection(EngineRenderingSettingsController& settingsC
 		    "Tone mapper",
 		    settings.ToneMapper,
 		    toneMapperOptions,
-		    [&settingsController](EngineToneMapper value) { settingsController.SetToneMapper(value); });
+		    [&settingsController](EngineToneMapper value) { settingsController.Set(&EngineRenderingSettingsState::ToneMapper, value); });
 
 		ImGui::EndTable();
 	}

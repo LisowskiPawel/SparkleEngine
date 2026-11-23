@@ -46,10 +46,8 @@ namespace SparkleLauncher
 
 	struct LevelRunOperationStep
 	{
-		std::string Id;
 		std::string DisplayName;
-		std::string DisplayCommandLine;
-		std::filesystem::path LogPath;
+		Process::ChildProcessRequest Request;
 	};
 
 	struct LevelRunReadinessState
@@ -70,7 +68,7 @@ namespace SparkleLauncher
 		std::filesystem::path ExecutablePath;
 		std::filesystem::path WorkingDirectory;
 		std::vector<Process::EnvironmentOverride> Environment;
-		std::vector<LevelRunOperationStep> Steps;
+		LevelRunOperationStep Step;
 		std::vector<std::string> PlannedEffects;
 		std::vector<std::string> ReadinessMessages;
 		LevelRunReadinessState Readiness;

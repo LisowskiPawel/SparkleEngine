@@ -203,14 +203,14 @@ namespace ExposureSettingsEditor
 		    "Exposure mode",
 		    settings.ExposureMode,
 		    ExposureModeOptions,
-		    [&settingsController](EngineExposureMode value) { settingsController.SetExposureMode(value); });
+		    [&settingsController](EngineExposureMode value) { settingsController.Set(&EngineRenderingSettingsState::ExposureMode, value); });
 
 		RenderingSettingsUi::DrawComboOptionRow(
 		    "##ExposureMeteringMethod",
 		    "Exposure metering",
 		    settings.ExposureMeteringMethod,
 		    ExposureMeteringOptions,
-		    [&settingsController](EngineExposureMeteringMethod value) { settingsController.SetExposureMeteringMethod(value); });
+		    [&settingsController](EngineExposureMeteringMethod value) { settingsController.Set(&EngineRenderingSettingsState::ExposureMeteringMethod, value); });
 	}
 
 	void DrawDefaultExposureValues(EngineRenderingSettingsController& settingsController, const EngineRenderingSettingsState& settings)
@@ -221,7 +221,7 @@ namespace ExposureSettingsEditor
 		const bool bManualExposureEdited = RenderingSettingsUi::DrawFloatInputRow("##ManualExposure", "Manual exposure", manualExposure, 0.1f, 1.0f, "%.4f");
 		if (bManualExposureEdited)
 		{
-			settingsController.SetManualExposure(manualExposure);
+			settingsController.Set(&EngineRenderingSettingsState::ManualExposure, manualExposure);
 		}
 
 		ImGui::EndDisabled();
@@ -230,35 +230,35 @@ namespace ExposureSettingsEditor
 		const bool bExposureCompensationEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureCompensation", "Exposure compensation EV", exposureCompensation, 0.1f, 1.0f, "%.2f");
 		if (bExposureCompensationEdited)
 		{
-			settingsController.SetExposureCompensation(exposureCompensation);
+			settingsController.Set(&EngineRenderingSettingsState::ExposureCompensation, exposureCompensation);
 		}
 
 		float exposureTargetLuminance = settings.ExposureTargetLuminance;
 		const bool bExposureTargetLuminanceEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureTargetLuminance", "Target luminance", exposureTargetLuminance, 0.01f, 0.1f, "%.4f");
 		if (bExposureTargetLuminanceEdited)
 		{
-			settingsController.SetExposureTargetLuminance(exposureTargetLuminance);
+			settingsController.Set(&EngineRenderingSettingsState::ExposureTargetLuminance, exposureTargetLuminance);
 		}
 
 		float exposureMin = settings.ExposureMin;
 		const bool bExposureMinEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureMin", "Min exposure", exposureMin, 0.0001f, 0.01f, "%.6f");
 		if (bExposureMinEdited)
 		{
-			settingsController.SetExposureMin(exposureMin);
+			settingsController.Set(&EngineRenderingSettingsState::ExposureMin, exposureMin);
 		}
 
 		float exposureMax = settings.ExposureMax;
 		const bool bExposureMaxEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureMax", "Max exposure", exposureMax, 1.0f, 64.0f, "%.3f");
 		if (bExposureMaxEdited)
 		{
-			settingsController.SetExposureMax(exposureMax);
+			settingsController.Set(&EngineRenderingSettingsState::ExposureMax, exposureMax);
 		}
 
 		float exposureAdaptationSpeedUp = settings.ExposureAdaptationSpeedUp;
 		const bool bExposureAdaptationSpeedUpEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureAdaptationSpeedUp", "Adapt rate up (1/s)", exposureAdaptationSpeedUp, 0.1f, 1.0f, "%.3f");
 		if (bExposureAdaptationSpeedUpEdited)
 		{
-			settingsController.SetExposureAdaptationSpeedUp(exposureAdaptationSpeedUp);
+			settingsController.Set(&EngineRenderingSettingsState::ExposureAdaptationSpeedUp, exposureAdaptationSpeedUp);
 		}
 
 		float exposureAdaptationSpeedDown = settings.ExposureAdaptationSpeedDown;
@@ -267,7 +267,7 @@ namespace ExposureSettingsEditor
 
 		if (bAdaptationSpeedDownEdited)
 		{
-			settingsController.SetExposureAdaptationSpeedDown(exposureAdaptationSpeedDown);
+			settingsController.Set(&EngineRenderingSettingsState::ExposureAdaptationSpeedDown, exposureAdaptationSpeedDown);
 		}
 	}
 

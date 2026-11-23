@@ -63,8 +63,7 @@ namespace SparkleLauncher
 	{
 		std::string Id;
 		std::string DisplayName;
-		std::string DisplayCommandLine;
-		std::filesystem::path LogPath;
+		Process::ChildProcessRequest Request;
 		std::filesystem::path DestructivePath;
 		bool bDestructive = false;
 	};

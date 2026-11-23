@@ -30,10 +30,8 @@ namespace SparkleLauncher
 
 	struct LevelOperationStep
 	{
-		std::string Id;
 		std::string DisplayName;
-		std::string DisplayCommandLine;
-		std::filesystem::path LogPath;
+		Process::ChildProcessRequest Request;
 	};
 
 	struct LevelOperationPlan

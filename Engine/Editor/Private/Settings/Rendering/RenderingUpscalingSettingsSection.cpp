@@ -38,14 +38,14 @@ void DrawUpscalingSettingsSection(EngineRenderingSettingsController& settingsCon
 		    "Provider",
 		    settings.UpscalerProvider,
 		    upscalerProviderOptions,
-		    [&settingsController](EUpscalerProviderKind value) { settingsController.SetUpscalerProvider(value); });
+		    [&settingsController](EUpscalerProviderKind value) { settingsController.Set(&EngineRenderingSettingsState::UpscalerProvider, value); });
 
 		RenderingSettingsUi::DrawComboOptionRow(
 		    "##UpscalerQualityMode",
 		    "Quality mode",
 		    settings.UpscalerQualityMode,
 		    upscalerQualityOptions,
-		    [&settingsController](EUpscalerQualityMode value) { settingsController.SetUpscalerQualityMode(value); });
+		    [&settingsController](EUpscalerQualityMode value) { settingsController.Set(&EngineRenderingSettingsState::UpscalerQualityMode, value); });
 
 		ImGui::EndTable();
 	}

@@ -51,9 +51,9 @@ namespace SparkleLauncher
 		return process;
 	}
 
-	std::vector<LevelOperationProcessStep> BuildLevelOperationProcessSteps(const LevelOperationPlan& plan)
+	std::vector<LevelOperationStep> BuildLevelOperationSteps(const LevelOperationPlan& plan)
 	{
-		std::vector<LevelOperationProcessStep> steps;
+		std::vector<LevelOperationStep> steps;
 		const std::filesystem::path projectRoot = ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId);
 		const ProjectLevelCatalog catalog = LoadProjectLevelCatalog(projectRoot);
 		for (const std::string& packId : BuildAssetPackSyncPlan(catalog, plan.Request.RequestedLevelIds, plan.Request.bSelectAvailableLevels))
@@ -64,8 +64,7 @@ namespace SparkleLauncher
 				continue;
 			}
 
-			LevelOperationProcessStep step;
-			step.Id = "sync-asset-pack-" + pack.id;
+			LevelOperationStep step;
 			step.DisplayName = "Acquire " + pack.displayName;
 			step.Request = MakeAssetPackSyncRequest(plan, pack);
 			steps.push_back(std::move(step));

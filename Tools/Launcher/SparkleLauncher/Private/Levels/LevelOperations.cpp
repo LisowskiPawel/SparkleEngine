@@ -6,7 +6,6 @@
 #include "ProjectLevelCatalog.h"
 
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Strings/StringUtils.h"
 #include "SparkleLauncher/ToolResolver.h"
 #include "Workspace/LauncherProductPaths.h"
 
@@ -19,19 +18,6 @@ namespace SparkleLauncher
 	static void AddReadiness(LevelOperationPlan& plan, std::string message)
 	{
 		plan.ReadinessMessages.push_back(std::move(message));
-	}
-
-	static void PopulateLevelOperationSteps(LevelOperationPlan& plan)
-	{
-		for (const LevelOperationProcessStep& processStep : BuildLevelOperationProcessSteps(plan))
-		{
-			LevelOperationStep step;
-			step.Id = processStep.Id;
-			step.DisplayName = processStep.DisplayName;
-			step.DisplayCommandLine = BuildDisplayCommandLine(processStep.Request.ExecutablePath, processStep.Request.Arguments);
-			step.LogPath = processStep.Request.LogPath;
-			plan.Steps.push_back(std::move(step));
-		}
 	}
 
 	const std::vector<LevelOperationDefinition>& GetLevelOperationDefinitions()
@@ -127,8 +113,8 @@ namespace SparkleLauncher
 		dryRun << "Dry-run plan for " << plan.Operation.DisplayName << ":";
 		for (const LevelOperationStep& step : plan.Steps)
 		{
-			dryRun << "\n  " << step.DisplayName << ": " << step.DisplayCommandLine;
-			dryRun << "\n    Log: " << step.LogPath.string();
+			dryRun << "\n  " << step.DisplayName << ": " << BuildDisplayCommandLine(step.Request.ExecutablePath, step.Request.Arguments);
+			dryRun << "\n    Log: " << step.Request.LogPath.string();
 		}
 		if (plan.Steps.empty())
 		{
@@ -158,7 +144,7 @@ namespace SparkleLauncher
 		{
 			ResolveAvailableLevels(plan);
 			RecordLevelSyncInputs(plan);
-			PopulateLevelOperationSteps(plan);
+			plan.Steps = BuildLevelOperationSteps(plan);
 			plan.bCanRun = true;
 		}
 		catch (const Diagnostics::Error& error)

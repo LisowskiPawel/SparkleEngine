@@ -257,19 +257,12 @@ namespace SparkleLauncher
 	{
 		try
 		{
-			const std::vector<BuildWorkspaceProcessStep> processSteps = BuildProcessStepsForPlan(plan);
-			for (const BuildWorkspaceProcessStep& processStep : processSteps)
+			plan.Steps = BuildProcessStepsForPlan(plan);
+			for (const BuildWorkspaceOperationStep& step : plan.Steps)
 			{
-				BuildWorkspaceOperationStep step;
-				step.Id = processStep.Id;
-				step.DisplayName = processStep.DisplayName;
-				step.DisplayCommandLine = BuildDisplayCommandLine(processStep.Request.ExecutablePath, processStep.Request.Arguments);
-				step.LogPath = processStep.Request.LogPath;
-				step.bUpdatesBuildFilesFreshness = processStep.bUpdatesBuildFilesFreshness;
-				plan.Steps.push_back(std::move(step));
 				if (plan.Kind != BuildWorkspaceOperationKind::InstallHostTool)
 				{
-					AddPlannedEffect(plan, processStep.DisplayName + ".");
+					AddPlannedEffect(plan, step.DisplayName + ".");
 				}
 			}
 		}
@@ -287,10 +280,10 @@ namespace SparkleLauncher
 		dryRun << "Dry-run plan for " << displayName << ":";
 		for (const BuildWorkspaceOperationStep& step : plan.Steps)
 		{
-			dryRun << "\n  " << step.DisplayName << ": " << step.DisplayCommandLine;
-			if (!step.LogPath.empty())
+			dryRun << "\n  " << step.DisplayName << ": " << BuildDisplayCommandLine(step.Request.ExecutablePath, step.Request.Arguments);
+			if (!step.Request.LogPath.empty())
 			{
-				dryRun << "\n    Log: " << step.LogPath.string();
+				dryRun << "\n    Log: " << step.Request.LogPath.string();
 			}
 		}
 		if (plan.Steps.empty())

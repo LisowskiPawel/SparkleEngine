@@ -1,6 +1,5 @@
 #include "SparkleLauncher/LevelRunOperations.h"
 
-#include "Levels/LevelRunOperationProcessRequests.h"
 #include "Operations/LauncherOperationProgress.h"
 #include "GpuCrash/GpuCrashLaunch.h"
 
@@ -24,43 +23,39 @@ namespace SparkleLauncher
 			return operation;
 		}
 
-		std::vector<LevelRunOperationProcessStep> processSteps = BuildLevelRunProcessStepsForPlan(plan);
-		for (std::size_t stepIndex = 0; stepIndex < processSteps.size(); ++stepIndex)
-		{
-			LevelRunOperationProcessStep& step = processSteps[stepIndex];
-			ReportOperationProgress(outputCallback, step.DisplayName);
-			Process::ChildProcessRequest request = step.Request;
-			request.Cancellation = cancellation;
-			AppendProcessOutputCallback(request, outputCallback);
-			operation.LogPath = request.LogPath;
+		const LevelRunOperationStep& step = plan.Step;
+		ReportOperationProgress(outputCallback, step.DisplayName);
+		Process::ChildProcessRequest request = step.Request;
+		request.Cancellation = cancellation;
+		AppendProcessOutputCallback(request, outputCallback);
+		operation.LogPath = request.LogPath;
 
-			const Process::ChildProcessResult result = processRunner.Run(request);
-			if (plan.Request.GpuCrashMode == RhiGpuCrashMode::Aftermath)
+		const Process::ChildProcessResult result = processRunner.Run(request);
+		if (plan.Request.GpuCrashMode == RhiGpuCrashMode::Aftermath)
+		{
+			const auto path = ReadGpuCrashAnnouncement(result.CapturedOutput);
+			if (!ReadGpuCrashState(path, plan.SessionId, result.ProcessId).empty())
 			{
-				const auto path = ReadGpuCrashAnnouncement(result.CapturedOutput);
-				if (!ReadGpuCrashState(path, plan.SessionId, result.ProcessId).empty())
-				{
-					operation.GpuCrash = GpuCrashIncident{path, plan.SessionId, result.ProcessId};
-				}
+				operation.GpuCrash = GpuCrashIncident{path, plan.SessionId, result.ProcessId};
 			}
-			if (!result.bReady || !result.Succeeded())
+		}
+		if (!result.bReady || !result.Succeeded())
+		{
+			if (result.bCancelled)
 			{
-				if (result.bCancelled)
-				{
-					const auto summary = result.FailureReason.empty() ? step.DisplayName + " was canceled." : result.FailureReason;
-					SetOperationFailure(operation, OperationProblemKind::Cancellation, summary, "Open the level again when ready.");
-				}
-				else
-				{
-					SetProcessOperationFailure(
-					    operation,
-					    result.StartFailure,
-					    result.FailureReason.empty() ? step.DisplayName + " failed." : result.FailureReason,
-					    "Review the application startup log, correct the first startup or readiness failure, then retry this level.");
-				}
-				MarkOperationFinished(operation, result.bCancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
-				return operation;
+				const auto summary = result.FailureReason.empty() ? step.DisplayName + " was canceled." : result.FailureReason;
+				SetOperationFailure(operation, OperationProblemKind::Cancellation, summary, "Open the level again when ready.");
 			}
+			else
+			{
+				SetProcessOperationFailure(
+				    operation,
+				    result.StartFailure,
+				    result.FailureReason.empty() ? step.DisplayName + " failed." : result.FailureReason,
+				    "Review the application startup log, correct the first startup or readiness failure, then retry this level.");
+			}
+			MarkOperationFinished(operation, result.bCancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
+			return operation;
 		}
 
 		MarkOperationFinished(operation, OperationStatus::Succeeded, 0);

@@ -27,16 +27,6 @@ void EngineRenderingSettingsController::RefreshFromRuntimeState() noexcept
 	m_state = m_refreshHandler();
 }
 
-bool EngineRenderingSettingsController::HasPendingRestart() const noexcept
-{
-	return ComputePendingRestart();
-}
-
-std::string EngineRenderingSettingsController::BuildPendingRestartMessage() const
-{
-	return DescribePendingRestart();
-}
-
 bool EngineRenderingSettingsController::CommitState()
 {
 	try
@@ -67,139 +57,7 @@ void EngineRenderingSettingsController::ResetDefaults()
 	}
 }
 
-void EngineRenderingSettingsController::SetVSync(bool bEnabled)
-{
-	SetValue(m_state.bVSync, bEnabled);
-}
-
-void EngineRenderingSettingsController::SetBackBufferFormat(PixelFormat format)
-{
-	SetValue(m_state.BackBufferFormat, format);
-}
-
-#if SPARKLE_TARGET_EDITOR && !SPARKLE_BUILD_SHIPPING
-void EngineRenderingSettingsController::SetStartupCaptureProvider(ExternalCaptureProvider provider)
-{
-	SetValue(m_state.StartupCaptureProvider, provider);
-}
-#endif
-
-void EngineRenderingSettingsController::SetPreferHighPerformanceAdapter(bool bEnabled)
-{
-	SetValue(m_state.bPreferHighPerformanceAdapter, bEnabled);
-}
-
-void EngineRenderingSettingsController::SetToneMapper(EngineToneMapper toneMapper)
-{
-	SetValue(m_state.ToneMapper, toneMapper);
-}
-
-void EngineRenderingSettingsController::SetExposureMode(EngineExposureMode mode)
-{
-	SetValue(m_state.ExposureMode, mode);
-}
-
-void EngineRenderingSettingsController::SetExposureMeteringMethod(EngineExposureMeteringMethod method)
-{
-	SetValue(m_state.ExposureMeteringMethod, method);
-}
-
-void EngineRenderingSettingsController::SetOutputColorEncoding(EngineOutputColorEncoding encoding)
-{
-	SetValue(m_state.OutputColorEncoding, encoding);
-}
-
-void EngineRenderingSettingsController::SetManualExposure(float exposure)
-{
-	SetValue(m_state.ManualExposure, exposure);
-}
-
-void EngineRenderingSettingsController::SetExposureCompensation(float compensation)
-{
-	SetValue(m_state.ExposureCompensation, compensation);
-}
-
-void EngineRenderingSettingsController::SetExposureTargetLuminance(float luminance)
-{
-	SetValue(m_state.ExposureTargetLuminance, luminance);
-}
-
-void EngineRenderingSettingsController::SetExposureMin(float exposure)
-{
-	SetValue(m_state.ExposureMin, exposure);
-}
-
-void EngineRenderingSettingsController::SetExposureMax(float exposure)
-{
-	SetValue(m_state.ExposureMax, exposure);
-}
-
-void EngineRenderingSettingsController::SetExposureAdaptationSpeedUp(float speed)
-{
-	SetValue(m_state.ExposureAdaptationSpeedUp, speed);
-}
-
-void EngineRenderingSettingsController::SetExposureAdaptationSpeedDown(float speed)
-{
-	SetValue(m_state.ExposureAdaptationSpeedDown, speed);
-}
-
-void EngineRenderingSettingsController::SetUpscalerProvider(EUpscalerProviderKind provider)
-{
-	SetValue(m_state.UpscalerProvider, provider);
-}
-
-void EngineRenderingSettingsController::SetUpscalerQualityMode(EUpscalerQualityMode mode)
-{
-	SetValue(m_state.UpscalerQualityMode, mode);
-}
-
-void EngineRenderingSettingsController::SetRayReconstructionMode(EngineRayReconstructionMode mode)
-{
-	SetValue(m_state.RayReconstructionMode, mode);
-}
-
-void EngineRenderingSettingsController::SetGBufferAlgorithm(GBufferAlgorithm algorithm)
-{
-	SetValue(m_state.SelectedGBufferAlgorithm, algorithm);
-}
-
-void EngineRenderingSettingsController::SetMeshAutoBatching(bool bEnabled)
-{
-	SetValue(m_state.bMeshAutoBatching, bEnabled);
-}
-
-void EngineRenderingSettingsController::SetRefitTlas(bool bEnabled)
-{
-	SetValue(m_state.bRefitTlas, bEnabled);
-}
-
-void EngineRenderingSettingsController::SetPtlasActive(bool bActive)
-{
-	SetValue(m_state.bPtlasActive, bActive);
-}
-
-void EngineRenderingSettingsController::SetPtlasPartitionsPerAxis(std::uint32_t partitionsPerAxis)
-{
-	SetValue(m_state.PtlasPartitionsPerAxis, partitionsPerAxis);
-}
-
-void EngineRenderingSettingsController::SetPtlasPartitionUpdateMode(RayTracingPtlasPartitionUpdateMode mode)
-{
-	SetValue(m_state.PtlasPartitionUpdateMode, mode);
-}
-
-void EngineRenderingSettingsController::SetPtlasMarkAllDynamicInPartition(bool bEnabled)
-{
-	SetValue(m_state.bPtlasMarkAllDynamicInPartition, bEnabled);
-}
-
-void EngineRenderingSettingsController::SetPtlasModeChangeDistance(float distance)
-{
-	SetValue(m_state.PtlasModeChangeDistance, distance);
-}
-
-bool EngineRenderingSettingsController::ComputePendingRestart() const noexcept
+bool EngineRenderingSettingsController::HasPendingRestart() const noexcept
 {
 #if SPARKLE_TARGET_EDITOR && !SPARKLE_BUILD_SHIPPING
 	if (m_sessionStartupCaptureProvider != m_state.StartupCaptureProvider)
@@ -210,7 +68,7 @@ bool EngineRenderingSettingsController::ComputePendingRestart() const noexcept
 	return m_bSessionPreferHighPerformanceAdapter != m_state.bPreferHighPerformanceAdapter || m_sessionBackBufferFormat != m_state.BackBufferFormat;
 }
 
-std::string EngineRenderingSettingsController::DescribePendingRestart() const
+std::string EngineRenderingSettingsController::BuildPendingRestartMessage() const
 {
 	std::vector<std::string> reasons;
 #if SPARKLE_TARGET_EDITOR && !SPARKLE_BUILD_SHIPPING

@@ -1,6 +1,6 @@
 #include "Build/BuildWorkspaceFailure.h"
 
-#include "Build/BuildWorkspaceProcessRequests.h"
+#include "SparkleLauncher/BuildWorkspaceOperations.h"
 #include "Core/Public/Process/ChildProcess.h"
 #include "Core/Public/Strings/StringUtils.h"
 
@@ -91,7 +91,7 @@ namespace SparkleLauncher
 		return {};
 	}
 
-	static std::string ExtractFailureDetail(const BuildWorkspaceProcessStep& step, const Process::ChildProcessResult& result)
+	static std::string ExtractFailureDetail(const BuildWorkspaceOperationStep& step, const Process::ChildProcessResult& result)
 	{
 		std::string logText;
 		std::string_view text = result.CapturedOutput;
@@ -130,7 +130,7 @@ namespace SparkleLauncher
 		return {};
 	}
 
-	std::string MakeBuildWorkspaceFailureSummary(const BuildWorkspaceProcessStep& step, const Process::ChildProcessResult& result)
+	std::string MakeBuildWorkspaceFailureSummary(const BuildWorkspaceOperationStep& step, const Process::ChildProcessResult& result)
 	{
 		if (!result.FailureReason.empty())
 		{
@@ -152,7 +152,7 @@ namespace SparkleLauncher
 		return detail.empty() ? step.DisplayName + " failed." : step.DisplayName + " failed: " + detail;
 	}
 
-	std::string BuildWorkspaceRecoveryAction(const BuildWorkspaceProcessStep& step)
+	std::string BuildWorkspaceRecoveryAction(const BuildWorkspaceOperationStep& step)
 	{
 		if (step.Id == "install-host-tool")
 		{

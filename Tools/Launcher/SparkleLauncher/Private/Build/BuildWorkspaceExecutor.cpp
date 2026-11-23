@@ -1,10 +1,8 @@
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 
 #include "Build/NativeBuildOutputReset.h"
-#include "Build/BuildWorkspaceProcessRequests.h"
 #include "Build/BuildWorkspaceFailure.h"
 #include "Operations/LauncherOperationProgress.h"
-#include "Core/Public/Diagnostics/Error.h"
 #include "ToolOutputPaths.h"
 #include "SparkleLauncher/SourceDependencyState.h"
 
@@ -99,60 +97,9 @@ namespace SparkleLauncher
 		return "The installer completed, but " + displayName + " is still unavailable. The required compiler or toolchain component was not installed.";
 	}
 
-	static bool MatchesPlannedStep(const BuildWorkspaceOperationStep& planned, const BuildWorkspaceProcessStep& executable)
-	{
-		return planned.Id == executable.Id && planned.DisplayName == executable.DisplayName
-		    && planned.DisplayCommandLine == BuildDisplayCommandLine(executable.Request.ExecutablePath, executable.Request.Arguments) && planned.LogPath == executable.Request.LogPath
-		    && planned.bUpdatesBuildFilesFreshness == executable.bUpdatesBuildFilesFreshness;
-	}
-
-	bool BuildWorkspaceExecutionPlanMatches(const BuildWorkspaceOperationPlan& plan, const std::vector<BuildWorkspaceProcessStep>& processSteps)
-	{
-		return plan.Steps.size() == processSteps.size()
-		    && std::equal(
-		        plan.Steps.begin(),
-		        plan.Steps.end(),
-		        processSteps.begin(),
-		        [](const BuildWorkspaceOperationStep& planned, const BuildWorkspaceProcessStep& executable) { return MatchesPlannedStep(planned, executable); });
-	}
-
-	static bool PrepareBuildWorkspaceExecution(const BuildWorkspaceOperationPlan& plan, OperationRecord& operation, std::vector<BuildWorkspaceProcessStep>& processSteps)
-	{
-		if (!plan.bCanRun)
-		{
-			SetOperationFailure(
-			    operation,
-			    OperationProblemKind::Prerequisite,
-			    plan.ReadinessMessages.empty() ? "Operation is not ready to run." : plan.ReadinessMessages.back(),
-			    "Open Sync, resolve the reported prerequisite, then retry this workflow.");
-
-			MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
-			return false;
-		}
-
-		try
-		{
-			processSteps = BuildProcessStepsForPlan(plan);
-		}
-		catch (const Diagnostics::Error& error)
-		{
-			SetOperationFailure(operation, OperationProblemKind::Planning, std::string("Operation planning failed: ") + error.what(), "Refresh the workflow, review its preview, then retry.");
-			MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
-			return false;
-		}
-		if (!BuildWorkspaceExecutionPlanMatches(plan, processSteps))
-		{
-			SetOperationFailure(operation, OperationProblemKind::Planning, "Operation inputs changed after planning.", "Refresh the workflow, review its updated preview, then retry.");
-			MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
-			return false;
-		}
-
-		return true;
-	}
-
 	static bool PrepareBuildWorkspaceStep(
 	    const BuildWorkspaceOperationPlan& plan,
-	    const BuildWorkspaceProcessStep& step,
+	    const BuildWorkspaceOperationStep& step,
 	    const Process::ChildProcessOutputCallback& outputCallback,
 	    OperationRecord& operation)
 	{
@@ -195,7 +142,7 @@ namespace SparkleLauncher
 
 	static bool RunBuildWorkspaceStep(
 	    const BuildWorkspaceOperationPlan& plan,
-	    const BuildWorkspaceProcessStep& step,
+	    const BuildWorkspaceOperationStep& step,
 	    IProcessRunner& processRunner,
 	    const Process::ChildProcessOutputCallback& outputCallback,
 	    OperationRecord& operation,
@@ -231,7 +178,7 @@ namespace SparkleLauncher
 		return true;
 	}
 
-	static bool ValidateBuildWorkspaceStep(const BuildWorkspaceOperationPlan& plan, const BuildWorkspaceProcessStep& step, OperationRecord& operation)
+	static bool ValidateBuildWorkspaceStep(const BuildWorkspaceOperationPlan& plan, const BuildWorkspaceOperationStep& step, OperationRecord& operation)
 	{
 		if (const std::optional<std::string> hostToolValidationFailure = ValidateRequestedHostToolAfterInstall(plan))
 		{
@@ -291,16 +238,22 @@ namespace SparkleLauncher
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
-		std::vector<BuildWorkspaceProcessStep> processSteps;
-		if (!PrepareBuildWorkspaceExecution(plan, operation, processSteps))
+		if (!plan.bCanRun)
 		{
+			SetOperationFailure(
+			    operation,
+			    OperationProblemKind::Prerequisite,
+			    plan.ReadinessMessages.empty() ? "Operation is not ready to run." : plan.ReadinessMessages.back(),
+			    "Open Sync, resolve the reported prerequisite, then retry this workflow.");
+
+			MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
 			return operation;
 		}
 
-		for (std::size_t stepIndex = 0; stepIndex < processSteps.size(); ++stepIndex)
+		for (std::size_t stepIndex = 0; stepIndex < plan.Steps.size(); ++stepIndex)
 		{
-			const BuildWorkspaceProcessStep& step = processSteps[stepIndex];
-			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex, processSteps.size());
+			const BuildWorkspaceOperationStep& step = plan.Steps[stepIndex];
+			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex, plan.Steps.size());
 			const bool bStepExecuted = RunBuildWorkspaceStep(plan, step, processRunner, outputCallback, operation, cancellation);
 			const bool bStepValidated = bStepExecuted && ValidateBuildWorkspaceStep(plan, step, operation);
 
@@ -308,7 +261,7 @@ namespace SparkleLauncher
 			{
 				return operation;
 			}
-			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex + 1, processSteps.size());
+			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex + 1, plan.Steps.size());
 		}
 		MarkOperationFinished(operation, OperationStatus::Succeeded, 0);
 		return operation;

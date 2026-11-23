@@ -9,13 +9,11 @@
 #include "ExternalCapture/ExternalCaptureDiscovery.h"
 #include "GpuCrash/GpuCrashLaunch.h"
 #include "Core/Public/Paths/FileSystemPaths.h"
-#include "SparkleLauncher/ToolResolver.h"
 
 #include <algorithm>
 #include <optional>
 #include <sstream>
 #include <system_error>
-#include <utility>
 
 namespace SparkleLauncher
 {
@@ -42,23 +40,6 @@ namespace SparkleLauncher
 		{
 			plan.ReadinessMessages.push_back(error.what());
 			return false;
-		}
-	}
-
-	static void PopulateRunStep(LevelRunOperationPlan& plan)
-	{
-		if (!plan.bCanRun)
-		{
-			return;
-		}
-		for (const LevelRunOperationProcessStep& processStep : BuildLevelRunProcessStepsForPlan(plan))
-		{
-			LevelRunOperationStep step;
-			step.Id = processStep.Id;
-			step.DisplayName = processStep.DisplayName;
-			step.DisplayCommandLine = BuildDisplayCommandLine(processStep.Request.ExecutablePath, processStep.Request.Arguments);
-			step.LogPath = processStep.Request.LogPath;
-			plan.Steps.push_back(std::move(step));
 		}
 	}
 
@@ -139,17 +120,18 @@ namespace SparkleLauncher
 	{
 		std::ostringstream dryRun;
 		dryRun << "Dry-run plan for " << displayName << ":";
-		for (const LevelRunOperationStep& step : plan.Steps)
+		if (plan.bCanRun)
 		{
-			dryRun << "\n  " << step.DisplayName << ": " << step.DisplayCommandLine;
+			const LevelRunOperationStep& step = plan.Step;
+			dryRun << "\n  " << step.DisplayName << ": " << BuildDisplayCommandLine(step.Request.ExecutablePath, step.Request.Arguments);
 			dryRun << "\n    Working directory: " << Strings::ToNarrow(plan.WorkingDirectory.wstring());
 			dryRun << "\n    Env: SPARKLE_STARTUP_LEVEL=" << plan.Request.LevelId;
-			if (!step.LogPath.empty())
+			if (!step.Request.LogPath.empty())
 			{
-				dryRun << "\n    Log: " << Strings::ToNarrow(step.LogPath.wstring());
+				dryRun << "\n    Log: " << Strings::ToNarrow(step.Request.LogPath.wstring());
 			}
 		}
-		if (plan.Steps.empty())
+		else
 		{
 			dryRun << "\n  No command step is available until readiness issues are resolved.";
 		}
@@ -254,7 +236,10 @@ namespace SparkleLauncher
 		const bool bCookedContentReady = bSceneAssetsReady && plan.Readiness.bCookedShadersReady;
 		plan.bCanRun = bProductReady && bCookedContentReady;
 
-		PopulateRunStep(plan);
+		if (plan.bCanRun)
+		{
+			plan.Step = BuildLevelRunStep(plan);
+		}
 
 		plan.Operation.DryRunText = BuildRunDryRunText(plan, definition->DisplayName);
 		return plan;

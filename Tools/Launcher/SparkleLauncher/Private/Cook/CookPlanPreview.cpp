@@ -73,29 +73,6 @@ namespace SparkleLauncher
 		}
 	}
 
-	static void PopulateCookSteps(CookOperationPlan& plan)
-	{
-		const std::vector<CookOperationProcessStep> processSteps = BuildCookProcessStepsForPlan(plan);
-		for (const CookOperationProcessStep& processStep : processSteps)
-		{
-			CookOperationStep step;
-			step.Id = processStep.Id;
-			step.DisplayName = processStep.DisplayName;
-			step.bDestructive = processStep.bDeletesCookedOutputs;
-			step.DestructivePath = processStep.DestructivePath;
-			if (processStep.bHasProcessRequest)
-			{
-				step.DisplayCommandLine = BuildDisplayCommandLine(processStep.Request.ExecutablePath, processStep.Request.Arguments);
-				step.LogPath = processStep.Request.LogPath;
-			}
-			else
-			{
-				step.DisplayCommandLine = "Delete " + processStep.DestructivePath.string();
-			}
-			plan.Steps.push_back(std::move(step));
-		}
-	}
-
 	void RecordCookInputs(CookOperationPlan& plan)
 	{
 		const CookOperationRequest& request = plan.Request;
@@ -121,10 +98,11 @@ namespace SparkleLauncher
 		dryRun << "Dry-run plan for " << displayName << ":";
 		for (const CookOperationStep& step : plan.Steps)
 		{
-			dryRun << "\n  " << step.DisplayName << ": " << step.DisplayCommandLine;
-			if (!step.LogPath.empty())
+			const std::string command = step.bDestructive ? "Delete " + step.DestructivePath.string() : BuildDisplayCommandLine(step.Request.ExecutablePath, step.Request.Arguments);
+			dryRun << "\n  " << step.DisplayName << ": " << command;
+			if (!step.Request.LogPath.empty())
 			{
-				dryRun << "\n    Log: " << step.LogPath.string();
+				dryRun << "\n    Log: " << step.Request.LogPath.string();
 			}
 		}
 		if (plan.Steps.empty())
@@ -139,7 +117,7 @@ namespace SparkleLauncher
 		PopulateCookEffects(plan);
 		if (bInputsReady)
 		{
-			PopulateCookSteps(plan);
+			plan.Steps = BuildCookProcessStepsForPlan(plan);
 		}
 		DescribeCookDryRun(plan, displayName);
 	}

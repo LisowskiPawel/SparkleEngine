@@ -30,7 +30,7 @@ void DrawRayTracingSceneSettingsSection(EngineRenderingSettingsController& setti
 		const bool bRefitTlasEdited = RenderingSettingsUi::DrawBooleanRow("##RefitTlas", "Refit TLAS", bRefitTlas);
 		if (bRefitTlasEdited)
 		{
-			settingsController.SetRefitTlas(bRefitTlas);
+			settingsController.Set(&EngineRenderingSettingsState::bRefitTlas, bRefitTlas);
 		}
 
 		ImGui::EndDisabled();

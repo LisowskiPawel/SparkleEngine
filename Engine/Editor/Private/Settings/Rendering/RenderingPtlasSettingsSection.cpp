@@ -24,7 +24,7 @@ void DrawPtlasSettingsSection(EngineRenderingSettingsController& settingsControl
 			const bool bPtlasActiveEdited = RenderingSettingsUi::DrawBooleanRow("##PtlasActive", "Enabled", bPtlasActive);
 			if (bPtlasActiveEdited)
 			{
-				settingsController.SetPtlasActive(bPtlasActive);
+				settingsController.Set(&EngineRenderingSettingsState::bPtlasActive, bPtlasActive);
 			}
 
 			if (settings.bPtlasActive)
@@ -33,7 +33,7 @@ void DrawPtlasSettingsSection(EngineRenderingSettingsController& settingsControl
 				const bool bPtlasPartitionsPerAxisEdited = RenderingSettingsUi::DrawUnsignedIntSliderRow("##PtlasPartitionsPerAxis", "Partitions per axis", ptlasPartitionsPerAxis, 1u, 64u);
 				if (bPtlasPartitionsPerAxisEdited)
 				{
-					settingsController.SetPtlasPartitionsPerAxis(ptlasPartitionsPerAxis);
+					settingsController.Set(&EngineRenderingSettingsState::PtlasPartitionsPerAxis, ptlasPartitionsPerAxis);
 				}
 
 				RenderingSettingsUi::DrawComboOptionRow(
@@ -41,7 +41,7 @@ void DrawPtlasSettingsSection(EngineRenderingSettingsController& settingsControl
 				    "Partition update mode",
 				    settings.PtlasPartitionUpdateMode,
 				    partitionUpdateModeOptions,
-				    [&settingsController](RayTracingPtlasPartitionUpdateMode value) { settingsController.SetPtlasPartitionUpdateMode(value); });
+				    [&settingsController](RayTracingPtlasPartitionUpdateMode value) { settingsController.Set(&EngineRenderingSettingsState::PtlasPartitionUpdateMode, value); });
 
 				bool bPtlasMarkAllDynamicInPartition = settings.bPtlasMarkAllDynamicInPartition;
 
@@ -52,14 +52,14 @@ void DrawPtlasSettingsSection(EngineRenderingSettingsController& settingsControl
 
 				if (bPtlasMarkAllDynamicInPartitionEdited)
 				{
-					settingsController.SetPtlasMarkAllDynamicInPartition(bPtlasMarkAllDynamicInPartition);
+					settingsController.Set(&EngineRenderingSettingsState::bPtlasMarkAllDynamicInPartition, bPtlasMarkAllDynamicInPartition);
 				}
 
 				float ptlasModeChangeDistance = settings.PtlasModeChangeDistance;
 				const bool bPtlasModeChangeDistanceEdited = RenderingSettingsUi::DrawFloatInputRow("##PtlasModeChangeDistance", "Mode change distance", ptlasModeChangeDistance);
 				if (bPtlasModeChangeDistanceEdited)
 				{
-					settingsController.SetPtlasModeChangeDistance(ptlasModeChangeDistance);
+					settingsController.Set(&EngineRenderingSettingsState::PtlasModeChangeDistance, ptlasModeChangeDistance);
 				}
 			}
 			ImGui::EndTable();

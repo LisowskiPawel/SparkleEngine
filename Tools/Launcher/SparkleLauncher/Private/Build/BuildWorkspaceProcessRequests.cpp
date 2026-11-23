@@ -55,9 +55,9 @@ namespace SparkleLauncher
 		throw Diagnostics::Error("Unknown workspace build scope.");
 	}
 
-	static void AddConfigureStep(std::vector<BuildWorkspaceProcessStep>& steps, const BuildWorkspaceOperationPlan& plan)
+	static void AddConfigureStep(std::vector<BuildWorkspaceOperationStep>& steps, const BuildWorkspaceOperationPlan& plan)
 	{
-		BuildWorkspaceProcessStep step;
+		BuildWorkspaceOperationStep step;
 		step.Id = "configure";
 		step.DisplayName = "Generate build files";
 		step.Request = MakeConfigureRequest(plan);
@@ -65,9 +65,9 @@ namespace SparkleLauncher
 		steps.push_back(std::move(step));
 	}
 
-	static void AddBuildStep(std::vector<BuildWorkspaceProcessStep>& steps, const BuildWorkspaceOperationPlan& plan, std::string_view profileName, const std::vector<std::string>& targets)
+	static void AddBuildStep(std::vector<BuildWorkspaceOperationStep>& steps, const BuildWorkspaceOperationPlan& plan, std::string_view profileName, const std::vector<std::string>& targets)
 	{
-		BuildWorkspaceProcessStep step;
+		BuildWorkspaceOperationStep step;
 		step.Id = "build";
 		step.DisplayName = "Build";
 		for (std::size_t index = 0; index < targets.size(); ++index)
@@ -80,7 +80,7 @@ namespace SparkleLauncher
 		steps.push_back(std::move(step));
 	}
 
-	static void AddWorkspaceBuildSteps(std::vector<BuildWorkspaceProcessStep>& steps, const BuildWorkspaceOperationPlan& plan)
+	static void AddWorkspaceBuildSteps(std::vector<BuildWorkspaceOperationStep>& steps, const BuildWorkspaceOperationPlan& plan)
 	{
 		if (BuildWorkspaceOperationRequiresConfigureStep(plan))
 		{
@@ -106,7 +106,7 @@ namespace SparkleLauncher
 		}
 	}
 
-	static void AddHostToolInstallStep(std::vector<BuildWorkspaceProcessStep>& steps, const BuildWorkspaceOperationPlan& plan)
+	static void AddHostToolInstallStep(std::vector<BuildWorkspaceOperationStep>& steps, const BuildWorkspaceOperationPlan& plan)
 	{
 		std::string errorMessage;
 		std::optional<Process::ChildProcessRequest> request = BuildHostToolInstallRequest(plan.Request.HostToolId, plan.Toolchain, plan.Request.WorkspaceRoot, plan.Operation.Id, errorMessage);
@@ -115,16 +115,16 @@ namespace SparkleLauncher
 			throw Diagnostics::Error(errorMessage);
 		}
 
-		BuildWorkspaceProcessStep step;
+		BuildWorkspaceOperationStep step;
 		step.Id = "install-host-tool";
 		step.DisplayName = "Install host tool";
 		step.Request = std::move(*request);
 		steps.push_back(std::move(step));
 	}
 
-	std::vector<BuildWorkspaceProcessStep> BuildProcessStepsForPlan(const BuildWorkspaceOperationPlan& plan)
+	std::vector<BuildWorkspaceOperationStep> BuildProcessStepsForPlan(const BuildWorkspaceOperationPlan& plan)
 	{
-		std::vector<BuildWorkspaceProcessStep> steps;
+		std::vector<BuildWorkspaceOperationStep> steps;
 		if (plan.Kind == BuildWorkspaceOperationKind::InstallHostTool)
 		{
 			AddHostToolInstallStep(steps, plan);

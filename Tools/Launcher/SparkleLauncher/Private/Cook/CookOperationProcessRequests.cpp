@@ -2,7 +2,6 @@
 #include "Core/Public/Strings/StringUtils.h"
 
 #include "Workspace/LauncherProductPaths.h"
-#include "Build/CMakeWorkflowProcessRequests.h"
 #include "Workspace/LauncherStatePaths.h"
 
 #include <algorithm>
@@ -73,29 +72,28 @@ namespace SparkleLauncher
 		return process;
 	}
 
-	static void AddStep(std::vector<CookOperationProcessStep>& steps, std::string id, std::string displayName, Process::ChildProcessRequest request)
+	static void AddStep(std::vector<CookOperationStep>& steps, std::string id, std::string displayName, Process::ChildProcessRequest request)
 	{
-		CookOperationProcessStep step;
+		CookOperationStep step;
 		step.Id = std::move(id);
 		step.DisplayName = std::move(displayName);
 		step.Request = std::move(request);
 		steps.push_back(std::move(step));
 	}
 
-	static void AddCleanStep(std::vector<CookOperationProcessStep>& steps, const CookOperationPlan& plan)
+	static void AddCleanStep(std::vector<CookOperationStep>& steps, const CookOperationPlan& plan)
 	{
-		CookOperationProcessStep step;
+		CookOperationStep step;
 		step.Id = "clean-cooked-output";
 		step.DisplayName = "Clean cooked output scope";
 		step.DestructivePath = plan.CookedOutputDirectory;
-		step.bHasProcessRequest = false;
-		step.bDeletesCookedOutputs = true;
+		step.bDestructive = true;
 		steps.push_back(std::move(step));
 	}
 
-	std::vector<CookOperationProcessStep> BuildCookProcessStepsForPlan(const CookOperationPlan& plan)
+	std::vector<CookOperationStep> BuildCookProcessStepsForPlan(const CookOperationPlan& plan)
 	{
-		std::vector<CookOperationProcessStep> steps;
+		std::vector<CookOperationStep> steps;
 		if (plan.Request.Mode == CookMode::Force)
 		{
 			AddCleanStep(steps, plan);

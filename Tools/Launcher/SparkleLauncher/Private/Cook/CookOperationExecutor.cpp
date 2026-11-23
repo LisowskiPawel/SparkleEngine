@@ -1,6 +1,5 @@
 #include "SparkleLauncher/CookOperations.h"
 
-#include "Cook/CookOperationProcessRequests.h"
 #include "Operations/LauncherOperationProgress.h"
 
 #include <optional>
@@ -10,7 +9,7 @@ namespace SparkleLauncher
 {
 	constexpr unsigned int kMissingRuntimeDependencyExitCode = 0xC0000135u;
 
-	static std::string MakeCookFailureSummary(const CookOperationProcessStep& step, const Process::ChildProcessResult& result)
+	static std::string MakeCookFailureSummary(const CookOperationStep& step, const Process::ChildProcessResult& result)
 	{
 		if (!result.FailureReason.empty())
 		{
@@ -41,7 +40,7 @@ namespace SparkleLauncher
 		return step.DisplayName + " failed.";
 	}
 
-	static std::string CookRecoveryAction(const CookOperationProcessStep& step)
+	static std::string CookRecoveryAction(const CookOperationStep& step)
 	{
 		if (step.Id == "cook-shaders")
 		{
@@ -96,12 +95,11 @@ namespace SparkleLauncher
 			return operation;
 		}
 
-		std::vector<CookOperationProcessStep> processSteps = BuildCookProcessStepsForPlan(plan);
-		for (std::size_t stepIndex = 0; stepIndex < processSteps.size(); ++stepIndex)
+		for (std::size_t stepIndex = 0; stepIndex < plan.Steps.size(); ++stepIndex)
 		{
-			CookOperationProcessStep& step = processSteps[stepIndex];
-			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex, processSteps.size());
-			if (step.bDeletesCookedOutputs)
+			const CookOperationStep& step = plan.Steps[stepIndex];
+			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex, plan.Steps.size());
+			if (step.bDestructive)
 			{
 				std::string errorMessage;
 				if (!CleanCookedOutputs(step.DestructivePath, errorMessage))
@@ -115,18 +113,12 @@ namespace SparkleLauncher
 					MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
 					return operation;
 				}
-				ReportOperationProgress(outputCallback, step.DisplayName, stepIndex + 1, processSteps.size());
+				ReportOperationProgress(outputCallback, step.DisplayName, stepIndex + 1, plan.Steps.size());
 				continue;
 			}
 
 			Process::ChildProcessRequest request = step.Request;
 			request.Cancellation = cancellation;
-			if (step.Id == "configure")
-			{
-				std::error_code errorCode;
-				std::filesystem::create_directories(request.WorkingDirectory, errorCode);
-			}
-
 			AppendProcessOutputCallback(request, outputCallback);
 			operation.LogPath = request.LogPath;
 
@@ -151,7 +143,7 @@ namespace SparkleLauncher
 			{
 				operation.ShaderExportPath = ReadProcessOutputPath(result.CapturedOutput, "SPARKLE_SHADER_EXPORT ");
 			}
-			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex + 1, processSteps.size());
+			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex + 1, plan.Steps.size());
 		}
 
 		MarkOperationFinished(operation, OperationStatus::Succeeded, 0);

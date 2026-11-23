@@ -1,82 +1,22 @@
 #include "SparkleLauncher/LevelOperations.h"
 
-#include "Levels/LevelOperationProcessRequests.h"
 #include "Levels/LevelSelectionCommit.h"
 #include "Workspace/LauncherProductPaths.h"
 #include "Operations/LauncherOperationProgress.h"
 
-#include "Core/Public/Diagnostics/Error.h"
-
-#include <algorithm>
-
 namespace SparkleLauncher
 {
-	static bool MatchesPlannedStep(const LevelOperationStep& planned, const LevelOperationProcessStep& executable)
-	{
-		return planned.Id == executable.Id && planned.DisplayName == executable.DisplayName
-		    && planned.DisplayCommandLine == BuildDisplayCommandLine(executable.Request.ExecutablePath, executable.Request.Arguments) && planned.LogPath == executable.Request.LogPath;
-	}
-
-	bool LevelOperationExecutionPlanMatches(const LevelOperationPlan& plan, const std::vector<LevelOperationProcessStep>& processSteps)
-	{
-		return plan.Steps.size() == processSteps.size()
-		    && std::equal(
-		        plan.Steps.begin(),
-		        plan.Steps.end(),
-		        processSteps.begin(),
-		        [](const LevelOperationStep& planned, const LevelOperationProcessStep& executable) { return MatchesPlannedStep(planned, executable); });
-	}
-
-	static bool PrepareLevelSyncExecution(const LevelOperationPlan& plan, OperationRecord& operation, std::vector<LevelOperationProcessStep>& processSteps)
-	{
-		if (!plan.bCanRun)
-		{
-			SetOperationFailure(
-			    operation,
-			    OperationProblemKind::Prerequisite,
-			    plan.ReadinessMessages.empty() ? "Level operation is not ready to run." : plan.ReadinessMessages.back(),
-			    "Resolve the reported source or content prerequisite, then retry Sync.");
-
-			MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
-			return false;
-		}
-
-		try
-		{
-			processSteps = BuildLevelOperationProcessSteps(plan);
-		}
-		catch (const Diagnostics::Error& error)
-		{
-			SetOperationFailure(
-			    operation,
-			    OperationProblemKind::Planning,
-			    std::string("Level operation planning failed: ") + error.what(),
-			    "Refresh the level workflow, review its preview, then retry.");
-
-			MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
-			return false;
-		}
-		if (!LevelOperationExecutionPlanMatches(plan, processSteps))
-		{
-			SetOperationFailure(operation, OperationProblemKind::Planning, "Level operation inputs changed after planning.", "Refresh the level workflow, review its updated preview, then retry.");
-			MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
-			return false;
-		}
-
-		return true;
-	}
-
 	static bool AcquireLevelPacks(
-	    std::vector<LevelOperationProcessStep>& processSteps,
+	    const std::vector<LevelOperationStep>& steps,
 	    IProcessRunner& processRunner,
 	    const Process::ChildProcessOutputCallback& outputCallback,
 	    OperationRecord& operation,
 	    std::stop_token cancellation)
 	{
-		for (std::size_t stepIndex = 0; stepIndex < processSteps.size(); ++stepIndex)
+		for (std::size_t stepIndex = 0; stepIndex < steps.size(); ++stepIndex)
 		{
-			LevelOperationProcessStep& step = processSteps[stepIndex];
-			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex, processSteps.size());
+			const LevelOperationStep& step = steps[stepIndex];
+			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex, steps.size());
 			Process::ChildProcessRequest request = step.Request;
 			request.Cancellation = cancellation;
 			AppendProcessOutputCallback(request, outputCallback);
@@ -98,7 +38,7 @@ namespace SparkleLauncher
 				MarkOperationFinished(operation, result.bCancelled ? OperationStatus::Canceled : OperationStatus::Failed, result.ExitCode);
 				return false;
 			}
-			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex + 1, processSteps.size());
+			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex + 1, steps.size());
 		}
 
 		return true;
@@ -108,12 +48,19 @@ namespace SparkleLauncher
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
-		std::vector<LevelOperationProcessStep> processSteps;
-		if (!PrepareLevelSyncExecution(plan, operation, processSteps))
+		if (!plan.bCanRun)
 		{
+			SetOperationFailure(
+			    operation,
+			    OperationProblemKind::Prerequisite,
+			    plan.ReadinessMessages.empty() ? "Level operation is not ready to run." : plan.ReadinessMessages.back(),
+			    "Resolve the reported source or content prerequisite, then retry Sync.");
+
+			MarkOperationFinished(operation, OperationStatus::Failed, std::nullopt);
 			return operation;
 		}
-		if (!AcquireLevelPacks(processSteps, processRunner, outputCallback, operation, cancellation))
+
+		if (!AcquireLevelPacks(plan.Steps, processRunner, outputCallback, operation, cancellation))
 		{
 			return operation;
 		}
