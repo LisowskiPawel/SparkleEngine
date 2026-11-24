@@ -5,22 +5,15 @@
 #include "Style/SparkleUiPalette.h"
 #include "Widgets/UiDetailsWidgets.h"
 
-#include <string>
-
 namespace RenderingSettingsUi
 {
-	bool MatchesFilter(const char* filterText, const char* title, const char* keywords)
+	bool BeginSettingsCategory(const char* filterText, const char* label, const char* keywords)
 	{
-		if (filterText == nullptr || filterText[0] == '\0')
+		if (filterText != nullptr && !EditorWidgets::MatchesDetailsFilter(filterText, label, keywords))
 		{
-			return true;
+			return false;
 		}
 
-		return EditorWidgets::MatchesDetailsFilter(std::string(filterText), title, keywords);
-	}
-
-	bool BeginSettingsCategory(const char* label)
-	{
 		ImGui::PushStyleColor(ImGuiCol_Header, SparkleUiPalette::HeaderBackground());
 		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, SparkleUiPalette::HeaderBackgroundHovered());
 		ImGui::PushStyleColor(ImGuiCol_HeaderActive, SparkleUiPalette::HeaderBackgroundActive());
@@ -55,38 +48,48 @@ namespace RenderingSettingsUi
 		ImGui::TextUnformatted(label);
 	}
 
-	bool DrawBooleanRow(const char* id, const char* label, bool& bValue)
+	void DrawBooleanRow(const char* id, const char* label, EngineRenderingSettingsController& controller, bool EngineRenderingSettingsState::* field)
 	{
 		BeginSettingsRow(label);
 		ImGui::TableSetColumnIndex(1);
-		return ImGui::Checkbox(id, &bValue);
+		bool bValue = controller.GetState().*field;
+		if (ImGui::Checkbox(id, &bValue))
+		{
+			controller.Set(field, bValue);
+		}
 	}
 
-	bool DrawUnsignedIntSliderRow(const char* id, const char* label, std::uint32_t& value, std::uint32_t minValue, std::uint32_t maxValue)
+	void DrawUnsignedIntSliderRow(
+	    const char* id,
+	    const char* label,
+	    EngineRenderingSettingsController& controller,
+	    std::uint32_t EngineRenderingSettingsState::* field,
+	    std::uint32_t minValue,
+	    std::uint32_t maxValue)
 	{
 		BeginSettingsRow(label);
 		ImGui::TableSetColumnIndex(1);
 		ImGui::SetNextItemWidth(-FLT_MIN);
 
-		int updatedValue = static_cast<int>(value);
+		int updatedValue = static_cast<int>(controller.GetState().*field);
 		const int minInt = static_cast<int>(minValue);
 		const int maxInt = static_cast<int>(maxValue);
-		const bool bEdited = ImGui::SliderInt(id, &updatedValue, minInt, maxInt);
-		if (!bEdited)
+		if (ImGui::SliderInt(id, &updatedValue, minInt, maxInt))
 		{
-			return false;
+			controller.Set(field, static_cast<std::uint32_t>(updatedValue));
 		}
-
-		value = static_cast<std::uint32_t>(updatedValue);
-		return true;
 	}
 
-	bool DrawFloatInputRow(const char* id, const char* label, float& value, float step, float stepFast, const char* format)
+	void DrawFloatInputRow(const char* id, const char* label, EngineRenderingSettingsController& controller, float EngineRenderingSettingsState::* field, float step, float stepFast, const char* format)
 	{
 		BeginSettingsRow(label);
 		ImGui::TableSetColumnIndex(1);
 		ImGui::SetNextItemWidth(-FLT_MIN);
-		return ImGui::InputFloat(id, &value, step, stepFast, format);
+		float value = controller.GetState().*field;
+		if (ImGui::InputFloat(id, &value, step, stepFast, format))
+		{
+			controller.Set(field, value);
+		}
 	}
 
 }

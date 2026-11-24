@@ -7,14 +7,9 @@
 
 #include <imgui.h>
 
-void DrawExposureSettingsSection(EngineRenderingSettingsController& settingsController, const EngineRenderingSettingsState& settings, const char* filterText)
+void DrawExposureSettingsSection(EngineRenderingSettingsController& settingsController, const char* filterText)
 {
-	const bool bExposureMatches = RenderingSettingsUi::MatchesFilter(
-	    filterText,
-	    "Exposure",
-	    "exposure automatic manual metering reduction downsample pyramid compensation ev luminance min max adapt speed");
-
-	const bool bExposureOpen = bExposureMatches && RenderingSettingsUi::BeginSettingsCategory("Exposure");
+	const bool bExposureOpen = RenderingSettingsUi::BeginSettingsCategory(filterText, "Exposure", "exposure automatic manual metering reduction downsample pyramid compensation ev luminance min max adapt speed");
 
 	if (!bExposureOpen)
 	{
@@ -23,7 +18,7 @@ void DrawExposureSettingsSection(EngineRenderingSettingsController& settingsCont
 
 	if (RenderingSettingsUi::BeginSettingsTable("##RenderingExposureSettings"))
 	{
-		ExposureSettingsEditor::DrawSettings(settingsController, settings);
+		ExposureSettingsEditor::DrawSettings(settingsController);
 		ImGui::EndTable();
 	}
 }

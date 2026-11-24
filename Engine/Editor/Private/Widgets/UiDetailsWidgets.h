@@ -1,12 +1,13 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
 namespace EditorWidgets
 {
-	bool MatchesDetailsFilter(const std::string& filterText, const char* title, const char* keywords) noexcept;
+	bool MatchesDetailsFilter(std::string_view filterText, const char* title, const char* keywords) noexcept;
 
-	bool DrawDetailsCategory(const char* title, bool bDefaultOpen = true);
+	bool DrawDetailsCategory(const char* title, std::string_view filterText = {}, const char* keywords = "", bool bDefaultOpen = true);
 	void DrawDetailsEmptyState(const char* text = "Select an object from the scene outliner to inspect its properties.");
 	void DrawDetailsValueRow(const char* label, const char* value);
 	bool EditDetailsFloat(const char* label, float& value, float speed, float minValue, float maxValue, const char* format, const float* resetValue = nullptr);

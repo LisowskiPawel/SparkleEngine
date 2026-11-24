@@ -70,8 +70,7 @@ namespace SparkleLauncher
 		return false;
 	}
 
-	template <typename Action>
-	static bool CleanGeneratedDirectory(const std::filesystem::path& directory, std::string_view scope, Action&& action, std::string& errorMessage)
+	template <typename Action> static bool CleanGeneratedDirectory(const std::filesystem::path& directory, std::string_view scope, Action&& action, std::string& errorMessage)
 	{
 		std::error_code error;
 		if (!std::filesystem::is_directory(directory, error))
@@ -165,16 +164,40 @@ namespace SparkleLauncher
 
 	static bool RemoveCompiledDevelopmentArtifacts(const SparkleTools::ToolOutputPaths& outputs, std::string& errorMessage)
 	{
-		const bool bProductOutputsRemoved = CleanGeneratedDirectory(
-		    outputs.ProductRoot,
-		    "development artifacts",
-		    [&](const std::filesystem::path& path)
-		    {
-			    return path.lexically_normal() == outputs.ProjectArtifactRoot.lexically_normal() || RemoveGeneratedPath(path, errorMessage);
-		    },
-		    errorMessage);
+		std::error_code errorCode;
+		if (!std::filesystem::is_directory(outputs.ProductRoot, errorCode))
+		{
+			if (!errorCode)
+			{
+				return true;
+			}
 
-		return bProductOutputsRemoved && RemoveProjectBuildOutputs(outputs, errorMessage);
+			errorMessage = "Failed to inspect development artifacts: " + outputs.ProductRoot.string() + ": " + errorCode.message();
+			return false;
+		}
+
+		std::filesystem::directory_iterator iterator(outputs.ProductRoot, errorCode);
+		const std::filesystem::directory_iterator end;
+		while (!errorCode && iterator != end)
+		{
+			const std::filesystem::path path = iterator->path();
+			iterator.increment(errorCode);
+			if (path.lexically_normal() == outputs.ProjectArtifactRoot.lexically_normal())
+			{
+				continue;
+			}
+			if (!RemoveGeneratedPath(path, errorMessage))
+			{
+				return false;
+			}
+		}
+		if (errorCode)
+		{
+			errorMessage = "Failed to enumerate development artifacts: " + outputs.ProductRoot.string() + ": " + errorCode.message();
+			return false;
+		}
+
+		return RemoveProjectBuildOutputs(outputs, errorMessage);
 	}
 
 	bool RequiresNativeBuildOutputReset(BuildFilesFreshnessState state)

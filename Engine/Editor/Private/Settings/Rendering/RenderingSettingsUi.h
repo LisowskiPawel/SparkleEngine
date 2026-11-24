@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Settings/EngineRenderingSettingsController.h"
+
 #include <imgui.h>
 
 #include <cstddef>
@@ -16,19 +18,37 @@ namespace RenderingSettingsUi
 		ValueType Value{};
 	};
 
-	bool MatchesFilter(const char* filterText, const char* title, const char* keywords);
-	bool BeginSettingsCategory(const char* label);
+	bool BeginSettingsCategory(const char* filterText, const char* label, const char* keywords);
 	bool BeginSettingsTable(const char* id);
 	void BeginSettingsRow(const char* label);
 
-	bool DrawBooleanRow(const char* id, const char* label, bool& bValue);
-	bool DrawUnsignedIntSliderRow(const char* id, const char* label, std::uint32_t& value, std::uint32_t minValue, std::uint32_t maxValue);
-	bool DrawFloatInputRow(const char* id, const char* label, float& value, float step = 1.0f, float stepFast = 10.0f, const char* format = "%.3f");
+	void DrawBooleanRow(const char* id, const char* label, EngineRenderingSettingsController& controller, bool EngineRenderingSettingsState::* field);
+	void DrawUnsignedIntSliderRow(
+	    const char* id,
+	    const char* label,
+	    EngineRenderingSettingsController& controller,
+	    std::uint32_t EngineRenderingSettingsState::* field,
+	    std::uint32_t minValue,
+	    std::uint32_t maxValue);
+	void DrawFloatInputRow(
+	    const char* id,
+	    const char* label,
+	    EngineRenderingSettingsController& controller,
+	    float EngineRenderingSettingsState::* field,
+	    float step = 1.0f,
+	    float stepFast = 10.0f,
+	    const char* format = "%.3f");
 
-	template <typename ValueType, std::size_t OptionCount, typename OnChanged>
-	void DrawComboOptionRow(const char* id, const char* label, ValueType value, const ComboOption<ValueType> (&options)[OptionCount], OnChanged&& onChanged)
+	template <typename ValueType, std::size_t OptionCount>
+	void DrawComboOptionRow(
+	    const char* id,
+	    const char* label,
+	    EngineRenderingSettingsController& controller,
+	    ValueType EngineRenderingSettingsState::* field,
+	    const ComboOption<ValueType> (&options)[OptionCount])
 	{
 		BeginSettingsRow(label);
+		const ValueType value = controller.GetState().*field;
 
 		const char* previewLabel = OptionCount > 0 ? options[0].Label : "";
 		for (const ComboOption<ValueType>& option : options)
@@ -49,7 +69,7 @@ namespace RenderingSettingsUi
 				const bool bSelected = option.Value == value;
 				if (ImGui::Selectable(option.Label, bSelected))
 				{
-					onChanged(option.Value);
+					controller.Set(field, option.Value);
 				}
 				if (bSelected)
 				{

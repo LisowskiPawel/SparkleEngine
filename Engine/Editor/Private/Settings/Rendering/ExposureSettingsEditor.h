@@ -6,6 +6,6 @@ struct ViewportExposureOverrides;
 
 namespace ExposureSettingsEditor
 {
-	void DrawSettings(EngineRenderingSettingsController& settingsController, const EngineRenderingSettingsState& settings);
+	void DrawSettings(EngineRenderingSettingsController& settingsController);
 	bool DrawOverrides(ViewportExposureOverrides& overrides, const EngineRenderingSettingsState& defaults) noexcept;
 }

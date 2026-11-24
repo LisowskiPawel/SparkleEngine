@@ -136,8 +136,7 @@ namespace SceneLightInspector
 	static bool BuildLightCommonCategory(const std::string& filterText, SceneLightDesc& lightDesc) noexcept
 	{
 		bool bChanged = false;
-		const bool bLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Light", "color visible visibility rendering");
-		const bool bLightOpen = bLightMatches && EditorWidgets::DrawDetailsCategory("Light");
+		const bool bLightOpen = EditorWidgets::DrawDetailsCategory("Light", filterText, "color visible visibility rendering");
 
 		if (!bLightOpen)
 		{
@@ -164,8 +163,7 @@ namespace SceneLightInspector
 
 	static bool BuildDirectionalLightTransformCategory(const std::string& filterText, SceneDirectionalLightDesc& lightDesc) noexcept
 	{
-		const bool bTransformMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Transform", "rotation direction transform");
-		const bool bTransformOpen = bTransformMatches && EditorWidgets::DrawDetailsCategory("Transform");
+		const bool bTransformOpen = EditorWidgets::DrawDetailsCategory("Transform", filterText, "rotation direction transform");
 
 		if (!bTransformOpen)
 		{
@@ -187,8 +185,7 @@ namespace SceneLightInspector
 	static bool BuildDirectionalLightCategory(const std::string& filterText, SceneDirectionalLightDesc& lightDesc) noexcept
 	{
 		bool bChanged = false;
-		const bool bDirectionalLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Directional Light", "illuminance lux angular size direction cast shadow rendering");
-		const bool bDirectionalLightOpen = bDirectionalLightMatches && EditorWidgets::DrawDetailsCategory("Directional Light");
+		const bool bDirectionalLightOpen = EditorWidgets::DrawDetailsCategory("Directional Light", filterText, "illuminance lux angular size direction cast shadow rendering");
 
 		if (!bDirectionalLightOpen)
 		{
@@ -230,8 +227,7 @@ namespace SceneLightInspector
 	static bool BuildPointLightCategory(const std::string& filterText, PointLightDesc& lightDesc) noexcept
 	{
 		bool bChanged = false;
-		const bool bPointLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Point Light", "luminous intensity candela range radius distance attenuation point");
-		const bool bPointLightOpen = bPointLightMatches && EditorWidgets::DrawDetailsCategory("Point Light");
+		const bool bPointLightOpen = EditorWidgets::DrawDetailsCategory("Point Light", filterText, "luminous intensity candela range radius distance attenuation point");
 
 		if (!bPointLightOpen)
 		{
@@ -249,8 +245,7 @@ namespace SceneLightInspector
 	static bool BuildSpotLightCategory(const std::string& filterText, SpotLightDesc& lightDesc) noexcept
 	{
 		bool bChanged = false;
-		const bool bSpotLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Spot Light", "luminous intensity candela direction range radius distance attenuation inner outer angle spot");
-		const bool bSpotLightOpen = bSpotLightMatches && EditorWidgets::DrawDetailsCategory("Spot Light");
+		const bool bSpotLightOpen = EditorWidgets::DrawDetailsCategory("Spot Light", filterText, "luminous intensity candela direction range radius distance attenuation inner outer angle spot");
 
 		if (!bSpotLightOpen)
 		{
@@ -290,8 +285,7 @@ namespace SceneLightInspector
 	static bool BuildRectLightCategory(const std::string& filterText, RectLightDesc& lightDesc) noexcept
 	{
 		bool bChanged = false;
-		const bool bRectLightMatches = EditorWidgets::MatchesDetailsFilter(filterText, "Rect Light", "luminance candela square meter direction tangent width height area rectangle quad shadow");
-		const bool bRectLightOpen = bRectLightMatches && EditorWidgets::DrawDetailsCategory("Rect Light");
+		const bool bRectLightOpen = EditorWidgets::DrawDetailsCategory("Rect Light", filterText, "luminance candela square meter direction tangent width height area rectangle quad shadow");
 
 		if (!bRectLightOpen)
 		{

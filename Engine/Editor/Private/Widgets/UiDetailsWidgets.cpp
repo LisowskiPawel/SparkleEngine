@@ -171,8 +171,13 @@ namespace EditorWidgets
 		ImGui::PopID();
 	}
 
-	bool DrawDetailsCategory(const char* title, bool bDefaultOpen)
+	bool DrawDetailsCategory(const char* title, std::string_view filterText, const char* keywords, bool bDefaultOpen)
 	{
+		if (!MatchesDetailsFilter(filterText, title, keywords))
+		{
+			return false;
+		}
+
 		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Framed;
 		if (bDefaultOpen)
 		{
@@ -315,7 +320,7 @@ namespace EditorWidgets
 		return bChanged;
 	}
 
-	bool MatchesDetailsFilter(const std::string& filterText, const char* title, const char* keywords) noexcept
+	bool MatchesDetailsFilter(std::string_view filterText, const char* title, const char* keywords) noexcept
 	{
 		if (filterText.empty())
 		{

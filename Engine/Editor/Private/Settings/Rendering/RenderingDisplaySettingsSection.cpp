@@ -8,7 +8,7 @@
 
 #include <imgui.h>
 
-void DrawDisplaySettingsSection(EngineRenderingSettingsController& settingsController, const EngineRenderingSettingsState& settings, const char* filterText)
+void DrawDisplaySettingsSection(EngineRenderingSettingsController& settingsController, const char* filterText)
 {
 	static constexpr RenderingSettingsUi::ComboOption<PixelFormat> backBufferFormatOptions[] = {
 	    {"R8G8B8A8 UNorm", PixelFormat::R8G8B8A8_UNorm},
@@ -23,8 +23,7 @@ void DrawDisplaySettingsSection(EngineRenderingSettingsController& settingsContr
 	    {"sRGB", EngineOutputColorEncoding::Srgb},
 	};
 
-	const bool bDisplayMatches = RenderingSettingsUi::MatchesFilter(filterText, "Display", "display vsync high-performance adapter gpu back buffer format sdr srgb linear output encoding");
-	const bool bDisplayOpen = bDisplayMatches && RenderingSettingsUi::BeginSettingsCategory("Display");
+	const bool bDisplayOpen = RenderingSettingsUi::BeginSettingsCategory(filterText, "Display", "display vsync high-performance adapter gpu back buffer format sdr srgb linear output encoding");
 
 	if (!bDisplayOpen)
 	{
@@ -33,33 +32,13 @@ void DrawDisplaySettingsSection(EngineRenderingSettingsController& settingsContr
 
 	if (RenderingSettingsUi::BeginSettingsTable("##RenderingDisplaySettings"))
 	{
-		bool bVSync = settings.bVSync;
-		const bool bVSyncEdited = RenderingSettingsUi::DrawBooleanRow("##VSync", "VSync", bVSync);
-		if (bVSyncEdited)
-		{
-			settingsController.Set(&EngineRenderingSettingsState::bVSync, bVSync);
-		}
+		RenderingSettingsUi::DrawBooleanRow("##VSync", "VSync", settingsController, &EngineRenderingSettingsState::bVSync);
 
-		RenderingSettingsUi::DrawComboOptionRow(
-		    "##BackBufferFormat",
-		    "Back buffer format",
-		    settings.BackBufferFormat,
-		    backBufferFormatOptions,
-		    [&settingsController](PixelFormat value) { settingsController.Set(&EngineRenderingSettingsState::BackBufferFormat, value); });
+		RenderingSettingsUi::DrawComboOptionRow("##BackBufferFormat", "Back buffer format", settingsController, &EngineRenderingSettingsState::BackBufferFormat, backBufferFormatOptions);
 
-		bool bPreferHighPerformanceAdapter = settings.bPreferHighPerformanceAdapter;
-		const bool bPreferHighPerformanceAdapterEdited = RenderingSettingsUi::DrawBooleanRow("##PreferHighPerformanceAdapter", "Prefer high-performance adapter", bPreferHighPerformanceAdapter);
-		if (bPreferHighPerformanceAdapterEdited)
-		{
-			settingsController.Set(&EngineRenderingSettingsState::bPreferHighPerformanceAdapter, bPreferHighPerformanceAdapter);
-		}
+		RenderingSettingsUi::DrawBooleanRow("##PreferHighPerformanceAdapter", "Prefer high-performance adapter", settingsController, &EngineRenderingSettingsState::bPreferHighPerformanceAdapter);
 
-		RenderingSettingsUi::DrawComboOptionRow(
-		    "##OutputColorEncoding",
-		    "Output encoding",
-		    settings.OutputColorEncoding,
-		    outputColorEncodingOptions,
-		    [&settingsController](EngineOutputColorEncoding value) { settingsController.Set(&EngineRenderingSettingsState::OutputColorEncoding, value); });
+		RenderingSettingsUi::DrawComboOptionRow("##OutputColorEncoding", "Output encoding", settingsController, &EngineRenderingSettingsState::OutputColorEncoding, outputColorEncodingOptions);
 
 		ImGui::EndTable();
 	}

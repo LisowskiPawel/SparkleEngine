@@ -25,8 +25,7 @@ namespace SceneMeshInspector
 
 	static void BuildTransformCategory(const std::string& filter, const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool bTransformMatches = EditorWidgets::MatchesDetailsFilter(filter, "Transform", "location rotation scale transform");
-		const bool bTransformOpen = bTransformMatches && EditorWidgets::DrawDetailsCategory("Transform");
+		const bool bTransformOpen = EditorWidgets::DrawDetailsCategory("Transform", filter, "location rotation scale transform");
 
 		if (!bTransformOpen)
 		{
@@ -42,8 +41,7 @@ namespace SceneMeshInspector
 
 	static void BuildMeshCategory(const std::string& filter, const WorldMeshReadData& mesh) noexcept
 	{
-		const bool bMeshMatches = EditorWidgets::MatchesDetailsFilter(filter, "Mesh", "type asset rendering skeletal static");
-		const bool bMeshOpen = bMeshMatches && EditorWidgets::DrawDetailsCategory("Mesh");
+		const bool bMeshOpen = EditorWidgets::DrawDetailsCategory("Mesh", filter, "type asset rendering skeletal static");
 
 		if (!bMeshOpen)
 		{
@@ -59,8 +57,7 @@ namespace SceneMeshInspector
 
 	static void BuildAdvancedParametersCategory(const std::string& filter, const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool bAdvancedMatches = EditorWidgets::MatchesDetailsFilter(filter, "Advanced", "visible visibility hidden");
-		const bool bAdvancedOpen = bAdvancedMatches && EditorWidgets::DrawDetailsCategory("Advanced", false);
+		const bool bAdvancedOpen = EditorWidgets::DrawDetailsCategory("Advanced", filter, "visible visibility hidden", false);
 
 		if (!bAdvancedOpen)
 		{
@@ -77,8 +74,7 @@ namespace SceneMeshInspector
 
 	static void BuildMaterialsCategory(const std::string& filter, const WorldMeshReadData& mesh) noexcept
 	{
-		const bool bMaterialsMatches = EditorWidgets::MatchesDetailsFilter(filter, "Materials", "element material slot surface");
-		const bool bMaterialsOpen = bMaterialsMatches && EditorWidgets::DrawDetailsCategory("Materials");
+		const bool bMaterialsOpen = EditorWidgets::DrawDetailsCategory("Materials", filter, "element material slot surface");
 
 		if (!bMaterialsOpen)
 		{

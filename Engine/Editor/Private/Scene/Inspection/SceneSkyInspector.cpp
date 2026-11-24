@@ -10,8 +10,7 @@
 void SceneSkyInspector::Build(const std::optional<SkyEnvironment>& current, EditorTransactionHistory& transactionHistory, std::uint64_t generation, const std::string& filter) noexcept
 {
 	bool bHasSky = current.has_value();
-	const bool bSkyMatches = EditorWidgets::MatchesDetailsFilter(filter, "Sky", "override default texture color brightness enabled visible");
-	const bool bSkyOpen = bSkyMatches && EditorWidgets::DrawDetailsCategory("Sky");
+	const bool bSkyOpen = EditorWidgets::DrawDetailsCategory("Sky", filter, "override default texture color brightness enabled visible");
 
 	if (bSkyOpen)
 	{
@@ -33,8 +32,7 @@ void SceneSkyInspector::Build(const std::optional<SkyEnvironment>& current, Edit
 
 	SceneSkyDesc after = *current;
 	bool bChanged = false;
-	const bool bRenderingMatches = EditorWidgets::MatchesDetailsFilter(filter, "Rendering", "sky texture color brightness enabled visible");
-	const bool bRenderingOpen = bRenderingMatches && EditorWidgets::DrawDetailsCategory("Rendering");
+	const bool bRenderingOpen = EditorWidgets::DrawDetailsCategory("Rendering", filter, "sky texture color brightness enabled visible");
 
 	if (bRenderingOpen)
 	{

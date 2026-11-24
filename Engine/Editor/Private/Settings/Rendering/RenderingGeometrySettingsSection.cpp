@@ -8,29 +8,18 @@
 
 #include <imgui.h>
 
-void DrawGeometrySettingsSection(EngineRenderingSettingsController& settingsController, const EngineRenderingSettingsState& settings, const char* filterText)
+void DrawGeometrySettingsSection(EngineRenderingSettingsController& settingsController, const char* filterText)
 {
 	static constexpr RenderingSettingsUi::ComboOption<GBufferAlgorithm> gBufferAlgorithmOptions[] = {{"Rasterized", GBufferAlgorithm::Rasterized}, {"Ray tracing", GBufferAlgorithm::RayTracing}};
-	const bool bGeometryMatches = RenderingSettingsUi::MatchesFilter(filterText, "Geometry", "geometry mesh auto batching");
-	const bool bGeometryOpen = bGeometryMatches && RenderingSettingsUi::BeginSettingsCategory("Geometry");
+	const bool bGeometryOpen = RenderingSettingsUi::BeginSettingsCategory(filterText, "Geometry", "geometry mesh auto batching");
 
 	if (bGeometryOpen)
 	{
 		if (RenderingSettingsUi::BeginSettingsTable("##RenderingGeometrySettings"))
 		{
-			RenderingSettingsUi::DrawComboOptionRow(
-			    "##GBufferAlgorithm",
-			    "GBuffer algorithm",
-			    settings.SelectedGBufferAlgorithm,
-			    gBufferAlgorithmOptions,
-			    [&settingsController](GBufferAlgorithm value) { settingsController.Set(&EngineRenderingSettingsState::SelectedGBufferAlgorithm, value); });
+			RenderingSettingsUi::DrawComboOptionRow("##GBufferAlgorithm", "GBuffer algorithm", settingsController, &EngineRenderingSettingsState::SelectedGBufferAlgorithm, gBufferAlgorithmOptions);
 
-			bool bMeshAutoBatching = settings.bMeshAutoBatching;
-			const bool bMeshAutoBatchingEdited = RenderingSettingsUi::DrawBooleanRow("##MeshAutoBatching", "Mesh auto batching", bMeshAutoBatching);
-			if (bMeshAutoBatchingEdited)
-			{
-				settingsController.Set(&EngineRenderingSettingsState::bMeshAutoBatching, bMeshAutoBatching);
-			}
+			RenderingSettingsUi::DrawBooleanRow("##MeshAutoBatching", "Mesh auto batching", settingsController, &EngineRenderingSettingsState::bMeshAutoBatching);
 
 			ImGui::EndTable();
 		}

@@ -45,8 +45,6 @@ void RenderingSettingsPanel::BuildUI(bool bDisableInteraction, const char* filte
 		return;
 	}
 
-	const EngineRenderingSettingsState& settings = m_settings->GetState();
-
 	ImGui::TextUnformatted("Engine - Rendering");
 	ImGui::PushStyleColor(ImGuiCol_Text, SparkleUiPalette::TextMuted());
 	ImGui::TextUnformatted("Rendering settings.");
@@ -68,15 +66,15 @@ void RenderingSettingsPanel::BuildUI(bool bDisableInteraction, const char* filte
 		ImGui::Dummy(ImVec2(0.0f, 4.0f));
 	}
 	ImGui::BeginDisabled(bDisableInteraction);
-	DrawDisplaySettingsSection(*m_settings, settings, filterText);
-	DrawExposureSettingsSection(*m_settings, settings, filterText);
-	DrawToneMappingSettingsSection(*m_settings, settings, filterText);
+	DrawDisplaySettingsSection(*m_settings, filterText);
+	DrawExposureSettingsSection(*m_settings, filterText);
+	DrawToneMappingSettingsSection(*m_settings, filterText);
 
-	DrawGeometrySettingsSection(*m_settings, settings, filterText);
+	DrawGeometrySettingsSection(*m_settings, filterText);
 
-	DrawRayReconstructionSettingsSection(*m_settings, settings, filterText);
-	DrawUpscalingSettingsSection(*m_settings, settings, filterText);
-	DrawRayTracingSceneSettingsSection(*m_settings, settings, filterText);
+	DrawRayReconstructionSettingsSection(*m_settings, filterText);
+	DrawUpscalingSettingsSection(*m_settings, filterText);
+	DrawRayTracingSceneSettingsSection(*m_settings, filterText);
 #if SPARKLE_TARGET_EDITOR && !SPARKLE_BUILD_SHIPPING
 	DrawExternalCaptureSettingsSection(*m_settings, filterText);
 #endif

@@ -86,15 +86,6 @@ static bool ResolveNamedCVarBatch(ConsoleVariableRegistry& registry, const CVarC
 	return true;
 }
 
-static bool ResolveCVarControlVariables(ConsoleVariableRegistry& registry, const CVarControlRequest& request, std::vector<ConsoleVariableBase*>& variables, std::string& outError)
-{
-	if (request.Operation == CVarControlOperation::List)
-	{
-		return CollectFilteredCVars(registry, request, variables, outError);
-	}
-	return ResolveNamedCVarBatch(registry, request, variables, outError);
-}
-
 static void CommitCVarControlValues(const CVarControlRequest& request, const std::vector<ConsoleVariableBase*>& variables)
 {
 	// Validation and assignment use the same pure parser and immutable text.
@@ -128,7 +119,9 @@ CVarControlResult ExecuteCVarControl(ConsoleVariableRegistry& registry, CVarCont
 {
 	CVarControlResult result;
 	std::vector<ConsoleVariableBase*> variables;
-	if (!ResolveCVarControlVariables(registry, request, variables, result.Error))
+	const bool bResolved = request.Operation == CVarControlOperation::List ? CollectFilteredCVars(registry, request, variables, result.Error)
+	                                                                       : ResolveNamedCVarBatch(registry, request, variables, result.Error);
+	if (!bResolved)
 	{
 		return result;
 	}

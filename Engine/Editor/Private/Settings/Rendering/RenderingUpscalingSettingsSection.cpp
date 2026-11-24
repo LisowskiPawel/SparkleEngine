@@ -8,7 +8,7 @@
 
 #include <imgui.h>
 
-void DrawUpscalingSettingsSection(EngineRenderingSettingsController& settingsController, const EngineRenderingSettingsState& settings, const char* filterText)
+void DrawUpscalingSettingsSection(EngineRenderingSettingsController& settingsController, const char* filterText)
 {
 	static constexpr RenderingSettingsUi::ComboOption<EUpscalerProviderKind> upscalerProviderOptions[] = {
 	    {"Linear", EUpscalerProviderKind::Linear},
@@ -23,8 +23,7 @@ void DrawUpscalingSettingsSection(EngineRenderingSettingsController& settingsCon
 	    {"Ultra performance", EUpscalerQualityMode::UltraPerformance},
 	};
 
-	const bool bUpscalingMatches = RenderingSettingsUi::MatchesFilter(filterText, "Upscaling", "upscaler upscaling linear bilinear dlss quality native aa balanced performance");
-	const bool bUpscalingOpen = bUpscalingMatches && RenderingSettingsUi::BeginSettingsCategory("Upscaling");
+	const bool bUpscalingOpen = RenderingSettingsUi::BeginSettingsCategory(filterText, "Upscaling", "upscaler upscaling linear bilinear dlss quality native aa balanced performance");
 
 	if (!bUpscalingOpen)
 	{
@@ -33,19 +32,9 @@ void DrawUpscalingSettingsSection(EngineRenderingSettingsController& settingsCon
 
 	if (RenderingSettingsUi::BeginSettingsTable("##RenderingUpscalingSettings"))
 	{
-		RenderingSettingsUi::DrawComboOptionRow(
-		    "##UpscalerProvider",
-		    "Provider",
-		    settings.UpscalerProvider,
-		    upscalerProviderOptions,
-		    [&settingsController](EUpscalerProviderKind value) { settingsController.Set(&EngineRenderingSettingsState::UpscalerProvider, value); });
+		RenderingSettingsUi::DrawComboOptionRow("##UpscalerProvider", "Provider", settingsController, &EngineRenderingSettingsState::UpscalerProvider, upscalerProviderOptions);
 
-		RenderingSettingsUi::DrawComboOptionRow(
-		    "##UpscalerQualityMode",
-		    "Quality mode",
-		    settings.UpscalerQualityMode,
-		    upscalerQualityOptions,
-		    [&settingsController](EUpscalerQualityMode value) { settingsController.Set(&EngineRenderingSettingsState::UpscalerQualityMode, value); });
+		RenderingSettingsUi::DrawComboOptionRow("##UpscalerQualityMode", "Quality mode", settingsController, &EngineRenderingSettingsState::UpscalerQualityMode, upscalerQualityOptions);
 
 		ImGui::EndTable();
 	}

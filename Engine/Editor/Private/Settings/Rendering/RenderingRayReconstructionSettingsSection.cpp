@@ -8,15 +8,14 @@
 
 #include <imgui.h>
 
-void DrawRayReconstructionSettingsSection(EngineRenderingSettingsController& settingsController, const EngineRenderingSettingsState& settings, const char* filterText)
+void DrawRayReconstructionSettingsSection(EngineRenderingSettingsController& settingsController, const char* filterText)
 {
 	static constexpr RenderingSettingsUi::ComboOption<EngineRayReconstructionMode> rayReconstructionModeOptions[] = {
 	    {"Off", EngineRayReconstructionMode::Off},
 	    {"NVIDIA DLSS Ray Reconstruction", EngineRayReconstructionMode::NvidiaDlssRayReconstruction},
 	};
 
-	const bool bRayReconstructionMatches = RenderingSettingsUi::MatchesFilter(filterText, "Ray Reconstruction", "dlss ray reconstruction indirect specular diffuse");
-	const bool bRayReconstructionOpen = bRayReconstructionMatches && RenderingSettingsUi::BeginSettingsCategory("Ray Reconstruction");
+	const bool bRayReconstructionOpen = RenderingSettingsUi::BeginSettingsCategory(filterText, "Ray Reconstruction", "dlss ray reconstruction indirect specular diffuse");
 
 	if (!bRayReconstructionOpen)
 	{
@@ -25,12 +24,7 @@ void DrawRayReconstructionSettingsSection(EngineRenderingSettingsController& set
 
 	if (RenderingSettingsUi::BeginSettingsTable("##RenderingRayReconstructionSettings"))
 	{
-		RenderingSettingsUi::DrawComboOptionRow(
-		    "##RayReconstructionMode",
-		    "Mode",
-		    settings.RayReconstructionMode,
-		    rayReconstructionModeOptions,
-		    [&settingsController](EngineRayReconstructionMode value) { settingsController.Set(&EngineRenderingSettingsState::RayReconstructionMode, value); });
+		RenderingSettingsUi::DrawComboOptionRow("##RayReconstructionMode", "Mode", settingsController, &EngineRenderingSettingsState::RayReconstructionMode, rayReconstructionModeOptions);
 
 		ImGui::EndTable();
 	}

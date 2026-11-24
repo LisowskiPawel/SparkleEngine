@@ -59,8 +59,8 @@ void EditorTransactionHistory::InvalidateForWorldGeneration(std::uint64_t worldG
 	}
 	m_worldGeneration = worldGeneration;
 	FinishInteraction();
-	m_undo.clear();
-	m_redo.clear();
+	m_transactions.clear();
+	m_position = 0;
 	if (m_lastResult && m_lastResult->IsAccepted())
 	{
 		m_lastResult.reset();
@@ -78,24 +78,25 @@ WorldEditResult EditorTransactionHistory::Execute(WorldEditCommand forward, Worl
 	}
 
 	const bool bInteractionContinues = m_bCoalescing && !coalescingKey.empty();
-	const bool bHasPreviousInteraction = bInteractionContinues && !m_undo.empty();
-	const bool bMatchesPreviousKey = bHasPreviousInteraction && m_undo.back().CoalescingKey == coalescingKey;
-	const bool bCanCoalesce = bMatchesPreviousKey && AffectsSameTarget(m_undo.back().Forward.Payload, forward.Payload);
+	const bool bHasPreviousInteraction = bInteractionContinues && m_position != 0;
+	const bool bMatchesPreviousKey = bHasPreviousInteraction && m_transactions[m_position - 1].CoalescingKey == coalescingKey;
+	const bool bCanCoalesce = bMatchesPreviousKey && AffectsSameTarget(m_transactions[m_position - 1].Forward.Payload, forward.Payload);
+	m_transactions.erase(m_transactions.begin() + m_position, m_transactions.end());
 
 	if (bCanCoalesce)
 	{
-		m_undo.back().Forward = std::move(forward);
+		m_transactions.back().Forward = std::move(forward);
 	}
 	else
 	{
-		if (m_undo.size() == MaximumTransactions)
+		if (m_transactions.size() == MaximumTransactions)
 		{
-			m_undo.erase(m_undo.begin());
+			m_transactions.erase(m_transactions.begin());
 		}
-		m_undo.push_back({std::move(forward), std::move(inverse), std::move(coalescingKey)});
+		m_transactions.push_back({std::move(forward), std::move(inverse), std::move(coalescingKey)});
 	}
-	m_redo.clear();
-	m_bCoalescing = !m_undo.back().CoalescingKey.empty();
+	m_position = m_transactions.size();
+	m_bCoalescing = !m_transactions.back().CoalescingKey.empty();
 	return result;
 }
 
@@ -103,18 +104,16 @@ WorldEditResult EditorTransactionHistory::Undo(std::uint64_t worldGeneration)
 {
 	FinishInteraction();
 	InvalidateForWorldGeneration(worldGeneration);
-	if (m_undo.empty())
+	if (m_position == 0)
 	{
 		m_lastResult = WorldEditResult{0, WorldEditResultStatus::Rejected, "There is no editor transaction to undo."};
 		return *m_lastResult;
 	}
-	Transaction transaction = m_undo.back();
-	WorldEditResult result = Submit(transaction.Inverse, worldGeneration);
+	WorldEditResult result = Submit(m_transactions[m_position - 1].Inverse, worldGeneration);
 	m_lastResult = result;
 	if (result.IsAccepted())
 	{
-		m_undo.pop_back();
-		m_redo.push_back(std::move(transaction));
+		--m_position;
 	}
 	return result;
 }
@@ -123,18 +122,16 @@ WorldEditResult EditorTransactionHistory::Redo(std::uint64_t worldGeneration)
 {
 	FinishInteraction();
 	InvalidateForWorldGeneration(worldGeneration);
-	if (m_redo.empty())
+	if (m_position == m_transactions.size())
 	{
 		m_lastResult = WorldEditResult{0, WorldEditResultStatus::Rejected, "There is no editor transaction to redo."};
 		return *m_lastResult;
 	}
-	Transaction transaction = m_redo.back();
-	WorldEditResult result = Submit(transaction.Forward, worldGeneration);
+	WorldEditResult result = Submit(m_transactions[m_position].Forward, worldGeneration);
 	m_lastResult = result;
 	if (result.IsAccepted())
 	{
-		m_redo.pop_back();
-		m_undo.push_back(std::move(transaction));
+		++m_position;
 	}
 	return result;
 }

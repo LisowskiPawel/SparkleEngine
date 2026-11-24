@@ -3,6 +3,7 @@
 #include "World/WorldEditCommand.h"
 
 #include <cstdint>
+#include <cstddef>
 #include <functional>
 #include <optional>
 #include <string>
@@ -36,8 +37,8 @@ private:
 
 	WorldEditResult Submit(WorldEditCommand command, std::uint64_t worldGeneration);
 	SubmitFunction m_submit;
-	std::vector<Transaction> m_undo;
-	std::vector<Transaction> m_redo;
+	std::vector<Transaction> m_transactions;
+	std::size_t m_position = 0;
 	std::optional<WorldEditResult> m_lastResult;
 	std::uint64_t m_nextRequestId = 1;
 	std::uint64_t m_worldGeneration = 0;

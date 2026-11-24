@@ -23,8 +23,7 @@ namespace SceneCameraInspector
 
 	static void BuildTransformCategory(const std::string& filter, const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool bTransformMatches = EditorWidgets::MatchesDetailsFilter(filter, "Transform", "location rotation scale position");
-		const bool bTransformOpen = bTransformMatches && EditorWidgets::DrawDetailsCategory("Transform");
+		const bool bTransformOpen = EditorWidgets::DrawDetailsCategory("Transform", filter, "location rotation scale position");
 
 		if (!bTransformOpen)
 		{
@@ -41,8 +40,7 @@ namespace SceneCameraInspector
 
 	static void BuildCameraCategory(const std::string& filter, const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool bCameraMatches = EditorWidgets::MatchesDetailsFilter(filter, "Camera", "field of view near clip far clip aspect ratio");
-		const bool bCameraOpen = bCameraMatches && EditorWidgets::DrawDetailsCategory("Camera");
+		const bool bCameraOpen = EditorWidgets::DrawDetailsCategory("Camera", filter, "field of view near clip far clip aspect ratio");
 
 		if (!bCameraOpen)
 		{
@@ -70,8 +68,7 @@ namespace SceneCameraInspector
 
 	static void BuildAdvancedParametersCategory(const std::string& filter, const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool bAdvancedMatches = EditorWidgets::MatchesDetailsFilter(filter, "Advanced", "visible visibility hidden");
-		const bool bAdvancedOpen = bAdvancedMatches && EditorWidgets::DrawDetailsCategory("Advanced", false);
+		const bool bAdvancedOpen = EditorWidgets::DrawDetailsCategory("Advanced", filter, "visible visibility hidden", false);
 
 		if (!bAdvancedOpen)
 		{

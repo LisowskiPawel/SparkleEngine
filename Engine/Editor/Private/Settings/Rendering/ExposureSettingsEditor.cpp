@@ -196,79 +196,33 @@ namespace ExposureSettingsEditor
 		return bChanged;
 	}
 
-	void DrawDefaultExposureModes(EngineRenderingSettingsController& settingsController, const EngineRenderingSettingsState& settings)
+	void DrawDefaultExposureModes(EngineRenderingSettingsController& settingsController)
 	{
-		RenderingSettingsUi::DrawComboOptionRow(
-		    "##ExposureMode",
-		    "Exposure mode",
-		    settings.ExposureMode,
-		    ExposureModeOptions,
-		    [&settingsController](EngineExposureMode value) { settingsController.Set(&EngineRenderingSettingsState::ExposureMode, value); });
+		RenderingSettingsUi::DrawComboOptionRow("##ExposureMode", "Exposure mode", settingsController, &EngineRenderingSettingsState::ExposureMode, ExposureModeOptions);
 
-		RenderingSettingsUi::DrawComboOptionRow(
-		    "##ExposureMeteringMethod",
-		    "Exposure metering",
-		    settings.ExposureMeteringMethod,
-		    ExposureMeteringOptions,
-		    [&settingsController](EngineExposureMeteringMethod value) { settingsController.Set(&EngineRenderingSettingsState::ExposureMeteringMethod, value); });
+		RenderingSettingsUi::DrawComboOptionRow("##ExposureMeteringMethod", "Exposure metering", settingsController, &EngineRenderingSettingsState::ExposureMeteringMethod, ExposureMeteringOptions);
 	}
 
-	void DrawDefaultExposureValues(EngineRenderingSettingsController& settingsController, const EngineRenderingSettingsState& settings)
+	void DrawDefaultExposureValues(EngineRenderingSettingsController& settingsController)
 	{
+		const auto& settings = settingsController.GetState();
 		ImGui::BeginDisabled(settings.ExposureMode != EngineExposureMode::Manual);
 
-		float manualExposure = settings.ManualExposure;
-		const bool bManualExposureEdited = RenderingSettingsUi::DrawFloatInputRow("##ManualExposure", "Manual exposure", manualExposure, 0.1f, 1.0f, "%.4f");
-		if (bManualExposureEdited)
-		{
-			settingsController.Set(&EngineRenderingSettingsState::ManualExposure, manualExposure);
-		}
+		RenderingSettingsUi::DrawFloatInputRow("##ManualExposure", "Manual exposure", settingsController, &EngineRenderingSettingsState::ManualExposure, 0.1f, 1.0f, "%.4f");
 
 		ImGui::EndDisabled();
 
-		float exposureCompensation = settings.ExposureCompensation;
-		const bool bExposureCompensationEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureCompensation", "Exposure compensation EV", exposureCompensation, 0.1f, 1.0f, "%.2f");
-		if (bExposureCompensationEdited)
-		{
-			settingsController.Set(&EngineRenderingSettingsState::ExposureCompensation, exposureCompensation);
-		}
+		RenderingSettingsUi::DrawFloatInputRow("##ExposureCompensation", "Exposure compensation EV", settingsController, &EngineRenderingSettingsState::ExposureCompensation, 0.1f, 1.0f, "%.2f");
 
-		float exposureTargetLuminance = settings.ExposureTargetLuminance;
-		const bool bExposureTargetLuminanceEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureTargetLuminance", "Target luminance", exposureTargetLuminance, 0.01f, 0.1f, "%.4f");
-		if (bExposureTargetLuminanceEdited)
-		{
-			settingsController.Set(&EngineRenderingSettingsState::ExposureTargetLuminance, exposureTargetLuminance);
-		}
+		RenderingSettingsUi::DrawFloatInputRow("##ExposureTargetLuminance", "Target luminance", settingsController, &EngineRenderingSettingsState::ExposureTargetLuminance, 0.01f, 0.1f, "%.4f");
 
-		float exposureMin = settings.ExposureMin;
-		const bool bExposureMinEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureMin", "Min exposure", exposureMin, 0.0001f, 0.01f, "%.6f");
-		if (bExposureMinEdited)
-		{
-			settingsController.Set(&EngineRenderingSettingsState::ExposureMin, exposureMin);
-		}
+		RenderingSettingsUi::DrawFloatInputRow("##ExposureMin", "Min exposure", settingsController, &EngineRenderingSettingsState::ExposureMin, 0.0001f, 0.01f, "%.6f");
 
-		float exposureMax = settings.ExposureMax;
-		const bool bExposureMaxEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureMax", "Max exposure", exposureMax, 1.0f, 64.0f, "%.3f");
-		if (bExposureMaxEdited)
-		{
-			settingsController.Set(&EngineRenderingSettingsState::ExposureMax, exposureMax);
-		}
+		RenderingSettingsUi::DrawFloatInputRow("##ExposureMax", "Max exposure", settingsController, &EngineRenderingSettingsState::ExposureMax, 1.0f, 64.0f, "%.3f");
 
-		float exposureAdaptationSpeedUp = settings.ExposureAdaptationSpeedUp;
-		const bool bExposureAdaptationSpeedUpEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureAdaptationSpeedUp", "Adapt rate up (1/s)", exposureAdaptationSpeedUp, 0.1f, 1.0f, "%.3f");
-		if (bExposureAdaptationSpeedUpEdited)
-		{
-			settingsController.Set(&EngineRenderingSettingsState::ExposureAdaptationSpeedUp, exposureAdaptationSpeedUp);
-		}
+		RenderingSettingsUi::DrawFloatInputRow("##ExposureAdaptationSpeedUp", "Adapt rate up (1/s)", settingsController, &EngineRenderingSettingsState::ExposureAdaptationSpeedUp, 0.1f, 1.0f, "%.3f");
 
-		float exposureAdaptationSpeedDown = settings.ExposureAdaptationSpeedDown;
-
-		const bool bAdaptationSpeedDownEdited = RenderingSettingsUi::DrawFloatInputRow("##ExposureAdaptationSpeedDown", "Adapt rate down (1/s)", exposureAdaptationSpeedDown, 0.1f, 1.0f, "%.3f");
-
-		if (bAdaptationSpeedDownEdited)
-		{
-			settingsController.Set(&EngineRenderingSettingsState::ExposureAdaptationSpeedDown, exposureAdaptationSpeedDown);
-		}
+		RenderingSettingsUi::DrawFloatInputRow("##ExposureAdaptationSpeedDown", "Adapt rate down (1/s)", settingsController, &EngineRenderingSettingsState::ExposureAdaptationSpeedDown, 0.1f, 1.0f, "%.3f");
 	}
 
 	bool DrawOverrideModes(ViewportExposureOverrides& exposure, const EngineRenderingSettingsState& defaults) noexcept
@@ -296,10 +250,10 @@ namespace ExposureSettingsEditor
 	}
 }
 
-void ExposureSettingsEditor::DrawSettings(EngineRenderingSettingsController& settingsController, const EngineRenderingSettingsState& settings)
+void ExposureSettingsEditor::DrawSettings(EngineRenderingSettingsController& settingsController)
 {
-	DrawDefaultExposureModes(settingsController, settings);
-	DrawDefaultExposureValues(settingsController, settings);
+	DrawDefaultExposureModes(settingsController);
+	DrawDefaultExposureValues(settingsController);
 }
 
 bool ExposureSettingsEditor::DrawOverrides(ViewportExposureOverrides& exposure, const EngineRenderingSettingsState& defaults) noexcept

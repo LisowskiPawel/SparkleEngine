@@ -8,7 +8,7 @@
 
 #include <imgui.h>
 
-void DrawToneMappingSettingsSection(EngineRenderingSettingsController& settingsController, const EngineRenderingSettingsState& settings, const char* filterText)
+void DrawToneMappingSettingsSection(EngineRenderingSettingsController& settingsController, const char* filterText)
 {
 	static constexpr RenderingSettingsUi::ComboOption<EngineToneMapper> toneMapperOptions[] = {
 	    {"Reinhard", EngineToneMapper::Reinhard},
@@ -16,8 +16,7 @@ void DrawToneMappingSettingsSection(EngineRenderingSettingsController& settingsC
 	    {"ACES fitted filmic", EngineToneMapper::AcesFilmic},
 	};
 
-	const bool bToneMappingMatches = RenderingSettingsUi::MatchesFilter(filterText, "Tone Mapping", "tone mapper aces reinhard filmic");
-	const bool bToneMappingOpen = bToneMappingMatches && RenderingSettingsUi::BeginSettingsCategory("Tone Mapping");
+	const bool bToneMappingOpen = RenderingSettingsUi::BeginSettingsCategory(filterText, "Tone Mapping", "tone mapper aces reinhard filmic");
 
 	if (!bToneMappingOpen)
 	{
@@ -26,12 +25,7 @@ void DrawToneMappingSettingsSection(EngineRenderingSettingsController& settingsC
 
 	if (RenderingSettingsUi::BeginSettingsTable("##RenderingToneMappingSettings"))
 	{
-		RenderingSettingsUi::DrawComboOptionRow(
-		    "##ToneMapper",
-		    "Tone mapper",
-		    settings.ToneMapper,
-		    toneMapperOptions,
-		    [&settingsController](EngineToneMapper value) { settingsController.Set(&EngineRenderingSettingsState::ToneMapper, value); });
+		RenderingSettingsUi::DrawComboOptionRow("##ToneMapper", "Tone mapper", settingsController, &EngineRenderingSettingsState::ToneMapper, toneMapperOptions);
 
 		ImGui::EndTable();
 	}
