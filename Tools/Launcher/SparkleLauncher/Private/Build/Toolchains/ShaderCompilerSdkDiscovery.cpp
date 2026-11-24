@@ -96,14 +96,8 @@ namespace SparkleLauncher
 			return status;
 		}
 
-		std::vector<std::string_view> missingEntryViews;
-		missingEntryViews.reserve(missingEntries.size());
-		for (const std::string& entry : missingEntries)
-		{
-			missingEntryViews.push_back(entry);
-		}
 		std::ostringstream detail;
-		detail << "Detected Vulkan SDK root " << status.Root.string() << ", but the shader compiler runtime bundle is missing: " << Strings::Join(missingEntryViews, ", ") << ".";
+		detail << "Detected Vulkan SDK root " << status.Root.string() << ", but the shader compiler runtime bundle is missing: " << Strings::Join(missingEntries, ", ") << ".";
 		status.Detail = detail.str();
 		return status;
 	}

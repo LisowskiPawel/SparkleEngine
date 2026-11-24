@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Api/AssetCookerTypes.h"
-
 #include <cstdint>
 #include <filesystem>
 #include <string>
@@ -24,7 +22,6 @@ struct AssetCookerProjectCookPlan final
 {
 	std::string projectName;
 	std::filesystem::path projectRoot;
-	std::filesystem::path cookedRoot;
 	std::filesystem::path shaderCompilerPath;
 	std::filesystem::path textureCookerPath;
 	std::filesystem::path temporaryRoot;

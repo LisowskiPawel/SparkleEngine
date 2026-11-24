@@ -131,7 +131,7 @@ static void PrintCookResult(const AssetCookerResult& result)
 
 	if (result.exitCode == 0)
 	{
-		ToolConsole::Message(std::cout, ToolConsoleSeverity::Info, "Cook completed", {ToolConsole::Field("products", std::to_string(result.outputs.size()))});
+		ToolConsole::Message(std::cout, ToolConsoleSeverity::Info, "Cook completed", {ToolConsole::Field("products", std::to_string(result.productCount))});
 	}
 }
 

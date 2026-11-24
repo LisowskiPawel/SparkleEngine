@@ -33,22 +33,10 @@ namespace SparkleLauncher
 	}
 
 	LauncherBackend::LauncherBackend(QObject* parent) :
-	    LauncherBackend({}, parent)
-	{
-	}
-
-	LauncherBackend::LauncherBackend(ProcessRunnerFactory processRunnerFactory, QObject* parent) :
 	    QObject(parent)
 	{
 		qRegisterMetaType<LauncherOperationResult>();
-		if (!processRunnerFactory)
-		{
-			processRunnerFactory = []()
-			{
-				return std::make_unique<NativeProcessRunner>();
-			};
-		}
-		m_operationService = std::make_unique<LauncherOperationService>(std::move(processRunnerFactory));
+		m_operationService = std::make_unique<LauncherOperationService>();
 		PopulateOperationCatalog();
 	}
 

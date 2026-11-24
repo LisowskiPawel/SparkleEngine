@@ -55,9 +55,10 @@ namespace Assets
 		}
 		for (const SceneAssetLoadWork& work : assets)
 		{
-			for (const SceneAssetPayload::SkeletalMeshInstance& mesh : work.Payload.skeletalMeshInstances)
+			for (const ECS::SceneMeshInstanceData& mesh : work.Payload.meshes)
 			{
-				if (!skeletonAssets.contains(mesh.skeletonAssetId))
+				const bool bUnresolvedSkeleton = mesh.Kind == SceneMeshKind::Skeletal && !skeletonAssets.contains(mesh.SkeletonAssetId);
+				if (bUnresolvedSkeleton)
 				{
 					throw Diagnostics::Error("Scene load package contains an unresolved cross-asset skeleton reference.");
 				}

@@ -11,7 +11,6 @@
 #include "Gui/Widgets/LauncherActionWidgets.h"
 #include "Gui/App/LauncherBackend.h"
 #include "Gui/Models/LauncherCleanUiModel.h"
-#include "Gui/Models/LauncherDependencyUiModel.h"
 #include "Gui/Style/LauncherIconLibrary.h"
 #include "Gui/Widgets/LauncherLayoutWidgets.h"
 #include "Gui/Models/LauncherLevelUiModel.h"

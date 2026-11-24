@@ -216,13 +216,7 @@ namespace SparkleLauncher
 			{
 				scopeIds.push_back(BuildWorkspaceScopeId(scope));
 			}
-			std::vector<std::string_view> scopeViews;
-			scopeViews.reserve(scopeIds.size());
-			for (const std::string& scopeId : scopeIds)
-			{
-				scopeViews.push_back(scopeId);
-			}
-			plan.Operation.Inputs.push_back({"buildScopes", Strings::Join(scopeViews, ",")});
+			plan.Operation.Inputs.push_back({"buildScopes", Strings::Join(scopeIds, ",")});
 		}
 		if (!request.SourceDependencyId.empty())
 		{

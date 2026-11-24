@@ -7,7 +7,6 @@
 #include <QtCore/QStringList>
 
 #include <algorithm>
-#include <iterator>
 #include <string>
 
 namespace SparkleLauncher
@@ -61,55 +60,38 @@ namespace SparkleLauncher
 		};
 	}
 
-	struct BuildConfigurationSupport final
-	{
-		QString DisplayName;
-		QString Value;
-		bool bHasEditorProfile = false;
-		bool bHasGameProfile = false;
-	};
-
 	static QVector<LauncherSelectionOption> BuildConfigurationOptions()
 	{
-		QVector<BuildConfigurationSupport> supportedConfigurations;
-		for (const BuildProfile& profile : GetBuildProfileCatalog())
+		const auto& profiles = GetBuildProfileCatalog();
+		QVector<LauncherSelectionOption> options;
+		for (const BuildProfile& profile : profiles)
 		{
 			const QString displayName = QString::fromStdString(ToString(profile.State));
 			const QString value = displayName.toLower();
-
-			auto found = std::find_if(
-			    supportedConfigurations.begin(),
-			    supportedConfigurations.end(),
-			    [&value](const BuildConfigurationSupport& configuration) { return configuration.Value == value; });
-
-			if (found == supportedConfigurations.end())
+			const auto existing = std::ranges::find(options, value, &LauncherSelectionOption::Value);
+			if (existing != options.end())
 			{
-				supportedConfigurations.push_back({displayName, value});
-				found = std::prev(supportedConfigurations.end());
+				continue;
 			}
 
-			found->bHasEditorProfile = found->bHasEditorProfile || profile.Target == BuildProfileTarget::Editor;
-			found->bHasGameProfile = found->bHasGameProfile || profile.Target == BuildProfileTarget::Game;
-		}
+			const auto hasProfile = [&profiles, &profile](BuildProfileTarget target)
+			{
+				return std::ranges::any_of(profiles, [&profile, target](const BuildProfile& candidate) { return candidate.State == profile.State && candidate.Target == target; });
+			};
 
-		QVector<LauncherSelectionOption> options;
-		options.reserve(supportedConfigurations.size());
-		for (const BuildConfigurationSupport& configuration : supportedConfigurations)
-		{
-			const bool bAvailable = configuration.bHasEditorProfile && configuration.bHasGameProfile;
 			QStringList missingProfiles;
-			if (!configuration.bHasEditorProfile)
+			if (!hasProfile(BuildProfileTarget::Editor))
 			{
 				missingProfiles.push_back("editor");
 			}
-			if (!configuration.bHasGameProfile)
+			if (!hasProfile(BuildProfileTarget::Game))
 			{
 				missingProfiles.push_back("game");
 			}
-
+			const bool bAvailable = missingProfiles.empty();
 			options.push_back(
-			    {configuration.DisplayName,
-			        configuration.Value,
+			    {displayName,
+			        value,
 			        bAvailable ? QStringLiteral("Editor and game profiles can be prepared automatically.") : QStringLiteral("Missing %1 build profile support.").arg(missingProfiles.join(" and ")),
 			        bAvailable});
 		}

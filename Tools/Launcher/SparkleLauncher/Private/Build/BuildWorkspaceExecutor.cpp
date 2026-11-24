@@ -143,7 +143,6 @@ namespace SparkleLauncher
 	static bool RunBuildWorkspaceStep(
 	    const BuildWorkspaceOperationPlan& plan,
 	    const BuildWorkspaceOperationStep& step,
-	    IProcessRunner& processRunner,
 	    const Process::ChildProcessOutputCallback& outputCallback,
 	    OperationRecord& operation,
 	    std::stop_token cancellation)
@@ -158,7 +157,7 @@ namespace SparkleLauncher
 		AppendProcessOutputCallback(request, outputCallback);
 		operation.LogPath = request.LogPath;
 
-		const Process::ChildProcessResult result = processRunner.Run(request);
+		const Process::ChildProcessResult result = RunLauncherProcess(request);
 		if (!result.Succeeded())
 		{
 			if (result.bCancelled)
@@ -230,11 +229,7 @@ namespace SparkleLauncher
 		return true;
 	}
 
-	OperationRecord RunBuildWorkspaceOperationPlan(
-	    BuildWorkspaceOperationPlan plan,
-	    IProcessRunner& processRunner,
-	    const Process::ChildProcessOutputCallback& outputCallback,
-	    std::stop_token cancellation)
+	OperationRecord RunBuildWorkspaceOperationPlan(BuildWorkspaceOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
@@ -254,7 +249,7 @@ namespace SparkleLauncher
 		{
 			const BuildWorkspaceOperationStep& step = plan.Steps[stepIndex];
 			ReportOperationProgress(outputCallback, step.DisplayName, stepIndex, plan.Steps.size());
-			const bool bStepExecuted = RunBuildWorkspaceStep(plan, step, processRunner, outputCallback, operation, cancellation);
+			const bool bStepExecuted = RunBuildWorkspaceStep(plan, step, outputCallback, operation, cancellation);
 			const bool bStepValidated = bStepExecuted && ValidateBuildWorkspaceStep(plan, step, operation);
 
 			if (!bStepValidated)

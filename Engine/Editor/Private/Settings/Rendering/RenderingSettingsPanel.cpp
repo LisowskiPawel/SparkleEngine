@@ -9,7 +9,6 @@
 #include "Settings/Rendering/RenderingRayTracingSceneSettingsSection.h"
 #include "Settings/Rendering/RenderingToneMappingSettingsSection.h"
 #include "Settings/Rendering/RenderingUpscalingSettingsSection.h"
-#include "Renderer/Public/Settings/EngineRenderingSettings.h"
 #include "Settings/EngineRenderingSettingsController.h"
 #include "Style/SparkleUiPalette.h"
 #if SPARKLE_TARGET_EDITOR && !SPARKLE_BUILD_SHIPPING

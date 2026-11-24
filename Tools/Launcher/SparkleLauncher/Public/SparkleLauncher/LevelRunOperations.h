@@ -6,7 +6,7 @@
 #include "SparkleLauncher/BuildProfileCatalog.h"
 #include "SparkleLauncher/LauncherContentDefaults.h"
 #include "SparkleLauncher/OperationModel.h"
-#include "SparkleLauncher/ProcessRunner.h"
+#include "SparkleLauncher/LauncherProcess.h"
 
 #include <cstdint>
 #include <filesystem>
@@ -49,28 +49,15 @@ namespace SparkleLauncher
 		Process::ChildProcessRequest Request;
 	};
 
-	struct LevelRunReadinessState
-	{
-		bool bExecutableReady = false;
-		bool bContentDirectoryReady = false;
-		bool bCookedMeshesReady = false;
-		bool bCookedTexturesReady = false;
-		bool bCookedShadersReady = false;
-	};
-
 	struct LevelRunOperationPlan
 	{
 		OperationRecord Operation;
 		LevelRunOperationRequest Request;
 		std::string TargetName;
 		std::string SessionId;
-		std::filesystem::path ExecutablePath;
-		std::filesystem::path WorkingDirectory;
-		std::vector<Process::EnvironmentOverride> Environment;
 		LevelRunOperationStep Step;
 		std::vector<std::string> PlannedEffects;
 		std::vector<std::string> ReadinessMessages;
-		LevelRunReadinessState Readiness;
 		bool bCanRun = false;
 	};
 
@@ -78,9 +65,5 @@ namespace SparkleLauncher
 	const std::vector<LevelRunOperationDefinition>& GetLevelRunOperationDefinitions();
 	const LevelRunOperationDefinition* FindLevelRunOperationDefinition(std::string_view operationId);
 	LevelRunOperationPlan PlanLevelRunOperation(std::string_view operationId, const LevelRunOperationRequest& request);
-	OperationRecord RunLevelRunOperationPlan(
-	    LevelRunOperationPlan plan,
-	    IProcessRunner& processRunner,
-	    const Process::ChildProcessOutputCallback& outputCallback = {},
-	    std::stop_token cancellation = {});
+	OperationRecord RunLevelRunOperationPlan(LevelRunOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback = {}, std::stop_token cancellation = {});
 }

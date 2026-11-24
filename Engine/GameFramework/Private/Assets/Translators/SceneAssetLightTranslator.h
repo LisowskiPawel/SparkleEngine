@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Assets/Cooked/CookedSceneLightRecord.h"
-#include "Assets/SceneAssetPayload.h"
+#include "Scene/Lighting/SceneLightDesc.h"
 
 namespace Assets
 {

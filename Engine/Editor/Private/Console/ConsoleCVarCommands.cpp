@@ -11,7 +11,7 @@
 static ConsoleCommandResult FormatControlResult(CVarControlResult result);
 static std::string FormatCVar(const CVarControlValue& variable);
 
-ConsoleCommandResult ExecuteConsoleListCVars(const CVarControlExecutor& executor, std::span<const std::string_view> arguments)
+ConsoleCommandResult ExecuteConsoleListCVars(const CVarControlExecutor& executor, std::span<const std::string> arguments)
 {
 	if (arguments.size() > 1)
 	{
@@ -26,7 +26,7 @@ ConsoleCommandResult ExecuteConsoleListCVars(const CVarControlExecutor& executor
 	return FormatControlResult(std::move(result));
 }
 
-ConsoleCommandResult ExecuteConsoleGetCVar(const CVarControlExecutor& executor, std::span<const std::string_view> arguments)
+ConsoleCommandResult ExecuteConsoleGetCVar(const CVarControlExecutor& executor, std::span<const std::string> arguments)
 {
 	if (arguments.size() != 1)
 	{
@@ -42,7 +42,7 @@ ConsoleCommandResult ExecuteConsoleGetCVar(const CVarControlExecutor& executor, 
 	return FormatControlResult(std::move(result));
 }
 
-ConsoleCommandResult ExecuteConsoleSetCVar(const CVarControlExecutor& executor, std::span<const std::string_view> arguments)
+ConsoleCommandResult ExecuteConsoleSetCVar(const CVarControlExecutor& executor, std::span<const std::string> arguments)
 {
 	if (arguments.size() < 2)
 	{

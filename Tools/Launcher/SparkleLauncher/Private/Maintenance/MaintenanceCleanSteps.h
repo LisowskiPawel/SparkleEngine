@@ -18,7 +18,6 @@ namespace SparkleLauncher
 
 	struct MaintenanceCleanStep
 	{
-		std::string Id;
 		std::string DisplayName;
 		std::filesystem::path DestructivePath;
 		std::filesystem::path PreservedPath;

@@ -1,45 +1,35 @@
 #pragma once
 
-#include "Assets/SceneMaterialVariantPayload.h"
-#include "Assets/SceneMeshAssetPayload.h"
 #include "Animation/AnimationClipResource.h"
-#include "Scene/Camera/CameraDesc.h"
+#include "Scene/Camera/SceneCameraEntry.h"
 #include "Scene/Lighting/SceneLightDesc.h"
 #include "Scene/Materials/MaterialDesc.h"
 #include "Animation/SkeletonResource.h"
+#include "Scene/Materials/MaterialVariant.h"
+#include "World/SceneMeshInstanceData.h"
 
 #include <cstdint>
-#include <string>
 #include <vector>
+
+struct SceneAssetMaterialVariantMapping final
+{
+	SceneMeshAssetIndex meshAssetIndex = kInvalidSceneMeshAssetIndex;
+	SceneMeshKind meshKind = SceneMeshKind::Static;
+	MaterialVariantIndex variantIndex = kInvalidMaterialVariantIndex;
+	MaterialHandle material;
+};
 
 struct SceneAssetPayload final
 {
-	using StaticMeshAsset = SceneAssetStaticMeshAsset;
-	using SkeletalMeshAsset = SceneAssetSkeletalMeshAsset;
-	using StaticMeshInstance = SceneAssetStaticMeshInstance;
-	using SkeletalMeshInstance = SceneAssetSkeletalMeshInstance;
-	using MeshInstanceGroup = SceneAssetMeshInstanceGroup;
-	using MaterialVariant = SceneAssetMaterialVariant;
-	using MaterialVariantMapping = SceneAssetMaterialVariantMapping;
-
 	std::uint64_t authoredInstanceId = 0;
 
-	struct Camera final
-	{
-		std::string name;
-		CameraDesc desc;
-	};
-
-	std::vector<StaticMeshAsset> staticMeshAssets;
-	std::vector<SkeletalMeshAsset> skeletalMeshAssets;
-	std::vector<StaticMeshInstance> staticMeshInstances;
-	std::vector<SkeletalMeshInstance> skeletalMeshInstances;
-	std::vector<MeshInstanceGroup> meshInstanceGroups;
-	std::vector<Camera> cameras;
+	std::vector<ECS::SceneMeshInstanceData> meshes;
+	std::vector<SceneMeshInstanceGroupData> meshInstanceGroups;
+	std::vector<SceneCameraEntry> cameras;
 	std::vector<SceneLightDesc> lights;
 	std::vector<SkeletonResource> skeletons;
 	std::vector<AnimationClipResource> animations;
 	std::vector<MaterialDesc> materials;
-	std::vector<MaterialVariant> materialVariants;
-	std::vector<MaterialVariantMapping> materialVariantMappings;
+	std::vector<MaterialVariantDesc> materialVariants;
+	std::vector<SceneAssetMaterialVariantMapping> materialVariantMappings;
 };

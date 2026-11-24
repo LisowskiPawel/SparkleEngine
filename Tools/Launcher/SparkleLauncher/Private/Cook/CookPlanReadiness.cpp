@@ -142,16 +142,10 @@ namespace SparkleLauncher
 			}
 
 			bRequiredCookToolsAvailable = false;
-			std::vector<std::string_view> missingSupportEntryViews;
-			missingSupportEntryViews.reserve(missingSupportEntries.size());
-			for (const std::string& supportEntry : missingSupportEntries)
-			{
-				missingSupportEntryViews.push_back(supportEntry);
-			}
 
 			plan.ReadinessMessages.push_back(
 			    "Cook tool runtime support bundle is incomplete beside " + toolPath.filename().string()
-			    + "; sync the complete product bundle or rebuild cooking tools: " + Strings::Join(missingSupportEntryViews, ", "));
+			    + "; sync the complete product bundle or rebuild cooking tools: " + Strings::Join(missingSupportEntries, ", "));
 		}
 		return bRequiredCookToolsAvailable;
 	}

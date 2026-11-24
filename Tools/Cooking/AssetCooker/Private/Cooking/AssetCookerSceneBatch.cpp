@@ -2,7 +2,7 @@
 
 #include "CookedSceneGenerationWriter.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "ImportedSceneCooker.h"
+#include "CookImportedScene.h"
 #include <TaskScheduler_c.h>
 #include <memory>
 #include <new>
@@ -24,7 +24,7 @@ bool AssetCookerSceneBatch::Execute(const std::vector<AssetCookerSceneEntry>& sc
 {
 	if (sceneEntries.size() > (std::numeric_limits<std::uint32_t>::max)())
 	{
-		diagnostics.AddError(AssetCookerCategory::SceneAssets, "Scene cook count exceeds task capacity.");
+		diagnostics.AddError("Scene cook count exceeds task capacity.");
 		return false;
 	}
 
@@ -45,11 +45,11 @@ bool AssetCookerSceneBatch::Execute(const std::vector<AssetCookerSceneEntry>& sc
 		}
 		catch (const std::exception& error)
 		{
-			diagnostics.AddError(AssetCookerCategory::SceneAssets, "Scene asset generation failed before publication: " + std::string(error.what()));
+			diagnostics.AddError("Scene asset generation failed before publication: " + std::string(error.what()));
 		}
 		catch (...)
 		{
-			diagnostics.AddError(AssetCookerCategory::SceneAssets, "Scene asset generation failed before publication: unknown failure.");
+			diagnostics.AddError("Scene asset generation failed before publication: unknown failure.");
 		}
 		return false;
 	}
@@ -89,7 +89,7 @@ void AssetCookerSceneBatch::BuildRange(std::uint32_t begin, std::uint32_t end, s
 		auto& item = run.Items[index];
 		try
 		{
-			item.Build = ImportedSceneCooker::Build(run.Entries[index], item.Diagnostics);
+			item.Build = CookImportedScene(run.Entries[index].sourcePath, item.Diagnostics);
 			if (run.Progress)
 			{
 				const auto completed = ++run.Completed;
@@ -189,7 +189,7 @@ bool AssetCookerSceneBatch::PublishProducts(std::vector<Item>& items, AssetCooke
 	}
 	catch (const Diagnostics::Error& error)
 	{
-		diagnostics.AddError(AssetCookerCategory::SceneAssets, error.what());
+		diagnostics.AddError(error.what());
 		return false;
 	}
 }

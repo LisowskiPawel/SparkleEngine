@@ -11,23 +11,24 @@
 struct AssetCookStage final
 {
 	const char* Name;
+	std::size_t ProductCount;
 	bool (*Validate)(const AssetCookerProjectCookPlan&, AssetCookerDiagnostics&);
-	bool (*Cook)(const AssetCookerProjectCookPlan&, AssetCookerDiagnostics&, std::vector<AssetCookerOutputRecord>&);
+	bool (*Cook)(const AssetCookerProjectCookPlan&, AssetCookerDiagnostics&);
 };
 
 static constexpr std::array Stages{
-    AssetCookStage{"shaders", ValidateShaderCookStage, CookShaders},
-    AssetCookStage{"textures", ValidateTextureCookStage, CookTextures},
-    AssetCookStage{"scene-assets", nullptr, CookSceneAssets}};
+    AssetCookStage{"shaders", 2, ValidateShaderCookStage, CookShaders},
+    AssetCookStage{"textures", 1, ValidateTextureCookStage, CookTextures},
+    AssetCookStage{"scene-assets", 3, nullptr, CookSceneAssets}};
 
-bool DispatchAssetCookPlan(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics& diagnostics, std::vector<AssetCookerOutputRecord>& outOutputs)
+bool DispatchAssetCookPlan(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics& diagnostics, std::size_t& productCount)
 {
 	for (const AssetCookerPlanStep step : plan.steps)
 	{
 		const auto index = static_cast<std::size_t>(step);
 		if (index >= Stages.size())
 		{
-			diagnostics.AddError(AssetCookerCategory::All, "Unknown asset cook stage.");
+			diagnostics.AddError("Unknown asset cook stage.");
 			return false;
 		}
 		if (Stages[index].Validate && !Stages[index].Validate(plan, diagnostics))
@@ -43,10 +44,11 @@ bool DispatchAssetCookPlan(const AssetCookerProjectCookPlan& plan, AssetCookerDi
 		const AssetCookStage& stage = Stages[static_cast<std::size_t>(plan.steps[index])];
 		const std::string phase = "Asset cook stage: " + std::string(stage.Name);
 		progress.Report(phase, index, plan.steps.size());
-		if (!stage.Cook(plan, diagnostics, outOutputs))
+		if (!stage.Cook(plan, diagnostics))
 		{
 			return false;
 		}
+		productCount += stage.ProductCount;
 		progress.Report(phase, index + 1u, plan.steps.size());
 	}
 	return true;

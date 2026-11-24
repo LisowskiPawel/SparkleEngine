@@ -91,24 +91,14 @@ namespace Strings
 		return lowered;
 	}
 
+	static bool CharactersEqualIgnoreCase(unsigned char left, unsigned char right) noexcept
+	{
+		return std::tolower(left) == std::tolower(right);
+	}
+
 	bool EqualsIgnoreCase(std::string_view lhs, std::string_view rhs) noexcept
 	{
-		if (lhs.size() != rhs.size())
-		{
-			return false;
-		}
-
-		for (std::size_t index = 0; index < lhs.size(); ++index)
-		{
-			const unsigned char lhsChar = static_cast<unsigned char>(lhs[index]);
-			const unsigned char rhsChar = static_cast<unsigned char>(rhs[index]);
-			if (std::tolower(lhsChar) != std::tolower(rhsChar))
-			{
-				return false;
-			}
-		}
-
-		return true;
+		return std::ranges::equal(lhs, rhs, CharactersEqualIgnoreCase);
 	}
 
 	bool StartsWithIgnoreCase(std::string_view value, std::string_view prefix) noexcept
@@ -124,27 +114,8 @@ namespace Strings
 
 	bool ContainsIgnoreCase(std::string_view haystack, std::string_view needle) noexcept
 	{
-		if (needle.empty())
-		{
-			return true;
-		}
-
-		if (needle.size() > haystack.size())
-		{
-			return false;
-		}
-
-		const std::size_t finalStartIndex = haystack.size() - needle.size();
-		for (std::size_t startIndex = 0; startIndex <= finalStartIndex; ++startIndex)
-		{
-			const std::string_view candidate = haystack.substr(startIndex, needle.size());
-			if (EqualsIgnoreCase(candidate, needle))
-			{
-				return true;
-			}
-		}
-
-		return false;
+		const auto match = std::ranges::search(haystack, needle, CharactersEqualIgnoreCase);
+		return needle.empty() || !match.empty();
 	}
 
 	bool TryParseBool(std::string_view str, bool& bOutValue)
@@ -186,7 +157,7 @@ namespace Strings
 		return true;
 	}
 
-	std::string Join(std::span<const std::string_view> values, std::string_view separator, std::size_t firstValueIndex)
+	template <typename TText> static std::string JoinStrings(std::span<const TText> values, std::string_view separator, std::size_t firstValueIndex)
 	{
 		std::string output;
 		for (std::size_t index = firstValueIndex; index < values.size(); ++index)
@@ -198,6 +169,16 @@ namespace Strings
 			output += values[index];
 		}
 		return output;
+	}
+
+	std::string Join(std::span<const std::string_view> values, std::string_view separator, std::size_t firstValueIndex)
+	{
+		return JoinStrings(values, separator, firstValueIndex);
+	}
+
+	std::string Join(std::span<const std::string> values, std::string_view separator, std::size_t firstValueIndex)
+	{
+		return JoinStrings(values, separator, firstValueIndex);
 	}
 
 }

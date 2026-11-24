@@ -35,27 +35,27 @@ namespace SparkleLauncher
 		    inputs);
 	}
 
-	OperationRecord RunLauncherOperationPlan(LauncherOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
+	OperationRecord RunLauncherOperationPlan(LauncherOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
 	{
 		return std::visit(
-		    [&processRunner, &outputCallback, cancellation](auto&& typedPlan) -> OperationRecord
+		    [&outputCallback, cancellation](auto&& typedPlan) -> OperationRecord
 		    {
 			    using Plan = std::remove_cvref_t<decltype(typedPlan)>;
 			    if constexpr (std::is_same_v<Plan, BuildWorkspaceOperationPlan>)
 			    {
-				    return RunBuildWorkspaceOperationPlan(std::move(typedPlan), processRunner, outputCallback, cancellation);
+				    return RunBuildWorkspaceOperationPlan(std::move(typedPlan), outputCallback, cancellation);
 			    }
 			    else if constexpr (std::is_same_v<Plan, LevelOperationPlan>)
 			    {
-				    return RunLevelOperationPlan(std::move(typedPlan), processRunner, outputCallback, cancellation);
+				    return RunLevelOperationPlan(std::move(typedPlan), outputCallback, cancellation);
 			    }
 			    else if constexpr (std::is_same_v<Plan, LevelRunOperationPlan>)
 			    {
-				    return RunLevelRunOperationPlan(std::move(typedPlan), processRunner, outputCallback, cancellation);
+				    return RunLevelRunOperationPlan(std::move(typedPlan), outputCallback, cancellation);
 			    }
 			    else if constexpr (std::is_same_v<Plan, CookOperationPlan>)
 			    {
-				    return RunCookOperationPlan(std::move(typedPlan), processRunner, outputCallback, cancellation);
+				    return RunCookOperationPlan(std::move(typedPlan), outputCallback, cancellation);
 			    }
 			    else
 			    {
@@ -68,7 +68,6 @@ namespace SparkleLauncher
 	OperationRecord ExecuteLauncherOperation(
 	    std::string_view operationId,
 	    const LauncherOperationInputs& inputs,
-	    IProcessRunner& processRunner,
 	    std::stop_token cancellation,
 	    const Process::ChildProcessOutputCallback& outputCallback)
 	{
@@ -101,7 +100,7 @@ namespace SparkleLauncher
 			return std::move(*blockedOperation);
 		}
 
-		return RunLauncherOperationPlan(std::move(plan), processRunner, outputCallback, cancellation);
+		return RunLauncherOperationPlan(std::move(plan), outputCallback, cancellation);
 	}
 
 }

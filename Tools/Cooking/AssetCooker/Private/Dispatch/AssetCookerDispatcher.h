@@ -3,6 +3,6 @@
 #include "../Diagnostics/AssetCookerDiagnostics.h"
 #include "../Planning/ProjectCookPlan.h"
 
-#include <vector>
+#include <cstddef>
 
-bool DispatchAssetCookPlan(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics& diagnostics, std::vector<AssetCookerOutputRecord>& outOutputs);
+bool DispatchAssetCookPlan(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics& diagnostics, std::size_t& productCount);

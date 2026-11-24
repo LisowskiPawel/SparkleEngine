@@ -222,7 +222,14 @@ namespace ExposureSettingsEditor
 
 		RenderingSettingsUi::DrawFloatInputRow("##ExposureAdaptationSpeedUp", "Adapt rate up (1/s)", settingsController, &EngineRenderingSettingsState::ExposureAdaptationSpeedUp, 0.1f, 1.0f, "%.3f");
 
-		RenderingSettingsUi::DrawFloatInputRow("##ExposureAdaptationSpeedDown", "Adapt rate down (1/s)", settingsController, &EngineRenderingSettingsState::ExposureAdaptationSpeedDown, 0.1f, 1.0f, "%.3f");
+		RenderingSettingsUi::DrawFloatInputRow(
+		    "##ExposureAdaptationSpeedDown",
+		    "Adapt rate down (1/s)",
+		    settingsController,
+		    &EngineRenderingSettingsState::ExposureAdaptationSpeedDown,
+		    0.1f,
+		    1.0f,
+		    "%.3f");
 	}
 
 	bool DrawOverrideModes(ViewportExposureOverrides& exposure, const EngineRenderingSettingsState& defaults) noexcept

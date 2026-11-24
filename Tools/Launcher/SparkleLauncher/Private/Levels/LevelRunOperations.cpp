@@ -21,7 +21,7 @@ namespace SparkleLauncher
 	{
 		try
 		{
-			const auto catalog = LoadProjectLevelCatalog(plan.WorkingDirectory);
+			const auto catalog = LoadProjectLevelCatalog(plan.Step.Request.WorkingDirectory);
 			const auto level = std::find_if(catalog.levels.begin(), catalog.levels.end(), [&plan](const ProjectLevelCatalogEntry& entry) { return entry.id == plan.Request.LevelId; });
 			if (level == catalog.levels.end())
 			{
@@ -59,23 +59,23 @@ namespace SparkleLauncher
 			plan.TargetName += "GpuCrashReceipt";
 		}
 
-		plan.ExecutablePath = ResolveProjectExecutable(
+		plan.Step.Request.ExecutablePath = ResolveProjectExecutable(
 		    plan.Request.WorkspaceRoot,
 		    plan.Request.ContentId,
 		    plan.Request.RunMode == LevelRunMode::Editor ? "editor" : "game",
 		    plan.Request.ProductProfile,
 		    plan.Request.GpuCrashMode == RhiGpuCrashMode::Off ? "" : "gpu-crash");
 
-		plan.WorkingDirectory = ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId);
+		plan.Step.Request.WorkingDirectory = ResolveProjectRoot(plan.Request.WorkspaceRoot, plan.Request.ContentId);
 		return true;
 	}
 
-	static void InspectRunReadiness(LevelRunOperationPlan& plan)
+	static bool InspectRunReadiness(LevelRunOperationPlan& plan)
 	{
 		std::error_code errorCode;
-		plan.Readiness.bExecutableReady = std::filesystem::is_regular_file(plan.ExecutablePath, errorCode);
+		const bool bExecutableReady = std::filesystem::is_regular_file(plan.Step.Request.ExecutablePath, errorCode);
 		errorCode.clear();
-		plan.Readiness.bContentDirectoryReady = std::filesystem::exists(plan.WorkingDirectory / std::string(Filesystem::kProjectMarker), errorCode);
+		const bool bContentDirectoryReady = std::filesystem::exists(plan.Step.Request.WorkingDirectory / std::string(Filesystem::kProjectMarker), errorCode);
 
 		const CookedContentReadiness cookedContent = InspectCookedContentReadiness(
 		    plan.Request.WorkspaceRoot,
@@ -83,23 +83,23 @@ namespace SparkleLauncher
 		    plan.Request.GpuCrashMode == RhiGpuCrashMode::Off ? "" : "gpu-crash");
 
 		// GameFramework always registers built-in Empty without imported scene assets.
-		plan.Readiness.bCookedMeshesReady = plan.Request.LevelId == "Empty" || cookedContent.bMeshesReady;
-		plan.Readiness.bCookedTexturesReady = cookedContent.bTexturesReady;
-		plan.Readiness.bCookedShadersReady = cookedContent.Shaders == CookedShaderPublicationState::Ready;
+		const bool bCookedMeshesReady = plan.Request.LevelId == "Empty" || cookedContent.bMeshesReady;
+		const bool bCookedTexturesReady = cookedContent.bTexturesReady;
+		const bool bCookedShadersReady = cookedContent.Shaders == CookedShaderPublicationState::Ready;
 
-		if (!plan.Readiness.bExecutableReady)
+		if (!bExecutableReady)
 		{
 			plan.ReadinessMessages.push_back("Selected product executable is missing; compile " + plan.TargetName + " first.");
 		}
-		if (!plan.Readiness.bContentDirectoryReady)
+		if (!bContentDirectoryReady)
 		{
-			plan.ReadinessMessages.push_back("Content working directory is missing or invalid: " + Strings::ToNarrow(plan.WorkingDirectory.wstring()));
+			plan.ReadinessMessages.push_back("Content working directory is missing or invalid: " + Strings::ToNarrow(plan.Step.Request.WorkingDirectory.wstring()));
 		}
-		if (!plan.Readiness.bCookedMeshesReady)
+		if (!bCookedMeshesReady)
 		{
 			plan.ReadinessMessages.push_back("Cooked scenes and meshes are missing.");
 		}
-		if (!plan.Readiness.bCookedTexturesReady)
+		if (!bCookedTexturesReady)
 		{
 			plan.ReadinessMessages.push_back("Cooked textures are missing.");
 		}
@@ -114,6 +114,11 @@ namespace SparkleLauncher
 				plan.ReadinessMessages.push_back("The complete cooked shader generation is missing.");
 				break;
 		}
+
+		const bool bProductReady = bExecutableReady && bContentDirectoryReady;
+		const bool bSceneAssetsReady = bCookedMeshesReady && bCookedTexturesReady;
+		const bool bCookedContentReady = bSceneAssetsReady && bCookedShadersReady;
+		return bProductReady && bCookedContentReady;
 	}
 
 	static std::string BuildRunDryRunText(const LevelRunOperationPlan& plan, std::string_view displayName)
@@ -124,7 +129,7 @@ namespace SparkleLauncher
 		{
 			const LevelRunOperationStep& step = plan.Step;
 			dryRun << "\n  " << step.DisplayName << ": " << BuildDisplayCommandLine(step.Request.ExecutablePath, step.Request.Arguments);
-			dryRun << "\n    Working directory: " << Strings::ToNarrow(plan.WorkingDirectory.wstring());
+			dryRun << "\n    Working directory: " << Strings::ToNarrow(plan.Step.Request.WorkingDirectory.wstring());
 			dryRun << "\n    Env: SPARKLE_STARTUP_LEVEL=" << plan.Request.LevelId;
 			if (!step.Request.LogPath.empty())
 			{
@@ -222,23 +227,19 @@ namespace SparkleLauncher
 			return plan;
 		}
 
-		plan.Environment.push_back({"SPARKLE_STARTUP_LEVEL", plan.Request.LevelId});
+		plan.Step.Request.Environment.push_back({"SPARKLE_STARTUP_LEVEL", plan.Request.LevelId});
 
-		InspectRunReadiness(plan);
+		plan.bCanRun = InspectRunReadiness(plan);
 
 		plan.PlannedEffects.push_back(
-		    "Run level " + plan.Request.LevelId + " in " + Strings::ToNarrow(plan.ExecutablePath.wstring()) + " from " + Strings::ToNarrow(plan.WorkingDirectory.wstring()) + ".");
+		    "Run level " + plan.Request.LevelId + " in " + Strings::ToNarrow(plan.Step.Request.ExecutablePath.wstring()) + " from " + Strings::ToNarrow(plan.Step.Request.WorkingDirectory.wstring())
+		    + ".");
 
 		plan.PlannedEffects.push_back("Use graphics API: " + plan.Request.GraphicsApi + ".");
 
-		const bool bProductReady = plan.Readiness.bExecutableReady && plan.Readiness.bContentDirectoryReady;
-		const bool bSceneAssetsReady = plan.Readiness.bCookedMeshesReady && plan.Readiness.bCookedTexturesReady;
-		const bool bCookedContentReady = bSceneAssetsReady && plan.Readiness.bCookedShadersReady;
-		plan.bCanRun = bProductReady && bCookedContentReady;
-
 		if (plan.bCanRun)
 		{
-			plan.Step = BuildLevelRunStep(plan);
+			ConfigureLevelRunStep(plan);
 		}
 
 		plan.Operation.DryRunText = BuildRunDryRunText(plan, definition->DisplayName);

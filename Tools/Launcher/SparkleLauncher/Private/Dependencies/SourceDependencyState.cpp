@@ -3,10 +3,10 @@
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 #include "Dependencies/SourceDependencyCacheAccess.h"
 #include "Dependencies/SourceDependencyFacts.h"
+#include "Core/Public/Strings/StringUtils.h"
 
 #include <cstdint>
 #include <algorithm>
-#include <sstream>
 #include <system_error>
 
 namespace SparkleLauncher
@@ -21,20 +21,6 @@ namespace SparkleLauncher
 
 		const std::uintmax_t size = std::filesystem::file_size(path, errorCode);
 		return !errorCode && size > 0;
-	}
-
-	static std::string JoinPaths(const std::vector<std::string>& paths)
-	{
-		std::ostringstream stream;
-		for (std::size_t index = 0; index < paths.size(); ++index)
-		{
-			if (index > 0)
-			{
-				stream << ", ";
-			}
-			stream << paths[index];
-		}
-		return stream.str();
 	}
 
 	struct SourceDependencyPresentation final
@@ -180,7 +166,7 @@ namespace SparkleLauncher
 			}
 
 			status.bAllEnabledDependenciesReady = false;
-			const std::string reason = validation.FailureReason.empty() ? "Missing: " + JoinPaths(validation.MissingRelativePaths) + "." : validation.FailureReason;
+			const std::string reason = validation.FailureReason.empty() ? "Missing: " + Strings::Join(validation.MissingRelativePaths, ", ") + "." : validation.FailureReason;
 			status.ReadinessMessages.push_back(dependency.Label + " cache is not ready. " + reason);
 		}
 

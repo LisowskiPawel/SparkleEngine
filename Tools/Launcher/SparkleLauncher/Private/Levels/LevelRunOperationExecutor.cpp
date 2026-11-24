@@ -7,7 +7,7 @@
 
 namespace SparkleLauncher
 {
-	OperationRecord RunLevelRunOperationPlan(LevelRunOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
+	OperationRecord RunLevelRunOperationPlan(LevelRunOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
@@ -30,7 +30,7 @@ namespace SparkleLauncher
 		AppendProcessOutputCallback(request, outputCallback);
 		operation.LogPath = request.LogPath;
 
-		const Process::ChildProcessResult result = processRunner.Run(request);
+		const Process::ChildProcessResult result = RunLauncherProcess(request);
 		if (plan.Request.GpuCrashMode == RhiGpuCrashMode::Aftermath)
 		{
 			const auto path = ReadGpuCrashAnnouncement(result.CapturedOutput);

@@ -37,8 +37,13 @@ static bool CollectFilteredCVars(ConsoleVariableRegistry& registry, const CVarCo
 	return true;
 }
 
-static bool ResolveNamedCVarBatch(ConsoleVariableRegistry& registry, const CVarControlRequest& request, std::vector<ConsoleVariableBase*>& variables, std::string& outError)
+static bool ResolveCVarControlVariables(ConsoleVariableRegistry& registry, const CVarControlRequest& request, std::vector<ConsoleVariableBase*>& variables, std::string& outError)
 {
+	if (request.Operation == CVarControlOperation::List)
+	{
+		return CollectFilteredCVars(registry, request, variables, outError);
+	}
+
 	constexpr std::size_t maximumBatchSize = 64;
 	if (request.Operation != CVarControlOperation::Query && request.Operation != CVarControlOperation::Set)
 	{
@@ -119,9 +124,7 @@ CVarControlResult ExecuteCVarControl(ConsoleVariableRegistry& registry, CVarCont
 {
 	CVarControlResult result;
 	std::vector<ConsoleVariableBase*> variables;
-	const bool bResolved = request.Operation == CVarControlOperation::List ? CollectFilteredCVars(registry, request, variables, result.Error)
-	                                                                       : ResolveNamedCVarBatch(registry, request, variables, result.Error);
-	if (!bResolved)
+	if (!ResolveCVarControlVariables(registry, request, variables, result.Error))
 	{
 		return result;
 	}

@@ -49,13 +49,13 @@ bool ValidateTextureCookStage(const AssetCookerProjectCookPlan& plan, AssetCooke
 	std::error_code error;
 	if (!std::filesystem::is_regular_file(plan.textureCookerPath, error) || error)
 	{
-		diagnostics.AddError(AssetCookerCategory::Textures, "TextureCooker executable was not found.", plan.textureCookerPath);
+		diagnostics.AddError("TextureCooker executable was not found.", plan.textureCookerPath);
 		return false;
 	}
 	return true;
 }
 
-bool CookTextures(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics& diagnostics, std::vector<AssetCookerOutputRecord>& outputs)
+bool CookTextures(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics& diagnostics)
 {
 	const AssetCookerTemporaryFile requestFile(MakeTemporaryPath(plan, "assetcooker-texture-requests", ".txt"));
 
@@ -63,7 +63,7 @@ bool CookTextures(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics
 	std::filesystem::create_directories(requestFile.GetPath().parent_path(), errorCode);
 	if (errorCode)
 	{
-		diagnostics.AddError(AssetCookerCategory::Textures, "Failed to create texture-request temp directory.", requestFile.GetPath().parent_path());
+		diagnostics.AddError("Failed to create texture-request temp directory.", requestFile.GetPath().parent_path());
 		return false;
 	}
 
@@ -75,10 +75,9 @@ bool CookTextures(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics
 	const int exitCode = AssetCookerToolProcess::Run(plan.textureCookerPath, {"cook-request-file", Strings::ToNarrow(requestFile.GetPath().wstring())}, plan.projectRoot);
 	if (exitCode != 0)
 	{
-		diagnostics.AddError(AssetCookerCategory::Textures, "Texture asset cooking failed.");
+		diagnostics.AddError("Texture asset cooking failed.");
 		return false;
 	}
 
-	outputs.push_back({AssetCookerCategory::Textures, "textures", Strings::ToNarrow((plan.cookedRoot / "Textures").wstring())});
 	return true;
 }

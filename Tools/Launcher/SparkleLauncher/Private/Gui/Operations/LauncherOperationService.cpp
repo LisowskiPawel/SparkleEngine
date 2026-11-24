@@ -51,8 +51,7 @@ namespace SparkleLauncher
 			}
 		};
 
-		explicit Implementation(ProcessRunnerFactory factory) :
-		    Factory(std::move(factory))
+		Implementation()
 		{
 			Scheduler = enkiNewTaskScheduler();
 			if (!Scheduler)
@@ -120,13 +119,8 @@ namespace SparkleLauncher
 					run.Observation(ReadGpuCrashCollectionState(*run.Incident));
 					return;
 				}
-				auto runner = run.Owner->Factory();
-				if (!runner)
-				{
-					throw std::runtime_error("No process runner is available for this Launcher operation.");
-				}
 				const auto operationId = run.Request.OperationId.toStdString();
-				run.Record = ExecuteLauncherOperation(operationId, run.Request.Inputs, *runner, run.Stop.get_token(), run.Output);
+				run.Record = ExecuteLauncherOperation(operationId, run.Request.Inputs, run.Stop.get_token(), run.Output);
 			}
 			catch (const std::exception& error)
 			{
@@ -218,7 +212,6 @@ namespace SparkleLauncher
 		}
 
 		const std::thread::id CreatorThread = std::this_thread::get_id();
-		ProcessRunnerFactory Factory;
 		enkiTaskScheduler* Scheduler = nullptr;
 		std::mutex Mutex;
 		std::list<std::unique_ptr<Run>> Runs;
@@ -226,8 +219,8 @@ namespace SparkleLauncher
 		bool bClosing = false;
 	};
 
-	LauncherOperationService::LauncherOperationService(ProcessRunnerFactory factory) :
-	    m_implementation(std::make_unique<Implementation>(std::move(factory)))
+	LauncherOperationService::LauncherOperationService() :
+	    m_implementation(std::make_unique<Implementation>())
 	{
 	}
 

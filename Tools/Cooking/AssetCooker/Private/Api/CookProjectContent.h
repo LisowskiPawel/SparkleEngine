@@ -2,6 +2,7 @@
 
 #include "AssetCookerTypes.h"
 
+#include <cstddef>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -19,7 +20,7 @@ struct AssetCookerResult final
 {
 	int exitCode = 1;
 	std::vector<AssetCookerDiagnosticRecord> diagnostics;
-	std::vector<AssetCookerOutputRecord> outputs;
+	std::size_t productCount = 0;
 };
 
 AssetCookerResult CookProjectContent(const AssetCookerRequest& request);

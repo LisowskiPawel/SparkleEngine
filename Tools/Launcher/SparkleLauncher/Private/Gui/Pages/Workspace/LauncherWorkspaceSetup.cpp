@@ -5,7 +5,6 @@
 
 #include "Gui/Widgets/LauncherActionWidgets.h"
 #include "Gui/Models/LauncherCleanUiModel.h"
-#include "Gui/Models/LauncherDependencyUiModel.h"
 #include "Gui/Widgets/LauncherLayoutWidgets.h"
 #include "Gui/Models/LauncherOperationRequestFactory.h"
 #include "Gui/Models/LauncherContentModel.h"

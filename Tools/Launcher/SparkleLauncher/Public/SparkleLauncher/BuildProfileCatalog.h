@@ -31,9 +31,6 @@ namespace SparkleLauncher
 
 	const std::vector<BuildProfile>& GetBuildProfileCatalog();
 	std::optional<BuildProfile> FindBuildProfile(std::string_view profileName);
-	const BuildProfile& GetDefaultBuildProfile();
-	bool IsEditorProfile(std::string_view profileName);
 	std::string BuildProjectTargetName(std::string_view projectName, const BuildProfile& profile);
 	std::string ToString(BuildProfileState state);
-	std::string ToString(BuildProfileTarget target);
 }

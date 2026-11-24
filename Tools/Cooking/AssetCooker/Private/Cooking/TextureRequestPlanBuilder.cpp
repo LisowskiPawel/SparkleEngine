@@ -28,14 +28,14 @@ bool TextureRequestPlanBuilder::Build(const AssetCookerProjectCookPlan& plan, As
 		}
 		catch (const Diagnostics::Error& error)
 		{
-			diagnostics.AddError(AssetCookerCategory::Textures, error.what(), sceneEntry.sourcePath);
+			diagnostics.AddError(error.what(), sceneEntry.sourcePath);
 			++failedSceneCount;
 		}
 	}
 
 	if (failedSceneCount != 0)
 	{
-		diagnostics.AddError(AssetCookerCategory::Textures, "Texture request collection failed for " + std::to_string(failedSceneCount) + " scene(s).");
+		diagnostics.AddError("Texture request collection failed for " + std::to_string(failedSceneCount) + " scene(s).");
 		return false;
 	}
 
@@ -45,7 +45,7 @@ bool TextureRequestPlanBuilder::Build(const AssetCookerProjectCookPlan& plan, As
 	}
 	catch (const Diagnostics::Error& error)
 	{
-		diagnostics.AddError(AssetCookerCategory::Textures, error.what());
+		diagnostics.AddError(error.what());
 		return false;
 	}
 
@@ -55,7 +55,7 @@ bool TextureRequestPlanBuilder::Build(const AssetCookerProjectCookPlan& plan, As
 	}
 	catch (const Diagnostics::Error& error)
 	{
-		diagnostics.AddError(AssetCookerCategory::Textures, error.what(), outputPath);
+		diagnostics.AddError(error.what(), outputPath);
 		return false;
 	}
 

@@ -80,7 +80,14 @@ namespace RenderingSettingsUi
 		}
 	}
 
-	void DrawFloatInputRow(const char* id, const char* label, EngineRenderingSettingsController& controller, float EngineRenderingSettingsState::* field, float step, float stepFast, const char* format)
+	void DrawFloatInputRow(
+	    const char* id,
+	    const char* label,
+	    EngineRenderingSettingsController& controller,
+	    float EngineRenderingSettingsState::* field,
+	    float step,
+	    float stepFast,
+	    const char* format)
 	{
 		BeginSettingsRow(label);
 		ImGui::TableSetColumnIndex(1);

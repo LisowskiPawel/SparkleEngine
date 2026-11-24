@@ -1,47 +1,15 @@
 #include "SparkleLauncher/ToolResolver.h"
 
 #include "Core/Public/Strings/StringUtils.h"
+#include "Core/Public/Environment/EnvironmentVariables.h"
 
 #include <algorithm>
-#include <cstdlib>
 #include <optional>
 #include <sstream>
 #include <system_error>
 
 namespace SparkleLauncher
 {
-	static std::optional<std::string> TryGetEnvironmentVariable(const char* name)
-	{
-		if (name == nullptr)
-		{
-			return std::nullopt;
-		}
-
-#if defined(_MSC_VER)
-		char* rawValue = nullptr;
-		size_t requiredLength = 0;
-		if (_dupenv_s(&rawValue, &requiredLength, name) != 0 || rawValue == nullptr || requiredLength <= 1)
-		{
-			if (rawValue != nullptr)
-			{
-				std::free(rawValue);
-			}
-			return std::nullopt;
-		}
-
-		std::string value(rawValue, requiredLength - 1);
-		std::free(rawValue);
-		return value;
-#else
-		const char* value = std::getenv(name);
-		if (value == nullptr || value[0] == '\0')
-		{
-			return std::nullopt;
-		}
-		return std::string(value);
-#endif
-	}
-
 	static std::vector<std::string> GetCandidateExecutableNames(KnownTool tool)
 	{
 		switch (tool)
@@ -65,35 +33,36 @@ namespace SparkleLauncher
 		return {};
 	}
 
-	static std::vector<std::string> GetToolOverrideEnvironmentNames(KnownTool tool)
+	static const char* GetToolOverrideEnvironmentName(KnownTool tool)
 	{
 		switch (tool)
 		{
 			case KnownTool::CMake:
-				return {"SPARKLE_CMAKE_EXE"};
+				return "SPARKLE_CMAKE_EXE";
 
 			case KnownTool::MSBuild:
-				return {"SPARKLE_MSBUILD_EXE"};
+				return "SPARKLE_MSBUILD_EXE";
 
 			case KnownTool::Ninja:
-				return {"SPARKLE_NINJA_EXE"};
+				return "SPARKLE_NINJA_EXE";
 
 			case KnownTool::Rider:
-				return {"SPARKLE_RIDER_EXE"};
+				return "SPARKLE_RIDER_EXE";
 
 			case KnownTool::Git:
-				return {"SPARKLE_GIT_EXE"};
+				return "SPARKLE_GIT_EXE";
 		}
 
-		return {};
+		return nullptr;
 	}
 
-	static void AddProgramFilesCandidate(std::vector<std::filesystem::path>& candidates, const char* environmentName, const std::filesystem::path& relativePath)
+	static void AddEnvironmentPath(std::vector<std::filesystem::path>& candidates, const char* environmentName, const std::filesystem::path& relativePath = {})
 	{
-		const std::optional<std::string> root = TryGetEnvironmentVariable(environmentName);
-		if (root.has_value())
+		std::string root;
+		const bool bHasRoot = Environment::TryGetVariable(environmentName, root);
+		if (bHasRoot)
 		{
-			candidates.push_back(std::filesystem::path(*root) / relativePath);
+			candidates.push_back(std::filesystem::path(root) / relativePath);
 		}
 	}
 
@@ -105,13 +74,14 @@ namespace SparkleLauncher
 	    std::string_view directoryPrefix,
 	    const std::filesystem::path& relativeExecutablePath)
 	{
-		const std::optional<std::string> root = TryGetEnvironmentVariable(environmentName);
-		if (!root.has_value())
+		std::string root;
+		const bool bHasRoot = Environment::TryGetVariable(environmentName, root);
+		if (!bHasRoot)
 		{
 			return;
 		}
 
-		const std::filesystem::path parentDirectory = std::filesystem::path(*root) / "JetBrains";
+		const std::filesystem::path parentDirectory = std::filesystem::path(root) / "JetBrains";
 		std::error_code errorCode;
 		if (!std::filesystem::is_directory(parentDirectory, errorCode))
 		{
@@ -143,24 +113,6 @@ namespace SparkleLauncher
 
 		std::ranges::sort(matches, [](const std::filesystem::path& left, const std::filesystem::path& right) { return BuildPathSortKey(left) < BuildPathSortKey(right); });
 		candidates.insert(candidates.end(), matches.begin(), matches.end());
-	}
-
-	static void AddLocalAppDataCandidate(std::vector<std::filesystem::path>& candidates, const std::filesystem::path& relativePath)
-	{
-		const std::optional<std::string> root = TryGetEnvironmentVariable("LocalAppData");
-		if (root.has_value())
-		{
-			candidates.push_back(std::filesystem::path(*root) / relativePath);
-		}
-	}
-
-	static void AddEnvironmentRootIfPresent(std::vector<std::filesystem::path>& roots, const char* environmentName, const std::filesystem::path& relativePath = {})
-	{
-		const std::optional<std::string> root = TryGetEnvironmentVariable(environmentName);
-		if (root.has_value())
-		{
-			roots.push_back(std::filesystem::path(*root) / relativePath);
-		}
 	}
 
 	static std::string BuildPathSortKey(const std::filesystem::path& path)
@@ -214,26 +166,26 @@ namespace SparkleLauncher
 		{
 			for (const std::string& edition : editions)
 			{
-				AddProgramFilesCandidate(candidates, "ProgramFiles", std::filesystem::path("Microsoft Visual Studio") / version / edition / "MSBuild" / "Current" / "Bin" / "MSBuild.exe");
+				AddEnvironmentPath(candidates, "ProgramFiles", std::filesystem::path("Microsoft Visual Studio") / version / edition / "MSBuild" / "Current" / "Bin" / "MSBuild.exe");
 			}
 		}
 	}
 
 	static void AddJetBrainsRiderCandidates(std::vector<std::filesystem::path>& candidates)
 	{
-		AddLocalAppDataCandidate(candidates, std::filesystem::path("Programs") / "Rider" / "bin" / "rider64.exe");
-		AddLocalAppDataCandidate(candidates, std::filesystem::path("JetBrains") / "Toolbox" / "scripts" / "rider.cmd");
-		AddProgramFilesCandidate(candidates, "ProgramFiles", std::filesystem::path("JetBrains") / "JetBrains Rider" / "bin" / "rider64.exe");
-		AddProgramFilesCandidate(candidates, "ProgramFiles(x86)", std::filesystem::path("JetBrains") / "JetBrains Rider" / "bin" / "rider64.exe");
+		AddEnvironmentPath(candidates, "LocalAppData", std::filesystem::path("Programs") / "Rider" / "bin" / "rider64.exe");
+		AddEnvironmentPath(candidates, "LocalAppData", std::filesystem::path("JetBrains") / "Toolbox" / "scripts" / "rider.cmd");
+		AddEnvironmentPath(candidates, "ProgramFiles", std::filesystem::path("JetBrains") / "JetBrains Rider" / "bin" / "rider64.exe");
+		AddEnvironmentPath(candidates, "ProgramFiles(x86)", std::filesystem::path("JetBrains") / "JetBrains Rider" / "bin" / "rider64.exe");
 		AddProgramFilesDirectoryMatches(candidates, "ProgramFiles", "JetBrains Rider", std::filesystem::path("bin") / "rider64.exe");
 		AddProgramFilesDirectoryMatches(candidates, "ProgramFiles(x86)", "JetBrains Rider", std::filesystem::path("bin") / "rider64.exe");
 
 		std::vector<std::filesystem::path> searchRoots;
-		AddEnvironmentRootIfPresent(searchRoots, "ProgramFiles", std::filesystem::path("JetBrains"));
-		AddEnvironmentRootIfPresent(searchRoots, "ProgramFiles(x86)", std::filesystem::path("JetBrains"));
-		AddEnvironmentRootIfPresent(searchRoots, "LocalAppData", std::filesystem::path("Programs"));
-		AddEnvironmentRootIfPresent(searchRoots, "LocalAppData", std::filesystem::path("JetBrains"));
-		AddEnvironmentRootIfPresent(searchRoots, "LocalAppData", std::filesystem::path("JetBrains") / "Toolbox");
+		AddEnvironmentPath(searchRoots, "ProgramFiles", std::filesystem::path("JetBrains"));
+		AddEnvironmentPath(searchRoots, "ProgramFiles(x86)", std::filesystem::path("JetBrains"));
+		AddEnvironmentPath(searchRoots, "LocalAppData", std::filesystem::path("Programs"));
+		AddEnvironmentPath(searchRoots, "LocalAppData", std::filesystem::path("JetBrains"));
+		AddEnvironmentPath(searchRoots, "LocalAppData", std::filesystem::path("JetBrains") / "Toolbox");
 
 		for (const std::filesystem::path& root : searchRoots)
 		{
@@ -246,31 +198,28 @@ namespace SparkleLauncher
 	static std::vector<std::filesystem::path> GetKnownInstallCandidates(KnownTool tool)
 	{
 		std::vector<std::filesystem::path> candidates;
-		for (const std::string& environmentName : GetToolOverrideEnvironmentNames(tool))
+		std::string overridePath;
+		if (Environment::TryGetVariable(GetToolOverrideEnvironmentName(tool), overridePath))
 		{
-			const std::optional<std::string> overridePath = TryGetEnvironmentVariable(environmentName.c_str());
-			if (overridePath.has_value())
-			{
-				candidates.emplace_back(*overridePath);
-			}
+			candidates.emplace_back(overridePath);
 		}
 
 		switch (tool)
 		{
 			case KnownTool::CMake:
-				AddProgramFilesCandidate(candidates, "ProgramFiles", std::filesystem::path("CMake") / "bin" / "cmake.exe");
+				AddEnvironmentPath(candidates, "ProgramFiles", std::filesystem::path("CMake") / "bin" / "cmake.exe");
 				break;
 			case KnownTool::MSBuild:
 				AddVisualStudioMSBuildCandidates(candidates);
 				break;
 			case KnownTool::Ninja:
-				AddProgramFilesCandidate(candidates, "ProgramFiles", std::filesystem::path("CMake") / "bin" / "ninja.exe");
+				AddEnvironmentPath(candidates, "ProgramFiles", std::filesystem::path("CMake") / "bin" / "ninja.exe");
 				break;
 			case KnownTool::Rider:
 				AddJetBrainsRiderCandidates(candidates);
 				break;
 			case KnownTool::Git:
-				AddProgramFilesCandidate(candidates, "ProgramFiles", std::filesystem::path("Git") / "cmd" / "git.exe");
+				AddEnvironmentPath(candidates, "ProgramFiles", std::filesystem::path("Git") / "cmd" / "git.exe");
 				break;
 		}
 
@@ -313,8 +262,8 @@ namespace SparkleLauncher
 	std::vector<std::filesystem::path> GetExecutableSearchPath()
 	{
 		std::vector<std::filesystem::path> searchPaths;
-		const std::optional<std::string> pathValue = TryGetEnvironmentVariable("PATH");
-		if (!pathValue.has_value())
+		std::string pathValue;
+		if (!Environment::TryGetVariable("PATH", pathValue))
 		{
 			return searchPaths;
 		}
@@ -324,7 +273,7 @@ namespace SparkleLauncher
 #else
 		constexpr char separator = ':';
 #endif
-		std::stringstream stream(*pathValue);
+		std::stringstream stream(pathValue);
 		std::string segment;
 		while (std::getline(stream, segment, separator))
 		{

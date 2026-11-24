@@ -4,5 +4,5 @@
 
 namespace SparkleLauncher
 {
-	LevelRunOperationStep BuildLevelRunStep(const LevelRunOperationPlan& plan);
+	void ConfigureLevelRunStep(LevelRunOperationPlan& plan);
 }

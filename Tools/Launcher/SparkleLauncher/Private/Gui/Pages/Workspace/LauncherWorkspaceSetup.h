@@ -20,7 +20,7 @@ namespace SparkleLauncher
 	class LauncherContentModel;
 	class LauncherSettings;
 	struct LauncherOperationResult;
-	struct ThirdPartyDependencyUiEntry;
+	struct SourceDependencyEntry;
 	struct ToolchainItemStatus;
 	struct BuildFilesFreshnessStatus;
 	struct BuildWorkspaceOperationRequest;
@@ -52,8 +52,8 @@ namespace SparkleLauncher
 		void AddSyncDependencies(QVBoxLayout& layout, bool bOptional);
 		void ActivateSourceDependency(QTreeWidgetItem* item);
 		void RefreshSourceDependencyRows();
-		void SyncSourceDependency(const ThirdPartyDependencyUiEntry& dependency);
-		void CleanSourceDependency(const ThirdPartyDependencyUiEntry& dependency);
+		void SyncSourceDependency(const SourceDependencyEntry& dependency);
+		void CleanSourceDependency(const SourceDependencyEntry& dependency);
 		void InstallHostTool(const ToolchainItemStatus& item);
 		QPushButton* CreateHostToolActionButton(const ToolchainItemStatus& item);
 		void AddHostToolStatusRow(QVBoxLayout& layout, const ToolchainItemStatus& item);

@@ -3,14 +3,9 @@
 #include <iterator>
 #include <utility>
 
-void AssetCookerDiagnostics::AddError(AssetCookerCategory category, std::string message)
+void AssetCookerDiagnostics::AddError(std::string message, const std::filesystem::path& sourcePath)
 {
-	Add(category, std::move(message), std::string());
-}
-
-void AssetCookerDiagnostics::AddError(AssetCookerCategory category, std::string message, const std::filesystem::path& sourcePath)
-{
-	Add(category, std::move(message), sourcePath.string());
+	m_records.push_back({std::move(message), sourcePath.string()});
 }
 
 void AssetCookerDiagnostics::Append(std::vector<AssetCookerDiagnosticRecord> additionalRecords)
@@ -23,11 +18,3 @@ std::vector<AssetCookerDiagnosticRecord> AssetCookerDiagnostics::ReleaseRecords(
 	return std::move(m_records);
 }
 
-void AssetCookerDiagnostics::Add(AssetCookerCategory category, std::string message, std::string sourcePath)
-{
-	AssetCookerDiagnosticRecord record;
-	record.category = category;
-	record.message = std::move(message);
-	record.sourcePath = std::move(sourcePath);
-	m_records.push_back(std::move(record));
-}

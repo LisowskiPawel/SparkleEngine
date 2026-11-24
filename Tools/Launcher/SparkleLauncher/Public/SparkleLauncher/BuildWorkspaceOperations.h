@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SparkleLauncher/OperationModel.h"
-#include "SparkleLauncher/ProcessRunner.h"
+#include "SparkleLauncher/LauncherProcess.h"
 #include "SparkleLauncher/LauncherContentDefaults.h"
 #include "SparkleLauncher/SourceDependencyState.h"
 
@@ -171,18 +171,13 @@ namespace SparkleLauncher
 		bool bCanRun = false;
 	};
 
-	std::string ToString(ToolchainItemState state);
-	std::string ToString(BuildFilesFreshnessState state);
-	std::string ToString(BuildWorkspaceOperationKind kind);
 	std::string BuildWorkspaceScopeId(BuildWorkspaceScope scope);
 	bool HasSelectedBuildScope(const BuildWorkspaceOperationRequest& request, BuildWorkspaceScope scope);
 	std::vector<std::string> ResolveWorkspaceBuildTargets(const BuildWorkspaceOperationPlan& plan, BuildWorkspaceScope scope);
 	bool TryParseBuildWorkspaceScope(std::string_view text, BuildWorkspaceScope& outScope);
-	std::string ToString(WorkspaceIde ide);
 	std::string DisplayName(WorkspaceIde ide);
 	std::string WorkspaceIdeCommandLineValue(WorkspaceIde ide);
 	bool TryParseWorkspaceIde(std::string_view text, WorkspaceIde& outIde);
-	std::string ToString(WorkspaceCompiler compiler);
 	std::string DisplayName(WorkspaceCompiler compiler);
 	std::string WorkspaceCompilerCommandLineValue(WorkspaceCompiler compiler);
 	bool TryParseWorkspaceCompiler(std::string_view text, WorkspaceCompiler& outCompiler);
@@ -195,9 +190,5 @@ namespace SparkleLauncher
 	BuildFilesFreshnessStatus CheckBuildFilesFreshness(const std::filesystem::path& workspaceRoot, const BuildToolchainStatus& toolchain);
 	bool UpdateBuildFilesFreshnessStamp(const std::filesystem::path& workspaceRoot, const BuildToolchainStatus& toolchain, std::string& errorMessage);
 	BuildWorkspaceOperationPlan PlanBuildWorkspaceOperation(std::string_view operationId, const BuildWorkspaceOperationRequest& request);
-	OperationRecord RunBuildWorkspaceOperationPlan(
-	    BuildWorkspaceOperationPlan plan,
-	    IProcessRunner& processRunner,
-	    const Process::ChildProcessOutputCallback& outputCallback = {},
-	    std::stop_token cancellation = {});
+	OperationRecord RunBuildWorkspaceOperationPlan(BuildWorkspaceOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback = {}, std::stop_token cancellation = {});
 }

@@ -4,16 +4,11 @@
 #include "GpuCrash/GpuCrashLaunch.h"
 #include "Core/Public/Strings/StringUtils.h"
 
-#include <utility>
-
 namespace SparkleLauncher
 {
-	LevelRunOperationStep BuildLevelRunStep(const LevelRunOperationPlan& plan)
+	void ConfigureLevelRunStep(LevelRunOperationPlan& plan)
 	{
-		Process::ChildProcessRequest request;
-		request.ExecutablePath = plan.ExecutablePath;
-		request.WorkingDirectory = plan.WorkingDirectory;
-		request.Environment = plan.Environment;
+		Process::ChildProcessRequest& request = plan.Step.Request;
 		request.LogPath = ResolveLauncherOperationLogPath(plan.Request.WorkspaceRoot, plan.Operation.Id, "RunLevel.txt");
 		request.Arguments = {"--graphics-api", plan.Request.GraphicsApi};
 		if (plan.Request.ProductProfile == "DebugEditor" || plan.Request.ProductProfile == "DevelopmentEditor")
@@ -27,7 +22,7 @@ namespace SparkleLauncher
 			    request.Arguments.end(),
 			    {"--gpu-crash-debugging", "aftermath", "--shader-export", Strings::ToNarrow(plan.Request.ShaderExportPath.wstring()), "--gpu-crash-session", plan.SessionId});
 
-			const GpuCrashReadinessExpectation expected{plan.ExecutablePath, plan.Request.ShaderExportPath, plan.SessionId, plan.Request.ProductProfile, plan.Request.GraphicsApi};
+			const GpuCrashReadinessExpectation expected{request.ExecutablePath, plan.Request.ShaderExportPath, plan.SessionId, plan.Request.ProductProfile, plan.Request.GraphicsApi};
 
 			request.ReadinessValidator = [expected](std::uint32_t pid, std::string_view output, std::string& error)
 			{
@@ -36,9 +31,6 @@ namespace SparkleLauncher
 		}
 		request.ReadinessValue = plan.Request.LevelId;
 
-		LevelRunOperationStep step;
-		step.DisplayName = (plan.Request.RunMode == LevelRunMode::Editor ? "Open " : "Run ") + plan.Request.LevelId;
-		step.Request = std::move(request);
-		return step;
+		plan.Step.DisplayName = (plan.Request.RunMode == LevelRunMode::Editor ? "Open " : "Run ") + plan.Request.LevelId;
 	}
 }

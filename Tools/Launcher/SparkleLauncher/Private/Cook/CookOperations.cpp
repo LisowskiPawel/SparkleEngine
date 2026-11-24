@@ -4,25 +4,6 @@
 
 namespace SparkleLauncher
 {
-	std::string ToString(CookOperationKind kind)
-	{
-		switch (kind)
-		{
-			case CookOperationKind::CookWorkspace:
-				return "CookWorkspace";
-			case CookOperationKind::CookShaders:
-				return "CookShaders";
-			case CookOperationKind::BuildTextures:
-				return "BuildTextures";
-			case CookOperationKind::BuildSceneAssets:
-				return "BuildSceneAssets";
-			case CookOperationKind::CookAllAssets:
-				return "CookAllAssets";
-		}
-
-		return "Unknown";
-	}
-
 	std::string ToString(CookWorkspaceScope scope)
 	{
 		switch (scope)

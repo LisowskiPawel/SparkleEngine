@@ -4,7 +4,7 @@
 #include "Gui/Operations/LauncherProgressStreamDecoder.h"
 #include "Gui/Models/LauncherOperationResult.h"
 #include "SparkleLauncher/OperationModel.h"
-#include "SparkleLauncher/ProcessRunner.h"
+#include "SparkleLauncher/LauncherProcess.h"
 
 #include <QtCore/QHash>
 #include <QtCore/QObject>
@@ -33,10 +33,7 @@ namespace SparkleLauncher
 		Q_OBJECT
 
 	public:
-		using ProcessRunnerFactory = std::function<std::unique_ptr<IProcessRunner>()>;
-
 		explicit LauncherBackend(QObject* parent = nullptr);
-		LauncherBackend(ProcessRunnerFactory processRunnerFactory, QObject* parent = nullptr);
 		~LauncherBackend() override;
 
 		const QVector<LauncherOperationDescriptor>& Operations() const;

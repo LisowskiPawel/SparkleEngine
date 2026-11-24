@@ -13,30 +13,30 @@ struct ConsoleCommandEntry final
 	std::string_view Name;
 	std::string_view Help;
 	std::string_view ArgumentSyntax;
-	ConsoleCommandResult (*Execute)(const ConsoleCommandActions&, std::span<const std::string_view>);
+	ConsoleCommandResult (*Execute)(const ConsoleCommandActions&, std::span<const std::string>);
 	bool bCompletesCVarName = false;
 };
 
-static ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandActions&, std::span<const std::string_view> arguments);
-static ConsoleCommandResult ExecuteConsoleCompileShaders(const ConsoleCommandActions& actions, std::span<const std::string_view> arguments);
-static ConsoleCommandResult ExecuteConsoleReloadShaders(const ConsoleCommandActions& actions, std::span<const std::string_view>);
+static ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandActions&, std::span<const std::string> arguments);
+static ConsoleCommandResult ExecuteConsoleCompileShaders(const ConsoleCommandActions& actions, std::span<const std::string> arguments);
+static ConsoleCommandResult ExecuteConsoleReloadShaders(const ConsoleCommandActions& actions, std::span<const std::string>);
 
 static constexpr ConsoleCommandEntry kCommands[] = {
     {"Help", "Lists console commands or filters command help.", "[filter]", ExecuteConsoleHelp},
     {"ListCVars",
         "Lists registered console variables.",
         "[filter]",
-        [](const ConsoleCommandActions& actions, std::span<const std::string_view> arguments) { return ExecuteConsoleListCVars(actions.Variables, arguments); },
+        [](const ConsoleCommandActions& actions, std::span<const std::string> arguments) { return ExecuteConsoleListCVars(actions.Variables, arguments); },
         true},
     {"GetCVar",
         "Prints a console variable value.",
         "<name>",
-        [](const ConsoleCommandActions& actions, std::span<const std::string_view> arguments) { return ExecuteConsoleGetCVar(actions.Variables, arguments); },
+        [](const ConsoleCommandActions& actions, std::span<const std::string> arguments) { return ExecuteConsoleGetCVar(actions.Variables, arguments); },
         true},
     {"SetCVar",
         "Sets a console variable value.",
         "<name> <value>",
-        [](const ConsoleCommandActions& actions, std::span<const std::string_view> arguments) { return ExecuteConsoleSetCVar(actions.Variables, arguments); },
+        [](const ConsoleCommandActions& actions, std::span<const std::string> arguments) { return ExecuteConsoleSetCVar(actions.Variables, arguments); },
         true},
     {"CompileShaders", "Recompile through Launcher, then reload on success. Optional symbols exports private debug data.", "[symbols]", ExecuteConsoleCompileShaders},
     {"ReloadShaders", "Reloads the existing cooked shader files. Build/Cook runs in Launcher.", {}, ExecuteConsoleReloadShaders}};
@@ -51,17 +51,6 @@ static const ConsoleCommandEntry* FindCommand(std::string_view name)
 		}
 	}
 	return nullptr;
-}
-
-static std::vector<std::string_view> BuildArgumentViews(const std::vector<std::string>& arguments)
-{
-	std::vector<std::string_view> views;
-	views.reserve(arguments.size());
-	for (const std::string& argument : arguments)
-	{
-		views.push_back(argument);
-	}
-	return views;
 }
 
 ConsoleCommandResult ExecuteConsoleLine(const ConsoleCommandActions& actions, std::string_view input)
@@ -80,8 +69,7 @@ ConsoleCommandResult ExecuteConsoleLine(const ConsoleCommandActions& actions, st
 	{
 		return ConsoleCommandResult::Error("unknown command: " + parsed.CommandName);
 	}
-	const std::vector<std::string_view> arguments = BuildArgumentViews(parsed.Arguments);
-	return command->Execute(actions, arguments);
+	return command->Execute(actions, parsed.Arguments);
 }
 
 std::vector<std::string> CompleteConsoleLine(std::string_view input)
@@ -108,7 +96,7 @@ std::vector<std::string> CompleteConsoleLine(std::string_view input)
 	return CompleteConsoleCVarName(ConsoleVariableRegistry::Get(), prefix);
 }
 
-static ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandActions&, std::span<const std::string_view> arguments)
+static ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandActions&, std::span<const std::string> arguments)
 {
 	if (arguments.size() > 1)
 	{
@@ -141,7 +129,7 @@ static ConsoleCommandResult ExecuteConsoleHelp(const ConsoleCommandActions&, std
 	return output.empty() ? ConsoleCommandResult::Warning("no commands matched") : ConsoleCommandResult::Success(std::move(output));
 }
 
-static ConsoleCommandResult ExecuteConsoleCompileShaders(const ConsoleCommandActions& actions, std::span<const std::string_view> arguments)
+static ConsoleCommandResult ExecuteConsoleCompileShaders(const ConsoleCommandActions& actions, std::span<const std::string> arguments)
 {
 	if (arguments.size() > 1 || (!arguments.empty() && arguments.front() != "symbols"))
 	{
@@ -150,7 +138,7 @@ static ConsoleCommandResult ExecuteConsoleCompileShaders(const ConsoleCommandAct
 	return actions.CompileShaders ? actions.CompileShaders(!arguments.empty()) : ConsoleCommandResult::Error("Shader compilation owner is unavailable.");
 }
 
-static ConsoleCommandResult ExecuteConsoleReloadShaders(const ConsoleCommandActions& actions, std::span<const std::string_view>)
+static ConsoleCommandResult ExecuteConsoleReloadShaders(const ConsoleCommandActions& actions, std::span<const std::string>)
 {
 	return actions.ReloadShaders ? actions.ReloadShaders() : ConsoleCommandResult::Error("Shader reload owner is unavailable.");
 }

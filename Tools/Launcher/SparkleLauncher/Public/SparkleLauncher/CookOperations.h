@@ -2,7 +2,7 @@
 
 #include "SparkleLauncher/LauncherContentDefaults.h"
 #include "SparkleLauncher/OperationModel.h"
-#include "SparkleLauncher/ProcessRunner.h"
+#include "SparkleLauncher/LauncherProcess.h"
 
 #include <cstdint>
 #include <filesystem>
@@ -81,7 +81,6 @@ namespace SparkleLauncher
 		bool bCanRun = false;
 	};
 
-	std::string ToString(CookOperationKind kind);
 	std::string ToString(CookWorkspaceScope scope);
 	std::string DisplayName(CookWorkspaceScope scope);
 	bool TryParseCookWorkspaceScope(std::string_view value, CookWorkspaceScope& outScope);
@@ -89,5 +88,5 @@ namespace SparkleLauncher
 	const std::vector<CookOperationDefinition>& GetCookOperationDefinitions();
 	const CookOperationDefinition* FindCookOperationDefinition(std::string_view operationId);
 	CookOperationPlan PlanCookOperation(std::string_view operationId, const CookOperationRequest& request);
-	OperationRecord RunCookOperationPlan(CookOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback = {}, std::stop_token cancellation = {});
+	OperationRecord RunCookOperationPlan(CookOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback = {}, std::stop_token cancellation = {});
 }

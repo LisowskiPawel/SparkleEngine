@@ -39,8 +39,7 @@ namespace RenderingSettingsUi
 	    float stepFast = 10.0f,
 	    const char* format = "%.3f");
 
-	template <typename ValueType, std::size_t OptionCount>
-	void DrawComboOptionRow(
+	template <typename ValueType, std::size_t OptionCount> void DrawComboOptionRow(
 	    const char* id,
 	    const char* label,
 	    EngineRenderingSettingsController& controller,

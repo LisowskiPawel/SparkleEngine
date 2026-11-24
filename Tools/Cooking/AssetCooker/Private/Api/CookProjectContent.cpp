@@ -10,7 +10,6 @@
 #include <string>
 #include <string_view>
 #include <system_error>
-#include <utility>
 #include <vector>
 
 static bool ResolveWorkspaceRoot(const std::filesystem::path& requestedRoot, AssetCookerDiagnostics& diagnostics, std::filesystem::path& outWorkspaceRoot)
@@ -25,7 +24,7 @@ static bool ResolveWorkspaceRoot(const std::filesystem::path& requestedRoot, Ass
 	const std::filesystem::path currentPath = std::filesystem::current_path(currentPathError);
 	if (currentPathError || !ProjectCookPlanner::TryFindWorkspaceRoot(currentPath, outWorkspaceRoot))
 	{
-		diagnostics.AddError(AssetCookerCategory::All, "Failed to resolve workspace root. Pass --root or set workspaceRoot.");
+		diagnostics.AddError("Failed to resolve workspace root. Pass --root or set workspaceRoot.");
 		return false;
 	}
 
@@ -46,12 +45,12 @@ static bool ResolveProjects(const std::filesystem::path& workspaceRoot, std::str
 	return !outProjects.empty();
 }
 
-static AssetCookerResult Finish(bool bSucceeded, AssetCookerDiagnostics& diagnostics, std::vector<AssetCookerOutputRecord> outputs = {})
+static AssetCookerResult Finish(bool bSucceeded, AssetCookerDiagnostics& diagnostics, std::size_t productCount = 0)
 {
 	AssetCookerResult result;
 	result.exitCode = bSucceeded ? 0 : 1;
 	result.diagnostics = diagnostics.ReleaseRecords();
-	result.outputs = std::move(outputs);
+	result.productCount = productCount;
 	return result;
 }
 
@@ -67,13 +66,13 @@ AssetCookerResult CookProjectContent(const AssetCookerRequest& request)
 	const std::optional<std::string_view> expectedToolProfile = ProjectCookPlanner::ResolveToolProfile(request.configuration);
 	if (!expectedToolProfile.has_value())
 	{
-		diagnostics.AddError(AssetCookerCategory::All, "Unsupported configuration '" + request.configuration + "'.");
+		diagnostics.AddError("Unsupported configuration '" + request.configuration + "'.");
 		return Finish(false, diagnostics);
 	}
 	const std::string_view toolProfile = request.toolProfile.empty() ? *expectedToolProfile : std::string_view(request.toolProfile);
 	if (toolProfile != *expectedToolProfile)
 	{
-		diagnostics.AddError(AssetCookerCategory::All, "Tool profile '" + std::string(toolProfile) + "' does not match game profile '" + request.configuration + "'.");
+		diagnostics.AddError("Tool profile '" + std::string(toolProfile) + "' does not match game profile '" + request.configuration + "'.");
 		return Finish(false, diagnostics);
 	}
 
@@ -83,20 +82,20 @@ AssetCookerResult CookProjectContent(const AssetCookerRequest& request)
 		return Finish(false, diagnostics);
 	}
 
-	std::vector<AssetCookerOutputRecord> outputs;
+	std::size_t productCount = 0;
 	for (const std::string& projectName : projects)
 	{
 		AssetCookerProjectCookPlan plan;
 		if (!ProjectCookPlanner::BuildProjectCookPlan(workspaceRoot, projectName, toolProfile, request.category, plan, diagnostics))
 		{
-			return Finish(false, diagnostics, std::move(outputs));
+			return Finish(false, diagnostics, productCount);
 		}
 
-		if (!DispatchAssetCookPlan(plan, diagnostics, outputs))
+		if (!DispatchAssetCookPlan(plan, diagnostics, productCount))
 		{
-			return Finish(false, diagnostics, std::move(outputs));
+			return Finish(false, diagnostics, productCount);
 		}
 	}
 
-	return Finish(true, diagnostics, std::move(outputs));
+	return Finish(true, diagnostics, productCount);
 }

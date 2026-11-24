@@ -5,7 +5,6 @@
 
 #include "Gui/Style/LauncherUiDesign.h"
 #include "Gui/Models/LauncherContentModel.h"
-#include "Gui/Models/LauncherDependencyUiModel.h"
 #include "Gui/Models/LauncherOperationRequestFactory.h"
 #include "Gui/App/LauncherSettings.h"
 
@@ -22,13 +21,39 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 
-#include <algorithm>
 #include <filesystem>
 #include <string>
 #include <system_error>
 
 namespace SparkleLauncher
 {
+	struct SourceDependencyStatus final
+	{
+		QString Text;
+		QString Detail;
+		QString State;
+		bool bHasCache = false;
+	};
+
+	static QString SourceDependencyPurpose(const SourceDependencyEntry& dependency)
+	{
+		const std::string purpose = dependency.ExpectedGitRevision.empty() ? dependency.Purpose : dependency.Purpose + "\nSource pin: " + dependency.ExpectedGitRevision;
+		return QString::fromStdString(purpose);
+	}
+
+	static SourceDependencyStatus InspectDependencyStatus(const SourceDependencyEntry& dependency, const std::filesystem::path& dependencyCachePath)
+	{
+		const SourceDependencyValidation validation = InspectSourceDependencyAvailability(dependency, dependencyCachePath);
+		const QString purpose = SourceDependencyPurpose(dependency);
+		const QString version = QString::fromStdString(dependency.Version);
+		const QString description = purpose.isEmpty() ? version : QStringLiteral("%1 \u00b7 %2").arg(version, purpose);
+		const QString detail = validation.FailureReason.empty() ? description : QString::fromStdString(validation.FailureReason);
+		std::error_code errorCode;
+		const bool bHasCache = std::filesystem::exists(validation.CachePath, errorCode);
+		const QString unavailableState = !validation.FailureReason.empty() ? "Unavailable" : (bHasCache ? "Incomplete" : "Missing");
+		return validation.bReady ? SourceDependencyStatus{"Available", detail, "ok", bHasCache} : SourceDependencyStatus{unavailableState, detail, "warning", bHasCache};
+	}
+
 	void LauncherWorkspaceSetup::AddSyncDependencies(QVBoxLayout& layout, bool bOptional)
 	{
 		auto* view = new QTreeWidget(layout.parentWidget());
@@ -43,15 +68,15 @@ namespace SparkleLauncher
 		view->setColumnWidth(0, 190);
 		view->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 		view->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-		for (const ThirdPartyDependencyUiEntry& dependency : GetTrackedThirdPartyDependencies())
+		for (const SourceDependencyEntry& dependency : GetSourceDependencies())
 		{
 			if (dependency.bRequired == bOptional)
 			{
 				continue;
 			}
 
-			auto* item = new QTreeWidgetItem(view, {dependency.Label});
-			item->setData(0, Qt::UserRole, dependency.Id);
+			auto* item = new QTreeWidgetItem(view, {QString::fromStdString(dependency.Label)});
+			item->setData(0, Qt::UserRole, QString::fromStdString(dependency.Id));
 		}
 		connect(view, &QTreeWidget::itemActivated, this, [this](QTreeWidgetItem* item) { ActivateSourceDependency(item); });
 		auto* activate = view->addAction("Sync or clean selected dependency", this, [this, view]() { ActivateSourceDependency(view->currentItem()); });
@@ -97,7 +122,6 @@ namespace SparkleLauncher
 	void LauncherWorkspaceSetup::RefreshSourceDependencyRows()
 	{
 		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(m_workspaceRoot);
-		const auto& dependencies = GetTrackedThirdPartyDependencies();
 		for (const auto& view : m_sourceDependencyViews)
 		{
 			if (view == nullptr)
@@ -107,21 +131,22 @@ namespace SparkleLauncher
 			for (int row = 0; row < view->topLevelItemCount(); ++row)
 			{
 				auto* item = view->topLevelItem(row);
-				const auto dependency = std::ranges::find(dependencies, item->data(0, Qt::UserRole).toString(), &ThirdPartyDependencyUiEntry::Id);
-				if (dependency == dependencies.end())
+				const QString id = item->data(0, Qt::UserRole).toString();
+				const SourceDependencyEntry* dependency = FindSourceDependency(id.toStdString());
+				if (dependency == nullptr)
 				{
 					continue;
 				}
-				const QString runId = m_sourceDependencyRunIds.value(dependency->Id);
+				const QString runId = m_sourceDependencyRunIds.value(id);
 				const bool bActive = !runId.isEmpty();
 				const bool bCleaning = bActive && m_cleaningSourceDependencyRunIds.contains(runId);
-				const auto status = bActive ? ThirdPartyDependencyUiStatus{} : BuildThirdPartyDependencyStatus(*dependency, workspaceOutputs.DependencyCacheRoot);
+				const auto status = bActive ? SourceDependencyStatus{} : InspectDependencyStatus(*dependency, workspaceOutputs.DependencyCacheRoot);
 				item->setText(1, bActive ? (bCleaning ? "Cleaning" : "Syncing") : status.Text);
 				item->setText(2, bActive ? "In progress" : status.bHasCache ? "Clean" : "Sync");
-				item->setText(3, bActive ? dependency->Version + " · " + dependency->Purpose : status.Detail);
+				item->setText(3, bActive ? QString::fromStdString(dependency->Version) + " · " + SourceDependencyPurpose(*dependency) : status.Detail);
 				const auto* color = bActive ? LauncherUi::Color::StateRunning : status.State == "ok" ? LauncherUi::Color::StateSuccess : LauncherUi::Color::StateWarning;
 				item->setForeground(1, QColor(color));
-				item->setData(2, Qt::AccessibleTextRole, item->text(2) + " " + dependency->Label);
+				item->setData(2, Qt::AccessibleTextRole, item->text(2) + " " + QString::fromStdString(dependency->Label));
 				item->setToolTip(3, item->text(3));
 				item->setData(0, Qt::AccessibleDescriptionRole, item->text(1) + ". " + item->text(3));
 			}
@@ -135,14 +160,13 @@ namespace SparkleLauncher
 			return;
 		}
 		const QString id = item->data(0, Qt::UserRole).toString();
-		const auto& dependencies = GetTrackedThirdPartyDependencies();
-		const auto dependency = std::ranges::find(dependencies, id, &ThirdPartyDependencyUiEntry::Id);
-		if (dependency == dependencies.end() || m_sourceDependencyRunIds.contains(id))
+		const SourceDependencyEntry* dependency = FindSourceDependency(id.toStdString());
+		if (dependency == nullptr || m_sourceDependencyRunIds.contains(id))
 		{
 			return;
 		}
 		const auto outputs = SparkleTools::ResolveToolOutputPaths(m_workspaceRoot);
-		const auto status = BuildThirdPartyDependencyStatus(*dependency, outputs.DependencyCacheRoot);
+		const auto status = InspectDependencyStatus(*dependency, outputs.DependencyCacheRoot);
 		if (status.bHasCache)
 		{
 			CleanSourceDependency(*dependency);
@@ -153,26 +177,20 @@ namespace SparkleLauncher
 		}
 	}
 
-	void LauncherWorkspaceSetup::SyncSourceDependency(const ThirdPartyDependencyUiEntry& dependency)
+	void LauncherWorkspaceSetup::SyncSourceDependency(const SourceDependencyEntry& dependency)
 	{
 		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, "workspace.sync-code");
-		std::get<BuildWorkspaceOperationRequest>(request.Inputs).SourceDependencyId = dependency.Id.toStdString();
-		m_startOperation(std::move(request), "Sync " + dependency.Label);
+		std::get<BuildWorkspaceOperationRequest>(request.Inputs).SourceDependencyId = dependency.Id;
+		m_startOperation(std::move(request), "Sync " + QString::fromStdString(dependency.Label));
 	}
 
-	void LauncherWorkspaceSetup::CleanSourceDependency(const ThirdPartyDependencyUiEntry& dependency)
+	void LauncherWorkspaceSetup::CleanSourceDependency(const SourceDependencyEntry& dependency)
 	{
-		const SourceDependencyEntry* sourceDependency = FindSourceDependency(dependency.Id.toStdString());
-		if (sourceDependency == nullptr)
-		{
-			return;
-		}
-
 		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, "workspace.clean");
 		auto& inputs = std::get<MaintenanceOperationRequest>(request.Inputs);
 		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(m_workspaceRoot);
 		const std::filesystem::path dependencyCachePath = workspaceOutputs.DependencyCacheRoot;
-		for (const std::filesystem::path& path : GetSourceDependencyCachePaths(*sourceDependency, dependencyCachePath))
+		for (const std::filesystem::path& path : GetSourceDependencyCachePaths(dependency, dependencyCachePath))
 		{
 			std::error_code errorCode;
 			if (!std::filesystem::exists(path, errorCode) || errorCode)
@@ -180,7 +198,7 @@ namespace SparkleLauncher
 				continue;
 			}
 
-			inputs.RequestedCleanTargets.push_back({dependency.Label.toStdString() + " cache", path, "Generated source dependency cache."});
+			inputs.RequestedCleanTargets.push_back({dependency.Label + " cache", path, "Generated source dependency cache."});
 		}
 		if (inputs.RequestedCleanTargets.empty())
 		{
@@ -191,8 +209,8 @@ namespace SparkleLauncher
 			return;
 		}
 
-		const QString runId = m_startOperation(std::move(request), "Clean " + dependency.Label);
-		m_sourceDependencyRunIds.insert(dependency.Id, runId);
+		const QString runId = m_startOperation(std::move(request), "Clean " + QString::fromStdString(dependency.Label));
+		m_sourceDependencyRunIds.insert(QString::fromStdString(dependency.Id), runId);
 		m_cleaningSourceDependencyRunIds.insert(runId);
 		RefreshSourceDependencyRows();
 	}
@@ -212,13 +230,13 @@ namespace SparkleLauncher
 			return;
 		}
 
-		for (const ThirdPartyDependencyUiEntry& dependency : GetTrackedThirdPartyDependencies())
+		for (const SourceDependencyEntry& dependency : GetSourceDependencies())
 		{
 			if (!dependency.bEnabled)
 			{
 				continue;
 			}
-			m_sourceDependencyRunIds.insert(dependency.Id, runId);
+			m_sourceDependencyRunIds.insert(QString::fromStdString(dependency.Id), runId);
 		}
 		RefreshSourceDependencyRows();
 	}

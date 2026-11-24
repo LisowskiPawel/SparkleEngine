@@ -78,7 +78,7 @@ namespace SparkleLauncher
 		return true;
 	}
 
-	OperationRecord RunCookOperationPlan(CookOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
+	OperationRecord RunCookOperationPlan(CookOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
@@ -122,7 +122,7 @@ namespace SparkleLauncher
 			AppendProcessOutputCallback(request, outputCallback);
 			operation.LogPath = request.LogPath;
 
-			const Process::ChildProcessResult result = processRunner.Run(request);
+			const Process::ChildProcessResult result = RunLauncherProcess(request);
 			if (!result.Succeeded())
 			{
 				if (result.bCancelled)

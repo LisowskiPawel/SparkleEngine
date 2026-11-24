@@ -12,7 +12,10 @@
 void DrawRayTracingSceneSettingsSection(EngineRenderingSettingsController& settingsController, const char* filterText)
 {
 	const auto& settings = settingsController.GetState();
-	const bool bRayTracingSceneOpen = RenderingSettingsUi::BeginSettingsCategory(filterText, "Ray Tracing Scene", "ray tracing scene tlas refit ptlas active partition update mode partitions dynamic distance acceleration structure");
+	const bool bRayTracingSceneOpen = RenderingSettingsUi::BeginSettingsCategory(
+	    filterText,
+	    "Ray Tracing Scene",
+	    "ray tracing scene tlas refit ptlas active partition update mode partitions dynamic distance acceleration structure");
 
 	if (!bRayTracingSceneOpen)
 	{

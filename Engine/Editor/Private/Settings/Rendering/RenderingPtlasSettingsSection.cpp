@@ -27,9 +27,18 @@ void DrawPtlasSettingsSection(EngineRenderingSettingsController& settingsControl
 			{
 				RenderingSettingsUi::DrawUnsignedIntSliderRow("##PtlasPartitionsPerAxis", "Partitions per axis", settingsController, &EngineRenderingSettingsState::PtlasPartitionsPerAxis, 1u, 64u);
 
-				RenderingSettingsUi::DrawComboOptionRow("##PtlasPartitionUpdateMode", "Partition update mode", settingsController, &EngineRenderingSettingsState::PtlasPartitionUpdateMode, partitionUpdateModeOptions);
+				RenderingSettingsUi::DrawComboOptionRow(
+				    "##PtlasPartitionUpdateMode",
+				    "Partition update mode",
+				    settingsController,
+				    &EngineRenderingSettingsState::PtlasPartitionUpdateMode,
+				    partitionUpdateModeOptions);
 
-				RenderingSettingsUi::DrawBooleanRow("##PtlasMarkAllDynamicInPartition", "Mark all dynamic in partition", settingsController, &EngineRenderingSettingsState::bPtlasMarkAllDynamicInPartition);
+				RenderingSettingsUi::DrawBooleanRow(
+				    "##PtlasMarkAllDynamicInPartition",
+				    "Mark all dynamic in partition",
+				    settingsController,
+				    &EngineRenderingSettingsState::bPtlasMarkAllDynamicInPartition);
 
 				RenderingSettingsUi::DrawFloatInputRow("##PtlasModeChangeDistance", "Mode change distance", settingsController, &EngineRenderingSettingsState::PtlasModeChangeDistance);
 			}

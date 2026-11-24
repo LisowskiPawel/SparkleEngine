@@ -193,14 +193,13 @@ namespace SparkleLauncher
 			return 1;
 		}
 
-		NativeProcessRunner processRunner;
 		const auto writeOutput = [&output](std::string_view text)
 		{
 			output << text << std::flush;
 		};
 
 		LauncherOperationPlan plan = PlanLauncherOperation(arguments.RunOperationId, *inputs);
-		const OperationRecord operation = RunLauncherOperationPlan(std::move(plan), processRunner, writeOutput);
+		const OperationRecord operation = RunLauncherOperationPlan(std::move(plan), writeOutput);
 		return ReportLauncherShellOperationResult(operation, output, error);
 	}
 }

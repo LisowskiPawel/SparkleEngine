@@ -9,12 +9,12 @@
 
 namespace Assets
 {
-	SceneAssetPayload::Camera BuildSceneAssetCamera(const CookedSceneCameraRecord& cameraRecord)
+	SceneCameraEntry BuildSceneAssetCamera(const CookedSceneCameraRecord& cameraRecord)
 	{
 		const Transform cameraTransform(DirectX::XMLoadFloat4x4(&cameraRecord.worldTransform));
 		const DirectX::XMFLOAT3 rotationEuler = cameraTransform.GetRotationEuler();
 
-		SceneAssetPayload::Camera camera;
+		SceneCameraEntry camera;
 		camera.name = cameraRecord.name;
 		camera.desc.position = cameraTransform.GetTranslation();
 		camera.desc.pitchRadians = rotationEuler.x;

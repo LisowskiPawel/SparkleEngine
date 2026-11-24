@@ -11,7 +11,6 @@ namespace SparkleLauncher
 {
 	static void AddCleanStep(
 	    std::vector<MaintenanceCleanStep>& steps,
-	    std::string id,
 	    std::string displayName,
 	    std::filesystem::path path,
 	    MaintenanceCleanBehavior behavior,
@@ -19,7 +18,6 @@ namespace SparkleLauncher
 	    std::string previewDetail = {})
 	{
 		MaintenanceCleanStep step;
-		step.Id = std::move(id);
 		step.DisplayName = std::move(displayName);
 		step.DestructivePath = std::move(path);
 		step.PreservedPath = std::move(preservedPath);
@@ -33,15 +31,15 @@ namespace SparkleLauncher
 		const std::filesystem::path contentPath = plan.Request.WorkspaceRoot / "Projects" / plan.Request.ContentId;
 		if (bIncludeBuild)
 		{
-			AddCleanStep(steps, "clean-content-build", "Clean content build tree", contentPath / "build", MaintenanceCleanBehavior::RemovePath);
+			AddCleanStep(steps, "Clean content build tree", contentPath / "build", MaintenanceCleanBehavior::RemovePath);
 		}
 		if (bIncludeLogs)
 		{
-			AddCleanStep(steps, "clean-content-logs", "Clean content logs", contentPath / "logs", MaintenanceCleanBehavior::RemovePath);
+			AddCleanStep(steps, "Clean content logs", contentPath / "logs", MaintenanceCleanBehavior::RemovePath);
 		}
 		if (bIncludeState)
 		{
-			AddCleanStep(steps, "clean-content-imgui", "Clean content ImGui state", contentPath / "imgui.ini", MaintenanceCleanBehavior::RemovePath);
+			AddCleanStep(steps, "Clean content ImGui state", contentPath / "imgui.ini", MaintenanceCleanBehavior::RemovePath);
 		}
 	}
 
@@ -83,51 +81,45 @@ namespace SparkleLauncher
 		switch (scope)
 		{
 			case CleanScope::CookedOutputs:
-				AddCleanStep(steps, "clean-cooked", "Clean cooked content", outputs.CookedProjectDirectory(plan.Request.ContentId), MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean cooked content", outputs.CookedProjectDirectory(plan.Request.ContentId), MaintenanceCleanBehavior::RemovePath);
 				return;
 			case CleanScope::BuildTree:
-				AddCleanStep(
-				    steps,
-				    "clean-build-tree",
-				    "Clean build tree except dependency cache",
-				    outputs.BuildRoot,
-				    MaintenanceCleanBehavior::RemoveDirectoryContentsPreservingPath,
-				    outputs.DependencyCacheRoot);
+				AddCleanStep(steps, "Clean build tree except dependency cache", outputs.BuildRoot, MaintenanceCleanBehavior::RemoveDirectoryContentsPreservingPath, outputs.DependencyCacheRoot);
 
-				AddCleanStep(steps, "clean-root-generated", "Clean root CMake and Visual Studio generated files", plan.Request.WorkspaceRoot, MaintenanceCleanBehavior::RemoveRootGeneratedFiles);
+				AddCleanStep(steps, "Clean root CMake and Visual Studio generated files", plan.Request.WorkspaceRoot, MaintenanceCleanBehavior::RemoveRootGeneratedFiles);
 				AddContentGeneratedCleanSteps(steps, plan, true, false, false);
 				return;
 			case CleanScope::ArtifactOutputs:
-				AddCleanStep(steps, "clean-artifacts", "Clean generated artifacts", outputs.ArtifactRoot, MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean generated artifacts", outputs.ArtifactRoot, MaintenanceCleanBehavior::RemovePath);
 				return;
 			case CleanScope::WorkspaceState:
-				AddCleanStep(steps, "clean-dot-vs", "Clean Visual Studio workspace state", plan.Request.WorkspaceRoot / ".vs", MaintenanceCleanBehavior::RemovePath);
-				AddCleanStep(steps, "clean-dot-vscode", "Clean VS Code workspace state", plan.Request.WorkspaceRoot / ".vscode", MaintenanceCleanBehavior::RemovePath);
-				AddCleanStep(steps, "clean-dot-idea", "Clean Rider workspace state", plan.Request.WorkspaceRoot / ".idea", MaintenanceCleanBehavior::RemovePath);
-				AddCleanStep(steps, "clean-root-imgui", "Clean root ImGui state", plan.Request.WorkspaceRoot / "imgui.ini", MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean Visual Studio workspace state", plan.Request.WorkspaceRoot / ".vs", MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean VS Code workspace state", plan.Request.WorkspaceRoot / ".vscode", MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean Rider workspace state", plan.Request.WorkspaceRoot / ".idea", MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean root ImGui state", plan.Request.WorkspaceRoot / "imgui.ini", MaintenanceCleanBehavior::RemovePath);
 				AddContentGeneratedCleanSteps(steps, plan, false, false, true);
-				AddCleanStep(steps, "clean-product-settings", "Clean product user settings", productUserState.SettingsRoot, MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean product user settings", productUserState.SettingsRoot, MaintenanceCleanBehavior::RemovePath);
 				return;
 			case CleanScope::ThirdPartyDependencyCache:
-				AddCleanStep(steps, "clean-dependency-cache", "Clean source dependency cache", outputs.DependencyCacheRoot, MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean source dependency cache", outputs.DependencyCacheRoot, MaintenanceCleanBehavior::RemovePath);
 				return;
 			case CleanScope::Logs:
-				AddCleanStep(steps, "clean-root-logs", "Clean legacy repository logs", plan.Request.WorkspaceRoot / "logs", MaintenanceCleanBehavior::RemovePath);
-				AddCleanStep(steps, "clean-product-logs", "Clean product logs", productUserState.LogsRoot, MaintenanceCleanBehavior::RemovePath);
-				AddCleanStep(steps, "clean-launcher-logs", "Clean launcher logs", launcherState.LogsRoot, MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean legacy repository logs", plan.Request.WorkspaceRoot / "logs", MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean product logs", productUserState.LogsRoot, MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean launcher logs", launcherState.LogsRoot, MaintenanceCleanBehavior::RemovePath);
 				AddContentGeneratedCleanSteps(steps, plan, false, true, false);
 				return;
 			case CleanScope::PristineGeneratedWorkspace:
-				AddCleanStep(steps, "clean-build", "Clean build tree", outputs.BuildRoot, MaintenanceCleanBehavior::RemovePath);
-				AddCleanStep(steps, "clean-artifacts", "Clean development artifacts", outputs.ArtifactRoot, MaintenanceCleanBehavior::RemovePath);
-				AddCleanStep(steps, "clean-dot-vs", "Clean Visual Studio workspace state", plan.Request.WorkspaceRoot / ".vs", MaintenanceCleanBehavior::RemovePath);
-				AddCleanStep(steps, "clean-dot-vscode", "Clean VS Code workspace state", plan.Request.WorkspaceRoot / ".vscode", MaintenanceCleanBehavior::RemovePath);
-				AddCleanStep(steps, "clean-dot-idea", "Clean Rider workspace state", plan.Request.WorkspaceRoot / ".idea", MaintenanceCleanBehavior::RemovePath);
-				AddCleanStep(steps, "clean-logs", "Clean legacy repository logs", plan.Request.WorkspaceRoot / "logs", MaintenanceCleanBehavior::RemovePath);
-				AddCleanStep(steps, "clean-product-state", "Clean product user state", productUserState.Root, MaintenanceCleanBehavior::RemovePath);
-				AddCleanStep(steps, "clean-launcher-state", "Clean launcher state", launcherState.Root, MaintenanceCleanBehavior::RemovePath);
-				AddCleanStep(steps, "clean-root-imgui", "Clean root ImGui state", plan.Request.WorkspaceRoot / "imgui.ini", MaintenanceCleanBehavior::RemovePath);
-				AddCleanStep(steps, "clean-root-generated", "Clean root CMake and Visual Studio generated files", plan.Request.WorkspaceRoot, MaintenanceCleanBehavior::RemoveRootGeneratedFiles);
+				AddCleanStep(steps, "Clean build tree", outputs.BuildRoot, MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean development artifacts", outputs.ArtifactRoot, MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean Visual Studio workspace state", plan.Request.WorkspaceRoot / ".vs", MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean VS Code workspace state", plan.Request.WorkspaceRoot / ".vscode", MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean Rider workspace state", plan.Request.WorkspaceRoot / ".idea", MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean legacy repository logs", plan.Request.WorkspaceRoot / "logs", MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean product user state", productUserState.Root, MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean launcher state", launcherState.Root, MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean root ImGui state", plan.Request.WorkspaceRoot / "imgui.ini", MaintenanceCleanBehavior::RemovePath);
+				AddCleanStep(steps, "Clean root CMake and Visual Studio generated files", plan.Request.WorkspaceRoot, MaintenanceCleanBehavior::RemoveRootGeneratedFiles);
 				AddContentGeneratedCleanSteps(steps, plan, true, true, true);
 				return;
 		}
@@ -139,7 +131,7 @@ namespace SparkleLauncher
 		{
 			for (const MaintenanceCleanPathSpec& target : plan.Request.RequestedCleanTargets)
 			{
-				AddCleanStep(steps, "clean-explicit-target", "Clean " + target.DisplayName, target.Path, MaintenanceCleanBehavior::RemovePath, {}, target.Detail);
+				AddCleanStep(steps, "Clean " + target.DisplayName, target.Path, MaintenanceCleanBehavior::RemovePath, {}, target.Detail);
 			}
 			return;
 		}

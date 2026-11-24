@@ -67,7 +67,7 @@ std::vector<std::string> ProjectCookPlanner::DiscoverProjects(const std::filesys
 	const std::filesystem::path projectsRoot = workspaceRoot / "Projects";
 	if (!PathExists(projectsRoot))
 	{
-		diagnostics.AddError(AssetCookerCategory::All, "Projects directory was not found.", projectsRoot);
+		diagnostics.AddError("Projects directory was not found.", projectsRoot);
 		return projects;
 	}
 
@@ -88,7 +88,7 @@ std::vector<std::string> ProjectCookPlanner::DiscoverProjects(const std::filesys
 	std::sort(projects.begin(), projects.end());
 	if (projects.empty())
 	{
-		diagnostics.AddError(AssetCookerCategory::All, "No runnable projects were found under Projects.");
+		diagnostics.AddError("No runnable projects were found under Projects.");
 	}
 	return projects;
 }
@@ -105,7 +105,6 @@ bool ProjectCookPlanner::BuildProjectCookPlan(
 	outPlan.projectName = std::string(projectName);
 	const auto outputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
 	outPlan.projectRoot = workspaceRoot / "Projects" / projectName;
-	outPlan.cookedRoot = outputs.CookedProjectDirectory(projectName);
 	outPlan.shaderCompilerPath = outputs.ToolTargetOutputs("ShaderCompiler", toolProfile).BinaryDirectory / "ShaderCompiler.exe";
 	outPlan.textureCookerPath = outputs.ToolTargetOutputs("TextureCooker", toolProfile).BinaryDirectory / "TextureCooker.exe";
 	outPlan.temporaryRoot = outputs.ToolScratchDirectory("AssetCooker", toolProfile);
@@ -113,7 +112,7 @@ bool ProjectCookPlanner::BuildProjectCookPlan(
 
 	if (!PathExists(outPlan.projectRoot / std::string(Filesystem::kProjectMarker)))
 	{
-		diagnostics.AddError(AssetCookerCategory::All, "Project marker was not found.", outPlan.projectRoot / std::string(Filesystem::kProjectMarker));
+		diagnostics.AddError("Project marker was not found.", outPlan.projectRoot / std::string(Filesystem::kProjectMarker));
 		return false;
 	}
 
@@ -190,7 +189,7 @@ bool ProjectCookPlanner::CollectSceneIds(const std::filesystem::path& projectRoo
 	}
 	catch (const Diagnostics::Error& error)
 	{
-		diagnostics.AddError(AssetCookerCategory::SceneAssets, error.what());
+		diagnostics.AddError(error.what());
 		return false;
 	}
 
@@ -217,7 +216,7 @@ bool ProjectCookPlanner::AppendLevelSceneIds(const ProjectLevelCatalog& catalog,
 
 	if (!catalog.HasLevelSourceInputs(level))
 	{
-		diagnostics.AddError(AssetCookerCategory::SceneAssets, "Catalog level is unavailable: " + level.id, level.sourcePath);
+		diagnostics.AddError("Catalog level is unavailable: " + level.id, level.sourcePath);
 		return false;
 	}
 
@@ -227,7 +226,7 @@ bool ProjectCookPlanner::AppendLevelSceneIds(const ProjectLevelCatalog& catalog,
 		return true;
 	}
 
-	diagnostics.AddError(AssetCookerCategory::SceneAssets, std::move(errorMessage), level.sourcePath);
+	diagnostics.AddError(std::move(errorMessage), level.sourcePath);
 	return false;
 }
 
@@ -238,7 +237,7 @@ bool ProjectCookPlanner::ResolveSceneEntry(const std::filesystem::path& projectR
 
 	if (!IsSceneIdSafe(relativeBase))
 	{
-		diagnostics.AddError(AssetCookerCategory::SceneAssets, "Catalog scene id must remain under the project mesh root: " + std::string(sceneId));
+		diagnostics.AddError("Catalog scene id must remain under the project mesh root: " + std::string(sceneId));
 		return false;
 	}
 
@@ -250,14 +249,14 @@ bool ProjectCookPlanner::ResolveSceneEntry(const std::filesystem::path& projectR
 
 	if (sourcePath.empty())
 	{
-		diagnostics.AddError(AssetCookerCategory::SceneAssets, "Catalog scene source was not found: " + std::string(sceneId), meshRoot / relativeBase);
+		diagnostics.AddError("Catalog scene source was not found: " + std::string(sceneId), meshRoot / relativeBase);
 		return false;
 	}
 
 	const std::optional<std::filesystem::path> relativePath = Paths::TryMakeRelativeUnderRoot(sourcePath, meshRoot);
 	if (!relativePath)
 	{
-		diagnostics.AddError(AssetCookerCategory::SceneAssets, "Resolved scene source escaped the project mesh root.", sourcePath);
+		diagnostics.AddError("Resolved scene source escaped the project mesh root.", sourcePath);
 		return false;
 	}
 
@@ -298,7 +297,7 @@ bool ProjectCookPlanner::ResolveSceneSource(
 		}
 		if (!outSourcePath.empty())
 		{
-			diagnostics.AddError(AssetCookerCategory::SceneAssets, "Catalog scene id resolves to more than one source file: " + std::string(sceneId));
+			diagnostics.AddError("Catalog scene id resolves to more than one source file: " + std::string(sceneId));
 			return false;
 		}
 		outSourcePath = std::move(candidate);

@@ -4,6 +4,9 @@
 #include "Assets/Loaders/CookedAssetByteReader.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Strings/StringUtils.h"
+#include "Core/Public/Formatting/HexFormat.h"
+#include "Scene/Meshes/CookedMesh.h"
+#include "Scene/Meshes/SkeletalCookedMesh.h"
 
 #include <span>
 #include <vector>
@@ -12,6 +15,8 @@
 #include <cstring>
 #include <iterator>
 #include <utility>
+#include <format>
+#include <memory>
 
 namespace Assets
 {
@@ -139,7 +144,7 @@ namespace Assets
 		return influences;
 	}
 
-	LoadedMeshAsset MeshAssetLoader::Decode(std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget)
+	std::shared_ptr<const Mesh> MeshAssetLoader::Decode(std::span<const std::uint8_t> bytes, CookedAssetId assetId, CookedMeshAssetKind expectedKind, CookedAssetAllocationBudget& budget)
 	{
 		CookedAssetByteReader reader(bytes, budget);
 		const auto header = reader.Read<CookedMeshAssetHeader>();
@@ -157,12 +162,23 @@ namespace Assets
 		}
 
 		MeshMorphData morphs = DecodeMorphTargets(morphRecords, morphDeltas, header, budget);
-		if (header.assetKind == CookedMeshAssetKind::Skeletal)
+		const bool bSkeletal = header.assetKind == CookedMeshAssetKind::Skeletal;
+		std::vector<VertexSkinInfluence> skinInfluences = bSkeletal ? DecodeSkinInfluences(skin, header.skinInfluenceCount, budget) : std::vector<VertexSkinInfluence>{};
+		if (expectedKind != header.assetKind)
 		{
-			std::vector<VertexSkinInfluence> skinInfluences = DecodeSkinInfluences(skin, header.skinInfluenceCount, budget);
-			SkeletalMeshData mesh{std::move(geometry), std::move(morphs), std::move(skinInfluences)};
-			return LoadedMeshAsset{.payload = std::move(mesh)};
+			throw Diagnostics::Error(std::format("Cooked scene mesh asset kind does not match manifest for asset {}", Formatting::FormatHexUInt64(assetId)));
 		}
-		return LoadedMeshAsset{.payload = std::move(geometry)};
+
+		// Bound the shared allocation's object and control-block storage during decoding.
+		constexpr std::size_t sharedOwnershipAllowance = 64;
+		if (bSkeletal)
+		{
+			SkeletalMeshData mesh{std::move(geometry), std::move(morphs), std::move(skinInfluences)};
+			budget.Reserve(sizeof(SkeletalCookedMesh) + sharedOwnershipAllowance);
+			return std::make_shared<SkeletalCookedMesh>(std::move(mesh), assetId);
+		}
+
+		budget.Reserve(sizeof(CookedMesh) + sharedOwnershipAllowance);
+		return std::make_shared<CookedMesh>(std::move(geometry), assetId);
 	}
 }

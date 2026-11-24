@@ -2,7 +2,7 @@
 
 #include "Gui/Operations/LauncherOperationRequest.h"
 #include "SparkleLauncher/OperationModel.h"
-#include "SparkleLauncher/ProcessRunner.h"
+#include "SparkleLauncher/LauncherProcess.h"
 
 #include <functional>
 #include <memory>
@@ -14,12 +14,10 @@ namespace SparkleLauncher
 	class LauncherOperationService final
 	{
 	public:
-		using ProcessRunnerFactory = std::function<std::unique_ptr<IProcessRunner>()>;
-
 		using OutputCallback = std::function<void(std::string_view)>;
 		using CompletionCallback = std::function<void(OperationRecord)>;
 
-		explicit LauncherOperationService(ProcessRunnerFactory processRunnerFactory);
+		LauncherOperationService();
 		~LauncherOperationService();
 
 		LauncherOperationService(const LauncherOperationService&) = delete;

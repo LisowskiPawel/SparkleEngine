@@ -6,12 +6,7 @@
 
 namespace SparkleLauncher
 {
-	static bool AcquireLevelPacks(
-	    const std::vector<LevelOperationStep>& steps,
-	    IProcessRunner& processRunner,
-	    const Process::ChildProcessOutputCallback& outputCallback,
-	    OperationRecord& operation,
-	    std::stop_token cancellation)
+	static bool AcquireLevelPacks(const std::vector<LevelOperationStep>& steps, const Process::ChildProcessOutputCallback& outputCallback, OperationRecord& operation, std::stop_token cancellation)
 	{
 		for (std::size_t stepIndex = 0; stepIndex < steps.size(); ++stepIndex)
 		{
@@ -22,7 +17,7 @@ namespace SparkleLauncher
 			AppendProcessOutputCallback(request, outputCallback);
 			operation.LogPath = request.LogPath;
 
-			const Process::ChildProcessResult result = processRunner.Run(request);
+			const Process::ChildProcessResult result = RunLauncherProcess(request);
 			if (!result.Succeeded())
 			{
 				if (result.bCancelled)
@@ -44,7 +39,7 @@ namespace SparkleLauncher
 		return true;
 	}
 
-	OperationRecord RunLevelOperationPlan(LevelOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
+	OperationRecord RunLevelOperationPlan(LevelOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);
@@ -60,7 +55,7 @@ namespace SparkleLauncher
 			return operation;
 		}
 
-		if (!AcquireLevelPacks(plan.Steps, processRunner, outputCallback, operation, cancellation))
+		if (!AcquireLevelPacks(plan.Steps, outputCallback, operation, cancellation))
 		{
 			return operation;
 		}

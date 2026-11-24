@@ -1,9 +1,12 @@
 #pragma once
 
-#include "Assets/Cooked/LoadedMeshAsset.h"
+#include "Assets/Cooked/CookedMeshAsset.h"
 
 #include <cstdint>
 #include <span>
+#include <memory>
+
+class Mesh;
 
 namespace Assets
 {
@@ -11,6 +14,6 @@ namespace Assets
 
 	namespace MeshAssetLoader
 	{
-		LoadedMeshAsset Decode(std::span<const std::uint8_t> bytes, CookedAssetAllocationBudget& budget);
+		std::shared_ptr<const Mesh> Decode(std::span<const std::uint8_t> bytes, CookedAssetId assetId, CookedMeshAssetKind expectedKind, CookedAssetAllocationBudget& budget);
 	}
 }

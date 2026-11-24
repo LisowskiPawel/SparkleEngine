@@ -1,4 +1,4 @@
-#include "SparkleLauncher/ProcessRunner.h"
+#include "SparkleLauncher/LauncherProcess.h"
 
 #include "Core/Public/Strings/StringUtils.h"
 #include "Core/Public/Process/ChildProcess.h"
@@ -16,7 +16,7 @@
 
 namespace SparkleLauncher
 {
-	Process::ChildProcessResult NativeProcessRunner::Run(const Process::ChildProcessRequest& request)
+	Process::ChildProcessResult RunLauncherProcess(const Process::ChildProcessRequest& request)
 	{
 		if (request.OutputCallback)
 		{

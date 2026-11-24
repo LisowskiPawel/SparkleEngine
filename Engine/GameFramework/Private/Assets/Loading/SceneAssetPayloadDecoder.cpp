@@ -10,10 +10,9 @@
 #include "Assets/Loaders/SkeletonAssetLoader.h"
 #include "Assets/Loaders/MaterialAssetLoader.h"
 #include "Assets/Loaders/CookedAssetFileSet.h"
-#include "Assets/Payload/SceneAssetPayloadCameraLightAppender.h"
-#include "Assets/Payload/SceneAssetPayloadMaterialVariantAppender.h"
-#include "Assets/Payload/SceneAssetPayloadMeshAppender.h"
-#include "Assets/Payload/SceneAssetPayloadMeshBindings.h"
+#include "Assets/Loading/SceneMeshDecoder.h"
+#include "Assets/Translators/SceneAssetCameraTranslator.h"
+#include "Assets/Translators/SceneAssetLightTranslator.h"
 #include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include <filesystem>
@@ -71,19 +70,38 @@ namespace Assets
 		}
 	}
 
+	static void DecodeCameras(const LoadedSceneManifest& manifest, SceneAssetPayload& payload, CookedAssetAllocationBudget& budget)
+	{
+		budget.ReserveArray<SceneCameraEntry>(manifest.cameras.size());
+		budget.Reserve(manifest.cameras.size(), sizeof(CookedSceneCameraRecord));
+		payload.cameras.reserve(manifest.cameras.size());
+		for (const auto& camera : manifest.cameras)
+		{
+			payload.cameras.push_back(BuildSceneAssetCamera(camera));
+		}
+	}
+
+	static void DecodeLights(const LoadedSceneManifest& manifest, SceneAssetPayload& payload, CookedAssetAllocationBudget& budget)
+	{
+		budget.ReserveArray<SceneLightDesc>(manifest.lights.size());
+		budget.Reserve(manifest.lights.size(), sizeof(CookedSceneLightRecord));
+		payload.lights.reserve(manifest.lights.size());
+		for (const auto& light : manifest.lights)
+		{
+			payload.lights.push_back(BuildSceneAssetLight(light));
+		}
+	}
+
 	SceneAssetPayload SceneAssetPayloadDecoder::Decode(const LoadedSceneManifest& manifest, CookedAssetFileSet& files)
 	{
 		SceneAssetPayload payload;
 		CookedAssetAllocationBudget& budget = files.GetAllocationBudget();
-		const std::vector<SceneAssetPayloadMeshBinding> meshAssetBindings = BuildSceneAssetPayloadMeshBindings(manifest, budget);
-		SceneAssetPayloadMeshAppender::AppendMeshAssets(manifest, files, payload);
+		DecodeSceneMeshes(manifest, files, payload);
 		DecodeMaterials(manifest, files, payload);
-		SceneAssetPayloadMeshAppender::AppendMeshInstances(manifest, meshAssetBindings, payload, budget);
-		SceneAssetPayloadMeshAppender::AppendMeshInstanceGroups(manifest, meshAssetBindings, payload, budget);
-		SceneAssetPayloadMaterialVariantAppender::AppendMaterialVariants(manifest, meshAssetBindings, payload, budget);
 		DecodeSkeletons(manifest, files, payload);
 		DecodeAnimations(manifest, files, payload);
-		SceneAssetPayloadCameraLightAppender::Append(manifest, payload, budget);
+		DecodeCameras(manifest, payload, budget);
+		DecodeLights(manifest, payload, budget);
 		return payload;
 	}
 }

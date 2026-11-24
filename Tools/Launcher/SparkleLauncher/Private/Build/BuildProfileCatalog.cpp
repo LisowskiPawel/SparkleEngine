@@ -34,17 +34,6 @@ namespace SparkleLauncher
 		return *found;
 	}
 
-	const BuildProfile& GetDefaultBuildProfile()
-	{
-		return GetBuildProfileCatalog().front();
-	}
-
-	bool IsEditorProfile(std::string_view profileName)
-	{
-		const std::optional<BuildProfile> profile = FindBuildProfile(profileName);
-		return profile.has_value() && profile->Target == BuildProfileTarget::Editor;
-	}
-
 	std::string BuildProjectTargetName(std::string_view projectName, const BuildProfile& profile)
 	{
 		std::string targetName(projectName);
@@ -67,16 +56,4 @@ namespace SparkleLauncher
 		return "Unknown";
 	}
 
-	std::string ToString(BuildProfileTarget target)
-	{
-		switch (target)
-		{
-			case BuildProfileTarget::Editor:
-				return "Editor";
-			case BuildProfileTarget::Game:
-				return "Game";
-		}
-
-		return "Unknown";
-	}
 }
