@@ -45,12 +45,6 @@ namespace SparkleLauncher
 	    std::string_view operationId,
 	    std::string& errorMessage)
 	{
-		if (!CanInstallClangCl(toolchain))
-		{
-			errorMessage = "Visual Studio and its installer are required before the launcher can add clang-cl.";
-			return std::nullopt;
-		}
-
 		const std::string installerArguments = "modify --installPath \"" + toolchain.VisualStudioPath.string() + "\" --add " + std::string(kClangClVisualStudioCompilerComponent) + " --add "
 		    + std::string(kClangClVisualStudioToolsetComponent) + " --passive --norestart";
 
@@ -73,36 +67,18 @@ namespace SparkleLauncher
 		return request;
 	}
 
-	const std::vector<HostToolInstallerDefinition>& GetHostToolInstallerDefinitions()
-	{
-		static const std::vector<HostToolInstallerDefinition> definitions = {
-		    {std::string(kClangClToolId),
-		        "clang-cl",
-		        "Ask Windows for administrator approval, then add the clang-cl compiler and its MSBuild integration through Visual Studio "
-		        "Installer.",
-		        CanInstallClangCl,
-		        BuildClangClInstallRequest},
-		};
-
-		return definitions;
-	}
-
 	const HostToolInstallerDefinition* FindHostToolInstaller(std::string_view toolId)
 	{
-		for (const HostToolInstallerDefinition& definition : GetHostToolInstallerDefinitions())
-		{
-			if (definition.Id == toolId)
-			{
-				return &definition;
-			}
-		}
-		return nullptr;
+		static const HostToolInstallerDefinition definition{
+		    "clang-cl",
+		    "Ask Windows for administrator approval, then add the clang-cl compiler and its MSBuild integration through Visual Studio Installer."};
+
+		return toolId == kClangClToolId ? &definition : nullptr;
 	}
 
 	bool CanInstallHostTool(std::string_view toolId, const BuildToolchainStatus& toolchain)
 	{
-		const HostToolInstallerDefinition* installer = FindHostToolInstaller(toolId);
-		return installer != nullptr && installer->IsAvailable != nullptr && installer->IsAvailable(toolchain);
+		return toolId == kClangClToolId && CanInstallClangCl(toolchain);
 	}
 
 	std::optional<Process::ChildProcessRequest> BuildHostToolInstallRequest(
@@ -118,11 +94,11 @@ namespace SparkleLauncher
 			errorMessage = "No launcher installer is registered for host tool '" + std::string(toolId) + "'.";
 			return std::nullopt;
 		}
-		if (installer->IsAvailable == nullptr || installer->BuildRequest == nullptr || !installer->IsAvailable(toolchain))
+		if (!CanInstallClangCl(toolchain))
 		{
 			errorMessage = "The registered launcher installer for " + installer->DisplayName + " is not available on this machine.";
 			return std::nullopt;
 		}
-		return installer->BuildRequest(toolchain, workspaceRoot, operationId, errorMessage);
+		return BuildClangClInstallRequest(toolchain, workspaceRoot, operationId, errorMessage);
 	}
 }

@@ -1,12 +1,20 @@
 #include "Vulkan/VulkanPCH.h"
 
-#include "Vulkan/Capture/VulkanCaptureReadback.h"
+#include "Vulkan/Capture/VulkanTextureReadback.h"
 
 #include "Capture/RhiCaptureFormat.h"
 #include "Vulkan/Commands/VulkanCommandQueue.h"
 #include "Vulkan/Device/VulkanRhi.h"
 #include "Vulkan/Memory/VulkanGpuMemoryAllocator.h"
 #include "Vulkan/VulkanTypeConversions.h"
+
+VulkanTextureReadback::VulkanTextureReadback(VulkanRhi& rhi, VulkanGpuMemoryAllocator& memoryAllocator) noexcept :
+    m_rhi(rhi),
+    m_memoryAllocator(memoryAllocator)
+{
+}
+
+VulkanTextureReadback::~VulkanTextureReadback() noexcept = default;
 
 static void RecordTransition(VkCommandBuffer commandBuffer, VkImage image, ResourceState before, ResourceState after) noexcept
 {
@@ -35,7 +43,7 @@ static void RecordTransition(VkCommandBuffer commandBuffer, VkImage image, Resou
 	vkCmdPipelineBarrier2(commandBuffer, &dependency);
 }
 
-VulkanCaptureService::PendingReadback::~PendingReadback() noexcept
+VulkanTextureReadback::PendingReadback::~PendingReadback() noexcept
 {
 	if (Device == VK_NULL_HANDLE)
 	{
@@ -47,7 +55,7 @@ VulkanCaptureService::PendingReadback::~PendingReadback() noexcept
 	}
 }
 
-std::unique_ptr<VulkanCaptureService::PendingReadback> VulkanCaptureService::PrepareReadback(const RhiTextureCaptureRequest& request) noexcept
+std::unique_ptr<VulkanTextureReadback::PendingReadback> VulkanTextureReadback::PrepareReadback(const RhiTextureCaptureRequest& request) noexcept
 {
 	if (!request.Resource || request.Width == 0 || request.Height == 0)
 	{
@@ -75,14 +83,14 @@ std::unique_ptr<VulkanCaptureService::PendingReadback> VulkanCaptureService::Pre
 	return pending;
 }
 
-bool VulkanCaptureService::AllocateReadbackBuffer(PendingReadback& pending) noexcept
+bool VulkanTextureReadback::AllocateReadbackBuffer(PendingReadback& pending) noexcept
 {
 	const VkBufferCreateInfo bufferInfo{.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO, .size = pending.ByteCount, .usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT, .sharingMode = VK_SHARING_MODE_EXCLUSIVE};
 	pending.Buffer = m_memoryAllocator.CreateBuffer(bufferInfo, RhiMemoryCategory::Readback, RhiMemoryResidencyClass::HostReadback, L"Texture capture readback");
 	return pending.Buffer != nullptr;
 }
 
-bool VulkanCaptureService::BeginReadbackCommands(PendingReadback& pending) noexcept
+bool VulkanTextureReadback::BeginReadbackCommands(PendingReadback& pending) noexcept
 {
 	const VkDevice device = pending.Device;
 	const VkCommandPoolCreateInfo poolInfo{.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO, .flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT, .queueFamilyIndex = m_rhi.GetGraphicsQueueFamilyIndex()};
@@ -111,7 +119,7 @@ bool VulkanCaptureService::BeginReadbackCommands(PendingReadback& pending) noexc
 	return true;
 }
 
-bool VulkanCaptureService::RecordReadbackCopy(PendingReadback& pending) noexcept
+bool VulkanTextureReadback::RecordReadbackCopy(PendingReadback& pending) noexcept
 {
 	const RhiTextureCaptureRequest& request = pending.Request;
 	const VkImage sourceImage = static_cast<VkImage>(request.Resource.Value);
@@ -130,14 +138,14 @@ bool VulkanCaptureService::RecordReadbackCopy(PendingReadback& pending) noexcept
 	return true;
 }
 
-bool VulkanCaptureService::SubmitReadback(PendingReadback& pending) noexcept
+bool VulkanTextureReadback::SubmitReadback(PendingReadback& pending) noexcept
 {
 	const VulkanQueueSubmission submission{.CommandBuffers = std::span<const VkCommandBuffer>(&pending.CommandBuffer, 1)};
 	pending.Submission = m_rhi.GetCommandQueue(ERhiQueueType::Graphics).Submit(submission);
 	return pending.Submission.IsValid();
 }
 
-void VulkanCaptureService::ReadPixels(PendingReadback& pending, RhiCaptureReadback& readback) noexcept
+void VulkanTextureReadback::ReadPixels(PendingReadback& pending, RhiCaptureReadback& readback) noexcept
 {
 	readback.Pixels.resize(static_cast<std::size_t>(pending.ByteCount));
 	const bool bPixelsRead = m_memoryAllocator.ReadAllocation(*pending.Buffer, readback.Pixels.data(), readback.Pixels.size());
@@ -159,12 +167,12 @@ void VulkanCaptureService::ReadPixels(PendingReadback& pending, RhiCaptureReadba
 	readback.Format = pending.Request.SourceFormat;
 }
 
-bool VulkanCaptureService::IsReadbackComplete(const PendingReadback& pending) const noexcept
+bool VulkanTextureReadback::IsReadbackComplete(const PendingReadback& pending) const noexcept
 {
 	return m_rhi.GetCommandQueue(ERhiQueueType::Graphics).IsSubmissionComplete(pending.Submission.Value);
 }
 
-void VulkanCaptureService::WaitForReadback(const PendingReadback& pending) noexcept
+void VulkanTextureReadback::WaitForReadback(const PendingReadback& pending) noexcept
 {
 	m_rhi.GetCommandQueue(ERhiQueueType::Graphics).WaitForSubmission(pending.Submission.Value);
 }

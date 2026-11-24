@@ -33,17 +33,9 @@ public:
 	    RhiMemoryResidencyClass residencyClass,
 	    std::wstring_view debugName) = 0;
 
-	virtual bool CreateVertexBuffer(
-	    const void* data,
-	    std::size_t sizeInBytes,
-	    std::uint32_t strideInBytes,
-	    std::wstring_view debugName,
-	    RhiOwnedResourceHandle& outResource,
-	    RhiVertexBufferView& outView) = 0;
+	RhiOwnedResourceHandle CreateHostUploadBuffer(const RhiBufferResourceDesc& desc, const void* data, RhiMemoryCategory category, std::wstring_view debugName);
 
-	virtual bool CreateStructuredBufferResource(const void* data, std::size_t sizeInBytes, std::uint32_t strideInBytes, std::wstring_view debugName, RhiOwnedResourceHandle& outResource) = 0;
 	virtual bool WriteBufferResource(RhiOwnedResourceHandle resource, std::size_t destinationOffsetInBytes, const void* data, std::size_t sizeInBytes) noexcept = 0;
-	virtual bool CreateIndexBuffer(const void* data, std::size_t sizeInBytes, RhiIndexFormat format, std::wstring_view debugName, RhiOwnedResourceHandle& outResource, RhiIndexBufferView& outView) = 0;
 	virtual void ReleaseOwnedResource(RhiOwnedResourceHandle resource) noexcept = 0;
 	virtual RhiResourceHandle GetResourceHandle(RhiOwnedResourceHandle resource) const noexcept = 0;
 	virtual RhiGpuVirtualAddress GetResourceGpuVirtualAddress(RhiOwnedResourceHandle resource) const noexcept = 0;

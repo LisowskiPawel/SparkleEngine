@@ -1,6 +1,6 @@
 #include "PCH.h"
 
-#include "D3D12/Capture/D3D12CaptureReadback.h"
+#include "D3D12/Capture/D3D12TextureReadback.h"
 
 #include "Capture/RhiCaptureFormat.h"
 #include "D3D12/D3D12TypeConversions.h"
@@ -8,6 +8,14 @@
 #include "D3D12/Memory/D3D12GpuMemoryAllocator.h"
 
 #include <cstring>
+
+D3D12TextureReadback::D3D12TextureReadback(D3D12Rhi& rhi, D3D12GpuMemoryAllocator& memoryAllocator) noexcept :
+    m_rhi(rhi),
+    m_memoryAllocator(memoryAllocator)
+{
+}
+
+D3D12TextureReadback::~D3D12TextureReadback() noexcept = default;
 
 static void RecordTransition(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, ResourceState before, ResourceState after) noexcept
 {
@@ -25,7 +33,7 @@ static void RecordTransition(ID3D12GraphicsCommandList* commandList, ID3D12Resou
 	commandList->ResourceBarrier(1, &barrier);
 }
 
-std::unique_ptr<D3D12CaptureService::PendingReadback> D3D12CaptureService::PrepareReadback(const RhiTextureCaptureRequest& request) noexcept
+std::unique_ptr<D3D12TextureReadback::PendingReadback> D3D12TextureReadback::PrepareReadback(const RhiTextureCaptureRequest& request) noexcept
 {
 	ID3D12Device* const device = m_rhi.GetDevice().Get();
 	ID3D12Resource* const sourceResource = static_cast<ID3D12Resource*>(request.Resource.Value);
@@ -59,7 +67,7 @@ std::unique_ptr<D3D12CaptureService::PendingReadback> D3D12CaptureService::Prepa
 	return pending;
 }
 
-bool D3D12CaptureService::AllocateReadbackBuffer(PendingReadback& pending) noexcept
+bool D3D12TextureReadback::AllocateReadbackBuffer(PendingReadback& pending) noexcept
 {
 	D3D12_RESOURCE_DESC readbackDesc{};
 	readbackDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -73,7 +81,7 @@ bool D3D12CaptureService::AllocateReadbackBuffer(PendingReadback& pending) noexc
 	return pending.Buffer != nullptr;
 }
 
-bool D3D12CaptureService::BeginReadbackCommands(PendingReadback& pending) noexcept
+bool D3D12TextureReadback::BeginReadbackCommands(PendingReadback& pending) noexcept
 {
 	ID3D12Device* const device = m_rhi.GetDevice().Get();
 
@@ -87,7 +95,7 @@ bool D3D12CaptureService::BeginReadbackCommands(PendingReadback& pending) noexce
 	return SUCCEEDED(commandListResult);
 }
 
-bool D3D12CaptureService::RecordReadbackCopy(PendingReadback& pending) noexcept
+bool D3D12TextureReadback::RecordReadbackCopy(PendingReadback& pending) noexcept
 {
 	const RhiTextureCaptureRequest& request = pending.Request;
 	ID3D12Resource* const sourceResource = static_cast<ID3D12Resource*>(request.Resource.Value);
@@ -104,14 +112,14 @@ bool D3D12CaptureService::RecordReadbackCopy(PendingReadback& pending) noexcept
 	return SUCCEEDED(pending.CommandList->Close());
 }
 
-bool D3D12CaptureService::SubmitReadback(PendingReadback& pending) noexcept
+bool D3D12TextureReadback::SubmitReadback(PendingReadback& pending) noexcept
 {
 	ID3D12CommandList* const commandLists[] = {pending.CommandList.Get()};
 	pending.Submission = m_rhi.SubmitCommandLists(ERhiQueueType::Graphics, commandLists);
 	return pending.Submission.IsValid();
 }
 
-void D3D12CaptureService::ReadPixels(PendingReadback& pending, RhiCaptureReadback& readback) noexcept
+void D3D12TextureReadback::ReadPixels(PendingReadback& pending, RhiCaptureReadback& readback) noexcept
 {
 	void* mappedData = nullptr;
 	const D3D12_RANGE readRange{0, static_cast<SIZE_T>(pending.TotalBytes)};
@@ -140,12 +148,12 @@ void D3D12CaptureService::ReadPixels(PendingReadback& pending, RhiCaptureReadbac
 	pending.Buffer->Resource->Unmap(0, &writeRange);
 }
 
-bool D3D12CaptureService::IsReadbackComplete(const PendingReadback& pending) const noexcept
+bool D3D12TextureReadback::IsReadbackComplete(const PendingReadback& pending) const noexcept
 {
 	return m_rhi.IsSubmissionComplete(pending.Submission);
 }
 
-void D3D12CaptureService::WaitForReadback(const PendingReadback& pending) noexcept
+void D3D12TextureReadback::WaitForReadback(const PendingReadback& pending) noexcept
 {
 	m_rhi.WaitForSubmission(pending.Submission);
 }

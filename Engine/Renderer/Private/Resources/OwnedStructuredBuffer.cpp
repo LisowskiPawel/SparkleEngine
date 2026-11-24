@@ -25,12 +25,8 @@ OwnedStructuredBuffer& OwnedStructuredBuffer::operator=(OwnedStructuredBuffer&& 
 	Reset();
 	m_resourceService = other.m_resourceService;
 	m_resource = other.m_resource;
-	m_sizeInBytes = other.m_sizeInBytes;
-	m_strideInBytes = other.m_strideInBytes;
 	other.m_resourceService = nullptr;
 	other.m_resource = {};
-	other.m_sizeInBytes = 0;
-	other.m_strideInBytes = 0;
 	return *this;
 }
 
@@ -38,20 +34,19 @@ OwnedStructuredBuffer OwnedStructuredBuffer::Upload(RhiResourceService& resource
 {
 	OwnedStructuredBuffer buffer;
 	buffer.m_resourceService = &resourceService;
-	if (!resourceService.CreateStructuredBufferResource(data, sizeInBytes, strideInBytes, debugName, buffer.m_resource))
+	const RhiBufferResourceDesc desc{.SizeInBytes = sizeInBytes, .StrideInBytes = strideInBytes, .Kind = RhiBufferKind::Structured};
+	buffer.m_resource = resourceService.CreateHostUploadBuffer(desc, data, RhiMemoryCategory::Mesh, debugName.empty() ? L"StructuredBuffer" : debugName);
+	if (!buffer.m_resource)
 	{
 		return {};
 	}
 
-	buffer.m_sizeInBytes = sizeInBytes;
-	buffer.m_strideInBytes = strideInBytes;
 	return buffer;
 }
 
 bool OwnedStructuredBuffer::Write(std::size_t destinationOffsetInBytes, const void* data, std::size_t sizeInBytes) noexcept
 {
-	return m_resourceService != nullptr && m_resource && destinationOffsetInBytes <= m_sizeInBytes && sizeInBytes <= m_sizeInBytes - destinationOffsetInBytes
-	    && m_resourceService->WriteBufferResource(m_resource, destinationOffsetInBytes, data, sizeInBytes);
+	return m_resourceService != nullptr && m_resourceService->WriteBufferResource(m_resource, destinationOffsetInBytes, data, sizeInBytes);
 }
 
 void OwnedStructuredBuffer::Reset() noexcept
@@ -62,6 +57,4 @@ void OwnedStructuredBuffer::Reset() noexcept
 	}
 	m_resourceService = nullptr;
 	m_resource = {};
-	m_sizeInBytes = 0;
-	m_strideInBytes = 0;
 }

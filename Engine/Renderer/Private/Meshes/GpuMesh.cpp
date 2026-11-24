@@ -7,7 +7,6 @@
 #include "Meshes/GpuMeshPreparation.h"
 #include "RHI/Public/Commands/RenderCommandList.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
-#include "RHI/Public/Resources/RhiUploadService.h"
 #include "Scene/Meshes/Mesh.h"
 #include "Scene/Meshes/MeshData.h"
 
@@ -22,23 +21,7 @@ GpuMesh::GpuMesh(GpuMeshHandle handle) noexcept :
 {
 }
 
-GpuMesh::~GpuMesh() noexcept
-{
-	if (m_renderHardwareInterface != nullptr)
-	{
-		if (m_vertexBuffer)
-		{
-			m_renderHardwareInterface->GetResourceService().ReleaseOwnedResource(m_vertexBuffer);
-			m_vertexBuffer = {};
-		}
-
-		if (m_indexBuffer)
-		{
-			m_renderHardwareInterface->GetResourceService().ReleaseOwnedResource(m_indexBuffer);
-			m_indexBuffer = {};
-		}
-	}
-}
+GpuMesh::~GpuMesh() noexcept = default;
 
 void GpuMesh::Upload(RenderHardwareInterface& renderHardwareInterface, RenderCommandList& commandList, GpuMeshPreparedData preparedData)
 {
@@ -62,27 +45,23 @@ void GpuMesh::CreateGeometryBuffers(RenderCommandList& commandList, const MeshDa
 void GpuMesh::CreateVertexBuffer(RenderCommandList& commandList, const MeshData& meshData)
 {
 	RhiResourceService& resources = m_renderHardwareInterface->GetResourceService();
-	const RhiBufferResourceDesc bufferDesc{.SizeInBytes = meshData.GetVertexBufferSize(), .StrideInBytes = sizeof(VertexData), .Kind = RhiBufferKind::Vertex, .bAllowRayTracingBuildInput = true};
-
-	m_vertexBuffer = resources.CreateBufferResource(bufferDesc, ResourceState::CopyDest, RhiMemoryCategory::Mesh, RhiMemoryResidencyClass::DeviceLocal, L"GpuMesh_VertexBuffer");
-
-	if (!m_vertexBuffer)
-	{
-		Diagnostics::Fatal(g_gpuMeshLogger, __FILE__, __LINE__, "GPU mesh vertex buffer creation failed.");
-	}
-
 	const std::span<const VertexData> vertices{meshData.vertices};
-	const bool bVerticesUploaded = m_renderHardwareInterface->GetUploadService().UploadBuffer(commandList, m_vertexBuffer, std::as_bytes(vertices), ResourceState::Common, L"GpuMesh_VertexUpload");
+	const bool bVerticesUploaded = m_vertexBuffer.Upload(
+	    *m_renderHardwareInterface,
+	    commandList,
+	    std::as_bytes(vertices),
+	    RhiBufferKind::Vertex,
+	    sizeof(VertexData),
+	    L"GpuMesh_VertexBuffer",
+	    L"GpuMesh_VertexUpload");
 
 	if (!bVerticesUploaded)
 	{
-		resources.ReleaseOwnedResource(m_vertexBuffer);
-		m_vertexBuffer = {};
 		Diagnostics::Fatal(g_gpuMeshLogger, __FILE__, __LINE__, "GPU mesh vertex upload failed.");
 	}
 
 	m_vertexBufferView = RhiVertexBufferView{
-	    .BufferLocation = resources.GetResourceGpuVirtualAddress(m_vertexBuffer),
+	    .BufferLocation = resources.GetResourceGpuVirtualAddress(m_vertexBuffer.GetResource()),
 	    .SizeInBytes = static_cast<std::uint32_t>(meshData.GetVertexBufferSize()),
 	    .StrideInBytes = sizeof(VertexData)};
 
@@ -95,27 +74,16 @@ void GpuMesh::CreateVertexBuffer(RenderCommandList& commandList, const MeshData&
 void GpuMesh::CreateIndexBuffer(RenderCommandList& commandList, const MeshData& meshData)
 {
 	RhiResourceService& resources = m_renderHardwareInterface->GetResourceService();
-	const RhiBufferResourceDesc bufferDesc{.SizeInBytes = meshData.GetIndexBufferSize(), .Kind = RhiBufferKind::Index, .bAllowRayTracingBuildInput = true};
-
-	m_indexBuffer = resources.CreateBufferResource(bufferDesc, ResourceState::CopyDest, RhiMemoryCategory::Mesh, RhiMemoryResidencyClass::DeviceLocal, L"GpuMesh_IndexBuffer");
-
-	if (!m_indexBuffer)
-	{
-		Diagnostics::Fatal(g_gpuMeshLogger, __FILE__, __LINE__, "GPU mesh index buffer creation failed.");
-	}
-
 	const std::span<const std::uint32_t> indices{meshData.indices};
-	const bool bIndicesUploaded = m_renderHardwareInterface->GetUploadService().UploadBuffer(commandList, m_indexBuffer, std::as_bytes(indices), ResourceState::Common, L"GpuMesh_IndexUpload");
+	const bool bIndicesUploaded = m_indexBuffer.Upload(*m_renderHardwareInterface, commandList, std::as_bytes(indices), RhiBufferKind::Index, 0, L"GpuMesh_IndexBuffer", L"GpuMesh_IndexUpload");
 
 	if (!bIndicesUploaded)
 	{
-		resources.ReleaseOwnedResource(m_indexBuffer);
-		m_indexBuffer = {};
 		Diagnostics::Fatal(g_gpuMeshLogger, __FILE__, __LINE__, "GPU mesh index upload failed.");
 	}
 
 	m_indexBufferView = RhiIndexBufferView{
-	    .BufferLocation = resources.GetResourceGpuVirtualAddress(m_indexBuffer),
+	    .BufferLocation = resources.GetResourceGpuVirtualAddress(m_indexBuffer.GetResource()),
 	    .SizeInBytes = static_cast<std::uint32_t>(meshData.GetIndexBufferSize()),
 	    .Format = RhiIndexFormat::UInt32};
 
@@ -127,8 +95,36 @@ void GpuMesh::CreateIndexBuffer(RenderCommandList& commandList, const MeshData& 
 
 void GpuMesh::CreateDeformationBuffers(RenderCommandList& commandList, GpuMeshPreparedData& preparedData)
 {
-	m_skinInfluences.Upload(*m_renderHardwareInterface, commandList, preparedData.GpuSkinInfluences);
-	m_morphTargets.Upload(*m_renderHardwareInterface, commandList, std::move(preparedData.MorphTargetDeltas), preparedData.MorphTargetCount);
+	const std::span<const VertexSkinInfluenceData> influences{preparedData.GpuSkinInfluences};
+	const bool bSkinUploaded = m_skinInfluences.Upload(
+	    *m_renderHardwareInterface,
+	    commandList,
+	    std::as_bytes(influences),
+	    RhiBufferKind::Structured,
+	    sizeof(VertexSkinInfluenceData),
+	    L"GpuMesh_SkinInfluences",
+	    L"GpuMesh_SkinInfluencesUpload");
+
+	if (!bSkinUploaded)
+	{
+		Diagnostics::Fatal(g_gpuMeshLogger, __FILE__, __LINE__, "GPU skin influence upload failed.");
+	}
+
+	const MorphTargetDeltaData emptyDelta{};
+	const std::span<const MorphTargetDeltaData> deltas = preparedData.MorphTargetDeltas.empty() ? std::span{&emptyDelta, 1} : std::span{preparedData.MorphTargetDeltas};
+	const bool bMorphTargetsUploaded = m_morphTargets.Upload(
+	    *m_renderHardwareInterface,
+	    commandList,
+	    std::as_bytes(deltas),
+	    RhiBufferKind::Structured,
+	    sizeof(MorphTargetDeltaData),
+	    L"GpuMesh_MorphTargetDeltas",
+	    L"GpuMesh_MorphTargetUpload");
+
+	if (!bMorphTargetsUploaded)
+	{
+		Diagnostics::Fatal(g_gpuMeshLogger, __FILE__, __LINE__, "GPU morph target upload failed.");
+	}
 }
 
 void GpuMesh::CommitPreparedData(GpuMeshPreparedData&& preparedData)
@@ -137,6 +133,8 @@ void GpuMesh::CommitPreparedData(GpuMeshPreparedData&& preparedData)
 	m_rayTracingHitVertices = std::move(preparedData.RayTracingVertices);
 	m_rayTracingHitIndices = std::move(preparedData.RayTracingIndices);
 	m_cpuSkinInfluences = std::move(preparedData.SkinInfluences);
+	m_morphTargetDeltas = std::move(preparedData.MorphTargetDeltas);
+	m_morphTargetCount = preparedData.MorphTargetCount;
 }
 
 void GpuMesh::Bind(RenderCommandContext& commandContext) const noexcept
@@ -145,8 +143,8 @@ void GpuMesh::Bind(RenderCommandContext& commandContext) const noexcept
 	{
 		RhiResourceService& resources = m_renderHardwareInterface->GetResourceService();
 
-		commandContext.TrackResource(resources.GetResourceHandle(m_vertexBuffer));
-		commandContext.TrackResource(resources.GetResourceHandle(m_indexBuffer));
+		commandContext.TrackResource(resources.GetResourceHandle(m_vertexBuffer.GetResource()));
+		commandContext.TrackResource(resources.GetResourceHandle(m_indexBuffer.GetResource()));
 	}
 
 	commandContext.SetPrimitiveTopology(GetPrimitiveTopology());
@@ -182,8 +180,8 @@ RhiIndexBufferView GpuMesh::GetIndexBufferView() const noexcept
 RhiRayTracingGeometryDesc GpuMesh::GetRayTracingGeometry() const noexcept
 {
 	RhiResourceService* const resources = m_renderHardwareInterface != nullptr ? &m_renderHardwareInterface->GetResourceService() : nullptr;
-	const RhiResourceHandle vertexResource = resources != nullptr ? resources->GetResourceHandle(m_vertexBuffer) : RhiResourceHandle{};
-	const RhiResourceHandle indexResource = resources != nullptr ? resources->GetResourceHandle(m_indexBuffer) : RhiResourceHandle{};
+	const RhiResourceHandle vertexResource = resources != nullptr ? resources->GetResourceHandle(m_vertexBuffer.GetResource()) : RhiResourceHandle{};
+	const RhiResourceHandle indexResource = resources != nullptr ? resources->GetResourceHandle(m_indexBuffer.GetResource()) : RhiResourceHandle{};
 
 	return RhiRayTracingGeometryDesc{
 	    .VertexBuffer = RhiRayTracingBufferBinding{.Resource = vertexResource},

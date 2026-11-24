@@ -4,7 +4,8 @@
 
 #include "Commands/RenderCommandList.h"
 #include "D3D12/Commands/D3D12CommandRecordingContext.h"
-#include "D3D12/Capture/D3D12CaptureService.h"
+#include "D3D12/Capture/D3D12TextureReadback.h"
+#include "Capture/RhiCaptureServiceAdapter.h"
 #include "D3D12/Device/D3D12Capabilities.h"
 #include "D3D12/Device/D3D12Rhi.h"
 #include "D3D12/SwapChain/D3D12SwapChain.h"
@@ -40,7 +41,7 @@ D3D12RenderHardwareInterface::D3D12RenderHardwareInterface(
     m_uploadService(&uploadService)
 {
 	m_interopService = std::make_unique<D3D12InteropService>(*this);
-	m_captureService = std::make_unique<D3D12CaptureService>(rhi, memoryAllocator);
+	m_captureService = std::make_unique<RhiCaptureServiceAdapter<D3D12TextureReadback>>(rhi, memoryAllocator);
 	m_pipelineService = std::make_unique<RhiPipelineServiceAdapter<D3D12Rhi, D3D12Pipeline, D3D12RayTracingPipeline, CompileD3D12BindingLayout>>(rhi);
 	m_descriptorService = std::make_unique<D3D12DescriptorService>(rhi, descriptorHeapManager, m_capabilities);
 	m_resourceService = std::make_unique<D3D12ResourceService>(rhi, memoryAllocator, m_capabilities);

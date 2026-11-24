@@ -62,7 +62,7 @@ public:
 	    const char* name,
 	    TField TParameters::* member,
 	    ShaderStageVisibility visibility = ShaderStageVisibility::All,
-	    bool bUsesGraphResource = ShaderParameterFieldTraits<TField>::bUsesGraphResource)
+	    bool bUsesGraphResource = TField::bUsesGraphResource)
 	{
 		ShaderParameterStructRegistry<TParameters>::AddField(
 		    name != nullptr ? name : "",
@@ -136,10 +136,9 @@ public:
 	{
 	}
 
-	template <typename TField>
-	std::uint32_t Add(const char* name, TField TParameters::* member, ShaderStageVisibility visibility, bool bUsesGraphResource = ShaderParameterFieldTraits<TField>::bUsesGraphResource)
+	template <typename TField> std::uint32_t Add(const char* name, TField TParameters::* member, ShaderStageVisibility visibility, bool bUsesGraphResource = TField::bUsesGraphResource)
 	{
-		return AddField<typename ShaderParameterFieldTraits<TField>::Semantic>(name, member, visibility, bUsesGraphResource);
+		return AddField<typename TField::Semantic>(name, member, visibility, bUsesGraphResource);
 	}
 
 	template <typename TField> std::uint32_t RenderTarget(const char* name, TField TParameters::* member, ShaderStageVisibility visibility = ShaderStageVisibility::AllGraphics)
@@ -254,11 +253,9 @@ public:
 
 private:
 	template <typename TExpectedSemantic, typename TField>
-	std::uint32_t AddField(const char* name, TField TParameters::* member, ShaderStageVisibility visibility, bool bUsesGraphResource = ShaderParameterFieldTraits<TField>::bUsesGraphResource)
+	std::uint32_t AddField(const char* name, TField TParameters::* member, ShaderStageVisibility visibility, bool bUsesGraphResource = TField::bUsesGraphResource)
 	{
-		static_assert(bIsShaderParameterFieldV<TField>, "Parameter registration requires a typed shader parameter field.");
-
-		using ActualSemantic = typename ShaderParameterFieldTraits<TField>::Semantic;
+		using ActualSemantic = typename TField::Semantic;
 		static_assert(std::is_same_v<ActualSemantic, TExpectedSemantic>, "Builder registration method does not match the shader parameter field type.");
 
 		m_bindings.push_back(
@@ -268,7 +265,7 @@ private:
 		        { return BindParameterField(parameterSet, bindingName, parameters.*member); }});
 		m_graphResourceParameters.push_back(bUsesGraphResource);
 
-		return m_layout.Add<ActualSemantic>(name, visibility, ShaderParameterFieldTraits<TField>::FieldArrayCount);
+		return m_layout.Add<ActualSemantic>(name, visibility, TField::FieldArrayCount);
 	}
 
 	ShaderStageVisibility m_valueVisibility = ShaderStageVisibility::All;

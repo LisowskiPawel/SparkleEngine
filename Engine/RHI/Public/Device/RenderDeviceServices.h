@@ -8,12 +8,13 @@
 #include <span>
 #include <cstdint>
 #include <memory>
+#include <source_location>
 #include <string_view>
 
 class Window;
 class RenderHardwareInterface;
 class RhiImGuiRenderer;
-class RenderDeviceServicesState;
+class RenderDeviceBackendServices;
 class RhiExternalCapture;
 struct RhiCapabilities;
 struct RhiDeviceLaunch;
@@ -55,13 +56,17 @@ public:
 	void AdvanceFrameInFlight() noexcept;
 
 private:
+	struct State;
+
 	RenderDeviceServices() noexcept;
 	static void FailCreation(std::string_view message) noexcept;
 	static void FailUnsupportedBackend(ERhiBackendApi api) noexcept;
 	static void ValidateBackBufferFormat(PixelFormat backBufferFormat) noexcept;
 	static RhiPresentationConfiguration ResolvePresentationConfiguration() noexcept;
+	RenderDeviceBackendServices& GetBackendServices(std::source_location location = std::source_location::current()) noexcept;
+	const RenderDeviceBackendServices& GetBackendServices(std::source_location location = std::source_location::current()) const noexcept;
 
-	std::unique_ptr<RenderDeviceServicesState> m_state;
+	std::unique_ptr<State> m_state;
 #if SPARKLE_TARGET_EDITOR && !SPARKLE_BUILD_SHIPPING
 	RhiExternalCapture* m_externalCapture = nullptr;
 #endif

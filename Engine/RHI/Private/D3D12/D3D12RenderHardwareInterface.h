@@ -19,7 +19,6 @@
 class D3D12DescriptorHeapManager;
 class D3D12DescriptorService;
 class D3D12UploadService;
-class D3D12CaptureService;
 class D3D12BackBufferPresentation;
 template <typename Implementation> class RhiPresentationServiceAdapter;
 class D3D12CommandRecordingContext;
@@ -89,7 +88,7 @@ private:
 	bool BuildPtlas(ID3D12GraphicsCommandList7* commandList, const RhiPtlasBuildCommandDesc& desc) const noexcept;
 
 	std::unique_ptr<D3D12InteropService> m_interopService;
-	std::unique_ptr<D3D12CaptureService> m_captureService;
+	std::unique_ptr<RhiCaptureService> m_captureService;
 	std::unique_ptr<RhiPresentationServiceAdapter<D3D12BackBufferPresentation>> m_presentationService;
 	std::unique_ptr<RhiPipelineService> m_pipelineService;
 	std::unique_ptr<D3D12ResourceService> m_resourceService;

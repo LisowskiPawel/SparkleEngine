@@ -7,7 +7,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <string>
 #include <string_view>
 #include <vector>
 
@@ -35,11 +34,7 @@ public:
 	    RhiMemoryCategory category,
 	    RhiMemoryResidencyClass residencyClass,
 	    std::wstring_view debugName) override;
-	bool CreateVertexBuffer(const void* data, std::size_t sizeInBytes, std::uint32_t strideInBytes, std::wstring_view debugName, RhiOwnedResourceHandle& outResource, RhiVertexBufferView& outView)
-	    override;
-	bool CreateStructuredBufferResource(const void* data, std::size_t sizeInBytes, std::uint32_t strideInBytes, std::wstring_view debugName, RhiOwnedResourceHandle& outResource) override;
 	bool WriteBufferResource(RhiOwnedResourceHandle resource, std::size_t destinationOffsetInBytes, const void* data, std::size_t sizeInBytes) noexcept override;
-	bool CreateIndexBuffer(const void* data, std::size_t sizeInBytes, RhiIndexFormat format, std::wstring_view debugName, RhiOwnedResourceHandle& outResource, RhiIndexBufferView& outView) override;
 	void ReleaseOwnedResource(RhiOwnedResourceHandle resource) noexcept override;
 	RhiResourceHandle GetResourceHandle(RhiOwnedResourceHandle resource) const noexcept override;
 	RhiGpuVirtualAddress GetResourceGpuVirtualAddress(RhiOwnedResourceHandle resource) const noexcept override;
@@ -67,9 +62,6 @@ private:
 	D3D12RecordingResourceUseToken BeginResourceTracking(RhiResourceHandle resource, bool bCoordinatorRecording) noexcept;
 	void EndResourceTracking(D3D12RecordingResourceUseToken use, RhiSubmissionToken submissionToken) noexcept;
 
-	static std::wstring MakeDebugName(std::wstring_view debugName, std::wstring_view defaultDebugName);
-	static RhiOwnedResourceHandle WrapOwnedResource(std::unique_ptr<D3D12GpuAllocationRecord> record) noexcept;
-	static RhiOwnedMemoryBlockHandle WrapOwnedMemoryBlock(std::unique_ptr<D3D12GpuHeapRecord> record) noexcept;
 	static bool ResourceSupportsUnorderedAccess(ID3D12Resource* resource) noexcept;
 	void CollectCrashDiagnosticsOnce() noexcept;
 

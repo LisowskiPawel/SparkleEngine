@@ -10,7 +10,7 @@
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_passParameterSetLogger, "Renderer.PassParameters");
 
-template <typename THandle> static bool ValidateResourceBinding(const std::vector<THandle>& handles, const PassParameterDesc& parameter) noexcept
+template <typename THandle> static bool ValidateResourceBinding(std::span<const THandle> handles, const PassParameterDesc& parameter) noexcept
 {
 	if (parameter.ArrayCount != static_cast<std::uint32_t>(handles.size()))
 	{
@@ -125,10 +125,10 @@ bool PassParameterSet::IsBound(const char* name) const noexcept
 
 bool PassParameterSet::SetTexture(const char* name, FrameGraphTextureHandle handle)
 {
-	return SetTextureArray(name, std::vector<FrameGraphTextureHandle>{handle});
+	return SetTextureArray(name, std::span(&handle, 1));
 }
 
-bool PassParameterSet::SetTextureArray(const char* name, const std::vector<FrameGraphTextureHandle>& handles)
+bool PassParameterSet::SetTextureArray(const char* name, std::span<const FrameGraphTextureHandle> handles)
 {
 	std::uint32_t index = 0;
 	const PassParameterDesc* parameter = FindParameter(name, index);
@@ -142,7 +142,7 @@ bool PassParameterSet::SetTextureArray(const char* name, const std::vector<Frame
 		return false;
 	}
 
-	m_bindings[index].SetValue(PassParameterTextureBindingData{.Handles = handles});
+	m_bindings[index].SetValue(PassParameterTextureBindingData{.Handles = {handles.begin(), handles.end()}});
 	return true;
 }
 
@@ -167,10 +167,10 @@ bool PassParameterSet::SetAttachment(const char* name, FrameGraphAttachmentBindi
 
 bool PassParameterSet::SetBuffer(const char* name, FrameGraphBufferHandle handle)
 {
-	return SetBufferArray(name, std::vector<FrameGraphBufferHandle>{handle});
+	return SetBufferArray(name, std::span(&handle, 1));
 }
 
-bool PassParameterSet::SetBufferArray(const char* name, const std::vector<FrameGraphBufferHandle>& handles)
+bool PassParameterSet::SetBufferArray(const char* name, std::span<const FrameGraphBufferHandle> handles)
 {
 	std::uint32_t index = 0;
 	const PassParameterDesc* parameter = FindParameter(name, index);
@@ -184,7 +184,7 @@ bool PassParameterSet::SetBufferArray(const char* name, const std::vector<FrameG
 		return false;
 	}
 
-	m_bindings[index].SetValue(PassParameterBufferBindingData{.Handles = handles});
+	m_bindings[index].SetValue(PassParameterBufferBindingData{.Handles = {handles.begin(), handles.end()}});
 	return true;
 }
 

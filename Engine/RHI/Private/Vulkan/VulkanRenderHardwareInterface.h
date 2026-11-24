@@ -18,7 +18,6 @@ class VulkanBackBufferPresentation;
 template <typename Implementation> class RhiPresentationServiceAdapter;
 class VulkanCommandRecordingContext;
 class VulkanUploadService;
-class VulkanCaptureService;
 class VulkanRenderCommandList;
 class VulkanDescriptorService;
 class VulkanGpuMemoryAllocator;
@@ -81,7 +80,7 @@ private:
 	void SetCommandRecordingContext(VulkanCommandRecordingContext& commandRecordingContext) noexcept;
 
 	std::unique_ptr<VulkanInteropService> m_interopService;
-	std::unique_ptr<VulkanCaptureService> m_captureService;
+	std::unique_ptr<RhiCaptureService> m_captureService;
 	std::unique_ptr<RhiPresentationServiceAdapter<VulkanBackBufferPresentation>> m_presentationService;
 	std::unique_ptr<RhiPipelineService> m_pipelineService;
 	std::unique_ptr<VulkanResourceService> m_resourceService;

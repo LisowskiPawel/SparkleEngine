@@ -28,15 +28,11 @@ public:
 		return Upload(resourceService, values.data(), values.size_bytes(), static_cast<std::uint32_t>(sizeof(TValue)), debugName);
 	}
 
-	bool IsValid() const noexcept { return m_resource && m_sizeInBytes > 0 && m_strideInBytes > 0; }
+	bool IsValid() const noexcept { return static_cast<bool>(m_resource); }
 
 	explicit operator bool() const noexcept { return IsValid(); }
 
 	RhiOwnedResourceHandle GetResource() const noexcept { return m_resource; }
-
-	std::uint64_t GetSizeInBytes() const noexcept { return m_sizeInBytes; }
-
-	std::uint32_t GetStrideInBytes() const noexcept { return m_strideInBytes; }
 
 	bool Write(std::size_t destinationOffsetInBytes, const void* data, std::size_t sizeInBytes) noexcept;
 	void Reset() noexcept;
@@ -45,6 +41,4 @@ private:
 	RhiResourceService* m_resourceService = nullptr;
 
 	RhiOwnedResourceHandle m_resource = {};
-	std::uint64_t m_sizeInBytes = 0;
-	std::uint32_t m_strideInBytes = 0;
 };

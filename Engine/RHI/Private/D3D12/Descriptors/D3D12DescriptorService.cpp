@@ -206,13 +206,13 @@ void D3D12DescriptorService::ReleaseDescriptorTable(RhiDescriptorTableHandle tab
 
 RhiDescriptorTableBinding D3D12DescriptorService::GetSharedSamplerBinding(const RhiSamplerDesc& samplerDesc) const noexcept
 {
-	D3D12SamplerLibrary::Slot slot = D3D12SamplerLibrary::Slot::Count;
+	std::uint32_t slot = 0;
 	if (!m_samplerTableHandle || !D3D12SamplerLibrary::TryGetSlot(samplerDesc, slot))
 	{
 		return {};
 	}
 
-	return RhiDescriptorTableBinding{m_samplerTableHandle, static_cast<std::uint32_t>(slot)};
+	return RhiDescriptorTableBinding{m_samplerTableHandle, slot};
 }
 
 void D3D12DescriptorService::SetSamplerTableHandle(RhiDescriptorTableHandle samplerTableHandle) noexcept

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Meshes/GpuMorphTargetBuffer.h"
-#include "Meshes/GpuSkinInfluenceBuffer.h"
+#include "Meshes/GpuMeshBuffer.h"
 #include "Meshes/GpuMeshHandle.h"
 #include "RayTracing/RayTracingHitData.h"
 #include "RHI/Public/Descriptors/RhiDescriptorHandles.h"
@@ -9,6 +8,7 @@
 #include "RHI/Public/Pipeline/RhiPipelineDesc.h"
 #include "RHI/Public/Resources/RhiResourceHandles.h"
 #include "Scene/Meshes/MeshSkinningData.h"
+#include "ShaderData/MorphTargetShaderData.h"
 
 #include <DirectXMath.h>
 
@@ -48,7 +48,7 @@ public:
 
 	std::uint32_t GetVertexCount() const noexcept { return m_vertexCount; }
 
-	bool IsValid() const noexcept { return m_vertexBuffer && m_indexBuffer; }
+	bool IsValid() const noexcept { return m_vertexBuffer.GetResource() && m_indexBuffer.GetResource(); }
 
 	GpuMeshHandle GetHandle() const noexcept { return m_handle; }
 
@@ -62,9 +62,9 @@ public:
 
 	bool UsesDepthClipping() const noexcept { return true; }
 
-	RhiOwnedResourceHandle GetVertexBufferResource() const noexcept { return m_vertexBuffer; }
+	RhiOwnedResourceHandle GetVertexBufferResource() const noexcept { return m_vertexBuffer.GetResource(); }
 
-	RhiOwnedResourceHandle GetIndexBufferResource() const noexcept { return m_indexBuffer; }
+	RhiOwnedResourceHandle GetIndexBufferResource() const noexcept { return m_indexBuffer.GetResource(); }
 
 	RhiGpuDescriptorHandle GetSkinInfluencesShaderResourceView() const noexcept { return m_skinInfluences.GetShaderResourceView(); }
 
@@ -84,9 +84,9 @@ public:
 
 	std::span<const VertexSkinInfluence> GetSkinInfluences() const noexcept { return m_cpuSkinInfluences; }
 
-	std::uint32_t GetMorphTargetCount() const noexcept { return m_morphTargets.GetTargetCount(); }
+	std::uint32_t GetMorphTargetCount() const noexcept { return m_morphTargetCount; }
 
-	std::span<const MorphTargetDeltaData> GetMorphTargetDeltas() const noexcept { return m_morphTargets.GetDeltas(); }
+	std::span<const MorphTargetDeltaData> GetMorphTargetDeltas() const noexcept { return m_morphTargetDeltas; }
 
 private:
 	void CreateGeometryBuffers(RenderCommandList& commandList, const MeshData& meshData);
@@ -97,10 +97,10 @@ private:
 
 	RenderHardwareInterface* m_renderHardwareInterface = nullptr;
 	GpuMeshHandle m_handle = {};
-	RhiOwnedResourceHandle m_vertexBuffer = {};
-	RhiOwnedResourceHandle m_indexBuffer = {};
-	GpuSkinInfluenceBuffer m_skinInfluences;
-	GpuMorphTargetBuffer m_morphTargets;
+	GpuMeshBuffer m_vertexBuffer;
+	GpuMeshBuffer m_indexBuffer;
+	GpuMeshBuffer m_skinInfluences;
+	GpuMeshBuffer m_morphTargets;
 	RhiVertexBufferView m_vertexBufferView{};
 	RhiIndexBufferView m_indexBufferView{};
 
@@ -110,4 +110,6 @@ private:
 	std::vector<RayTracingHitVertex> m_rayTracingHitVertices;
 	std::vector<std::uint32_t> m_rayTracingHitIndices;
 	std::vector<VertexSkinInfluence> m_cpuSkinInfluences;
+	std::vector<MorphTargetDeltaData> m_morphTargetDeltas;
+	std::uint32_t m_morphTargetCount = 0;
 };

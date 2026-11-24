@@ -38,11 +38,11 @@ RhiOwnedResourceHandle D3D12ResourceService::CreateTextureResource(
 
 	const D3D12_RESOURCE_DESC resourceDesc = D3D12TypeConversions::BuildTextureResourceDesc(desc);
 	const D3D12_RESOURCE_STATES resourceState = D3D12TypeConversions::ToResourceStates(initialState);
-	const std::wstring ownedDebugName = MakeDebugName(debugName, L"TextureResource");
+	const std::wstring_view resourceDebugName = debugName.empty() ? L"TextureResource" : debugName;
 
-	std::unique_ptr<D3D12GpuAllocationRecord> ownedRecord = m_memoryAllocator->CreateTexture(resourceDesc, resourceState, nullptr, category, residencyClass, ownedDebugName);
+	std::unique_ptr<D3D12GpuAllocationRecord> ownedRecord = m_memoryAllocator->CreateTexture(resourceDesc, resourceState, nullptr, category, residencyClass, resourceDebugName);
 
-	return ownedRecord != nullptr ? WrapOwnedResource(std::move(ownedRecord)) : RhiOwnedResourceHandle{};
+	return MakeD3D12OwnedResourceHandle(std::move(ownedRecord));
 }
 
 RhiOwnedResourceHandle D3D12ResourceService::CreateBufferResource(
@@ -58,107 +58,16 @@ RhiOwnedResourceHandle D3D12ResourceService::CreateBufferResource(
 	}
 
 	const D3D12_RESOURCE_DESC resourceDesc = D3D12TypeConversions::BuildBufferResourceDesc(desc);
-	const D3D12_RESOURCE_STATES resourceState = D3D12TypeConversions::ToResourceStates(initialState);
-	const std::wstring ownedDebugName = MakeDebugName(debugName, L"BufferResource");
+	const D3D12_RESOURCE_STATES resourceState = residencyClass == RhiMemoryResidencyClass::HostUpload ? D3D12_RESOURCE_STATE_GENERIC_READ : D3D12TypeConversions::ToResourceStates(initialState);
+	const std::wstring_view resourceDebugName = debugName.empty() ? L"BufferResource" : debugName;
 
-	std::unique_ptr<D3D12GpuAllocationRecord> ownedRecord = m_memoryAllocator->CreateBuffer(resourceDesc, resourceState, category, residencyClass, ownedDebugName);
-
-	return ownedRecord != nullptr ? WrapOwnedResource(std::move(ownedRecord)) : RhiOwnedResourceHandle{};
-}
-
-bool D3D12ResourceService::CreateVertexBuffer(
-    const void* data,
-    std::size_t sizeInBytes,
-    std::uint32_t strideInBytes,
-    std::wstring_view debugName,
-    RhiOwnedResourceHandle& outResource,
-    RhiVertexBufferView& outView)
-{
-	outResource = {};
-	outView = {};
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || data == nullptr || sizeInBytes == 0 || strideInBytes == 0)
-	{
-		return false;
-	}
-
-	D3D12_RESOURCE_DESC resourceDesc = D3D12TypeConversions::BuildBufferResourceDesc(RhiBufferResourceDesc{.SizeInBytes = sizeInBytes});
-	std::wstring ownedDebugName = MakeDebugName(debugName, L"VertexBuffer");
-
-	std::unique_ptr<D3D12GpuAllocationRecord> ownedRecord = m_memoryAllocator->CreateBuffer(
-	    resourceDesc,
-	    D3D12_RESOURCE_STATE_GENERIC_READ,
-	    RhiMemoryCategory::Mesh,
-	    RhiMemoryResidencyClass::HostUpload,
-	    ownedDebugName);
-
-	if (ownedRecord == nullptr || ownedRecord->Resource == nullptr)
+	std::unique_ptr<D3D12GpuAllocationRecord> ownedRecord = m_memoryAllocator->CreateBuffer(resourceDesc, resourceState, category, residencyClass, resourceDebugName);
+	if (ownedRecord == nullptr && residencyClass == RhiMemoryResidencyClass::HostUpload)
 	{
 		CollectCrashDiagnosticsOnce();
-		return false;
 	}
 
-	ID3D12Resource* const ownedResource = ownedRecord->Resource.Get();
-	void* mappedData = nullptr;
-	const D3D12_RANGE readRange{0, 0};
-	if (FAILED(ownedResource->Map(0, &readRange, &mappedData)))
-	{
-		return false;
-	}
-
-	ownedRecord->bIsMapped = true;
-	ownedRecord->CpuMappedAddress = mappedData;
-	std::memcpy(mappedData, data, sizeInBytes);
-	ownedResource->Unmap(0, nullptr);
-	ownedRecord->bIsMapped = false;
-	ownedRecord->CpuMappedAddress = nullptr;
-
-	outView = RhiVertexBufferView{.BufferLocation = ownedResource->GetGPUVirtualAddress(), .SizeInBytes = static_cast<std::uint32_t>(sizeInBytes), .StrideInBytes = strideInBytes};
-	outResource = WrapOwnedResource(std::move(ownedRecord));
-	return true;
-}
-
-bool D3D12ResourceService::CreateStructuredBufferResource(const void* data, std::size_t sizeInBytes, std::uint32_t strideInBytes, std::wstring_view debugName, RhiOwnedResourceHandle& outResource)
-{
-	outResource = {};
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || data == nullptr || sizeInBytes == 0 || strideInBytes == 0)
-	{
-		return false;
-	}
-
-	const RhiBufferResourceDesc bufferDesc{.SizeInBytes = sizeInBytes, .StrideInBytes = strideInBytes};
-	const D3D12_RESOURCE_DESC resourceDesc = D3D12TypeConversions::BuildBufferResourceDesc(bufferDesc);
-	std::wstring ownedDebugName = MakeDebugName(debugName, L"StructuredBuffer");
-
-	std::unique_ptr<D3D12GpuAllocationRecord> ownedRecord = m_memoryAllocator->CreateBuffer(
-	    resourceDesc,
-	    D3D12_RESOURCE_STATE_GENERIC_READ,
-	    RhiMemoryCategory::Mesh,
-	    RhiMemoryResidencyClass::HostUpload,
-	    ownedDebugName);
-
-	if (ownedRecord == nullptr || ownedRecord->Resource == nullptr)
-	{
-		CollectCrashDiagnosticsOnce();
-		return false;
-	}
-
-	ID3D12Resource* const ownedResource = ownedRecord->Resource.Get();
-	void* mappedData = nullptr;
-	const D3D12_RANGE readRange{0, 0};
-	if (FAILED(ownedResource->Map(0, &readRange, &mappedData)))
-	{
-		return false;
-	}
-
-	ownedRecord->bIsMapped = true;
-	ownedRecord->CpuMappedAddress = mappedData;
-	std::memcpy(mappedData, data, sizeInBytes);
-	ownedResource->Unmap(0, nullptr);
-	ownedRecord->bIsMapped = false;
-	ownedRecord->CpuMappedAddress = nullptr;
-
-	outResource = WrapOwnedResource(std::move(ownedRecord));
-	return static_cast<bool>(outResource);
+	return MakeD3D12OwnedResourceHandle(std::move(ownedRecord));
 }
 
 bool D3D12ResourceService::WriteBufferResource(RhiOwnedResourceHandle resource, std::size_t destinationOffsetInBytes, const void* data, std::size_t sizeInBytes) noexcept
@@ -193,57 +102,6 @@ bool D3D12ResourceService::WriteBufferResource(RhiOwnedResourceHandle resource, 
 	record->Resource->Unmap(0, &writtenRange);
 	record->bIsMapped = false;
 	record->CpuMappedAddress = nullptr;
-	return true;
-}
-
-bool D3D12ResourceService::CreateIndexBuffer(
-    const void* data,
-    std::size_t sizeInBytes,
-    RhiIndexFormat format,
-    std::wstring_view debugName,
-    RhiOwnedResourceHandle& outResource,
-    RhiIndexBufferView& outView)
-{
-	outResource = {};
-	outView = {};
-	if (m_rhi == nullptr || m_memoryAllocator == nullptr || data == nullptr || sizeInBytes == 0)
-	{
-		return false;
-	}
-
-	D3D12_RESOURCE_DESC resourceDesc = D3D12TypeConversions::BuildBufferResourceDesc(RhiBufferResourceDesc{.SizeInBytes = sizeInBytes});
-	std::wstring ownedDebugName = MakeDebugName(debugName, L"IndexBuffer");
-
-	std::unique_ptr<D3D12GpuAllocationRecord> ownedRecord = m_memoryAllocator->CreateBuffer(
-	    resourceDesc,
-	    D3D12_RESOURCE_STATE_GENERIC_READ,
-	    RhiMemoryCategory::Mesh,
-	    RhiMemoryResidencyClass::HostUpload,
-	    ownedDebugName);
-
-	if (ownedRecord == nullptr || ownedRecord->Resource == nullptr)
-	{
-		CollectCrashDiagnosticsOnce();
-		return false;
-	}
-
-	ID3D12Resource* const ownedResource = ownedRecord->Resource.Get();
-	void* mappedData = nullptr;
-	const D3D12_RANGE readRange{0, 0};
-	if (FAILED(ownedResource->Map(0, &readRange, &mappedData)))
-	{
-		return false;
-	}
-
-	ownedRecord->bIsMapped = true;
-	ownedRecord->CpuMappedAddress = mappedData;
-	std::memcpy(mappedData, data, sizeInBytes);
-	ownedResource->Unmap(0, nullptr);
-	ownedRecord->bIsMapped = false;
-	ownedRecord->CpuMappedAddress = nullptr;
-
-	outView = RhiIndexBufferView{.BufferLocation = ownedResource->GetGPUVirtualAddress(), .SizeInBytes = static_cast<std::uint32_t>(sizeInBytes), .Format = format};
-	outResource = WrapOwnedResource(std::move(ownedRecord));
 	return true;
 }
 
@@ -365,9 +223,9 @@ RhiOwnedMemoryBlockHandle D3D12ResourceService::CreateTransientMemoryBlock(RhiTr
 		return {};
 	}
 
-	std::wstring ownedDebugName = MakeDebugName(debugName, L"TransientMemoryBlock");
-	std::unique_ptr<D3D12GpuHeapRecord> ownedMemoryBlock = m_memoryAllocator->CreateTransientHeap(pool, sizeInBytes, alignment, ownedDebugName);
-	return ownedMemoryBlock != nullptr ? WrapOwnedMemoryBlock(std::move(ownedMemoryBlock)) : RhiOwnedMemoryBlockHandle{};
+	const std::wstring_view resourceDebugName = debugName.empty() ? L"TransientMemoryBlock" : debugName;
+	std::unique_ptr<D3D12GpuHeapRecord> ownedMemoryBlock = m_memoryAllocator->CreateTransientHeap(pool, sizeInBytes, alignment, resourceDebugName);
+	return MakeD3D12OwnedMemoryBlockHandle(std::move(ownedMemoryBlock));
 }
 
 void D3D12ResourceService::ReleaseTransientMemoryBlock(RhiOwnedMemoryBlockHandle memoryBlock) noexcept
@@ -403,12 +261,12 @@ RhiOwnedResourceHandle D3D12ResourceService::CreateAliasingTextureResource(
 	const D3D12_RESOURCE_STATES resourceState = D3D12TypeConversions::ToResourceStates(desc.InitialState);
 	const D3D12_CLEAR_VALUE clearValue = D3D12TypeConversions::BuildClearValue(desc.ClearValue);
 	const D3D12_CLEAR_VALUE* clearValuePtr = desc.ClearValue.ValueType == RhiOptimizedClearValue::Type::None ? nullptr : &clearValue;
-	std::wstring ownedDebugName = MakeDebugName(debugName, L"AliasingTexture");
+	const std::wstring_view resourceDebugName = debugName.empty() ? L"AliasingTexture" : debugName;
 
 	std::unique_ptr<D3D12GpuAllocationRecord> ownedResource = m_memoryAllocator
-	                                                              ->CreateAliasingTexture(*ownedMemoryBlock, memoryBlockOffset, resourceDesc, resourceState, clearValuePtr, ownedDebugName);
+	                                                              ->CreateAliasingTexture(*ownedMemoryBlock, memoryBlockOffset, resourceDesc, resourceState, clearValuePtr, resourceDebugName);
 
-	return ownedResource != nullptr ? WrapOwnedResource(std::move(ownedResource)) : RhiOwnedResourceHandle{};
+	return MakeD3D12OwnedResourceHandle(std::move(ownedResource));
 }
 
 RhiOwnedResourceHandle D3D12ResourceService::CreateAliasingBufferResource(
@@ -425,11 +283,11 @@ RhiOwnedResourceHandle D3D12ResourceService::CreateAliasingBufferResource(
 
 	const D3D12_RESOURCE_DESC resourceDesc = D3D12TypeConversions::BuildBufferResourceDesc(desc.ResourceDesc);
 	const D3D12_RESOURCE_STATES resourceState = D3D12TypeConversions::ToResourceStates(desc.InitialState);
-	std::wstring ownedDebugName = MakeDebugName(debugName, L"AliasingBuffer");
+	const std::wstring_view resourceDebugName = debugName.empty() ? L"AliasingBuffer" : debugName;
 
-	std::unique_ptr<D3D12GpuAllocationRecord> ownedResource = m_memoryAllocator->CreateAliasingBuffer(*ownedMemoryBlock, memoryBlockOffset, resourceDesc, resourceState, ownedDebugName);
+	std::unique_ptr<D3D12GpuAllocationRecord> ownedResource = m_memoryAllocator->CreateAliasingBuffer(*ownedMemoryBlock, memoryBlockOffset, resourceDesc, resourceState, resourceDebugName);
 
-	return ownedResource != nullptr ? WrapOwnedResource(std::move(ownedResource)) : RhiOwnedResourceHandle{};
+	return MakeD3D12OwnedResourceHandle(std::move(ownedResource));
 }
 
 bool D3D12ResourceService::SupportsUnorderedAccess(RhiResourceHandle resource) const noexcept
@@ -458,26 +316,6 @@ void D3D12ResourceService::EndResourceTracking(D3D12RecordingResourceUseToken us
 	{
 		m_memoryAllocator->ReleaseRecordingResource(use, submissionToken);
 	}
-}
-
-std::wstring D3D12ResourceService::MakeDebugName(std::wstring_view debugName, std::wstring_view defaultDebugName)
-{
-	return debugName.empty() ? std::wstring(defaultDebugName) : std::wstring(debugName);
-}
-
-RhiOwnedResourceHandle D3D12ResourceService::WrapOwnedResource(std::unique_ptr<D3D12GpuAllocationRecord> record) noexcept
-{
-	return MakeD3D12OwnedResourceHandle(std::move(record));
-}
-
-RhiOwnedMemoryBlockHandle D3D12ResourceService::WrapOwnedMemoryBlock(std::unique_ptr<D3D12GpuHeapRecord> record) noexcept
-{
-	if (record == nullptr)
-	{
-		return {};
-	}
-
-	return MakeD3D12OwnedMemoryBlockHandle(std::move(record));
 }
 
 bool D3D12ResourceService::ResourceSupportsUnorderedAccess(ID3D12Resource* resource) noexcept

@@ -8,11 +8,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include <algorithm>
-#include <array>
 #include <filesystem>
 #include <optional>
-#include <set>
 #include <string>
 #include <string_view>
 
@@ -20,33 +17,7 @@ static std::optional<MeshDiagnosticMetadata> ParseCookedMeshMetadata(std::string
 {
 	try
 	{
-		Json::InputAdmission admission(metadataText, metadataText.size());
-		std::set<std::string> repeated;
-		const std::array<std::string_view, 3> fields{"schema", "displayName", "source"};
-
-		const auto admitValue = [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
-		{
-			admission.ReadEvent(depth, event);
-			if (event != nlohmann::json::parse_event_t::key)
-			{
-				return true;
-			}
-
-			const auto& key = value.get_ref<const std::string&>();
-			const bool bConsumed = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
-			if (bConsumed && !admission.TryReadKey(depth, key))
-			{
-				repeated.insert(key);
-			}
-			return bConsumed;
-		};
-
-		auto document = nlohmann::json::parse(metadataText.begin(), metadataText.end(), admitValue);
-
-		for (const auto& key : repeated)
-		{
-			document.erase(key);
-		}
+		const auto document = Json::ParseObjectFields<nlohmann::json>(metadataText, metadataText.size(), {"schema", "displayName", "source"});
 		if (document.at("schema") != "cooked-mesh-metadata")
 		{
 			return std::nullopt;

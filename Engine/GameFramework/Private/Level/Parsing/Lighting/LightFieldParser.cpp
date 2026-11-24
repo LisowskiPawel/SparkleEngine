@@ -7,6 +7,7 @@
 #include "Core/Public/Strings/StringUtils.h"
 
 #include <format>
+#include <type_traits>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_lightFieldParserLogger, "GameFramework.LightFieldParser");
 
@@ -19,24 +20,6 @@ namespace LevelParsing
 		common.worldTransform._41 = position.x;
 		common.worldTransform._42 = position.y;
 		common.worldTransform._43 = position.z;
-	}
-
-	static bool IsLightKind(const SceneLightDesc& light, SceneLightKind kind) noexcept
-	{
-		switch (kind)
-		{
-			case SceneLightKind::Directional:
-				return light.GetDirectional() != nullptr;
-			case SceneLightKind::Point:
-				return light.GetPoint() != nullptr;
-			case SceneLightKind::Spot:
-				return light.GetSpot() != nullptr;
-			case SceneLightKind::Rect:
-				return light.GetRect() != nullptr;
-			case SceneLightKind::Unknown:
-			default:
-				return false;
-		}
 	}
 
 	static std::string_view GetLightKindName(SceneLightKind kind) noexcept
@@ -92,7 +75,7 @@ namespace LevelParsing
 		std::size_t currentKindIndex = 0;
 		for (SceneLightDesc& light : lights)
 		{
-			if (!IsLightKind(light, kind))
+			if (light.GetKind() != kind)
 			{
 				continue;
 			}
@@ -148,11 +131,7 @@ namespace LevelParsing
 	static void ParseDirectionalField(std::string_view field, const ParsedLevelLine& line, SceneLightDesc& light)
 	{
 		SceneDirectionalLightDesc& value = *light.GetDirectional();
-		if (IsCommonField(field))
-		{
-			ParseCommonField(field, line, light.common);
-		}
-		else if (field == "Direction")
+		if (field == "Direction")
 		{
 			value.direction = ParseFloat3(line.value, "directional light direction");
 		}
@@ -174,65 +153,46 @@ namespace LevelParsing
 		}
 	}
 
-	static void ParsePointField(std::string_view field, const ParsedLevelLine& line, SceneLightDesc& light)
+	template <typename TLight> static bool ParseLocalLightField(std::string_view field, const ParsedLevelLine& line, TLight& value)
 	{
-		PointLightDesc& value = *light.GetPoint();
-		if (IsCommonField(field))
+		constexpr bool bSpot = std::is_same_v<TLight, SpotLightDesc>;
+		if (field == "LuminousIntensityCandela")
 		{
-			ParseCommonField(field, line, light.common);
-		}
-		else if (field == "LuminousIntensityCandela")
-		{
-			value.luminousIntensity = ParseFloat(line.value, "point light luminous intensity");
+			value.luminousIntensity = ParseFloat(line.value, bSpot ? "spot light luminous intensity" : "point light luminous intensity");
 		}
 		else if (field == "Range")
 		{
-			value.range = ParseFloat(line.value, "point light range");
+			value.range = ParseFloat(line.value, bSpot ? "spot light range" : "point light range");
 		}
 		else if (field == "Radius")
 		{
-			value.radius = ParseFloat(line.value, "point light radius");
+			value.radius = ParseFloat(line.value, bSpot ? "spot light radius" : "point light radius");
 		}
 		else if (field == "DistanceAttenuationCoefficients")
 		{
-			value.distanceAttenuationCoefficients = ParseFloat3(line.value, "point light distance attenuation coefficients");
+			value.distanceAttenuationCoefficients = ParseFloat3(line.value, bSpot ? "spot light distance attenuation coefficients" : "point light distance attenuation coefficients");
 		}
 		else if (field == "CastShadow")
 		{
-			value.bCastShadow = ParseBool(line.value, "point light shadow flag");
+			value.bCastShadow = ParseBool(line.value, bSpot ? "spot light shadow flag" : "point light shadow flag");
 		}
 		else
 		{
-			UnsupportedField(SceneLightKind::Point, field);
+			return false;
 		}
+		return true;
 	}
 
 	static void ParseSpotField(std::string_view field, const ParsedLevelLine& line, SceneLightDesc& light)
 	{
 		SpotLightDesc& value = *light.GetSpot();
-		if (IsCommonField(field))
+		if (ParseLocalLightField(field, line, value))
 		{
-			ParseCommonField(field, line, light.common);
+			return;
 		}
-		else if (field == "Direction")
+		if (field == "Direction")
 		{
 			value.direction = ParseFloat3(line.value, "spot light direction");
-		}
-		else if (field == "LuminousIntensityCandela")
-		{
-			value.luminousIntensity = ParseFloat(line.value, "spot light luminous intensity");
-		}
-		else if (field == "Range")
-		{
-			value.range = ParseFloat(line.value, "spot light range");
-		}
-		else if (field == "Radius")
-		{
-			value.radius = ParseFloat(line.value, "spot light radius");
-		}
-		else if (field == "DistanceAttenuationCoefficients")
-		{
-			value.distanceAttenuationCoefficients = ParseFloat3(line.value, "spot light distance attenuation coefficients");
 		}
 		else if (field == "InnerAngleRadians")
 		{
@@ -241,10 +201,6 @@ namespace LevelParsing
 		else if (field == "OuterAngleRadians")
 		{
 			value.outerAngleRadians = ParseFloat(line.value, "spot light outer angle");
-		}
-		else if (field == "CastShadow")
-		{
-			value.bCastShadow = ParseBool(line.value, "spot light shadow flag");
 		}
 		else
 		{
@@ -255,11 +211,7 @@ namespace LevelParsing
 	static void ParseRectField(std::string_view field, const ParsedLevelLine& line, SceneLightDesc& light)
 	{
 		RectLightDesc& value = *light.GetRect();
-		if (IsCommonField(field))
-		{
-			ParseCommonField(field, line, light.common);
-		}
-		else if (field == "LuminanceCdPerM2")
+		if (field == "LuminanceCdPerM2")
 		{
 			value.luminance = ParseFloat(line.value, "rect light luminance");
 		}
@@ -297,13 +249,21 @@ namespace LevelParsing
 	void ParseLightField(const ParsedLightFieldKey& key, const ParsedLevelLine& parsedLine, std::vector<SceneLightDesc>& lights)
 	{
 		SceneLightDesc& light = ResolveLight(lights, key.Kind, key.Index);
+		if (IsCommonField(key.Field))
+		{
+			ParseCommonField(key.Field, parsedLine, light.common);
+			return;
+		}
 		switch (key.Kind)
 		{
 			case SceneLightKind::Directional:
 				ParseDirectionalField(key.Field, parsedLine, light);
 				return;
 			case SceneLightKind::Point:
-				ParsePointField(key.Field, parsedLine, light);
+				if (!ParseLocalLightField(key.Field, parsedLine, *light.GetPoint()))
+				{
+					UnsupportedField(SceneLightKind::Point, key.Field);
+				}
 				return;
 			case SceneLightKind::Spot:
 				ParseSpotField(key.Field, parsedLine, light);

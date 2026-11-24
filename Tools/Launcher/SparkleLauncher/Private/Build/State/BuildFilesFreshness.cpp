@@ -9,9 +9,6 @@
 #include <nlohmann/json.hpp>
 #include "ToolOutputPaths.h"
 
-#include <algorithm>
-#include <array>
-#include <set>
 #include <optional>
 #include <string_view>
 #include <system_error>
@@ -27,36 +24,14 @@ namespace SparkleLauncher
 	{
 		try
 		{
-			Json::InputAdmission admission(text, text.size());
-			std::set<std::string> repeated;
-			const std::array<std::string_view, 9> fields{"generator", "platform", "toolset", "qtRoot", "vulkanSdkRoot", "contentPipeline", "shaderCompiler", "nvidiaStreamline", "sourceListHash"};
-
-			const auto admitValue = [&](int depth, nlohmann::json::parse_event_t event, nlohmann::json& value)
-			{
-				admission.ReadEvent(depth, event);
-				if (event != nlohmann::json::parse_event_t::key)
-				{
-					return true;
-				}
-
-				const auto& key = value.get_ref<const std::string&>();
-				const bool bConsumed = depth == 1 && std::find(fields.begin(), fields.end(), key) != fields.end();
-				if (bConsumed && !admission.TryReadKey(depth, key))
-				{
-					repeated.insert(key);
-				}
-				return bConsumed;
-			};
-
-			auto document = nlohmann::json::parse(text.begin(), text.end(), admitValue);
+			auto document = Json::ParseObjectFields<nlohmann::json>(
+			    text,
+			    text.size(),
+			    {"generator", "platform", "toolset", "qtRoot", "vulkanSdkRoot", "contentPipeline", "shaderCompiler", "nvidiaStreamline", "sourceListHash"});
 
 			if (!document.is_object())
 			{
 				return nlohmann::json::object();
-			}
-			for (const auto& key : repeated)
-			{
-				document.erase(key);
 			}
 			return document;
 		}

@@ -2,7 +2,8 @@
 
 #include "Vulkan/VulkanRenderHardwareInterface.h"
 
-#include "Vulkan/Capture/VulkanCaptureService.h"
+#include "Vulkan/Capture/VulkanTextureReadback.h"
+#include "Capture/RhiCaptureServiceAdapter.h"
 #include "Vulkan/Commands/VulkanCommandRecordingContext.h"
 #include "Vulkan/Commands/VulkanRenderCommandList.h"
 #include "Vulkan/Descriptors/VulkanDescriptorAllocator.h"
@@ -31,7 +32,7 @@ VulkanRenderHardwareInterface::VulkanRenderHardwareInterface(VulkanRhi& rhi, Vul
     m_memoryAllocator(&memoryAllocator)
 {
 	m_interopService = std::make_unique<VulkanInteropService>(*this);
-	m_captureService = std::make_unique<VulkanCaptureService>(rhi, memoryAllocator);
+	m_captureService = std::make_unique<RhiCaptureServiceAdapter<VulkanTextureReadback>>(rhi, memoryAllocator);
 	m_pipelineService = std::make_unique<RhiPipelineServiceAdapter<VulkanRhi, VulkanPipeline, VulkanRayTracingPipeline, CompileVulkanBindingLayout>>(rhi);
 	m_rayTracingServices = std::make_unique<VulkanRayTracingServices>(rhi, memoryAllocator);
 	m_descriptorService = std::make_unique<VulkanDescriptorService>(rhi, memoryAllocator, m_capabilities);

@@ -11,6 +11,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <span>
 #include <string>
 #include <type_traits>
 #include <variant>
@@ -119,10 +120,10 @@ public:
 	bool IsBound(const char* name) const noexcept;
 
 	bool SetTexture(const char* name, FrameGraphTextureHandle handle);
-	bool SetTextureArray(const char* name, const std::vector<FrameGraphTextureHandle>& handles);
+	bool SetTextureArray(const char* name, std::span<const FrameGraphTextureHandle> handles);
 	bool SetAttachment(const char* name, FrameGraphAttachmentBinding binding);
 	bool SetBuffer(const char* name, FrameGraphBufferHandle handle);
-	bool SetBufferArray(const char* name, const std::vector<FrameGraphBufferHandle>& handles);
+	bool SetBufferArray(const char* name, std::span<const FrameGraphBufferHandle> handles);
 	bool SetShaderResourceView(const char* name, RhiDescriptorTableBinding descriptorTable);
 	bool SetShaderResourceView(const char* name, RhiGpuDescriptorHandle descriptorTable);
 	bool UsesGraphResource(std::uint32_t index) const noexcept;

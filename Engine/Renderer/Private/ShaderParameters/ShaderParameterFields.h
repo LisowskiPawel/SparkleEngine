@@ -9,7 +9,6 @@
 #include <array>
 #include <cstddef>
 #include <type_traits>
-#include <vector>
 
 namespace ShaderParameterFields
 {
@@ -19,7 +18,8 @@ namespace ShaderParameterFields
 		static_assert(ArrayCount > 0, "Shader parameter field arrays must contain at least one element.");
 
 		using HandleType = THandle;
-		static constexpr std::size_t Count = ArrayCount;
+		static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
+		static constexpr bool bUsesGraphResource = true;
 
 		ResourceArrayField() = default;
 
@@ -36,8 +36,6 @@ namespace ShaderParameterFields
 		THandle& operator[](std::size_t index) noexcept { return m_values[index]; }
 
 		const std::array<THandle, ArrayCount>& GetValues() const noexcept { return m_values; }
-
-		std::vector<THandle> ToVector() const { return std::vector<THandle>(m_values.begin(), m_values.end()); }
 
 	private:
 		std::array<THandle, ArrayCount> m_values = {};
@@ -78,6 +76,8 @@ class SPARKLE_RENDERER_API ShaderTexture2DSRV final
 {
 public:
 	using Semantic = ReadTexture;
+	static constexpr std::uint32_t FieldArrayCount = 1;
+	static constexpr bool bUsesGraphResource = false;
 
 	ShaderTexture2DSRV();
 
@@ -101,7 +101,8 @@ public:
 	static_assert(ArrayCount > 0, "Shader texture descriptor tables must contain at least one element.");
 
 	using Semantic = ReadTexture;
-	static constexpr std::size_t Count = ArrayCount;
+	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
+	static constexpr bool bUsesGraphResource = false;
 
 	ShaderTexture2DTableSRV() = default;
 
@@ -123,6 +124,8 @@ class SPARKLE_RENDERER_API ShaderAccelerationStructure final
 {
 public:
 	using Semantic = AccelerationStructure;
+	static constexpr std::uint32_t FieldArrayCount = 1;
+	static constexpr bool bUsesGraphResource = true;
 
 	ShaderAccelerationStructure();
 
@@ -154,6 +157,8 @@ class ShaderRenderTarget final
 {
 public:
 	using Semantic = RenderTarget;
+	static constexpr std::uint32_t FieldArrayCount = 1;
+	static constexpr bool bUsesGraphResource = true;
 
 	ShaderRenderTarget& operator=(FrameGraphAttachmentBinding binding) noexcept
 	{
@@ -173,6 +178,8 @@ class ShaderDepthTarget final
 {
 public:
 	using Semantic = DepthTarget;
+	static constexpr std::uint32_t FieldArrayCount = 1;
+	static constexpr bool bUsesGraphResource = true;
 
 	ShaderDepthTarget& operator=(FrameGraphAttachmentBinding binding) noexcept
 	{
@@ -213,6 +220,8 @@ template <typename TValue> class ShaderUniform final
 public:
 	using Semantic = UniformData<TValue>;
 	using ValueType = TValue;
+	static constexpr std::uint32_t FieldArrayCount = 1;
+	static constexpr bool bUsesGraphResource = false;
 
 	ShaderUniform() = default;
 
@@ -242,6 +251,8 @@ class SPARKLE_RENDERER_API ShaderSamplerSet final
 {
 public:
 	using Semantic = SamplerSet;
+	static constexpr std::uint32_t FieldArrayCount = 1;
+	static constexpr bool bUsesGraphResource = false;
 
 	ShaderSamplerSet();
 
@@ -268,143 +279,14 @@ private:
 	bool m_bIsBound = false;
 };
 
-template <typename T> struct ShaderParameterFieldTraits;
-
-template <typename TValue, std::size_t ArrayCount> struct ShaderParameterFieldTraits<ShaderTexture2D<TValue, ArrayCount>>
+template <std::size_t ArrayCount> bool BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderParameterFields::ResourceArrayField<FrameGraphTextureHandle, ArrayCount>& field)
 {
-	using Semantic = ReadTexture;
-	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
-	static constexpr bool bUsesGraphResource = true;
-};
-
-template <typename TValue, std::size_t ArrayCount> struct ShaderParameterFieldTraits<ShaderTexture3D<TValue, ArrayCount>>
-{
-	using Semantic = ReadTexture;
-	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
-	static constexpr bool bUsesGraphResource = true;
-};
-
-template <typename TValue, std::size_t ArrayCount> struct ShaderParameterFieldTraits<ShaderTextureCube<TValue, ArrayCount>>
-{
-	using Semantic = ReadTexture;
-	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
-	static constexpr bool bUsesGraphResource = true;
-};
-
-template <> struct ShaderParameterFieldTraits<ShaderTexture2DSRV>
-{
-	using Semantic = ReadTexture;
-	static constexpr std::uint32_t FieldArrayCount = 1;
-	static constexpr bool bUsesGraphResource = false;
-};
-
-template <std::size_t ArrayCount> struct ShaderParameterFieldTraits<ShaderTexture2DTableSRV<ArrayCount>>
-{
-	using Semantic = ReadTexture;
-	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
-	static constexpr bool bUsesGraphResource = false;
-};
-
-template <> struct ShaderParameterFieldTraits<ShaderAccelerationStructure>
-{
-	using Semantic = AccelerationStructure;
-	static constexpr std::uint32_t FieldArrayCount = 1;
-	static constexpr bool bUsesGraphResource = true;
-};
-
-template <typename TValue, std::size_t ArrayCount> struct ShaderParameterFieldTraits<ShaderRWTexture2D<TValue, ArrayCount>>
-{
-	using Semantic = RWTexture;
-	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
-	static constexpr bool bUsesGraphResource = true;
-};
-
-template <> struct ShaderParameterFieldTraits<ShaderRenderTarget>
-{
-	using Semantic = RenderTarget;
-	static constexpr std::uint32_t FieldArrayCount = 1;
-	static constexpr bool bUsesGraphResource = true;
-};
-
-template <> struct ShaderParameterFieldTraits<ShaderDepthTarget>
-{
-	using Semantic = DepthTarget;
-	static constexpr std::uint32_t FieldArrayCount = 1;
-	static constexpr bool bUsesGraphResource = true;
-};
-
-template <typename TValue, std::size_t ArrayCount> struct ShaderParameterFieldTraits<ShaderBuffer<TValue, ArrayCount>>
-{
-	using Semantic = ReadBuffer;
-	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
-	static constexpr bool bUsesGraphResource = true;
-};
-
-template <typename TValue, std::size_t ArrayCount> struct ShaderParameterFieldTraits<ShaderRWBuffer<TValue, ArrayCount>>
-{
-	using Semantic = RWBuffer;
-	static constexpr std::uint32_t FieldArrayCount = static_cast<std::uint32_t>(ArrayCount);
-	static constexpr bool bUsesGraphResource = true;
-};
-
-template <typename TValue> struct ShaderParameterFieldTraits<ShaderUniform<TValue>>
-{
-	using Semantic = UniformData<TValue>;
-	static constexpr std::uint32_t FieldArrayCount = 1;
-	static constexpr bool bUsesGraphResource = false;
-};
-
-template <> struct ShaderParameterFieldTraits<ShaderSamplerSet>
-{
-	using Semantic = SamplerSet;
-	static constexpr std::uint32_t FieldArrayCount = 1;
-	static constexpr bool bUsesGraphResource = false;
-};
-
-template <typename T, typename = void> struct IsShaderParameterField : std::false_type
-{
-};
-
-template <typename T> struct IsShaderParameterField<T, std::void_t<typename ShaderParameterFieldTraits<T>::Semantic>> : std::true_type
-{
-};
-
-template <typename T> constexpr bool bIsShaderParameterFieldV = IsShaderParameterField<T>::value;
-
-template <typename TValue, std::size_t ArrayCount>
-std::enable_if_t<ArrayCount == 1, bool> BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderTexture2D<TValue, ArrayCount>& field)
-{
-	return parameterSet.SetTexture(name, field.GetValues()[0]);
+	return parameterSet.SetTextureArray(name, field.GetValues());
 }
 
-template <typename TValue, std::size_t ArrayCount>
-std::enable_if_t<(ArrayCount > 1), bool> BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderTexture2D<TValue, ArrayCount>& field)
+template <std::size_t ArrayCount> bool BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderParameterFields::ResourceArrayField<FrameGraphBufferHandle, ArrayCount>& field)
 {
-	return parameterSet.SetTextureArray(name, field.ToVector());
-}
-
-template <typename TValue, std::size_t ArrayCount>
-std::enable_if_t<ArrayCount == 1, bool> BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderTexture3D<TValue, ArrayCount>& field)
-{
-	return parameterSet.SetTexture(name, field.GetValues()[0]);
-}
-
-template <typename TValue, std::size_t ArrayCount>
-std::enable_if_t<(ArrayCount > 1), bool> BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderTexture3D<TValue, ArrayCount>& field)
-{
-	return parameterSet.SetTextureArray(name, field.ToVector());
-}
-
-template <typename TValue, std::size_t ArrayCount>
-std::enable_if_t<ArrayCount == 1, bool> BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderTextureCube<TValue, ArrayCount>& field)
-{
-	return parameterSet.SetTexture(name, field.GetValues()[0]);
-}
-
-template <typename TValue, std::size_t ArrayCount>
-std::enable_if_t<(ArrayCount > 1), bool> BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderTextureCube<TValue, ArrayCount>& field)
-{
-	return parameterSet.SetTextureArray(name, field.ToVector());
+	return parameterSet.SetBufferArray(name, field.GetValues());
 }
 
 SPARKLE_RENDERER_API bool BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderTexture2DSRV& field);
@@ -416,44 +298,8 @@ template <std::size_t ArrayCount> inline bool BindParameterField(PassParameterSe
 
 SPARKLE_RENDERER_API bool BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderAccelerationStructure& field);
 
-template <typename TValue, std::size_t ArrayCount>
-std::enable_if_t<ArrayCount == 1, bool> BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderRWTexture2D<TValue, ArrayCount>& field)
-{
-	return parameterSet.SetTexture(name, field.GetValues()[0]);
-}
-
-template <typename TValue, std::size_t ArrayCount>
-std::enable_if_t<(ArrayCount > 1), bool> BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderRWTexture2D<TValue, ArrayCount>& field)
-{
-	return parameterSet.SetTextureArray(name, field.ToVector());
-}
-
 SPARKLE_RENDERER_API bool BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderRenderTarget& field);
 SPARKLE_RENDERER_API bool BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderDepthTarget& field);
-
-template <typename TValue, std::size_t ArrayCount>
-std::enable_if_t<ArrayCount == 1, bool> BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderBuffer<TValue, ArrayCount>& field)
-{
-	return parameterSet.SetBuffer(name, field.GetValues()[0]);
-}
-
-template <typename TValue, std::size_t ArrayCount>
-std::enable_if_t<(ArrayCount > 1), bool> BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderBuffer<TValue, ArrayCount>& field)
-{
-	return parameterSet.SetBufferArray(name, field.ToVector());
-}
-
-template <typename TValue, std::size_t ArrayCount>
-std::enable_if_t<ArrayCount == 1, bool> BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderRWBuffer<TValue, ArrayCount>& field)
-{
-	return parameterSet.SetBuffer(name, field.GetValues()[0]);
-}
-
-template <typename TValue, std::size_t ArrayCount>
-std::enable_if_t<(ArrayCount > 1), bool> BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderRWBuffer<TValue, ArrayCount>& field)
-{
-	return parameterSet.SetBufferArray(name, field.ToVector());
-}
 
 template <typename TValue> bool BindParameterField(PassParameterSet& parameterSet, const char* name, const ShaderUniform<TValue>& field)
 {

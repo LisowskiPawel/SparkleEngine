@@ -239,20 +239,19 @@ void RayTracingBlasCache::ReplaceDynamicVertexBuffer(std::span<const DirectX::XM
 		entry.dynamicVertexBufferView = {};
 	}
 
-	const bool bVertexBufferCreated = m_renderHardwareInterface->GetResourceService().CreateVertexBuffer(
-	    positions.data(),
-	    positions.size() * sizeof(DirectX::XMFLOAT3),
-	    static_cast<std::uint32_t>(sizeof(DirectX::XMFLOAT3)),
-	    L"RayTracingSkinnedBlasVertices",
-	    entry.dynamicVertexBuffer,
-	    entry.dynamicVertexBufferView);
+	RhiResourceService& resources = m_renderHardwareInterface->GetResourceService();
+	const RhiBufferResourceDesc desc{.SizeInBytes = positions.size_bytes(), .StrideInBytes = sizeof(DirectX::XMFLOAT3), .Kind = RhiBufferKind::Vertex, .bAllowRayTracingBuildInput = true};
 
-	const bool bVertexBufferAvailable = bVertexBufferCreated && entry.dynamicVertexBuffer;
-
-	if (!bVertexBufferAvailable)
+	entry.dynamicVertexBuffer = resources.CreateHostUploadBuffer(desc, positions.data(), RhiMemoryCategory::Mesh, L"RayTracingSkinnedBlasVertices");
+	if (!entry.dynamicVertexBuffer)
 	{
 		Diagnostics::Fatal(g_rayTracingBlasCacheLogger, __FILE__, __LINE__, "Skinned BLAS dynamic vertex-buffer allocation failed.");
 	}
+
+	entry.dynamicVertexBufferView = RhiVertexBufferView{
+	    .BufferLocation = resources.GetResourceGpuVirtualAddress(entry.dynamicVertexBuffer),
+	    .SizeInBytes = static_cast<std::uint32_t>(desc.SizeInBytes),
+	    .StrideInBytes = desc.StrideInBytes};
 }
 
 RhiRayTracingGeometryDesc RayTracingBlasCache::BuildSkinnedGeometryDesc(const GpuMesh& gpuMesh, const Entry& entry, std::uint32_t vertexCount) const noexcept

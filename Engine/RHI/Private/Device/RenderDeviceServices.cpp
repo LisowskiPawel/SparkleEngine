@@ -13,7 +13,6 @@
 #endif
 #include "Device/RenderDeviceBackendFactory.h"
 #include "Device/RenderDeviceBackendServices.h"
-#include "Device/RenderDeviceServicesState.h"
 #include "CVars/RHICVars.h"
 #include "Presentation/RhiPresentationDefaults.h"
 
@@ -21,11 +20,18 @@
 
 #include "Core/Public/Diagnostics/Logger.h"
 #include "Core/Public/Diagnostics/Verify.h"
+#include "Core/Public/Threading/ThreadOwnership.h"
 #include <format>
 #include <string>
 #include <utility>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_renderDeviceServicesLogger, "RHI.Services");
+
+struct RenderDeviceServices::State final
+{
+	Threading::OwnerThread Owner{"RenderDeviceServices"};
+	std::unique_ptr<RenderDeviceBackendServices> Backend;
+};
 
 void RenderDeviceServices::FailCreation(std::string_view message) noexcept
 {
@@ -71,12 +77,26 @@ RhiPresentationConfiguration RenderDeviceServices::ResolvePresentationConfigurat
 }
 
 RenderDeviceServices::RenderDeviceServices() noexcept :
-
-    m_state(std::make_unique<RenderDeviceServicesState>())
+    m_state(std::make_unique<State>())
 {
 }
 
-RenderDeviceServices::~RenderDeviceServices() noexcept = default;
+RenderDeviceServices::~RenderDeviceServices() noexcept
+{
+	m_state->Owner.AssertAccess();
+}
+
+RenderDeviceBackendServices& RenderDeviceServices::GetBackendServices(std::source_location location) noexcept
+{
+	m_state->Owner.AssertAccess(location);
+	return *m_state->Backend;
+}
+
+const RenderDeviceBackendServices& RenderDeviceServices::GetBackendServices(std::source_location location) const noexcept
+{
+	m_state->Owner.AssertAccess(location);
+	return *m_state->Backend;
+}
 
 std::unique_ptr<RenderDeviceServices> RenderDeviceServices::Create(Window& window, const RhiDeviceLaunch& launch) noexcept
 {
@@ -115,13 +135,13 @@ std::unique_ptr<RenderDeviceServices> RenderDeviceServices::Create(Window& windo
 			FailUnsupportedBackend(backendApi);
 	}
 
-	services->m_state->SetBackendServices(std::move(backendServices));
+	services->m_state->Backend = std::move(backendServices);
 
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
 	services->m_externalCapture = launch.ExternalCapture;
 	if (launch.ExternalCapture)
 	{
-		services->m_state->GetBackendServices().BindExternalCapture(*launch.ExternalCapture);
+		services->GetBackendServices().BindExternalCapture(*launch.ExternalCapture);
 	}
 #endif
 	const RhiAdapterIdentity& adapter = services->GetCapabilities().ExternalFeatureInterop.Adapter;
@@ -139,24 +159,24 @@ std::unique_ptr<RenderDeviceServices> RenderDeviceServices::Create(Window& windo
 
 const RhiCapabilities& RenderDeviceServices::GetCapabilities() const noexcept
 {
-	const RenderDeviceBackendServices& backendServices = m_state->GetBackendServices();
+	const RenderDeviceBackendServices& backendServices = GetBackendServices();
 	return backendServices.GetRenderHardwareInterface().GetCapabilities();
 }
 
 RenderHardwareInterface& RenderDeviceServices::GetRenderHardwareInterface() noexcept
 {
-	return m_state->GetBackendServices().GetRenderHardwareInterface();
+	return GetBackendServices().GetRenderHardwareInterface();
 }
 
 const RenderHardwareInterface& RenderDeviceServices::GetRenderHardwareInterface() const noexcept
 {
-	const RenderDeviceBackendServices& backendServices = m_state->GetBackendServices();
+	const RenderDeviceBackendServices& backendServices = GetBackendServices();
 	return backendServices.GetRenderHardwareInterface();
 }
 
 RhiImGuiRenderer& RenderDeviceServices::GetImGuiRenderer() noexcept
 {
-	return m_state->GetBackendServices().GetImGuiRenderer();
+	return GetBackendServices().GetImGuiRenderer();
 }
 
 void RenderDeviceServices::SettleForShutdown() noexcept
@@ -167,7 +187,7 @@ void RenderDeviceServices::SettleForShutdown() noexcept
 		m_externalCapture->Shutdown();
 	}
 #endif
-	m_state->GetBackendServices().SettleForShutdown();
+	GetBackendServices().SettleForShutdown();
 #if SPARKLE_WITH_GPU_CRASH_DEBUGGING
 	// Settle diagnostics before cache joins can wait behind their writer on I/O.
 	if (auto* session = GpuCrashSession::Current())
@@ -185,12 +205,12 @@ void RenderDeviceServices::ResizeSwapChain() noexcept
 		m_externalCapture->InvalidateTarget();
 	}
 #endif
-	m_state->GetBackendServices().ResizeSwapChain();
+	GetBackendServices().ResizeSwapChain();
 }
 
 void RenderDeviceServices::BeginFrame(std::uint64_t frameId) noexcept
 {
-	RenderDeviceBackendServices& backendServices = m_state->GetBackendServices();
+	RenderDeviceBackendServices& backendServices = GetBackendServices();
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
 	if (m_externalCapture)
 	{
@@ -204,72 +224,72 @@ void RenderDeviceServices::BeginFrame(std::uint64_t frameId) noexcept
 
 void RenderDeviceServices::PrepareCommandRecording() noexcept
 {
-	m_state->GetBackendServices().PrepareCommandRecording();
+	GetBackendServices().PrepareCommandRecording();
 }
 
 RenderCommandList& RenderDeviceServices::GetCurrentGraphicsCommandList() noexcept
 {
-	return m_state->GetBackendServices().GetCurrentGraphicsCommandList();
+	return GetBackendServices().GetCurrentGraphicsCommandList();
 }
 
 RenderCommandList& RenderDeviceServices::GetGraphicsCommandList(std::uint32_t frameIndex) noexcept
 {
-	return m_state->GetBackendServices().GetGraphicsCommandList(frameIndex);
+	return GetBackendServices().GetGraphicsCommandList(frameIndex);
 }
 
 RenderCommandList& RenderDeviceServices::BeginCurrentGraphicsCommandList() noexcept
 {
-	return m_state->GetBackendServices().BeginCurrentGraphicsCommandList();
+	return GetBackendServices().BeginCurrentGraphicsCommandList();
 }
 
 RhiCommandRecordingLease RenderDeviceServices::AcquireCommandRecordingLease(ERhiQueueType queueType, RhiCommandRecordingOwner owner) noexcept
 {
-	return m_state->GetBackendServices().AcquireCommandRecordingLease(queueType, owner);
+	return GetBackendServices().AcquireCommandRecordingLease(queueType, owner);
 }
 
 RhiCommandRecordingLease RenderDeviceServices::TakeCurrentGraphicsCommandRecordingLease() noexcept
 {
-	return m_state->GetBackendServices().TakeCurrentGraphicsCommandRecordingLease();
+	return GetBackendServices().TakeCurrentGraphicsCommandRecordingLease();
 }
 
 RhiSubmissionToken RenderDeviceServices::SubmitCommandRecordingLease(RhiCommandRecordingLease&& lease, std::span<const RhiSubmissionToken> waitTokens) noexcept
 {
-	return m_state->GetBackendServices().SubmitCommandRecordingLease(std::move(lease), waitTokens);
+	return GetBackendServices().SubmitCommandRecordingLease(std::move(lease), waitTokens);
 }
 
 RhiSubmissionToken RenderDeviceServices::SubmitCommandRecordingBatch(std::span<RhiCommandRecordingLease> leases, std::span<const RhiSubmissionToken> waitTokens) noexcept
 {
-	return m_state->GetBackendServices().SubmitCommandRecordingBatch(leases, waitTokens);
+	return GetBackendServices().SubmitCommandRecordingBatch(leases, waitTokens);
 }
 
 RhiSubmissionToken RenderDeviceServices::SubmitCurrentGraphicsCommandList(std::span<const RhiSubmissionToken> waitTokens) noexcept
 {
-	return m_state->GetBackendServices().SubmitCurrentGraphicsCommandList(waitTokens);
+	return GetBackendServices().SubmitCurrentGraphicsCommandList(waitTokens);
 }
 
 void RenderDeviceServices::QueueWait(ERhiQueueType waitQueue, RhiSubmissionToken executionToken) noexcept
 {
-	m_state->GetBackendServices().QueueWait(waitQueue, executionToken);
+	GetBackendServices().QueueWait(waitQueue, executionToken);
 }
 
 void RenderDeviceServices::WaitForSubmission(RhiSubmissionToken token) noexcept
 {
-	m_state->GetBackendServices().WaitForSubmission(token);
+	GetBackendServices().WaitForSubmission(token);
 }
 
 bool RenderDeviceServices::IsSubmissionComplete(RhiSubmissionToken token) const noexcept
 {
-	return m_state->GetBackendServices().IsSubmissionComplete(token);
+	return GetBackendServices().IsSubmissionComplete(token);
 }
 
 RhiSubmissionToken RenderDeviceServices::GetLastSubmittedToken(ERhiQueueType queueType) const noexcept
 {
-	return m_state->GetBackendServices().GetLastSubmittedToken(queueType);
+	return GetBackendServices().GetLastSubmittedToken(queueType);
 }
 
 void RenderDeviceServices::SubmitFrame(std::uint64_t frameId) noexcept
 {
-	m_state->GetBackendServices().SubmitFrame(frameId);
+	GetBackendServices().SubmitFrame(frameId);
 #if SPARKLE_WITH_EXTERNAL_CAPTURE
 	if (m_externalCapture)
 	{
@@ -280,5 +300,5 @@ void RenderDeviceServices::SubmitFrame(std::uint64_t frameId) noexcept
 
 void RenderDeviceServices::AdvanceFrameInFlight() noexcept
 {
-	m_state->GetBackendServices().AdvanceFrameInFlight();
+	GetBackendServices().AdvanceFrameInFlight();
 }
