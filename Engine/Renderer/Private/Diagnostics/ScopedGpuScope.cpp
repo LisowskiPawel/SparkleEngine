@@ -2,11 +2,11 @@
 
 #include "Diagnostics/ScopedGpuScope.h"
 
-#include "Commands/RenderCommandContext.h"
+#include "RHI/Public/Commands/RenderCommandList.h"
 
 #include <utility>
 
-ScopedGpuScope::ScopedGpuScope(RenderCommandContext& commands, std::string_view label, RhiDiagnosticLabelColor color) noexcept
+ScopedGpuScope::ScopedGpuScope(RenderCommandList& commands, std::string_view label, RhiDiagnosticLabelColor color) noexcept
 {
 	if (label.empty() || !commands.SupportsDiagnosticScopes())
 	{

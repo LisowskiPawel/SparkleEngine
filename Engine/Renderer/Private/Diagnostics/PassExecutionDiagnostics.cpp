@@ -2,10 +2,10 @@
 
 #include "Diagnostics/PassExecutionDiagnostics.h"
 
-#include "Commands/RenderCommandContext.h"
+#include "RHI/Public/Commands/RenderCommandList.h"
 #include "Debug/RendererCVars.h"
 
-PassExecutionDiagnostics::PassExecutionDiagnostics(RenderCommandContext& commands, std::string_view passScopeLabel, EFrameGraphPassKind passKind) noexcept :
+PassExecutionDiagnostics::PassExecutionDiagnostics(RenderCommandList& commands, std::string_view passScopeLabel, EFrameGraphPassKind passKind) noexcept :
     m_commands(commands),
     m_passScopeLabel(passScopeLabel),
     m_passColor(GetPassEventColor(passKind))

@@ -160,18 +160,18 @@ namespace SparkleLauncher
 		return definitions;
 	}
 
-	std::optional<LevelRunOperationDefinition> FindLevelRunOperationDefinition(std::string_view operationId)
+	const LevelRunOperationDefinition* FindLevelRunOperationDefinition(std::string_view operationId)
 	{
 		const std::vector<LevelRunOperationDefinition>& definitions = GetLevelRunOperationDefinitions();
 		const auto found = std::find_if(definitions.begin(), definitions.end(), [operationId](const LevelRunOperationDefinition& definition) { return definition.Id == operationId; });
-		return found == definitions.end() ? std::nullopt : std::optional<LevelRunOperationDefinition>(*found);
+		return found == definitions.end() ? nullptr : &*found;
 	}
 
 	LevelRunOperationPlan PlanLevelRunOperation(std::string_view operationId, const LevelRunOperationRequest& request)
 	{
 		LevelRunOperationPlan plan;
-		const std::optional<LevelRunOperationDefinition> definition = FindLevelRunOperationDefinition(operationId);
-		if (!definition.has_value())
+		const LevelRunOperationDefinition* definition = FindLevelRunOperationDefinition(operationId);
+		if (definition == nullptr)
 		{
 			plan.Operation = MakeOperationRecord(std::string(operationId), "Unknown level run operation");
 			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Unknown level run operation id.", "Choose the registered Run Level operation, then retry.");

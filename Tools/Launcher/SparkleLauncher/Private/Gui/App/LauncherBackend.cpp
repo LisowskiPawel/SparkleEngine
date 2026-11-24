@@ -1,11 +1,7 @@
 #include "Gui/App/LauncherBackend.h"
 
-#include "SparkleLauncher/BuildWorkspaceOperations.h"
-#include "SparkleLauncher/CookOperations.h"
-#include "SparkleLauncher/LevelOperations.h"
-#include "SparkleLauncher/LevelRunOperations.h"
-#include "SparkleLauncher/MaintenanceOperations.h"
 #include "Gui/Operations/LauncherOperationService.h"
+#include "Operations/LauncherOperationExecution.h"
 
 #include <QtCore/QMetaObject>
 
@@ -158,35 +154,12 @@ namespace SparkleLauncher
 	{
 		m_operations.clear();
 
-		for (const BuildWorkspaceOperationDefinition& definition : GetBuildWorkspaceOperationDefinitions())
-		{
-			m_operations.push_back(
-			    {QString::fromStdString(definition.Id), QString::fromStdString(definition.Group), QString::fromStdString(definition.DisplayName), QString::fromStdString(definition.Description)});
-		}
-
-		for (const CookOperationDefinition& definition : GetCookOperationDefinitions())
-		{
-			m_operations.push_back(
-			    {QString::fromStdString(definition.Id), QString::fromStdString(definition.Group), QString::fromStdString(definition.DisplayName), QString::fromStdString(definition.Description)});
-		}
-
-		for (const LevelOperationDefinition& definition : GetLevelOperationDefinitions())
-		{
-			m_operations.push_back(
-			    {QString::fromStdString(definition.Id), QString::fromStdString(definition.Group), QString::fromStdString(definition.DisplayName), QString::fromStdString(definition.Description)});
-		}
-
-		for (const LevelRunOperationDefinition& definition : GetLevelRunOperationDefinitions())
-		{
-			m_operations.push_back(
-			    {QString::fromStdString(definition.Id), QString::fromStdString(definition.Group), QString::fromStdString(definition.DisplayName), QString::fromStdString(definition.Description)});
-		}
-
-		for (const MaintenanceOperationDefinition& definition : GetMaintenanceOperationDefinitions())
-		{
-			m_operations.push_back(
-			    {QString::fromStdString(definition.Id), QString::fromStdString(definition.Group), QString::fromStdString(definition.DisplayName), QString::fromStdString(definition.Description)});
-		}
+		VisitLauncherOperationDefinitions(
+		    [this](const auto& definition)
+		    {
+			    m_operations.push_back(
+			        {QString::fromStdString(definition.Id), QString::fromStdString(definition.Group), QString::fromStdString(definition.DisplayName), QString::fromStdString(definition.Description)});
+		    });
 	}
 
 	const LauncherOperationDescriptor* LauncherBackend::FindOperation(const QString& operationId) const

@@ -33,7 +33,6 @@
 #include <vector>
 
 class RayTracingShaderTable;
-class RenderCommandContext;
 class RenderCommandList;
 class RhiCommandSubmissionService;
 class FrameGraphTransientAllocator;
@@ -293,8 +292,8 @@ private:
 	void SyncImportedBufferViews(FrameGraphResourceHandle handle, const FrameGraphResourceMetadata& metadata, FrameGraphResourceAccess& access) const noexcept;
 	void ReleaseExternalResourceViews() noexcept;
 	void ReleaseExternalResourceViews(FrameGraphResourceHandle handle) noexcept;
-	void EmitTransientAliasingBarriers(RenderCommandContext& commandContext, std::string_view passName, const std::vector<FrameGraphAliasingBarrier>& barriers) const noexcept;
-	void EmitCompiledBarriers(RenderCommandContext& commandContext, std::string_view passName, const std::vector<FrameGraphBarrier>& barriers) const noexcept;
+	void EmitTransientAliasingBarriers(RenderCommandList& commandList, std::string_view passName, const std::vector<FrameGraphAliasingBarrier>& barriers) const noexcept;
+	void EmitCompiledBarriers(RenderCommandList& commandList, std::string_view passName, const std::vector<FrameGraphBarrier>& barriers) const noexcept;
 	void RecordFrameBeginBarriers(const FrameGraphPlan& plan, RenderCommandList& commandList) const;
 	void RecordFrameEndBarriers(const FrameGraphPlan& plan, RenderCommandList& commandList) const;
 	void PrepareTextureHistories(const FrameGraphPlan& plan);

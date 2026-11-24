@@ -15,7 +15,7 @@
 class GpuMesh;
 class GpuMeshCache;
 class PassExecutionDiagnostics;
-class RenderCommandContext;
+class RenderCommandList;
 class RenderHardwareInterface;
 struct MeshDraw;
 struct PreparedRenderScene;
@@ -41,9 +41,9 @@ public:
 	RayTracingBlasCache& operator=(RayTracingBlasCache&&) = delete;
 
 	void BeginFrame() noexcept;
-	BlasHandle EnsureBlas(RenderCommandContext& commandContext, const GpuMesh& gpuMesh, PassExecutionDiagnostics* diagnostics = nullptr) noexcept;
+	BlasHandle EnsureBlas(RenderCommandList& commandList, const GpuMesh& gpuMesh, PassExecutionDiagnostics* diagnostics = nullptr) noexcept;
 	BlasHandle EnsureBlas(
-	    RenderCommandContext& commandContext,
+	    RenderCommandList& commandList,
 	    const PreparedRenderScene& preparedScene,
 	    const MeshDraw& draw,
 	    std::uint32_t gpuSceneSlot,
@@ -78,9 +78,9 @@ private:
 	};
 
 	void ReleaseEntryResources(Entry& entry) noexcept;
-	BlasHandle BuildBlas(RenderCommandContext& commandContext, const RhiRayTracingGeometryDesc& geometry, Entry& entry, PassExecutionDiagnostics* diagnostics) noexcept;
+	BlasHandle BuildBlas(RenderCommandList& commandList, const RhiRayTracingGeometryDesc& geometry, Entry& entry, PassExecutionDiagnostics* diagnostics) noexcept;
 	BlasHandle EnsureSkinnedBlas(
-	    RenderCommandContext& commandContext,
+	    RenderCommandList& commandList,
 	    const PreparedRenderScene& preparedScene,
 	    const MeshDraw& draw,
 	    std::uint32_t gpuSceneSlot,
@@ -89,7 +89,7 @@ private:
 	void ReplaceDynamicVertexBuffer(std::span<const DirectX::XMFLOAT3> positions, Entry& entry) noexcept;
 	RhiRayTracingGeometryDesc BuildSkinnedGeometryDesc(const GpuMesh& gpuMesh, const Entry& entry, std::uint32_t vertexCount) const noexcept;
 	void EnsureEntryResources(const RhiRayTracingAccelerationStructurePrebuildInfo& prebuildInfo, Entry& entry) noexcept;
-	void TrackBuildResources(RenderCommandContext& commandContext, const Entry& entry) const noexcept;
+	void TrackBuildResources(RenderCommandList& commandList, const Entry& entry) const noexcept;
 	bool GeometryMatches(const Entry& entry, const RhiRayTracingGeometryDesc& geometry) const noexcept;
 	BlasHandle BuildHandle(const Entry& entry) const noexcept;
 

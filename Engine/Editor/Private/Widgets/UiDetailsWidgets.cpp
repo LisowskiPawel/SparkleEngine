@@ -5,6 +5,8 @@
 
 #include "Style/SparkleUiPalette.h"
 
+#include <algorithm>
+#include <span>
 #include <cfloat>
 #include <cmath>
 
@@ -52,16 +54,9 @@ namespace EditorWidgets
 		return std::fabs(value - defaultValue) > DetailsDirtyEpsilon;
 	}
 
-	static bool IsDifferentFromDefault(const float values[3], const float defaultValues[3]) noexcept
+	template <typename TValue> static bool IsDifferentFromDefault(const TValue& value, const TValue& defaultValue) noexcept
 	{
-		for (int axis = 0; axis < 3; ++axis)
-		{
-			if (IsDifferentFromDefault(values[axis], defaultValues[axis]))
-			{
-				return true;
-			}
-		}
-		return false;
+		return value != defaultValue;
 	}
 
 	static bool BeginDetailsRow(const char* label, int valueColumnCount)
@@ -150,6 +145,23 @@ namespace EditorWidgets
 		ImGui::Dummy(ImVec2(DetailsUtilityColumnWidth, EditorIconSize));
 	}
 
+	template <typename TValue> static bool ResetDetailsValues(int utilityColumnIndex, std::span<TValue> values, const TValue* defaults)
+	{
+		if (defaults == nullptr)
+		{
+			DrawDetailsEmptyUtility(utilityColumnIndex);
+			return false;
+		}
+
+		const bool bDirty = !std::equal(values.begin(), values.end(), defaults, [](const TValue& value, const TValue& defaultValue) { return !IsDifferentFromDefault(value, defaultValue); });
+		if (!DrawDetailsResetButton(utilityColumnIndex, bDirty))
+		{
+			return false;
+		}
+		std::copy_n(defaults, values.size(), values.data());
+		return true;
+	}
+
 	static void EndDetailsRow()
 	{
 		ImGui::EndTable();
@@ -208,19 +220,7 @@ namespace EditorWidgets
 		ImGui::TableSetColumnIndex(1);
 		ImGui::SetNextItemWidth(-FLT_MIN);
 		bool bChanged = ImGui::DragFloat("##value", &value, speed, minValue, maxValue, format);
-		if (resetValue != nullptr)
-		{
-			const bool bDirty = IsDifferentFromDefault(value, *resetValue);
-			if (DrawDetailsResetButton(2, bDirty))
-			{
-				value = *resetValue;
-				bChanged = true;
-			}
-		}
-		else
-		{
-			DrawDetailsEmptyUtility(2);
-		}
+		bChanged = ResetDetailsValues(2, std::span{&value, 1}, resetValue) || bChanged;
 
 		EndDetailsRow();
 		return bChanged;
@@ -261,21 +261,7 @@ namespace EditorWidgets
 			}
 			ImGui::PopID();
 		}
-		if (resetValues != nullptr)
-		{
-			const bool bDirty = IsDifferentFromDefault(values, resetValues);
-			if (DrawDetailsResetButton(4, bDirty))
-			{
-				values[0] = resetValues[0];
-				values[1] = resetValues[1];
-				values[2] = resetValues[2];
-				bChanged = true;
-			}
-		}
-		else
-		{
-			DrawDetailsEmptyUtility(4);
-		}
+		bChanged = ResetDetailsValues(4, std::span{values, 3}, resetValues) || bChanged;
 
 		EndDetailsRow();
 		return bChanged;
@@ -291,21 +277,7 @@ namespace EditorWidgets
 		ImGui::TableSetColumnIndex(1);
 		ImGui::SetNextItemWidth(-FLT_MIN);
 		bool bChanged = ImGui::ColorEdit3("##value", values, ImGuiColorEditFlags_Float | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_PickerHueBar);
-		if (resetValues != nullptr)
-		{
-			const bool bDirty = IsDifferentFromDefault(values, resetValues);
-			if (DrawDetailsResetButton(2, bDirty))
-			{
-				values[0] = resetValues[0];
-				values[1] = resetValues[1];
-				values[2] = resetValues[2];
-				bChanged = true;
-			}
-		}
-		else
-		{
-			DrawDetailsEmptyUtility(2);
-		}
+		bChanged = ResetDetailsValues(2, std::span{values, 3}, resetValues) || bChanged;
 
 		EndDetailsRow();
 		return bChanged;
@@ -320,18 +292,7 @@ namespace EditorWidgets
 
 		ImGui::TableSetColumnIndex(1);
 		bool bChanged = ImGui::Checkbox("##value", &bValue);
-		if (resetValue != nullptr)
-		{
-			if (DrawDetailsResetButton(2, bValue != *resetValue))
-			{
-				bValue = *resetValue;
-				bChanged = true;
-			}
-		}
-		else
-		{
-			DrawDetailsEmptyUtility(2);
-		}
+		bChanged = ResetDetailsValues(2, std::span{&bValue, 1}, resetValue) || bChanged;
 
 		EndDetailsRow();
 		return bChanged;
@@ -348,18 +309,7 @@ namespace EditorWidgets
 		ImGui::SetNextItemWidth(-FLT_MIN);
 		bool bChanged = ImGui::InputText("##value", &value);
 
-		if (resetValue != nullptr)
-		{
-			if (DrawDetailsResetButton(2, value != *resetValue))
-			{
-				value = *resetValue;
-				bChanged = true;
-			}
-		}
-		else
-		{
-			DrawDetailsEmptyUtility(2);
-		}
+		bChanged = ResetDetailsValues(2, std::span{&value, 1}, resetValue) || bChanged;
 
 		EndDetailsRow();
 		return bChanged;

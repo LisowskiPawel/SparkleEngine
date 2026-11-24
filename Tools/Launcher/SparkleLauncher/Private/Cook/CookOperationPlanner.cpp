@@ -8,8 +8,8 @@ namespace SparkleLauncher
 	CookOperationPlan PlanCookOperation(std::string_view operationId, const CookOperationRequest& request)
 	{
 		CookOperationPlan plan;
-		const std::optional<CookOperationDefinition> definition = FindCookOperationDefinition(operationId);
-		if (!definition.has_value())
+		const CookOperationDefinition* definition = FindCookOperationDefinition(operationId);
+		if (definition == nullptr)
 		{
 			plan.Operation = MakeOperationRecord(std::string(operationId), "Unknown cook operation");
 			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Unknown cook operation id.", "Choose a registered Cook operation, then retry.");

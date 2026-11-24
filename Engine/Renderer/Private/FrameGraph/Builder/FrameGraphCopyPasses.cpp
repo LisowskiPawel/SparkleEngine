@@ -18,7 +18,7 @@ namespace FrameGraphCopyPasses
 			    resources.Read(source, ResourceUsage::CopySource, "Source");
 			    resources.Write(destination, ResourceUsage::CopyDest, "Destination");
 		    },
-		    [destination, source](PassCommandContext& context) { context.Resources.CopyTexture(context.Commands, destination, source); });
+		    [destination, source](PassCommandContext& context) { context.Resources.CopyTexture(context.Commands.GetRenderCommandList(), destination, source); });
 	}
 
 	void AddBufferCopy(FrameGraphBuilder& builder, std::string_view name, FrameGraphBufferHandle destination, FrameGraphBufferHandle source)
@@ -32,6 +32,6 @@ namespace FrameGraphCopyPasses
 			    resources.Read(source, ResourceUsage::CopySource, "Source");
 			    resources.Write(destination, ResourceUsage::CopyDest, "Destination");
 		    },
-		    [destination, source](PassCommandContext& context) { context.Resources.CopyBuffer(context.Commands, destination, source); });
+		    [destination, source](PassCommandContext& context) { context.Resources.CopyBuffer(context.Commands.GetRenderCommandList(), destination, source); });
 	}
 }

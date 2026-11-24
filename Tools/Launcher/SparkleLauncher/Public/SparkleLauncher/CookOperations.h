@@ -6,7 +6,6 @@
 
 #include <cstdint>
 #include <filesystem>
-#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -88,7 +87,7 @@ namespace SparkleLauncher
 	bool TryParseCookWorkspaceScope(std::string_view value, CookWorkspaceScope& outScope);
 	std::string ToString(CookMode mode);
 	const std::vector<CookOperationDefinition>& GetCookOperationDefinitions();
-	std::optional<CookOperationDefinition> FindCookOperationDefinition(std::string_view operationId);
+	const CookOperationDefinition* FindCookOperationDefinition(std::string_view operationId);
 	CookOperationPlan PlanCookOperation(std::string_view operationId, const CookOperationRequest& request);
 	OperationRecord RunCookOperationPlan(CookOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback = {}, std::stop_token cancellation = {});
 }

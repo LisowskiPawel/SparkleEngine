@@ -1,7 +1,7 @@
 #include "PCH.h"
 #include "FrameGraph/FrameGraph.h"
 
-#include "Commands/RenderCommandContext.h"
+#include "RHI/Public/Commands/RenderCommandList.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 #include "FrameGraph/Diagnostics/FrameGraphExecutionDiagnostics.h"
 #include "FrameGraph/Execution/FrameGraphSubmissionExecutor.h"
@@ -27,30 +27,23 @@ void FrameGraph::Execute(const FrameGraphPlan& plan, RhiCommandSubmissionService
 
 void FrameGraph::RecordFrameBeginBarriers(const FrameGraphPlan& plan, RenderCommandList& commandList) const
 {
-	RenderCommandContext commands(commandList);
-	FrameGraphExecutionDiagnostics diagnostics(m_renderHardwareInterface.GetDiagnostics(), commands);
-	if (diagnostics.ShouldEmitDetailedMarkers())
-	{
-		commands.EnableDrawDispatchDiagnostics();
-	}
-
+	FrameGraphExecutionDiagnostics diagnostics(m_renderHardwareInterface.GetDiagnostics(), commandList);
 	if (!plan.initialTransientAliasingBarriers.empty())
 	{
 		diagnostics.InsertFrameBeginAliasingBarrierMarker();
 	}
 
-	EmitTransientAliasingBarriers(commands, "FrameBegin", plan.initialTransientAliasingBarriers);
-	EmitCompiledBarriers(commands, "FrameBegin", plan.initialBarriers);
+	EmitTransientAliasingBarriers(commandList, "FrameBegin", plan.initialTransientAliasingBarriers);
+	EmitCompiledBarriers(commandList, "FrameBegin", plan.initialBarriers);
 }
 
 void FrameGraph::RecordFrameEndBarriers(const FrameGraphPlan& plan, RenderCommandList& commandList) const
 {
-	RenderCommandContext commands(commandList);
-	FrameGraphExecutionDiagnostics diagnostics(m_renderHardwareInterface.GetDiagnostics(), commands);
+	FrameGraphExecutionDiagnostics diagnostics(m_renderHardwareInterface.GetDiagnostics(), commandList);
 	if (!plan.finalBarriers.empty())
 	{
 		diagnostics.InsertFrameEndResourceBarrierMarker();
 	}
 
-	EmitCompiledBarriers(commands, "FrameEnd", plan.finalBarriers);
+	EmitCompiledBarriers(commandList, "FrameEnd", plan.finalBarriers);
 }

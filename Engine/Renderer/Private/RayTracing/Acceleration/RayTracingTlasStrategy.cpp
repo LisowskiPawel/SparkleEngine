@@ -24,7 +24,7 @@ RenderRayTracingFrameBindings RayTracingTlasStrategy::Prepare(const PreparedRend
 }
 
 void RayTracingTlasStrategy::Build(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const PreparedRenderScene& preparedScene,
     RayTracingBlasCache& blasCache,
     const RayTracingShaderTablePlan& shaderTablePlan,
@@ -32,7 +32,7 @@ void RayTracingTlasStrategy::Build(
     PassExecutionDiagnostics* diagnostics) noexcept
 {
 	(void) viewPlan;
-	m_tlasBuilder.Build(commandContext, preparedScene, blasCache, shaderTablePlan, diagnostics);
+	m_tlasBuilder.Build(commandList, preparedScene, blasCache, shaderTablePlan, diagnostics);
 }
 
 void RayTracingTlasStrategy::Clear() noexcept

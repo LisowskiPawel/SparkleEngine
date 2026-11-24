@@ -112,28 +112,8 @@ namespace SparkleLauncher
 		return std::to_string(target.FileCount) + " files, " + std::to_string(target.DirectoryCount) + " directories, " + std::to_string(target.ByteCount) + " bytes";
 	}
 
-	static void PopulatePlanSteps(MaintenanceOperationPlan& plan)
-	{
-		if (!plan.bCanRun)
-		{
-			return;
-		}
-
-		for (const MaintenanceCleanStep& cleanStep : BuildMaintenanceCleanSteps(plan))
-		{
-			MaintenanceOperationStep step;
-			step.Id = cleanStep.Id;
-			step.DisplayName = cleanStep.DisplayName;
-			step.bDestructive = true;
-			step.DestructivePath = cleanStep.DestructivePath;
-			step.DisplayCommandLine = "Delete " + cleanStep.DestructivePath.string();
-			plan.Steps.push_back(std::move(step));
-		}
-	}
-
 	void DescribeMaintenancePlan(MaintenanceOperationPlan& plan)
 	{
-		PopulatePlanSteps(plan);
 		for (const MaintenanceCleanTarget& target : plan.CleanTargets)
 		{
 			plan.PlannedEffects.push_back(target.DisplayName + ": " + target.Path.string() + " (" + target.Detail + "; " + FormatCleanTargetStats(target) + ")");
@@ -148,15 +128,13 @@ namespace SparkleLauncher
 		{
 			dryRun << "\n  Confirmation required for clean scope: " << ToString(plan.Request.RequestedCleanScope);
 		}
-		for (const MaintenanceOperationStep& step : plan.Steps)
+		const auto steps = plan.bCanRun ? BuildMaintenanceCleanSteps(plan) : std::vector<MaintenanceCleanStep>{};
+		for (const MaintenanceCleanStep& step : steps)
 		{
-			dryRun << "\n  " << step.DisplayName << ": " << step.DisplayCommandLine;
-			if (step.bDestructive)
-			{
-				dryRun << "\n    Scope: " << step.DestructivePath.string();
-			}
+			dryRun << "\n  " << step.DisplayName << ": Delete " << step.DestructivePath.string();
+			dryRun << "\n    Scope: " << step.DestructivePath.string();
 		}
-		if (plan.Steps.empty())
+		if (steps.empty())
 		{
 			dryRun
 			    << (plan.Request.bCleanLevelContent && plan.bCanRun ? "\n  No extracted content requires deletion; catalog selection will be cleared."

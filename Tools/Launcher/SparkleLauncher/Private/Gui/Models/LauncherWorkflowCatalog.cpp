@@ -1,7 +1,5 @@
 #include "Gui/Models/LauncherWorkflowCatalog.h"
 
-#include "Gui/Models/LauncherUiModel.h"
-
 namespace SparkleLauncher
 {
 	QString LauncherScenesOperationId()
@@ -12,17 +10,29 @@ namespace SparkleLauncher
 	QVector<LauncherWorkflowDefinition> CreateLauncherWorkflowCatalog()
 	{
 		return {
-		    {LauncherWorkflowPageKind::Scenes, {LauncherScenesOperationId()}},
-		    {LauncherWorkflowPageKind::Sync, {"workspace.sync-code"}},
-		    {LauncherWorkflowPageKind::Build, {"workspace.build"}},
-		    {LauncherWorkflowPageKind::Cook, {"cook.workspace"}},
-		    {LauncherWorkflowPageKind::Clean, {"workspace.clean"}},
+		    {LauncherScenesOperationId(), "Scenes", LauncherIcon::Start},
+		    {"workspace.sync-code", "Sync", LauncherIcon::Sync},
+		    {"workspace.build", "Build", LauncherIcon::Build},
+		    {"cook.workspace", "Cook", LauncherIcon::Cook},
+		    {"workspace.clean", "Clean", LauncherIcon::Clean},
 		};
 	}
 
 	QString LauncherOperationDisplayNameOverride(const QString& operationId)
 	{
-		return LauncherUiModelForOperation(operationId).DisplayName;
+		if (operationId == LauncherScenesOperationId())
+		{
+			return "Scenes";
+		}
+		if (operationId == "cook.tools.prepare")
+		{
+			return "Build Cook Tools";
+		}
+		if (operationId == "cook.assets")
+		{
+			return "Cook Scene Assets";
+		}
+		return {};
 	}
 
 }

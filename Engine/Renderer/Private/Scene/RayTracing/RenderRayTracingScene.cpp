@@ -2,7 +2,7 @@
 
 #include "Scene/RayTracing/RenderRayTracingScene.h"
 
-#include "Commands/RenderCommandContext.h"
+#include "RHI/Public/Commands/RenderCommandList.h"
 #include "Meshes/GpuMeshCache.h"
 #include "RayTracing/Acceleration/RayTracingBlasCache.h"
 #include "RayTracing/Acceleration/RayTracingAccelerationStrategy.h"
@@ -55,7 +55,7 @@ RenderRayTracingFrameBindings RenderRayTracingScene::Prepare(const PreparedRende
 }
 
 void RenderRayTracingScene::Build(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const PreparedRenderScene& preparedScene,
     const RayTracingPtlasPartitionPlan& viewPlan,
     PassExecutionDiagnostics* diagnostics) noexcept
@@ -67,7 +67,7 @@ void RenderRayTracingScene::Build(
 
 	m_blasCache->BeginFrame();
 
-	m_accelerationStrategy->Build(commandContext, preparedScene, *m_blasCache, m_shaderTablePlan, viewPlan, diagnostics);
+	m_accelerationStrategy->Build(commandList, preparedScene, *m_blasCache, m_shaderTablePlan, viewPlan, diagnostics);
 
 	m_blasCache->EndFrame();
 }

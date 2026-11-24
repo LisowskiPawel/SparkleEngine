@@ -99,11 +99,11 @@ namespace SparkleLauncher
 		return definitions;
 	}
 
-	std::optional<CookOperationDefinition> FindCookOperationDefinition(std::string_view operationId)
+	const CookOperationDefinition* FindCookOperationDefinition(std::string_view operationId)
 	{
 		const std::vector<CookOperationDefinition>& definitions = GetCookOperationDefinitions();
 		const auto found = std::find_if(definitions.begin(), definitions.end(), [operationId](const CookOperationDefinition& definition) { return definition.Id == operationId; });
-		return found == definitions.end() ? std::nullopt : std::optional<CookOperationDefinition>(*found);
+		return found == definitions.end() ? nullptr : &*found;
 	}
 
 }

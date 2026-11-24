@@ -89,11 +89,11 @@ namespace SparkleLauncher
 	{
 		const std::string id = operationId.toStdString();
 		const std::string contentId = contentModel.ContentId().toStdString();
-		if (FindBuildWorkspaceOperationDefinition(id).has_value())
+		if (FindBuildWorkspaceOperationDefinition(id) != nullptr)
 		{
 			return {.OperationId = operationId, .Inputs = BuildWorkspacePlanRequest(workspaceRoot, contentModel, settings)};
 		}
-		if (FindCookOperationDefinition(id).has_value())
+		if (FindCookOperationDefinition(id) != nullptr)
 		{
 			CookOperationRequest inputs;
 			inputs.WorkspaceRoot = workspaceRoot;
@@ -104,11 +104,11 @@ namespace SparkleLauncher
 			inputs.bShaderEnableDebugInfo = settings.ShaderSymbols();
 			return {.OperationId = operationId, .Inputs = std::move(inputs)};
 		}
-		if (FindLevelOperationDefinition(id).has_value())
+		if (FindLevelOperationDefinition(id) != nullptr)
 		{
 			return {.OperationId = operationId, .Inputs = LevelOperationRequest{.WorkspaceRoot = workspaceRoot, .ContentId = contentId}};
 		}
-		if (FindLevelRunOperationDefinition(id).has_value())
+		if (FindLevelRunOperationDefinition(id) != nullptr)
 		{
 			LevelRunOperationRequest inputs;
 			inputs.WorkspaceRoot = workspaceRoot;
@@ -124,7 +124,7 @@ namespace SparkleLauncher
 			}
 			return {.OperationId = operationId, .Inputs = std::move(inputs)};
 		}
-		if (FindMaintenanceOperationDefinition(id).has_value())
+		if (FindMaintenanceOperationDefinition(id) != nullptr)
 		{
 			MaintenanceOperationRequest inputs;
 			inputs.WorkspaceRoot = workspaceRoot;

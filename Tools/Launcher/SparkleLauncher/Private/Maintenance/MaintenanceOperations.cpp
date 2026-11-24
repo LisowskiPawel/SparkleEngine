@@ -80,11 +80,11 @@ namespace SparkleLauncher
 		return definitions;
 	}
 
-	std::optional<MaintenanceOperationDefinition> FindMaintenanceOperationDefinition(std::string_view operationId)
+	const MaintenanceOperationDefinition* FindMaintenanceOperationDefinition(std::string_view operationId)
 	{
 		const std::vector<MaintenanceOperationDefinition>& definitions = GetMaintenanceOperationDefinitions();
 		const auto found = std::find_if(definitions.begin(), definitions.end(), [operationId](const MaintenanceOperationDefinition& definition) { return definition.Id == operationId; });
-		return found == definitions.end() ? std::nullopt : std::optional<MaintenanceOperationDefinition>(*found);
+		return found == definitions.end() ? nullptr : &*found;
 	}
 
 }

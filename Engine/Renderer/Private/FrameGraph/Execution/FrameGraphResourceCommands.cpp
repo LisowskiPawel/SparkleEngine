@@ -5,7 +5,7 @@
 
 #include "Config/DepthConvention.h"
 #include "FrameGraph/FrameGraph.h"
-#include "Commands/RenderCommandContext.h"
+#include "RHI/Public/Commands/RenderCommandList.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 #include "RHI/Public/Interop/RhiInteropService.h"
 
@@ -17,7 +17,7 @@ FrameGraphResourceCommands::FrameGraphResourceCommands(const FrameGraph& frameGr
 {
 }
 
-void FrameGraphResourceCommands::BeginRasterPass(RenderCommandContext& commandContext, const FrameGraphRasterPass& rasterPass) const noexcept
+void FrameGraphResourceCommands::BeginRasterPass(RenderCommandList& commandList, const FrameGraphRasterPass& rasterPass) const noexcept
 {
 	std::array<FrameGraphTextureHandle, 8> colorHandles = {};
 	for (std::uint32_t index = 0; index < rasterPass.ColorCount; ++index)
@@ -26,7 +26,7 @@ void FrameGraphResourceCommands::BeginRasterPass(RenderCommandContext& commandCo
 	}
 
 	BindRenderTargets(
-	    commandContext,
+	    commandList,
 	    std::span<const FrameGraphTextureHandle>(colorHandles.data(), rasterPass.ColorCount),
 	    rasterPass.bHasDepthStencil ? rasterPass.DepthStencil.Handle : FrameGraphTextureHandle::Invalid());
 
@@ -34,22 +34,22 @@ void FrameGraphResourceCommands::BeginRasterPass(RenderCommandContext& commandCo
 	{
 		if (rasterPass.Colors[index].Load == FrameGraphAttachmentLoadAction::Clear)
 		{
-			ClearRenderTarget(commandContext, rasterPass.Colors[index].Handle);
+			ClearRenderTarget(commandList, rasterPass.Colors[index].Handle);
 		}
 	}
 	if (rasterPass.bHasDepthStencil && rasterPass.DepthStencil.Load == FrameGraphAttachmentLoadAction::Clear)
 	{
-		ClearDepthStencil(commandContext, rasterPass.DepthStencil.Handle);
+		ClearDepthStencil(commandList, rasterPass.DepthStencil.Handle);
 	}
 }
 
-void FrameGraphResourceCommands::EndRasterPass(RenderCommandContext& commandContext) const noexcept
+void FrameGraphResourceCommands::EndRasterPass(RenderCommandList& commandList) const noexcept
 {
-	commandContext.EndRasterPass();
+	commandList.EndRasterPass();
 }
 
 void FrameGraphResourceCommands::BindRenderTargets(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     std::span<const FrameGraphTextureHandle> renderTargetHandles,
     FrameGraphTextureHandle depthStencilHandle) const noexcept
 {
@@ -62,34 +62,34 @@ void FrameGraphResourceCommands::BindRenderTargets(
 		renderTargetViews[index] = ResolveRenderTargetView(renderTargetHandles[index].GetResourceHandle());
 	}
 	const RhiCpuDescriptorHandle depthStencilView = depthStencilHandle.IsValid() ? ResolveDepthStencilView(depthStencilHandle.GetResourceHandle()) : RhiCpuDescriptorHandle{};
-	commandContext.SetRenderTargets(static_cast<std::uint32_t>(renderTargetHandles.size()), renderTargetViews.data(), depthStencilView ? &depthStencilView : nullptr);
+	commandList.SetRenderTargets(static_cast<std::uint32_t>(renderTargetHandles.size()), renderTargetViews.data(), depthStencilView ? &depthStencilView : nullptr);
 }
 
-void FrameGraphResourceCommands::CopyTexture(RenderCommandContext& commandContext, FrameGraphTextureHandle destinationHandle, FrameGraphTextureHandle sourceHandle) const noexcept
+void FrameGraphResourceCommands::CopyTexture(RenderCommandList& commandList, FrameGraphTextureHandle destinationHandle, FrameGraphTextureHandle sourceHandle) const noexcept
 {
-	CopyResource(commandContext, destinationHandle.GetResourceHandle(), sourceHandle.GetResourceHandle());
+	CopyResource(commandList, destinationHandle.GetResourceHandle(), sourceHandle.GetResourceHandle());
 }
 
-void FrameGraphResourceCommands::CopyBuffer(RenderCommandContext& commandContext, FrameGraphBufferHandle destinationHandle, FrameGraphBufferHandle sourceHandle) const noexcept
+void FrameGraphResourceCommands::CopyBuffer(RenderCommandList& commandList, FrameGraphBufferHandle destinationHandle, FrameGraphBufferHandle sourceHandle) const noexcept
 {
-	CopyResource(commandContext, destinationHandle.GetResourceHandle(), sourceHandle.GetResourceHandle());
+	CopyResource(commandList, destinationHandle.GetResourceHandle(), sourceHandle.GetResourceHandle());
 }
 
-void FrameGraphResourceCommands::ClearRenderTarget(RenderCommandContext& commandContext, FrameGraphTextureHandle handle) const noexcept
+void FrameGraphResourceCommands::ClearRenderTarget(RenderCommandList& commandList, FrameGraphTextureHandle handle) const noexcept
 {
 	const FrameGraphResourceHandle resourceHandle = handle.GetResourceHandle();
 	const FrameGraphResourceMetadata& metadata = m_frameGraph.m_resourceRegistry.GetMetadata(resourceHandle);
 	assert(metadata.kind == FrameGraphResourceKind::BackBuffer || metadata.kind == FrameGraphResourceKind::ColorRenderTarget);
 	const std::array<float, 4> clearColor = metadata.textureDesc.clearColor;
-	commandContext.ClearRenderTarget(ResolveRenderTargetView(resourceHandle), clearColor);
+	commandList.ClearRenderTarget(ResolveRenderTargetView(resourceHandle), clearColor);
 }
 
-void FrameGraphResourceCommands::ClearDepthStencil(RenderCommandContext& commandContext, FrameGraphTextureHandle handle) const noexcept
+void FrameGraphResourceCommands::ClearDepthStencil(RenderCommandList& commandList, FrameGraphTextureHandle handle) const noexcept
 {
 	const FrameGraphResourceHandle resourceHandle = handle.GetResourceHandle();
 	const FrameGraphResourceMetadata& metadata = m_frameGraph.m_resourceRegistry.GetMetadata(resourceHandle);
 	assert(metadata.kind == FrameGraphResourceKind::DepthStencil);
-	commandContext.ClearDepthStencil(ResolveDepthStencilView(resourceHandle), DepthConvention::GetClearDepth());
+	commandList.ClearDepthStencil(ResolveDepthStencilView(resourceHandle), DepthConvention::GetClearDepth(), 0);
 }
 
 RhiResourceHandle FrameGraphResourceCommands::ResolveResource(FrameGraphTextureHandle handle) const noexcept
@@ -174,9 +174,9 @@ RhiResourceHandle FrameGraphResourceCommands::ResolveAccelerationStructure(Frame
 	return m_frameGraph.ResolveResource(handle.GetResourceHandle());
 }
 
-void FrameGraphResourceCommands::BindGlobalDescriptorState(RenderCommandContext& commandContext) const noexcept
+void FrameGraphResourceCommands::BindGlobalDescriptorState(RenderCommandList& commandList) const noexcept
 {
-	GetRenderHardwareInterface().GetDescriptorService().BindGlobalDescriptorState(commandContext.GetRenderCommandList());
+	GetRenderHardwareInterface().GetDescriptorService().BindGlobalDescriptorState(commandList);
 }
 
 RenderHardwareInterface& FrameGraphResourceCommands::GetRenderHardwareInterface() const noexcept
@@ -220,7 +220,7 @@ RhiGpuDescriptorHandle FrameGraphResourceCommands::ResolveUnorderedAccessView(Fr
 	return m_frameGraph.m_renderHardwareInterface.GetDescriptorService().GetResourceViewGpuHandle(access.unorderedAccessView);
 }
 
-void FrameGraphResourceCommands::CopyResource(RenderCommandContext& commandContext, FrameGraphResourceHandle destinationHandle, FrameGraphResourceHandle sourceHandle) const noexcept
+void FrameGraphResourceCommands::CopyResource(RenderCommandList& commandList, FrameGraphResourceHandle destinationHandle, FrameGraphResourceHandle sourceHandle) const noexcept
 {
 	const FrameGraphResourceMetadata& destinationMetadata = m_frameGraph.m_resourceRegistry.GetMetadata(destinationHandle);
 	const FrameGraphResourceMetadata& sourceMetadata = m_frameGraph.m_resourceRegistry.GetMetadata(sourceHandle);
@@ -230,5 +230,5 @@ void FrameGraphResourceCommands::CopyResource(RenderCommandContext& commandConte
 	const RhiResourceHandle sourceResource = m_frameGraph.ResolveResource(sourceHandle);
 	assert(destinationResource);
 	assert(sourceResource);
-	commandContext.CopyResource(destinationResource, sourceResource);
+	commandList.CopyResource(destinationResource, sourceResource);
 }

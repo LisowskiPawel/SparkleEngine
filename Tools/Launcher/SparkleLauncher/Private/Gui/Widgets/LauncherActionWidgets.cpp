@@ -1,7 +1,7 @@
 #include "Gui/Widgets/LauncherActionWidgets.h"
 
 #include "Gui/Style/LauncherUiDesign.h"
-#include "Gui/Models/LauncherUiModel.h"
+#include "Gui/Models/LauncherWorkflowCatalog.h"
 
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
@@ -31,8 +31,33 @@ namespace SparkleLauncher
 
 	QString PrimaryActionLabelForOperationId(const QString& operationId)
 	{
-		const QString primaryVerb = LauncherUiModelForOperation(operationId).PrimaryVerb;
-		return primaryVerb.isEmpty() ? QString("Run") : primaryVerb;
+		if (operationId == LauncherScenesOperationId())
+		{
+			return "Scenes";
+		}
+		if (operationId == "workspace.sync-code")
+		{
+			return "Sync All";
+		}
+		if (operationId == "workspace.generate-build-files")
+		{
+			return "Generate";
+		}
+		const bool bWorkspaceBuild = operationId == "workspace.build" || operationId.startsWith("workspace.build.");
+		const bool bToolBuild = operationId == "launcher.build.self" || operationId == "cook.tools.prepare";
+		if (bWorkspaceBuild || bToolBuild)
+		{
+			return "Build";
+		}
+		if (operationId == "levels.sync")
+		{
+			return "Sync";
+		}
+		if (operationId == "workspace.clean")
+		{
+			return "Clean";
+		}
+		return operationId.startsWith("cook.") ? QStringLiteral("Cook") : QStringLiteral("Run");
 	}
 
 	void ApplyActionAvailability(QPushButton& button, bool bEnabled, const QString& reason)

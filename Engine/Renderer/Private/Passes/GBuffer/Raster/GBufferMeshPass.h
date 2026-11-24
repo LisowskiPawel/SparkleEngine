@@ -12,6 +12,7 @@
 #include <vector>
 
 class RenderCommandContext;
+class RenderCommandList;
 class GpuMesh;
 class RenderBindingLayout;
 class RenderPipeline;
@@ -62,7 +63,7 @@ public:
 	GBufferMeshPass(GBufferMeshPass&&) noexcept = default;
 
 	void MaterializePipelines(const RenderPassRuntimeCache& runtimeCache, const RasterPassRenderState& renderState, const GraphicsAttachmentSignature& attachments);
-	void PrepareRasterPass(RenderCommandContext& commandContext) const;
+	void PrepareRasterPass(RenderCommandList& commandList) const;
 	void Draw(PassCommandContext& context, ParameterInstance& parameters);
 
 private:
@@ -89,7 +90,7 @@ private:
 	static bool HasValidSkinning(const PreparedRenderScene& preparedScene, const RenderView& view, const MeshInstanceBatch& batch) noexcept;
 	static void ConfigureDrawParameters(const Parameters& passParameters, std::uint32_t firstInstance, DrawParameterInstance& drawParameters);
 	static RhiRasterizerState ResolveRasterizerState(const MaterialData& material, const GpuMesh& gpuMesh, bool bWireframe) noexcept;
-	static void BindBatchPipeline(const FrameGraphResourceCommands& resources, RenderCommandContext& commandContext, DrawParameterInstance& drawParameters, const PreparedDraw& draw);
+	static void BindBatchPipeline(const FrameGraphResourceCommands& resources, RenderCommandList& commandList, DrawParameterInstance& drawParameters, const PreparedDraw& draw);
 	static void DrawBatch(
 	    const FrameGraphResourceCommands& resources,
 	    RenderCommandContext& commandContext,

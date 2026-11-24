@@ -4,14 +4,14 @@
 
 #include "Diagnostics/PassExecutionDiagnostics.h"
 #include "Debug/RendererCVars.h"
-#include "Commands/RenderCommandContext.h"
+#include "RHI/Public/Commands/RenderCommandList.h"
 #include "FrameGraph/Compiler/FrameGraphPlan.h"
 
 #include <string>
 
 static constexpr RhiDiagnosticLabelColor kFrameGraphDetailMarkerColor{.Red = 120, .Green = 160, .Blue = 220, .Alpha = 255};
 
-FrameGraphExecutionDiagnostics::FrameGraphExecutionDiagnostics(const RenderDiagnostics& backendDiagnostics, RenderCommandContext& commands) noexcept :
+FrameGraphExecutionDiagnostics::FrameGraphExecutionDiagnostics(const RenderDiagnostics& backendDiagnostics, RenderCommandList& commands) noexcept :
     m_backendDiagnostics(backendDiagnostics),
     m_commands(commands)
 {

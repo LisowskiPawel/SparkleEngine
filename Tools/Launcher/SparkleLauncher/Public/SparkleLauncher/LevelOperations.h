@@ -5,7 +5,6 @@
 #include "SparkleLauncher/ProcessRunner.h"
 
 #include <filesystem>
-#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -46,7 +45,7 @@ namespace SparkleLauncher
 	};
 
 	const std::vector<LevelOperationDefinition>& GetLevelOperationDefinitions();
-	std::optional<LevelOperationDefinition> FindLevelOperationDefinition(std::string_view operationId);
+	const LevelOperationDefinition* FindLevelOperationDefinition(std::string_view operationId);
 	LevelOperationPlan PlanLevelOperation(std::string_view operationId, const LevelOperationRequest& request);
 	OperationRecord RunLevelOperationPlan(LevelOperationPlan plan, IProcessRunner& processRunner, const Process::ChildProcessOutputCallback& outputCallback = {}, std::stop_token cancellation = {});
 }

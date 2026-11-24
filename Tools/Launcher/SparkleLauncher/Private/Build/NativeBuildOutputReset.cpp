@@ -2,6 +2,7 @@
 
 #include "ToolOutputPaths.h"
 
+#include <string_view>
 #include <system_error>
 
 namespace SparkleLauncher
@@ -69,183 +70,111 @@ namespace SparkleLauncher
 		return false;
 	}
 
-	static bool RemoveDependencyBuildState(const std::filesystem::path& dependencyRoot, std::string& errorMessage)
+	template <typename Action>
+	static bool CleanGeneratedDirectory(const std::filesystem::path& directory, std::string_view scope, Action&& action, std::string& errorMessage)
 	{
-		std::error_code errorCode;
-		if (!std::filesystem::is_directory(dependencyRoot, errorCode))
+		std::error_code error;
+		if (!std::filesystem::is_directory(directory, error))
 		{
-			if (!errorCode)
+			if (!error)
 			{
 				return true;
 			}
-
-			errorMessage = "Failed to inspect source dependency cache: " + dependencyRoot.string() + ": " + errorCode.message();
+			errorMessage = "Failed to inspect " + std::string(scope) + ": " + directory.string() + ": " + error.message();
 			return false;
 		}
 
-		std::filesystem::directory_iterator iterator(dependencyRoot, errorCode);
+		std::filesystem::directory_iterator entry(directory, error);
 		const std::filesystem::directory_iterator end;
-		while (!errorCode && iterator != end)
+		while (!error && entry != end)
 		{
-			const std::filesystem::path path = iterator->path();
-			const std::string name = path.filename().string();
-			iterator.increment(errorCode);
-			if (name.ends_with("-build") || name.ends_with("-subbuild"))
+			const std::filesystem::path path = entry->path();
+			entry.increment(error);
+			if (!action(path))
 			{
-				if (!RemoveGeneratedPath(path, errorMessage))
-				{
-					return false;
-				}
+				return false;
 			}
 		}
-		if (errorCode)
+		if (error)
 		{
-			errorMessage = "Failed to enumerate source dependency cache: " + dependencyRoot.string() + ": " + errorCode.message();
+			errorMessage = "Failed to enumerate " + std::string(scope) + ": " + directory.string() + ": " + error.message();
 			return false;
 		}
-
 		return true;
+	}
+
+	static bool RemoveDependencyBuildState(const std::filesystem::path& dependencyRoot, std::string& errorMessage)
+	{
+		return CleanGeneratedDirectory(
+		    dependencyRoot,
+		    "source dependency cache",
+		    [&](const std::filesystem::path& path)
+		    {
+			    const std::string name = path.filename().string();
+			    const bool bGenerated = name.ends_with("-build") || name.ends_with("-subbuild");
+			    return !bGenerated || RemoveGeneratedPath(path, errorMessage);
+		    },
+		    errorMessage);
 	}
 
 	static bool RemoveGeneratedBuildTree(const std::filesystem::path& buildDirectory, const std::filesystem::path& dependencyCacheRoot, std::string& errorMessage)
 	{
-		std::error_code errorCode;
-		if (!std::filesystem::is_directory(buildDirectory, errorCode))
-		{
-			if (!errorCode)
-			{
-				return true;
-			}
-
-			errorMessage = "Failed to inspect generated build tree: " + buildDirectory.string() + ": " + errorCode.message();
-			return false;
-		}
-
-		std::filesystem::directory_iterator iterator(buildDirectory, errorCode);
-		const std::filesystem::directory_iterator end;
-		while (!errorCode && iterator != end)
-		{
-			const std::filesystem::path path = iterator->path();
-			iterator.increment(errorCode);
-			if (path.lexically_normal() == dependencyCacheRoot.lexically_normal())
-			{
-				if (!RemoveDependencyBuildState(path, errorMessage))
-				{
-					return false;
-				}
-				continue;
-			}
-
-			if (!RemoveGeneratedPath(path, errorMessage))
-			{
-				return false;
-			}
-		}
-		if (errorCode)
-		{
-			errorMessage = "Failed to enumerate generated build tree: " + buildDirectory.string() + ": " + errorCode.message();
-			return false;
-		}
-
-		return true;
+		return CleanGeneratedDirectory(
+		    buildDirectory,
+		    "generated build tree",
+		    [&](const std::filesystem::path& path)
+		    {
+			    if (path.lexically_normal() == dependencyCacheRoot.lexically_normal())
+			    {
+				    return RemoveDependencyBuildState(path, errorMessage);
+			    }
+			    return RemoveGeneratedPath(path, errorMessage);
+		    },
+		    errorMessage);
 	}
 
 	static bool RemoveProjectBuildOutputs(const SparkleTools::ToolOutputPaths& outputs, std::string& errorMessage)
 	{
-		const std::filesystem::path& projectsDirectory = outputs.ProjectArtifactRoot;
-		std::error_code errorCode;
-		if (!std::filesystem::is_directory(projectsDirectory, errorCode))
-		{
-			if (!errorCode)
-			{
-				return true;
-			}
+		return CleanGeneratedDirectory(
+		    outputs.ProjectArtifactRoot,
+		    "project artifacts",
+		    [&](const std::filesystem::path& projectDirectory)
+		    {
+			    std::error_code error;
+			    const bool bDirectory = std::filesystem::is_directory(projectDirectory, error);
+			    if (error)
+			    {
+				    errorMessage = "Failed to enumerate project artifacts: " + outputs.ProjectArtifactRoot.string() + ": " + error.message();
+				    return false;
+			    }
+			    if (!bDirectory)
+			    {
+				    return RemoveGeneratedPath(projectDirectory, errorMessage);
+			    }
 
-			errorMessage = "Failed to inspect project artifacts: " + projectsDirectory.string() + ": " + errorCode.message();
-			return false;
-		}
+			    const std::filesystem::path cookedDirectory = outputs.CookedProjectDirectory(projectDirectory.filename().string()).lexically_normal();
 
-		std::filesystem::directory_iterator iterator(projectsDirectory, errorCode);
-		const std::filesystem::directory_iterator end;
-		while (!errorCode && iterator != end)
-		{
-			const std::filesystem::path projectDirectory = iterator->path();
-			const bool bIsProjectDirectory = iterator->is_directory(errorCode);
-			iterator.increment(errorCode);
-			if (errorCode)
-			{
-				break;
-			}
-			if (!bIsProjectDirectory)
-			{
-				if (!RemoveGeneratedPath(projectDirectory, errorMessage))
-				{
-					return false;
-				}
-				continue;
-			}
-
-			const std::filesystem::path cookedDirectory = outputs.CookedProjectDirectory(projectDirectory.filename().string()).lexically_normal();
-			std::filesystem::directory_iterator projectIterator(projectDirectory, errorCode);
-			while (!errorCode && projectIterator != end)
-			{
-				const std::filesystem::path path = projectIterator->path();
-				projectIterator.increment(errorCode);
-				if (path.lexically_normal() == cookedDirectory)
-				{
-					continue;
-				}
-				if (!RemoveGeneratedPath(path, errorMessage))
-				{
-					return false;
-				}
-			}
-		}
-		if (errorCode)
-		{
-			errorMessage = "Failed to enumerate project artifacts: " + projectsDirectory.string() + ": " + errorCode.message();
-			return false;
-		}
-
-		return true;
+			    return CleanGeneratedDirectory(
+			        projectDirectory,
+			        "project artifacts",
+			        [&](const std::filesystem::path& path) { return path.lexically_normal() == cookedDirectory || RemoveGeneratedPath(path, errorMessage); },
+			        errorMessage);
+		    },
+		    errorMessage);
 	}
 
 	static bool RemoveCompiledDevelopmentArtifacts(const SparkleTools::ToolOutputPaths& outputs, std::string& errorMessage)
 	{
-		std::error_code errorCode;
-		if (!std::filesystem::is_directory(outputs.ProductRoot, errorCode))
-		{
-			if (!errorCode)
-			{
-				return true;
-			}
+		const bool bProductOutputsRemoved = CleanGeneratedDirectory(
+		    outputs.ProductRoot,
+		    "development artifacts",
+		    [&](const std::filesystem::path& path)
+		    {
+			    return path.lexically_normal() == outputs.ProjectArtifactRoot.lexically_normal() || RemoveGeneratedPath(path, errorMessage);
+		    },
+		    errorMessage);
 
-			errorMessage = "Failed to inspect development artifacts: " + outputs.ProductRoot.string() + ": " + errorCode.message();
-			return false;
-		}
-
-		std::filesystem::directory_iterator iterator(outputs.ProductRoot, errorCode);
-		const std::filesystem::directory_iterator end;
-		while (!errorCode && iterator != end)
-		{
-			const std::filesystem::path path = iterator->path();
-			iterator.increment(errorCode);
-			if (path.lexically_normal() == outputs.ProjectArtifactRoot.lexically_normal())
-			{
-				continue;
-			}
-			if (!RemoveGeneratedPath(path, errorMessage))
-			{
-				return false;
-			}
-		}
-		if (errorCode)
-		{
-			errorMessage = "Failed to enumerate development artifacts: " + outputs.ProductRoot.string() + ": " + errorCode.message();
-			return false;
-		}
-
-		return RemoveProjectBuildOutputs(outputs, errorMessage);
+		return bProductOutputsRemoved && RemoveProjectBuildOutputs(outputs, errorMessage);
 	}
 
 	bool RequiresNativeBuildOutputReset(BuildFilesFreshnessState state)

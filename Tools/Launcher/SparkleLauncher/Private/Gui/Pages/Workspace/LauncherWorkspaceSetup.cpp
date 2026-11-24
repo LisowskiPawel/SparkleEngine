@@ -12,7 +12,6 @@
 #include "Gui/App/LauncherSettings.h"
 #include "Gui/Models/LauncherToolchainUiModel.h"
 #include "Gui/Style/LauncherUiDesign.h"
-#include "Gui/Models/LauncherUiModel.h"
 #include "Gui/Models/LauncherWorkflowCatalog.h"
 
 #include "SparkleLauncher/BuildWorkspaceOperations.h"

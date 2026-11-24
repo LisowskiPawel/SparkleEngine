@@ -5,7 +5,6 @@
 
 #include <cstdint>
 #include <filesystem>
-#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -84,21 +83,11 @@ namespace SparkleLauncher
 		bool bDestructiveActionConfirmed = false;
 	};
 
-	struct MaintenanceOperationStep
-	{
-		std::string Id;
-		std::string DisplayName;
-		std::string DisplayCommandLine;
-		std::filesystem::path DestructivePath;
-		bool bDestructive = false;
-	};
-
 	struct MaintenanceOperationPlan
 	{
 		OperationRecord Operation;
 		MaintenanceOperationRequest Request;
 		std::vector<MaintenanceCleanTarget> CleanTargets;
-		std::vector<MaintenanceOperationStep> Steps;
 		std::vector<std::string> PlannedEffects;
 		std::vector<std::string> ReadinessMessages;
 		bool bCanRun = false;
@@ -109,7 +98,7 @@ namespace SparkleLauncher
 	bool CleanScopeRequiresContent(CleanScope scope) noexcept;
 	bool TryParseCleanScope(std::string_view text, CleanScope& outScope) noexcept;
 	const std::vector<MaintenanceOperationDefinition>& GetMaintenanceOperationDefinitions();
-	std::optional<MaintenanceOperationDefinition> FindMaintenanceOperationDefinition(std::string_view operationId);
+	const MaintenanceOperationDefinition* FindMaintenanceOperationDefinition(std::string_view operationId);
 	MaintenanceOperationPlan PlanMaintenanceOperation(std::string_view operationId, const MaintenanceOperationRequest& request);
 	OperationRecord RunMaintenanceOperationPlan(MaintenanceOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback = {});
 }

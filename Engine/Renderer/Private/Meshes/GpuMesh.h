@@ -16,7 +16,6 @@
 #include <span>
 #include <vector>
 
-class RenderCommandContext;
 class RenderCommandList;
 class RenderHardwareInterface;
 struct GpuMeshPreparedData;
@@ -42,7 +41,7 @@ public:
 
 	void Upload(RenderHardwareInterface& renderHardwareInterface, RenderCommandList& commandList, GpuMeshPreparedData preparedData);
 
-	void Bind(RenderCommandContext& commandContext) const noexcept;
+	void Bind(RenderCommandList& commandList) const noexcept;
 
 	std::uint32_t GetIndexCount() const noexcept { return m_indexCount; }
 

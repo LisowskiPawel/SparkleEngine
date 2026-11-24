@@ -193,11 +193,11 @@ namespace SparkleLauncher
 		return definitions;
 	}
 
-	std::optional<BuildWorkspaceOperationDefinition> FindBuildWorkspaceOperationDefinition(std::string_view operationId)
+	const BuildWorkspaceOperationDefinition* FindBuildWorkspaceOperationDefinition(std::string_view operationId)
 	{
 		const std::vector<BuildWorkspaceOperationDefinition>& definitions = GetBuildWorkspaceOperationDefinitions();
 		const auto found = std::find_if(definitions.begin(), definitions.end(), [operationId](const BuildWorkspaceOperationDefinition& definition) { return definition.Id == operationId; });
-		return found == definitions.end() ? std::nullopt : std::optional<BuildWorkspaceOperationDefinition>(*found);
+		return found == definitions.end() ? nullptr : &*found;
 	}
 
 	static void RecordBuildInputs(BuildWorkspaceOperationPlan& plan)
@@ -296,8 +296,8 @@ namespace SparkleLauncher
 	BuildWorkspaceOperationPlan PlanBuildWorkspaceOperation(std::string_view operationId, const BuildWorkspaceOperationRequest& request)
 	{
 		BuildWorkspaceOperationPlan plan;
-		const std::optional<BuildWorkspaceOperationDefinition> definition = FindBuildWorkspaceOperationDefinition(operationId);
-		if (!definition.has_value())
+		const BuildWorkspaceOperationDefinition* definition = FindBuildWorkspaceOperationDefinition(operationId);
+		if (definition == nullptr)
 		{
 			plan.Operation = MakeOperationRecord(std::string(operationId), "Unknown build operation");
 			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Unknown build/workspace operation id.", "Choose a registered Build or Sync operation, then retry.");

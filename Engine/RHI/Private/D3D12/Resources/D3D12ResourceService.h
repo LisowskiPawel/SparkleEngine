@@ -15,7 +15,6 @@ class D3D12RenderHardwareInterface;
 class D3D12Rhi;
 struct D3D12GpuAllocationRecord;
 struct D3D12GpuHeapRecord;
-struct ID3D12Resource;
 
 class D3D12ResourceService final : public RhiResourceService
 {
@@ -62,12 +61,11 @@ private:
 	D3D12RecordingResourceUseToken BeginResourceTracking(RhiResourceHandle resource, bool bCoordinatorRecording) noexcept;
 	void EndResourceTracking(D3D12RecordingResourceUseToken use, RhiSubmissionToken submissionToken) noexcept;
 
-	static bool ResourceSupportsUnorderedAccess(ID3D12Resource* resource) noexcept;
 	void CollectCrashDiagnosticsOnce() noexcept;
 
-	D3D12Rhi* m_rhi = nullptr;
-	D3D12GpuMemoryAllocator* m_memoryAllocator = nullptr;
-	const RhiCapabilities* m_capabilities = nullptr;
+	D3D12Rhi& m_rhi;
+	D3D12GpuMemoryAllocator& m_memoryAllocator;
+	const RhiCapabilities& m_capabilities;
 	std::vector<std::unique_ptr<D3D12GpuAllocationRecord>> m_pendingOwnedResourceReleases;
 	std::vector<std::unique_ptr<D3D12GpuHeapRecord>> m_pendingOwnedMemoryBlockReleases;
 	bool m_bCrashDiagnosticsCollected = false;

@@ -16,7 +16,7 @@ namespace SparkleLauncher
 {
 	static std::optional<LauncherOperationInputs> BuildLauncherShellInputs(std::string_view operationId, const LauncherShellModel& model, const LauncherShellArguments& arguments)
 	{
-		if (FindBuildWorkspaceOperationDefinition(operationId).has_value())
+		if (FindBuildWorkspaceOperationDefinition(operationId) != nullptr)
 		{
 			BuildWorkspaceOperationRequest request;
 			request.WorkspaceRoot = model.WorkspaceRoot;
@@ -28,7 +28,7 @@ namespace SparkleLauncher
 			request.bForceConfigure = false;
 			return request;
 		}
-		if (FindCookOperationDefinition(operationId).has_value())
+		if (FindCookOperationDefinition(operationId) != nullptr)
 		{
 			CookOperationRequest request;
 			request.WorkspaceRoot = model.WorkspaceRoot;
@@ -40,7 +40,7 @@ namespace SparkleLauncher
 			request.SelectedScopes = {CookWorkspaceScope::Shaders, CookWorkspaceScope::Textures, CookWorkspaceScope::SceneAssets};
 			return request;
 		}
-		if (FindLevelOperationDefinition(operationId).has_value())
+		if (FindLevelOperationDefinition(operationId) != nullptr)
 		{
 			LevelOperationRequest request;
 			request.WorkspaceRoot = model.WorkspaceRoot;
@@ -51,7 +51,7 @@ namespace SparkleLauncher
 			}
 			return request;
 		}
-		if (FindLevelRunOperationDefinition(operationId).has_value())
+		if (FindLevelRunOperationDefinition(operationId) != nullptr)
 		{
 			LevelRunOperationRequest request;
 			request.WorkspaceRoot = model.WorkspaceRoot;
@@ -64,7 +64,7 @@ namespace SparkleLauncher
 			request.ShaderExportPath = arguments.ShaderExportPath;
 			return request;
 		}
-		if (FindMaintenanceOperationDefinition(operationId).has_value())
+		if (FindMaintenanceOperationDefinition(operationId) != nullptr)
 		{
 			MaintenanceOperationRequest request;
 			request.WorkspaceRoot = model.WorkspaceRoot;

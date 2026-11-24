@@ -6,7 +6,7 @@
 #include "RayTracing/Acceleration/RayTracingTlasBuilder.h"
 #include "RayTracing/Acceleration/RayTracingBlasCache.h"
 
-#include "Commands/RenderCommandContext.h"
+#include "RHI/Public/Commands/RenderCommandList.h"
 #include "Core/Public/Math/MathUtils.h"
 #include "Meshes/GpuMesh.h"
 #include "Debug/RendererCVars.h"
@@ -103,7 +103,7 @@ void RayTracingTlasBuilder::Prepare(std::uint32_t instanceCapacity) noexcept
 }
 
 void RayTracingTlasBuilder::Build(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const PreparedRenderScene& preparedScene,
     RayTracingBlasCache& blasCache,
     const RayTracingShaderTablePlan& shaderTablePlan,
@@ -112,16 +112,16 @@ void RayTracingTlasBuilder::Build(
 	const auto& instances = preparedScene.rayTracingInstances;
 	BuildState state;
 	state.Instances.reserve(instances.size());
-	CollectInstances(commandContext, preparedScene, blasCache, shaderTablePlan, diagnostics, state);
+	CollectInstances(commandList, preparedScene, blasCache, shaderTablePlan, diagnostics, state);
 	PrepareBuild(state);
 
-	RecordBuild(commandContext, state, diagnostics);
+	RecordBuild(commandList, state, diagnostics);
 
 	m_builtInstanceCount = static_cast<std::uint32_t>(state.Instances.size());
 }
 
 void RayTracingTlasBuilder::CollectInstances(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const PreparedRenderScene& preparedScene,
     RayTracingBlasCache& blasCache,
     const RayTracingShaderTablePlan& shaderTablePlan,
@@ -141,9 +141,9 @@ void RayTracingTlasBuilder::CollectInstances(
 			Diagnostics::Fatal(g_rayTracingTlasBuilderLogger, __FILE__, __LINE__, "TLAS work references a mesh instance with no GPU mesh handle.");
 		}
 
-		const RayTracingBlasCache::BlasHandle blas = blasCache.EnsureBlas(commandContext, preparedScene, draw, input.GpuSceneSlot, diagnostics);
+		const RayTracingBlasCache::BlasHandle blas = blasCache.EnsureBlas(commandList, preparedScene, draw, input.GpuSceneSlot, diagnostics);
 
-		commandContext.TrackResource(blas.resource);
+		commandList.TrackResource(blas.resource);
 		if (blas.bBuiltThisFrame)
 		{
 			state.BuiltBlasResources.insert(blas.resource.Value);
@@ -202,18 +202,18 @@ void RayTracingTlasBuilder::PrepareBuild(BuildState& state) noexcept
 	state.EventName = bCanRefit ? "TLAS Refit" : "TLAS Build";
 }
 
-void RayTracingTlasBuilder::RecordBuild(RenderCommandContext& commandContext, const BuildState& state, PassExecutionDiagnostics* diagnostics) const noexcept
+void RayTracingTlasBuilder::RecordBuild(RenderCommandList& commandList, const BuildState& state, PassExecutionDiagnostics* diagnostics) const noexcept
 {
 	for (void* resourceValue : state.BuiltBlasResources)
 	{
-		commandContext.UnorderedAccessBarrier(RhiResourceHandle{resourceValue});
+		commandList.UnorderedAccessBarrier(RhiResourceHandle{resourceValue});
 	}
-	TrackBuildResources(commandContext);
+	TrackBuildResources(commandList);
 
 	auto tlasGpuScope = diagnostics != nullptr ? diagnostics->BeginGpuScope(state.EventName) : ScopedGpuScope{};
 	RhiResourceService& resourceService = m_renderHardwareInterface.GetResourceService();
 
-	commandContext.BuildTlas(
+	commandList.BuildTlas(
 	    resourceService.GetResourceGpuVirtualAddress(m_instanceBuffer),
 	    static_cast<std::uint32_t>(state.Instances.size()),
 	    resourceService.GetResourceGpuVirtualAddress(m_scratchBuffer),
@@ -221,13 +221,13 @@ void RayTracingTlasBuilder::RecordBuild(RenderCommandContext& commandContext, co
 	    state.Mode);
 }
 
-void RayTracingTlasBuilder::TrackBuildResources(RenderCommandContext& commandContext) const noexcept
+void RayTracingTlasBuilder::TrackBuildResources(RenderCommandList& commandList) const noexcept
 {
 	RhiResourceService& resources = m_renderHardwareInterface.GetResourceService();
 
-	commandContext.TrackResource(resources.GetResourceHandle(m_instanceBuffer));
-	commandContext.TrackResource(resources.GetResourceHandle(m_scratchBuffer));
-	commandContext.TrackResource(resources.GetResourceHandle(m_accelerationStructureBuffer));
+	commandList.TrackResource(resources.GetResourceHandle(m_instanceBuffer));
+	commandList.TrackResource(resources.GetResourceHandle(m_scratchBuffer));
+	commandList.TrackResource(resources.GetResourceHandle(m_accelerationStructureBuffer));
 }
 
 void RayTracingTlasBuilder::Clear() noexcept

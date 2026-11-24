@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <optional>
 
-class RenderCommandContext;
+class RenderCommandList;
 class RenderHardwareInterface;
 class PassExecutionDiagnostics;
 class RayTracingShaderTablePlan;
@@ -26,7 +26,7 @@ public:
 
 	void Prepare(std::uint32_t instanceCapacity) noexcept;
 	void Build(
-	    RenderCommandContext& commandContext,
+	    RenderCommandList& commandList,
 	    const PreparedRenderScene& preparedScene,
 	    RayTracingBlasCache& blasCache,
 	    const RayTracingShaderTablePlan& shaderTablePlan,
@@ -45,15 +45,15 @@ private:
 	static std::uint64_t ResolveScratchSize(const RhiRayTracingAccelerationStructurePrebuildInfo& prebuildInfo, ERhiTlasBuildFlags buildFlags) noexcept;
 	static RhiRayTracingInstanceFlags ResolveInstanceFlags(const PreparedRenderScene& preparedScene, const MeshDraw& draw) noexcept;
 	static void CollectInstances(
-	    RenderCommandContext& commandContext,
+	    RenderCommandList& commandList,
 	    const PreparedRenderScene& preparedScene,
 	    RayTracingBlasCache& blasCache,
 	    const RayTracingShaderTablePlan& shaderTablePlan,
 	    PassExecutionDiagnostics* diagnostics,
 	    BuildState& state) noexcept;
 	void PrepareBuild(BuildState& state) noexcept;
-	void RecordBuild(RenderCommandContext& commandContext, const BuildState& state, PassExecutionDiagnostics* diagnostics) const noexcept;
-	void TrackBuildResources(RenderCommandContext& commandContext) const noexcept;
+	void RecordBuild(RenderCommandList& commandList, const BuildState& state, PassExecutionDiagnostics* diagnostics) const noexcept;
+	void TrackBuildResources(RenderCommandList& commandList) const noexcept;
 	void ReleaseResources() noexcept;
 	void EnsureResources(const RhiRayTracingAccelerationStructurePrebuildInfo& prebuildInfo, ERhiTlasBuildFlags buildFlags) noexcept;
 

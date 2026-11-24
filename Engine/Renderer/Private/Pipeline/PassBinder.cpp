@@ -3,7 +3,7 @@
 #include "RHI/Public/Descriptors/RhiDescriptorService.h"
 #include "RHI/Public/Resources/RhiUploadService.h"
 
-#include "Commands/RenderCommandContext.h"
+#include "RHI/Public/Commands/RenderCommandList.h"
 #include "FrameGraph/Execution/FrameGraphResourceCommands.h"
 #include "ShaderParameters/PassParameterSet.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
@@ -16,7 +16,7 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_passBinderLogger, "Renderer.PassBinder");
 struct BindingRequest;
 
 static void BindCompiledPassParameter(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const FrameGraphResourceCommands& resources,
     const CompiledBinding& compiledBinding,
     const PassParameterBinding* parameterBinding,
@@ -29,16 +29,16 @@ static void BindAccelerationStructure(const BindingRequest& request);
 static void BindResourceTable(const BindingRequest& request, bool bReadWrite);
 static void BindSamplerTable(const BindingRequest& request);
 static void BindPushConstantData(const BindingRequest& request);
-static void BindGpuAddress(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiGpuVirtualAddress gpuAddress, BindingDomain domain);
-static void BindDescriptorTableOverride(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, const PassBindingOverride& bindingOverride, BindingDomain domain);
-static void BindDescriptorTable(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiGpuDescriptorHandle descriptorTable, BindingDomain domain);
-static void BindDescriptorTable(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiDescriptorTableBinding descriptorTable, BindingDomain domain);
-static void BindPushConstants(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, const void* data, std::uint32_t constantCount, BindingDomain domain);
+static void BindGpuAddress(RenderCommandList& commandList, const CompiledBinding& compiledBinding, RhiGpuVirtualAddress gpuAddress, BindingDomain domain);
+static void BindDescriptorTableOverride(RenderCommandList& commandList, const CompiledBinding& compiledBinding, const PassBindingOverride& bindingOverride, BindingDomain domain);
+static void BindDescriptorTable(RenderCommandList& commandList, const CompiledBinding& compiledBinding, RhiGpuDescriptorHandle descriptorTable, BindingDomain domain);
+static void BindDescriptorTable(RenderCommandList& commandList, const CompiledBinding& compiledBinding, RhiDescriptorTableBinding descriptorTable, BindingDomain domain);
+static void BindPushConstants(RenderCommandList& commandList, const CompiledBinding& compiledBinding, const void* data, std::uint32_t constantCount, BindingDomain domain);
 static void Require(bool bCondition, std::string_view message);
 
 struct BindingRequest final
 {
-	RenderCommandContext& CommandContext;
+	RenderCommandList& CommandList;
 	const FrameGraphResourceCommands& Resources;
 	RenderHardwareInterface& HardwareInterface;
 	const CompiledBinding& Binding;
@@ -47,24 +47,24 @@ struct BindingRequest final
 	BindingDomain Domain = BindingDomain::Graphics;
 };
 
-static void BindDomainLayout(RenderCommandContext& commandContext, const RenderBindingLayout& layout, BindingDomain domain)
+static void BindDomainLayout(RenderCommandList& commandList, const RenderBindingLayout& layout, BindingDomain domain)
 {
 	if (domain == BindingDomain::Compute)
 	{
-		commandContext.SetComputeBindingLayout(layout);
+		commandList.SetComputeBindingLayout(layout);
 	}
 	else if (domain == BindingDomain::RayTracing)
 	{
-		commandContext.SetRayTracingBindingLayout(layout);
+		commandList.SetRayTracingBindingLayout(layout);
 	}
 	else
 	{
-		commandContext.SetGraphicsBindingLayout(layout);
+		commandList.SetGraphicsBindingLayout(layout);
 	}
 }
 
 void BindPassParameters(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const FrameGraphResourceCommands& resources,
     const RenderBindingLayout& layout,
     const PassParameterSet& parameterSet,
@@ -77,16 +77,16 @@ void BindPassParameters(
 		Require(parameterSet.GetLayout().Matches(layout.GetParameterLayout()), "Pass parameter layout does not match the compiled binding layout.");
 	}
 
-	BindDomainLayout(commandContext, layout, domain);
+	BindDomainLayout(commandList, layout, domain);
 	for (std::size_t bindingIndex = 0; bindingIndex < layout.GetBindingCount(); ++bindingIndex)
 	{
 		const CompiledBinding& compiledBinding = layout.GetBindings()[bindingIndex];
-		BindCompiledPassParameter(commandContext, resources, compiledBinding, parameterSet.FindBinding(compiledBinding.Name), overrides, domain);
+		BindCompiledPassParameter(commandList, resources, compiledBinding, parameterSet.FindBinding(compiledBinding.Name), overrides, domain);
 	}
 }
 
 static void BindCompiledPassParameter(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const FrameGraphResourceCommands& resources,
     const CompiledBinding& compiledBinding,
     const PassParameterBinding* parameterBinding,
@@ -94,7 +94,7 @@ static void BindCompiledPassParameter(
     BindingDomain domain)
 {
 	const BindingRequest request{
-	    .CommandContext = commandContext,
+	    .CommandList = commandList,
 	    .Resources = resources,
 	    .HardwareInterface = resources.GetRenderHardwareInterface(),
 	    .Binding = compiledBinding,
@@ -138,7 +138,7 @@ static void BindConstantBuffer(const BindingRequest& request)
 	const PassBindingOverride* bindingOverride = request.Overrides != nullptr ? request.Overrides->Find(request.Binding.Name, PassBindingOverrideType::ConstantBufferView) : nullptr;
 	if (bindingOverride != nullptr)
 	{
-		BindGpuAddress(request.CommandContext, request.Binding, bindingOverride->GpuAddress, request.Domain);
+		BindGpuAddress(request.CommandList, request.Binding, bindingOverride->GpuAddress, request.Domain);
 		return;
 	}
 
@@ -146,12 +146,9 @@ static void BindConstantBuffer(const BindingRequest& request)
 	const PassParameterUniformBindingData* uniformData = request.Parameters->AsUniformData();
 	Require(uniformData != nullptr, "Constant-buffer binding has incompatible parameter data.");
 
-	const RhiGpuVirtualAddress gpuAddress = request.HardwareInterface.GetUploadService().AllocateUniformConstantBuffer(
-	    request.CommandContext.GetRenderCommandList(),
-	    uniformData->Data,
-	    uniformData->SizeInBytes);
+	const RhiGpuVirtualAddress gpuAddress = request.HardwareInterface.GetUploadService().AllocateUniformConstantBuffer(request.CommandList, uniformData->Data, uniformData->SizeInBytes);
 
-	BindGpuAddress(request.CommandContext, request.Binding, gpuAddress, request.Domain);
+	BindGpuAddress(request.CommandList, request.Binding, gpuAddress, request.Domain);
 }
 
 static void BindReadOnlyAddress(const BindingRequest& request)
@@ -159,7 +156,7 @@ static void BindReadOnlyAddress(const BindingRequest& request)
 	const PassBindingOverride* bindingOverride = request.Overrides != nullptr ? request.Overrides->Find(request.Binding.Name, PassBindingOverrideType::ShaderResourceView) : nullptr;
 	if (bindingOverride != nullptr)
 	{
-		BindGpuAddress(request.CommandContext, request.Binding, bindingOverride->GpuAddress, request.Domain);
+		BindGpuAddress(request.CommandList, request.Binding, bindingOverride->GpuAddress, request.Domain);
 		return;
 	}
 
@@ -171,7 +168,7 @@ static void BindReadWriteAddress(const BindingRequest& request)
 	Require(request.Overrides != nullptr, "Read-write address binding requires an explicit pass override.");
 	const PassBindingOverride* bindingOverride = request.Overrides->Find(request.Binding.Name, PassBindingOverrideType::UnorderedAccessView);
 	Require(bindingOverride != nullptr, "Read-write address binding has no unordered-access override.");
-	BindGpuAddress(request.CommandContext, request.Binding, bindingOverride->GpuAddress, request.Domain);
+	BindGpuAddress(request.CommandList, request.Binding, bindingOverride->GpuAddress, request.Domain);
 }
 
 static void BindAccelerationStructure(const BindingRequest& request)
@@ -183,15 +180,15 @@ static void BindAccelerationStructure(const BindingRequest& request)
 	Require(static_cast<bool>(resource), "Acceleration-structure binding resolved to no resource.");
 	if (request.Domain == BindingDomain::Compute)
 	{
-		request.CommandContext.BindComputeAccelerationStructure(request.Binding.BindingIndex, resource);
+		request.CommandList.BindComputeAccelerationStructure(request.Binding.BindingIndex, resource);
 		return;
 	}
 	if (request.Domain == BindingDomain::RayTracing)
 	{
-		request.CommandContext.BindRayTracingAccelerationStructure(request.Binding.BindingIndex, resource);
+		request.CommandList.BindRayTracingAccelerationStructure(request.Binding.BindingIndex, resource);
 		return;
 	}
-	request.CommandContext.BindAccelerationStructure(request.Binding.BindingIndex, resource);
+	request.CommandList.BindGraphicsAccelerationStructure(request.Binding.BindingIndex, resource);
 }
 
 static void BindResourceTable(const BindingRequest& request, bool bReadWrite)
@@ -199,7 +196,7 @@ static void BindResourceTable(const BindingRequest& request, bool bReadWrite)
 	const PassBindingOverride* bindingOverride = request.Overrides != nullptr ? request.Overrides->Find(request.Binding.Name, PassBindingOverrideType::DescriptorTable) : nullptr;
 	if (bindingOverride != nullptr)
 	{
-		BindDescriptorTableOverride(request.CommandContext, request.Binding, *bindingOverride, request.Domain);
+		BindDescriptorTableOverride(request.CommandList, request.Binding, *bindingOverride, request.Domain);
 		return;
 	}
 
@@ -208,11 +205,11 @@ static void BindResourceTable(const BindingRequest& request, bool bReadWrite)
 	{
 		if (descriptorTableData->Table)
 		{
-			BindDescriptorTable(request.CommandContext, request.Binding, descriptorTableData->Table, request.Domain);
+			BindDescriptorTable(request.CommandList, request.Binding, descriptorTableData->Table, request.Domain);
 		}
 		else
 		{
-			BindDescriptorTable(request.CommandContext, request.Binding, descriptorTableData->GpuHandle, request.Domain);
+			BindDescriptorTable(request.CommandList, request.Binding, descriptorTableData->GpuHandle, request.Domain);
 		}
 		return;
 	}
@@ -222,15 +219,15 @@ static void BindResourceTable(const BindingRequest& request, bool bReadWrite)
 		Require(!textureData->IsAttachment(), "Graph attachments cannot be bound as shader resource tables.");
 		Require(textureData->Handles.size() == 1, "Texture binding must contain exactly one resource.");
 		const RhiGpuDescriptorHandle view = bReadWrite ? request.Resources.ResolveUnorderedAccessView(textureData->Handles[0]) : request.Resources.ResolveShaderResourceView(textureData->Handles[0]);
-		BindDescriptorTable(request.CommandContext, request.Binding, view, request.Domain);
+		BindDescriptorTable(request.CommandList, request.Binding, view, request.Domain);
 		return;
 	}
 
-	const PassParameterBufferBindingData* bufferData = request.Parameters->AsBufferData();
-	Require(bufferData != nullptr, bReadWrite ? "Read-write resource binding has incompatible parameter data." : "Read-only resource binding has incompatible parameter data.");
-	Require(bufferData->Handles.size() == 1, "Buffer binding must contain exactly one resource.");
-	const RhiGpuDescriptorHandle view = bReadWrite ? request.Resources.ResolveUnorderedAccessView(bufferData->Handles[0]) : request.Resources.ResolveShaderResourceView(bufferData->Handles[0]);
-	BindDescriptorTable(request.CommandContext, request.Binding, view, request.Domain);
+	const std::vector<FrameGraphBufferHandle>* bufferHandles = request.Parameters->AsBufferHandles();
+	Require(bufferHandles != nullptr, bReadWrite ? "Read-write resource binding has incompatible parameter data." : "Read-only resource binding has incompatible parameter data.");
+	Require(bufferHandles->size() == 1, "Buffer binding must contain exactly one resource.");
+	const RhiGpuDescriptorHandle view = bReadWrite ? request.Resources.ResolveUnorderedAccessView(bufferHandles->front()) : request.Resources.ResolveShaderResourceView(bufferHandles->front());
+	BindDescriptorTable(request.CommandList, request.Binding, view, request.Domain);
 }
 
 static void BindSamplerTable(const BindingRequest& request)
@@ -238,16 +235,16 @@ static void BindSamplerTable(const BindingRequest& request)
 	const PassBindingOverride* bindingOverride = request.Overrides != nullptr ? request.Overrides->Find(request.Binding.Name, PassBindingOverrideType::DescriptorTable) : nullptr;
 	if (bindingOverride != nullptr)
 	{
-		BindDescriptorTableOverride(request.CommandContext, request.Binding, *bindingOverride, request.Domain);
+		BindDescriptorTableOverride(request.CommandList, request.Binding, *bindingOverride, request.Domain);
 		return;
 	}
 
 	Require(request.Parameters != nullptr, "Sampler binding is absent from the pass parameter set.");
-	const PassParameterSamplerBindingData* samplerData = request.Parameters->AsSamplerData();
-	Require(samplerData != nullptr, "Sampler binding has incompatible parameter data.");
-	const RhiDescriptorTableBinding samplerBinding = request.HardwareInterface.GetDescriptorService().GetSharedSamplerBinding(samplerData->Desc);
+	const RhiSamplerDesc* sampler = request.Parameters->AsSamplerDesc();
+	Require(sampler != nullptr, "Sampler binding has incompatible parameter data.");
+	const RhiDescriptorTableBinding samplerBinding = request.HardwareInterface.GetDescriptorService().GetSharedSamplerBinding(*sampler);
 	Require(static_cast<bool>(samplerBinding), "Sampler binding did not resolve a descriptor table.");
-	BindDescriptorTable(request.CommandContext, request.Binding, samplerBinding, request.Domain);
+	BindDescriptorTable(request.CommandList, request.Binding, samplerBinding, request.Domain);
 }
 
 static void BindPushConstantData(const BindingRequest& request)
@@ -255,14 +252,14 @@ static void BindPushConstantData(const BindingRequest& request)
 	const PassBindingOverride* bindingOverride = request.Overrides != nullptr ? request.Overrides->Find(request.Binding.Name, PassBindingOverrideType::PushConstants) : nullptr;
 	if (bindingOverride != nullptr)
 	{
-		BindPushConstants(request.CommandContext, request.Binding, bindingOverride->ConstantsData, bindingOverride->ConstantCount, request.Domain);
+		BindPushConstants(request.CommandList, request.Binding, bindingOverride->ConstantsData, bindingOverride->ConstantCount, request.Domain);
 		return;
 	}
 
 	Require(request.Parameters != nullptr, "Push-constant binding is absent from the pass parameter set.");
 	const PassParameterUniformBindingData* uniformData = request.Parameters->AsUniformData();
 	Require(uniformData != nullptr, "Push-constant binding has incompatible parameter data.");
-	BindPushConstants(request.CommandContext, request.Binding, uniformData->Data, uniformData->SizeInBytes / static_cast<std::uint32_t>(sizeof(std::uint32_t)), request.Domain);
+	BindPushConstants(request.CommandList, request.Binding, uniformData->Data, uniformData->SizeInBytes / static_cast<std::uint32_t>(sizeof(std::uint32_t)), request.Domain);
 }
 
 static void Require(bool bCondition, std::string_view message)
@@ -273,19 +270,19 @@ static void Require(bool bCondition, std::string_view message)
 	}
 }
 
-static void BindDescriptorTableOverride(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, const PassBindingOverride& bindingOverride, BindingDomain domain)
+static void BindDescriptorTableOverride(RenderCommandList& commandList, const CompiledBinding& compiledBinding, const PassBindingOverride& bindingOverride, BindingDomain domain)
 {
 	if (bindingOverride.DescriptorTableKind == DescriptorTableOverrideKind::LogicalTable)
 	{
-		BindDescriptorTable(commandContext, compiledBinding, bindingOverride.LogicalDescriptorTable, domain);
+		BindDescriptorTable(commandList, compiledBinding, bindingOverride.LogicalDescriptorTable, domain);
 	}
 	else
 	{
-		BindDescriptorTable(commandContext, compiledBinding, bindingOverride.DescriptorTable, domain);
+		BindDescriptorTable(commandList, compiledBinding, bindingOverride.DescriptorTable, domain);
 	}
 }
 
-static void BindGpuAddress(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiGpuVirtualAddress gpuAddress, BindingDomain domain)
+static void BindGpuAddress(RenderCommandList& commandList, const CompiledBinding& compiledBinding, RhiGpuVirtualAddress gpuAddress, BindingDomain domain)
 {
 	Require(gpuAddress != 0, "Pass address binding resolved to a null GPU address.");
 	switch (compiledBinding.Type)
@@ -293,43 +290,43 @@ static void BindGpuAddress(RenderCommandContext& commandContext, const CompiledB
 		case CompiledBindingType::ConstantBuffer:
 			if (domain == BindingDomain::Compute)
 			{
-				commandContext.BindComputeConstantBuffer(compiledBinding.BindingIndex, gpuAddress);
+				commandList.BindComputeConstantBuffer(compiledBinding.BindingIndex, gpuAddress);
 			}
 			else if (domain == BindingDomain::RayTracing)
 			{
-				commandContext.BindRayTracingConstantBuffer(compiledBinding.BindingIndex, gpuAddress);
+				commandList.BindRayTracingConstantBuffer(compiledBinding.BindingIndex, gpuAddress);
 			}
 			else
 			{
-				commandContext.BindConstantBuffer(compiledBinding.BindingIndex, gpuAddress);
+				commandList.BindGraphicsConstantBuffer(compiledBinding.BindingIndex, gpuAddress);
 			}
 			return;
 		case CompiledBindingType::ReadOnlyAddress:
 			if (domain == BindingDomain::Compute)
 			{
-				commandContext.BindComputeShaderResourceAddress(compiledBinding.BindingIndex, gpuAddress);
+				commandList.BindComputeShaderResource(compiledBinding.BindingIndex, gpuAddress);
 			}
 			else if (domain == BindingDomain::RayTracing)
 			{
-				commandContext.BindRayTracingShaderResourceAddress(compiledBinding.BindingIndex, gpuAddress);
+				commandList.BindRayTracingShaderResource(compiledBinding.BindingIndex, gpuAddress);
 			}
 			else
 			{
-				commandContext.BindShaderResourceAddress(compiledBinding.BindingIndex, gpuAddress);
+				commandList.BindGraphicsShaderResource(compiledBinding.BindingIndex, gpuAddress);
 			}
 			return;
 		case CompiledBindingType::ReadWriteAddress:
 			if (domain == BindingDomain::Compute)
 			{
-				commandContext.BindComputeUnorderedAccessAddress(compiledBinding.BindingIndex, gpuAddress);
+				commandList.BindComputeUnorderedAccess(compiledBinding.BindingIndex, gpuAddress);
 			}
 			else if (domain == BindingDomain::RayTracing)
 			{
-				commandContext.BindRayTracingUnorderedAccessAddress(compiledBinding.BindingIndex, gpuAddress);
+				commandList.BindRayTracingUnorderedAccess(compiledBinding.BindingIndex, gpuAddress);
 			}
 			else
 			{
-				commandContext.BindUnorderedAccessAddress(compiledBinding.BindingIndex, gpuAddress);
+				commandList.BindGraphicsUnorderedAccess(compiledBinding.BindingIndex, gpuAddress);
 			}
 			return;
 		default:
@@ -338,55 +335,55 @@ static void BindGpuAddress(RenderCommandContext& commandContext, const CompiledB
 	}
 }
 
-static void BindDescriptorTable(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiGpuDescriptorHandle descriptorTable, BindingDomain domain)
+static void BindDescriptorTable(RenderCommandList& commandList, const CompiledBinding& compiledBinding, RhiGpuDescriptorHandle descriptorTable, BindingDomain domain)
 {
 	Require(static_cast<bool>(descriptorTable), "Pass resource binding resolved to a null GPU descriptor handle.");
 	if (domain == BindingDomain::Compute)
 	{
-		commandContext.BindComputeDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
+		commandList.BindComputeDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
 		return;
 	}
 	if (domain == BindingDomain::RayTracing)
 	{
-		commandContext.BindRayTracingDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
+		commandList.BindRayTracingDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
 		return;
 	}
 
-	commandContext.BindDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
+	commandList.BindGraphicsDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
 }
 
-static void BindDescriptorTable(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, RhiDescriptorTableBinding descriptorTable, BindingDomain domain)
+static void BindDescriptorTable(RenderCommandList& commandList, const CompiledBinding& compiledBinding, RhiDescriptorTableBinding descriptorTable, BindingDomain domain)
 {
 	Require(static_cast<bool>(descriptorTable), "Pass resource binding resolved to an invalid logical descriptor table.");
 	if (domain == BindingDomain::Compute)
 	{
-		commandContext.BindComputeDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
+		commandList.BindComputeDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
 		return;
 	}
 	if (domain == BindingDomain::RayTracing)
 	{
-		commandContext.BindRayTracingDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
+		commandList.BindRayTracingDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
 		return;
 	}
 
-	commandContext.BindDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
+	commandList.BindGraphicsDescriptorTable(compiledBinding.BindingIndex, descriptorTable);
 }
 
-static void BindPushConstants(RenderCommandContext& commandContext, const CompiledBinding& compiledBinding, const void* data, std::uint32_t constantCount, BindingDomain domain)
+static void BindPushConstants(RenderCommandList& commandList, const CompiledBinding& compiledBinding, const void* data, std::uint32_t constantCount, BindingDomain domain)
 {
 	Require(data != nullptr, "Push-constant binding has no data.");
 	Require(constantCount > 0, "Push-constant binding has no values.");
 
 	if (domain == BindingDomain::Compute)
 	{
-		commandContext.SetComputePushConstants(compiledBinding.BindingIndex, constantCount, data, 0);
+		commandList.SetComputePushConstants(compiledBinding.BindingIndex, constantCount, data, 0);
 		return;
 	}
 	if (domain == BindingDomain::RayTracing)
 	{
-		commandContext.SetRayTracingPushConstants(compiledBinding.BindingIndex, constantCount, data, 0);
+		commandList.SetRayTracingPushConstants(compiledBinding.BindingIndex, constantCount, data, 0);
 		return;
 	}
 
-	commandContext.SetPushConstants(compiledBinding.BindingIndex, constantCount, data, 0);
+	commandList.SetGraphicsPushConstants(compiledBinding.BindingIndex, constantCount, data, 0);
 }

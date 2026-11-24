@@ -8,7 +8,7 @@
 #include <memory>
 #include <span>
 
-class RenderCommandContext;
+class RenderCommandList;
 class RenderHardwareInterface;
 class GpuMeshCache;
 class PassExecutionDiagnostics;
@@ -32,7 +32,7 @@ public:
 	RenderRayTracingScene& operator=(RenderRayTracingScene&&) = delete;
 
 	RenderRayTracingFrameBindings Prepare(const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan) noexcept;
-	void Build(RenderCommandContext& commandContext, const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan, PassExecutionDiagnostics* diagnostics = nullptr) noexcept;
+	void Build(RenderCommandList& commandList, const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan, PassExecutionDiagnostics* diagnostics = nullptr) noexcept;
 	void Clear() noexcept;
 	void SynchronizeShaderTablePlan(std::span<const RenderPrimitive> primitives, const RenderMaterialTable& materials) noexcept;
 

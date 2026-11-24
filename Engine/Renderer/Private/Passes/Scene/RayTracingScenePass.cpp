@@ -29,5 +29,6 @@ void AddRayTracingScenePass(FrameGraphBuilder& builder, const RenderFrame& frame
 
 		    resourceBuilder.Use(sceneTlas, ResourceUsage::AccelerationStructureBuild, "SceneTlas");
 	    },
-	    [&rayTracingScene, &frame](PassCommandContext& context) { rayTracingScene.Build(context.Commands, frame.PreparedScene, frame.View.rayTracingPlan, &context.Diagnostics); });
+	    [&rayTracingScene, &frame](PassCommandContext& context)
+	    { rayTracingScene.Build(context.Commands.GetRenderCommandList(), frame.PreparedScene, frame.View.rayTracingPlan, &context.Diagnostics); });
 }

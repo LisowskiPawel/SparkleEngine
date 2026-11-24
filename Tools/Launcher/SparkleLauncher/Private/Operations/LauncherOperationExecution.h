@@ -14,6 +14,23 @@
 
 namespace SparkleLauncher
 {
+	template <typename Visitor> void VisitLauncherOperationDefinitions(Visitor&& visit)
+	{
+		const auto visitDefinitions = [&visit](const auto& definitions)
+		{
+			for (const auto& definition : definitions)
+			{
+				visit(definition);
+			}
+		};
+
+		visitDefinitions(GetBuildWorkspaceOperationDefinitions());
+		visitDefinitions(GetCookOperationDefinitions());
+		visitDefinitions(GetLevelOperationDefinitions());
+		visitDefinitions(GetLevelRunOperationDefinitions());
+		visitDefinitions(GetMaintenanceOperationDefinitions());
+	}
+
 	using LauncherOperationInputs = std::variant<BuildWorkspaceOperationRequest, LevelOperationRequest, LevelRunOperationRequest, CookOperationRequest, MaintenanceOperationRequest>;
 	using LauncherOperationPlan = std::variant<BuildWorkspaceOperationPlan, LevelOperationPlan, LevelRunOperationPlan, CookOperationPlan, MaintenanceOperationPlan>;
 

@@ -5,7 +5,7 @@
 
 #include "RayTracing/Acceleration/RayTracingPtlasStrategy.h"
 
-#include "Commands/RenderCommandContext.h"
+#include "RHI/Public/Commands/RenderCommandList.h"
 #include "Meshes/GpuMesh.h"
 #include "RayTracing/Acceleration/RayTracingBlasCache.h"
 #include "RayTracing/Acceleration/RayTracingPtlasPartitionPlanner.h"
@@ -47,7 +47,7 @@ RhiPtlasInstanceFlags RayTracingPtlasStrategy::ResolveInstanceFlags(const Prepar
 }
 
 void RayTracingPtlasStrategy::Build(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const PreparedRenderScene& preparedScene,
     RayTracingBlasCache& blasCache,
     const RayTracingShaderTablePlan& shaderTablePlan,
@@ -63,14 +63,14 @@ void RayTracingPtlasStrategy::Build(
 
 	PtlasBuildState state;
 	state.InstanceWrites.reserve(instances.size());
-	CollectPtlasInstances(commandContext, preparedScene, viewPlan, blasCache, shaderTablePlan, diagnostics, state);
+	CollectPtlasInstances(commandList, preparedScene, viewPlan, blasCache, shaderTablePlan, diagnostics, state);
 	PreparePtlasOperationBuffer(state);
 
-	RecordPtlasBuild(commandContext, state, diagnostics);
+	RecordPtlasBuild(commandList, state, diagnostics);
 }
 
 void RayTracingPtlasStrategy::CollectPtlasInstances(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const PreparedRenderScene& preparedScene,
     const RayTracingPtlasPartitionPlan& partitionPlan,
     RayTracingBlasCache& blasCache,
@@ -91,9 +91,9 @@ void RayTracingPtlasStrategy::CollectPtlasInstances(
 			Diagnostics::Fatal(g_rayTracingPtlasBuildLogger, __FILE__, __LINE__, "PTLAS work references a mesh instance with no GPU mesh handle.");
 		}
 
-		const RayTracingBlasCache::BlasHandle blas = blasCache.EnsureBlas(commandContext, preparedScene, draw, input.GpuSceneSlot, diagnostics);
+		const RayTracingBlasCache::BlasHandle blas = blasCache.EnsureBlas(commandList, preparedScene, draw, input.GpuSceneSlot, diagnostics);
 
-		commandContext.TrackResource(blas.resource);
+		commandList.TrackResource(blas.resource);
 		if (blas.bBuiltThisFrame)
 		{
 			state.BuiltBlasResources.insert(blas.resource.Value);
@@ -151,21 +151,21 @@ void RayTracingPtlasStrategy::PreparePtlasOperationBuffer(PtlasBuildState& state
 	}
 }
 
-void RayTracingPtlasStrategy::RecordPtlasBuild(RenderCommandContext& commandContext, const PtlasBuildState& state, PassExecutionDiagnostics* diagnostics) const noexcept
+void RayTracingPtlasStrategy::RecordPtlasBuild(RenderCommandList& commandList, const PtlasBuildState& state, PassExecutionDiagnostics* diagnostics) const noexcept
 {
 	for (void* resourceValue : state.BuiltBlasResources)
 	{
-		commandContext.UnorderedAccessBarrier(RhiResourceHandle{resourceValue});
+		commandList.UnorderedAccessBarrier(RhiResourceHandle{resourceValue});
 	}
 
-	TrackBuildResources(commandContext);
+	TrackBuildResources(commandList);
 
 	auto tlasGpuScope = diagnostics != nullptr ? diagnostics->BeginGpuScope("PTLAS Build") : ScopedGpuScope{};
 
 	RhiResourceService& resources = m_renderHardwareInterface.GetResourceService();
 	const RhiGpuVirtualAddress operationDataAddress = resources.GetResourceGpuVirtualAddress(m_ptlasResources.NativeOperationData);
 
-	commandContext.BuildPtlas(
+	commandList.BuildPtlas(
 	    RhiPtlasBuildCommandDesc{
 	        .Layout = m_ptlasResources.Layout,
 	        .DestinationResource = resources.GetResourceHandle(m_ptlasResources.Storage),
@@ -176,11 +176,11 @@ void RayTracingPtlasStrategy::RecordPtlasBuild(RenderCommandContext& commandCont
 	        .OperationCount = operationDataAddress + state.NativeOperationLayout.OperationCountOffsetInBytes});
 }
 
-void RayTracingPtlasStrategy::TrackBuildResources(RenderCommandContext& commandContext) const noexcept
+void RayTracingPtlasStrategy::TrackBuildResources(RenderCommandList& commandList) const noexcept
 {
 	RhiResourceService& resources = m_renderHardwareInterface.GetResourceService();
 
-	commandContext.TrackResource(resources.GetResourceHandle(m_ptlasResources.Storage));
-	commandContext.TrackResource(resources.GetResourceHandle(m_ptlasResources.Scratch));
-	commandContext.TrackResource(resources.GetResourceHandle(m_ptlasResources.NativeOperationData));
+	commandList.TrackResource(resources.GetResourceHandle(m_ptlasResources.Storage));
+	commandList.TrackResource(resources.GetResourceHandle(m_ptlasResources.Scratch));
+	commandList.TrackResource(resources.GetResourceHandle(m_ptlasResources.NativeOperationData));
 }

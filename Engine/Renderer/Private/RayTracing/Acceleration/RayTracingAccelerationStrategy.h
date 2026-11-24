@@ -9,7 +9,7 @@
 class RayTracingBlasCache;
 class PassExecutionDiagnostics;
 class RayTracingShaderTablePlan;
-class RenderCommandContext;
+class RenderCommandList;
 class RenderHardwareInterface;
 struct RayTracingCapabilityReport;
 struct PreparedRenderScene;
@@ -27,7 +27,7 @@ public:
 	virtual RenderRayTracingFrameBindings Prepare(const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan) noexcept = 0;
 
 	virtual void Build(
-	    RenderCommandContext& commandContext,
+	    RenderCommandList& commandList,
 	    const PreparedRenderScene& preparedScene,
 	    RayTracingBlasCache& blasCache,
 	    const RayTracingShaderTablePlan& shaderTablePlan,

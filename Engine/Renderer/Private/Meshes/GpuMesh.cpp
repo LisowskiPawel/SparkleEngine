@@ -2,10 +2,9 @@
 #include "Meshes/GpuMesh.h"
 #include "RHI/Public/Resources/RhiResourceService.h"
 
-#include "Commands/RenderCommandContext.h"
+#include "RHI/Public/Commands/RenderCommandList.h"
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Meshes/GpuMeshPreparation.h"
-#include "RHI/Public/Commands/RenderCommandList.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
 #include "Scene/Meshes/Mesh.h"
 #include "Scene/Meshes/MeshData.h"
@@ -46,19 +45,7 @@ void GpuMesh::CreateVertexBuffer(RenderCommandList& commandList, const MeshData&
 {
 	RhiResourceService& resources = m_renderHardwareInterface->GetResourceService();
 	const std::span<const VertexData> vertices{meshData.vertices};
-	const bool bVerticesUploaded = m_vertexBuffer.Upload(
-	    *m_renderHardwareInterface,
-	    commandList,
-	    std::as_bytes(vertices),
-	    RhiBufferKind::Vertex,
-	    sizeof(VertexData),
-	    L"GpuMesh_VertexBuffer",
-	    L"GpuMesh_VertexUpload");
-
-	if (!bVerticesUploaded)
-	{
-		Diagnostics::Fatal(g_gpuMeshLogger, __FILE__, __LINE__, "GPU mesh vertex upload failed.");
-	}
+	m_vertexBuffer.Upload(*m_renderHardwareInterface, commandList, std::as_bytes(vertices), RhiBufferKind::Vertex, sizeof(VertexData), L"GpuMesh_VertexBuffer", L"GpuMesh_VertexUpload");
 
 	m_vertexBufferView = RhiVertexBufferView{
 	    .BufferLocation = resources.GetResourceGpuVirtualAddress(m_vertexBuffer.GetResource()),
@@ -75,12 +62,7 @@ void GpuMesh::CreateIndexBuffer(RenderCommandList& commandList, const MeshData& 
 {
 	RhiResourceService& resources = m_renderHardwareInterface->GetResourceService();
 	const std::span<const std::uint32_t> indices{meshData.indices};
-	const bool bIndicesUploaded = m_indexBuffer.Upload(*m_renderHardwareInterface, commandList, std::as_bytes(indices), RhiBufferKind::Index, 0, L"GpuMesh_IndexBuffer", L"GpuMesh_IndexUpload");
-
-	if (!bIndicesUploaded)
-	{
-		Diagnostics::Fatal(g_gpuMeshLogger, __FILE__, __LINE__, "GPU mesh index upload failed.");
-	}
+	m_indexBuffer.Upload(*m_renderHardwareInterface, commandList, std::as_bytes(indices), RhiBufferKind::Index, 0, L"GpuMesh_IndexBuffer", L"GpuMesh_IndexUpload");
 
 	m_indexBufferView = RhiIndexBufferView{
 	    .BufferLocation = resources.GetResourceGpuVirtualAddress(m_indexBuffer.GetResource()),
@@ -96,7 +78,8 @@ void GpuMesh::CreateIndexBuffer(RenderCommandList& commandList, const MeshData& 
 void GpuMesh::CreateDeformationBuffers(RenderCommandList& commandList, GpuMeshPreparedData& preparedData)
 {
 	const std::span<const VertexSkinInfluenceData> influences{preparedData.GpuSkinInfluences};
-	const bool bSkinUploaded = m_skinInfluences.Upload(
+
+	m_skinInfluences.Upload(
 	    *m_renderHardwareInterface,
 	    commandList,
 	    std::as_bytes(influences),
@@ -105,26 +88,11 @@ void GpuMesh::CreateDeformationBuffers(RenderCommandList& commandList, GpuMeshPr
 	    L"GpuMesh_SkinInfluences",
 	    L"GpuMesh_SkinInfluencesUpload");
 
-	if (!bSkinUploaded)
-	{
-		Diagnostics::Fatal(g_gpuMeshLogger, __FILE__, __LINE__, "GPU skin influence upload failed.");
-	}
-
 	const MorphTargetDeltaData emptyDelta{};
 	const std::span<const MorphTargetDeltaData> deltas = preparedData.MorphTargetDeltas.empty() ? std::span{&emptyDelta, 1} : std::span{preparedData.MorphTargetDeltas};
-	const bool bMorphTargetsUploaded = m_morphTargets.Upload(
-	    *m_renderHardwareInterface,
-	    commandList,
-	    std::as_bytes(deltas),
-	    RhiBufferKind::Structured,
-	    sizeof(MorphTargetDeltaData),
-	    L"GpuMesh_MorphTargetDeltas",
-	    L"GpuMesh_MorphTargetUpload");
 
-	if (!bMorphTargetsUploaded)
-	{
-		Diagnostics::Fatal(g_gpuMeshLogger, __FILE__, __LINE__, "GPU morph target upload failed.");
-	}
+	m_morphTargets
+	    .Upload(*m_renderHardwareInterface, commandList, std::as_bytes(deltas), RhiBufferKind::Structured, sizeof(MorphTargetDeltaData), L"GpuMesh_MorphTargetDeltas", L"GpuMesh_MorphTargetUpload");
 }
 
 void GpuMesh::CommitPreparedData(GpuMeshPreparedData&& preparedData)
@@ -137,19 +105,19 @@ void GpuMesh::CommitPreparedData(GpuMeshPreparedData&& preparedData)
 	m_morphTargetCount = preparedData.MorphTargetCount;
 }
 
-void GpuMesh::Bind(RenderCommandContext& commandContext) const noexcept
+void GpuMesh::Bind(RenderCommandList& commandList) const noexcept
 {
 	if (m_renderHardwareInterface != nullptr)
 	{
 		RhiResourceService& resources = m_renderHardwareInterface->GetResourceService();
 
-		commandContext.TrackResource(resources.GetResourceHandle(m_vertexBuffer.GetResource()));
-		commandContext.TrackResource(resources.GetResourceHandle(m_indexBuffer.GetResource()));
+		commandList.TrackResource(resources.GetResourceHandle(m_vertexBuffer.GetResource()));
+		commandList.TrackResource(resources.GetResourceHandle(m_indexBuffer.GetResource()));
 	}
 
-	commandContext.SetPrimitiveTopology(GetPrimitiveTopology());
-	commandContext.BindVertexBuffer(GetVertexBufferView());
-	commandContext.BindIndexBuffer(GetIndexBufferView());
+	commandList.SetPrimitiveTopology(GetPrimitiveTopology());
+	commandList.BindVertexBuffer(GetVertexBufferView());
+	commandList.BindIndexBuffer(GetIndexBufferView());
 }
 
 const RhiVertexInputDeclaration& GpuMesh::GetVertexInputDeclaration() const noexcept

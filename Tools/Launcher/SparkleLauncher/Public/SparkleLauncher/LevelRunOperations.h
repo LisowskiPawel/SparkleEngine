@@ -10,7 +10,6 @@
 
 #include <cstdint>
 #include <filesystem>
-#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -77,7 +76,7 @@ namespace SparkleLauncher
 
 	std::string_view ToString(LevelRunMode mode) noexcept;
 	const std::vector<LevelRunOperationDefinition>& GetLevelRunOperationDefinitions();
-	std::optional<LevelRunOperationDefinition> FindLevelRunOperationDefinition(std::string_view operationId);
+	const LevelRunOperationDefinition* FindLevelRunOperationDefinition(std::string_view operationId);
 	LevelRunOperationPlan PlanLevelRunOperation(std::string_view operationId, const LevelRunOperationRequest& request);
 	OperationRecord RunLevelRunOperationPlan(
 	    LevelRunOperationPlan plan,

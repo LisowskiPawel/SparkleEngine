@@ -96,7 +96,7 @@ namespace SparkleLauncher
 	{
 		MaintenanceOperationPlan plan;
 		const auto definition = FindMaintenanceOperationDefinition(operationId);
-		if (!definition.has_value())
+		if (definition == nullptr)
 		{
 			plan.Operation = MakeOperationRecord(std::string(operationId), "Unknown maintenance operation");
 			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Unknown maintenance operation id.", "Choose a registered Clean operation, then retry.");

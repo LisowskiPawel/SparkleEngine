@@ -24,7 +24,7 @@ public:
 	GpuMeshBuffer(GpuMeshBuffer&&) = delete;
 	GpuMeshBuffer& operator=(GpuMeshBuffer&&) = delete;
 
-	bool Upload(
+	void Upload(
 	    RenderHardwareInterface& renderHardwareInterface,
 	    RenderCommandList& commandList,
 	    std::span<const std::byte> payload,

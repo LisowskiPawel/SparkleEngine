@@ -52,10 +52,10 @@ const GBufferMeshPass::DrawParameterMetadata& GBufferMeshPass::GetDrawParameterM
 	return metadata;
 }
 
-void GBufferMeshPass::PrepareRasterPass(RenderCommandContext& commandContext) const
+void GBufferMeshPass::PrepareRasterPass(RenderCommandList& commandList) const
 {
-	commandContext.SetViewport(m_view.viewport);
-	commandContext.SetScissorRect(m_view.scissorRect);
+	commandList.SetViewport(m_view.viewport);
+	commandList.SetScissorRect(m_view.scissorRect);
 }
 
 void GBufferMeshPass::BindMaterial(DrawParameterInstance& drawParameters, const PreparedDraw& draw)
@@ -124,14 +124,14 @@ RhiRasterizerState GBufferMeshPass::ResolveRasterizerState(const MaterialData& m
 	    .bDepthClipEnable = gpuMesh.UsesDepthClipping()};
 }
 
-void GBufferMeshPass::BindBatchPipeline(const FrameGraphResourceCommands& resources, RenderCommandContext& commandContext, DrawParameterInstance& drawParameters, const PreparedDraw& draw)
+void GBufferMeshPass::BindBatchPipeline(const FrameGraphResourceCommands& resources, RenderCommandList& commandList, DrawParameterInstance& drawParameters, const PreparedDraw& draw)
 {
 	const GpuMesh& mesh = draw.Mesh.get();
 	PassBindingOverrides overrides;
 	overrides.SetDescriptorTable("SkinInfluences", mesh.GetSkinInfluencesShaderResourceView());
 	overrides.SetDescriptorTable("MorphTargetDeltas", mesh.GetMorphTargetDeltasShaderResourceView());
 
-	BindRasterShaderPass(commandContext, resources, draw.BindingLayout.get(), draw.Pipeline.get(), drawParameters.GetPassParameterSet(), &overrides);
+	BindRasterShaderPass(commandList, resources, draw.BindingLayout.get(), draw.Pipeline.get(), drawParameters.GetPassParameterSet(), &overrides);
 }
 
 void GBufferMeshPass::DrawBatch(
@@ -142,13 +142,14 @@ void GBufferMeshPass::DrawBatch(
     const PreparedDraw& draw)
 {
 	const GpuMesh& mesh = draw.Mesh.get();
-	mesh.Bind(commandContext);
+	RenderCommandList& commandList = commandContext.GetRenderCommandList();
+	mesh.Bind(commandList);
 
 	DrawParameterInstance drawParameters(drawParameterMetadata);
 	ConfigureDrawParameters(passParameters, draw.FirstInstance, drawParameters);
 	BindMaterial(drawParameters, draw);
 
-	BindBatchPipeline(resources, commandContext, drawParameters, draw);
+	BindBatchPipeline(resources, commandList, drawParameters, draw);
 
 	commandContext.DrawIndexedInstanced(mesh.GetIndexCount(), draw.InstanceCount, 0, 0, 0);
 }

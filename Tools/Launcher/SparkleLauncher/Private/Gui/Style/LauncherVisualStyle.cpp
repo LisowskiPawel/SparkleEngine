@@ -111,7 +111,7 @@ namespace SparkleLauncher
 		addRule("#FooterContextCombo:disabled", "background: transparent; border-color: transparent; color: " + textMuted + ";");
 		addRule("#FooterContextCombo::drop-down", "border: none; width: 18px;");
 		addRule("#FooterContextCombo::down-arrow", "image: url(:/SparkleLauncher/footer-chevron.xpm); width: 7px; height: 4px; margin-right: 4px;");
-		addRule("#OptionsScrollArea, #OptionsStack, #OptionsContent, #OperationStack, #InlineOptionsSection, #ActivityDetailsPanel", "background: transparent; border: none;");
+		addRule("#OptionsScrollArea, #OptionsStack, #OptionsContent, #InlineOptionsSection, #ActivityDetailsPanel", "background: transparent; border: none;");
 		addRule("#OptionsScrollArea QWidget", "background: transparent;");
 		addRule("#OptionRow", "background: transparent; border-top: 1px solid " + divider + "; min-height: 38px;");
 		addRule("#OptionGroup", "background: transparent; border: none; margin-top: 4px;");
@@ -228,16 +228,6 @@ namespace SparkleLauncher
 		addRule("#WorkflowGroupButton:focus", "background: #1d211e; color: " + textPrimary + "; border: none; border-left: 3px solid #65715f;");
 		addRule("#WorkflowGroupButton[ActiveState=\"true\"]:focus", "background: #20251f; color: " + textPrimary + "; border: none; border-left: 3px solid " + accent + ";");
 
-		addRule(
-		    "#WorkflowButton",
-		    "background: transparent; color: " + textSecondary
-		        + "; border: none; border-bottom: 3px solid transparent; padding: 11px 17px 9px 17px; text-align: center; font-size: "
-		          "9.25pt; font-weight: 800;");
-
-		addRule("#WorkflowButton:hover", "background: #1b1e1b; color: " + textPrimary + ";");
-		addRule("#WorkflowButton:checked", "background: transparent; border-bottom: 3px solid " + accent + "; color: #ffffff;");
-		addRule("#WorkflowButton:focus", "background: #1b1e1b; color: " + textPrimary + "; border: none; border-bottom: 3px solid #56614c;");
-		addRule("#WorkflowButton:checked:focus", "background: transparent; color: #ffffff; border: none; border-bottom: 3px solid " + accent + ";");
 		addRule("QPushButton", "background: " + primary + "; color: #071006; border: 1px solid #92d83a; border-radius: 4px; padding: 6px 15px; font-weight: 700;");
 		addRule("QPushButton:hover", "background: " + primaryHover + ";");
 		addRule("QPushButton:focus, QToolButton:focus", "border: 1px solid " + focus + ";");

@@ -190,7 +190,7 @@ namespace SparkleLauncher
 	bool HasIncompleteEnabledSourceDependencies(const BuildWorkspaceOperationPlan& plan);
 	bool BuildWorkspaceOperationRequiresConfigureStep(const BuildWorkspaceOperationPlan& plan);
 	const std::vector<BuildWorkspaceOperationDefinition>& GetBuildWorkspaceOperationDefinitions();
-	std::optional<BuildWorkspaceOperationDefinition> FindBuildWorkspaceOperationDefinition(std::string_view operationId);
+	const BuildWorkspaceOperationDefinition* FindBuildWorkspaceOperationDefinition(std::string_view operationId);
 	BuildToolchainStatus DetectBuildToolchain(WorkspaceIde preferredIde, WorkspaceCompiler compiler = WorkspaceCompiler::Msvc);
 	BuildFilesFreshnessStatus CheckBuildFilesFreshness(const std::filesystem::path& workspaceRoot, const BuildToolchainStatus& toolchain);
 	bool UpdateBuildFilesFreshnessStamp(const std::filesystem::path& workspaceRoot, const BuildToolchainStatus& toolchain, std::string& errorMessage);

@@ -63,12 +63,10 @@ namespace SparkleLauncher::LauncherUi
 	{
 		inline constexpr int RailWidth = 168;
 		inline constexpr int RailItemMinHeight = 48;
-		inline constexpr int TabMinHeight = 36;
 		inline constexpr int RailIconSize = 16;
 		inline constexpr int RailTopPadding = 10;
 		inline constexpr int RailBottomPadding = 12;
 		inline constexpr int RailGroupSpacing = 4;
-		inline constexpr int WorkflowTabSpacing = 18;
 		inline constexpr int PanelHorizontalMargin = 18;
 		inline constexpr int PanelVerticalMargin = 14;
 	}

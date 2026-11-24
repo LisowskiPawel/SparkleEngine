@@ -1,13 +1,10 @@
 #include "Shell/LauncherShellModel.h"
 
 #include "Startup/LauncherArguments.h"
+#include "Operations/LauncherOperationExecution.h"
 
-#include "SparkleLauncher/CookOperations.h"
-#include "SparkleLauncher/LevelOperations.h"
-#include "SparkleLauncher/LevelRunOperations.h"
 #include "Workspace/LauncherStatePaths.h"
 #include "Workspace/LauncherProductPaths.h"
-#include "SparkleLauncher/MaintenanceOperations.h"
 
 #include <algorithm>
 #include <chrono>
@@ -24,26 +21,7 @@ namespace SparkleLauncher
 	std::vector<LauncherShellOperationRow> BuildLauncherShellOperationRows()
 	{
 		std::vector<LauncherShellOperationRow> rows;
-		for (const BuildWorkspaceOperationDefinition& definition : GetBuildWorkspaceOperationDefinitions())
-		{
-			rows.push_back({definition.Group, definition.Id, definition.DisplayName, "Dry-run", definition.Description});
-		}
-		for (const CookOperationDefinition& definition : GetCookOperationDefinitions())
-		{
-			rows.push_back({definition.Group, definition.Id, definition.DisplayName, "Dry-run", definition.Description});
-		}
-		for (const LevelOperationDefinition& definition : GetLevelOperationDefinitions())
-		{
-			rows.push_back({definition.Group, definition.Id, definition.DisplayName, "Dry-run", definition.Description});
-		}
-		for (const LevelRunOperationDefinition& definition : GetLevelRunOperationDefinitions())
-		{
-			rows.push_back({definition.Group, definition.Id, definition.DisplayName, "Dry-run", definition.Description});
-		}
-		for (const MaintenanceOperationDefinition& definition : GetMaintenanceOperationDefinitions())
-		{
-			rows.push_back({definition.Group, definition.Id, definition.DisplayName, "Dry-run", definition.Description});
-		}
+		VisitLauncherOperationDefinitions([&rows](const auto& definition) { rows.push_back({definition.Group, definition.Id, definition.DisplayName, "Dry-run", definition.Description}); });
 		return rows;
 	}
 

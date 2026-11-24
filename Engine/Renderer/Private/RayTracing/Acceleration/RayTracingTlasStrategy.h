@@ -12,7 +12,7 @@ public:
 	~RayTracingTlasStrategy() noexcept override;
 	RenderRayTracingFrameBindings Prepare(const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan) noexcept override;
 	void Build(
-	    RenderCommandContext& commandContext,
+	    RenderCommandList& commandList,
 	    const PreparedRenderScene& preparedScene,
 	    RayTracingBlasCache& blasCache,
 	    const RayTracingShaderTablePlan& shaderTablePlan,

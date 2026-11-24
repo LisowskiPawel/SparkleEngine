@@ -114,13 +114,13 @@ void PassResourceBuilder::DeclareTextureBinding(const PassParameterDesc& paramet
 
 void PassResourceBuilder::DeclareBufferBinding(const PassParameterDesc& parameter, const PassParameterBinding& binding) noexcept
 {
-	const PassParameterBufferBindingData* bufferData = binding.AsBufferData();
-	assert(bufferData != nullptr);
+	const std::vector<FrameGraphBufferHandle>* bufferHandles = binding.AsBufferHandles();
+	assert(bufferHandles != nullptr);
 
 	const ResourceUsage usage = GetFrameGraphUsage(parameter);
-	for (std::uint32_t arrayIndex = 0; arrayIndex < static_cast<std::uint32_t>(bufferData->Handles.size()); ++arrayIndex)
+	for (std::uint32_t arrayIndex = 0; arrayIndex < static_cast<std::uint32_t>(bufferHandles->size()); ++arrayIndex)
 	{
-		DeclareResourceHandle(bufferData->Handles[arrayIndex].GetResourceHandle(), usage, parameter, arrayIndex);
+		DeclareResourceHandle((*bufferHandles)[arrayIndex].GetResourceHandle(), usage, parameter, arrayIndex);
 	}
 }
 

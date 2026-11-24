@@ -18,7 +18,6 @@ class GpuSceneSlotAllocator;
 class GpuMeshCache;
 class MaterialCache;
 class PassExecutionDiagnostics;
-class RenderCommandContext;
 class RenderGpuScene;
 class RenderHardwareInterface;
 class RenderRayTracingScene;

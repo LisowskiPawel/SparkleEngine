@@ -2,7 +2,7 @@
 
 #include "FrameGraph/FrameGraph.h"
 
-#include "Commands/RenderCommandContext.h"
+#include "RHI/Public/Commands/RenderCommandList.h"
 #include "Core/Public/Diagnostics/Verify.h"
 
 #include <cassert>
@@ -50,7 +50,7 @@ static void FailUnresolvedResourceBarrier(std::string_view passName, const Frame
 	Diagnostics::Fatal(LogFrameGraphBarrierPlayback, __FILE__, __LINE__, message);
 }
 
-void FrameGraph::EmitTransientAliasingBarriers(RenderCommandContext& commandContext, std::string_view passName, const std::vector<FrameGraphAliasingBarrier>& barriers) const noexcept
+void FrameGraph::EmitTransientAliasingBarriers(RenderCommandList& commandList, std::string_view passName, const std::vector<FrameGraphAliasingBarrier>& barriers) const noexcept
 {
 	for (const FrameGraphAliasingBarrier& barrier : barriers)
 	{
@@ -77,11 +77,11 @@ void FrameGraph::EmitTransientAliasingBarriers(RenderCommandContext& commandCont
 			FailUnresolvedAliasingBarrier(passName, barrier, beforeName, afterName);
 		}
 
-		commandContext.AliasResource(beforeResource, afterResource);
+		commandList.AliasResource(beforeResource, afterResource);
 	}
 }
 
-void FrameGraph::EmitCompiledBarriers(RenderCommandContext& commandContext, std::string_view passName, const std::vector<FrameGraphBarrier>& barriers) const noexcept
+void FrameGraph::EmitCompiledBarriers(RenderCommandList& commandList, std::string_view passName, const std::vector<FrameGraphBarrier>& barriers) const noexcept
 {
 	for (const FrameGraphBarrier& barrier : barriers)
 	{
@@ -100,11 +100,11 @@ void FrameGraph::EmitCompiledBarriers(RenderCommandContext& commandContext, std:
 		switch (barrier.type)
 		{
 			case FrameGraphBarrier::Type::Transition:
-				commandContext.TransitionResource(resource, barrier.before, barrier.after);
+				commandList.TransitionResource(resource, barrier.before, barrier.after);
 				break;
 			case FrameGraphBarrier::Type::UnorderedAccess:
 			case FrameGraphBarrier::Type::AccelerationStructure:
-				commandContext.UnorderedAccessBarrier(resource);
+				commandList.UnorderedAccessBarrier(resource);
 				break;
 			default:
 				assert(false);

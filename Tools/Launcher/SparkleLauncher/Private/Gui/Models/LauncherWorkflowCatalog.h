@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Gui/Models/LauncherUiModel.h"
+#include "Gui/Style/LauncherIconLibrary.h"
 
 #include <QtCore/QString>
 #include <QtCore/QVector>
@@ -9,8 +9,9 @@ namespace SparkleLauncher
 {
 	struct LauncherWorkflowDefinition
 	{
-		LauncherWorkflowPageKind PageKind = LauncherWorkflowPageKind::Unknown;
-		QVector<QString> OperationIds;
+		QString OperationId;
+		QString DisplayName;
+		LauncherIcon Icon;
 	};
 
 	QString LauncherScenesOperationId();

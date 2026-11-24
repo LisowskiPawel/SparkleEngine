@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-class RenderCommandContext;
+class RenderCommandList;
 class FrameGraphResourceCommands;
 class PassParameterSet;
 
@@ -17,7 +17,7 @@ enum class BindingDomain : std::uint8_t
 };
 
 void BindPassParameters(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const FrameGraphResourceCommands& resources,
     const RenderBindingLayout& layout,
     const PassParameterSet& parameterSet,

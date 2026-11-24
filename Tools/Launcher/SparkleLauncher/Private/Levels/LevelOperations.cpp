@@ -29,11 +29,11 @@ namespace SparkleLauncher
 		return definitions;
 	}
 
-	std::optional<LevelOperationDefinition> FindLevelOperationDefinition(std::string_view operationId)
+	const LevelOperationDefinition* FindLevelOperationDefinition(std::string_view operationId)
 	{
 		const std::vector<LevelOperationDefinition>& definitions = GetLevelOperationDefinitions();
 		const auto found = std::find_if(definitions.begin(), definitions.end(), [operationId](const LevelOperationDefinition& definition) { return definition.Id == operationId; });
-		return found == definitions.end() ? std::nullopt : std::optional<LevelOperationDefinition>(*found);
+		return found == definitions.end() ? nullptr : &*found;
 	}
 
 	static void ResolveAvailableLevels(LevelOperationPlan& plan)
@@ -127,7 +127,7 @@ namespace SparkleLauncher
 	{
 		LevelOperationPlan plan;
 		const auto definition = FindLevelOperationDefinition(operationId);
-		if (!definition.has_value())
+		if (definition == nullptr)
 		{
 			plan.Operation = MakeOperationRecord(std::string(operationId), "Unknown level operation");
 			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Unknown level operation id.", "Choose a registered level Sync operation, then retry.");

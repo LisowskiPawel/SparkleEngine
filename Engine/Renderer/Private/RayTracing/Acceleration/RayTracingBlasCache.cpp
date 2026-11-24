@@ -6,7 +6,7 @@
 #include "RayTracing/Acceleration/RayTracingBlasGeometryBuilder.h"
 
 #include "Meshes/GpuMeshCache.h"
-#include "Commands/RenderCommandContext.h"
+#include "RHI/Public/Commands/RenderCommandList.h"
 #include "Meshes/GpuMesh.h"
 #include "Diagnostics/PassExecutionDiagnostics.h"
 #include "RHI/Public/Device/RenderHardwareInterface.h"
@@ -57,7 +57,7 @@ void RayTracingBlasCache::BeginFrame() noexcept
 	}
 }
 
-RayTracingBlasCache::BlasHandle RayTracingBlasCache::EnsureBlas(RenderCommandContext& commandContext, const GpuMesh& gpuMesh, PassExecutionDiagnostics* diagnostics) noexcept
+RayTracingBlasCache::BlasHandle RayTracingBlasCache::EnsureBlas(RenderCommandList& commandList, const GpuMesh& gpuMesh, PassExecutionDiagnostics* diagnostics) noexcept
 {
 	if (m_renderHardwareInterface == nullptr || !gpuMesh.IsValid())
 	{
@@ -75,11 +75,11 @@ RayTracingBlasCache::BlasHandle RayTracingBlasCache::EnsureBlas(RenderCommandCon
 		return BuildHandle(entry);
 	}
 
-	return BuildBlas(commandContext, geometry, entry, diagnostics);
+	return BuildBlas(commandList, geometry, entry, diagnostics);
 }
 
 RayTracingBlasCache::BlasHandle RayTracingBlasCache::EnsureBlas(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const PreparedRenderScene& preparedScene,
     const MeshDraw& draw,
     std::uint32_t gpuSceneSlot,
@@ -87,7 +87,7 @@ RayTracingBlasCache::BlasHandle RayTracingBlasCache::EnsureBlas(
 {
 	if (IsSkinnedRayTracingDraw(draw))
 	{
-		return EnsureSkinnedBlas(commandContext, preparedScene, draw, gpuSceneSlot, diagnostics);
+		return EnsureSkinnedBlas(commandList, preparedScene, draw, gpuSceneSlot, diagnostics);
 	}
 
 	const GpuMesh* gpuMesh = m_meshes != nullptr ? m_meshes->Resolve(draw.Geometry.Mesh) : nullptr;
@@ -95,14 +95,10 @@ RayTracingBlasCache::BlasHandle RayTracingBlasCache::EnsureBlas(
 	{
 		Diagnostics::Fatal(g_rayTracingBlasCacheLogger, __FILE__, __LINE__, "BLAS cache could not resolve the mesh referenced by the render scene.");
 	}
-	return EnsureBlas(commandContext, *gpuMesh, diagnostics);
+	return EnsureBlas(commandList, *gpuMesh, diagnostics);
 }
 
-RayTracingBlasCache::BlasHandle RayTracingBlasCache::BuildBlas(
-    RenderCommandContext& commandContext,
-    const RhiRayTracingGeometryDesc& geometry,
-    Entry& entry,
-    PassExecutionDiagnostics* diagnostics) noexcept
+RayTracingBlasCache::BlasHandle RayTracingBlasCache::BuildBlas(RenderCommandList& commandList, const RhiRayTracingGeometryDesc& geometry, Entry& entry, PassExecutionDiagnostics* diagnostics) noexcept
 {
 	const RhiRayTracingAccelerationStructurePrebuildInfo prebuildInfo = m_renderHardwareInterface->GetRayTracingService().GetBottomLevelAccelerationStructurePrebuildInfo(geometry);
 	if (prebuildInfo.ResultDataMaxSizeInBytes == 0 || prebuildInfo.ScratchDataSizeInBytes == 0)
@@ -113,12 +109,12 @@ RayTracingBlasCache::BlasHandle RayTracingBlasCache::BuildBlas(
 	EnsureEntryResources(prebuildInfo, entry);
 
 	entry.geometry = geometry;
-	TrackBuildResources(commandContext, entry);
+	TrackBuildResources(commandList, entry);
 
 	{
 		auto blasGpuScope = diagnostics != nullptr ? diagnostics->BeginGpuScope("BLAS Build") : ScopedGpuScope{};
 
-		commandContext.BuildBottomLevelAccelerationStructure(
+		commandList.BuildBottomLevelAccelerationStructure(
 		    geometry,
 		    m_renderHardwareInterface->GetResourceService().GetResourceGpuVirtualAddress(entry.scratchBuffer),
 		    m_renderHardwareInterface->GetResourceService().GetResourceGpuVirtualAddress(entry.accelerationStructureBuffer));
@@ -129,7 +125,7 @@ RayTracingBlasCache::BlasHandle RayTracingBlasCache::BuildBlas(
 }
 
 RayTracingBlasCache::BlasHandle RayTracingBlasCache::EnsureSkinnedBlas(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const PreparedRenderScene& preparedScene,
     const MeshDraw& draw,
     std::uint32_t gpuSceneSlot,
@@ -148,7 +144,7 @@ RayTracingBlasCache::BlasHandle RayTracingBlasCache::EnsureSkinnedBlas(
 	entry.bTouchedThisFrame = true;
 
 	const RhiRayTracingGeometryDesc geometry = BuildSkinnedGeometry(preparedScene, draw, entry);
-	return BuildBlas(commandContext, geometry, entry, diagnostics);
+	return BuildBlas(commandList, geometry, entry, diagnostics);
 }
 
 void RayTracingBlasCache::EndFrame() noexcept
@@ -316,7 +312,7 @@ void RayTracingBlasCache::EnsureEntryResources(const RhiRayTracingAccelerationSt
 	}
 }
 
-void RayTracingBlasCache::TrackBuildResources(RenderCommandContext& commandContext, const Entry& entry) const noexcept
+void RayTracingBlasCache::TrackBuildResources(RenderCommandList& commandList, const Entry& entry) const noexcept
 {
 	if (m_renderHardwareInterface == nullptr)
 	{
@@ -325,8 +321,8 @@ void RayTracingBlasCache::TrackBuildResources(RenderCommandContext& commandConte
 
 	RhiResourceService& resources = m_renderHardwareInterface->GetResourceService();
 
-	commandContext.TrackResource(resources.GetResourceHandle(entry.scratchBuffer));
-	commandContext.TrackResource(resources.GetResourceHandle(entry.accelerationStructureBuffer));
+	commandList.TrackResource(resources.GetResourceHandle(entry.scratchBuffer));
+	commandList.TrackResource(resources.GetResourceHandle(entry.accelerationStructureBuffer));
 }
 
 bool RayTracingBlasCache::GeometryMatches(const Entry& entry, const RhiRayTracingGeometryDesc& geometry) const noexcept

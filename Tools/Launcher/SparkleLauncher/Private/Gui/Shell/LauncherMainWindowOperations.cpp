@@ -153,7 +153,7 @@ namespace SparkleLauncher
 		}
 
 		return operationId == LauncherScenesOperationId() || operationId == "levels.sync" || operationId == "levels.run" || operationId.startsWith("workspace.build.")
-		    || FindCookOperationDefinition(operationId.toStdString()).has_value();
+		    || FindCookOperationDefinition(operationId.toStdString()) != nullptr;
 	}
 
 	void LauncherMainWindow::PromptForLauncherRestart()

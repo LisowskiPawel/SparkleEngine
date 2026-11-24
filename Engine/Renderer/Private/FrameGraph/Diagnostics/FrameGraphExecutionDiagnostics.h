@@ -6,12 +6,12 @@
 
 class PassExecutionDiagnostics;
 struct FrameGraphPassNode;
-class RenderCommandContext;
+class RenderCommandList;
 
 class FrameGraphExecutionDiagnostics final
 {
 public:
-	FrameGraphExecutionDiagnostics(const RenderDiagnostics& backendDiagnostics, RenderCommandContext& commands) noexcept;
+	FrameGraphExecutionDiagnostics(const RenderDiagnostics& backendDiagnostics, RenderCommandList& commands) noexcept;
 
 	bool ShouldEmitFramePassMarkers() const noexcept;
 	bool ShouldEmitDetailedMarkers() const noexcept;
@@ -26,5 +26,5 @@ private:
 	void InsertDetailedMarker(std::string_view label) const;
 
 	const RenderDiagnostics& m_backendDiagnostics;
-	RenderCommandContext& m_commands;
+	RenderCommandList& m_commands;
 };

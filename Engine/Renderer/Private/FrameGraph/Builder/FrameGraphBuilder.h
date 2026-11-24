@@ -67,10 +67,11 @@ public:
 		    parameters,
 		    [passState](PassCommandContext& context, TypedPassParameterInstance<TParameters>& passParameters) mutable
 		    {
-			    passState->Draw.PrepareRasterPass(context.Commands);
-			    context.Resources.BeginRasterPass(context.Commands, passState->Pass);
+			    RenderCommandList& commandList = context.Commands.GetRenderCommandList();
+			    passState->Draw.PrepareRasterPass(commandList);
+			    context.Resources.BeginRasterPass(commandList, passState->Pass);
 			    passState->Draw.Draw(context, passParameters);
-			    context.Resources.EndRasterPass(context.Commands);
+			    context.Resources.EndRasterPass(commandList);
 		    });
 	}
 
@@ -103,7 +104,7 @@ public:
 			    {
 				    passParameters.GetPassParameterSet().ReportInvalidBindings(diagnosticLabel.c_str());
 			    }
-			    BindComputeShaderPass(context.Commands, context.Resources, runtime->BindingLayout, runtime->Pipeline, passParameters.GetPassParameterSet());
+			    BindComputeShaderPass(context.Commands.GetRenderCommandList(), context.Resources, runtime->BindingLayout, runtime->Pipeline, passParameters.GetPassParameterSet());
 			    DispatchComputeShaderPass(context.Commands, groupCount);
 		    });
 	}
@@ -203,7 +204,7 @@ private:
 				    passParameters.GetPassParameterSet().ReportInvalidBindings(diagnosticLabel.c_str());
 			    }
 
-			    BindRayTracingShaderPass(context.Commands, context.Resources, runtime.BindingLayout, runtime.Pipeline, passParameters.GetPassParameterSet());
+			    BindRayTracingShaderPass(context.Commands.GetRenderCommandList(), context.Resources, runtime.BindingLayout, runtime.Pipeline, passParameters.GetPassParameterSet());
 			    context.Commands.TraceRays(
 			        TraceRaysDesc{
 			            .Pipeline = &runtime.Pipeline,

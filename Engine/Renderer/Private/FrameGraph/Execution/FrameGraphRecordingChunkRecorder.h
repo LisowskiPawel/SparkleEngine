@@ -18,7 +18,7 @@ public:
 	void Record(const RecordingChunk& chunk, RenderCommandList& commandList) const;
 
 private:
-	ScopedGpuScope BeginChunkScope(const RecordingChunk& chunk, RenderCommandContext& commands) const;
+	ScopedGpuScope BeginChunkScope(const RecordingChunk& chunk, RenderCommandList& commands) const;
 	void RecordGroup(const RecordingGroup& group, RenderCommandList& commandList, RenderCommandContext& commands, FrameGraphExecutionDiagnostics& graphDiagnostics) const;
 	void RecordPass(FrameGraphPassIndex passIndex, RenderCommandList& commandList, RenderCommandContext& commands, FrameGraphExecutionDiagnostics& graphDiagnostics) const;
 	void TrackPassResources(const FrameGraphPassNode& pass, RenderCommandList& commandList) const;

@@ -15,20 +15,6 @@ SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_rayTracingPtlasPartitionPlannerLogger, "Ren
 
 RayTracingPtlasPartitionPlanner::RayTracingPtlasPartitionPlanner() noexcept = default;
 
-struct RayTracingPtlasPartitionPlanner::SceneBounds final
-{
-	DirectX::XMFLOAT3 Min = {};
-	DirectX::XMFLOAT3 Max = {};
-	bool bValid = false;
-};
-
-struct RayTracingPtlasPartitionPlanner::InstanceBounds final
-{
-	DirectX::XMFLOAT3 Min = {};
-	DirectX::XMFLOAT3 Max = {};
-	bool bValid = false;
-};
-
 struct RayTracingPtlasPartitionPlanner::ObservedInstance final
 {
 	const MeshDraw* Draw = nullptr;
@@ -46,104 +32,39 @@ struct RayTracingPtlasPartitionPlanner::BuildState final
 	std::vector<ObservedInstance> ObservedInstances;
 };
 
-void RayTracingPtlasPartitionPlanner::ExpandSceneBounds(SceneBounds& bounds, const DirectX::XMFLOAT3& point) noexcept
+RenderMeshWorldBounds RayTracingPtlasPartitionPlanner::ComputeInstanceWorldBounds(const PreparedRenderScene& preparedScene, std::uint32_t primitiveIndex) noexcept
 {
-	if (!bounds.bValid)
-	{
-		bounds.Min = point;
-		bounds.Max = point;
-		bounds.bValid = true;
-		return;
-	}
-
-	bounds.Min.x = (std::min) (bounds.Min.x, point.x);
-	bounds.Min.y = (std::min) (bounds.Min.y, point.y);
-	bounds.Min.z = (std::min) (bounds.Min.z, point.z);
-	bounds.Max.x = (std::max) (bounds.Max.x, point.x);
-	bounds.Max.y = (std::max) (bounds.Max.y, point.y);
-	bounds.Max.z = (std::max) (bounds.Max.z, point.z);
-}
-
-DirectX::XMFLOAT3 RayTracingPtlasPartitionPlanner::TransformPoint(const DirectX::XMFLOAT3& point, const DirectX::XMFLOAT4X4& worldMatrix) noexcept
-{
-	const DirectX::XMVECTOR localPoint = DirectX::XMLoadFloat3(&point);
-	const DirectX::XMMATRIX world = DirectX::XMLoadFloat4x4(&worldMatrix);
-	const DirectX::XMVECTOR worldPoint = DirectX::XMVector3TransformCoord(localPoint, world);
-	DirectX::XMFLOAT3 transformed{};
-	DirectX::XMStoreFloat3(&transformed, worldPoint);
-	return transformed;
-}
-
-RayTracingPtlasPartitionPlanner::InstanceBounds RayTracingPtlasPartitionPlanner::ComputeInstanceWorldBounds(const PreparedRenderScene& preparedScene, std::uint32_t primitiveIndex) noexcept
-{
-	if (primitiveIndex < preparedScene.primitives.size())
-	{
-		const RenderMeshWorldBounds& prepared = preparedScene.primitives[primitiveIndex].WorldBounds;
-		if (prepared.bValid)
-		{
-			return InstanceBounds{.Min = prepared.Min, .Max = prepared.Max, .bValid = true};
-		}
-	}
 	if (primitiveIndex >= preparedScene.primitives.size())
 	{
 		return {};
 	}
-	const MeshDraw& draw = preparedScene.primitives[primitiveIndex].Draw;
-	if (!draw.Geometry.Mesh || !draw.Geometry.bHasLocalBounds)
+
+	const PreparedRenderPrimitive& primitive = preparedScene.primitives[primitiveIndex];
+	if (primitive.WorldBounds.bValid)
+	{
+		return primitive.WorldBounds;
+	}
+
+	const MeshDraw& draw = primitive.Draw;
+	if (!draw.Geometry.Mesh)
 	{
 		const DirectX::XMFLOAT3 position{draw.Transform.WorldMatrix._41, draw.Transform.WorldMatrix._42, draw.Transform.WorldMatrix._43};
-		return InstanceBounds{.Min = position, .Max = position, .bValid = true};
+		return RenderMeshWorldBounds{.Min = position, .Max = position, .bValid = true};
 	}
-
-	const DirectX::XMFLOAT3 corners[] = {
-	    {draw.Geometry.LocalBoundsMin.x, draw.Geometry.LocalBoundsMin.y, draw.Geometry.LocalBoundsMin.z},
-	    {draw.Geometry.LocalBoundsMax.x, draw.Geometry.LocalBoundsMin.y, draw.Geometry.LocalBoundsMin.z},
-	    {draw.Geometry.LocalBoundsMin.x, draw.Geometry.LocalBoundsMax.y, draw.Geometry.LocalBoundsMin.z},
-	    {draw.Geometry.LocalBoundsMax.x, draw.Geometry.LocalBoundsMax.y, draw.Geometry.LocalBoundsMin.z},
-	    {draw.Geometry.LocalBoundsMin.x, draw.Geometry.LocalBoundsMin.y, draw.Geometry.LocalBoundsMax.z},
-	    {draw.Geometry.LocalBoundsMax.x, draw.Geometry.LocalBoundsMin.y, draw.Geometry.LocalBoundsMax.z},
-	    {draw.Geometry.LocalBoundsMin.x, draw.Geometry.LocalBoundsMax.y, draw.Geometry.LocalBoundsMax.z},
-	    {draw.Geometry.LocalBoundsMax.x, draw.Geometry.LocalBoundsMax.y, draw.Geometry.LocalBoundsMax.z}};
-
-	InstanceBounds worldBounds{};
-	for (const DirectX::XMFLOAT3& corner : corners)
-	{
-		const DirectX::XMFLOAT3 transformedCorner = TransformPoint(corner, draw.Transform.WorldMatrix);
-		if (!worldBounds.bValid)
-		{
-			worldBounds.Min = transformedCorner;
-			worldBounds.Max = transformedCorner;
-			worldBounds.bValid = true;
-			continue;
-		}
-
-		worldBounds.Min.x = (std::min) (worldBounds.Min.x, transformedCorner.x);
-		worldBounds.Min.y = (std::min) (worldBounds.Min.y, transformedCorner.y);
-		worldBounds.Min.z = (std::min) (worldBounds.Min.z, transformedCorner.z);
-		worldBounds.Max.x = (std::max) (worldBounds.Max.x, transformedCorner.x);
-		worldBounds.Max.y = (std::max) (worldBounds.Max.y, transformedCorner.y);
-		worldBounds.Max.z = (std::max) (worldBounds.Max.z, transformedCorner.z);
-	}
-	return worldBounds;
+	return RenderMeshWorldBounds::Transform(draw.Geometry, draw.Transform.WorldMatrix);
 }
 
-DirectX::XMFLOAT3 RayTracingPtlasPartitionPlanner::ComputeInstancePartitionPosition(const PreparedRenderScene& preparedScene, std::uint32_t primitiveIndex) noexcept
+RenderMeshWorldBounds RayTracingPtlasPartitionPlanner::ComputeSceneBounds(const PreparedRenderScene& preparedScene) noexcept
 {
-	const InstanceBounds bounds = ComputeInstanceWorldBounds(preparedScene, primitiveIndex);
-	return DirectX::XMFLOAT3{0.5f * (bounds.Min.x + bounds.Max.x), 0.5f * (bounds.Min.y + bounds.Max.y), 0.5f * (bounds.Min.z + bounds.Max.z)};
-}
-
-RayTracingPtlasPartitionPlanner::SceneBounds RayTracingPtlasPartitionPlanner::ComputeSceneBounds(const PreparedRenderScene& preparedScene) noexcept
-{
-	SceneBounds bounds{};
+	RenderMeshWorldBounds bounds{};
 	for (const RenderRayTracingInstance& input : preparedScene.rayTracingInstances)
 	{
 		const std::uint32_t primitiveIndex = input.PrimitiveIndex;
-		const InstanceBounds instanceBounds = ComputeInstanceWorldBounds(preparedScene, primitiveIndex);
+		const RenderMeshWorldBounds instanceBounds = ComputeInstanceWorldBounds(preparedScene, primitiveIndex);
 		if (instanceBounds.bValid)
 		{
-			ExpandSceneBounds(bounds, instanceBounds.Min);
-			ExpandSceneBounds(bounds, instanceBounds.Max);
+			bounds.Expand(instanceBounds.Min);
+			bounds.Expand(instanceBounds.Max);
 		}
 	}
 	return bounds;
@@ -163,14 +84,14 @@ std::uint32_t RayTracingPtlasPartitionPlanner::QuantizeAxis(float value, float m
 	return static_cast<std::uint32_t>(scaled);
 }
 
-std::uint32_t RayTracingPtlasPartitionPlanner::ComputeGridPartitionId(const DirectX::XMFLOAT3& position, const SceneBounds& bounds, std::uint32_t partitionsPerAxis) noexcept
+std::uint32_t RayTracingPtlasPartitionPlanner::ComputeGridPartitionId(const DirectX::XMFLOAT3& position, const RenderMeshWorldBounds& bounds, std::uint32_t partitionsPerAxis) noexcept
 {
 	const std::uint32_t x = QuantizeAxis(position.x, bounds.Min.x, bounds.Max.x, partitionsPerAxis);
 	const std::uint32_t z = QuantizeAxis(position.z, bounds.Min.z, bounds.Max.z, partitionsPerAxis);
 	return x + z * partitionsPerAxis;
 }
 
-DirectX::XMFLOAT3 RayTracingPtlasPartitionPlanner::ComputeGridPartitionCenter(std::uint32_t partitionId, const SceneBounds& bounds, std::uint32_t partitionsPerAxis) noexcept
+DirectX::XMFLOAT3 RayTracingPtlasPartitionPlanner::ComputeGridPartitionCenter(std::uint32_t partitionId, const RenderMeshWorldBounds& bounds, std::uint32_t partitionsPerAxis) noexcept
 {
 	if (partitionsPerAxis == 0)
 	{
@@ -222,7 +143,7 @@ RayTracingPtlasPartitionPlan RayTracingPtlasPartitionPlanner::InitializePlan(con
 	return plan;
 }
 
-void RayTracingPtlasPartitionPlanner::PreparePartitionStates(const SceneBounds& bounds, const RayTracingPtlasPartitionPlannerConfig& config, const RayTracingPtlasPartitionPlan& plan)
+void RayTracingPtlasPartitionPlanner::PreparePartitionStates(const RenderMeshWorldBounds& bounds, const RayTracingPtlasPartitionPlannerConfig& config, const RayTracingPtlasPartitionPlan& plan)
 {
 	if (!plan.Validation.bHasPartitionOverflow && m_partitionStates.size() != plan.Counts.GridPartitionCount)
 	{
@@ -244,7 +165,7 @@ void RayTracingPtlasPartitionPlanner::PreparePartitionStates(const SceneBounds& 
 
 void RayTracingPtlasPartitionPlanner::CollectObservedInstances(
     const PreparedRenderScene& preparedScene,
-    const SceneBounds& bounds,
+    const RenderMeshWorldBounds& bounds,
     const RayTracingPtlasPartitionPlannerConfig& config,
     RayTracingPtlasPartitionPlan& plan,
     BuildState& state)
@@ -268,7 +189,8 @@ void RayTracingPtlasPartitionPlanner::CollectObservedInstances(
 		}
 
 		const MeshDraw& draw = preparedScene.primitives[input.PrimitiveIndex].Draw;
-		const DirectX::XMFLOAT3 position = ComputeInstancePartitionPosition(preparedScene, input.PrimitiveIndex);
+		const RenderMeshWorldBounds instanceBounds = ComputeInstanceWorldBounds(preparedScene, input.PrimitiveIndex);
+		const DirectX::XMFLOAT3 position = instanceBounds.GetCenter();
 		const std::uint32_t localPartitionId = plan.Validation.bHasPartitionOverflow ? 0u : ComputeGridPartitionId(position, bounds, config.PartitionsPerAxis);
 		const PreviousInstanceState* previous = input.GpuSceneSlot < m_previousInstances.size() && m_previousInstances[input.GpuSceneSlot].bValid ? &m_previousInstances[input.GpuSceneSlot] : nullptr;
 		const bool bDirtyTransform = previous == nullptr || IsTransformDirty(draw.Transform.WorldMatrix, previous->WorldMatrix, config.TransformDirtyEpsilon);
@@ -379,7 +301,7 @@ RayTracingPtlasPartitionPlan RayTracingPtlasPartitionPlanner::Build(const Prepar
 		return plan;
 	}
 
-	const SceneBounds bounds = ComputeSceneBounds(preparedScene);
+	const RenderMeshWorldBounds bounds = ComputeSceneBounds(preparedScene);
 	PreparePartitionStates(bounds, config, plan);
 	BuildState state;
 	CollectObservedInstances(preparedScene, bounds, config, plan, state);

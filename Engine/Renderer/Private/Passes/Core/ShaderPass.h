@@ -8,6 +8,7 @@
 #include <type_traits>
 
 class RenderCommandContext;
+class RenderCommandList;
 class FrameGraphResourceCommands;
 class RenderBindingLayout;
 class RenderPipeline;
@@ -29,7 +30,7 @@ struct RayTracingDispatchDimensions final
 
 void DispatchComputeShaderPass(RenderCommandContext& commandContext, const ComputeDispatchDesc& dispatch) noexcept;
 void BindComputeShaderPass(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const FrameGraphResourceCommands& resources,
     const RenderBindingLayout& bindingLayout,
     const RenderPipeline& pipeline,
@@ -37,14 +38,14 @@ void BindComputeShaderPass(
     const PassBindingOverrides* overrides = nullptr) noexcept;
 
 void BindRasterShaderPass(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const FrameGraphResourceCommands& resources,
     const RenderBindingLayout& bindingLayout,
     const RenderPipeline& pipeline,
     const PassParameterSet& parameterSet,
     const PassBindingOverrides* overrides = nullptr) noexcept;
 void BindRayTracingShaderPass(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const FrameGraphResourceCommands& resources,
     const RenderBindingLayout& bindingLayout,
     const RayTracingPipeline& pipeline,

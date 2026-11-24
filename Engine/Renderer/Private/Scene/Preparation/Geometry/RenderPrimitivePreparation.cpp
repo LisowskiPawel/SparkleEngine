@@ -3,67 +3,6 @@
 #include "Scene/Preparation/Geometry/RenderPrimitivePreparation.h"
 
 #include <algorithm>
-#include <array>
-
-static std::array<DirectX::XMFLOAT3, 8> BuildBoundsCorners(const MeshDrawGeometry& geometry) noexcept
-{
-	return {
-	    DirectX::XMFLOAT3{geometry.LocalBoundsMin.x, geometry.LocalBoundsMin.y, geometry.LocalBoundsMin.z},
-	    DirectX::XMFLOAT3{geometry.LocalBoundsMax.x, geometry.LocalBoundsMin.y, geometry.LocalBoundsMin.z},
-	    DirectX::XMFLOAT3{geometry.LocalBoundsMin.x, geometry.LocalBoundsMax.y, geometry.LocalBoundsMin.z},
-	    DirectX::XMFLOAT3{geometry.LocalBoundsMax.x, geometry.LocalBoundsMax.y, geometry.LocalBoundsMin.z},
-	    DirectX::XMFLOAT3{geometry.LocalBoundsMin.x, geometry.LocalBoundsMin.y, geometry.LocalBoundsMax.z},
-	    DirectX::XMFLOAT3{geometry.LocalBoundsMax.x, geometry.LocalBoundsMin.y, geometry.LocalBoundsMax.z},
-	    DirectX::XMFLOAT3{geometry.LocalBoundsMin.x, geometry.LocalBoundsMax.y, geometry.LocalBoundsMax.z},
-	    DirectX::XMFLOAT3{geometry.LocalBoundsMax.x, geometry.LocalBoundsMax.y, geometry.LocalBoundsMax.z}};
-}
-
-static DirectX::XMFLOAT3 TransformPoint(const DirectX::XMFLOAT3& point, DirectX::FXMMATRIX worldMatrix) noexcept
-{
-	const DirectX::XMVECTOR localPoint = DirectX::XMLoadFloat3(&point);
-	const DirectX::XMVECTOR worldPoint = DirectX::XMVector3TransformCoord(localPoint, worldMatrix);
-	DirectX::XMFLOAT3 transformed;
-	DirectX::XMStoreFloat3(&transformed, worldPoint);
-	return transformed;
-}
-
-static void ExpandBounds(const DirectX::XMFLOAT3& point, RenderMeshWorldBounds& bounds) noexcept
-{
-	if (!bounds.bValid)
-	{
-		bounds.Min = point;
-		bounds.Max = point;
-		bounds.bValid = true;
-		return;
-	}
-
-	bounds.Min.x = (std::min) (bounds.Min.x, point.x);
-	bounds.Min.y = (std::min) (bounds.Min.y, point.y);
-	bounds.Min.z = (std::min) (bounds.Min.z, point.z);
-	bounds.Max.x = (std::max) (bounds.Max.x, point.x);
-	bounds.Max.y = (std::max) (bounds.Max.y, point.y);
-	bounds.Max.z = (std::max) (bounds.Max.z, point.z);
-}
-
-static RenderMeshWorldBounds TransformBounds(const MeshDrawGeometry& geometry, const DirectX::XMFLOAT4X4& worldMatrix) noexcept
-{
-	if (!geometry.bHasLocalBounds)
-	{
-		const DirectX::XMFLOAT3 position{worldMatrix._41, worldMatrix._42, worldMatrix._43};
-		return RenderMeshWorldBounds{.Min = position, .Max = position, .bValid = true};
-	}
-
-	const DirectX::XMMATRIX world = DirectX::XMLoadFloat4x4(&worldMatrix);
-	const std::array<DirectX::XMFLOAT3, 8> corners = BuildBoundsCorners(geometry);
-
-	RenderMeshWorldBounds bounds;
-	for (const DirectX::XMFLOAT3& corner : corners)
-	{
-		const DirectX::XMFLOAT3 worldCorner = TransformPoint(corner, world);
-		ExpandBounds(worldCorner, bounds);
-	}
-	return bounds;
-}
 
 void PrepareRenderPrimitives(std::span<const ResolvedRenderPrimitive> inputs, std::span<PreparedRenderPrimitive> outputs) noexcept
 {
@@ -76,7 +15,7 @@ void PrepareRenderPrimitives(std::span<const ResolvedRenderPrimitive> inputs, st
 		output = PreparedRenderPrimitive{
 		    .Object = input.Object,
 		    .Draw = input.Draw,
-		    .WorldBounds = TransformBounds(input.Draw.Geometry, input.WorldMatrix),
+		    .WorldBounds = RenderMeshWorldBounds::Transform(input.Draw.Geometry, input.WorldMatrix),
 		    .Material = input.Material,
 		    .InstanceGroupIndex = input.InstanceGroupIndex,
 		    .MaterialAlphaMode = input.MaterialAlphaMode};

@@ -61,7 +61,7 @@ private:
 	void DrainCompletedResourceReleases() noexcept;
 	void FlushDeferredResourceReleases() noexcept;
 
-	VulkanRhi* m_rhi = nullptr;
-	VulkanGpuMemoryAllocator* m_memoryAllocator = nullptr;
-	const RhiCapabilities* m_capabilities = nullptr;
+	VulkanRhi& m_rhi;
+	VulkanGpuMemoryAllocator& m_memoryAllocator;
+	const RhiCapabilities& m_capabilities;
 };

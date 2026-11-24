@@ -4,13 +4,13 @@
 
 #include <string_view>
 
-class RenderCommandContext;
+class RenderCommandList;
 
 class ScopedGpuScope final
 {
 public:
 	ScopedGpuScope() noexcept = default;
-	ScopedGpuScope(RenderCommandContext& commands, std::string_view label, RhiDiagnosticLabelColor color = {}) noexcept;
+	ScopedGpuScope(RenderCommandList& commands, std::string_view label, RhiDiagnosticLabelColor color = {}) noexcept;
 	~ScopedGpuScope() noexcept;
 
 	ScopedGpuScope(const ScopedGpuScope&) = delete;
@@ -21,5 +21,5 @@ public:
 private:
 	void Reset() noexcept;
 
-	RenderCommandContext* m_commands = nullptr;
+	RenderCommandList* m_commands = nullptr;
 };

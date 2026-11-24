@@ -16,7 +16,7 @@ public:
 
 	RenderRayTracingFrameBindings Prepare(const PreparedRenderScene& preparedScene, const RayTracingPtlasPartitionPlan& viewPlan) noexcept override;
 	void Build(
-	    RenderCommandContext& commandContext,
+	    RenderCommandList& commandList,
 	    const PreparedRenderScene& preparedScene,
 	    RayTracingBlasCache& blasCache,
 	    const RayTracingShaderTablePlan& shaderTablePlan,
@@ -40,7 +40,7 @@ private:
 	static RhiPtlasInstanceFlags ResolveInstanceFlags(const PreparedRenderScene& preparedScene, const MeshDraw& draw) noexcept;
 	void EnsurePtlasResources(const RhiPtlasDesc& requiredLayout) noexcept;
 	static void CollectPtlasInstances(
-	    RenderCommandContext& commandContext,
+	    RenderCommandList& commandList,
 	    const PreparedRenderScene& preparedScene,
 	    const RayTracingPtlasPartitionPlan& partitionPlan,
 	    RayTracingBlasCache& blasCache,
@@ -48,8 +48,8 @@ private:
 	    PassExecutionDiagnostics* diagnostics,
 	    PtlasBuildState& state) noexcept;
 	void PreparePtlasOperationBuffer(PtlasBuildState& state) noexcept;
-	void RecordPtlasBuild(RenderCommandContext& commandContext, const PtlasBuildState& state, PassExecutionDiagnostics* diagnostics) const noexcept;
-	void TrackBuildResources(RenderCommandContext& commandContext) const noexcept;
+	void RecordPtlasBuild(RenderCommandList& commandList, const PtlasBuildState& state, PassExecutionDiagnostics* diagnostics) const noexcept;
+	void TrackBuildResources(RenderCommandList& commandList) const noexcept;
 	void ReleasePtlasResources() noexcept;
 
 	RenderHardwareInterface& m_renderHardwareInterface;

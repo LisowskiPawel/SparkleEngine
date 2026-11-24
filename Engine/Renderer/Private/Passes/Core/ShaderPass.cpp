@@ -21,43 +21,43 @@ void DispatchComputeShaderPass(RenderCommandContext& commandContext, const Compu
 }
 
 void BindComputeShaderPass(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const FrameGraphResourceCommands& resources,
     const RenderBindingLayout& bindingLayout,
     const RenderPipeline& pipeline,
     const PassParameterSet& parameterSet,
     const PassBindingOverrides* overrides) noexcept
 {
-	resources.BindGlobalDescriptorState(commandContext);
+	resources.BindGlobalDescriptorState(commandList);
 
-	commandContext.SetPipeline(pipeline);
+	commandList.SetPipeline(pipeline);
 
-	BindPassParameters(commandContext, resources, bindingLayout, parameterSet, BindingDomain::Compute, overrides);
+	BindPassParameters(commandList, resources, bindingLayout, parameterSet, BindingDomain::Compute, overrides);
 }
 
 void BindRasterShaderPass(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const FrameGraphResourceCommands& resources,
     const RenderBindingLayout& bindingLayout,
     const RenderPipeline& pipeline,
     const PassParameterSet& parameterSet,
     const PassBindingOverrides* overrides) noexcept
 {
-	resources.BindGlobalDescriptorState(commandContext);
+	resources.BindGlobalDescriptorState(commandList);
 
-	commandContext.SetPipeline(pipeline);
+	commandList.SetPipeline(pipeline);
 
-	BindPassParameters(commandContext, resources, bindingLayout, parameterSet, BindingDomain::Graphics, overrides);
+	BindPassParameters(commandList, resources, bindingLayout, parameterSet, BindingDomain::Graphics, overrides);
 }
 
 void BindRayTracingShaderPass(
-    RenderCommandContext& commandContext,
+    RenderCommandList& commandList,
     const FrameGraphResourceCommands& resources,
     const RenderBindingLayout& bindingLayout,
     const RayTracingPipeline& pipeline,
     const PassParameterSet& parameterSet) noexcept
 {
-	resources.BindGlobalDescriptorState(commandContext);
-	commandContext.SetRayTracingPipeline(pipeline);
-	BindPassParameters(commandContext, resources, bindingLayout, parameterSet, BindingDomain::RayTracing);
+	resources.BindGlobalDescriptorState(commandList);
+	commandList.SetRayTracingPipeline(pipeline);
+	BindPassParameters(commandList, resources, bindingLayout, parameterSet, BindingDomain::RayTracing);
 }

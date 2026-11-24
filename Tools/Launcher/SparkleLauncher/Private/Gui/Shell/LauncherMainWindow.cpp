@@ -19,8 +19,8 @@
 #include "Gui/Models/LauncherContentModel.h"
 #include "Gui/App/LauncherSettings.h"
 #include "Gui/Models/LauncherToolchainUiModel.h"
+#include "Gui/Models/LauncherWorkflowCatalog.h"
 #include "Gui/Style/LauncherUiDesign.h"
-#include "Gui/Models/LauncherUiModel.h"
 #include "Gui/Style/LauncherVisualStyle.h"
 
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
@@ -131,12 +131,7 @@ namespace SparkleLauncher
 		// The workflow panel invokes its page factory during construction.
 		InitializeWorkflowPresentation(*centralWidget);
 
-		m_workflowPanel = new LauncherWorkflowPanel(
-		    m_icons,
-		    [this](const QString& operationId) { return DisplayNameForOperation(operationId); },
-		    [this](QWidget* widget) { RegisterFocusable(widget); },
-		    [this](QWidget* parent) { return CreateOptionsPanel(parent); },
-		    centralWidget);
+		m_workflowPanel = new LauncherWorkflowPanel(m_icons, [this](QWidget* widget) { RegisterFocusable(widget); }, [this](QWidget* parent) { return CreateOptionsPanel(parent); }, centralWidget);
 
 		connect(m_workflowPanel, &LauncherWorkflowPanel::OperationSelected, this, &LauncherMainWindow::SetSelectedOperation);
 		rootLayout->addWidget(m_workflowPanel, 1);
@@ -145,11 +140,7 @@ namespace SparkleLauncher
 		rootLayout->addWidget(CreateFooterContextPanel(centralWidget), 0);
 		RefreshContextSelectors();
 		setCentralWidget(centralWidget);
-		const QString initialOperationId = m_workflowPanel->InitialOperationId();
-		if (!initialOperationId.isEmpty())
-		{
-			SetSelectedOperation(initialOperationId);
-		}
+		SetSelectedOperation(LauncherScenesOperationId());
 
 		ConfigureTabOrder();
 		ApplyVisualStyle();
@@ -437,7 +428,7 @@ namespace SparkleLauncher
 
 	void LauncherMainWindow::UpdateWorkflowRunAvailability()
 	{
-		if (FindBuildWorkspaceOperationDefinition(m_selectedOperationId.toStdString()).has_value())
+		if (FindBuildWorkspaceOperationDefinition(m_selectedOperationId.toStdString()) != nullptr)
 		{
 			const BuildWorkspaceOperationRequest request = BuildWorkspacePlanRequest(m_workspaceRoot, m_contentModel, m_settings);
 			const BuildWorkspaceOperationPlan plan = PlanBuildWorkspaceOperation(m_selectedOperationId.toStdString(), request);
@@ -446,7 +437,7 @@ namespace SparkleLauncher
 			return;
 		}
 
-		if (FindCookOperationDefinition(m_selectedOperationId.toStdString()).has_value())
+		if (FindCookOperationDefinition(m_selectedOperationId.toStdString()) != nullptr)
 		{
 			const LauncherOperationRequest operationRequest = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, m_selectedOperationId);
 			const auto& cookRequest = std::get<CookOperationRequest>(operationRequest.Inputs);

@@ -17,17 +17,6 @@
 #include <variant>
 #include <vector>
 
-enum class PassParameterValueKind : std::uint8_t
-{
-	None,
-	Texture,
-	Buffer,
-	DescriptorTable,
-	AccelerationStructure,
-	UniformData,
-	Sampler,
-};
-
 struct PassParameterTextureBindingData
 {
 	std::vector<FrameGraphTextureHandle> Handles;
@@ -36,13 +25,6 @@ struct PassParameterTextureBindingData
 	bool IsAttachment() const noexcept { return Attachment.Handle.IsValid(); }
 
 	bool IsBound() const noexcept { return IsAttachment() || !Handles.empty(); }
-};
-
-struct PassParameterBufferBindingData
-{
-	std::vector<FrameGraphBufferHandle> Handles;
-
-	bool IsBound() const noexcept { return !Handles.empty(); }
 };
 
 struct PassParameterDescriptorTableBindingData
@@ -61,30 +43,22 @@ struct PassParameterUniformBindingData
 	bool IsBound() const noexcept { return Data != nullptr && SizeInBytes > 0; }
 };
 
-struct PassParameterSamplerBindingData
-{
-	RhiSamplerDesc Desc = {};
-
-	bool IsBound() const noexcept { return true; }
-};
-
 using PassParameterBindingValue = std::variant<
     std::monostate,
     PassParameterTextureBindingData,
-    PassParameterBufferBindingData,
+    std::vector<FrameGraphBufferHandle>,
     PassParameterDescriptorTableBindingData,
     FrameGraphAccelerationStructureHandle,
     PassParameterUniformBindingData,
-    PassParameterSamplerBindingData>;
+    RhiSamplerDesc>;
 
 struct SPARKLE_RENDERER_API PassParameterBinding
 {
-	PassParameterValueKind GetKind() const noexcept;
 	bool IsBound() const noexcept;
 
 	const PassParameterTextureBindingData* AsTextureData() const noexcept { return std::get_if<PassParameterTextureBindingData>(&m_value); }
 
-	const PassParameterBufferBindingData* AsBufferData() const noexcept { return std::get_if<PassParameterBufferBindingData>(&m_value); }
+	const std::vector<FrameGraphBufferHandle>* AsBufferHandles() const noexcept { return std::get_if<std::vector<FrameGraphBufferHandle>>(&m_value); }
 
 	const PassParameterDescriptorTableBindingData* AsDescriptorTableData() const noexcept { return std::get_if<PassParameterDescriptorTableBindingData>(&m_value); }
 
@@ -92,13 +66,10 @@ struct SPARKLE_RENDERER_API PassParameterBinding
 
 	const PassParameterUniformBindingData* AsUniformData() const noexcept { return std::get_if<PassParameterUniformBindingData>(&m_value); }
 
-	const PassParameterSamplerBindingData* AsSamplerData() const noexcept { return std::get_if<PassParameterSamplerBindingData>(&m_value); }
+	const RhiSamplerDesc* AsSamplerDesc() const noexcept { return std::get_if<RhiSamplerDesc>(&m_value); }
 
 private:
 	friend class PassParameterSet;
-
-	void Reset() noexcept;
-	void SetValue(PassParameterBindingValue value);
 
 	PassParameterBindingValue m_value;
 };
@@ -117,7 +88,6 @@ public:
 
 	const PassParameterBinding* FindBinding(const char* name) const noexcept;
 	const PassParameterBinding* GetBinding(std::uint32_t index) const noexcept;
-	bool IsBound(const char* name) const noexcept;
 
 	bool SetTexture(const char* name, FrameGraphTextureHandle handle);
 	bool SetTextureArray(const char* name, std::span<const FrameGraphTextureHandle> handles);
@@ -147,7 +117,6 @@ public:
 
 private:
 	const PassParameterDesc* FindParameter(const char* name, std::uint32_t& outIndex) const noexcept;
-	const PassParameterBinding* FindBinding(const char* name, std::uint32_t& outIndex) const noexcept;
 	bool SetDescriptorTable(const char* name, PassParameterDescriptorTableBindingData binding, ShaderParameterSemanticKind textureKind, ShaderParameterSemanticKind bufferKind);
 	const PassParameterLayout& m_layout;
 	std::vector<PassParameterBinding> m_bindings;

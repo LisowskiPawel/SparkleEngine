@@ -26,13 +26,15 @@ void AddLightingTargetClearPass(FrameGraphBuilder& builder, std::string_view nam
 	    },
 	    [ownedTargets, extent](PassCommandContext& context)
 	    {
-		    context.Commands.SetScissorRect(0, 0, static_cast<std::int32_t>(extent.Width), static_cast<std::int32_t>(extent.Height));
-		    context.Resources.BindRenderTargets(context.Commands, ownedTargets);
+		    RenderCommandList& commandList = context.Commands.GetRenderCommandList();
+		    const RhiRect scissorRect{.Left = 0, .Top = 0, .Right = static_cast<std::int32_t>(extent.Width), .Bottom = static_cast<std::int32_t>(extent.Height)};
+		    commandList.SetScissorRect(scissorRect);
+		    context.Resources.BindRenderTargets(commandList, ownedTargets);
 		    for (const auto target : ownedTargets)
 		    {
-			    context.Resources.ClearRenderTarget(context.Commands, target);
+			    context.Resources.ClearRenderTarget(commandList, target);
 		    }
-		    context.Resources.EndRasterPass(context.Commands);
+		    context.Resources.EndRasterPass(commandList);
 	    });
 }
 
