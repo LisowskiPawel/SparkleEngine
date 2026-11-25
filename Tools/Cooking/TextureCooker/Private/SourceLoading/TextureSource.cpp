@@ -131,10 +131,6 @@ TextureSource LoadTextureSource(const TextureCookRequest& request, TextureCookMe
 	const auto bytes = ReadSource(request.sourcePath);
 	const auto extension = Paths::GetLowercaseExtension(request.sourcePath);
 
-	if (extension == L".ktx" || extension == L".ktx2")
-	{
-		return LoadKtxTextureSource(bytes, request, processingMemory);
-	}
 	if (extension == L".exr")
 	{
 		return LoadExrTextureSource(bytes, request, processingMemory);

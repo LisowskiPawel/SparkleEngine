@@ -103,8 +103,7 @@ static TextureColorSpace ResolveColorSpace(TextureGroup textureGroup, const std:
 static TextureMipPolicy ResolveMipPolicy(const std::filesystem::path& sourceTexturePath)
 {
 	const auto extension = Paths::GetLowercaseExtension(sourceTexturePath);
-	const bool bKtx = extension == L".ktx" || extension == L".ktx2";
-	if (extension == L".dds" || bKtx)
+	if (extension == L".dds")
 	{
 		return TextureMipPolicy::PreserveExisting;
 	}

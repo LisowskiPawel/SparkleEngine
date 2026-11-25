@@ -14,7 +14,7 @@ Shared acquisition, admission and cache locking live in [CMake/Dependencies](../
 | Platform windows/input | [SDL3](sdl3/Dependency.cmake) |
 | Editor and runtime UI | [ImGui](imgui/Dependency.cmake), selected [graphics backends](imgui/Backends.cmake), [Font Awesome](editor-icons/Dependency.cmake) |
 | Source import | [cgltf](cgltf/Dependency.cmake), [Assimp](assimp/Dependency.cmake), [MikkTSpace](mikktspace/Dependency.cmake) |
-| Texture processing and compression | [DirectXTex](directxtex/Dependency.cmake), [stb](stb/Dependency.cmake), [TinyEXR](tinyexr/Dependency.cmake), [KTX](ktx/Dependency.cmake), [zlib](zlib/Dependency.cmake) |
+| Texture processing and compression | [DirectXTex](directxtex/Dependency.cmake), [stb](stb/Dependency.cmake), [TinyEXR](tinyexr/Dependency.cmake), [zlib](zlib/Dependency.cmake) |
 | Animation runtime and offline builders | [ozz-animation](ozz_animation/Dependency.cmake) |
 | Shader tools | [ShaderMake](shadermake/Dependency.cmake), [SPIRV-Reflect](spirv-reflect/Dependency.cmake) |
 | D3D12/Vulkan allocation and API helpers | [D3D12MA](d3d12ma/Dependency.cmake), [VMA](vma/Dependency.cmake), [D3DX12](D3DX12/Dependency.cmake), [NVAPI](nvidia-nvapi/Dependency.cmake) |

@@ -33,7 +33,7 @@ namespace SparkleLauncher
 	{
 		if (operationId == LauncherScenesOperationId())
 		{
-			return "Scenes";
+			return "Quick Start";
 		}
 		if (operationId == "workspace.sync-code")
 		{

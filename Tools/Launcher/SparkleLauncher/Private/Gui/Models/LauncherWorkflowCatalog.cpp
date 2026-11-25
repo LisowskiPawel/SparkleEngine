@@ -10,7 +10,7 @@ namespace SparkleLauncher
 	QVector<LauncherWorkflowDefinition> CreateLauncherWorkflowCatalog()
 	{
 		return {
-		    {LauncherScenesOperationId(), "Scenes", LauncherIcon::Start},
+		    {LauncherScenesOperationId(), "Quick Start", LauncherIcon::Start},
 		    {"workspace.sync-code", "Sync", LauncherIcon::Sync},
 		    {"workspace.build", "Build", LauncherIcon::Build},
 		    {"cook.workspace", "Cook", LauncherIcon::Cook},
@@ -22,7 +22,7 @@ namespace SparkleLauncher
 	{
 		if (operationId == LauncherScenesOperationId())
 		{
-			return "Scenes";
+			return "Quick Start";
 		}
 		if (operationId == "cook.tools.prepare")
 		{

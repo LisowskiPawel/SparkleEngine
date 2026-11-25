@@ -23,9 +23,21 @@ The [role sources](References.md#role-sources) explain this choice. Compiler eng
 
 ## Product scope
 
-Launcher selects scenes, reports readiness and runs build, cook and launch operations. Editor provides inspection, supported edits and developer controls. Game presents the rendered scene with camera input. All three target Windows, with separate D3D12 and Vulkan validation.
+Real-time path tracing is the only lighting path supported by Sparkle. Remove the independent Reference path tracer, its render mode, accumulation/convergence state, checkpoints/resume, dedicated exports and UI, shaders, resources and release requirements. Validate the retained renderer through bounded analytic checks, native signals/captures and suitable external comparisons; do not maintain a second Sparkle renderer for validation.
 
-The release target is a complete prebuilt bundle with approved cooked content. Matching source can reuse that bundle's outputs and replace them through the normal build/cook path. Public package validation and redistribution rights remain open.
+Launcher is the reviewer's Quick Start entry point: choose a supplied map and open Editor or Game. Editor exposes the selected scene inspection/editing, rendering options/effects and debug views; Game presents the scene with camera input. Those runtime controls use prepared shaders/content. All three target Windows, with separate D3D12 and Vulkan validation.
+
+Retain basic skeletal clip playback/skinning for the Knight scene and simple movement examples; remove morph targets and morph weights. General animation authoring is outside this cleanup. Keep both native backends, multiple GPU queues and shader-target enumeration, with explicit cross-queue synchronization and lifetime ownership.
+
+Keep the owned frame graph, rasterized and ray-traced GBuffer alternatives, and existing subsurface shading within the single real-time lighting path. Retain ReSTIR indirect lighting, TLAS refit, DLSS Super Resolution/Ray Reconstruction, exposure controls and useful signal views. Remove HDR display modes, vignette and chromatic aberration; HDR/EXR content inputs remain a separate capability. Optional automatic mesh batching is selected for removal subject to its recorded workload/cost check; authored instance groups remain.
+
+Launcher can start configured GPU debugging tools and launch Editor in GPU-crash debugging mode. Breadcrumbs and semantic GPU markers are required: preserve D3D12 DRED, supported Vulkan checkpoints, Aftermath integration, matched debug data, native fault collection and safe dump completion. Remove extra Launcher incident monitoring/presentation and managed analysis/recovery workflows. Native diagnostic collection after a fault remains essential; external tools perform investigation.
+
+The release target is a complete prebuilt Launcher/Editor/Game inspection bundle with approved cooked content, engine DLLs and required runtime dependencies. Reviewers extract and run it without an IDE, compiler, source acquisition or cooking. It is a portfolio demonstration, not a developer SDK. Public package validation and redistribution rights remain open.
+
+You are the sole maintainer/developer and Rider is the only supported IDE. Keep shared/DLL engine modules, private per-module PCHs and efficient incremental builds. Your source-workspace Launcher retains preparation, dependency/content sync, build, cook, clean and debugging controls. Reviewers are not expected to iterate code, shaders or content. Remove Visual Studio IDE integration while preserving compiler/build/project support required by the proven Rider workflow. The [module decisions](Implementation/PortfolioScopeDecisions.md#who-the-engine-serves) own the audience and capability boundaries.
+
+The public walkthrough covers launch, map selection, Editor/Game controls, supported rendering effects, known limits and return to supplied defaults. Matching source provides a concise architecture/data-flow map and clear entry points for inspecting your design. No developer installation, contributor onboarding or public engine SDK is required to review it. Missing development tools must not block a prepared scene's runtime readiness.
 
 The first release uses English keyboard/mouse input on one windowed or borderless display. Check UI at 100%, 150% and 200% DPI. The user's display resolution is independent of the benchmark resolution. Controllers, exclusive fullscreen and VR are outside this release.
 
@@ -33,19 +45,19 @@ Packaged use must work offline after extraction, without accounts, telemetry, un
 
 The [level catalog](../Projects/Showcase/Levels.catalog) identifies intended release scenes and previews. Catalog flags establish neither qualification nor asset rights; see [distribution requirements](Engineering.md#build-and-delivery).
 
-After release, Bistro exterior/interior becomes the flagship, with San Miguel 2.0 providing a second scene and Sponza remaining the short regression loop. Their [test roles](Rendering.md#test-scenes) are different.
+The selected scene set is Empty, CornellBox, classic Sponza, BistroExterior, BistroInteriorWine, ModernSponzaKnight, ModernSponzaCandles, CesiumMan, LPSHead, DamagedHelmet and ABeautifulGame. Stanford Bunny/Dragon remain conditional on a supported non-PLY route. Retire the other scene entries while preserving assets referenced by retained scenes; the [scene decisions](Implementation/PortfolioScopeDecisions.md#showcase-scenes-and-conversion-scripts) own that boundary.
 
-Keep ownership of the RHI, frame graph, graphics API/resource lifetime and independent Reference renderer. Simplify support code and delegate selected production algorithms through the [migration decisions](ThirdPartyMigration.md), focusing personal research on the three cases and crediting upstream work. [Roadmap](Roadmap.md#supporting-system-simplification) sets priorities.
+Keep ownership of the RHI, frame graph, graphics API/resource lifetime and real-time path tracer. Simplify support code and delegate selected production algorithms through the [migration decisions](ThirdPartyMigration.md), focusing personal research on the three cases and crediting upstream work. [Roadmap](Roadmap.md#supporting-system-simplification) sets priorities.
 
 Keep supporting systems as small as the rendering and reproduction workflows allow. General gameplay, physics, networking, audio, scripting, plugin SDKs, installers/updaters, Linux, extra hardware campaigns, geometry caches, frame generation, GPU-driven geometry, atmosphere/clouds/imported volumes, broad authoring or diagnostics tools and general ML runtimes are outside the selected work.
 
 ## Technical development
 
-Develop these capabilities through the same three cases where possible. Each needs an explained decision, checked result and honest limitations. [Engineering](Engineering.md#verification) owns the validation method; [Rendering](Rendering.md) owns feature requirements. The [role archive](References.md#role-sources) preserves the original qualifications.
+Develop these longer-term capabilities through the same three cases where useful. They guide your study and evidence, not features to add simply because they appear in a role description. The selected module decisions define the current portfolio engine. Each claimed result needs an explained decision, checked output and honest limitations. [Engineering](Engineering.md#verification) owns the validation method; the [role archive](References.md#role-sources) preserves the original qualifications.
 
 ### Rendering and GPU systems
 
-- **Light transport.** Derive and implement raster/ray lighting, sampling, accumulation and path tracing within a real-time budget. Explain estimators, distributions, reuse assumptions and normalization, with independent controls and counterexamples that test correctness, temporal behavior and cost.
+- **Light transport.** Derive and implement lighting, sampling, temporal reuse and path tracing within the single real-time lighting path. Explain estimators, distributions, reuse assumptions and normalization, with independent controls and counterexamples that test correctness, temporal behavior and cost.
 
 - **Applied mathematics.** Use linear algebra, calculus, probability/statistics, Monte Carlo estimation, optimization, signal processing and numerical analysis to explain rendering and ML decisions. State units, assumptions, reference uncertainty and a prediction that measurements can confirm or refute.
 
@@ -75,6 +87,8 @@ Develop these capabilities through the same three cases where possible. Each nee
 
 ### Collaboration and direction
 
+Use permitted professional work, technical discussion and optional feedback to demonstrate collaboration. Sparkle remains a single-maintainer project; these career goals do not require contributor infrastructure or a general-purpose engine SDK.
+
 - **Partner integration.** Understand another team's constraints and coordinate research, hardware, drivers, compilers, content and production concerns. Deliver usable configuration, diagnostics and maintenance guidance with measured results, review feedback and reproduction/adoption records. Credit personal and team contributions separately.
 
 - **Research productization and communication.** Turn a prototype into maintained code, a useful tool or a justified negative result. Prioritize, package, document and review it; explain the decision to ship, simplify or remove it, including failed experiments. Present the cases and a concise paper/talk/demo in clear English with working reproduction links.
@@ -91,28 +105,31 @@ Track degree subject/level, employment duration, shipped-product contribution, p
 
 ## The three cases
 
+Use these as a framework for explaining your work and longer-term growth. Reviewer Quick Start is the prepared engine and its code guide, not a request to run research, build shaders or prepare datasets. The separate narrative/future-scope decisions remain in the module checklist.
+
 1. **Content to correct pixel.** Follow an asset and material through cooking, shading and checked raw output. Include selected material and bounded volumetric work, with a defined reference domain and uncertainty.
 2. **One measured frame, two APIs.** Combine CPU preparation, shader and resource-lifetime studies with a difficult incident and whole-frame results. Include relevant lighting, reconstruction, cache and acceleration-structure comparisons, plus a rejected or inconclusive alternative.
-3. **Owned model to shader.** Connect reference labels, data, training, checked GPU operators, runtime behavior and held-out evaluation. Separate personally owned model work from vendor cache/texture integration.
+3. **Owned model to shader.** Connect independently checked external or analytic labels, data, training, checked GPU operators, runtime behavior and held-out evaluation. This later work does not require a Sparkle Reference renderer. Separate personally owned model work from vendor cache/texture integration.
 
 Open each case with the result, problem, constraints, personal contribution, baseline and measured configuration. Link owned code, native captures and a reproduction command. Explain mathematics/API choices, alternatives, failures, limitations and simplification; credit papers, libraries and collaborators. Integration cases also explain SDK selection, signal/lifetime decisions and maintenance removed.
 
 | Reader | Time | What they should find |
 | --- | --- | --- |
 | Recruiter | 60–90 seconds | Identity, actual role level, three relevant outcomes, demo, location/travel status and working links |
-| Hiring manager | 10 minutes | Three cases with constraints, personal contribution, measured results, code/capture links and limitations |
+| Hiring manager | 10 minutes | Launcher/map walkthrough, selected results and constraints, personal contribution, code/capture links and limitations |
 | Graphics specialist | 45–60 minutes | Mathematics, code, native captures, experiments and failure cases |
-| Developer reproducing the work | 30 minutes plus build time | Supported setup, commands, expected output and troubleshooting |
+| Reviewer running the portfolio | 30 minutes | Quick Start, map selection, Editor/Game controls, supported effects/options, expected results and troubleshooting; no development setup |
+| Reviewer inspecting the code | As needed | Matching source, application entry points, module ownership/data flow and explanations of important decisions; no requirement to build |
 
-Portfolio delivery requires one landing page, three case narratives, links to shareable original files, commands and expected results, and a short paper/talk/demo outline.
+Prepare a landing/Quick Start page, complete inspection bundle, concise architecture guide, matching source links and selected code/capture/result explanations. Your own build/cook commands remain documented separately. Additional case-narrative or future research prerequisites follow the still-open DO-01/DO-02 scope decisions; the runtime walkthrough itself does not require a reviewer to develop anything.
 
 ## Review and transfer
 
-A reviewer should be able to trace a claim from mathematics through source, cooked code and native output, reproduce its comparison and inspect uncertainty and failure cases. Each capability needs evidence or a stated limitation.
+A reviewer should be able to run the selected demonstrations, explore the approved runtime controls and trace a claim through matching source, cooked/native output and your measurements. Provide the important assumptions, uncertainty and failure cases. You reproduce the build/cook and controlled experiments; a reviewer may inspect their evidence without repeating the development workflow.
 
-Reproduce the documented build and result without undocumented repairs. Record who performed the run, prior involvement, environment, failed steps, assistance and output. Check hashes, prerequisites, settings and sharing rights before review. Distinguish assisted reproduction from an independent run.
+Reproduce your maintainer build/cook workflow and the reviewer's extracted-package result without undocumented repairs. Reviewer acceptance does not require building or cooking from source. Record who performed the run, prior involvement, environment, failed steps, assistance and output. Check hashes, prerequisites, settings and sharing rights before review. Distinguish assisted reproduction from an independent run.
 
-Challenge a meaningful assumption in a separate technical review. Use the result in a second workflow or project and observe an explanation exercise. Record the task, feedback and revision/retest, or the evidence for leaving the design unchanged.
+For further technical development, challenge an assumption in review and try a result in a second context when useful. Record actual feedback and revisions. External adoption, another developer's source build and a second project are optional evidence, not prerequisites for reviewer Quick Start; separate experiment repositories follow Sparkle cleanup.
 
 Label self-review, assisted reproduction and external adoption accurately. External participation is optional. Upstream contributions need a real finding and must follow the recipient's submission and disclosure requirements.
 

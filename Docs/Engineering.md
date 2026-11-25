@@ -2,9 +2,11 @@
 
 [Documentation](README.md) | [Code style](CodeStyle.md)
 
-This guide covers setup, module boundaries, development and validation. For the current work and release limits, see the [roadmap](Roadmap.md).
+This guide covers your maintainer setup, module boundaries, development and validation. Reviewers use the prebuilt Launcher Quick Start, explore Editor/Game and inspect matching source; they do not need to follow the build/cook instructions. For current work and release limits, see the [roadmap](Roadmap.md).
 
 ## Build and run
+
+Target workflow: Rider is the sole maintainer IDE, Sparkle engine modules use shared/DLL linkage and private PCHs, and build/cook/sync remain maintainer tools. The reviewer receives a complete prebuilt Launcher/Editor/Game inspection bundle with no development prerequisites. These are selected cleanup requirements, not a claim that the migration is implemented. The recorded commands below describe the existing Windows generator/toolchain path; Visual Studio-format build files may still be needed by Rider and do not imply retaining Visual Studio as a supported IDE. Follow the [explicit IDE/build-tool boundary](Implementation/PortfolioScopeDecisions.md#rider-and-visual-studio-removal-boundary) before removing generator/discovery code.
 
 ### Requirements
 
@@ -168,6 +170,8 @@ Entry points validate inputs and compose subject-owned capabilities; keep proces
 
 ### Performance and images
 
+The supported lighting scope is the real-time path tracer alone; the existing Reference implementation is scheduled for removal. Correctness comparisons may use analytic cases or independently produced external results with stated limits; they must not require retaining that renderer or its checkpoints/convergence system.
+
 Fix inputs, settings, warm-up, repeats, image domain and reference uncertainty before measuring. Report frame-time distributions, memory, overhead and whether cost improves, stays bounded or remains unmeasured. Remove unnecessary work before parallelizing.
 
 Keep runs/machines separate. Choose absolute/relative thresholds and statistics accounting for correlated frames. An interval crossing a threshold is inconclusive. Worst-frame comparisons need equal sample counts or an explicit model; pooled percentiles cannot replace stable runs and correct images.
@@ -176,17 +180,17 @@ Separate native captures from optimized timing; match frames, shaders and symbol
 
 ## Build and delivery
 
-Run loads level definitions and cooked dependencies without requiring raw assets or source-selection flags. Game presents the scene; Editor provides inspection and editing.
+Run loads level definitions and cooked dependencies without requiring raw assets or source-selection flags. Reviewer Quick Start selects a supplied map and launches Editor or Game. Approved rendering/effect changes, scene inspection, movement and basic animation must use prepared data without a compiler/cooker. The supported reload/reset workflow returns to supplied defaults. Your development Launcher retains build/cook/sync/clean; missing developer tools do not make a complete runtime bundle unready.
 
 Prepare the release base with a complete build and cook. [ReleaseProducts.cmake](../CMake/Packaging/ReleaseProducts.cmake) declares `release_package`; [Package.ps1](../CMake/Packaging/Package.ps1) requires canonical `build/`, reviewed `SPARKLE_RELEASE_INPUTS`, matching source/product hashes and the final `--shader-symbols` export. It publishes an **unsigned internal** archive with a path, SHA-256, manifest, SBOM and provenance. Staging rejects changed qualified bytes. Signing and public-release qualification remain open in [Roadmap](Roadmap.md#before-the-first-release).
 
 The combined package requires **both ShippingEditor and ShippingGame inventories**. Multi-config builds produce both; a single Shipping configuration supplies only its own inventory.
 
-Matching source can import the prepared base with [SyncProducts.ps1](../CMake/Packaging/SyncProducts.ps1), then rebuild/cook into the same outputs. Installer/updater, old-store migration and a freshness service are outside scope.
+The existing [SyncProducts.ps1](../CMake/Packaging/SyncProducts.ps1) imports prepared products for a maintainer workspace. General cross-workspace product import is a removal recommendation under BU-05, with its answer still pending; it is not a reviewer delivery requirement. Your source/dependency/content sync remains distinct and retained. Installer/updater, contributor onboarding, old-store migration and a freshness service are outside scope.
 
 Scene selection does not grant redistribution rights. Preserve export restrictions on unqualified Classic/Modern Sponza derivatives and previews. Local acquisition, public archives and repository history are separate distribution cases. Keep [Qt notices](../CMake/Notices/Qt/README.md), [asset recipes](../Projects/Showcase/Assets/Meshes) and [thumbnail provenance](../Projects/Showcase/Launcher/Thumbnails/README.md).
 
-Test the final package's file/dependency list, standard-user launch, relocation, writable paths, source rebuild, scene output, symbols, failure/recovery and signing/download identity. Check rights, notices and provenance for those actual files. Review GPU dumps, debug data, source and symbols before sharing incident files.
+Test the final package's file/dependency list, standard-user launch, relocation, writable paths, every promised map/product, approved runtime controls, scene output, optional debugger prerequisites, failure/recovery and signing/download identity. Verify your source build/cook separately; no reviewer source rebuild is required. Provide matching source entry points and a short module/data-flow guide for architecture inspection. Check rights, notices and provenance for actual shipped files. Review GPU dumps, debug data, source and symbols before sharing diagnostic files.
 
 Cookers stage complete validated output before publication. Core owns containment, locks, incomplete markers and in-process rollback. Readers retain guards through their final filesystem access, including worker reads; decoding may continue from owned bytes afterward. Interrupted publication or failed rollback requires cleanup and recook, with source/settings outside disposable output. Persisted journal replay and power-loss recovery are unsupported.
 

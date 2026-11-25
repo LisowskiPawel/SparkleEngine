@@ -16,7 +16,6 @@ set(_sparkle_source_dependencies
     assimp
     ozz_animation
     directxtex
-    ktx
     spirv-reflect
     shadermake
     editor-icons
@@ -49,7 +48,7 @@ else()
         endforeach()
     endif()
     if(NOT SPARKLE_ENABLE_CONTENT_PIPELINE)
-        list(REMOVE_ITEM _sparkle_source_dependencies cgltf mikktspace stb assimp directxtex ktx)
+        list(REMOVE_ITEM _sparkle_source_dependencies cgltf mikktspace stb assimp directxtex)
     endif()
     if(NOT SPARKLE_ENABLE_SHADER_COMPILER)
         list(REMOVE_ITEM _sparkle_source_dependencies spirv-reflect shadermake)

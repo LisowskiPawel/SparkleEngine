@@ -53,7 +53,6 @@ namespace SparkleLauncher
 			    {"zlib", "Compression used by Assimp and EXR processing.", false, true},
 			    {"assimp", "FBX and PLY source scene imports.", false, features.bContentPipelineEnabled},
 			    {"directxtex", "CPU texture decoding, conversion, mip generation and BC encoding.", false, features.bContentPipelineEnabled},
-			    {"ktx", "KTX1/KTX2 source containers and transcoding.", false, features.bContentPipelineEnabled},
 			    {"shadermake", "Offline DXC/Slang batch execution for the shader cooker.", false, features.bShaderCompilerEnabled},
 			    {"spirv-reflect", "SPIR-V reflection for offline shader compilation.", false, features.bShaderCompilerEnabled},
 			    {"nvidia-nvapi", "D3D12 NVAPI and PTLAS capability support.", false, SPARKLE_SOURCE_NVAPI_ENABLED != 0},

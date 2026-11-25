@@ -19,6 +19,8 @@ Methods and comparison implementations for the [rendering features](Rendering.md
 
 ### Path transport and materials
 
+Published path tracers and offline-rendering literature below are study sources or possible external comparison controls. They do not require a Reference renderer inside Sparkle; the selected product scope includes only real-time path-traced lighting.
+
 - [PBRT Monte Carlo integration](https://pbr-book.org/4ed/Monte_Carlo_Integration), [microfacets](https://www.pbr-book.org/4ed/Reflection_Models/Roughness_Using_Microfacet_Theory), [rounding error](https://pbr-book.org/4ed/Shapes/Managing_Rounding_Error) and [volume scattering](https://www.pbr-book.org/4ed/Volume_Scattering): independent mathematical controls.
 - [glTF specification](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html): source material, coordinate and unit semantics.
 - [Veach's light-transport thesis](https://graphics.stanford.edu/papers/veach_thesis/) and [PBRT's improved path tracer](https://pbr-book.org/4ed/Light_Transport_I_Surface_Reflection/A_Better_Path_Tracer): estimator, MIS and independent reference reasoning.

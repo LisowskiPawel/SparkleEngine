@@ -18,7 +18,6 @@ set(TEXTURE_COOKER_PRIVATE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/RasterTextureSource.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/TextureSourceMetadata.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/TextureSource.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceLoading/KtxTextureSource.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/App/TextureCookerApplication.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cli/InspectTextureCookRequestFileCommand.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/CookTextureRequestFile.cpp
@@ -95,7 +94,6 @@ target_link_libraries(TextureCooker
         SparkleRHIContracts
         stb
         tinyexr
-        ktx_read
 )
 
 sparkle_stage_linked_runtime(TextureCooker)
