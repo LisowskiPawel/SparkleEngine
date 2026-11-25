@@ -1,10 +1,10 @@
 # References
 
-[Documentation](README.md) | [Rendering](Rendering.md)
+[Goals](Goals.md) | [Scope decisions](Implementation/PortfolioScopeDecisions.md)
 
 Sources behind the project guides, including dated role and professional studies. Pinned links identify the studied revision; check current prerequisites, licenses and fixes before reuse. Project rules and decisions remain in their owning guides.
 
-The [repository footprint review](RepositoryFootprint.md) connects repository-wide complexity and named cut candidates to these practices, with a dated size baseline and peer comparison.
+The [module footprint and scope decisions](Implementation/PortfolioScopeDecisions.md#where-the-code-footprint-actually-is) connect the current measured code footprint, named cut candidates and retained boundaries to these practices and [Goals](Goals.md).
 
 ## Contents
 
@@ -15,7 +15,7 @@ The [repository footprint review](RepositoryFootprint.md) connects repository-wi
 
 ## Rendering research
 
-Methods and comparison implementations for the [rendering features](Rendering.md).
+Methods and comparison implementations for the [rendering scope](Implementation/PortfolioScopeDecisions.md#renderer).
 
 ### Path transport and materials
 
@@ -81,14 +81,14 @@ Studies that connect the professional goals to concrete engineering work. Publis
 
 ## Integration precedents
 
-Primary examples behind the [migration decisions](ThirdPartyMigration.md). These are study sources; Sparkle integration still needs the owning guide's [adoption checks](ThirdPartyMigration.md#requirements-for-adoption).
+Primary examples behind the [integration scope decisions](Implementation/PortfolioScopeDecisions.md#third-party-integration-maintenance). These are study sources; Sparkle still follows its [module ownership](Engineering.md#module-boundaries), [data/lifetime](Engineering.md#data-and-lifetime) and [verification](Engineering.md#verification) rules.
 
 | Example | Relevant lesson |
 | --- | --- |
 | NVIDIA [Donut dependency composition](https://github.com/NVIDIA-RTX/Donut/blob/e50042f4bbd762971cc90431261e967404855b81/thirdparty/CMakeLists.txt), [ImGui target](https://github.com/NVIDIA-RTX/Donut/blob/e50042f4bbd762971cc90431261e967404855b81/thirdparty/imgui.cmake) and [NVRHI build](https://github.com/NVIDIA-RTX/NVRHI/blob/6b96fb03e07539f08327aea76c56d55f1de9d906/CMakeLists.txt) | Identifiable external composition, per-library build recipes and compiled dependency targets, with selected graphics headers/imports. Sparkle groups each recipe with its bindings/patches under `ThirdParty/<name>` while native adapters stay with their consumer. This is a local placement choice, not a Sparkle build-time result. |
 | NVIDIA [Falcor external composition](https://github.com/NVIDIAGameWorks/Falcor/blob/759aad033ff610fb0d82c74f7e0a508d0096d5f2/external/CMakeLists.txt) and [RTXPT build](https://github.com/NVIDIA-RTX/RTXPT/blob/303b408ab81790a5051abd7573830b7a4112eb8e/CMakeLists.txt) | Explicit source/package/SDK boundaries, imported binaries and architecture-specific inputs. Falcor uses prebuilt packages as well as source; Sparkle does not need its package stack for incremental reuse. |
 | AMD [Capsaicin dependency setup](https://github.com/GPUOpen-LibrariesAndSDKs/Capsaicin/blob/914b91596cd119eda85fbc1d3c7ee6ac391b1452/CMakeLists.txt) and [Cauldron library composition](https://github.com/GPUOpen-LibrariesAndSDKs/Cauldron/blob/b92d559bd083f44df9f8f42a6ad149c1584ae94c/CMakeLists.txt) | `third_party`/`libs` are distinguishable from native sources, with selected dependency targets/backends. Their global options and acquisition behavior are not blanket recommendations. |
-| [Epic third-party integration](https://dev.epicgames.com/documentation/en-us/unreal-engine/integrating-third-party-libraries-into-unreal-engine), CMake 3.30 [dependencies](https://cmake.org/cmake/help/v3.30/guide/using-dependencies/index.html), [FetchContent](https://cmake.org/cmake/help/v3.30/module/FetchContent.html) and [subdirectory policy](https://cmake.org/cmake/help/v3.30/command/add_subdirectory.html) | External source/build boundaries, imported or source-built dependencies, runtime staging and supported population/system/exclusion controls. Sparkle's [integration contract](ThirdPartyMigration.md#ownership-and-dependency-workflow) selects the local design. |
+| [Epic third-party integration](https://dev.epicgames.com/documentation/en-us/unreal-engine/integrating-third-party-libraries-into-unreal-engine), CMake 3.30 [dependencies](https://cmake.org/cmake/help/v3.30/guide/using-dependencies/index.html), [FetchContent](https://cmake.org/cmake/help/v3.30/module/FetchContent.html) and [subdirectory policy](https://cmake.org/cmake/help/v3.30/command/add_subdirectory.html) | External source/build boundaries, imported or source-built dependencies, runtime staging and supported population/system/exclusion controls. Sparkle's [module contract](Engineering.md#module-boundaries) and [dependency layout](../ThirdParty/README.md) select the local design. |
 | CMake 3.30 [conditional/transitive link semantics](https://cmake.org/cmake/help/v3.30/manual/cmake-generator-expressions.7.html), [custom targets](https://cmake.org/cmake/help/v3.30/command/add_custom_target.html) and [output/build-event rules](https://cmake.org/cmake/help/v3.30/command/add_custom_command.html) | Package attribution must use selected link semantics and explicit non-link contributors. Always-built work and post-build-only copying have different reuse/repair behavior; zero compilation alone does not qualify deployment. |
 | Pinned [ImGui context/allocator guidance](https://github.com/ocornut/imgui/blob/6d910d5487d11ca567b61c7824b0c78c569d62f0/imgui.cpp#L1360) and [Assimp build options](https://github.com/assimp/assimp/blob/c35200e38ea8f058812b83de2ef32c6093b0ece2/CMakeLists.txt) | Separate archive compilation from per-module globals/allocator state; determine linkage and transitive providers from actual library options and consumers. A uniform static-library rule would miss these contracts. |
 | [Cycles replaces its scheduler with TBB](https://github.com/blender/blender/commit/e50f1ddc6540680d2aafc1c76f8339d69350f84a); [OpenUSD Work](https://openusd.org/release/api/work_page_front.html) | Scheduler retirement and process concurrency. Sparkle's task plan determines candidate fit and lifecycle requirements. |

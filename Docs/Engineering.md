@@ -1,6 +1,6 @@
 # Developer guide
 
-[Documentation](README.md) | [Code style](CodeStyle.md)
+[Goals](Goals.md) | [Code style](CodeStyle.md)
 
 This guide covers your maintainer setup, module boundaries, development and validation. Reviewers use the prebuilt Launcher Quick Start, explore Editor/Game and inspect matching source; they do not need to follow the build/cook instructions. For current work and release limits, see the [roadmap](Roadmap.md).
 
@@ -78,7 +78,7 @@ Put stable contracts in `Public` and implementation in `Private`. New public API
 
 Core is the base dependency. GameFramework does not depend on Renderer or RHI; RHI does not depend on Renderer. Native types remain inside the backend or an explicit interop interface. Dependencies follow actual public use, not convenient transitive includes.
 
-Use the [integration contract](ThirdPartyMigration.md#ownership-and-dependency-workflow) and [dependency navigation](../ThirdParty/README.md) for recipes, vendor source, Sparkle compile bindings and native adapters. Linkage, public usage and allocator/context lifetime follow the actual library/module boundary. Prepared cooking uses existing tools; build reuse, verified input admission, runtime repair and configuration-correct distribution metadata require their own checks.
+Use the [integration scope](Implementation/PortfolioScopeDecisions.md#third-party-integration-maintenance) and [dependency navigation](../ThirdParty/README.md) for recipes, vendor source, Sparkle compile bindings and native adapters. Linkage, public usage and allocator/context lifetime follow the actual library/module boundary. Prepared cooking uses existing tools; build reuse, verified input admission, runtime repair and configuration-correct distribution metadata require their own checks.
 
 For replacements, name the mechanism being retired and the policy retained. Assess the complete producer-to-consumer change, including callers and adapters. Moving code earns no removal credit; report non-native, generated, dependency and build/runtime costs separately. Keep capability additions distinct from simplification.
 
@@ -196,9 +196,9 @@ Cookers stage complete validated output before publication. Core owns containmen
 
 ## Writing documentation
 
-Keep Engineering, Goals, References, Rendering and Roadmap at the scope and level of detail of the [November 8, 2026 guide set](https://github.com/LisowskiPawel/SparkleEngine/tree/dcd5b4d027543aeb11a133ac40da64cc74ce5a77/Docs). This is an editorial reference; behavior and decisions stay current.
+Keep Engineering, Goals, References, CodeStyle and Roadmap at the scope and level of detail of the [November 8, 2026 guide set](https://github.com/LisowskiPawel/SparkleEngine/tree/dcd5b4d027543aeb11a133ac40da64cc74ce5a77/Docs). This is an editorial reference; behavior and decisions stay current.
 
-Add material only for a recurring reader question about purpose, scope, a lasting decision, a required workflow or a product/comparison limit. Cite primary sources for those claims. Search the [existing owner](README.md#guides), including [dependency decisions](ThirdPartyMigration.md), before writing; revise its section and link from other guides.
+Add material only for a recurring reader question about purpose, scope, a lasting decision, a required workflow or a product/comparison limit. Cite primary sources for those claims. Search the existing guides and [scope decisions](Implementation/PortfolioScopeDecisions.md), including their dependency boundaries, before writing; revise its section and link from other guides.
 
 Keep minimum runnable setup commands and important current limits. Put API/wire detail and per-file inventories with their code owner. Keep stage checklists and individual run results out of main guides. Use one concise `Docs/Implementation/<Feature>.md` for unfinished delivery and acceptance/failure checks; keep raw evidence in ignored output. After each verified stage, remove its heading, checklist, prompt and progress text in the same run; partial stages retain only missing work. Completion is marked by removal, with receipts kept outside the active plan. Preserve stage numbers, repair links and delete the plan when its last required item closes, retaining lasting decisions and unresolved product limits in their existing owners.
 

@@ -1,6 +1,6 @@
 # Code style
 
-[Documentation](README.md) | [Developer guide](Engineering.md)
+[Goals](Goals.md) | [Developer guide](Engineering.md)
 
 These conventions apply to project C++ and shaders. [.clang-format](../.clang-format), [.clang-tidy](../.clang-tidy) and module CMake define the mechanical settings. [CodeStyle.ps1](../CMake/CodeStyle.ps1) runs the formatter; naming, decision complexity, braces and logical paragraphs are reviewed with the code.
 

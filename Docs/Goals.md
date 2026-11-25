@@ -1,6 +1,6 @@
 # Goals
 
-[Documentation](README.md) | [Roadmap](Roadmap.md)
+[Scope decisions](Implementation/PortfolioScopeDecisions.md) | [Roadmap](Roadmap.md)
 
 ## Target persona
 
@@ -47,7 +47,7 @@ The [level catalog](../Projects/Showcase/Levels.catalog) identifies intended rel
 
 The selected scene set is Empty, CornellBox, classic Sponza, BistroExterior, BistroInteriorWine, ModernSponzaKnight, ModernSponzaCandles, CesiumMan, LPSHead, DamagedHelmet and ABeautifulGame. Stanford Bunny/Dragon remain conditional on a supported non-PLY route. Retire the other scene entries while preserving assets referenced by retained scenes; the [scene decisions](Implementation/PortfolioScopeDecisions.md#showcase-scenes-and-conversion-scripts) own that boundary.
 
-Keep ownership of the RHI, frame graph, graphics API/resource lifetime and real-time path tracer. Simplify support code and delegate selected production algorithms through the [migration decisions](ThirdPartyMigration.md), focusing personal research on the three cases and crediting upstream work. [Roadmap](Roadmap.md#supporting-system-simplification) sets priorities.
+Keep ownership of the RHI, frame graph, graphics API/resource lifetime and real-time path tracer. Simplify support code and delegate selected production algorithms through the [integration scope decisions](Implementation/PortfolioScopeDecisions.md#third-party-integration-maintenance), focusing personal research on the three cases and crediting upstream work. [Roadmap](Roadmap.md#supporting-system-simplification) sets priorities.
 
 Keep supporting systems as small as the rendering and reproduction workflows allow. General gameplay, physics, networking, audio, scripting, plugin SDKs, installers/updaters, Linux, extra hardware campaigns, geometry caches, frame generation, GPU-driven geometry, atmosphere/clouds/imported volumes, broad authoring or diagnostics tools and general ML runtimes are outside the selected work.
 
@@ -95,7 +95,7 @@ Use permitted professional work, technical discussion and optional feedback to d
 
 - **Technical direction.** Choose high-value problems and finish repeated substantial work under real constraints. Lead uncertain investigations, challenge designs, review constructively, teach reasoning and remove complexity. Demonstrate decisions improved through feedback and second-context use, alongside credible professional evidence of shipped impact, mentoring, stewardship or partner trust.
 
-The [rendering guide](Rendering.md#later-rendering-work) selects feature scope; [Roadmap](Roadmap.md#after-release) sets delivery order.
+The [product scope](#product-scope) selects retained engine features; [Roadmap](Roadmap.md#after-release) sets delivery order.
 
 ### Professional qualifications
 

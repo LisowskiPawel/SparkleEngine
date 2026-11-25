@@ -1,6 +1,6 @@
 # Roadmap
 
-[Documentation](README.md) | [Goals](Goals.md)
+[Scope decisions](Implementation/PortfolioScopeDecisions.md) | [Goals](Goals.md)
 
 ## Current priority
 
@@ -84,15 +84,15 @@ Use the [case framework](Goals.md#the-three-cases) to explain completed technica
 
 ## Supporting-system simplification
 
-Launcher scene-view qualification retains physical fractional/mixed-DPI, assistive-technology and broader GUI/GPU/profile/capture/package checks as **UNVERIFIED** in the [bound delivery record](../build/validation/launcher-item-views/candidate-20261122/REPORT.md). Its [required temporary cleanup](Implementation/LauncherItemViews.md) remains open after automatic approval review rejected deletion; this adds no release prerequisite.
+Launcher scene-view qualification retains physical fractional/mixed-DPI, assistive-technology and broader GUI/GPU/profile/capture/package checks as **UNVERIFIED** in the [bound delivery record](../build/validation/launcher-item-views/candidate-20261122/REPORT.md). Its required temporary cleanup, recorded with that evidence, remains open after automatic approval review rejected deletion; this adds no release prerequisite.
 
-Reduce maintained native support code before adding optional rendering SDK capabilities. The [task-runtime replacement](ThirdPartyMigration.md#task-execution) has completed code delivery; compiler preprocessing reuse remains an independent scope. [SDL3 window/input code delivery is complete](ThirdPartyMigration.md#window-and-input), with no net line saving claimed. Other replacements require a demonstrated net win. New dependency changes follow the [integration contract](ThirdPartyMigration.md#ownership-and-dependency-workflow). The [migration guide](ThirdPartyMigration.md) owns decisions and retirement boundaries. These simplifications add no new first-release prerequisites.
+Reduce maintained native support code before adding optional rendering SDK capabilities. Task-runtime replacement and SDL3 window/input code delivery are complete; this does not close broader product qualification, and no SDL3 net line saving is claimed. Compiler preprocessing reuse remains conditional under CP-04. Other replacements require a demonstrated net win. The [module scope decisions](Implementation/PortfolioScopeDecisions.md#where-the-code-footprint-actually-is) now own named cuts, retained boundaries and conditional replacements; [Engineering](Engineering.md#module-boundaries) owns integration/lifetime rules. These simplifications add no new first-release prerequisites.
 
 Task-runtime code delivery closes with actual owner/capacity/lifetime checks and retirement of the local runtime. The [final record](../build/validation/task-runtime/close-20261122/REPORT.md) and [frozen comparison limits](../build/validation/task-runtime/close-20261122/QUALIFICATION-LIMITS.md) retain unrun timing, frame distributions, memory, cancellation latency, full build/package growth and relocated/clean-machine delivery. New ShaderMake/Slang debug exports need GPU-diagnostics qualification at their actual source/tool/SDK identity; rejecting old receipts remains required. Static/shared and focused D3D12/Vulkan owner checks do not certify broader release behavior. Cost targets missed for added code, API, state and cleanup; the net retirement result is separate. These are existing product/integration qualification responsibilities, without a replacement implementation plan or a new first-release prerequisite.
 
 Window/input product qualification retains the [frozen comparison limits](../build/validation/window-input/stage-1-20261122/PROTOCOL.md) and [bound observations](../build/validation/window-input/delivery-20261122/REPORT.md). Focused 100% single-monitor, input, native chrome, both API capture/GPU replay and delivery results do not certify 150/200% or mixed-DPI displays, physical slow/fast/edge-crossing response, layout/IME/clipboard, full profile/image/startup/frame/memory distributions, or relocated package/clean-machine delivery; these remain UNVERIFIED. Preserve the failed Vulkan device-loss run with a preceding RenderDoc replay active and the replay-GUI loading/cleanup issue separately from passing isolated captures and CLI replays. Broader product/tool qualification stays here and in the report, without a replacement implementation plan.
 
-Keep product blockers open through final qualification: raster/ray material parity for UV transforms, address modes and occlusion strength; the unresolved Vulkan swapchain allocation failure; and full image/package/reproduction checks on both APIs. Isolated cooker or sampling results do not close those gates. See the lasting [texture contract](Rendering.md#texture-cooking).
+Keep product blockers open through final qualification: raster/ray material parity for UV transforms, address modes and occlusion strength; the unresolved Vulkan swapchain allocation failure; and full image/package/reproduction checks on both APIs. Isolated cooker or sampling results do not close those gates. See the retained [texture-cooking boundary](Implementation/PortfolioScopeDecisions.md#texturecooker).
 
 ## Choosing the next task
 

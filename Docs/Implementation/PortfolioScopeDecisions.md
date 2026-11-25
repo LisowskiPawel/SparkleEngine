@@ -1,6 +1,6 @@
 # SparkleEngine module scope decisions
 
-[Goals](../Goals.md) | [Roadmap](../Roadmap.md)
+[Goals](../Goals.md) | [References](../References.md) | [Roadmap](../Roadmap.md)
 
 **Selected: Option C, a reduced engine suite with distinct Launcher, Editor and Game. Real-time path tracing is the only supported lighting path. The Reference path tracer and all of its dedicated infrastructure are to be removed.** You are the sole maintainer/developer. Reviewers launch the prebuilt portfolio and read its source; they are not expected to iterate code, shaders or content. This is the target scope, not a claim that implementation cleanup is complete.
 
@@ -8,9 +8,62 @@
 
 A `-` in `Your answer` means no decision has been recorded. You can answer a section at a time, using the item IDs. An asterisk on a suggestion means another decision or content requirement must be resolved first. Coupled choices are listed near the end.
 
-Most module decisions are recorded. Remaining answer cells are BU-05/BU-06, TP-01/TP-02 and DO-01/DO-02. The Stanford non-PLY condition and the explicit performance/replacement checks on accepted conditional cuts remain unresolved acceptance work. Use the stable IDs for any further answers; do not reinterpret an earlier Yes/No from an updated recommendation.
+There are 202 decision rows: the original 129 plus 73 more detailed questions added on 25 November. Original answers remain recorded. BU-05/BU-06, TP-01/TP-02 and DO-01/DO-02 remain unanswered, and every new answer is blank. The Stanford non-PLY condition and checks on accepted conditional cuts remain unresolved acceptance work. TX-03 was implemented and verified during this scope review; the new questions are planning only. Use stable IDs for further answers; a recommendation never silently changes an earlier answer.
 
 Correctness, safe lifetime, useful errors and protection of accepted outputs remain requirements of every retained workflow. They are not optional features in this checklist. Existing working code also needs your review and understanding; a Yes is not approval of its current architecture.
+
+## How these recommendations follow Goals and References
+
+Decision authority is [Goals: Product scope](../Goals.md#product-scope) and your recorded answers. [References](../References.md) supplies engineering precedents and the archived role evidence; it is not a feature checklist. A capability appearing in a research paper, NVIDIA sample or job description does not make it an engine requirement. Later neural/model work and case narratives remain separate from this cleanup.
+
+| Decision test | Source and application here |
+| --- | --- |
+| Does this demonstrate the work you want to own? | [Target persona](../Goals.md#target-persona), [rendering/GPU systems](../Goals.md#rendering-and-gpu-systems), [role sources](../References.md#role-sources): prioritize explicit APIs, real-time transport, measured integration, shader work and difficult debugging. A general installer, project framework or elaborate operation-history UI provides weaker evidence for this target. |
+| Does a named user still need it? | [Product scope](../Goals.md#product-scope), [review and transfer](../Goals.md#review-and-transfer): preserve your fast build/cook/debug workflow and the reviewer's offline Launcher/Editor/Game experience. Removing the developer GUI is an explicit reopening, not an inferred consequence of reviewer simplicity. |
+| Does removal reduce an obligation or just move its code? | [North Star](../Goals.md#north-star), [integration precedents](../References.md#integration-precedents), [code style](../References.md#code-style): remove a supported mode, duplicate authority, state machine or unused producer/consumer chain. Count new replacement code and remaining dependencies. A renamed coordinator is not a saving. |
+| Is a library already responsible for the mechanism? | [C++ engineering](../Goals.md#software-and-analysis), [integration precedents](../References.md#integration-precedents): use CMake target dependencies, Qt controls and compiler/library facilities when they cover the real contract. You still own integration, failure behavior and lifetime; do not replace working dependencies with handwritten equivalents merely to claim authorship. |
+| Would the cut damage evidence or correctness? | [Whole-system performance and difficult debugging](../Goals.md#software-and-analysis), [NVIDIA production studies](../References.md#nvidia-production-studies), [tools and APIs](../References.md#tools-and-apis): preserve symbols/source correlation, breadcrumbs, bounded publication/settlement, valid material/animation data and useful controlled comparisons. No line-count target overrides these. |
+| Is an execution simplification actually cheaper on retained workloads? | [Hardware/concurrency](../Goals.md#rendering-and-gpu-systems), [whole-system performance](../Goals.md#software-and-analysis): GF-06/GF-08 and similar changes need a defined retained workload, baseline, memory/time limits and checked output. Removing parallelism without that comparison is not an established improvement. |
+| Does the result remain easy to inspect and maintain? | [Make ownership clear](../Goals.md#north-star), [code style](../References.md#code-style), [documentation examples](../References.md#documentation-examples): use descriptive responsibility names, explicit entry points and one data-flow explanation. Keep module/lifetime boundaries that aid reasoning, even in small code. |
+
+This leads to three outcomes: **retain for a named portfolio/development requirement**, **remove an unnecessary capability**, or **replace a mechanism only after proving the narrower contract**. The detailed tables name the item, removal boundary, reason and recommendation separately. Your answer stays blank for every new question. A conditional replacement is not permission to weaken correctness or delete the old path before its replacement works.
+
+The local application of these precedents is a recommendation, not a claim that NVIDIA or AMD requires a particular Sparkle class structure. The [NVRHI guide](https://raw.githubusercontent.com/NVIDIA-RTX/NVRHI/main/doc/ProgrammingGuide.md) is a useful resource-lifetime precedent; it does not replace the selected owned RHI. [Qt item views](https://doc.qt.io/qt-6.11/qlistview.html) provide list/icon presentation; whether they cover a specific Launcher wrapper still needs a local comparison. [CMake target dependencies](https://cmake.org/cmake/help/v3.30/manual/cmake-buildsystem.7.html) motivate one native-build authority, not blind deletion of SDK/deployment invalidation. [NVIDIA's shader-debugging study](https://developer.nvidia.com/blog/harness-powerful-shader-insights-using-shader-debug-info-with-nvidia-nsight-graphics/) supports retaining usable source correlation while simplifying surrounding UI. These primary pages were checked on 25 November; this was not a new vacancy-status or qualification survey.
+
+## Where the code footprint actually is
+
+Snapshot: 25 November 2026, working tree after KTX removal. Counts include tracked, present first-party C/C++ headers/implementation and build/automation scripts, including blank/comment lines. They exclude downloaded vendor trees, generated output, notices, documentation and raw asset data. Shader assets and maintained patches are reported separately. These are containing scopes, not promised deletion amounts or measurements of code quality, build time or runtime cost. File-level inventory is recorded locally in `build/validation/portfolio-footprint-20261125/authored-files.json`.
+
+| Owner | Files | Physical lines | What deserves a closer decision |
+| --- | ---: | ---: | --- |
+| Launcher application | 205 | 19,662 | GUI 8,101; native build orchestration 3,835; clean/maintenance 1,152; scene operations 1,184. Setup, history and alternate workflows need separate choices. |
+| GameFramework | 219 | 12,223 | World implementation 4,501; asset implementation 2,516; level implementation 2,420. Inspect representation, load concurrency and runtime animation construction separately. |
+| Editor | 152 | 12,005 | Asset inspection 1,314 and shader UI 779 are already retirement candidates. Scene UI 2,072, viewport 1,994 and custom widgets 872 contain retained work and optional presentation. |
+| ShaderCompiler | 104 | 7,938 | Compilation/publication/debugging dominate. The optional analysis folder is only 43 lines; removing its label does not remove the expensive part of this module. |
+| Core | 127 | 7,278 | Process implementation 1,189; paths 969; files 907, plus their public contracts. Much serves retained tools, publication or a relocatable reviewer bundle. |
+| SourceImporters | 89 | 5,900 | glTF implementation 3,245; shared Assimp adapters 1,191; FBX adapters 740; PLY adapters only 37. PLY removal alone will not retire Assimp while FBX remains. |
+| Cooking libraries/tools together | 105 | 5,810 | TextureCooker 2,019; AssetCooker 1,550; SceneCooker 1,430; MaterialCooker 434; MeshCooker 377. Small library boundaries are not the dominant cost. |
+| Application | 60 | 5,373 | Reference-specific Editor code 949; GPU-crash persistence/input handling 1,482; ordinary image capture 744. These are different responsibilities with different removal rules. |
+| CMake root | 50 | 3,207 | Packaging 954; dependency preparation 596; artifact policy 492; GPU diagnostics 442. The current GitHub workflow is just 41 additional lines of source/whitespace checks. |
+| Platform | 25 | 1,783 | Input implementation 1,036; window implementation 494. Most implements the retained Editor/Game interaction contract. |
+| ToolSupport | 20 | 1,428 | Project/level catalog implementation alone is 700. Its content-pack model matters more than its small progress helpers. |
+| Showcase source/conversion | 15 | 762 | CornellBox and LPSHead converters, small product entry points and composition. Scene data and asset bytes are outside this count. |
+| Renderer, for comparison | 619 | 36,806 | Existing rendering decisions remain authoritative. Do not cut retained rendering features indirectly through host/tool simplification. |
+| RHI, for comparison | 372 | 37,814 | Both APIs, multiple queues, shader-target enumeration and breadcrumbs remain protected. |
+
+Across the counted tree there are 159,223 physical lines. Outside Renderer/RHI there are 84,603, about 53%; this includes graphics tooling, not just unrelated infrastructure. Shader asset source contributes another 7,544 lines, and maintained patch files another 1,071 diff lines. The Launcher root composition outside its application adds 34 lines. Do not count cached third-party source or binary assets as code you authored.
+
+The three largest non-Renderer/non-RHI application modules are Launcher, GameFramework and Editor. They should be reviewed before shaving small math helpers or merging the 377-line MeshCooker. The already selected Editor asset/shader panels and the two host/Editor Reference folders contain 3,275 lines together; their shared callers still require classification, so this is not a guaranteed net saving.
+
+| Review order | Decisions to make | Why this comes first |
+| --- | --- | --- |
+| 1 | LA-16 through LA-25; existing LA-11/LA-13/LA-15 | Largest non-rendering module; remove extra workflow/UI obligations while preserving your Launcher iteration controls. |
+| 2 | GF-08/GF-13/GF-16; existing GF-02/GF-06 | Review cross-pool loading, runtime offline animation construction and read-view copying independently of retained animation and read lifetime. |
+| 3 | ED-17 through ED-24; existing ED-12/ED-13/ED-14 | Bound presentation and persistence. Keep useful live inspection without accidentally promising a full scene-authoring product. |
+| 4 | BU-05/BU-07 through BU-12, TS-03/TS-04 | Product import, package contents, feature combinations and content-pack generality cross several owners. |
+| 5 | CP-05 through CP-10, IM-06 through IM-09, TX-05 through TX-08 | Narrow tool interfaces and admitted inputs after proving what the retained scenes and debuggers actually use. |
+
+`No*` means a narrower replacement or a retained-content/cost check is needed before removal. It does not mean keeping a second implementation indefinitely. A rewrite that merely moves lines is not a scope saving. The optional RV questions near the end explicitly identify larger changes to earlier answers; all other new questions aim to refine their accepted scope.
 
 ## Who the engine serves
 
@@ -28,7 +81,7 @@ A retained feature earns its place by serving your iteration/understanding, the 
 
 ## Launcher
 
-Owner: [Tools/Launcher/SparkleLauncher](../../Tools/Launcher/SparkleLauncher). Observed scope: 205 source/build files, 19,723 physical lines. Launcher remains a distinct application.
+Owner: [Tools/Launcher/SparkleLauncher](../../Tools/Launcher/SparkleLauncher). Observed scope: 205 source/build files, 19,662 physical lines. Launcher remains a distinct application.
 
 Reviewer Quick Start is its public entry point. Your source-workspace Launcher also owns the retained developer iteration actions; those actions are not reviewer prerequisites.
 
@@ -67,6 +120,28 @@ LA-15 is removed from the target scope. Launcher may configure/start the GPU deb
 
 Required engine-side SDK initialization, breadcrumbs/markers, native fault collection, crash-data callbacks/output, shader debug information and bounded collection-completion waits remain under AP-05/RH-09. Their ownership is separate from Launcher reacting to a crash. Remove additional custom post-crash orchestration under AP-07; do not delete required diagnostic collection merely because it occurs after a fault. The [explicit keep/remove boundary](#gpu-crash-diagnostics-preservation-and-removal) governs all such cuts.
 
+### Launcher: additional decisions
+
+The 8,101-line GUI contains required scene browsing as well as developer setup, models, styling and activity presentation. The 494-line `Private/Build/State` area implements independent build-freshness tracking. These totals overlap the module total; they are not additional savings.
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| LA-16 | **Native compiler component installer** | Remove `HostToolInstaller.*`, installation actions and GUI/planner branches. Install your chosen compiler once yourself; keep detection and useful missing-tool errors. | No | [product scope](../Goals.md#product-scope): OS tool installation is outside the portfolio; detection still serves your iteration. | - |
+| LA-17 | **Multiple Windows compiler families: MSVC and clang-cl** | Choose one proven MSVC or clang-cl route; retire the other compiler-selection, detection and reset branches. Rider-only does not itself select a compiler. | No* | [product scope](../Goals.md#product-scope): one maintainer needs one proven toolchain, not two permanent qualification branches. | - |
+| LA-18 | **Multiple CMake generator families: Visual Studio/MSBuild and Ninja** | Keep the generator/project format proven with Rider and standalone Launcher. Retire unused Ninja/other-generator choices; retain MSBuild/solution support if that is the chosen route. | No* | [product scope](../Goals.md#product-scope): one proven Rider route reduces configuration state; project support remains when required. | - |
+| LA-19 | **Launcher build-file freshness scanner and signatures** | Prefer CMake regeneration/build dependencies plus minimum cache/configuration identity. Prove added/removed sources, changed recipes and toolchain changes are detected before retiring `Build/State` logic. | No* | [integration precedents](../References.md#integration-precedents): prefer the native build authority; preserve invalidation before removing duplicate tracking. | - |
+| LA-20 | **Automatic toolchain-change artifact reset** | Use an explicit incompatible-cache error and the approved native Clean scope. Retain automatic reset only for a demonstrated single-toolchain iteration need. Source caches are preserved. | No* | [ownership](../Goals.md#north-star): explicit clean ownership can replace extra reset state after toolchain narrowing. | - |
+| LA-21 | **Multi-run operation-history browser** | Show current/last operation, bounded output, failure and the existing log path. Remove the multi-run browser; preserve progress and cancellation. | No | [product scope](../Goals.md#product-scope): current progress/failure is useful; a history browser adds presentation maintenance. | - |
+| LA-22 | **Concurrent independent build/cook/sync/clean operations** | Serialize build/cook/sync/clean through one responsive operation owner. Clearly reject or queue another request. A launched Editor/Game and bounded parallelism within a build/cook remain independent. | No* | [ownership](../Goals.md#north-star): serialize mutations to reduce operation lifetimes; preserve parallel work inside each operation. | - |
+| LA-23 | **Expanded compiler/SDK/dependency setup dashboard** | Keep concise developer readiness, explicit SDK/tool paths and retained prepare/build actions. Remove extra detail cards and installation/repair branches. Quick Start still reports runtime readiness. | No | [reviewer usability](../Goals.md#review-and-transfer): keep usable readiness and setup; remove a general environment-management interface. | - |
+| LA-24 | **Per-dependency code-sync controls** | Sync the enabled pinned set as one operation. Keep selected scene-content sync, incremental cache reuse and dependency-specific errors. | No | [product scope](../Goals.md#product-scope): the enabled pinned set is your supported development unit; cache reuse remains. | - |
+| LA-25 | **Custom Qt styling and general widget-wrapper layer** | Prefer standard Qt controls and one compact owned theme, retaining scene previews. Remove wrappers only when behavior has a simpler owner; preserve useful accessibility, focus and error behavior. | No* | [integration precedents](../References.md#integration-precedents): reuse Qt behavior while keeping a compact polished interface you can own. | - |
+| LA-26 | **Scene-ready child-process launch handshake** | No reports process creation only, losing startup/map-failure detection. The Core readiness protocol is unrelated to post-crash monitoring. | Yes | [reviewer usability](../Goals.md#review-and-transfer): successful process creation alone does not demonstrate a usable map. | - |
+| LA-27 | **Explicit workspace/tool/SDK path overrides** | Keep recovery for your own relocated checkouts and SDK installations through one supported path contract, without a general IDE/project framework. | Yes | [product scope](../Goals.md#product-scope): practical solo-developer recovery is useful without a generic setup matrix. | - |
+| LA-28 | **Non-destructive workflow dry-run reports** | Remove optional non-destructive preview presentation and its CLI switch only where unused. Keep clean effects preview, internal planning required by execution/readiness, help and errors. | No* | [product scope](../Goals.md#product-scope): remove unused presentation, while retaining required clean previews and execution planning. | - |
+
+Sources: [host-tool installation](../../Tools/Launcher/SparkleLauncher/Private/Build/Toolchains/HostToolInstaller.cpp), [freshness scanning](../../Tools/Launcher/SparkleLauncher/Private/Build/State/BuildFreshnessSignature.cpp), [activity UI](../../Tools/Launcher/SparkleLauncher/Private/Gui/Shell/LauncherActivityPanel.cpp), [operation lifetime](../../Tools/Launcher/SparkleLauncher/Private/Gui/Operations/LauncherOperationService.cpp). LA-22 changes admission, completion/cancellation and close together; deleting a worker without following its callbacks is not valid simplification.
+
 ## Editor
 
 Owner: [Engine/Editor](../../Engine/Editor). Observed scope: 152 source/build files, 12,005 physical lines. Editor remains distinct from Game.
@@ -98,6 +173,25 @@ The existing [edit command set](../../Engine/GameFramework/Public/World/WorldEdi
 
 ED-09 also needs an explicit list of saved fields: a live edit being supported does not establish that it survives Save All. Keep that distinction visible when choosing the final Editor contract.
 
+### Editor: additional decisions
+
+Existing ED-12/ED-13/ED-14 retire mesh, texture and shader-inspection interfaces. Shader compile/reload, useful compiler failures and the console remain. Custom widgets, style, icons and workspace presentation deserve separate choices.
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| ED-17 | **Custom Editor title bar and native hit testing** | Use a normal decorated window. Remove custom drawing and otherwise unused Platform non-client hit testing; retain windowed/borderless presentation, DPI and focus behavior. | No* | [product scope](../Goals.md#product-scope): bespoke desktop chrome is weaker portfolio evidence than rendering and inspection. | - |
+| ED-18 | **Generated RGBA icon catalogs and Editor icon texture service** | Prefer already available font glyphs or a smaller fixed set. Retire generation/upload only when the replacement covers retained controls; ordinary ImGui rendering remains. | No* | [integration precedents](../References.md#integration-precedents): reuse a smaller existing presentation path if it covers the retained interface. | - |
+| ED-19 | **Per-property inspector text search** | Keep the outliner and clear fixed property sections. Lose per-property search; this is a small convenience cut. | No | [product scope](../Goals.md#product-scope): a small optional convenience beyond the retained outliner and selected property controls. | - |
+| ED-20 | **Console command/CVar autocompletion** | Remove `CompleteConsoleLine`/`CompleteConsoleCVarName` and completion UI only. Keep input parsing, execution, history, CVar get/set, compile/reload, help and errors under ED-11; a small cut. | No | [product scope](../Goals.md#product-scope): keep execution/history, reduce optional convenience code only if you accept the loss. | - |
+| ED-21 | **Undo/redo command pairs and drag coalescing** | No weakens undo/redo selected in ED-08. Keep the bounded command set without building a generic transaction framework. | Yes | [reviewer usability](../Goals.md#review-and-transfer): reversible edits make the selected Editor inspection usable. | - |
+| ED-22 | **Save lighting, sky and active-camera description** | These are the fields currently captured by `CaptureLevelWorldState`. Recommendation preserves ED-09's existing narrow responsibility. | Yes | [product scope](../Goals.md#product-scope): preserve the selected narrow authoring workflow and describe its real saved fields. | - |
+| ED-23 | **Persistent per-object transform/visibility/material overrides** | Keep approved edits live for inspection but session-only, with reload/reset. Full object persistence is a scope expansion, not implemented by today's Save All. | No | [product scope](../Goals.md#product-scope): broad scene authoring is outside cleanup; this would add an unimplemented obligation. | - |
+| ED-24 | **Writing scene edits into the reviewer bundle** | Keep maintainer save in a writable source workspace; reviewer edits stay in-session and reload returns to supplied defaults. Avoid a second user-content storage system. | No | [reviewer usability](../Goals.md#review-and-transfer): preserve supplied defaults and offline inspection without a second content-authoring system. | - |
+
+The [save projection](../../Engine/GameFramework/Private/Level/LevelWorldProjection.cpp) captures light descriptions, sky and the active camera description into the existing level document. It does not serialize every object edit or establish persistence of every imported camera transform/selection. The [writer](../../Engine/GameFramework/Private/Level/Parsing/LevelDocumentFormat.cpp) supports fixed level/camera/sky/lighting/scene-assets sections. Rename or explain Save All according to the selected fields. ED-23 limits new work; it is not current removable code.
+
+[Undo history](../../Engine/Editor/Private/Scene/Transactions/EditorTransactionHistory.h) is small and directly serves a retained interaction. [Title-bar controls](../../Engine/Editor/Private/Workspace/TitleBarWindowControls.cpp) and [icon generation](../../Engine/Editor/CMake/EditorIconAssets.cmake) are distinct presentation costs. Decorative cuts must preserve focus-loss cancellation and correct viewport input.
+
 ## Application hosts
 
 Owner: [Engine/Application](../../Engine/Application). Observed scope: 60 source/build files, 5,373 physical lines. Keep separate Editor/Game composition and a cooked-only Game runtime.
@@ -115,6 +209,19 @@ Shared host composition makes Editor/Game run reliably for reviewers and connect
 | AP-07 | Extra post-crash incident UI/catalog/reporting and automatic analysis/recovery. This removal excludes breadcrumb/marker sidecars, matched debug metadata, essential dump writing and bounded native collection completion. | No | No |
 
 Startup, shutdown, process/task settlement, capture completion and lifetime ordering remain work to own. Three task resources or several coordinators should be justified by their actual lifetimes, rather than removed merely because they look similar.
+
+### Application hosts: additional decisions
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| AP-08 | **Ordinary BMP viewport screenshots** | No reopens AP-02. Keep one ordinary capture route; Reference EXR/statistics/checkpoint writers are unnecessary for screenshots. | Yes | [reviewer usability](../Goals.md#review-and-transfer): one usable evidence/export path earns scope; Reference artifacts do not follow from it. | - |
+| AP-09 | **Explicit Editor restart for startup-only settings** | No means close/relaunch manually. Trace setting/capture callers before removing `Restart` or Core process relaunch; LA-13 removes Launcher self-rebuild/restart only. | Yes | [debugging evidence](../References.md#nvidia-production-studies): required capture startup changes are distinct from Launcher self-rebuilding. | - |
+| AP-10 | **Persisted adapter/startup preferences** | Keep effect persistence under AP-04; choose startup options explicitly at launch. This avoids an earlier inspection silently selecting a different startup path. | No | [reviewer usability](../Goals.md#review-and-transfer): explicit startup choices keep reviewer behavior predictable while effect settings still persist. | - |
+| AP-11 | **CPU render-thread mode and frame-lead diagnostic controls** | A fixed production execution policy is possible, but first identify the retained performance/debugging consumers of `r.ThreadedRenderer` and `r.RenderPipelineDepth`. Do not confuse CPU frame lead with retained multiple GPU queues. | Yes, developer diagnostics | [performance](../Goals.md#software-and-analysis): controlled CPU/submission comparisons can justify these developer controls. | - |
+
+The [ordinary capture writer](../../Engine/Application/Private/Editor/Capture/ViewportCaptureWriter.cpp) uses BMP. `ImageEncoding::EncodeExr` serves Reference artifact encoding; it is a last-consumer candidate under AP-03, not a reason to remove TinyEXR texture input. Trace [Editor restart](../../Engine/Application/Private/Editor/Host/EditorApplication.cpp) and [settings persistence](../../Engine/Application/Private/RenderingSettings/EngineRenderingSettingsPersistence.cpp) separately from Launcher bootstrap behavior.
+
+The 1,482-line GPU-crash persistence/input area is mixed responsibility. Its size does not authorize removing required dumps, markers, shader identity or completion waits. The explicit diagnostic boundary below remains authoritative.
 
 ## GameFramework and scene runtime
 
@@ -137,6 +244,28 @@ Keep scene/material identity, selected edits, stable read/publication boundaries
 The intended scope is basic clip playback and movement demonstrations, not blend trees, animation graphs, retargeting, IK, timeline tooling or general animation authoring. Do not add these during cleanup. CesiumMan is retained under PR-11 as a second basic animation example; additional examples remain later choices.
 
 GF-06 accepts the suggested simplification subject to its workload/cost check. It concerns CPU world-system execution, not asynchronous scene loading, Renderer tasks or GPU queues retained under RH-04.
+
+### GameFramework: additional decisions
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| GF-08 | **Cross-pool per-asset read/decode pipeline** | Keep asynchronous replacement under GF-04, but consider one background load operation with a bounded asset loop. Remove cross-pool machinery only after Bistro/Knight load time, memory, cancellation and accepted-world preservation checks. | No* | [performance](../Goals.md#software-and-analysis): keep asynchronous loading, but require a measured benefit for the extra handoffs. | - |
+| GF-09 | **Transactional replacement-world staging** | Keep staging/generation checks even if GF-08 makes execution serial. No cannot mean destroying the active scene before replacement succeeds. | Yes | [ownership](../Goals.md#north-star): failed preparation must not destroy the accepted world. | - |
+| GF-10 | **Immutable Editor world read view** | Keep one publication authority and safe borrowed read lifetime. The current incremental path still clones previous storage; GF-16 separately decides that copying mechanism. | Yes | [ownership](../Goals.md#north-star): protect consumer lifetime while separately questioning the copying mechanism. | - |
+| GF-11 | **Incremental world-to-renderer identity/resource publication** | No implies rebuilding/resending more scene data. Keep the narrow protocol for scene replacement, edits and animation; no public gameplay extension API is needed. | Yes | [performance](../Goals.md#software-and-analysis): large scenes need stable identity and bounded update work. | - |
+| GF-12 | **Fixed text level-document parser and writer** | No requires one replacement format across all consumers and regeneration, preserving chosen save fields. Do not keep both grammars. Parsing's 1,092 lines still contain necessary field validation. | Yes, narrow | [ownership](../Goals.md#north-star): one small explicit schema can be owned; a format rewrite is not a free saving. | - |
+| GF-13 | **Runtime Ozz offline animation/skeleton construction** | Move offline construction to SceneCooker; ship prepared runtime data and required metadata. Retire runtime offline-builder dependencies/duplicate conversion only after bounded loading and basic animation pass. Moving lines alone is not net simplification. | No* | [product scope](../Goals.md#product-scope): basic runtime playback should not need unnecessary preparation work at load time. | - |
+| GF-14 | **Multi-asset level composition** | No breaks Knight/Candles composition or requires rebaked assets. Keep needed composition without adding general scene streaming. | Yes | [product scope](../Goals.md#product-scope): Knight/Candles require actual base/add-on composition. | - |
+| GF-15 | **Shared scene resource stores** | No risks duplicated Bistro resources/memory. Keep real shared identity and lifetime; retire a store only after its retained consumers disappear. | Yes | [performance](../Goals.md#software-and-analysis): preserve real reuse instead of inflating per-instance data. | - |
+| GF-16 | **Whole-storage copying during Editor read-view publication** | Retain immutable read lifetime from GF-10. Investigate smaller publication/storage sharing when only a camera or property changed; check large-scene CPU/memory cost before replacing it. No additional cache/layer is justified without a smaller measured design. | No* | [performance](../Goals.md#software-and-analysis): measure the full snapshot copy independently of dirty-field refresh and read safety. | - |
+
+The [read-view publisher](../../Engine/GameFramework/Private/World/GameWorldPublication.cpp) constructs `WorldReadView::Storage` from the entire previous storage before refreshing changed entities. Dirty-field refresh does not establish that full-storage copying is absent; GF-16 addresses that exact mechanism. No runtime timing or memory benefit is claimed yet.
+
+Sources: [scene loading](../../Engine/GameFramework/Private/Level/Loading/SceneLoadRun.cpp), [world publication](../../Engine/GameFramework/Private/World/GameWorldPublication.cpp), [render extraction](../../Engine/GameFramework/Private/World/Extraction/RenderFrameSubmissionExtractor.cpp), [animation construction](../../Engine/GameFramework/Private/Assets/Loaders/AnimationAssetLoader.cpp), [skeleton construction](../../Engine/GameFramework/Private/Assets/Loaders/SkeletonAssetLoader.cpp). Both loaders include Ozz offline-builder APIs today; GF-13 is an actual ownership choice.
+
+GF-02 removes morphs; GF-06 conditionally simplifies per-frame world-system parallelism; GF-08 conditionally simplifies loading. None removes skeletal playback, GPU queues, renderer threading or all asynchronous work. `AnimationPreviewBaker`/`AnimationPreviewEvaluator` serve retained animation despite their names; they are not merely the removed mesh-preview panel.
+
+The private ECS uses `Destroy` and slot reuse in mesh/camera/light/animation construction rollback. Do not call it unused gameplay infrastructure or remove cleanup/identity checks because the Editor lacks Delete Object.
 
 ## RHI
 
@@ -221,6 +350,15 @@ Shared foundations support your iteration and both applications. The target is c
 
 File/path/JSON/hash/math/time primitives still follow actual consumers. File-set publication and reader lifetime are not cosmetic scaffolding: simplify only with an equivalent accepted-output guarantee. Remove unused public utilities and forwarding layers as normal cleanup after the scope choices.
 
+### Core: additional decisions
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| CO-05 | **Unused non-Windows OS fallback branches** | Remove unused OS branches such as XDG/HOME state-root discovery. Keep the supported Windows failure behavior. This is a small cleanup, not a platform rewrite or major saving. | No | [product scope](../Goals.md#product-scope): the selected engine is Windows-only; this is a small support-surface cleanup. | - |
+| CO-06 | **Core-owned engine/project/cooked-layout discovery** | Consider host/product-owned roots passed into actual consumers, retaining one shared layout contract. Remove duplicate discovery/authority, not merely relocate 969 lines of path implementation. This requires a concrete smaller design first. | No* | [code ownership/style](../References.md#code-style): product policy should have one appropriate owner; prove a smaller design before moving it. | - |
+
+Do not count Core's entire Files/Process/Paths areas as removable scaffolding. Retained consumers need UTF-8/native argument conversion, bounded reads, atomic publication, child cancellation/settlement, relocatable read-only content and writable user state. LA-26 governs the readiness handoff in [ChildProcessWindowsReadiness](../../Engine/Core/Private/Process/Windows/ChildProcessWindowsReadiness.cpp); removing post-crash observation does not retire it. [File-set publication](../../Engine/Core/Public/Files/FileSetPublication.h) already explicitly excludes journal replay, so a hypothetical recovery framework is not available deletion credit.
+
 ## Platform
 
 Owner: [Engine/Platform](../../Engine/Platform). Observed scope: 25 source/build files, 1,783 physical lines.
@@ -234,6 +372,16 @@ Reviewer-facing window/input behavior must work without setup; you own its imple
 | PL-03 | Layered/deferred input routing for Editor UI and viewport ownership. A No replaces that routing with a simpler explicit design. | Yes | Yes |
 
 Keyboard/mouse camera control, focus-loss cancellation, pointer release and correct DPI/resize behavior remain requirements of the selected modes. No controller, VR or Linux work is being added by this checklist.
+
+### Platform: narrower review
+
+This is a 1,783-line adapter, not a general multi-platform engine layer. ED-17 owns the custom title-bar/hit-test choice across Editor and Platform; do not ask for a contradictory second answer here.
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| PL-04 | **Immediate and deferred delivery in fixed input layers** | No needs a proven simpler delivery contract for UI, camera and system observers. Preserve releases on focus/routing changes and the layered/deferred behavior accepted under PL-03. The current API is already fixed-purpose, not a plugin input stack. | Yes | [reviewer usability](../Goals.md#review-and-transfer): retained UI/camera interaction needs coherent routing and cancellation. | - |
+
+Source: [InputSystem contract](../../Engine/Platform/Public/Input/InputSystem.h). No controller/VR/plugin input subsystem was found here to retire. Do not invent one as a scope-cut candidate.
 
 ## SourceImporters
 
@@ -253,6 +401,23 @@ All five importer capabilities are retained for your preparation workflow: glTF/
 
 Animation/morph/variant import follows GF-01/GF-02/GF-03. Tangent generation and coordinate/unit/material interpretation remain as required by retained content. Do not assume FBX can disappear while keeping every current scene; ModernSponzaKnight explicitly references an FBX asset. FBX is now retained for Knight; The local asset audit also identified FBX source for both Bistro scenes. No glTF-only cut can remove those retained source routes.
 
+### SourceImporters: additional decisions
+
+The glTF geometry area is 1,562 lines, animation 705, and Assimp/FBX adapters together 1,931. Necessary tangent frames, skeleton transforms and source interpretation remain even when their source files are individually small.
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| IM-06 | **FBX embedded-texture extraction/cache/TGA encoding** | Require external texture files for retained FBX assets. Remove extraction/cache/encoding only after an actual retained FBX import confirms embedded payloads are unnecessary. Existing DDS filename references alone do not establish this. | No* | [product scope](../Goals.md#product-scope): support the actual retained FBX inputs rather than all possible embedded payload forms. | - |
+| IM-07 | **Missing-tangent generation and tangent-frame remapping** | No requires consistently preprocessed source meshes and visual checks. Keep the MikkTSpace-backed path needed for correct normal mapping; it is not just optional importer polish. | Yes | [product scope](../Goals.md#product-scope): correct normal mapping is part of content-to-pixel evidence, not cosmetic import tooling. | - |
+| IM-08 | **Step/cubic source-animation curve support** | Require source clips already baked to the supported simple form. First inspect retained glTF samplers and FBX conversion; preserve Knight/Cesium timing and rotation quality. This narrows accepted inputs, with modest direct code savings. | No* | [product scope](../Goals.md#product-scope): basic clip playback can use a bounded source subset only after content equivalence is shown. | - |
+| IM-09 | **Import/cook every source animation clip** | Keep only named required clips for basic demonstrations. This can reduce data/preparation and your supported examples; ordinary iteration over clips may remain and does not earn a large source-deletion estimate. | No* | [product scope](../Goals.md#product-scope): retain deliberate movement demonstrations rather than an arbitrary clip-support obligation. | - |
+
+The current glTF camera importer accepts its checked perspective-camera subset; keeping source-authored cameras is not a promise to add every glTF projection or infinite-far-plane form. Unsupported forms need an explicit error rather than silent reinterpretation.
+
+Sources: [FBX texture extraction](../../Tools/Import/SourceImporters/Private/Fbx/FbxEmbeddedTextureImporter.cpp), [tangent generation](../../Tools/Import/SourceImporters/Private/Gltf/Geometry/GltfMeshTangentGenerator.cpp), [animation baking](../../Tools/Cooking/SceneCooker/Private/Animations/AnimationPreviewBaker.cpp). IM-08/IM-09 do not remove basic animation, skinning or imported cameras/lights.
+
+IM-03 remains Yes. Its own PLY adapter is only 37 lines; Assimp is still required for retained FBX. The non-PLY Stanford condition means those scenes cannot justify PLY, but this audit does not silently reverse your importer answer. Removing unsupported scene entries also does not imply every material feature used by retained shader assets can go.
+
 ## AssetCooker
 
 Owner: [Tools/Cooking/AssetCooker](../../Tools/Cooking/AssetCooker). Observed scope: 30 source/build files, 1,550 physical lines.
@@ -267,6 +432,19 @@ Maintainer iteration and release preparation. A missing cooker/toolchain does no
 
 Retain one explicit selected-content plan, useful diagnostics and reliable publication for your iteration. LA-08 keeps supported Launcher options without restoring the extra AssetCooker control surface removed under AC-03. This executable composes SceneCooker, MeshCooker, MaterialCooker and texture requests; the supporting cookers below are mostly libraries, not independent user-facing applications.
 
+### AssetCooker: additional decisions
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| AC-04 | **General multi-project/ALL/positional cook CLI** | Support Showcase and a small explicit argument grammar. Retain profile/root options needed by actual callers; remove duplicate multi-project policy under TS-02. | No | [product scope](../Goals.md#product-scope): Showcase is the only product; remove unused CLI generality. | - |
+| AC-05 | **AssetCooker-owned shader-cook orchestration** | Make AssetCooker own scene/mesh/material/texture preparation and let the retained Launcher owner sequence ShaderCompiler. Preserve one Cook All action and noninteractive operation. Verify no retained caller loses its complete cook. | No* | [ownership](../Goals.md#north-star): one cook sequencer can replace duplicate orchestration while retaining Cook All. | - |
+| AC-06 | **Supervised TextureCooker child-process stage** | No implies in-process composition while TX-04's standalone tool still exists. Keep the existing shared request format and process boundary unless a smaller measured design justifies changing it. | Yes | [ownership](../Goals.md#north-star): a real process boundary and one request contract can be clearer than a second in-process integration. | - |
+| AC-07 | **Extension-probing scene-source resolver** | Use one explicit catalog source path per retained scene asset. Preserve stable scene identity, relocatable paths and rejection of ambiguous/escaping input; update all level/cook/acquisition consumers together. | No* | [ownership](../Goals.md#north-star): explicit curated source paths reduce hidden selection policy and ambiguity. | - |
+
+AC-07 targets `ProjectCookPlanner::ResolveSceneSource`: it currently accepts an exact source path or probes four extensions. This is distinct from stable cooked scene identity.
+
+Sources: [CLI grammar](../../Tools/Cooking/AssetCooker/Private/Cli/AssetCookerCli.cpp), [shader stage](../../Tools/Cooking/AssetCooker/Private/Cooking/CookShaders.cpp), [texture stage](../../Tools/Cooking/AssetCooker/Private/Cooking/CookTextures.cpp). AC-05 is orchestration cleanup with a small direct footprint, not permission to retire ShaderCompiler or retained Launcher cooking.
+
 ## SceneCooker
 
 Owner: [Tools/Cooking/SceneCooker](../../Tools/Cooking/SceneCooker). Observed scope: 30 source/build files, 1,430 physical lines.
@@ -279,6 +457,14 @@ Maintainer pipeline library whose output supplies runtime cameras, lights, insta
 | SC-02 | SceneCooker as a distinct cohesive library boundary within the content pipeline. A No merges its retained responsibility into the consuming cooker. | Yes | Yes |
 
 Keep skeleton/animation builders under GF-01; remove morph payloads under GF-02. Complete scene generations, content identity and acceptance stay protected even if scene content becomes much simpler.
+
+### SceneCooker: additional decision
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| SC-03 | **Custom cook-time animation curve resampler** | Keep only interpolation genuinely needed after IM-08 and the chosen Ozz preparation route under GF-13. A replacement must preserve rotations, bind transforms, source timing and bounded data; do not discard it merely because its name contains Preview. | No* | [integration precedents](../References.md#integration-precedents): reuse a proven narrow preparation path where possible, preserving animation semantics. | - |
+
+The remaining scene cook is already constrained by retained cameras/lights, instances, variants and skeletal animation. GF-13 is the single decision about moving offline Ozz construction here; SC-03 concerns the curve-conversion implementation, not a second vote on runtime construction.
 
 ## MeshCooker
 
@@ -294,7 +480,7 @@ Static vertex/index/layout validity remains essential. Keep skeletal/skinning pa
 
 ## MaterialCooker
 
-Owner: [Tools/Cooking/MaterialCooker](../../Tools/Cooking/MaterialCooker). Observed scope: 8 source/build files, 435 physical lines.
+Owner: [Tools/Cooking/MaterialCooker](../../Tools/Cooking/MaterialCooker). Observed scope: 8 source/build files, 434 physical lines.
 
 Maintainer pipeline library that preserves material meaning through to the demonstrated pixel. Reviewer controls operate on admitted runtime data rather than recooking source materials.
 
@@ -306,7 +492,7 @@ Variant support follows GF-03 and subsurface support follows RE-10. Do not vote 
 
 ## TextureCooker
 
-Owner: [Tools/Cooking/TextureCooker](../../Tools/Cooking/TextureCooker). Observed scope: 31 source/build files, 2,192 physical lines.
+Owner: [Tools/Cooking/TextureCooker](../../Tools/Cooking/TextureCooker). Observed scope: 30 source/build files, 2,019 physical lines.
 
 Maintainer pipeline and compression tooling. Reviewers need the resulting GPU textures; they do not need decoders, encoders or conversion commands installed to inspect a map.
 
@@ -323,7 +509,18 @@ TX-03 is decided No. Remove KTX/KTX2 source input and the KTX dependency entirel
 
 The 25 November asset audit found no KTX/KTX2 files or image references in the retained asset set. All retained source entries were present; local glTF/GLB images used PNG/JPEG and the retained Bistro FBX metadata referenced DDS. The Knight FBX contained no Texture/Video objects. This asset inspection is separate from executed cook/build verification.
 
-The implementation retires the KTX loader, dispatch/declaration, special mip-policy branch, dependency recipe/catalog and build link, Launcher dependency presentation and KTX-only notices. Keep unsupported BasisU admission rejection and the raw-source package rejection guard: neither is a dependency on KTX. Validate remaining format cooking and failed-input preservation before qualifying the change. Previously produced archives/notices are historical artifacts and are not rewritten by source removal.
+The implementation retires the KTX loader, dispatch/declaration, special mip-policy branch, dependency recipe/catalog and build link, Launcher dependency presentation and KTX-only notices. Keep unsupported BasisU admission rejection and the raw-source package rejection guard: neither is a dependency on KTX. Source removal is implemented. Root CMake configure and DevelopmentEditor builds of TextureCooker, AssetCooker and SparkleLauncher passed on 25 November. PNG, JPEG, multi-mip DDS, HDR and a retained sky EXR cooked successfully; DDS retained its mip count. Both removed extensions were rejected while preserving an accepted output. Scoped formatting and diff checks passed. These are tool checks, not GUI/GPU or package qualification. Local receipts: `build/validation/ktx-removal-20261125/`. Previously produced archives/notices are historical artifacts and are not rewritten by source removal.
+
+### TextureCooker: additional decisions
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| TX-05 | **PSD/PIC/PNM-family texture source inputs** | Reject unused formats explicitly after checking retained external and embedded inputs. stb may remain for PNG/TGA, so this is a small support-surface cut, not full decoder-library removal. | No* | [product scope](../Goals.md#product-scope): admit only required inputs; remaining stb users prevent a whole-library removal claim. | - |
+| TX-06 | **BMP/GIF texture source inputs through WIC** | Retain only formats used by retained inputs. Multi-frame sources are already rejected, and WIC may remain for JPEG; no large dependency saving is promised. BMP screenshot output is a different path. | No* | [product scope](../Goals.md#product-scope): trim unused admission paths without confusing screenshot output or JPEG decoding. | - |
+| TX-07 | **Texture request-file inspection/report command** | Keep request-file cooking, validation, help and failures. Remove presentation in `InspectTextureCookRequestFileCommand` if you do not use it. | No | [product scope](../Goals.md#product-scope): optional reporting has less value than the required cooking/diagnostic contract. | - |
+| TX-08 | **BC6H and floating-point HDR cooked outputs** | No needs one chosen quality/memory policy for retained environments. Keep an explicit fallback where compression quality is inadequate; retaining EXR input alone does not decide the GPU representation. | Yes | [performance](../Goals.md#software-and-analysis): quality/memory tradeoffs can justify both outputs; input format is a different decision. | - |
+
+Sources: [format dispatch](../../Tools/Cooking/TextureCooker/Private/SourceLoading/TextureSource.cpp), [request inspection](../../Tools/Cooking/TextureCooker/Private/Cli/InspectTextureCookRequestFileCommand.cpp), [processing](../../Tools/Cooking/TextureCooker/Private/Processing/TextureProcessor.cpp). TX-05/TX-06 are lower priority than Launcher/world/Editor cuts. Do not remove normal-map, sRGB, mip or accepted-output guarantees to shrink the processor.
 
 ## ShaderCompiler
 
@@ -340,6 +537,23 @@ Maintainer-only compilation, publication and symbol preparation. Reviewers can e
 
 DXIL follows RH-01; SPIR-V follows RH-02. Slang and DXC/HLSL are both retained. Keep shader symbols, native source correlation and required debug exports, including GPU-crash/breadcrumb investigation support. Retain typed host/shader ABI checks, reflection consumed by runtime, publication and failed-recompile preservation. ShaderMake is already integrated. Remove only optional developer analysis/export modes under CP-03, not data required by compilation, reflection, debugging or external tools. CP-04 accepts retirement of redundant first-party preprocessing only after a proven replacement; it is not an established safe deletion or a reason to repeat an already failed trial unchanged.
 
+### ShaderCompiler: additional decisions
+
+Of 7,938 lines, cook publication is 1,524, planning 1,016, compile batching 991, and DXIL/SPIR-V/Slang reflection occupies substantial compiler code. These areas contain retained debugging and ABI work; the optional analysis folder alone is just 43 lines.
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| CP-05 | **Single registered-shader compilation selector** | No compiles a larger selection. Keep the small useful selector; it is distinct from removing optional analysis/export UI. | Yes | [product scope](../Goals.md#product-scope): focused shader iteration directly serves your retained development workflow. | - |
+| CP-06 | **Changed-source/include-closure incremental selection** | No falls back to broader compilation. Preserve correct invalidation and accepted-output publication; do not drop dependency tracking while claiming incremental correctness. | Yes | [product scope](../Goals.md#product-scope): fast iteration must still invalidate the actual dependent shaders correctly. | - |
+| CP-07 | **Bounded parallel compiler sessions** | No uses serial compilation and may slow your iteration. Keep the existing small limit and a serial setting for diagnosis. | Yes | [performance](../Goals.md#software-and-analysis): useful bounded iteration throughput with a serial diagnostic setting. | - |
+| CP-08 | **Two symbol-export CLI routes: debug-info and debug-artifacts** | Prefer one clear symbols operation with an explicit output contract. Keep exact code/symbol/source identity, fresh outputs and required SDK/debug associations; this is interface consolidation, not removal of debug exports. | No* | [debugging evidence](../References.md#nvidia-production-studies): preserve matched code/symbol/source exports while consolidating optional interface duplication. | - |
+| CP-09 | **ShaderCompiler catalog/inspection CLI commands** | Remove optional command presentation after checking your automation. Preserve shader-target enumeration and its supported mappings under RH-08. | No* | [product scope](../Goals.md#product-scope): optional reporting can go; target enums, contract checks and runtime reflection stay. | - |
+| CP-10 | **Host/shader ABI verification and runtime reflection data** | No risks accepting mismatched shader layouts. Keep the real consumed contract; remove duplicate representations only after tracing Renderer/RHI consumers. | Yes | [debugging evidence](../References.md#nvidia-production-studies): inspectable correct shader integration is stronger evidence than fewer validation lines. | - |
+
+Sources: [cook options](../../Tools/Shaders/ShaderCompiler/Private/Cli/ShaderCookOptions.cpp), [planning](../../Tools/Shaders/ShaderCompiler/Private/Cooking/Planning/ShaderCookPlanBuilder.cpp), [debug artifact writer](../../Tools/Shaders/ShaderCompiler/Private/Cooking/Publication/ShaderDebugArtifactWriter.cpp), [ABI verification](../../Tools/Shaders/ShaderCompiler/Private/Verification/ShaderParameterStructVerifier.cpp). CP-08 must follow the protected GPU-diagnostics boundary before touching manifests or identity data.
+
+The default cook already selects DXIL SM 6.6 and SPIR-V 1.6. Keeping the shader-target enum does not require cooking every target for every release, nor does a narrower default justify deleting the enum or Slang.
+
 ## ToolSupport
 
 Owner: [Tools/Support/ToolSupport](../../Tools/Support/ToolSupport). Observed scope: 20 source/build files, 1,428 physical lines.
@@ -352,6 +566,17 @@ Shared maintainer/tool contracts that prevent duplicate path/startup/error polic
 | TS-02 | General multi-project discovery/resolution beyond the single Showcase project. A No fixes the supported product to Showcase. | No | No |
 
 Retain genuine shared lifetime/format policy. Remove forwarding helpers and copies where actual consumers can use the owner directly. Project generality also reaches CMake, Launcher and cook planning, so TS-02 is one decision across those consumers.
+
+### ToolSupport: additional decisions
+
+The catalog implementation is 700 of this module's 1,428 lines. Much describes packs, parent dependencies, families, variants, source/download readiness and selected levels; review that model rather than deleting a small shared progress writer.
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| TS-03 | **General scene-family/variant presentation metadata** | Use explicit retained scene entries and the actual pack dependency relationships. Keep Knight/Candles base-content dependencies; flattening presentation must not lose required downloads. | No* | [product scope](../Goals.md#product-scope): a curated scene list needs real dependencies, not a general content-browser model. | - |
+| TS-04 | **Unsupported scene/add-on catalog policies** | Remove retired entries and branches with no remaining consumer. Preserve manual-download/source-availability explanations still needed for retained packs; do not delete a field just because a reviewer never downloads content. | No* | [product scope](../Goals.md#product-scope): remove retired workflow obligations while retaining required manual-source diagnostics. | - |
+
+Source: [catalog contract](../../Tools/Support/ToolSupport/Public/ProjectLevelCatalog.h). TS-02 already removes general multi-project discovery across Core paths, CMake project discovery, Launcher project resolution and cook planning. A hardcoded project label with the discovery framework still underneath is not completion.
 
 ## Showcase scenes and conversion scripts
 
@@ -390,7 +615,7 @@ A No removes the associated level/catalog/thumbnail/acquisition/conversion/packa
 
 ## CMake, packaging and repository automation
 
-Owners: [CMake](../../CMake), root/module build files and [.github/workflows](../../.github/workflows). Measured CMake-root scope: 50 source/script files and 3,208 physical lines, plus the root composition file.
+Owners: [CMake](../../CMake), root/module build files and [.github/workflows](../../.github/workflows). Measured CMake-root scope: 50 source/script files and 3,207 physical lines, plus the root composition file.
 
 Build efficiency serves your iteration; packaging serves reviewer Quick Start. A reviewer is not asked to configure CMake, open a solution, build/cook, sync dependencies or repair deployment.
 
@@ -433,6 +658,21 @@ Source remains available as portfolio evidence and your own reproducible develop
 
 Keep one artifact layout and authoritative dependency declarations. The three products share real build policy; copying it into separate scripts is not simplification.
 
+### Build, packaging and automation: additional decisions
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| BU-07 | **Developer cooker/compiler payloads in reviewer packages** | Ship runtime Launcher/Editor/Game and their actual dependencies. Keep developer tools in your source workspace; inspection does not need compilers or recooking. Source companions/required notices remain separate obligations. | No | [product scope](../Goals.md#product-scope): a runtime inspection bundle is not a development SDK. | - |
+| BU-08 | **Mandatory bespoke SBOM/provenance package artifacts** | Prefer one minimal file/dependency inventory with revision/input identity and required notices. Preserve exact shader/debug identity and runtime closure. This is a packaging-workflow choice, not blanket removal of manifests/hashes. | No* | [pipeline precedents](../References.md#pipeline-automation): retain a useful package consumer/inventory without adopting a larger release-process inventory by imitation. | - |
+| BU-09 | **Unused build-feature combination matrix** | Retire unused optional-subsystem combinations. Preserve composition switches needed by BU-03 and intentional capture/crash-debug modes, plus both retained APIs. Do not replace a matrix with duplicated build policy. | No* | [product scope](../Goals.md#product-scope): qualify real products and diagnostic modes, not speculative subsystem combinations. | - |
+| BU-10 | **Batch wrapper around PowerShell code-style tooling** | Use one documented PowerShell/Rider external-tool command, updating callers. Keep the formatter, project-specific style rules and your ability to refine them under BU-06. Only a small wrapper is at issue. | No* | [code ownership/style](../References.md#code-style): keep refinable style rules through one supported entry point; tiny direct savings. | - |
+| BU-11 | **Existing lightweight GitHub source checks** | No removes a 41-line automatic check, not a large CI farm. Keep it if useful; a broad compiler/GPU/reviewer-build matrix is not present in this workflow. | Yes | [pipeline precedents](../References.md#pipeline-automation): a concrete 41-line check is already small; it is not broad CI infrastructure. | - |
+| BU-12 | **Optional native sanitizer build support** | No removes a small debugging facility. Keep supported sanitizer use for ownership/lifetime investigation; it is not a reviewer runtime requirement or proof that sanitizer runs have passed. | Yes | [performance](../Goals.md#software-and-analysis): lifetime debugging can justify this small developer facility. | - |
+
+Sources: [release inventory](../../CMake/Packaging/ReleaseProducts.cmake), [package inputs](../../CMake/Packaging/Payload/PackageInputs.ps1), [workspace features](../../CMake/SparkleWorkspaceFeatures.cmake), [style wrapper](../../CMake/CodeStyle.bat), [sanitizer policy](../../CMake/Build/Sanitizers.cmake).
+
+BU-05 remains a single unanswered choice: a No retires `SyncProducts.ps1`, `Publication/ProductImport.ps1` and their product-import-only callers. It does not retire packaging, source/content sync, shared runtime inventories or file publication. Reviewer extraction still requires an actual three-product/offline run; source checks cannot establish it.
+
 ## Third-party integration maintenance
 
 Owner: [ThirdParty](../../ThirdParty), with runtime semantic adapters in their consuming modules.
@@ -444,7 +684,17 @@ You maintain the selected integrations and understand their Sparkle contracts. R
 | TP-01 | Use the already integrated libraries for logging, JSON, processes, tasks, windows/input, UI, allocation and shader compilation, while owning Sparkle's contracts and policy. A No implies selectively replacing those integrations. | Yes | - |
 | TP-02 | Keep maintained upstream patches/forks whose behavior is still required by retained workflows. A No needs an identified unpatched equivalent or retirement of the dependent capability. | Yes* | - |
 
-Keep ozz for retained basic skeletal animation and Assimp for the Knight FBX route. Other dependency retirement follows the last real consumer: KTX is retired under TX-03, while SDK payloads retire after their actual integrations disappear. NVAPI may have consumers beyond PTLAS; do not remove it from RH-03 alone. Bindings and patches count as first-party understanding/maintenance regardless of their folder.
+Keep ozz for retained basic skeletal animation and Assimp for the Knight FBX route. Other dependency retirement follows the last real consumer: KTX is retired under TX-03, while SDK payloads retire after their actual integrations disappear. TP-05 now explicitly reviews the native NVAPI provider; prove its complete last-consumer closure before retiring SDK acquisition or headers. Keep Aftermath, Streamline and native DRED separate. Bindings and patches count as first-party understanding/maintenance regardless of their folder.
+
+### Third-party maintenance: additional decisions
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| TP-03 | **Project-maintained enkiTS runtime patch surface** | Re-audit each extension against remaining Launcher, loading, frame and shutdown consumers. Retire only extensions whose last consumer disappears; retained completion, failure and native-argument lifetime contracts must have a proven replacement. Do not promise the whole fork can go. | No* | [ownership](../Goals.md#north-star): own every retained scheduler extension and retire only proven unused obligations. | - |
+| TP-04 | **Pinned Slang debug/source-correlation patches** | No needs a verified compiler with equivalent behavior. Keep required symbols/source correlation; removing analysis UI does not establish that these patches are redundant. | Yes* | [debugging evidence](../References.md#nvidia-production-studies): debug exports remain useful until a verified compiler removes the need. | - |
+| TP-05 | **Native NVAPI ray-tracing provider and SDK integration** | The inspected provider exposes PTLAS capabilities/building. Retire it and the SDK only after checking all remaining native, shader and build consumers. Standard DXR, Aftermath/DRED, Streamline/DLSS and generic NVIDIA tool launch remain separate. | No* | [product scope](../Goals.md#product-scope): the selected PTLAS cut should retire its exclusive dependencies, not other NVIDIA SDKs. | - |
+
+Sources: [enkiTS integration](../../ThirdParty/enkits/Dependency.cmake), [runtime patch](../../ThirdParty/enkits/Patches/enkiTS-sparkle-runtime.patch), [Slang source-location patch](../../ThirdParty/slang/Patches/SlangLoopSourceLocations.patch), [Slang debug-format patch](../../ThirdParty/slang/Patches/SlangDebugInformationFormat.patch). Maintained patches are your review burden even inside ThirdParty. A library's upstream source size is not your first-party line count; its supported features, binary/build cost and patch surface are different costs.
 
 ## Documentation and future scope
 
@@ -458,6 +708,64 @@ Write a short runtime walkthrough and code-architecture entry point for reviewer
 | DO-02 | Treat optional future rendering/SDK/neural features as cleanup-release prerequisites. Recommend keeping them outside the current reviewer delivery unless separately selected. | No | - |
 
 The already chosen direction remains: Sparkle is the main piece, every retained first-party responsibility must be understood, and separate experiment repositories come after cleanup. Preserve the useful professional/role references and current correctness limitations. Remove completed diaries, duplicate policy and obsolete feature instructions as their owners change.
+
+### Documentation: additional decision
+
+| ID | Keep this capability or mechanism? | Precise removal boundary / retained behavior | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| DO-03 | **Permanent detailed cleanup worksheet after delivery** | Once choices are implemented, keep a compact accepted-scope record and the actual architecture/data-flow entry point; retire completed action detail. Do not erase unresolved decisions or required ownership explanations. | No | [reviewer usability](../Goals.md#review-and-transfer): durable architecture guidance should replace completed planning detail. | - |
+
+## Larger cuts that would reopen earlier decisions
+
+These are alternatives for a second reduction pass if the normal refinements leave more scope than you want. They are not approved, and none changes an existing Yes until you explicitly choose it. Each asks whether to keep the named capability.
+
+| ID | Keep this earlier commitment? | What No would buy and cost | Recommendation | Portfolio reason | Your answer |
+| --- | --- | --- | --- | --- | --- |
+| RV-01 | **Launcher developer workflow GUI beyond Quick Start** | Keep those operations in CLI and retain a small graphical scene launcher. This attacks more of the 8,101-line GUI, but changes the GUI interpretation of LA-03 through LA-10 and your stated Launcher development workflow. It does not remove the operation owners wholesale. | Yes, given your stated workflow | [product scope](../Goals.md#product-scope): your explicitly retained GUI workflow currently justifies this scope; No must reopen that choice. | - |
+| RV-02 | **In-process Editor map switching** | One scene per process can simplify replacement/cancellation/state transitions. This changes ED-10/GF-04; startup still needs loading, useful errors and responsive presentation, so the whole level/asset module cannot disappear. | Yes, unless you choose this tradeoff | [product scope](../Goals.md#product-scope): useful inspection behavior, with a larger simplification available only if you accept relaunching. | - |
+| RV-03 | **Current typed ECS scene implementation** | A fixed scene representation may remove generic storage/mutation machinery, but requires redesigning loading, edits, identities, animation and extraction. This reopens GF-05 and is a rewrite with uncertain net savings, not an easy folder deletion. | Yes; narrow current ownership first | [ownership](../Goals.md#north-star): narrow existing responsibilities before undertaking a representation rewrite. | - |
+| RV-04 | **In-repository FBX source pipeline** | A verified externally prepared glTF/GLB route could retire FBX/shared Assimp adapters and perhaps Assimp itself after the separate PLY choice is resolved. This changes IM-02 and retained content preparation. Conversion must preserve animation, camera/light units, materials and redistribution/reproduction inputs before any source route is removed. | Yes, until an alternative is proven | [product scope](../Goals.md#product-scope): retained Bistro/Knight inputs justify it until an equivalent prepared route is proven. | - |
+| RV-05 | **PLY source import without a retained PLY scene** | Reopens IM-03: remove the PLY adapter/dispatch/build option if no retained input needs it. This is only 37 adapter lines; Assimp remains while FBX does, so do not sell this as a large dependency removal. | No, if no retained input | [product scope](../Goals.md#product-scope): reconsider unused input scope explicitly; this reverses IM-03 only with your answer. | - |
+
+The strongest first pass is the approved feature cuts plus LA-16 through LA-25, GF-08/GF-13 and the Editor/tool/package refinements. If that still exceeds your ownership budget, RV-01/RV-02 are the clearest capability reductions to discuss before RV-03's representation rewrite. There is no defensible fixed percentage reduction yet: conditional replacements are unimplemented, scopes overlap and the retained large scenes impose real obligations.
+
+For each accepted cut, list the actual producer, consumers, state lifetime, build membership and dependency before editing; then remove its last-use closure in one coherent change. For each retained large subsystem, produce a short path from entry point to final consumer that you can explain yourself. This planning pass does not implement new decisions.
+
+## Precise deletion names and protected neighbors
+
+Use the decision ID and the full capability name when discussing a cut. Broad words below are search terms, not deletion boundaries. A file containing both responsibilities must be narrowed before removal.
+
+| Name of the removable item | Explicitly retained neighbor |
+| --- | --- |
+| **Launcher GPU-crash incident observer, history/catalog and managed inspector workflow** | Native crash dump/debug-data persistence, DRED/Aftermath breadcrumbs/markers, Vulkan checkpoints, matched shader identity and bounded completion. |
+| **Independent Reference path-tracer renderer and its checkpoint/export pipeline** | The real-time path tracer; shared BSDF/material/sampling code with real-time consumers; external/analytic validation controls and ordinary screenshots. |
+| **Mesh/texture/shader inspection panels and their unused diagnostic producers** | Scene outliner/inspection, signal/debug views, shader compile/reload, ABI reflection, native captures and shader symbols. |
+| **Morph target/weight deformation pipeline** | Skeletons, skeletal clips, poses, joint palettes, skinning, previous-frame motion and required BLAS/TLAS updates. |
+| **Visual Studio IDE actions/settings** | The compiler, Windows SDK, required discovery, MSBuild and generated solution/project files when consumed by the proven Rider route. |
+| **HDR display/output mode support** | HDR/EXR source textures, floating-point lighting data, exposure, SDR tone mapping and chosen HDR texture encoding. |
+| **Optional shader catalog/analysis reports** | Compiler errors, host/shader ABI checks, consumed reflection and debugger/source-correlation artifacts. |
+| **Cooked-product import into another source workspace** | Source dependency sync, selected content acquisition, cooking, runtime packaging and ordinary extraction. |
+| **Generated native/third-party compilation outputs in a chosen clean scope** | Downloaded sources, original assets and unrelated captures/user state; source-cache retirement is a separate last-consumer decision. |
+| **Cook-time animation curve resampling or runtime offline Ozz construction, if replaced** | Correct clip interpolation/bind data and basic skeletal playback. Neither name permits deleting all animation preview/evaluation code. |
+| **PTLAS-specific NVAPI provider, if its last consumer disappears** | Standard DXR BLAS/TLAS/refit, Aftermath/DRED, Streamline/DLSS and optional Nsight/RenderDoc/PIX launch. |
+
+## Audit coverage and next implementation boundary
+
+The footprint inventory covers every tracked, present code/script owner under the stated counting rule. The capability review follows the largest support areas and their public contracts/callers; it is not a claim that all 159,223 lines received a correctness review or that runtime/package qualification was performed.
+
+| Audited area | Decision coverage / remaining implementation question |
+| --- | --- |
+| Launcher GUI, native build/toolchains, operation service, startup/CLI, scene run/sync, cook and maintenance | LA-01 through LA-28 cover the user-facing obligations and the largest independent mechanisms. Trace unused observers, display models and operation fields to their final consumers after answers. No Launcher live-copy implementation was found in the inspected current source; LA-13 remains excluded scope, not claimed deletion savings. |
+| Editor workspace/widgets/icons, scene commands, viewport/settings, console, inspection panels | ED-01 through ED-24 bound live edits, save behavior and optional presentation. Retire panel-only Renderer/host producers too; do not keep expensive producer work after removing its window. |
+| World/ECS, loading/staging, asset readers, animation, resource stores, render extraction | GF-01 through GF-16 cover representation, execution, publication/copying and preparation. Asset allocation bounds, failed-load preservation and construction rollback remain correctness work. |
+| Application capture, restart/settings and diagnostics | AP-01 through AP-11 plus the protected diagnostics table distinguish normal runtime, development and native fault collection. |
+| Core/Platform and shared tool catalogs/paths | CO/PL/TS decisions distinguish reusable mechanisms from product policy. No independent gameplay, physics, audio, networking, scripting, controller/VR or public-plugin module appears among the current module owners; do not manufacture savings from absent systems. |
+| Importers, cookers and source-content routes | IM/AC/SC/MC/MA/TX and PR decisions cover the admitted data path. MeshCooker and MaterialCooker remain intentionally small retained boundaries; no extra format/schema abstraction is justified just to simplify their names. |
+| ShaderCompiler, source mounts/reflection, debug publication and maintained patches | CP/TP decisions preserve the measured-frame/debugging path. CP-04 remains conditional on a proven compiler-owned replacement, including source identity. |
+| Build graph, deployment, package metadata/import, style and CI | BU/TP/DO decisions cover the actual repository automation. A 41-line CI check and small sanitizer/style helpers are not a hidden large automation suite. |
+| Showcase scenes, conversion scripts, shader assets, Renderer and RHI | Existing PR/SH/RE/RH answers remain authoritative. Source formats, generated data, SDK/build consumers and runtime contracts must be pruned with their retired features; shader/RHI algorithms are not indirectly removed by a tool UI decision. |
+
+For an accepted No, the implementation starts with a bounded list of exact files/functions/fields, their remaining consumers and the retained behavior that must still work. For a conditional No, first show the smaller replacement and acceptance limits. Validate affected success/failure paths and remove superseded code in the same change. Do not keep compatibility branches or add a new generic framework to manage this cleanup.
 
 ## GPU crash diagnostics preservation and removal
 
@@ -553,8 +861,10 @@ Single-maintainer scope does not relax correctness, reproducibility, input/publi
 
 ## Review basis
 
-Reviewed source: `6dd51591b0890e71da5b4ae795ac730a0f49b695`, 25 November 2026, initially clean before these documentation changes. The selected-source inventory contained **2,313 files and 165,884 physical lines**, including comments and blanks. It covers C/C++, shaders and build/scripts under Engine, Tools, Projects and CMake plus the root CMake file. It excludes upstream vendor source, generated outputs, documentation and binary content. No removal count or runtime result is claimed.
+The original checklist started from source revision `6dd51591b0890e71da5b4ae795ac730a0f49b695`. This expanded footprint/capability pass uses the post-KTX source at `20587c481dc03def914d600e20bc5ac4bd5fd081`, 25 November 2026, with documentation edits in progress. The earlier inventory used a different selection and must not be treated as a measured before/after reduction. The current inventory is 2,201 code/script files and 159,223 physical lines, plus separately counted shader source and maintained patch files as explained above. File hashes and local receipts are under `build/validation/portfolio-footprint-20261125/`.
 
-The checklist follows current module composition, selected operation/host/editor paths, source-format dispatch, the world edit contract, rendering settings, shader backend declarations and the Showcase catalog. Per-module numbers are scale indicators, not judgments of code quality. Future implementation still needs complete consumer/lifetime checks for each chosen cut.
+Reviewed paths include Launcher workflow/toolchain/state/GUI owners, scene loading and world publication, Ozz load-time builders, Editor saving/commands, import/texture admission, shader compilation/debugging, dependency recipes and package composition. The source evidence supports the named mechanisms and their containing footprint, not a complete correctness audit or a guaranteed deletion percentage. References' archived role/persona studies inform relevance; they do not establish current vacancies, hiring outcomes or a requirement to reproduce another project's feature count.
 
-After the remaining answers, derive the ordered removal and reauthoring plan from these decisions and both workflows. Preserve recorded Yes/No choices and the detailed crash-diagnostic boundaries. No source/content removal or runtime qualification is claimed by this document update.
+All 129 existing answer cells were compared with the starting document and preserved; all 73 new answer cells remain blank. Recommendation names and reasons are tied to Goals/References, with explicit conditional checks and protected neighbors. This pass changes documentation only after the separately implemented KTX retirement. Its earlier tool checks used the existing root DevelopmentEditor configuration; they do not qualify the planned DLL/Rider migration, full engine behavior, images, GPU faults or an extracted reviewer package.
+
+At 10?15 hours per week, start with complete removal chains and small bounded refinements before representation/format rewrites. After answers, derive implementation order from the actual retained dependencies and the two user workflows. Keep reviewer delivery and your personal understanding of the surviving source as the completion criteria.
