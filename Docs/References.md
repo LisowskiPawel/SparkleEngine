@@ -64,7 +64,7 @@ Further reading outside the current plan: [MegaLights](https://advances.realtime
 ## Scene sources
 
 - [ORCA Bistro](https://developer.nvidia.com/orca/amazon-lumberyard-bistro): the exterior and Interior Wine source family; authored light and material information.
-- [McGuire Computer Graphics Archive](https://casual-effects.com/g3d/data10/index.html): San Miguel's corrected high/low pair and its source notes.
+- [McGuire Computer Graphics Archive](https://casual-effects.com/g3d/data10/index.html): CornellBox and LPSHead publisher inputs and source notes.
 - [Intel GPU Research Samples](https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html): Modern Sponza and separately scoped add-ons.
 
 Record the source, notices and content identity. Check redistribution rights separately from local acquisition.
