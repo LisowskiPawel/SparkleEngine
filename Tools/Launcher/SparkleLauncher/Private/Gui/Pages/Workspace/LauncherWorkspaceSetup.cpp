@@ -27,7 +27,6 @@
 #include <QtWidgets/QSizePolicy>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
-#include <QtWidgets/QTreeWidget>
 
 #include <filesystem>
 #include <system_error>
@@ -88,7 +87,7 @@ namespace SparkleLauncher
 
 	void LauncherWorkspaceSetup::ResetWidgets()
 	{
-		m_sourceDependencyViews.clear();
+		m_sourceDependencyRows.clear();
 	}
 
 	bool LauncherWorkspaceSetup::CompleteOperation(const QString& runId)

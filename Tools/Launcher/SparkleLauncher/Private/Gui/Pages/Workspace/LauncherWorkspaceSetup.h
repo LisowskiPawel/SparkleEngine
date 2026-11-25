@@ -10,10 +10,9 @@
 #include <filesystem>
 #include <functional>
 
+class QLabel;
 class QPushButton;
 class QVBoxLayout;
-class QTreeWidget;
-class QTreeWidgetItem;
 
 namespace SparkleLauncher
 {
@@ -48,8 +47,16 @@ namespace SparkleLauncher
 		void CompilerSelected(WorkspaceCompiler compiler);
 
 	private:
+		struct SourceDependencyRow final
+		{
+			QString Id;
+			QPointer<QLabel> StatusLabel;
+			QPointer<QLabel> DetailLabel;
+			QPointer<QPushButton> ActionButton;
+		};
+
 		void AddSyncDependencies(QVBoxLayout& layout, bool bOptional);
-		void ActivateSourceDependency(QTreeWidgetItem* item);
+		void ActivateSourceDependency(const QString& id);
 		void RefreshSourceDependencyRows();
 		void SyncSourceDependency(const SourceDependencyEntry& dependency);
 		void CleanSourceDependency(const SourceDependencyEntry& dependency);
@@ -76,7 +83,7 @@ namespace SparkleLauncher
 		std::function<QString(LauncherOperationRequest, const QString&)> m_startOperation;
 		QWidget& m_dialogParent;
 		QHash<QString, QString> m_sourceDependencyRunIds;
-		QList<QPointer<QTreeWidget>> m_sourceDependencyViews;
+		QList<SourceDependencyRow> m_sourceDependencyRows;
 		QSet<QString> m_cleaningSourceDependencyRunIds;
 	};
 }

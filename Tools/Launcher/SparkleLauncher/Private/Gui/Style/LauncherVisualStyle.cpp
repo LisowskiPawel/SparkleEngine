@@ -130,9 +130,6 @@ namespace SparkleLauncher
 		addRule("#OptionGroupTitle", "color: " + textPrimary + "; font-size: 13.5pt; font-weight: 700; padding: 0 0 3px 0;");
 		addRule("#FieldLabel", "color: " + textSecondary + "; font-size: 9pt; font-weight: 650; padding-top: 0;");
 		addRule("#OptionHelpText", "color: " + textSecondary + "; font-size: 9pt; line-height: 132%; padding: 0 0 9px 0;");
-		addRule("#CleanScopeView, #SourceDependencyView", "background: #171917; border: 1px solid " + divider + "; border-radius: 4px; alternate-background-color: #1d211e;");
-		addRule("QTreeView::item", "padding: 7px 4px;");
-		addRule("QHeaderView::section", "background: #1b1e1c; color: " + textSecondary + "; border: none; padding: 7px 4px;");
 		addRule("#WorkflowSelectionPanel", "background: #171917; border: 1px solid " + divider + "; border-radius: 4px;");
 		addRule("#WorkflowScopeRow", "background: transparent; border: none; border-bottom: 1px solid " + divider + ";");
 		addRule("#WorkflowScopeRow:hover", "background: #1d211e;");

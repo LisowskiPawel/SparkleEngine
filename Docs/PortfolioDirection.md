@@ -6,15 +6,15 @@ Revised 25 November 2026 for Pawel Lisowski. Available time: **10–15 hours a w
 
 **SparkleEngine will be the main portfolio piece. Reduce its scope until you can personally design, understand and stand behind everything that remains.** Small GitHub experiment repositories come afterward, once this cleanup is complete.
 
-This changes the earlier recommendation to make a separate application the primary project. Sparkle itself is now the deliverable. The open questions are how much engine it should contain and how to rebuild your ownership of it.
+**Selected product profile: C, a reduced engine suite with distinct Launcher, Editor and Game.** Sparkle itself is the deliverable. The next step is your Yes/No choices in the [module scope checklist](Implementation/PortfolioScopeDecisions.md); detailed feature cuts remain undecided.
 
 Your quality requirement applies to all retained first-party work: rendering, Launcher, scene loading, cooking, scripts, CMake, integration bindings and delivery. A support subsystem earns its place by helping the finished portfolio engine and being something you want to own.
 
 ## Recommendation
 
-Choose **Option B, a compact rendering workbench**, and **rework it one responsibility at a time after cutting scope**. Keep Sparkle's identity, selected rendering capabilities and useful experience. Personally decide the surviving architecture, retain existing implementations only after understanding and accepting them, and rewrite the parts whose design you cannot defend.
+Use **Option C, the selected reduced engine suite**, and **rework it one responsibility at a time after cutting scope**. Keep the three application identities and personally decide their retained capabilities. Retain existing implementations only after understanding and accepting them, and rewrite the parts whose design you cannot defend.
 
-A small Launcher can belong in that result. Give it a narrow purpose and the same engineering standard as the renderer. Remove broader product responsibilities when their maintenance and learning cost exceed their contribution to your selected engine.
+Launcher, Editor and Game all receive the same engineering standard. Their feature lists can shrink substantially. Remove product responsibilities when their maintenance and learning cost exceed their contribution to the selected suite.
 
 For this plan, "handcrafted" means that the Sparkle-owned design and code are deliberately yours: you can explain them, justify the choices, modify them independently and demonstrate their behavior. Existing generated code receives no exemption. Third-party libraries and vendor algorithms remain explicitly credited dependencies; you must understand their contracts and the behavior relevant to Sparkle, while distinguishing their implementation from yours.
 
@@ -22,13 +22,13 @@ Translate "engineering masterpiece" into a finishable standard: clear responsibi
 
 ## Options for the finished Sparkle
 
-All three options keep Sparkle as an engine portfolio piece. They differ in how much product surrounds the rendering engine. These are proposed scopes; no feature removal or backend change has been selected or implemented.
+All three options keep Sparkle as an engine portfolio piece. **Option C is selected.** The alternatives remain here for context; individual feature removals and backend scope are still open in the checklist. No code removal has been implemented.
 
 | Option | Finished experience | Main scope reduction | Ownership burden | Assessment |
 | --- | --- | --- | --- | --- |
 | **A Lean rendering engine** | A renderer library and one Showcase application with camera, a few rendering controls and reproducible captures | Separate Launcher, broad Editor, general gameplay/world machinery and broad content workflows | Smallest of these options; native graphics and shaders still require substantial work | Strong if finishing with deep rendering ownership is the priority |
-| **B Compact rendering workbench** | Sparkle renderer, one Showcase application with inspection controls, and a small Launcher for the selected demonstration workflow | General authoring, separate broad Editor/Game feature sets, workspace management UI and unused content paths | Adds a bounded, visible example of product engineering to the renderer | **Recommended balance for your stated goal** |
-| **C Reduced engine suite** | Distinct Launcher, Editor and Game, with a selected set of scene edits and content operations | Unused features within each product, while preserving three application lifecycles | Largest: editing, transactions, persistence, asynchronous operations and delivery all need ownership | Choose if these workflows are personally important enough to justify the extra months |
+| **B Compact rendering workbench** | Sparkle renderer, one Showcase application with inspection controls, and a small Launcher for the selected demonstration workflow | General authoring, separate broad Editor/Game feature sets, workspace management UI and unused content paths | Adds a bounded, visible example of product engineering to the renderer | Alternative, not selected |
+| **C Reduced engine suite** | Distinct Launcher, Editor and Game, with a selected set of scene edits and content operations | Unused features within each product, while preserving three application lifecycles | Largest: editing, transactions, persistence, asynchronous operations and delivery all need ownership | **Selected by you** |
 
 A rendering engine does not need general gameplay features to be a coherent engine. What makes the result convincing is how well the retained parts work together and how completely you understand them.
 
@@ -40,9 +40,9 @@ Your current [goals](Goals.md#product-scope) retain both D3D12 and Vulkan. You c
 
 My recommendation is to establish ownership and correctness on D3D12 first, then assess the Vulkan cost before freezing the final scope. If Vulkan remains in the finished source, it must meet the same ownership standard. Calling an unfamiliar backend "deferred" would leave the central problem unresolved. A decision to ship only one API would require an explicit update to the goals and removal of the retired path.
 
-## What the recommended scope would contain
+## What the selected suite would contain
 
-The proposed workbench has a simple purpose: let another engineer run and inspect a small number of well-understood rendering configurations, while giving you a system you can explain from launch through the final pixel and shutdown.
+The suite lets another engineer prepare and run selected content through Launcher, inspect and make supported changes through Editor, and experience the rendered scene through Game. Each product uses a system you can explain from launch through the final pixel and shutdown.
 
 | Area | Proposed treatment | Reason to retain it |
 | --- | --- | --- |
@@ -50,8 +50,8 @@ The proposed workbench has a simple purpose: let another engineer run and inspec
 | Rendering and shaders | Keep one coherent production frame, a bounded independent Reference path and selected existing integration work | Correct pixels, algorithm reasoning and realistic integration |
 | Content | Keep one selected scene/material path, a small controlled scene and one representative scene | Understandable asset-to-pixel flow with useful regression workloads |
 | Scene/world code | Keep the representation and motion the chosen demos need; retire general gameplay scheduling or animation features without a retained demonstration | Avoid maintaining a general game framework by default |
-| Showcase controls | Keep camera, relevant settings, signal inspection and capture/profiling access | Makes the rendering understandable and debuggable |
-| Launcher | Keep a small scene/configuration/run workflow with readiness, progress and failure reporting where needed | A polished entry point with an explainable execution lifecycle |
+| Editor and Game | Keep distinct hosts; choose the Editor's scene edits, diagnostics and developer controls, with a focused cooked-only Game | Preserves the selected product split and keeps runtime responsibilities clear |
+| Launcher | Choose selected scene preparation, build/cook/run workflows, readiness and result presentation | A polished entry point with an explainable execution lifecycle |
 | Importing and cooking | Keep the required source-to-runtime path and reproducible commands; narrow supported formats and operations | A portfolio engine still needs a reliable content workflow |
 | Core, build and delivery | Keep what the retained applications use, including necessary validation, diagnostics and dependency handling | The result must build, run and fail understandably |
 
@@ -61,7 +61,7 @@ Do not add the whole future rendering roadmap during cleanup. Choose among exist
 
 ### How to treat the Launcher
 
-For Option B, the initial proposed Launcher responsibility is: select an approved scene/configuration, report the prerequisites for running it, start the Showcase application, and report its outcome. Keep build and cook available through documented commands. Add Launcher buttons for those operations only if you explicitly choose to own their additional workflow.
+Option C retains Launcher as a distinct product. The [Launcher decisions](Implementation/PortfolioScopeDecisions.md#launcher) separate build, cook, run, source preparation, toolchain selection, maintenance and diagnostic features so you can choose their scope individually. The earlier proposal to reduce Launcher to a run-only entry point has not been adopted.
 
 The current Launcher covers considerably more. Its [build operations](../Tools/Launcher/SparkleLauncher/Public/SparkleLauncher/BuildWorkspaceOperations.h), [cook operations](../Tools/Launcher/SparkleLauncher/Public/SparkleLauncher/CookOperations.h) and [operation dispatch](../Tools/Launcher/SparkleLauncher/Private/Operations/LauncherOperationExecution.cpp) include workspace and tool preparation. Removing GUI actions alone would leave their underlying code and dependency obligations in place; audit remaining CLI and Editor callers before retiring anything.
 
@@ -105,9 +105,9 @@ For the parts that most directly demonstrate authorship, start from your own ske
 
 ### Stage zero Choose the engine you will finish
 
-Select A, B or C; decide the actual workflows, scenes, rendering configurations and intended backend scope. Preserve the current committed and uncommitted state and any content needed to reproduce the reference. Establish one fixed-camera baseline where possible, while retaining known defects as defects.
+Option C is selected. Answer the module checklist to choose the actual workflows, scenes, rendering configurations and intended backend scope. Preserve the current committed and uncommitted state and any content needed to reproduce the reference. Establish one fixed-camera baseline where possible, while retaining known defects as defects.
 
-Map the whole retained footprint, beyond the files you already know. Every responsibility needs one outcome: remove it, retain it after you understand and accept it, or redesign and reimplement it. Include callers, build rules, scripts and integration bindings. Keep one concise scope record in this document rather than creating another overlapping inventory.
+Map the whole retained footprint, beyond the files you already know. Every responsibility needs one outcome: remove it, retain it after you understand and accept it, or redesign and reimplement it. Include callers, build rules, scripts and integration bindings. Record the choices in the linked module checklist and derive the implementation sequence from those answers, without duplicating the decision record.
 
 **Exit:** a concrete product boundary and a reason for every retained responsibility. Then reconcile [Goals](Goals.md) and [Roadmap](Roadmap.md) with that choice before implementation. The direction is agreed; the precise feature cuts remain open.
 
@@ -119,7 +119,7 @@ Retire unused applications, features, formats and workflows through their full d
 
 ### Stage two Own the application and support workflows
 
-Make the selected launch-to-shutdown path yours. If Launcher stays, use one small real action as the first complete reauthoring exercise, including its failure and close paths. Continue through application startup, settings, content preparation and scene loading. Keep source conversion and runtime loading distinct where their lifetimes differ.
+Make the selected launch-to-shutdown path yours. Use one small retained Launcher action as the first complete reauthoring exercise, including its failure and close paths. Continue through application startup, settings, content preparation and scene loading. Keep source conversion and runtime loading distinct where their lifetimes differ.
 
 **Exit:** you can trace and modify all retained support workflows, and explain how they connect to rendering. A clean UI alone does not complete this stage.
 
@@ -157,15 +157,15 @@ For scale only, these are hypothetical remaining budgets, not estimates for Spar
 | 600 hours | 40–60 weeks |
 | 900 hours | 60–90 weeks |
 
-If the forecast is too long, remove more responsibilities or choose Option A. Preserve the ownership standard. A larger engine with undocumented or unexplained corners would leave your original concern unresolved.
+If the forecast is too long, remove more responsibilities within Launcher, Editor and Game. Preserve the ownership standard. A larger engine with undocumented or unexplained corners would leave your original concern unresolved.
 
 Cleanup is complete when the chosen product is working and reproducible, every retained first-party responsibility meets the ownership standard, replaced machinery is removed, and you can explain the whole design. Remaining ambitions belong to later work. Known limitations can be explicit, but an unverified core behavior promised by the chosen product remains unfinished.
 
 ## The decision in front of you
 
-My recommendation is **Option B with gradual reauthoring**: Sparkle as a compact rendering workbench, your own graphics architecture, a small deliberately designed Launcher, limited content and controls, and full understanding of everything retained. Choose A if that support scope is not worth its cost to you. Choose C if the distinct Editor/Game workflows are important enough to own in comparable depth.
+**Option C is selected, with gradual reauthoring proposed as the migration method.** The next decision is which features each retained product contains. Use the [module scope checklist](Implementation/PortfolioScopeDecisions.md) first; the ordered removal and reauthoring plan follows your answers.
 
-The immediate decision is which Sparkle you want to finish. The architecture and implementation should then be shaped through your own design work, with the present repository serving as experience and evidence rather than an obligation to preserve every feature.
+The architecture and implementation should be shaped through your own design work, with the present repository serving as experience and evidence rather than an obligation to preserve every feature.
 
 ## Evidence behind the plan
 
