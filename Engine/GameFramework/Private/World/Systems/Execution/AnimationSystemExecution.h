@@ -2,8 +2,6 @@
 
 #include <cstdint>
 
-class SkeletonResourceStore;
-
 namespace ECS
 {
 	class AnimationClipResourceStore;
@@ -14,13 +12,7 @@ namespace ECS
 	class AnimationSystemExecution final
 	{
 	public:
-		AnimationSystemExecution(
-		    EntityRegistry& registry,
-		    const AnimationClipResourceStore& clips,
-		    const SkeletonResourceStore& skeletons,
-		    AnimationEvaluationStorage& output,
-		    MorphWeightStorage& weights,
-		    float deltaSeconds);
+		AnimationSystemExecution(EntityRegistry& registry, const AnimationClipResourceStore& clips, AnimationEvaluationStorage& output, MorphWeightStorage& weights, float deltaSeconds);
 
 		std::uint32_t GetPlaybackCount() const noexcept;
 		std::uint32_t GetPoseCount() const noexcept;
@@ -33,7 +25,6 @@ namespace ECS
 	private:
 		EntityRegistry& m_registry;
 		const AnimationClipResourceStore& m_clips;
-		const SkeletonResourceStore& m_skeletons;
 		AnimationEvaluationStorage& m_evaluation;
 		MorphWeightStorage& m_weights;
 		float m_deltaSeconds = 0.0f;

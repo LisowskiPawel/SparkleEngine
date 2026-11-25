@@ -2,6 +2,7 @@
 #include "Level/LevelRegistry.h"
 
 #include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Diagnostics/Logger.h"
 #include "Level/LevelAsset.h"
 #include "Level/Parsing/LevelParser.h"
 

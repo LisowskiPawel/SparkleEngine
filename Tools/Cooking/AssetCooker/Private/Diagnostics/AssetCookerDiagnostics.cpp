@@ -17,4 +17,3 @@ std::vector<AssetCookerDiagnosticRecord> AssetCookerDiagnostics::ReleaseRecords(
 {
 	return std::move(m_records);
 }
-

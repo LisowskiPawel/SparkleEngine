@@ -57,13 +57,13 @@ void UI::Implementation::Build()
 
 void UI::Implementation::HandleTransactionShortcuts(bool bDisableInteraction)
 {
+	const EditorSceneModel& model = m_scene.GetModel();
 	if (bDisableInteraction || ImGui::GetIO().WantTextInput)
 	{
 		return;
 	}
 
-	const EditorSceneModel* model = m_scene.GetModel();
-	if (model == nullptr)
+	if (!model.HasWorld())
 	{
 		return;
 	}
@@ -71,11 +71,11 @@ void UI::Implementation::HandleTransactionShortcuts(bool bDisableInteraction)
 	EditorTransactionHistory& history = m_scene.GetHistory();
 	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Z, ImGuiInputFlags_RouteGlobal))
 	{
-		(void) history.Undo(model->GetWorldGeneration());
+		(void) history.Undo(model.GetWorldGeneration());
 	}
 	else if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Y, ImGuiInputFlags_RouteGlobal))
 	{
-		(void) history.Redo(model->GetWorldGeneration());
+		(void) history.Redo(model.GetWorldGeneration());
 	}
 }
 

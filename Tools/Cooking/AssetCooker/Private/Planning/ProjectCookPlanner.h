@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Api/AssetCookerTypes.h"
 #include "../Diagnostics/AssetCookerDiagnostics.h"
 #include "ProjectCookPlan.h"
 

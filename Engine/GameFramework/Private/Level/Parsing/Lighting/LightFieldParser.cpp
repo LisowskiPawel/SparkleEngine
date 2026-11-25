@@ -1,12 +1,16 @@
 #include "PCH.h"
 
 #include "LightFieldParser.h"
+#include "LightFieldKeyParser.h"
 
 #include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Diagnostics/Logger.h"
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Core/Public/Strings/StringUtils.h"
 
+#include <cstddef>
 #include <format>
+#include <string_view>
 #include <type_traits>
 
 SPARKLE_DEFINE_LOG_CATEGORY_STATIC(g_lightFieldParserLogger, "GameFramework.LightFieldParser");
@@ -34,7 +38,6 @@ namespace LevelParsing
 				return "spot";
 			case SceneLightKind::Rect:
 				return "rect";
-			case SceneLightKind::Unknown:
 			default:
 				return "unknown";
 		}
@@ -47,27 +50,21 @@ namespace LevelParsing
 		{
 			case SceneLightKind::Directional:
 				light.payload = SceneDirectionalLightDesc{};
-
-				return light;
-
+				break;
 			case SceneLightKind::Point:
 				light.payload = PointLightDesc{};
-
-				return light;
-
+				break;
 			case SceneLightKind::Spot:
 				light.payload = SpotLightDesc{};
-
-				return light;
-
+				break;
 			case SceneLightKind::Rect:
 				light.payload = RectLightDesc{};
-
-				return light;
+				break;
 			case SceneLightKind::Unknown:
 			default:
 				Diagnostics::Fatal(g_lightFieldParserLogger, __FILE__, __LINE__, "Light field parser received an unknown light kind.");
 		}
+		return light;
 	}
 
 	static SceneLightDesc& ResolveLight(std::vector<SceneLightDesc>& lights, SceneLightKind kind, std::size_t kindIndex)
@@ -94,12 +91,7 @@ namespace LevelParsing
 		return lights.back();
 	}
 
-	static bool IsCommonField(std::string_view field) noexcept
-	{
-		return field == "Name" || field == "Color" || field == "Visible" || field == "Position";
-	}
-
-	static void ParseCommonField(std::string_view field, const ParsedLevelLine& line, SceneLightCommonDesc& common)
+	static bool ParseCommonField(std::string_view field, const ParsedLevelLine& line, SceneLightCommonDesc& common)
 	{
 		if (field == "Name")
 		{
@@ -108,24 +100,25 @@ namespace LevelParsing
 			{
 				throw Diagnostics::Error("Light name cannot be empty.");
 			}
-			return;
+			return true;
 		}
 		if (field == "Color")
 		{
 			common.color = ParseFloat3(line.value, "light color");
-			return;
+			return true;
 		}
 		if (field == "Visible")
 		{
 			common.bVisible = ParseBool(line.value, "light visibility");
-			return;
+			return true;
 		}
 		if (field == "Position")
 		{
 			const DirectX::XMFLOAT3 position = ParseFloat3(line.value, "light position");
 			SetLightPosition(common, position);
-			return;
+			return true;
 		}
+		return false;
 	}
 
 	static void ParseDirectionalField(std::string_view field, const ParsedLevelLine& line, SceneLightDesc& light)
@@ -246,12 +239,12 @@ namespace LevelParsing
 		throw Diagnostics::Error(std::format("Unsupported {} light field '{}'.", GetLightKindName(kind), field));
 	}
 
-	void ParseLightField(const ParsedLightFieldKey& key, const ParsedLevelLine& parsedLine, std::vector<SceneLightDesc>& lights)
+	void ParseLightField(const ParsedLevelLine& parsedLine, std::vector<SceneLightDesc>& lights)
 	{
+		const ParsedLightFieldKey key = ParseLightFieldKey(parsedLine.key);
 		SceneLightDesc& light = ResolveLight(lights, key.Kind, key.Index);
-		if (IsCommonField(key.Field))
+		if (ParseCommonField(key.Field, parsedLine, light.common))
 		{
-			ParseCommonField(key.Field, parsedLine, light.common);
 			return;
 		}
 		switch (key.Kind)
@@ -276,5 +269,4 @@ namespace LevelParsing
 				Diagnostics::Fatal(g_lightFieldParserLogger, __FILE__, __LINE__, "Light field parser received an unknown light kind.");
 		}
 	}
-
 }

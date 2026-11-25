@@ -1,9 +1,9 @@
 set(ASSET_COOKER_CORE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Api/CookProjectContent.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/AssetCookerSceneBatch.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/DefaultTextureCookRequestBuilder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/CookImportedScene.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureRequestPlanBuilder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/BuildTextureCookRequests.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/DefaultTextureCookRequestBuilder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Diagnostics/AssetCookerDiagnostics.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Discovery/CatalogedLevelSceneReader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Planning/ProjectCookPlanner.cpp
@@ -18,9 +18,9 @@ set(ASSET_COOKER_CORE_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Api/CookProjectContent.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Api/AssetCookerTypes.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/AssetCookerSceneBatch.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/DefaultTextureCookRequestBuilder.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/CookImportedScene.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/TextureRequestPlanBuilder.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/BuildTextureCookRequests.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/DefaultTextureCookRequestBuilder.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Diagnostics/AssetCookerDiagnostics.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Discovery/CatalogedLevelSceneReader.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Planning/ProjectCookPlanner.h

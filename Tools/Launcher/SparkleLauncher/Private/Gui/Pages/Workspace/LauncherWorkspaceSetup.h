@@ -19,7 +19,6 @@ namespace SparkleLauncher
 {
 	class LauncherContentModel;
 	class LauncherSettings;
-	struct LauncherOperationResult;
 	struct SourceDependencyEntry;
 	struct ToolchainItemStatus;
 	struct BuildFilesFreshnessStatus;

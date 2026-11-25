@@ -1,8 +1,9 @@
 #include "PCH.h"
 
-#include "LightingSectionWriter.h"
+#include "Level/Parsing/LightingSectionParser.h"
 
 #include "Core/Public/Diagnostics/Verify.h"
+#include "Core/Public/Diagnostics/Logger.h"
 
 #include <iomanip>
 #include <ostream>
@@ -68,7 +69,7 @@ namespace LevelParsing
 		output << prefix << "CastShadow = " << (value.bCastShadow ? "true" : "false") << "\n";
 	}
 
-	void WriteLightingSectionValues(std::ostream& output, const LevelDesc& levelDesc)
+	void WriteLightingSection(std::ostream& output, const LevelDesc& levelDesc)
 	{
 		output << std::setprecision(9);
 		output << "[Lighting]\n";

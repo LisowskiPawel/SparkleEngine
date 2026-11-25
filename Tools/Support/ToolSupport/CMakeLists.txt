@@ -1,7 +1,7 @@
 set(TOOL_SUPPORT_PUBLIC_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/Public/BinaryAssetWriter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/SourceAssetPaths.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/ToolConsole.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Public/ToolMain.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/ProjectLevelCatalog.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/ToolOutputPaths.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Public/ToolWorkProgress.h
@@ -12,6 +12,7 @@ set(TOOL_SUPPORT_PUBLIC_HEADERS
 set(TOOL_SUPPORT_PRIVATE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/SourceAssetPaths.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/ToolConsole.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/ToolMain.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Projects/ProjectLevelCatalog.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Projects/ProjectLevelCatalogReader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Projects/ProjectLevelCatalogReader.h

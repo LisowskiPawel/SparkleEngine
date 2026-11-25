@@ -3,12 +3,9 @@
 #include "Level/Parsing/LightingSectionParser.h"
 
 #include "Core/Public/Diagnostics/Error.h"
-#include "Level/Parsing/Lighting/LightFieldKeyParser.h"
 #include "Level/Parsing/Lighting/LightFieldParser.h"
-#include "Level/Parsing/Lighting/LightingSectionWriter.h"
 
 #include <format>
-#include <ostream>
 
 namespace LevelParsing
 {
@@ -24,8 +21,7 @@ namespace LevelParsing
 
 	void ParseLightingSectionField(const ParsedLevelLine& parsedLine, LevelDesc& levelDesc)
 	{
-		const ParsedLightFieldKey key = ParseLightFieldKey(parsedLine.key);
-		ParseLightField(key, parsedLine, levelDesc.lights);
+		ParseLightField(parsedLine, levelDesc.lights);
 	}
 
 	void ValidateLightingSection(const LevelDesc& levelDesc)
@@ -42,10 +38,5 @@ namespace LevelParsing
 				ValidateRectBasis(rect->direction, rect->tangent, lightIndex);
 			}
 		}
-	}
-
-	void WriteLightingSection(std::ostream& output, const LevelDesc& levelDesc)
-	{
-		WriteLightingSectionValues(output, levelDesc);
 	}
 }

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Level/LevelLoadOperation.h"
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -33,8 +32,7 @@ namespace Assets
 		void Cancel() noexcept;
 		bool IsSettled() const noexcept;
 		void Join() noexcept;
-		SceneLoadCompletion TakeCompletion(std::uint64_t requestId);
-		LevelLoadOperationProgress GetProgress(std::uint64_t requestId) const noexcept;
+		SceneLoadCompletion TakeCompletion();
 
 	private:
 		static constexpr std::size_t MaximumAssetsInFlight = 2;

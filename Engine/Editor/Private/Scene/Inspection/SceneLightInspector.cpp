@@ -129,8 +129,7 @@ namespace SceneLightInspector
 		{
 			return;
 		}
-		(void) transactionHistory
-		    .Execute({0, SetLightDescriptionCommand{lightEntity, std::move(lightDesc)}}, {0, SetLightDescriptionCommand{lightEntity, sceneLight}}, worldGeneration, "light-description");
+		(void) transactionHistory.Execute(SetLightDescriptionCommand{lightEntity, std::move(lightDesc)}, SetLightDescriptionCommand{lightEntity, sceneLight}, worldGeneration, "light-description");
 	}
 
 	static bool BuildLightCommonCategory(const std::string& filterText, SceneLightDesc& lightDesc) noexcept

@@ -21,7 +21,6 @@ class QWidget;
 namespace SparkleLauncher
 {
 	class LauncherIconLibrary;
-	struct LauncherOperationResult;
 
 	class LauncherActivityPanel final : public QFrame
 	{
@@ -33,7 +32,7 @@ namespace SparkleLauncher
 		void DisplayOperationStarted(const QString& runId, const QString& title);
 		void AppendOperationOutput(const QString& runId, const QString& outputText);
 		void UpdateOperationProgress(const QString& runId, const QString& phase, quint64 completed, quint64 total);
-		void DisplayOperationFinished(const QString& runId, const LauncherOperationResult& result);
+		void DisplayOperationFinished(const QString& runId, const OperationRecord& result);
 		void ShowRunOutput(const QString& runId);
 		bool HasActiveRun() const;
 

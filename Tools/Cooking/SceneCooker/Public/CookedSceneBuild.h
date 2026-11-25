@@ -17,8 +17,6 @@
 struct CookedSkeletonAssetBuild final
 {
 	Assets::CookedAssetId assetId = Assets::InvalidCookedAssetId;
-	std::uint32_t sourceSkinIndex = 0;
-	std::filesystem::path sourcePath;
 	std::vector<Assets::CookedSkeletonJointRecord> joints;
 	std::vector<Assets::CookedSkeletonEvaluationJointRecord> evaluationJoints;
 };
@@ -30,7 +28,6 @@ struct CookedAnimationAssetBuild final
 	std::uint32_t sourceAnimationIndex = 0;
 	float durationSeconds = 0.0f;
 	std::string name;
-	std::filesystem::path sourcePath;
 	std::vector<Assets::CookedAnimationChannelRecord> channels;
 	std::vector<Assets::CookedAnimationKeyframeRecord> keyframes;
 };

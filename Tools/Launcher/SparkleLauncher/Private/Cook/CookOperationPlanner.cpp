@@ -5,7 +5,7 @@
 
 namespace SparkleLauncher
 {
-	CookOperationPlan PlanCookOperation(std::string_view operationId, const CookOperationRequest& request)
+	CookOperationPlan PlanLauncherOperation(std::string_view operationId, const CookOperationRequest& request)
 	{
 		CookOperationPlan plan;
 		const CookOperationDefinition* definition = FindCookOperationDefinition(operationId);

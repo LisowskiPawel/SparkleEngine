@@ -1,83 +1,58 @@
 #include "PCH.h"
-#include "GameFramework/Public/Assets/Cooked/CookedSceneMetadataRecords.h"
 
 #include "Metadata/CookedSceneMetadataBuilder.h"
 
-#include <cstdint>
+#include "GameFramework/Public/Assets/Cooked/CookedSceneMetadataRecords.h"
+#include "SourceImportOutput.h"
 
-class CookedSceneFeatureMetadata final
+#include <algorithm>
+
+std::uint32_t CookedSceneMetadataBuilder::BuildFeatureFlags(const SourceImportOutput& importOutput) noexcept
 {
-public:
-	static void AddFeatureFlag(std::uint32_t& flags, Assets::CookedSceneFeatureFlags flag) noexcept { flags |= Assets::ToCookedSceneFeatureFlagMask(flag); }
+	using Assets::CookedSceneFeatureFlags;
+	using Assets::ToCookedSceneFeatureFlagMask;
 
-	static std::uint32_t BuildFeatureFlags(const SourceImportOutput& importOutput) noexcept
+	std::uint32_t flags = 0;
+	if (!importOutput.scene.cameras.empty())
 	{
-		std::uint32_t flags = 0;
-		if (!importOutput.scene.cameras.empty())
-		{
-			AddFeatureFlag(flags, Assets::CookedSceneFeatureFlags::Cameras);
-		}
-
-		if (!importOutput.scene.lights.empty())
-		{
-			AddFeatureFlag(flags, Assets::CookedSceneFeatureFlags::Lights);
-		}
-
-		bool bHasSkinnedMeshes = !importOutput.scene.skeletons.empty();
-		for (const ImportedMeshPrimitive& primitive : importOutput.scene.meshPrimitives)
-		{
-			if (primitive.geometry.HasSkinInfluences())
-			{
-				bHasSkinnedMeshes = true;
-				break;
-			}
-		}
-
-		if (bHasSkinnedMeshes)
-		{
-			AddFeatureFlag(flags, Assets::CookedSceneFeatureFlags::SkinnedMeshes);
-			AddFeatureFlag(flags, Assets::CookedSceneFeatureFlags::Skeletons);
-		}
-
-		if (!importOutput.scene.animations.empty())
-		{
-			AddFeatureFlag(flags, Assets::CookedSceneFeatureFlags::Animations);
-		}
-
-		bool bHasSkeletalMorphTargets = false;
-		for (const ImportedMeshPrimitive& primitive : importOutput.scene.meshPrimitives)
-		{
-			if (primitive.geometry.HasSkinInfluences() && primitive.geometry.HasMorphTargets())
-			{
-				bHasSkeletalMorphTargets = true;
-				break;
-			}
-		}
-
-		if (bHasSkeletalMorphTargets)
-		{
-			AddFeatureFlag(flags, Assets::CookedSceneFeatureFlags::MorphTargets);
-		}
-
-		if (!importOutput.scene.materialVariants.empty() || !importOutput.scene.materialVariantMappings.empty())
-		{
-			AddFeatureFlag(flags, Assets::CookedSceneFeatureFlags::MaterialVariants);
-		}
-
-		for (const ImportedMeshInstanceGroup& group : importOutput.scene.meshInstanceGroups)
-		{
-			if (group.groupKind == ImportedMeshInstanceGroupKind::AuthoredInstanceGroup)
-			{
-				AddFeatureFlag(flags, Assets::CookedSceneFeatureFlags::AuthoredMeshInstancing);
-				break;
-			}
-		}
-
-		return flags;
+		flags |= ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::Cameras);
 	}
-};
+	if (!importOutput.scene.lights.empty())
+	{
+		flags |= ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::Lights);
+	}
+	if (!importOutput.scene.animations.empty())
+	{
+		flags |= ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::Animations);
+	}
+	if (!importOutput.scene.materialVariants.empty() || !importOutput.scene.materialVariantMappings.empty())
+	{
+		flags |= ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::MaterialVariants);
+	}
 
-void CookedSceneMetadataBuilder::BuildMetadata(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild)
-{
-	outBuild.manifest.featureFlags = CookedSceneFeatureMetadata::BuildFeatureFlags(importOutput);
+	bool bHasSkinnedMeshes = !importOutput.scene.skeletons.empty();
+	for (const ImportedMeshPrimitive& primitive : importOutput.scene.meshPrimitives)
+	{
+		if (primitive.geometry.HasSkinInfluences())
+		{
+			bHasSkinnedMeshes = true;
+			if (primitive.geometry.HasMorphTargets())
+			{
+				flags |= ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::MorphTargets);
+			}
+		}
+	}
+	if (bHasSkinnedMeshes)
+	{
+		flags |= ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::SkinnedMeshes) | ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::Skeletons);
+	}
+
+	const bool bHasAuthoredInstances = std::ranges::any_of(
+	    importOutput.scene.meshInstanceGroups,
+	    [](const ImportedMeshInstanceGroup& group) { return group.groupKind == ImportedMeshInstanceGroupKind::AuthoredInstanceGroup; });
+	if (bHasAuthoredInstances)
+	{
+		flags |= ToCookedSceneFeatureFlagMask(CookedSceneFeatureFlags::AuthoredMeshInstancing);
+	}
+	return flags;
 }

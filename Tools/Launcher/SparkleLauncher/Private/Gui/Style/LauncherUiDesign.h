@@ -37,13 +37,9 @@ namespace SparkleLauncher::LauncherUi
 
 	namespace Space
 	{
-		inline constexpr int Tiny = 2;
 		inline constexpr int XSmall = 4;
 		inline constexpr int Small = 8;
 		inline constexpr int Medium = 12;
-		inline constexpr int Large = 16;
-		inline constexpr int XLarge = 18;
-		inline constexpr int SectionGap = 18;
 	}
 
 	namespace Window
@@ -67,8 +63,6 @@ namespace SparkleLauncher::LauncherUi
 		inline constexpr int RailTopPadding = 10;
 		inline constexpr int RailBottomPadding = 12;
 		inline constexpr int RailGroupSpacing = 4;
-		inline constexpr int PanelHorizontalMargin = 18;
-		inline constexpr int PanelVerticalMargin = 14;
 	}
 
 	namespace ContextSelector
@@ -106,17 +100,9 @@ namespace SparkleLauncher::LauncherUi
 
 	namespace Row
 	{
-		inline constexpr int FieldLabelWidth = 132;
-		inline constexpr int FieldValueWidth = 560;
 		inline constexpr int InlineStatusWidth = 88;
 		inline constexpr int StatusActionWidth = 88;
 		inline constexpr int StatusActionHeight = 28;
-	}
-
-	namespace Button
-	{
-		inline constexpr int PrimaryMinHeight = 36;
-		inline constexpr int SecondaryMinHeight = 32;
 	}
 
 	namespace Page
@@ -161,13 +147,8 @@ namespace SparkleLauncher::LauncherUi
 
 	namespace Option
 	{
-		inline constexpr int LabelHorizontalPadding = 10;
-		inline constexpr int ValueLeftPadding = 10;
 		inline constexpr int GroupSpacing = 4;
 		inline constexpr int StatusDetailSpacing = 1;
-
-		inline const QMargins LabelMargins{LabelHorizontalPadding, 0, LabelHorizontalPadding, 0};
-		inline const QMargins ValueMargins{ValueLeftPadding, 0, 0, 0};
 		inline const QMargins GroupMargins{0, 6, 0, 6};
 	}
 
@@ -224,7 +205,6 @@ namespace SparkleLauncher::LauncherUi
 		inline constexpr int MaximumColumns = 4;
 		inline constexpr int HorizontalSpacing = 14;
 		inline constexpr int VerticalSpacing = 14;
-		inline constexpr int CardContentSpacing = 7;
 		inline constexpr double CardAspectRatio = 2.42;
 		inline const QMargins CardBodyMargins{14, 11, 14, 11};
 	}

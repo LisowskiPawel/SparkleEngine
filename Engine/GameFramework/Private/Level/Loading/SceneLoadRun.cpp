@@ -1,7 +1,8 @@
 #include "PCH.h"
 #include "Level/Loading/SceneLoadRun.h"
 
-#include "Level/Loading/SceneLoadExecutor.h"
+#include "Level/Loading/SceneLoadCompletion.h"
+#include "Level/Loading/SceneLoadPackageBuilder.h"
 #include "Level/Loading/SceneLoadWorkState.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Diagnostics/Verify.h"
@@ -233,29 +234,29 @@ namespace Assets
 
 	void SceneLoadRun::Finalize() noexcept
 	{
-		auto stage = LevelLoadOperationStage::Ready;
+		auto status = SceneLoadStatus::Ready;
 		const bool bFailed = std::any_of(m_failures.begin(), m_failures.end(), [](const auto& failure) { return bool(failure); });
 		if (bFailed)
 		{
-			stage = LevelLoadOperationStage::Failed;
+			status = SceneLoadStatus::Failed;
 		}
 		else if (IsCancelled())
 		{
-			stage = LevelLoadOperationStage::Cancelled;
+			status = SceneLoadStatus::Cancelled;
 		}
 		else
 		{
 			try
 			{
-				m_work->FinalizePackage();
+				FinalizeSceneLoadPackage(*m_work);
 			}
 			catch (...)
 			{
 				m_finalFailure = std::current_exception();
-				stage = LevelLoadOperationStage::Failed;
+				status = SceneLoadStatus::Failed;
 			}
 		}
-		m_work->Stage.store(stage, std::memory_order_release);
+		m_work->Status.store(status, std::memory_order_release);
 	}
 
 	void SceneLoadRun::Read(void* argument) noexcept
@@ -296,9 +297,7 @@ namespace Assets
 
 	bool SceneLoadRun::IsSettled() const noexcept
 	{
-		const auto stage = m_work->Stage.load(std::memory_order_acquire);
-		const bool bTerminal = stage == LevelLoadOperationStage::Ready || stage == LevelLoadOperationStage::Failed;
-		if (!bTerminal && stage != LevelLoadOperationStage::Cancelled)
+		if (m_work->Status.load(std::memory_order_acquire) == SceneLoadStatus::Pending)
 		{
 			return false;
 		}
@@ -358,16 +357,16 @@ namespace Assets
 		m_stop.request_stop();
 	}
 
-	SceneLoadCompletion SceneLoadRun::TakeCompletion(std::uint64_t requestId)
+	SceneLoadCompletion SceneLoadRun::TakeCompletion()
 	{
 		SceneLoadCompletion completion;
-		completion.RequestId = requestId;
-		completion.Stage = m_work->Stage.load(std::memory_order_acquire);
-		if (completion.Stage == LevelLoadOperationStage::Ready)
+		completion.RequestId = m_work->Package->RequestId;
+		completion.Status = m_work->Status.load(std::memory_order_acquire);
+		if (completion.Status == SceneLoadStatus::Ready)
 		{
 			completion.Package = std::move(m_work->Package);
 		}
-		else if (completion.Stage == LevelLoadOperationStage::Cancelled)
+		else if (completion.Status == SceneLoadStatus::Cancelled)
 		{
 			completion.Diagnostic = "Scene load cancelled.";
 		}
@@ -408,15 +407,5 @@ namespace Assets
 		{
 			return "Unknown scene load failure.";
 		}
-	}
-
-	LevelLoadOperationProgress SceneLoadRun::GetProgress(std::uint64_t requestId) const noexcept
-	{
-		LevelLoadOperationProgress progress;
-		progress.RequestId = requestId;
-		progress.Stage = m_work->Stage.load(std::memory_order_acquire);
-		progress.CompletedAssets = m_work->CompletedDecodes.load(std::memory_order_relaxed);
-		progress.TotalAssets = static_cast<std::uint32_t>(m_work->Assets.size());
-		return progress;
 	}
 }

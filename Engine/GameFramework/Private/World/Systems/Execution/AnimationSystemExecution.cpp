@@ -5,7 +5,6 @@
 #include "Animation/AnimationEvaluationStorage.h"
 #include "Animation/AnimationPreviewEvaluator.h"
 #include "World/Resources/AnimationClipResourceStore.h"
-#include "World/Resources/SkeletonResourceStore.h"
 #include "World/Resources/MorphWeightStorage.h"
 #include "World/ECS/EntityRegistry.h"
 
@@ -17,13 +16,11 @@ namespace ECS
 	AnimationSystemExecution::AnimationSystemExecution(
 	    EntityRegistry& registry,
 	    const AnimationClipResourceStore& clips,
-	    const SkeletonResourceStore& skeletons,
 	    AnimationEvaluationStorage& output,
 	    MorphWeightStorage& weights,
 	    float deltaSeconds) :
 	    m_registry(registry),
 	    m_clips(clips),
-	    m_skeletons(skeletons),
 	    m_evaluation(output),
 	    m_weights(weights),
 	    m_deltaSeconds((std::max) (0.0f, deltaSeconds))
@@ -52,13 +49,13 @@ namespace ECS
 		{
 			const EntityId entity = entities[index];
 			AnimationState& state = *m_registry.GetMutable<AnimationState>(entity);
-			const ResolvedAnimationClip clip = m_clips.Resolve(state.Resource);
-			if (!clip.IsValid() || !state.bPlaying || clip.Resource->durationSeconds <= 0.0f)
+			const BoundAnimationClip* clip = m_clips.Resolve(state.Resource);
+			if (clip == nullptr || !state.bPlaying || clip->Resource.durationSeconds <= 0.0f)
 			{
 				continue;
 			}
 			state.TimeSeconds += m_deltaSeconds * state.PlaybackRate;
-			state.TimeSeconds = state.bLooping ? std::fmod(state.TimeSeconds, clip.Resource->durationSeconds) : (std::min) (state.TimeSeconds, clip.Resource->durationSeconds);
+			state.TimeSeconds = state.bLooping ? std::fmod(state.TimeSeconds, clip->Resource.durationSeconds) : (std::min) (state.TimeSeconds, clip->Resource.durationSeconds);
 		}
 		return true;
 	}
@@ -75,10 +72,9 @@ namespace ECS
 				continue;
 			}
 
-			const ResolvedAnimationClip clip = m_clips.Resolve(slot.Clip);
-			const SkeletonResource* skeleton = m_skeletons.Resolve(slot.Skeleton);
-			const bool bInputsAvailable = clip.IsValid() && skeleton != nullptr;
-			const bool bPoseEvaluated = bInputsAvailable && AnimationPreviewEvaluator::EvaluatePose(*clip.Resource, *skeleton, state->TimeSeconds, slot);
+			const BoundAnimationClip* clip = m_clips.Resolve(slot.Clip);
+			const bool bInputsAvailable = clip != nullptr && slot.Skeleton != nullptr;
+			const bool bPoseEvaluated = bInputsAvailable && AnimationPreviewEvaluator::EvaluatePose(clip->Resource, *slot.Skeleton, state->TimeSeconds, slot);
 			if (!bPoseEvaluated)
 			{
 				return false;
@@ -99,13 +95,13 @@ namespace ECS
 				continue;
 			}
 
-			const ResolvedAnimationClip clip = m_clips.Resolve(sample.Clip);
-			if (!clip.IsValid())
+			const BoundAnimationClip* clip = m_clips.Resolve(sample.Clip);
+			if (clip == nullptr)
 			{
 				continue;
 			}
 
-			const bool bWeightsEvaluated = AnimationPreviewEvaluator::EvaluateMorph(*clip.Resource, sample.TrackIndex, state->TimeSeconds, sample.Weights);
+			const bool bWeightsEvaluated = AnimationPreviewEvaluator::EvaluateMorph(clip->Resource, sample.TrackIndex, state->TimeSeconds, sample.Weights);
 			if (!bWeightsEvaluated)
 			{
 				return false;

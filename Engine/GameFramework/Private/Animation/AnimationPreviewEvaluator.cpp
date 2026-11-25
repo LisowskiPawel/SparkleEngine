@@ -1,6 +1,7 @@
 #include "PCH.h"
 
 #include "Animation/AnimationPreviewEvaluator.h"
+#include "Animation/SkeletonResource.h"
 
 #include <ozz/animation/runtime/local_to_model_job.h>
 #include <ozz/animation/runtime/track_sampling_job.h>

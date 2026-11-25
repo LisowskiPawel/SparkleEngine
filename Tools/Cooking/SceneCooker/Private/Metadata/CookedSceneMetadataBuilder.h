@@ -1,10 +1,10 @@
 #pragma once
 
-#include "CookedSceneBuild.h"
-#include "SourceImportOutput.h"
+#include <cstdint>
 
-class CookedSceneMetadataBuilder final
+struct SourceImportOutput;
+
+namespace CookedSceneMetadataBuilder
 {
-public:
-	static void BuildMetadata(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild);
-};
+	std::uint32_t BuildFeatureFlags(const SourceImportOutput& importOutput) noexcept;
+}

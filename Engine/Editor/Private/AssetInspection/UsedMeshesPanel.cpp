@@ -5,6 +5,7 @@
 #include "AssetInspection/MeshDiagnosticsPresentation.h"
 #include "AssetInspection/PanelDiagnosticsFormatting.h"
 #include "Core/Public/Strings/StringUtils.h"
+#include "Core/Public/Formatting/HexFormat.h"
 #include "Icons/EditorIcon.h"
 #include "Widgets/UiIconWidgets.h"
 #include "Widgets/UiPanelWidgets.h"
@@ -107,11 +108,13 @@ void UsedMeshesPanel::DrawToolbar()
 	ImGui::InputTextWithHint("##UsedMeshesFilter", filterHint.c_str(), m_filterBuffer.data(), m_filterBuffer.size());
 	ImGui::SameLine();
 
+	const MeshDiagnosticsPresentation::Summary summary = MeshDiagnosticsPresentation::BuildSummary(m_snapshot);
+
 	ImGui::TextDisabled(
 	    "%zu mesh(es), %zu resident, instances %u, groups %u (authored %u, shared %u), batches %u (authored %u, preserved %u, auto %u, "
 	    "single %u), saved %u",
 	    m_snapshot.Rows.size(),
-	    MeshDiagnosticsPresentation::CountResidentMeshes(m_snapshot),
+	    summary.ResidentCount,
 	    static_cast<unsigned int>(m_snapshot.GeometryInstancing.RenderableInstanceCount),
 	    static_cast<unsigned int>(m_snapshot.GeometryInstancing.RuntimeInstanceGroupCount),
 	    static_cast<unsigned int>(m_snapshot.GeometryInstancing.RuntimeAuthoredGroupCount),
@@ -123,10 +126,8 @@ void UsedMeshesPanel::DrawToolbar()
 	    static_cast<unsigned int>(m_snapshot.GeometryInstancing.SingleInstanceBatchCount),
 	    static_cast<unsigned int>(m_snapshot.GeometryInstancing.EstimatedGBufferDrawCallsSaved));
 
-	const std::uint64_t gpuBytes = MeshDiagnosticsPresentation::SumGpuBytes(m_snapshot);
-	const std::uint64_t cpuBytes = MeshDiagnosticsPresentation::SumCpuBytes(m_snapshot);
-	const std::string gpuMemory = PanelDiagnosticsFormatting::FormatByteSize(gpuBytes);
-	const std::string cpuMemory = PanelDiagnosticsFormatting::FormatByteSize(cpuBytes);
+	const std::string gpuMemory = PanelDiagnosticsFormatting::FormatByteSize(summary.GpuBytes);
+	const std::string cpuMemory = PanelDiagnosticsFormatting::FormatByteSize(summary.CpuBytes);
 
 	ImGui::TextDisabled(
 	    "instances/batch %u..%u, rejected %u (gpu %u, material %u, group %u, incompatible %u), GPU %s, CPU %s estimated",
@@ -228,9 +229,9 @@ void UsedMeshesPanel::DrawSelectedMeshInspector(bool bDisableInteraction)
 
 void UsedMeshesPanel::DrawSelectedMeshDetails(const MeshDiagnosticsRow& row) const
 {
-	const std::string meshRuntimeId = MeshDiagnosticsPresentation::FormatRuntimeId(row.MeshRuntimeId);
-	const std::string gpuRuntimeId = row.GpuMeshRuntimeId != 0 ? MeshDiagnosticsPresentation::FormatRuntimeId(row.GpuMeshRuntimeId) : std::string("none");
-	const std::string meshAssetId = row.MeshAssetId != 0 ? MeshDiagnosticsPresentation::FormatAssetId(row.MeshAssetId) : std::string("none");
+	const std::string meshRuntimeId = Formatting::FormatPrefixedHexUInt64(row.MeshRuntimeId);
+	const std::string gpuRuntimeId = row.GpuMeshRuntimeId != 0 ? Formatting::FormatPrefixedHexUInt64(row.GpuMeshRuntimeId) : std::string("none");
+	const std::string meshAssetId = row.MeshAssetId != 0 ? Formatting::FormatPrefixedHexUInt64(row.MeshAssetId) : std::string("none");
 	const std::string vertices = std::to_string(row.VertexCount);
 	const std::string indices = std::to_string(row.IndexCount);
 	const std::string triangles = std::to_string(row.TriangleCount);
@@ -292,9 +293,9 @@ bool UsedMeshesPanel::MatchesFilter(const MeshDiagnosticsRow& row) const
 
 	const MeshDiagnosticMetadata* metadata = m_metadata.Find(row.MeshAssetId);
 	const std::string displayName = MeshDiagnosticsPresentation::FormatMeshDisplayName(row, metadata);
-	const std::string meshRuntimeId = MeshDiagnosticsPresentation::FormatRuntimeId(row.MeshRuntimeId);
-	const std::string gpuRuntimeId = row.GpuMeshRuntimeId != 0 ? MeshDiagnosticsPresentation::FormatRuntimeId(row.GpuMeshRuntimeId) : std::string("none");
-	const std::string meshAssetId = row.MeshAssetId != 0 ? MeshDiagnosticsPresentation::FormatAssetId(row.MeshAssetId) : std::string("none");
+	const std::string meshRuntimeId = Formatting::FormatPrefixedHexUInt64(row.MeshRuntimeId);
+	const std::string gpuRuntimeId = row.GpuMeshRuntimeId != 0 ? Formatting::FormatPrefixedHexUInt64(row.GpuMeshRuntimeId) : std::string("none");
+	const std::string meshAssetId = row.MeshAssetId != 0 ? Formatting::FormatPrefixedHexUInt64(row.MeshAssetId) : std::string("none");
 	const std::string sourcePath = MeshDiagnosticsPresentation::FormatMeshSourcePath(row, metadata);
 	const std::string material = MeshDiagnosticsPresentation::FormatMaterial(row);
 	const std::string memory = MeshDiagnosticsPresentation::FormatMemorySummary(row);

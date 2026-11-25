@@ -123,7 +123,7 @@ namespace SparkleLauncher
 		plan.Operation.DryRunText = dryRun.str();
 	}
 
-	LevelOperationPlan PlanLevelOperation(std::string_view operationId, const LevelOperationRequest& request)
+	LevelOperationPlan PlanLauncherOperation(std::string_view operationId, const LevelOperationRequest& request)
 	{
 		LevelOperationPlan plan;
 		const auto definition = FindLevelOperationDefinition(operationId);

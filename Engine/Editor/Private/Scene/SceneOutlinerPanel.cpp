@@ -56,11 +56,10 @@ void SceneOutlinerPanel::BuildToolbar() noexcept
 	ImGui::PopStyleVar();
 }
 
-void SceneOutlinerPanel::BuildFooter() noexcept
+void SceneOutlinerPanel::BuildFooter(std::size_t displayedCount) noexcept
 {
-	const EditorSceneModel& model = *m_scene.GetModel();
+	const EditorSceneModel& model = m_scene.GetModel();
 	const std::size_t totalCount = 1u + model.GetCameras().size() + model.GetLights().size() + model.GetMeshes().size();
-	const std::size_t displayedCount = CountVisibleEntries();
 	const bool bHasValidSelection = model.Contains(m_scene.GetSelection());
 	ImGui::Separator();
 	ImGui::TextDisabled("%zu actors%s", displayedCount, bHasValidSelection ? " (1 selected)" : "");
@@ -71,101 +70,54 @@ void SceneOutlinerPanel::BuildFooter() noexcept
 	}
 }
 
-void SceneOutlinerPanel::DrawEntrySection(SceneOutlinerFilter filter, const char* id, const char* label, const char* emptyText, std::span<const EditorSceneEntry> entries) noexcept
+template <typename T>
+std::size_t SceneOutlinerPanel::DrawEntrySection(SceneOutlinerFilter filter, const char* id, const char* label, const char* emptyText, std::span<const T> entries, bool bDraw) noexcept
 {
 	if (m_activeFilter != SceneOutlinerFilter::All && m_activeFilter != filter)
 	{
-		return;
+		return 0;
 	}
 
-	bool bOpen = true;
-	DrawSectionRow(id, label, entries.size(), bOpen);
-	if (bOpen)
+	const bool bOpen = bDraw && DrawSectionRow(id, label, entries.size());
+	if (bOpen && entries.empty())
 	{
-		if (entries.empty())
-		{
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(1);
-			ImGui::TextDisabled("%s", emptyText);
-		}
+		ImGui::TableNextRow();
+		ImGui::TableSetColumnIndex(1);
+		ImGui::TextDisabled("%s", emptyText);
+	}
 
-		for (const EditorSceneEntry& entry : entries)
+	if (!bOpen && m_filterText.empty())
+	{
+		return entries.size();
+	}
+
+	std::size_t count = 0;
+	for (std::size_t index = 0; index < entries.size(); ++index)
+	{
+		const SceneObjectPresentation::Entry entry = SceneObjectPresentation::BuildEntry(entries[index], index);
+		if (MatchesFilter(entry))
 		{
-			if (MatchesFilter(entry))
+			++count;
+			if (bOpen)
 			{
-				DrawSelectionEntry(entry.Label.c_str(), entry.TypeLabel.c_str(), entry.Selection);
+				DrawSelectionEntry(entry);
 			}
 		}
 	}
+	return count;
 }
 
-bool SceneOutlinerPanel::PassesActiveFilter(const SceneObjectSelection& selection) const noexcept
+bool SceneOutlinerPanel::MatchesFilter(const SceneObjectPresentation::Entry& entry) const noexcept
 {
-	switch (m_activeFilter)
-	{
-		case SceneOutlinerFilter::Cameras:
-			return selection.type == SceneObjectType::Camera;
-		case SceneOutlinerFilter::Lights:
-			return selection.type == SceneObjectType::Light;
-		case SceneOutlinerFilter::Meshes:
-			return selection.type == SceneObjectType::Mesh;
-		case SceneOutlinerFilter::All:
-		default:
-			return true;
-	}
-}
-
-bool SceneOutlinerPanel::MatchesFilter(const EditorSceneEntry& entry) const noexcept
-{
-	if (!PassesActiveFilter(entry.Selection))
-	{
-		return false;
-	}
 	if (m_filterText.empty())
 	{
 		return true;
 	}
-	const bool bLabelMatches = Strings::ContainsIgnoreCase(entry.Label.c_str(), m_filterText);
-	return bLabelMatches || Strings::ContainsIgnoreCase(entry.TypeLabel.c_str(), m_filterText);
+	const bool bLabelMatches = Strings::ContainsIgnoreCase(entry.GetLabel().data(), m_filterText);
+	return bLabelMatches || Strings::ContainsIgnoreCase(entry.TypeLabel, m_filterText);
 }
 
-std::size_t SceneOutlinerPanel::CountVisibleEntries() const noexcept
-{
-	std::size_t count = 0;
-
-	const auto countVisible = [this](std::span<const EditorSceneEntry> entries) noexcept
-	{
-		std::size_t visibleCount = 0;
-		for (const EditorSceneEntry& entry : entries)
-		{
-			if (MatchesFilter(entry))
-			{
-				++visibleCount;
-			}
-		}
-		return visibleCount;
-	};
-
-	const EditorSceneModel& model = *m_scene.GetModel();
-	count += countVisible(model.GetCameraEntries());
-	const EditorSceneEntry& sky = model.GetSkyEntry();
-	if (MatchesFilter(sky))
-	{
-		++count;
-	}
-	count += countVisible(model.GetLightEntries());
-	count += countVisible(model.GetMeshEntries());
-
-	return count;
-}
-
-bool SceneOutlinerPanel::IsEntryVisible(const SceneObjectSelection& selection) const noexcept
-{
-	const EditorSceneEntry* entry = m_scene.GetModel()->FindEntry(selection);
-	return entry == nullptr || entry->bVisible;
-}
-
-void SceneOutlinerPanel::DrawSectionRow(const char* id, const char* label, std::size_t count, bool& bOpen) noexcept
+bool SceneOutlinerPanel::DrawSectionRow(const char* id, const char* label, std::size_t count) noexcept
 {
 	ImGui::TableNextRow();
 	ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, SparkleUiPalette::SectionHeaderBackground());
@@ -173,7 +125,7 @@ void SceneOutlinerPanel::DrawSectionRow(const char* id, const char* label, std::
 	ImGui::PushID(id);
 	const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth;
 	const std::string sectionLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::FolderOpen, label);
-	bOpen = ImGui::TreeNodeEx("##section", flags, "%s (%zu)", sectionLabel.c_str(), count);
+	const bool bOpen = ImGui::TreeNodeEx("##section", flags, "%s (%zu)", sectionLabel.c_str(), count);
 	ImGui::PopID();
 	ImGui::TableSetColumnIndex(2);
 	const std::string typeLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Folder, "Folder");
@@ -182,6 +134,7 @@ void SceneOutlinerPanel::DrawSectionRow(const char* id, const char* label, std::
 	{
 		ImGui::TreePop();
 	}
+	return bOpen;
 }
 
 void SceneOutlinerPanel::DrawSelectionCell(const char* label, const SceneObjectSelection& selection, bool bIsSelected, int flags) noexcept
@@ -202,10 +155,13 @@ void SceneOutlinerPanel::DrawSelectionCell(const char* label, const SceneObjectS
 	}
 }
 
-void SceneOutlinerPanel::DrawSelectionEntry(const char* label, const char* typeLabel, const SceneObjectSelection& selection) noexcept
+void SceneOutlinerPanel::DrawSelectionEntry(const SceneObjectPresentation::Entry& entry) noexcept
 {
+	const char* label = entry.GetLabel().data();
+	const char* typeLabel = entry.TypeLabel;
+	const SceneObjectSelection& selection = entry.Selection;
 	const bool bIsSelected = m_scene.GetSelection() == selection;
-	const bool bIsVisible = IsEntryVisible(selection);
+	const bool bIsVisible = entry.bVisible;
 	ImGui::TableNextRow();
 	if (bIsSelected)
 	{
@@ -222,9 +178,7 @@ void SceneOutlinerPanel::DrawSelectionEntry(const char* label, const char* typeL
 
 	ImGui::TableSetColumnIndex(1);
 	ImGui::Indent(16.0f);
-	const EditorSceneEntry* entry = m_scene.GetModel()->FindEntry(selection);
-	const SceneLightKind lightKind = entry ? entry->LightKind : SceneLightKind::Unknown;
-	const EditorIcons::EditorIcon icon = SceneObjectPresentation::BuildSelectionIcon(selection, lightKind);
+	const EditorIcons::EditorIcon icon = SceneObjectPresentation::BuildSelectionIcon(selection, entry.LightKind);
 	EditorWidgets::DrawEditorIcon(icon, typeLabel, !bIsSelected);
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
 	{
@@ -274,8 +228,9 @@ void SceneOutlinerPanel::BeginWindow() noexcept
 	m_widthPixels = ImGui::GetWindowWidth();
 }
 
-void SceneOutlinerPanel::BuildSceneTable() noexcept
+std::size_t SceneOutlinerPanel::BuildSceneTable() noexcept
 {
+	const EditorSceneModel& model = m_scene.GetModel();
 	ImGui::Spacing();
 	ImGui::Separator();
 	ImGui::Spacing();
@@ -285,19 +240,22 @@ void SceneOutlinerPanel::BuildSceneTable() noexcept
 
 	if (bTableOpen)
 	{
-		const EditorSceneModel& model = *m_scene.GetModel();
 		ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 20.0f);
 		ImGui::TableSetupColumn("Item Label", ImGuiTableColumnFlags_WidthStretch);
 		ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 88.0f);
 		ImGui::TableHeadersRow();
+	}
 
-		DrawEntrySection(SceneOutlinerFilter::Cameras, "Camera", "Camera", "No cameras in scene", model.GetCameraEntries());
-		DrawEntrySection(SceneOutlinerFilter::All, "Sky", "Sky", "", std::span(&model.GetSkyEntry(), 1));
-		DrawEntrySection(SceneOutlinerFilter::Lights, "Lights", "Lights", "No lights in scene", model.GetLightEntries());
-		DrawEntrySection(SceneOutlinerFilter::Meshes, "Meshes", "Meshes", "No meshes in scene", model.GetMeshEntries());
+	std::size_t count = DrawEntrySection(SceneOutlinerFilter::Cameras, "Camera", "Camera", "No cameras in scene", model.GetCameras(), bTableOpen);
+	count += DrawEntrySection(SceneOutlinerFilter::All, "Sky", "Sky", "", std::span(&model.GetSkyEnvironment(), 1), bTableOpen);
+	count += DrawEntrySection(SceneOutlinerFilter::Lights, "Lights", "Lights", "No lights in scene", model.GetLights(), bTableOpen);
+	count += DrawEntrySection(SceneOutlinerFilter::Meshes, "Meshes", "Meshes", "No meshes in scene", model.GetMeshes(), bTableOpen);
+	if (bTableOpen)
+	{
 		ImGui::EndTable();
 	}
 	ImGui::PopStyleVar();
+	return count;
 }
 
 void SceneOutlinerPanel::BuildUI(bool bDisableInteraction)
@@ -305,7 +263,7 @@ void SceneOutlinerPanel::BuildUI(bool bDisableInteraction)
 	BeginWindow();
 	EditorWidgets::DrawPanelHeader("Scene", "Outliner");
 
-	if (m_scene.GetModel() == nullptr)
+	if (!m_scene.GetModel().HasWorld())
 	{
 		ImGui::TextDisabled("Scene outliner unavailable");
 		ImGui::End();
@@ -314,8 +272,8 @@ void SceneOutlinerPanel::BuildUI(bool bDisableInteraction)
 
 	ImGui::BeginDisabled(bDisableInteraction);
 	BuildToolbar();
-	BuildSceneTable();
-	BuildFooter();
+	const std::size_t displayedCount = BuildSceneTable();
+	BuildFooter(displayedCount);
 	ImGui::EndDisabled();
 
 	ImGui::End();

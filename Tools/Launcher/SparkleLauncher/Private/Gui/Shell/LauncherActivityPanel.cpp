@@ -2,7 +2,6 @@
 
 #include "Gui/Style/LauncherIconLibrary.h"
 #include "Gui/Style/LauncherUiDesign.h"
-#include "Gui/Models/LauncherOperationResult.h"
 
 #include <QtGui/QClipboard>
 #include <QtGui/QColor>
@@ -263,7 +262,7 @@ namespace SparkleLauncher
 		}
 	}
 
-	void LauncherActivityPanel::DisplayOperationFinished(const QString& runId, const LauncherOperationResult& result)
+	void LauncherActivityPanel::DisplayOperationFinished(const QString& runId, const OperationRecord& result)
 	{
 		auto run = m_runs.find(runId);
 		if (run == m_runs.end())
@@ -276,24 +275,26 @@ namespace SparkleLauncher
 		if (result.Status == OperationStatus::Succeeded)
 		{
 			AppendRunOutput(runId, "\nResult: " + statusText + "\n");
-			if (!result.LogPath.isEmpty())
+			if (!result.LogPath.empty())
 			{
-				AppendRunOutput(runId, "Log: " + result.LogPath + "\n");
+				AppendRunOutput(runId, "Log: " + QString::fromStdString(result.LogPath.string()) + "\n");
 			}
 		}
 		else
 		{
 			QString diagnosis = "Result: " + statusText + "\n";
-			diagnosis += "Problem type: " + result.ProblemKind + "\n";
-			diagnosis += "What failed: " + result.Problem + "\n";
-			diagnosis += "Next action: " + result.ExpectedAction + "\n";
+			const OperationFailure emptyFailure;
+			const OperationFailure& failure = result.Failure ? *result.Failure : emptyFailure;
+			diagnosis += "Problem type: " + (result.Failure ? QString::fromStdString(ToString(failure.Kind)) : QString()) + "\n";
+			diagnosis += "What failed: " + QString::fromStdString(failure.Summary) + "\n";
+			diagnosis += "Next action: " + QString::fromStdString(failure.ExpectedAction) + "\n";
 			if (result.ExitCode.has_value())
 			{
 				diagnosis += QStringLiteral("Exit code: %1\n").arg(*result.ExitCode);
 			}
-			if (!result.LogPath.isEmpty())
+			if (!result.LogPath.empty())
 			{
-				diagnosis += "Log: " + result.LogPath + "\n";
+				diagnosis += "Log: " + QString::fromStdString(result.LogPath.string()) + "\n";
 			}
 			QTextCursor cursor(run->Output);
 			cursor.insertText(diagnosis + "\nProcess output:\n");

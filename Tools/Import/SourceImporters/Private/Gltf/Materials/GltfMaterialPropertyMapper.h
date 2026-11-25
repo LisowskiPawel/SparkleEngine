@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Types/ImportedMaterial.h"
+#include "Types/ImportedSceneIndices.h"
 
 struct cgltf_material;
+struct ImportedMaterial;
 
-class GltfMaterialPropertyMapper final
+namespace GltfMaterialPropertyMapper
 {
-public:
-	static void Apply(const cgltf_material& material, ImportedMaterial& importedMaterial);
-};
+	void Apply(const cgltf_material& material, ImportedMaterialIndex materialIndex, ImportedMaterial& importedMaterial);
+}

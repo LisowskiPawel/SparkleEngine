@@ -63,7 +63,6 @@ set(SPARKLE_LAUNCHER_GUI_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Models/LauncherContextUiModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Models/LauncherExternalCaptureUiModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Models/LauncherLevelUiModel.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Models/LauncherOperationResult.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Models/LauncherOperationRequestFactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Models/LauncherContentModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Gui/Models/LauncherToolchainUiModel.h

@@ -19,6 +19,7 @@ private:
 	void BeginWindow() noexcept;
 	void BuildDetailsToolbar() noexcept;
 	void BuildInspectorTabs() noexcept;
+	void DrawSelectionHeader() noexcept;
 	void BuildSelectionInspector() noexcept;
 	void BuildEditStatus() noexcept;
 

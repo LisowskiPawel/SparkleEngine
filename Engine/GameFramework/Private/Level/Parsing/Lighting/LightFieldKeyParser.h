@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameFramework/Public/Scene/Lighting/SceneLightDesc.h"
+#include "Scene/Lighting/SceneLightKind.h"
 
 #include <cstddef>
 #include <string_view>

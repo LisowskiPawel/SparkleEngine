@@ -6,8 +6,12 @@
 #include <string>
 
 class EditorSceneSession;
-struct EditorSceneEntry;
 struct SceneObjectSelection;
+
+namespace SceneObjectPresentation
+{
+	struct Entry;
+}
 
 enum class SceneOutlinerFilter : std::uint8_t
 {
@@ -31,16 +35,13 @@ public:
 private:
 	void BeginWindow() noexcept;
 	void BuildToolbar() noexcept;
-	void BuildSceneTable() noexcept;
-	void BuildFooter() noexcept;
-	void DrawEntrySection(SceneOutlinerFilter filter, const char* id, const char* label, const char* emptyText, std::span<const EditorSceneEntry> entries) noexcept;
-	bool PassesActiveFilter(const SceneObjectSelection& selection) const noexcept;
-	bool MatchesFilter(const EditorSceneEntry& entry) const noexcept;
-	std::size_t CountVisibleEntries() const noexcept;
-	bool IsEntryVisible(const SceneObjectSelection& selection) const noexcept;
-	void DrawSectionRow(const char* id, const char* label, std::size_t count, bool& bOpen) noexcept;
+	std::size_t BuildSceneTable() noexcept;
+	void BuildFooter(std::size_t displayedCount) noexcept;
+	template <typename T> std::size_t DrawEntrySection(SceneOutlinerFilter filter, const char* id, const char* label, const char* emptyText, std::span<const T> entries, bool bDraw) noexcept;
+	bool MatchesFilter(const SceneObjectPresentation::Entry& entry) const noexcept;
+	bool DrawSectionRow(const char* id, const char* label, std::size_t count) noexcept;
 	void DrawSelectionCell(const char* label, const SceneObjectSelection& selection, bool bIsSelected, int flags) noexcept;
-	void DrawSelectionEntry(const char* label, const char* typeLabel, const SceneObjectSelection& selection) noexcept;
+	void DrawSelectionEntry(const SceneObjectPresentation::Entry& entry) noexcept;
 
 	EditorSceneSession& m_scene;
 	float m_widthPixels = 320.0f;

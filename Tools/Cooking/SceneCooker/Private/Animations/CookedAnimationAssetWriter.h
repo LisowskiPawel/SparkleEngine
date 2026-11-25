@@ -1,15 +1,10 @@
 #pragma once
 
-#include <vector>
-
-namespace Files
-{
-	struct FilePublication;
-}
+#include <filesystem>
 
 struct CookedAnimationAssetBuild;
 
 namespace CookedAnimationAssetWriter
 {
-	void StageAnimationAssets(const std::vector<CookedAnimationAssetBuild>& animationAssets, std::vector<Files::FilePublication>& outPublication);
+	void Write(const CookedAnimationAssetBuild& asset, const std::filesystem::path& outputPath);
 }

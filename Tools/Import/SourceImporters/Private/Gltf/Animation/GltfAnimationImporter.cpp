@@ -2,7 +2,6 @@
 
 #include "Gltf/Animation/GltfAnimationImporter.h"
 #include "Gltf/Animation/GltfAnimationSampler.h"
-#include "Types/FindImportedSkeletonForSourceSkin.h"
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <cgltf.h>
@@ -62,7 +61,7 @@ namespace GltfAnimationImporter
 			return kInvalidImportedSkeletonIndex;
 		}
 
-		return FindImportedSkeletonForSourceSkin(importedScene, static_cast<std::uint32_t>(sourceSkinIndex));
+		return importedScene.FindSkeletonForSourceSkin(static_cast<std::uint32_t>(sourceSkinIndex));
 	}
 
 	static void ImportChannel(

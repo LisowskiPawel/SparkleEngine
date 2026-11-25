@@ -87,6 +87,6 @@ namespace SparkleLauncher
 	std::string ToString(CookMode mode);
 	const std::vector<CookOperationDefinition>& GetCookOperationDefinitions();
 	const CookOperationDefinition* FindCookOperationDefinition(std::string_view operationId);
-	CookOperationPlan PlanCookOperation(std::string_view operationId, const CookOperationRequest& request);
-	OperationRecord RunCookOperationPlan(CookOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback = {}, std::stop_token cancellation = {});
+	CookOperationPlan PlanLauncherOperation(std::string_view operationId, const CookOperationRequest& request);
+	OperationRecord RunLauncherOperationPlan(CookOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback = {}, std::stop_token cancellation = {});
 }

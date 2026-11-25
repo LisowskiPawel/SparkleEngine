@@ -2,12 +2,10 @@
 #include "Cooking/CookedTextureAssetWriter.h"
 #include "Textures/CookedTextureAsset.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Files/BinaryStreamWriter.h"
-#include "Core/Public/Files/FileUtils.h"
+#include "Core/Public/Files/BinaryFileWriter.h"
 
 #include <DirectXTex.h>
 
-#include <fstream>
 #include <limits>
 #include <span>
 #include <vector>
@@ -40,7 +38,7 @@ namespace CookedTextureWriting
 		return mipHeaders;
 	}
 
-	void WriteContents(std::ofstream& output, const DirectX::ScratchImage& texture, std::span<const CookedTextureMipHeader> mipHeaders)
+	void WriteContents(Files::BinaryFileWriter& output, const DirectX::ScratchImage& texture, std::span<const CookedTextureMipHeader> mipHeaders)
 	{
 		const auto& metadata = texture.GetMetadata();
 		const auto levels = mipHeaders.size() / metadata.arraySize;
@@ -54,22 +52,13 @@ namespace CookedTextureWriting
 		const auto dimension = metadata.IsCubemap() ? TextureResourceDimension::TextureCube : TextureResourceDimension::Texture2D;
 		header.packedLayout = PackCookedTextureLayout(dimension, static_cast<std::uint16_t>(metadata.arraySize));
 
-		std::string error;
-		const bool bHeaderWritten = Files::BinaryStreamWriter::WriteValue(output, header, error);
-		const bool bMipHeadersWritten = bHeaderWritten && Files::BinaryStreamWriter::WriteBytes(output, mipHeaders.data(), mipHeaders.size() * sizeof(CookedTextureMipHeader), error);
-		if (!bMipHeadersWritten)
-		{
-			throw Diagnostics::Error(error);
-		}
+		output.WriteValue(header);
+		output.WriteBytes(mipHeaders.data(), mipHeaders.size() * sizeof(CookedTextureMipHeader));
 
 		for (std::size_t index = 0; index < mipHeaders.size(); ++index)
 		{
 			const auto& image = *texture.GetImage(index % levels, index / levels, 0);
-			const bool bWritten = Files::BinaryStreamWriter::WriteBytes(output, image.pixels, image.slicePitch, error);
-			if (!bWritten)
-			{
-				throw Diagnostics::Error(error);
-			}
+			output.WriteBytes(image.pixels, image.slicePitch);
 		}
 	}
 }
@@ -80,15 +69,7 @@ void StageCookedTextureAsset(const DirectX::ScratchImage& texture, TextureMipPol
 	const std::size_t levels = policy == TextureMipPolicy::NoMips ? 1 : metadata.mipLevels;
 	const auto mipHeaders = CookedTextureWriting::BuildMipHeaders(texture, levels);
 
-	std::ofstream output;
-	std::string error;
-	if (!Files::TryOpenBinaryOutput(stagedOutputPath, output, error))
-	{
-		throw Diagnostics::Error(error);
-	}
+	Files::BinaryFileWriter output(stagedOutputPath);
 	CookedTextureWriting::WriteContents(output, texture, mipHeaders);
-	if (!Files::TryCloseOutput(output, stagedOutputPath, error))
-	{
-		throw Diagnostics::Error(error);
-	}
+	output.Close();
 }

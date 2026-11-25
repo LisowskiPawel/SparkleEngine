@@ -3,7 +3,7 @@
 
 #include "Scene/Commands/SceneObjectCommandFactory.h"
 
-#include <memory>
+#include <optional>
 #include <utility>
 
 EditorSceneSession::EditorSceneSession(EditorSceneSource source, EditorTransactionHistory::SubmitFunction submit) :
@@ -27,37 +27,35 @@ void EditorSceneSession::Refresh()
 	}
 
 	const std::uint64_t worldGeneration = view.GetGeneration();
-	if (m_model && m_model->GetWorldGeneration() == worldGeneration)
+	if (m_model.HasWorld() && m_model.GetWorldGeneration() == worldGeneration)
 	{
-		if (m_model->GetWorldSequence() == view.GetSequence())
+		if (m_model.GetWorldSequence() == view.GetSequence())
 		{
 			return;
 		}
 	}
 
 	WorldMaterialVariantView materialVariants = m_source.MaterialVariants ? m_source.MaterialVariants() : WorldMaterialVariantView{};
-	auto model = std::make_unique<EditorSceneModel>(std::move(view), std::move(materialVariants));
-
-	const bool bWorldChanged = m_model && m_model->GetWorldGeneration() != worldGeneration;
-	m_model = std::move(model);
+	const bool bWorldChanged = m_model.HasWorld() && m_model.GetWorldGeneration() != worldGeneration;
+	m_model = EditorSceneModel(std::move(view), std::move(materialVariants));
 	m_history.InvalidateForWorldGeneration(worldGeneration);
 	SynchronizeSelection(bWorldChanged);
 }
 
 void EditorSceneSession::SynchronizeSelection(bool bWorldChanged) noexcept
 {
-	if (!bWorldChanged && m_model->Contains(m_selection))
+	if (!bWorldChanged && m_model.Contains(m_selection))
 	{
 		return;
 	}
 
-	const auto cameras = m_model->GetCameras();
+	const auto cameras = m_model.GetCameras();
 	m_selection = cameras.empty() ? SceneObjectSelection::None() : SceneObjectSelection::Camera(cameras.front().Entity);
 }
 
 void EditorSceneSession::Select(const SceneObjectSelection& selection)
 {
-	if (!m_model || !m_model->Contains(selection))
+	if (!m_model.Contains(selection))
 	{
 		return;
 	}
@@ -71,25 +69,19 @@ void EditorSceneSession::Select(const SceneObjectSelection& selection)
 
 	if (selection.type == SceneObjectType::Camera)
 	{
-		auto commands = SceneObjectCommandFactory::SetActiveCamera(*m_model, selection.entity);
+		auto commands = SceneObjectCommandFactory::SetActiveCamera(m_model, selection.entity);
 		if (commands)
 		{
-			(void) m_history.Execute(std::move(commands->Forward), std::move(commands->Inverse), m_model->GetWorldGeneration());
+			(void) m_history.Execute(std::move(commands->Forward), std::move(commands->Inverse), m_model.GetWorldGeneration());
 		}
 	}
 }
 
 void EditorSceneSession::ToggleVisibility(const SceneObjectSelection& selection)
 {
-	const EditorSceneEntry* entry = m_model ? m_model->FindEntry(selection) : nullptr;
-	if (entry == nullptr)
-	{
-		return;
-	}
-
-	auto commands = SceneObjectCommandFactory::SetVisibility(*m_model, selection, !entry->bVisible);
+	auto commands = SceneObjectCommandFactory::ToggleVisibility(m_model, selection);
 	if (commands)
 	{
-		(void) m_history.Execute(std::move(commands->Forward), std::move(commands->Inverse), m_model->GetWorldGeneration());
+		(void) m_history.Execute(std::move(commands->Forward), std::move(commands->Inverse), m_model.GetWorldGeneration());
 	}
 }

@@ -2,13 +2,12 @@
 
 #include "Editor/ReferencePathTracer/ReferencePathTracerArtifactWriter.h"
 
-#include "Core/Public/Hash/HashUtils.h"
-#include "Editor/Artifacts/ArtifactBundlePublication.h"
 #include "Editor/ReferencePathTracer/ReferencePathTracerArtifactEncoding.h"
+#include "Editor/ReferencePathTracer/ReferencePathTracerArtifactPublication.h"
+#include "Core/Public/Hash/HashUtils.h"
 
-#include <utility>
 #include <exception>
-#include <span>
+#include <string>
 
 namespace ReferencePathTracerArtifactWriter
 {
@@ -19,27 +18,6 @@ namespace ReferencePathTracerArtifactWriter
 			return false;
 		}
 		return !artifact.Checkpoint || Hash::TrySha256Hex(*artifact.Checkpoint, checkpoint, error);
-	}
-
-	static ArtifactBundlePublicationRequest BuildPublication(ReferencePathTracerArtifactWriteRequest& request, ReferencePathTracerEncodedArtifact& artifact, const std::string& manifest)
-	{
-		ArtifactBundlePublicationRequest publication{
-		    .AllowedRoot = std::move(request.AllowedRoot),
-		    .PublicationDirectory = std::move(request.PublicationDirectory),
-		    .CompletionFile = "manifest.json",
-		    .MaximumOutputBytes = request.MaximumOutputBytes};
-
-		publication.Files.push_back(ArtifactBundleFile{.RelativePath = "beauty.exr", .Bytes = std::move(artifact.Beauty)});
-		if (artifact.Checkpoint)
-		{
-			publication.Files.push_back(ArtifactBundleFile{.RelativePath = "checkpoint.bin", .Bytes = std::move(*artifact.Checkpoint)});
-		}
-
-		const auto manifestBytes = std::as_bytes(std::span(manifest));
-		ArtifactBundleFile manifestFile{.RelativePath = "manifest.json", .Bytes = std::vector<std::byte>(manifestBytes.begin(), manifestBytes.end())};
-		publication.Files.push_back(std::move(manifestFile));
-
-		return publication;
 	}
 }
 
@@ -66,15 +44,8 @@ ReferencePathTracerArtifactWriteResult ReferencePathTracerArtifactWriter::Write(
 			return result;
 		}
 		const std::string manifest = ReferencePathTracerArtifactEncoding::BuildManifest(request, artifact, beautyHash, checkpointHash);
-		ArtifactBundlePublicationRequest publication = BuildPublication(request, artifact, manifest);
-		ArtifactBundlePublicationResult published = ArtifactBundlePublication::Publish(std::move(publication), cancellationToken);
-		result.bSucceeded = published.bSucceeded;
-		result.PublicationDirectory = std::move(published.PublicationDirectory);
-		result.ErrorMessage = std::move(published.ErrorMessage);
-		if (result.bSucceeded && !published.Files.empty())
-		{
-			result.ManifestSha256 = std::move(published.Files.back().Sha256);
-		}
+		result.ManifestSha256 = ReferencePathTracerArtifactPublication::Publish(request, artifact, manifest, beautyHash, checkpointHash, cancellationToken);
+		result.bSucceeded = true;
 	}
 	catch (const std::exception& error)
 	{

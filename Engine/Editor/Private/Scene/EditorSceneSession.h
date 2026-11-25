@@ -2,9 +2,10 @@
 
 #include "Scene/Model/EditorSceneModel.h"
 #include "Scene/Transactions/EditorTransactionHistory.h"
+#include "World/WorldMaterialVariantView.h"
+#include "World/WorldReadView.h"
 
 #include <functional>
-#include <memory>
 
 struct EditorSceneSource final
 {
@@ -21,7 +22,7 @@ public:
 	void Select(const SceneObjectSelection& selection);
 	void ToggleVisibility(const SceneObjectSelection& selection);
 
-	const EditorSceneModel* GetModel() const noexcept { return m_model.get(); }
+	const EditorSceneModel& GetModel() const noexcept { return m_model; }
 
 	const SceneObjectSelection& GetSelection() const noexcept { return m_selection; }
 
@@ -31,7 +32,7 @@ private:
 	void SynchronizeSelection(bool bWorldChanged) noexcept;
 
 	EditorSceneSource m_source;
-	std::unique_ptr<const EditorSceneModel> m_model;
+	EditorSceneModel m_model;
 	SceneObjectSelection m_selection;
 	EditorTransactionHistory m_history;
 };

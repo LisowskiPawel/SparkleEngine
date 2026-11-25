@@ -4,12 +4,11 @@
 #include "MaterialCooker.h"
 #include "CookedMaterialAssetBuild.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Files/BinaryStreamWriter.h"
+#include "Core/Public/Files/BinaryFileWriter.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Files/FileSetPublication.h"
 #include "Core/Public/Paths/CookedAssetPaths.h"
 
-#include <fstream>
 #include <limits>
 #include <cstring>
 
@@ -51,15 +50,11 @@ static std::vector<Assets::CookedTextureReferenceRecord> BuildTextureReferenceRe
 	return records;
 }
 
-static void WriteTextureReferencePaths(std::ofstream& output, const CookedMaterialAssetBuild& materialAsset)
+static void WriteTextureReferencePaths(Files::BinaryFileWriter& output, const CookedMaterialAssetBuild& materialAsset)
 {
-	std::string errorMessage;
 	for (const Assets::CookedTextureReference& reference : materialAsset.textureReferences)
 	{
-		if (!Files::BinaryStreamWriter::WriteBytes(output, reference.texturePath.data(), reference.texturePath.size(), errorMessage))
-		{
-			throw Diagnostics::Error(errorMessage);
-		}
+		output.WriteBytes(reference.texturePath.data(), reference.texturePath.size());
 	}
 }
 
@@ -67,30 +62,12 @@ static void WriteMaterialAsset(const CookedMaterialAssetBuild& materialAsset, co
 {
 	const Assets::CookedMaterialAssetHeader header = BuildHeader(materialAsset);
 	const std::vector<Assets::CookedTextureReferenceRecord> records = BuildTextureReferenceRecords(materialAsset);
-	std::string errorMessage;
-	std::ofstream output;
-	if (!Files::TryOpenBinaryOutput(stagedOutputPath, output, errorMessage))
-	{
-		throw Diagnostics::Error(errorMessage);
-	}
-	if (!Files::BinaryStreamWriter::WriteValue(output, header, errorMessage))
-	{
-		throw Diagnostics::Error(errorMessage);
-	}
-
-	if (!Files::BinaryStreamWriter::WriteBytes(output, materialAsset.name.data(), materialAsset.name.size(), errorMessage))
-	{
-		throw Diagnostics::Error("Failed to write cooked material asset name payload.");
-	}
-	if (!Files::BinaryStreamWriter::WriteArray(output, records, errorMessage))
-	{
-		throw Diagnostics::Error(errorMessage);
-	}
+	Files::BinaryFileWriter output(stagedOutputPath);
+	output.WriteValue(header);
+	output.WriteBytes(materialAsset.name.data(), materialAsset.name.size(), "Failed to write cooked material asset name payload.");
+	output.WriteArray(records);
 	WriteTextureReferencePaths(output, materialAsset);
-	if (!Files::TryCloseOutput(output, stagedOutputPath, errorMessage))
-	{
-		throw Diagnostics::Error(errorMessage);
-	}
+	output.Close();
 }
 
 static void StageMaterialAsset(const CookedMaterialAssetBuild& materialAsset, std::vector<Files::FilePublication>& outPublication)

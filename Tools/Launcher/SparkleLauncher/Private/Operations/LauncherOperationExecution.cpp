@@ -5,34 +5,23 @@
 
 namespace SparkleLauncher
 {
+	std::optional<std::string_view> FindLauncherOperationDisplayName(std::string_view operationId)
+	{
+		std::optional<std::string_view> name;
+		VisitLauncherOperationDefinitions(
+		    [&](const auto& definition)
+		    {
+			    if (!name && definition.Id == operationId)
+			    {
+				    name = definition.DisplayName;
+			    }
+		    });
+		return name;
+	}
+
 	LauncherOperationPlan PlanLauncherOperation(std::string_view operationId, const LauncherOperationInputs& inputs)
 	{
-		return std::visit(
-		    [operationId](const auto& request) -> LauncherOperationPlan
-		    {
-			    using Request = std::remove_cvref_t<decltype(request)>;
-			    if constexpr (std::is_same_v<Request, BuildWorkspaceOperationRequest>)
-			    {
-				    return PlanBuildWorkspaceOperation(operationId, request);
-			    }
-			    else if constexpr (std::is_same_v<Request, LevelOperationRequest>)
-			    {
-				    return PlanLevelOperation(operationId, request);
-			    }
-			    else if constexpr (std::is_same_v<Request, LevelRunOperationRequest>)
-			    {
-				    return PlanLevelRunOperation(operationId, request);
-			    }
-			    else if constexpr (std::is_same_v<Request, CookOperationRequest>)
-			    {
-				    return PlanCookOperation(operationId, request);
-			    }
-			    else
-			    {
-				    return PlanMaintenanceOperation(operationId, request);
-			    }
-		    },
-		    inputs);
+		return std::visit([operationId](const auto& request) -> LauncherOperationPlan { return PlanLauncherOperation(operationId, request); }, inputs);
 	}
 
 	OperationRecord RunLauncherOperationPlan(LauncherOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
@@ -41,25 +30,13 @@ namespace SparkleLauncher
 		    [&outputCallback, cancellation](auto&& typedPlan) -> OperationRecord
 		    {
 			    using Plan = std::remove_cvref_t<decltype(typedPlan)>;
-			    if constexpr (std::is_same_v<Plan, BuildWorkspaceOperationPlan>)
+			    if constexpr (std::is_same_v<Plan, MaintenanceOperationPlan>)
 			    {
-				    return RunBuildWorkspaceOperationPlan(std::move(typedPlan), outputCallback, cancellation);
-			    }
-			    else if constexpr (std::is_same_v<Plan, LevelOperationPlan>)
-			    {
-				    return RunLevelOperationPlan(std::move(typedPlan), outputCallback, cancellation);
-			    }
-			    else if constexpr (std::is_same_v<Plan, LevelRunOperationPlan>)
-			    {
-				    return RunLevelRunOperationPlan(std::move(typedPlan), outputCallback, cancellation);
-			    }
-			    else if constexpr (std::is_same_v<Plan, CookOperationPlan>)
-			    {
-				    return RunCookOperationPlan(std::move(typedPlan), outputCallback, cancellation);
+				    return RunLauncherOperationPlan(std::move(typedPlan), outputCallback);
 			    }
 			    else
 			    {
-				    return RunMaintenanceOperationPlan(std::move(typedPlan), outputCallback);
+				    return RunLauncherOperationPlan(std::move(typedPlan), outputCallback, cancellation);
 			    }
 		    },
 		    std::move(plan));

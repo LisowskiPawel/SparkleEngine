@@ -172,7 +172,7 @@ namespace SparkleLauncher
 		return found == definitions.end() ? nullptr : &*found;
 	}
 
-	LevelRunOperationPlan PlanLevelRunOperation(std::string_view operationId, const LevelRunOperationRequest& request)
+	LevelRunOperationPlan PlanLauncherOperation(std::string_view operationId, const LevelRunOperationRequest& request)
 	{
 		LevelRunOperationPlan plan;
 		const LevelRunOperationDefinition* definition = FindLevelRunOperationDefinition(operationId);

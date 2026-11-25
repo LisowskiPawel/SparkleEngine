@@ -1,47 +1,39 @@
 #include "PCH.h"
 
-#include "SceneObjectCommandFactory.h"
+#include "Scene/Commands/SceneObjectCommandFactory.h"
 
 #include "Scene/Model/EditorSceneModel.h"
 #include "Scene/SceneObjectSelection.h"
 
-std::optional<EditorCommandPair> SceneObjectCommandFactory::SetVisibility(const EditorSceneModel& model, const SceneObjectSelection& selection, bool bVisible)
+#include <utility>
+
+std::optional<EditorCommandPair> SceneObjectCommandFactory::ToggleVisibility(const EditorSceneModel& model, const SceneObjectSelection& selection)
 {
-	EditorCommandPair commands;
-	if (selection.type == SceneObjectType::Light)
-	{
-		const WorldLightReadData* light = model.FindLight(selection.entity);
-		if (light == nullptr)
-		{
-			return std::nullopt;
-		}
-		SceneLightDesc after = light->Description;
-		after.common.bVisible = bVisible;
-		commands.Forward.Payload = SetLightDescriptionCommand{selection.entity, after};
-		commands.Inverse.Payload = SetLightDescriptionCommand{selection.entity, light->Description};
-	}
-	else if (selection.type == SceneObjectType::Sky)
-	{
-		SkyEnvironment after = model.GetSkyEnvironment().value_or(SkyEnvironment{});
-		after.bEnabled = bVisible;
-		commands.Forward.Payload = SetSkyEnvironmentCommand{after};
-		commands.Inverse.Payload = SetSkyEnvironmentCommand{model.GetSkyEnvironment()};
-	}
-	else if (selection.entity.IsValid())
-	{
-		const EditorSceneEntry* entry = model.FindEntry(selection);
-		if (entry == nullptr)
-		{
-			return std::nullopt;
-		}
-		commands.Forward.Payload = SetEntityVisibilityCommand{selection.entity, bVisible};
-		commands.Inverse.Payload = SetEntityVisibilityCommand{selection.entity, entry->bVisible};
-	}
-	else
+	const std::optional<bool> visibility = model.ReadVisibility(selection);
+	if (!visibility)
 	{
 		return std::nullopt;
 	}
-	return commands;
+
+	const bool bVisible = !*visibility;
+	if (selection.type == SceneObjectType::Light)
+	{
+		const SceneLightDesc& before = model.FindLight(selection.entity)->Description;
+		SceneLightDesc after = before;
+		after.common.bVisible = bVisible;
+		return EditorCommandPair{SetLightDescriptionCommand{selection.entity, std::move(after)}, SetLightDescriptionCommand{selection.entity, before}};
+	}
+	if (selection.type == SceneObjectType::Sky)
+	{
+		SkyEnvironment after = model.GetSkyEnvironment().value_or(SkyEnvironment{});
+		after.bEnabled = bVisible;
+		return EditorCommandPair{SetSkyEnvironmentCommand{after}, SetSkyEnvironmentCommand{model.GetSkyEnvironment()}};
+	}
+	if (selection.entity.IsValid())
+	{
+		return EditorCommandPair{SetEntityVisibilityCommand{selection.entity, bVisible}, SetEntityVisibilityCommand{selection.entity, *visibility}};
+	}
+	return std::nullopt;
 }
 
 std::optional<EditorCommandPair> SceneObjectCommandFactory::SetActiveCamera(const EditorSceneModel& model, EntityId camera)
@@ -50,6 +42,7 @@ std::optional<EditorCommandPair> SceneObjectCommandFactory::SetActiveCamera(cons
 	{
 		return std::nullopt;
 	}
+
 	EntityId previous = EntityId::Invalid();
 	for (const WorldCameraReadData& entry : model.GetCameras())
 	{
@@ -62,9 +55,5 @@ std::optional<EditorCommandPair> SceneObjectCommandFactory::SetActiveCamera(cons
 	{
 		return std::nullopt;
 	}
-
-	EditorCommandPair commands;
-	commands.Forward.Payload = SetActiveCameraCommand{camera};
-	commands.Inverse.Payload = SetActiveCameraCommand{previous};
-	return commands;
+	return EditorCommandPair{SetActiveCameraCommand{camera}, SetActiveCameraCommand{previous}};
 }

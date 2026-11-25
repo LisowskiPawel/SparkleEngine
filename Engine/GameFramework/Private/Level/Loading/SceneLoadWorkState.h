@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Level/Loading/SceneLoadExecutor.h"
+#include "Level/Loading/SceneLoadCompletion.h"
+#include "Level/Loading/SceneLoadPackage.h"
 #include "Assets/Cooked/LoadedSceneManifest.h"
 #include "Assets/Loaders/CookedAssetFileSet.h"
 #include "Core/Public/Files/FileSetPublication.h"
@@ -41,7 +42,6 @@ namespace Assets
 		void PreparePackage(std::uint64_t requestId, std::uint64_t worldGeneration, std::uint64_t documentGeneration, LevelDesc level, const SceneAssetCatalog& catalog);
 		void ReadAsset(std::size_t index);
 		void DecodeAsset(std::size_t index);
-		void FinalizePackage();
 
 	private:
 		void ResolveAssets(const SceneAssetCatalog& catalog);
@@ -51,7 +51,6 @@ namespace Assets
 		CookedAssetAllocationBudget AllocationBudget;
 		std::unique_ptr<SceneLoadPackage> Package;
 		std::vector<SceneAssetLoadWork> Assets;
-		std::atomic<std::uint32_t> CompletedDecodes = 0;
-		std::atomic<LevelLoadOperationStage> Stage = LevelLoadOperationStage::Reading;
+		std::atomic<SceneLoadStatus> Status = SceneLoadStatus::Pending;
 	};
 }

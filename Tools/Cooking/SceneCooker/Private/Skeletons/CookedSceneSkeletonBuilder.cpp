@@ -133,8 +133,6 @@ namespace CookedSceneSkeletonBuilder
 
 			CookedSkeletonAssetBuild skeletonAsset;
 			skeletonAsset.assetId = BuildSkeletonAssetId(sceneAssetId, importedSkeleton.sourceSkinIndex);
-			skeletonAsset.sourceSkinIndex = importedSkeleton.sourceSkinIndex;
-			skeletonAsset.sourcePath = importOutput.GetSourcePath();
 			skeletonAsset.joints.reserve(importedSkeleton.joints.size());
 
 			std::unordered_set<std::uint32_t> sourceNodeIndices;

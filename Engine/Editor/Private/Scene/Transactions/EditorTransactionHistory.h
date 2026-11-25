@@ -16,7 +16,7 @@ public:
 
 	explicit EditorTransactionHistory(SubmitFunction submit);
 
-	WorldEditResult Execute(WorldEditCommand forward, WorldEditCommand inverse, std::uint64_t worldGeneration, std::string coalescingKey = {});
+	WorldEditResult Execute(WorldEditPayload forward, WorldEditPayload inverse, std::uint64_t worldGeneration, std::string coalescingKey = {});
 	WorldEditResult Undo(std::uint64_t worldGeneration);
 	WorldEditResult Redo(std::uint64_t worldGeneration);
 	void InvalidateForWorldGeneration(std::uint64_t worldGeneration) noexcept;
@@ -30,12 +30,12 @@ public:
 private:
 	struct Transaction final
 	{
-		WorldEditCommand Forward;
-		WorldEditCommand Inverse;
+		WorldEditPayload Forward;
+		WorldEditPayload Inverse;
 		std::string CoalescingKey;
 	};
 
-	WorldEditResult Submit(WorldEditCommand command, std::uint64_t worldGeneration);
+	WorldEditResult Submit(WorldEditPayload payload, std::uint64_t worldGeneration);
 	SubmitFunction m_submit;
 	std::vector<Transaction> m_transactions;
 	std::size_t m_position = 0;

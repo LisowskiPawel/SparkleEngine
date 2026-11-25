@@ -2,39 +2,31 @@
 
 #include "Animation/AnimationClipResource.h"
 #include "World/ECS/Components/AnimationComponents.h"
-#include "World/Resources/SkeletonResourceStore.h"
 
 #include <cstdint>
 #include <span>
 #include <vector>
 
+class SkeletonResourceStore;
+struct SkeletonResource;
+
 namespace ECS
 {
-	struct ResolvedAnimationClip final
+	struct BoundAnimationClip final
 	{
-		const AnimationClipResource* Resource = nullptr;
-		SkeletonResourceHandle Skeleton;
+		AnimationClipResource Resource;
+		const SkeletonResource* Skeleton = nullptr;
 		std::uint32_t TargetGeneration = 0;
-
-		bool IsValid() const noexcept { return Resource != nullptr && TargetGeneration != 0; }
 	};
 
 	class AnimationClipResourceStore final
 	{
 	public:
 		AnimationResourceHandle Add(AnimationClipResource&& clip);
-		ResolvedAnimationClip Resolve(AnimationResourceHandle handle) const noexcept;
+		const BoundAnimationClip* Resolve(AnimationResourceHandle handle) const noexcept;
 		bool ResolveTargets(const SkeletonResourceStore& skeletons, std::uint32_t targetGeneration) noexcept;
 
 	private:
-		struct Entry final
-		{
-			AnimationClipResource Resource;
-			SkeletonResourceHandle Skeleton;
-			std::uint32_t Generation = 1;
-			std::uint32_t TargetGeneration = 0;
-		};
-
-		std::vector<Entry> m_entries;
+		std::vector<BoundAnimationClip> m_entries;
 	};
 }

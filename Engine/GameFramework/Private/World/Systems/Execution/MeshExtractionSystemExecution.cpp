@@ -57,8 +57,8 @@ namespace ECS
 		slot.WorldMatrix = world->Matrix;
 		DirectX::XMStoreFloat3x4(&slot.WorldInverseTranspose, DirectX::XMLoadFloat4x4(&world->InverseTranspose));
 		slot.Material = mesh.Material;
-		const SkeletonResourceHandle skeleton = m_skeletons.Find(mesh.SkeletonAssetId);
-		slot.Skeleton = skeleton.IsValid() ? RenderSkeletonAssetHandle(mesh.SkeletonAssetId) : RenderSkeletonAssetHandle{};
+		const SkeletonResource* skeleton = m_skeletons.Find(mesh.SkeletonAssetId);
+		slot.Skeleton = skeleton != nullptr ? RenderSkeletonAssetHandle(mesh.SkeletonAssetId) : RenderSkeletonAssetHandle{};
 		slot.Kind = mesh.Kind;
 		slot.MeshAssetIndex = mesh.MeshAssetIndex;
 		slot.InstanceGroupIndex = mesh.InstanceGroupIndex;

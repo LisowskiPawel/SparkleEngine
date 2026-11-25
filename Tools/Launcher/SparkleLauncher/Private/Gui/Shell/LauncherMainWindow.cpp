@@ -430,7 +430,7 @@ namespace SparkleLauncher
 		if (FindBuildWorkspaceOperationDefinition(m_selectedOperationId.toStdString()) != nullptr)
 		{
 			const BuildWorkspaceOperationRequest request = BuildWorkspacePlanRequest(m_workspaceRoot, m_contentModel, m_settings);
-			const BuildWorkspaceOperationPlan plan = PlanBuildWorkspaceOperation(m_selectedOperationId.toStdString(), request);
+			const BuildWorkspaceOperationPlan plan = PlanLauncherOperation(m_selectedOperationId.toStdString(), request);
 			const QString reason = plan.bCanRun ? "Run " + DisplayNameForOperation(m_selectedOperationId) + ". Existing runs keep going." : FirstBlockingReadinessMessage(plan.ReadinessMessages);
 			ApplyActionAvailability(*m_runButton, plan.bCanRun, reason);
 			return;
@@ -440,7 +440,7 @@ namespace SparkleLauncher
 		{
 			const LauncherOperationRequest operationRequest = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, m_selectedOperationId);
 			const auto& cookRequest = std::get<CookOperationRequest>(operationRequest.Inputs);
-			const CookOperationPlan plan = PlanCookOperation(m_selectedOperationId.toStdString(), cookRequest);
+			const CookOperationPlan plan = PlanLauncherOperation(m_selectedOperationId.toStdString(), cookRequest);
 
 			const QString reason = plan.bCanRun
 			    ? "Run " + DisplayNameForOperation(m_selectedOperationId) + ". Existing runs keep going."

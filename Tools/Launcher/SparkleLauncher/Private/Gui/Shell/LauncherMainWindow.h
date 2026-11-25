@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Gui/Style/LauncherIconLibrary.h"
-#include "Gui/Models/LauncherOperationResult.h"
 #include "Gui/Operations/LauncherOperationRequest.h"
 
 #include <QtCore/QHash>
@@ -22,7 +21,6 @@ class QVBoxLayout;
 
 namespace SparkleLauncher
 {
-	struct LauncherOperationDescriptor;
 	enum class WorkspaceCompiler : std::uint8_t;
 	class LauncherBackend;
 	class LauncherContentModel;
@@ -47,10 +45,10 @@ namespace SparkleLauncher
 		void HandleApplicationStateChanged(Qt::ApplicationState state);
 		void RunSelectedOperation();
 		void CleanSelectedOperation();
-		void DisplayOperationStarted(const QString& runId, const QString& operationId, const QString& title);
-		void AppendOperationOutput(const QString& runId, const QString& operationId, const QString& outputText);
-		void UpdateOperationProgress(const QString& runId, const QString& operationId, const QString& phase, quint64 completed, quint64 total);
-		void DisplayOperationFinished(const QString& runId, const QString& operationId, const QString& title, const LauncherOperationResult& result);
+		void DisplayOperationStarted(const QString& runId, const QString& title);
+		void AppendOperationOutput(const QString& runId, const QString& outputText);
+		void UpdateOperationProgress(const QString& runId, const QString& phase, quint64 completed, quint64 total);
+		void DisplayOperationFinished(const QString& runId, const OperationRecord& result);
 
 	private:
 		void InitializeWorkflowPresentation(QWidget& parent);
@@ -70,7 +68,6 @@ namespace SparkleLauncher
 		void ConfigureTabOrder();
 		void UpdateRunAvailability();
 		void UpdateWorkflowRunAvailability();
-		const LauncherOperationDescriptor* FindOperationDescriptor(const QString& operationId) const;
 		QString DisplayNameForOperation(const QString& operationId) const;
 		bool OperationNeedsContent(const QString& operationId) const;
 		void PromptForLauncherRestart();

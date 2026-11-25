@@ -99,6 +99,6 @@ namespace SparkleLauncher
 	bool TryParseCleanScope(std::string_view text, CleanScope& outScope) noexcept;
 	const std::vector<MaintenanceOperationDefinition>& GetMaintenanceOperationDefinitions();
 	const MaintenanceOperationDefinition* FindMaintenanceOperationDefinition(std::string_view operationId);
-	MaintenanceOperationPlan PlanMaintenanceOperation(std::string_view operationId, const MaintenanceOperationRequest& request);
-	OperationRecord RunMaintenanceOperationPlan(MaintenanceOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback = {});
+	MaintenanceOperationPlan PlanLauncherOperation(std::string_view operationId, const MaintenanceOperationRequest& request);
+	OperationRecord RunLauncherOperationPlan(MaintenanceOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback = {});
 }

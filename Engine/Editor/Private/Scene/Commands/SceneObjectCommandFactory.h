@@ -9,14 +9,12 @@ struct SceneObjectSelection;
 
 struct EditorCommandPair final
 {
-	WorldEditCommand Forward;
-	WorldEditCommand Inverse;
+	WorldEditPayload Forward;
+	WorldEditPayload Inverse;
 };
 
-// Pure translation from an immutable editor model and user intent to semantic world commands.
-// Panels own widget behavior only and never reconstruct domain mutation rules.
 namespace SceneObjectCommandFactory
 {
-	std::optional<EditorCommandPair> SetVisibility(const EditorSceneModel& model, const SceneObjectSelection& selection, bool bVisible);
+	std::optional<EditorCommandPair> ToggleVisibility(const EditorSceneModel& model, const SceneObjectSelection& selection);
 	std::optional<EditorCommandPair> SetActiveCamera(const EditorSceneModel& model, EntityId camera);
 }

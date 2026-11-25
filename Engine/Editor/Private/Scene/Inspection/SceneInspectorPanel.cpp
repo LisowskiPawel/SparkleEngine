@@ -47,12 +47,52 @@ void SceneInspectorPanel::SetTopInset(float topInsetPixels) noexcept
 	m_topInsetPixels = topInsetPixels;
 }
 
+void SceneInspectorPanel::DrawSelectionHeader() noexcept
+{
+	const SceneObjectSelection& selection = m_scene.GetSelection();
+	const auto entry = SceneObjectPresentation::BuildEntry(m_scene.GetModel(), selection);
+	const char* title = entry ? entry->GetLabel().data() : "No Selection";
+	const char* subtitle = entry ? entry->TypeLabel : "Object";
+	const EditorIcons::EditorIcon icon = SceneObjectPresentation::BuildSelectionIcon(selection, entry ? entry->LightKind : SceneLightKind::Unknown);
+
+	constexpr float kHeaderHeight = 30.0f;
+	constexpr float kHeaderPaddingX = 8.0f;
+	const float width = ImGui::GetContentRegionAvail().x;
+	const ImVec2 start = ImGui::GetCursorScreenPos();
+	const ImVec2 end(start.x + width, start.y + kHeaderHeight);
+	ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+	const ImU32 backgroundColor = ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::HeaderBackgroundActive());
+	drawList->AddRectFilled(start, end, backgroundColor);
+	const ImVec2 accentEnd(start.x + 3.0f, end.y);
+	const ImU32 accentColor = ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::Accent());
+	drawList->AddRectFilled(start, accentEnd, accentColor);
+	const ImVec2 topBorderEnd(end.x, start.y);
+	const ImU32 topBorderColor = SparkleUiPalette::WithAlphaU32(SparkleUiPalette::Border(), 0.52f);
+	drawList->AddLine(start, topBorderEnd, topBorderColor);
+	const ImVec2 bottomBorderStart(start.x, end.y - 1.0f);
+	const ImVec2 bottomBorderEnd(end.x, end.y - 1.0f);
+	const ImU32 bottomBorderColor = SparkleUiPalette::WithAlphaU32(SparkleUiPalette::Border(), 0.58f);
+	drawList->AddLine(bottomBorderStart, bottomBorderEnd, bottomBorderColor);
+
+	ImGui::InvisibleButton("##DetailsSelectionHeader", ImVec2(width, kHeaderHeight));
+
+	ImGui::SetCursorScreenPos(ImVec2(start.x + kHeaderPaddingX + 10.0f, start.y + 7.0f));
+	ImGui::TextUnformatted(EditorIcons::GetEditorIconGlyph(icon));
+	ImGui::SameLine(0.0f, 8.0f);
+	ImGui::TextUnformatted(title);
+	ImGui::SameLine();
+	ImGui::TextDisabled("%s", subtitle);
+
+	ImGui::SetCursorScreenPos(ImVec2(start.x, end.y));
+}
+
 void SceneInspectorPanel::BuildSelectionInspector() noexcept
 {
-	const EditorSceneModel& model = *m_scene.GetModel();
+	const EditorSceneModel& model = m_scene.GetModel();
 	const SceneObjectSelection& selection = m_scene.GetSelection();
 	EditorTransactionHistory& history = m_scene.GetHistory();
-	SceneObjectPresentation::DrawSelectionHeader(model, selection);
+	DrawSelectionHeader();
 	BuildDetailsToolbar();
 	switch (selection.type)
 	{
@@ -123,6 +163,7 @@ void SceneInspectorPanel::BeginWindow() noexcept
 
 void SceneInspectorPanel::BuildInspectorTabs() noexcept
 {
+	const EditorSceneModel& model = m_scene.GetModel();
 	constexpr ImGuiTabBarFlags kTabBarFlags = ImGuiTabBarFlags_NoCloseWithMiddleMouseButton | ImGuiTabBarFlags_FittingPolicyResizeDown;
 	if (ImGui::BeginTabBar("##InspectorTabs", kTabBarFlags))
 	{
@@ -133,7 +174,6 @@ void SceneInspectorPanel::BuildInspectorTabs() noexcept
 			ImGui::EndTabItem();
 		}
 
-		const EditorSceneModel& model = *m_scene.GetModel();
 		if (!model.GetMaterialVariants().Names.empty() && ImGui::BeginTabItem("Variants"))
 		{
 			ImGui::Spacing();
@@ -149,7 +189,7 @@ void SceneInspectorPanel::BuildUI(bool bDisableInteraction)
 {
 	BeginWindow();
 
-	if (m_scene.GetModel() == nullptr)
+	if (!m_scene.GetModel().HasWorld())
 	{
 		ImGui::TextDisabled("Scene inspector unavailable");
 		ImGui::End();

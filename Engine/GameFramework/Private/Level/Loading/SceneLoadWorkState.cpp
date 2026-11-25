@@ -56,7 +56,6 @@ namespace Assets
 	{
 		SceneAssetLoadWork& work = Assets[index];
 		SceneAssetFileReader::Read(work.Id, work.ManifestPath, work.Manifest, work.Files);
-		Stage.store(LevelLoadOperationStage::Decoding, std::memory_order_release);
 	}
 
 	void SceneLoadWorkState::DecodeAsset(std::size_t index)
@@ -64,12 +63,5 @@ namespace Assets
 		SceneAssetLoadWork& work = Assets[index];
 		work.Payload = SceneAssetPayloadDecoder::Decode(work.Manifest, work.Files);
 		PrepareSceneAssetForCommit(work);
-		CompletedDecodes.fetch_add(1, std::memory_order_relaxed);
-	}
-
-	void SceneLoadWorkState::FinalizePackage()
-	{
-		Stage.store(LevelLoadOperationStage::Validating, std::memory_order_release);
-		FinalizeSceneLoadPackage(*this);
 	}
 }

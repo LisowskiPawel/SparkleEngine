@@ -90,7 +90,7 @@ namespace ECS
 			}
 
 			const AnimationEvaluationStorage::PoseWorkSlot& pose = poses[skinning->Pose.Slot];
-			const SkeletonResourceHandle skeleton = skeletons.Find(skinning->SkeletonAssetId);
+			const SkeletonResource* skeleton = skeletons.Find(skinning->SkeletonAssetId);
 			const AnimationState* playback = animationStates.Get(pose.Entity);
 			const std::uint32_t jointMatrixOffset = static_cast<std::uint32_t>(dynamic.JointMatrices.size());
 			dynamic.JointMatrices.insert(dynamic.JointMatrices.end(), pose.JointMatrices.begin(), pose.JointMatrices.end());
@@ -98,7 +98,7 @@ namespace ECS
 			dynamic.JointMatrixRanges.push_back(
 			    RenderJointMatrixRange{
 			        .Object = objects.FindObject(mesh.Entity),
-			        .Skeleton = skeleton.IsValid() ? RenderSkeletonAssetHandle(skinning->SkeletonAssetId) : RenderSkeletonAssetHandle{},
+			        .Skeleton = skeleton != nullptr ? RenderSkeletonAssetHandle(skinning->SkeletonAssetId) : RenderSkeletonAssetHandle{},
 			        .Animation = playback != nullptr ? RenderAnimationAssetHandle(playback->AnimationAssetId) : RenderAnimationAssetHandle{},
 			        .JointMatrixOffset = jointMatrixOffset,
 			        .JointMatrixCount = static_cast<std::uint32_t>(pose.JointMatrices.size())});

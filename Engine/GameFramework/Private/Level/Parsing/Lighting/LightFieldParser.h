@@ -1,11 +1,11 @@
 #pragma once
 
-#include "LightFieldKeyParser.h"
+#include "GameFramework/Public/Scene/Lighting/SceneLightDesc.h"
 #include "Level/Parsing/LevelParserCommon.h"
 
 #include <vector>
 
 namespace LevelParsing
 {
-	void ParseLightField(const ParsedLightFieldKey& key, const ParsedLevelLine& parsedLine, std::vector<SceneLightDesc>& lights);
+	void ParseLightField(const ParsedLevelLine& parsedLine, std::vector<SceneLightDesc>& lights);
 }

@@ -11,15 +11,18 @@ struct MeshDiagnosticMetadata;
 
 namespace MeshDiagnosticsPresentation
 {
-	std::string FormatRuntimeId(std::uintptr_t id);
-	std::string FormatAssetId(std::uint64_t id);
+	struct Summary final
+	{
+		std::size_t ResidentCount = 0;
+		std::uint64_t CpuBytes = 0;
+		std::uint64_t GpuBytes = 0;
+	};
+
+	Summary BuildSummary(const MeshDiagnosticsSnapshot& snapshot) noexcept;
 	std::string FormatMeshDisplayName(const MeshDiagnosticsRow& row, const MeshDiagnosticMetadata* metadata);
 	std::string FormatMeshSourcePath(const MeshDiagnosticsRow& row, const MeshDiagnosticMetadata* metadata);
 	std::string FormatMemorySummary(const MeshDiagnosticsRow& row);
 	std::string FormatMaterial(const MeshDiagnosticsRow& row);
 	std::string FormatBoundsExtent(const MeshDiagnosticsBounds& bounds);
 	std::string FormatBoundsPoint(const std::array<float, 3>& point);
-	std::size_t CountResidentMeshes(const MeshDiagnosticsSnapshot& snapshot) noexcept;
-	std::uint64_t SumCpuBytes(const MeshDiagnosticsSnapshot& snapshot) noexcept;
-	std::uint64_t SumGpuBytes(const MeshDiagnosticsSnapshot& snapshot) noexcept;
 }

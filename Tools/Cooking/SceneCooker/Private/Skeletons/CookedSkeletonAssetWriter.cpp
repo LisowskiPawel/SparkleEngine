@@ -1,39 +1,19 @@
 #include "PCH.h"
 
-#include "CookedSkeletonAssetWriter.h"
+#include "Skeletons/CookedSkeletonAssetWriter.h"
 
 #include "CookedSceneBuild.h"
-#include "BinaryAssetWriter.h"
-#include "Core/Public/Files/FileUtils.h"
-#include "Core/Public/Files/FileSetPublication.h"
-#include "Core/Public/Paths/CookedAssetPaths.h"
+#include "Core/Public/Files/BinaryFileWriter.h"
 
-namespace CookedSkeletonAssetWriter
+void CookedSkeletonAssetWriter::Write(const CookedSkeletonAssetBuild& asset, const std::filesystem::path& outputPath)
 {
-	static void StageSkeletonAsset(const CookedSkeletonAssetBuild& skeletonAsset, std::vector<Files::FilePublication>& outPublication)
-	{
-		const std::filesystem::path outputPath = Paths::CookedSkeletonAsset(skeletonAsset.assetId);
-		const std::filesystem::path stagedOutputPath = Files::BuildTemporaryPath(outputPath, ".cook-generation");
+	const Assets::CookedSkeletonAssetHeader header{
+	    .fileHeader = {Assets::kCookedSkeletonAssetMagic},
+	    .jointCount = static_cast<std::uint32_t>(asset.joints.size()),
+	    .jointStride = sizeof(Assets::CookedSkeletonJointRecord),
+	    .evaluationJointCount = static_cast<std::uint32_t>(asset.evaluationJoints.size()),
+	    .evaluationJointStride = sizeof(Assets::CookedSkeletonEvaluationJointRecord),
+	    .flags = 0};
 
-		Files::CleanupTemporaryFile(stagedOutputPath);
-		outPublication.push_back({stagedOutputPath, outputPath});
-
-		const Assets::CookedSkeletonAssetHeader header{
-		    .fileHeader = {Assets::kCookedSkeletonAssetMagic},
-		    .jointCount = static_cast<std::uint32_t>(skeletonAsset.joints.size()),
-		    .jointStride = sizeof(Assets::CookedSkeletonJointRecord),
-		    .evaluationJointCount = static_cast<std::uint32_t>(skeletonAsset.evaluationJoints.size()),
-		    .evaluationJointStride = sizeof(Assets::CookedSkeletonEvaluationJointRecord),
-		    .flags = 0};
-
-		SparkleTools::WriteBinaryAssetFile(stagedOutputPath, header, skeletonAsset.joints, skeletonAsset.evaluationJoints);
-	}
-
-	void StageSkeletonAssets(const std::vector<CookedSkeletonAssetBuild>& skeletonAssets, std::vector<Files::FilePublication>& outPublication)
-	{
-		for (const CookedSkeletonAssetBuild& skeletonAsset : skeletonAssets)
-		{
-			StageSkeletonAsset(skeletonAsset, outPublication);
-		}
-	}
+	Files::WriteBinaryFile(outputPath, header, asset.joints, asset.evaluationJoints);
 }

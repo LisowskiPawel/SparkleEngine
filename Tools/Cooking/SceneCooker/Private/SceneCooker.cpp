@@ -8,6 +8,7 @@
 #include "MaterialVariants/CookedSceneMaterialVariantBuilder.h"
 #include "Metadata/CookedSceneMetadataBuilder.h"
 #include "Skeletons/CookedSceneSkeletonBuilder.h"
+#include "SourceImportOutput.h"
 
 void SceneCooker::BuildManifest(const SourceImportOutput& importOutput, CookedSceneBuild& outBuild)
 {
@@ -29,5 +30,5 @@ void SceneCooker::BuildManifest(const SourceImportOutput& importOutput, CookedSc
 	CookedSceneMaterialVariantBuilder::BuildMaterialVariants(importOutput, outBuild);
 	CookedSceneCameraBuilder::BuildCameras(importOutput, outBuild);
 	CookedSceneLightBuilder::BuildLights(importOutput, outBuild);
-	CookedSceneMetadataBuilder::BuildMetadata(importOutput, outBuild);
+	outBuild.manifest.featureFlags = CookedSceneMetadataBuilder::BuildFeatureFlags(importOutput);
 }

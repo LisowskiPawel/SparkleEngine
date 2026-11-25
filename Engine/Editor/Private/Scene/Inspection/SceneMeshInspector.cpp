@@ -35,7 +35,7 @@ namespace SceneMeshInspector
 
 		if (EditSceneTransform(after, {0.0f, 0.0f, 0.0f}))
 		{
-			(void) transactionHistory.Execute({0, SetLocalTransformCommand{mesh.Entity, after}}, {0, SetLocalTransformCommand{mesh.Entity, mesh.LocalTransform}}, generation, "mesh-transform");
+			(void) transactionHistory.Execute(SetLocalTransformCommand{mesh.Entity, after}, SetLocalTransformCommand{mesh.Entity, mesh.LocalTransform}, generation, "mesh-transform");
 		}
 	}
 
@@ -68,7 +68,7 @@ namespace SceneMeshInspector
 		const bool bDefaultVisible = true;
 		if (EditorWidgets::EditDetailsCheckbox("Visible", bVisible, &bDefaultVisible))
 		{
-			(void) transactionHistory.Execute({0, SetEntityVisibilityCommand{mesh.Entity, bVisible}}, {0, SetEntityVisibilityCommand{mesh.Entity, mesh.bVisible}}, generation, "mesh-visibility");
+			(void) transactionHistory.Execute(SetEntityVisibilityCommand{mesh.Entity, bVisible}, SetEntityVisibilityCommand{mesh.Entity, mesh.bVisible}, generation, "mesh-visibility");
 		}
 	}
 

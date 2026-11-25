@@ -1,33 +1,27 @@
 #include "Gui/App/LauncherGuiApp.h"
 #include "Shell/LauncherShell.h"
 #include "Startup/LauncherArguments.h"
-#include "Core/Public/Threading/ThreadOwnership.h"
-#include "Core/Public/Process/CommandLineUtils.h"
-#include <vector>
+#include "ToolMain.h"
 
 #include <iostream>
 
+namespace SparkleLauncher
+{
+	static int RunLauncher(int argc, char** argv)
+	{
+#if !defined(_WIN32)
+		std::cerr << "SparkleLauncher GUI is currently implemented for Windows.\n";
+#endif
+		if (ShouldRunLauncherShell(argc, argv))
+		{
+			const LauncherShell shell;
+			return shell.Run(argc, argv, std::cout, std::cerr);
+		}
+		return RunLauncherGui(argc, argv);
+	}
+}
+
 int main(int argc, char** argv)
 {
-	Threading::SetCurrentThreadRole("Sparkle.ToolMain");
-#if defined(_WIN32)
-	auto arguments = CommandLine::ReadProcessArguments();
-	std::vector<char*> argumentPointers;
-	for (auto& argument : arguments)
-	{
-		argumentPointers.push_back(argument.data());
-	}
-	argumentPointers.push_back(nullptr);
-	argc = static_cast<int>(arguments.size());
-	argv = argumentPointers.data();
-#endif
-#if !defined(_WIN32)
-	std::cerr << "SparkleLauncher GUI is currently implemented for Windows.\n";
-#endif
-	if (SparkleLauncher::ShouldRunLauncherShell(argc, argv))
-	{
-		const SparkleLauncher::LauncherShell shell;
-		return shell.Run(argc, argv, std::cout, std::cerr);
-	}
-	return SparkleLauncher::RunLauncherGui(argc, argv);
+	return SparkleTools::RunToolMain(argc, argv, SparkleLauncher::RunLauncher);
 }

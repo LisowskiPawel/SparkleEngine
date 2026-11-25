@@ -3,7 +3,6 @@
 #include "GameFramework/Public/World/EntityId.h"
 #include "World/ECS/Components/AnimationComponents.h"
 #include "World/Resources/AnimationClipResourceStore.h"
-#include "World/Resources/SkeletonResourceStore.h"
 
 #include <cstdint>
 #include <array>
@@ -11,9 +10,13 @@
 #include <span>
 #include <vector>
 #include <memory>
+#include <DirectXMath.h>
 #include <ozz/animation/runtime/sampling_job.h>
 #include <ozz/base/maths/soa_transform.h>
 #include <ozz/base/maths/simd_math.h>
+
+class SkeletonResourceStore;
+struct SkeletonResource;
 
 namespace ECS
 {
@@ -27,7 +30,7 @@ namespace ECS
 		{
 			EntityId Entity;
 			AnimationResourceHandle Clip;
-			SkeletonResourceHandle Skeleton;
+			const SkeletonResource* Skeleton = nullptr;
 			std::uint64_t SourceInstanceId = 0;
 			std::unique_ptr<ozz::animation::SamplingJob::Context> Context;
 			std::vector<ozz::math::SoaTransform> LocalTransforms;
@@ -67,9 +70,9 @@ namespace ECS
 		std::uint32_t GetTargetGeneration() const noexcept { return m_targetGeneration; }
 
 	private:
-		void BuildAnimationWork(const EntityRegistry& registry, const AnimationClipResourceStore& clips, const SkeletonResourceStore& skeletons, std::uint32_t targetGeneration);
-		void AppendPoseWork(EntityId entity, AnimationResourceHandle clipHandle, const ResolvedAnimationClip& clip, const SkeletonResourceStore& skeletons, std::uint64_t sourceInstanceId);
-		void AppendMorphSamples(EntityId entity, AnimationResourceHandle clipHandle, const ResolvedAnimationClip& clip, std::uint64_t sourceInstanceId);
+		void BuildAnimationWork(const EntityRegistry& registry, const AnimationClipResourceStore& clips, std::uint32_t targetGeneration);
+		void AppendPoseWork(EntityId entity, AnimationResourceHandle clipHandle, const BoundAnimationClip& clip, std::uint64_t sourceInstanceId);
+		void AppendMorphSamples(EntityId entity, AnimationResourceHandle clipHandle, const BoundAnimationClip& clip, std::uint64_t sourceInstanceId);
 		void BindMorphTargets(const EntityRegistry& registry, MorphWeightStorage& morphWeights);
 		void BindSkinningOutputs(EntityRegistry& registry, const SkeletonResourceStore& skeletons, std::uint32_t targetGeneration);
 

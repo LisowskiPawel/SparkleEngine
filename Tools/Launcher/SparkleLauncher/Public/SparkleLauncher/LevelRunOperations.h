@@ -64,6 +64,6 @@ namespace SparkleLauncher
 	std::string_view ToString(LevelRunMode mode) noexcept;
 	const std::vector<LevelRunOperationDefinition>& GetLevelRunOperationDefinitions();
 	const LevelRunOperationDefinition* FindLevelRunOperationDefinition(std::string_view operationId);
-	LevelRunOperationPlan PlanLevelRunOperation(std::string_view operationId, const LevelRunOperationRequest& request);
-	OperationRecord RunLevelRunOperationPlan(LevelRunOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback = {}, std::stop_token cancellation = {});
+	LevelRunOperationPlan PlanLauncherOperation(std::string_view operationId, const LevelRunOperationRequest& request);
+	OperationRecord RunLauncherOperationPlan(LevelRunOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback = {}, std::stop_token cancellation = {});
 }

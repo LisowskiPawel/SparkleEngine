@@ -15,24 +15,36 @@ namespace SparkleLauncher
 	public:
 		explicit LauncherSettings(QObject* parent = nullptr);
 
-		const QString& RunMode() const;
-		const QString& BuildConfiguration() const;
+		const QString& RunMode() const { return m_runMode; }
+
+		const QString& BuildConfiguration() const { return m_buildConfiguration; }
+
 		const QString& EditorProfile() const;
 		const QString& GameProfile() const;
-		const QString& WorkspaceIde() const;
-		const QString& WorkspaceCompiler() const;
-		const QString& BuildScopes() const;
-		const QString& CookScopes() const;
-		const QString& ShaderBackend() const;
+
+		const QString& WorkspaceIde() const { return m_workspaceIde; }
+
+		const QString& WorkspaceCompiler() const { return m_workspaceCompiler; }
+
+		const QString& BuildScopes() const { return m_buildScopes; }
+
+		const QString& CookScopes() const { return m_cookScopes; }
+
+		const QString& ShaderBackend() const { return m_shaderBackend; }
 
 		bool ShaderSymbols() const { return m_bShaderSymbols; }
 
-		const QString& GraphicsApi() const;
-		ExternalCaptureProvider CaptureProvider() const;
-		RhiGpuCrashMode GpuCrashMode() const;
-		const QString& ShaderExportPath() const;
-		const QString& GpuCrashInspectorPath() const;
-		const QString& CleanScope() const;
+		const QString& GraphicsApi() const { return m_graphicsApi; }
+
+		ExternalCaptureProvider CaptureProvider() const { return m_captureProvider; }
+
+		RhiGpuCrashMode GpuCrashMode() const { return m_gpuCrashMode; }
+
+		const QString& ShaderExportPath() const { return m_shaderExportPath; }
+
+		const QString& GpuCrashInspectorPath() const { return m_gpuCrashInspectorPath; }
+
+		const QString& CleanScope() const { return m_cleanScope; }
 
 	public slots:
 		void SetRunMode(const QString& runMode);
@@ -54,6 +66,15 @@ namespace SparkleLauncher
 		void SettingsChanged();
 
 	private:
+		template <typename TValue> void AssignSetting(TValue& setting, const TValue& value)
+		{
+			if (setting != value)
+			{
+				setting = value;
+				emit SettingsChanged();
+			}
+		}
+
 		QString m_runMode = "editor";
 
 		QString m_buildConfiguration = "development";

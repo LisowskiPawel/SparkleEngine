@@ -3,7 +3,6 @@
 #include "Assimp/AssimpSkinImporter.h"
 
 #include "Assimp/AssimpNodeTransformConverter.h"
-#include "Types/FindImportedSkeletonForSourceSkin.h"
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <DirectXMath.h>
@@ -18,9 +17,8 @@
 #include <utility>
 #include <vector>
 
-class FbxSkinTranslation final
+namespace FbxSkinTranslation
 {
-public:
 	using NodeSet = std::unordered_set<const aiNode*>;
 
 	using NodeIndexMap = std::unordered_map<const aiNode*, std::uint32_t>;
@@ -123,8 +121,11 @@ public:
 		return inverse;
 	}
 
-	static std::string MeshName(const aiMesh& mesh) { return mesh.mName.length > 0 ? std::string(mesh.mName.C_Str()) : std::string("<unnamed-mesh>"); }
-};
+	static std::string MeshName(const aiMesh& mesh)
+	{
+		return mesh.mName.length > 0 ? std::string(mesh.mName.C_Str()) : std::string("<unnamed-mesh>");
+	}
+}
 
 struct AssimpSkinImporter::SkeletonBuildState final
 {
@@ -134,14 +135,6 @@ struct AssimpSkinImporter::SkeletonBuildState final
 	const aiNode* SkeletonRoot = nullptr;
 	DirectX::XMMATRIX BindSpaceCorrection = DirectX::XMMatrixIdentity();
 	ImportedSkeleton Skeleton;
-};
-
-struct AssimpSkinImporter::InfluenceBuildState final
-{
-	using WeightedJoint = std::pair<std::uint16_t, float>;
-
-	std::unordered_map<std::string, std::uint16_t> JointIndices;
-	std::vector<std::vector<WeightedJoint>> VertexWeights;
 };
 
 void AssimpSkinImporter::CollectSkeletonTopology(const aiScene& scene, const aiNode& meshNode, const aiMesh& mesh, SkeletonBuildState& state)
@@ -255,7 +248,7 @@ ImportedSkeletonIndex AssimpSkinImporter::ImportSkeleton(const aiScene& scene, c
 		return kInvalidImportedSkeletonIndex;
 	}
 
-	const ImportedSkeletonIndex existingSkeleton = FindImportedSkeletonForSourceSkin(importedScene, sourceMeshIndex);
+	const ImportedSkeletonIndex existingSkeleton = importedScene.FindSkeletonForSourceSkin(sourceMeshIndex);
 	if (existingSkeleton != kInvalidImportedSkeletonIndex)
 	{
 		return existingSkeleton;
@@ -271,67 +264,79 @@ ImportedSkeletonIndex AssimpSkinImporter::ImportSkeleton(const aiScene& scene, c
 	return skeletonIndex;
 }
 
-void AssimpSkinImporter::CollectSkinWeights(const aiMesh& mesh, const ImportedSkeleton& skeleton, InfluenceBuildState& state)
+namespace FbxSkinTranslation
 {
-	state.JointIndices.reserve(skeleton.joints.size());
-	for (std::size_t jointIndex = 0; jointIndex < skeleton.joints.size(); ++jointIndex)
+	using WeightedJoint = std::pair<std::uint16_t, float>;
+	using VertexSkinWeights = std::vector<std::vector<WeightedJoint>>;
+
+	static VertexSkinWeights CollectSkinWeights(const aiMesh& mesh, const ImportedSkeleton& skeleton)
 	{
-		state.JointIndices.emplace(skeleton.joints[jointIndex].name, static_cast<std::uint16_t>(jointIndex));
+		std::unordered_map<std::string, std::uint16_t> jointIndices;
+		jointIndices.reserve(skeleton.joints.size());
+		for (std::size_t jointIndex = 0; jointIndex < skeleton.joints.size(); ++jointIndex)
+		{
+			jointIndices.emplace(skeleton.joints[jointIndex].name, static_cast<std::uint16_t>(jointIndex));
+		}
+
+		VertexSkinWeights vertexWeights(mesh.mNumVertices);
+		for (unsigned int boneIndex = 0; boneIndex < mesh.mNumBones; ++boneIndex)
+		{
+			const aiBone* bone = mesh.mBones[boneIndex];
+			const auto joint = bone != nullptr ? jointIndices.find(bone->mName.C_Str()) : jointIndices.end();
+			if (bone == nullptr || joint == jointIndices.end())
+			{
+				throw Diagnostics::Error(std::format("FBX mesh '{}' has a bone absent from its imported skeleton.", FbxSkinTranslation::MeshName(mesh)));
+			}
+
+			for (unsigned int weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex)
+			{
+				const aiVertexWeight& sourceWeight = bone->mWeights[weightIndex];
+				const bool bWeightInvalid = !std::isfinite(sourceWeight.mWeight) || sourceWeight.mWeight < 0.0f;
+				if (sourceWeight.mVertexId >= mesh.mNumVertices || bWeightInvalid)
+				{
+					throw Diagnostics::Error(std::format("FBX mesh '{}' has an invalid weight for bone '{}'.", FbxSkinTranslation::MeshName(mesh), bone->mName.C_Str()));
+				}
+				if (sourceWeight.mWeight > 0.0f)
+				{
+					vertexWeights[sourceWeight.mVertexId].emplace_back(joint->second, sourceWeight.mWeight);
+				}
+			}
+		}
+		return vertexWeights;
 	}
 
-	state.VertexWeights.resize(mesh.mNumVertices);
-	for (unsigned int boneIndex = 0; boneIndex < mesh.mNumBones; ++boneIndex)
+	static void WriteSkinInfluences(const aiMesh& mesh, ImportedMeshGeometry& geometry, const VertexSkinWeights& vertexWeights)
 	{
-		const aiBone* bone = mesh.mBones[boneIndex];
-		const auto joint = bone != nullptr ? state.JointIndices.find(bone->mName.C_Str()) : state.JointIndices.end();
-		if (bone == nullptr || joint == state.JointIndices.end())
+		geometry.deformation.skinInfluences.resize(mesh.mNumVertices);
+		for (std::size_t vertexIndex = 0; vertexIndex < vertexWeights.size(); ++vertexIndex)
 		{
-			throw Diagnostics::Error(std::format("FBX mesh '{}' has a bone absent from its imported skeleton.", FbxSkinTranslation::MeshName(mesh)));
-		}
-
-		for (unsigned int weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex)
-		{
-			const aiVertexWeight& sourceWeight = bone->mWeights[weightIndex];
-			const bool bWeightInvalid = !std::isfinite(sourceWeight.mWeight) || sourceWeight.mWeight < 0.0f;
-			if (sourceWeight.mVertexId >= mesh.mNumVertices || bWeightInvalid)
+			const std::vector<WeightedJoint>& weights = vertexWeights[vertexIndex];
+			if (weights.empty() || weights.size() > 8u)
 			{
-				throw Diagnostics::Error(std::format("FBX mesh '{}' has an invalid weight for bone '{}'.", FbxSkinTranslation::MeshName(mesh), bone->mName.C_Str()));
+				throw Diagnostics::Error(
+				    std::format(
+				        "FBX mesh '{}' vertex {} has {} skin influences; the engine supports one to eight without truncation.",
+				        FbxSkinTranslation::MeshName(mesh),
+				        vertexIndex,
+				        weights.size()));
 			}
-			if (sourceWeight.mWeight > 0.0f)
+
+			float weightSum = 0.0f;
+			for (const WeightedJoint& weight : weights)
 			{
-				state.VertexWeights[sourceWeight.mVertexId].emplace_back(joint->second, sourceWeight.mWeight);
+				weightSum += weight.second;
 			}
-		}
-	}
-}
+			if (!std::isfinite(weightSum) || weightSum <= 1.0e-8f)
+			{
+				throw Diagnostics::Error(std::format("FBX mesh '{}' vertex {} has an invalid total skin weight.", FbxSkinTranslation::MeshName(mesh), vertexIndex));
+			}
 
-void AssimpSkinImporter::WriteSkinInfluences(const aiMesh& mesh, ImportedMeshGeometry& geometry, const InfluenceBuildState& state)
-{
-	geometry.deformation.skinInfluences.resize(mesh.mNumVertices);
-	for (std::size_t vertexIndex = 0; vertexIndex < state.VertexWeights.size(); ++vertexIndex)
-	{
-		const std::vector<InfluenceBuildState::WeightedJoint>& weights = state.VertexWeights[vertexIndex];
-		if (weights.empty() || weights.size() > 8u)
-		{
-			throw Diagnostics::Error(
-			    std::format("FBX mesh '{}' vertex {} has {} skin influences; the engine supports one to eight without truncation.", FbxSkinTranslation::MeshName(mesh), vertexIndex, weights.size()));
-		}
-
-		float weightSum = 0.0f;
-		for (const InfluenceBuildState::WeightedJoint& weight : weights)
-		{
-			weightSum += weight.second;
-		}
-		if (!std::isfinite(weightSum) || weightSum <= 1.0e-8f)
-		{
-			throw Diagnostics::Error(std::format("FBX mesh '{}' vertex {} has an invalid total skin weight.", FbxSkinTranslation::MeshName(mesh), vertexIndex));
-		}
-
-		ImportedSkinInfluence& influence = geometry.deformation.skinInfluences[vertexIndex];
-		for (std::size_t influenceIndex = 0; influenceIndex < weights.size(); ++influenceIndex)
-		{
-			influence.jointIndices[influenceIndex] = weights[influenceIndex].first;
-			influence.jointWeights[influenceIndex] = weights[influenceIndex].second / weightSum;
+			ImportedSkinInfluence& influence = geometry.deformation.skinInfluences[vertexIndex];
+			for (std::size_t influenceIndex = 0; influenceIndex < weights.size(); ++influenceIndex)
+			{
+				influence.jointIndices[influenceIndex] = weights[influenceIndex].first;
+				influence.jointWeights[influenceIndex] = weights[influenceIndex].second / weightSum;
+			}
 		}
 	}
 }
@@ -347,7 +352,6 @@ void AssimpSkinImporter::ImportSkinInfluences(const aiMesh& mesh, const Imported
 		throw Diagnostics::Error(std::format("FBX mesh '{}' vertex count differs between geometry and skin data.", FbxSkinTranslation::MeshName(mesh)));
 	}
 
-	InfluenceBuildState state;
-	CollectSkinWeights(mesh, skeleton, state);
-	WriteSkinInfluences(mesh, geometry, state);
+	const auto weights = FbxSkinTranslation::CollectSkinWeights(mesh, skeleton);
+	FbxSkinTranslation::WriteSkinInfluences(mesh, geometry, weights);
 }

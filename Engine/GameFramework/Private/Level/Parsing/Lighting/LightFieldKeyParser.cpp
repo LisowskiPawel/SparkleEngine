@@ -1,6 +1,6 @@
 #include "PCH.h"
 
-#include "LightFieldKeyParser.h"
+#include "Level/Parsing/Lighting/LightFieldKeyParser.h"
 
 #include "Core/Public/Diagnostics/Error.h"
 
@@ -61,5 +61,4 @@ namespace LevelParsing
 		}
 		throw Diagnostics::Error(std::format("Unsupported lighting field '{}'.", key));
 	}
-
 }

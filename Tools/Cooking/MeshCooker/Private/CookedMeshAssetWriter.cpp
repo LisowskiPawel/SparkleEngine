@@ -4,7 +4,7 @@
 
 #include "CookedMeshAssetBuild.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "BinaryAssetWriter.h"
+#include "Core/Public/Files/BinaryFileWriter.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Files/FileSetPublication.h"
 #include "Core/Public/Formatting/HexFormat.h"
@@ -45,7 +45,7 @@ void CookedMeshAssetWriter::WriteMeshAsset(const CookedMeshAssetBuild& meshAsset
 {
 	const Assets::CookedMeshAssetHeader header = BuildHeader(meshAsset);
 
-	SparkleTools::WriteBinaryAssetFile(outputPath, header, meshAsset.vertices, meshAsset.indices, meshAsset.skinInfluences, meshAsset.morphTargets, meshAsset.morphTargetDeltas);
+	Files::WriteBinaryFile(outputPath, header, meshAsset.vertices, meshAsset.indices, meshAsset.skinInfluences, meshAsset.morphTargets, meshAsset.morphTargetDeltas);
 }
 
 void CookedMeshAssetWriter::WriteMeshMetadata(const CookedMeshAssetBuild& meshAsset, const std::filesystem::path& outputPath)

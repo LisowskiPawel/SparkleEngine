@@ -4,56 +4,41 @@
 #include "Core/Public/Environment/EnvironmentVariables.h"
 
 #include <algorithm>
+#include <array>
 #include <optional>
 #include <sstream>
 #include <system_error>
 
 namespace SparkleLauncher
 {
-	static std::vector<std::string> GetCandidateExecutableNames(KnownTool tool)
+	struct KnownToolDescription final
 	{
-		switch (tool)
+		KnownTool Tool = KnownTool::CMake;
+		const char* DisplayName = "Unknown";
+		const char* OverrideEnvironment = nullptr;
+		std::array<const char*, 4> ExecutableNames{};
+	};
+
+	static constexpr KnownToolDescription kKnownTools[] = {
+	    {KnownTool::CMake, "CMake", "SPARKLE_CMAKE_EXE", {"cmake.exe", "cmake"}},
+	    {KnownTool::MSBuild, "MSBuild", "SPARKLE_MSBUILD_EXE", {"MSBuild.exe", "msbuild.exe", "MSBuild"}},
+	    {KnownTool::Ninja, "Ninja", "SPARKLE_NINJA_EXE", {"ninja.exe", "ninja"}},
+	    {KnownTool::Rider, "Rider", "SPARKLE_RIDER_EXE", {"rider64.exe", "rider.exe", "rider.bat", "rider"}},
+	    {KnownTool::Git, "Git", "SPARKLE_GIT_EXE", {"git.exe", "git"}},
+	};
+
+	static const KnownToolDescription& DescribeTool(KnownTool tool) noexcept
+	{
+		for (const KnownToolDescription& description : kKnownTools)
 		{
-			case KnownTool::CMake:
-				return {"cmake.exe", "cmake"};
-
-			case KnownTool::MSBuild:
-				return {"MSBuild.exe", "msbuild.exe", "MSBuild"};
-
-			case KnownTool::Ninja:
-				return {"ninja.exe", "ninja"};
-
-			case KnownTool::Rider:
-				return {"rider64.exe", "rider.exe", "rider.bat", "rider"};
-
-			case KnownTool::Git:
-				return {"git.exe", "git"};
+			if (description.Tool == tool)
+			{
+				return description;
+			}
 		}
 
-		return {};
-	}
-
-	static const char* GetToolOverrideEnvironmentName(KnownTool tool)
-	{
-		switch (tool)
-		{
-			case KnownTool::CMake:
-				return "SPARKLE_CMAKE_EXE";
-
-			case KnownTool::MSBuild:
-				return "SPARKLE_MSBUILD_EXE";
-
-			case KnownTool::Ninja:
-				return "SPARKLE_NINJA_EXE";
-
-			case KnownTool::Rider:
-				return "SPARKLE_RIDER_EXE";
-
-			case KnownTool::Git:
-				return "SPARKLE_GIT_EXE";
-		}
-
-		return nullptr;
+		static constexpr KnownToolDescription unknown{};
+		return unknown;
 	}
 
 	static void AddEnvironmentPath(std::vector<std::filesystem::path>& candidates, const char* environmentName, const std::filesystem::path& relativePath = {})
@@ -120,7 +105,7 @@ namespace SparkleLauncher
 		return Strings::ToLowerCopy(path.lexically_normal().generic_string());
 	}
 
-	static void AddRecursiveExecutableMatches(std::vector<std::filesystem::path>& candidates, const std::filesystem::path& root, std::string_view filename, int maxDepth)
+	static void AddRecursiveRiderCandidates(std::vector<std::filesystem::path>& candidates, const std::filesystem::path& root)
 	{
 		std::error_code errorCode;
 		if (!std::filesystem::is_directory(root, errorCode))
@@ -128,7 +113,9 @@ namespace SparkleLauncher
 			return;
 		}
 
-		std::vector<std::filesystem::path> matches;
+		std::vector<std::filesystem::path> rider64Matches;
+		std::vector<std::filesystem::path> riderMatches;
+		std::vector<std::filesystem::path> scriptMatches;
 		std::filesystem::recursive_directory_iterator iterator(root, std::filesystem::directory_options::skip_permission_denied, errorCode);
 		const std::filesystem::recursive_directory_iterator end;
 		while (iterator != end)
@@ -139,23 +126,39 @@ namespace SparkleLauncher
 				iterator.increment(errorCode);
 				continue;
 			}
-
-			if (iterator.depth() > maxDepth)
+			if (iterator.depth() > 5)
 			{
 				iterator.disable_recursion_pending();
 			}
 
 			const std::filesystem::directory_entry entry = *iterator;
-			if (entry.is_regular_file(errorCode) && Strings::EqualsIgnoreCase(entry.path().filename().string(), filename))
+			if (entry.is_regular_file(errorCode))
 			{
-				matches.push_back(entry.path());
+				const std::string filename = entry.path().filename().string();
+				// Match executables through iterator depth 5 and scripts through depth 6.
+				const bool bExecutableDepth = iterator.depth() <= 5;
+				if (bExecutableDepth && Strings::EqualsIgnoreCase(filename, "rider64.exe"))
+				{
+					rider64Matches.push_back(entry.path());
+				}
+				else if (bExecutableDepth && Strings::EqualsIgnoreCase(filename, "rider.exe"))
+				{
+					riderMatches.push_back(entry.path());
+				}
+				else if (Strings::EqualsIgnoreCase(filename, "rider.cmd"))
+				{
+					scriptMatches.push_back(entry.path());
+				}
 			}
 			errorCode.clear();
 			iterator.increment(errorCode);
 		}
 
-		std::ranges::sort(matches, [](const std::filesystem::path& left, const std::filesystem::path& right) { return BuildPathSortKey(left) < BuildPathSortKey(right); });
-		candidates.insert(candidates.end(), matches.begin(), matches.end());
+		for (auto* matches : {&rider64Matches, &riderMatches, &scriptMatches})
+		{
+			std::ranges::sort(*matches, [](const std::filesystem::path& left, const std::filesystem::path& right) { return BuildPathSortKey(left) < BuildPathSortKey(right); });
+			candidates.insert(candidates.end(), matches->begin(), matches->end());
+		}
 	}
 
 	static void AddVisualStudioMSBuildCandidates(std::vector<std::filesystem::path>& candidates)
@@ -189,9 +192,7 @@ namespace SparkleLauncher
 
 		for (const std::filesystem::path& root : searchRoots)
 		{
-			AddRecursiveExecutableMatches(candidates, root, "rider64.exe", 4);
-			AddRecursiveExecutableMatches(candidates, root, "rider.exe", 4);
-			AddRecursiveExecutableMatches(candidates, root, "rider.cmd", 5);
+			AddRecursiveRiderCandidates(candidates, root);
 		}
 	}
 
@@ -199,7 +200,7 @@ namespace SparkleLauncher
 	{
 		std::vector<std::filesystem::path> candidates;
 		std::string overridePath;
-		if (Environment::TryGetVariable(GetToolOverrideEnvironmentName(tool), overridePath))
+		if (Environment::TryGetVariable(DescribeTool(tool).OverrideEnvironment, overridePath))
 		{
 			candidates.emplace_back(overridePath);
 		}
@@ -242,21 +243,7 @@ namespace SparkleLauncher
 
 	std::string ToString(KnownTool tool)
 	{
-		switch (tool)
-		{
-			case KnownTool::CMake:
-				return "CMake";
-			case KnownTool::MSBuild:
-				return "MSBuild";
-			case KnownTool::Ninja:
-				return "Ninja";
-			case KnownTool::Rider:
-				return "Rider";
-			case KnownTool::Git:
-				return "Git";
-		}
-
-		return "Unknown";
+		return DescribeTool(tool).DisplayName;
 	}
 
 	std::vector<std::filesystem::path> GetExecutableSearchPath()
@@ -307,8 +294,12 @@ namespace SparkleLauncher
 		result.Tool = tool;
 		result.DisplayName = ToString(tool);
 
-		for (const std::string& candidateName : GetCandidateExecutableNames(tool))
+		for (const char* candidateName : DescribeTool(tool).ExecutableNames)
 		{
+			if (candidateName == nullptr)
+			{
+				break;
+			}
 			if (const std::optional<std::filesystem::path> path = FindExecutableOnPath(candidateName))
 			{
 				result.bFound = true;
@@ -327,5 +318,4 @@ namespace SparkleLauncher
 		result.FailureReason = result.DisplayName + " executable was not found on PATH or in known install locations.";
 		return result;
 	}
-
 }

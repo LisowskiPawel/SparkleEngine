@@ -78,7 +78,7 @@ namespace SparkleLauncher
 		return true;
 	}
 
-	OperationRecord RunCookOperationPlan(CookOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
+	OperationRecord RunLauncherOperationPlan(CookOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);

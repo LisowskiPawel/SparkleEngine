@@ -83,12 +83,7 @@ namespace CookedAnimationAssetBuilder
 		        .keyframeCount = static_cast<std::uint32_t>(bakedKeys.size())});
 	}
 
-	static CookedAnimationAssetBuild BuildAsset(
-	    const SourceImportOutput& importOutput,
-	    std::string_view sceneAssetId,
-	    const ImportedAnimationClip& importedClip,
-	    std::size_t clipIndex,
-	    const CookedSceneBuild& build)
+	static CookedAnimationAssetBuild BuildAsset(std::string_view sceneAssetId, const ImportedAnimationClip& importedClip, std::size_t clipIndex, const CookedSceneBuild& build)
 	{
 		const bool bAnimationClipInvalidName = !importedClip.IsValid() || importedClip.name.size() >= sizeof(Assets::CookedAnimationAssetHeader::name);
 		const bool bClipInvalidSkeletonAssetsSize = bAnimationClipInvalidName || (importedClip.targetSkeletonIndex >= build.outputs.skeletonAssets.size());
@@ -109,7 +104,6 @@ namespace CookedAnimationAssetBuilder
 		asset.sourceAnimationIndex = importedClip.sourceAnimationIndex;
 		asset.durationSeconds = importedClip.durationSeconds;
 		asset.name = importedClip.name;
-		asset.sourcePath = importOutput.GetSourcePath();
 		asset.channels.reserve(importedClip.channels.size());
 
 		const CookedSkeletonAssetBuild& skeleton = build.outputs.skeletonAssets[importedClip.targetSkeletonIndex];
@@ -136,7 +130,7 @@ namespace CookedAnimationAssetBuilder
 				throw Diagnostics::Error(std::format("Imported animation clip {} duplicates a source animation index.", clipIndex));
 			}
 
-			CookedAnimationAssetBuild animationAsset = BuildAsset(importOutput, sceneAssetId, importedClip, clipIndex, outBuild);
+			CookedAnimationAssetBuild animationAsset = BuildAsset(sceneAssetId, importedClip, clipIndex, outBuild);
 
 			outBuild.manifest.animationReferences.push_back({.animationAssetId = animationAsset.assetId, .sourceAnimationIndex = importedClip.sourceAnimationIndex, .flags = 0});
 			outBuild.outputs.animationAssets.push_back(std::move(animationAsset));

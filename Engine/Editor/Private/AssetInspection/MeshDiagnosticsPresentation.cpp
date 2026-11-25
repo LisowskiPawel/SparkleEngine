@@ -4,20 +4,23 @@
 
 #include "AssetInspection/PanelDiagnosticsFormatting.h"
 #include "AssetInspection/MeshDiagnosticMetadataCatalog.h"
+#include "Core/Public/Formatting/HexFormat.h"
 
 #include <format>
 #include <string>
 
 namespace MeshDiagnosticsPresentation
 {
-	std::string FormatRuntimeId(std::uintptr_t id)
+	Summary BuildSummary(const MeshDiagnosticsSnapshot& snapshot) noexcept
 	{
-		return std::format("0x{:016X}", static_cast<std::uint64_t>(id));
-	}
-
-	std::string FormatAssetId(std::uint64_t id)
-	{
-		return std::format("0x{:016X}", id);
+		Summary summary;
+		for (const MeshDiagnosticsRow& row : snapshot.Rows)
+		{
+			summary.GpuBytes += row.EstimatedGpuByteSize;
+			summary.CpuBytes += row.EstimatedCpuByteSize;
+			summary.ResidentCount += row.bGpuResident ? 1u : 0u;
+		}
+		return summary;
 	}
 
 	std::string FormatMeshDisplayName(const MeshDiagnosticsRow& row, const MeshDiagnosticMetadata* metadata)
@@ -35,7 +38,7 @@ namespace MeshDiagnosticsPresentation
 		{
 			return metadata->SourcePath;
 		}
-		return row.MeshAssetId != 0 ? FormatAssetId(row.MeshAssetId) : std::string("unknown");
+		return row.MeshAssetId != 0 ? Formatting::FormatPrefixedHexUInt64(row.MeshAssetId) : std::string("unknown");
 	}
 
 	std::string FormatMemorySummary(const MeshDiagnosticsRow& row)
@@ -64,38 +67,4 @@ namespace MeshDiagnosticsPresentation
 	{
 		return std::format("{:.3f}, {:.3f}, {:.3f}", point[0], point[1], point[2]);
 	}
-
-	std::size_t CountResidentMeshes(const MeshDiagnosticsSnapshot& snapshot) noexcept
-	{
-		std::size_t residentCount = 0;
-		for (const MeshDiagnosticsRow& row : snapshot.Rows)
-		{
-			if (row.bGpuResident)
-			{
-				++residentCount;
-			}
-		}
-		return residentCount;
-	}
-
-	std::uint64_t SumCpuBytes(const MeshDiagnosticsSnapshot& snapshot) noexcept
-	{
-		std::uint64_t totalBytes = 0;
-		for (const MeshDiagnosticsRow& row : snapshot.Rows)
-		{
-			totalBytes += row.EstimatedCpuByteSize;
-		}
-		return totalBytes;
-	}
-
-	std::uint64_t SumGpuBytes(const MeshDiagnosticsSnapshot& snapshot) noexcept
-	{
-		std::uint64_t totalBytes = 0;
-		for (const MeshDiagnosticsRow& row : snapshot.Rows)
-		{
-			totalBytes += row.EstimatedGpuByteSize;
-		}
-		return totalBytes;
-	}
-
 }

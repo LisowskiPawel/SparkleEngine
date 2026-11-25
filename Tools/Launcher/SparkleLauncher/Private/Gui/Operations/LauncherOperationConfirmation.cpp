@@ -18,7 +18,7 @@ namespace SparkleLauncher
 		QStringList scopeNames;
 		if (clean->bCleanLevelContent)
 		{
-			const auto plan = PlanMaintenanceOperation("workspace.clean", *clean);
+			const auto plan = PlanLauncherOperation("workspace.clean", *clean);
 			if (plan.Operation.Failure.has_value())
 			{
 				QMessageBox::warning(&parent, "Level content could not be resolved", QString::fromStdString(plan.Operation.Failure->Summary));

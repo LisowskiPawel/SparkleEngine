@@ -92,7 +92,7 @@ namespace SparkleLauncher
 		plan.bCanRun = plan.Request.bDestructiveActionConfirmed;
 	}
 
-	MaintenanceOperationPlan PlanMaintenanceOperation(std::string_view operationId, const MaintenanceOperationRequest& request)
+	MaintenanceOperationPlan PlanLauncherOperation(std::string_view operationId, const MaintenanceOperationRequest& request)
 	{
 		MaintenanceOperationPlan plan;
 		const auto definition = FindMaintenanceOperationDefinition(operationId);

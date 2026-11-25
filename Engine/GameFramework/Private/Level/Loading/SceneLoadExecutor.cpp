@@ -18,7 +18,6 @@ namespace Assets
 		std::unique_ptr<SceneLoadRun> Current;
 		std::shared_ptr<const SceneAssetCatalog> Catalog;
 		std::uint64_t NextCatalogGeneration = 1;
-		std::uint64_t RequestId = 0;
 	};
 
 	SceneLoadExecutor::SceneLoadExecutor(enkiTaskScheduler* io, enkiTaskScheduler* cpu, std::stop_token parentStop) :
@@ -46,7 +45,6 @@ namespace Assets
 		work->PreparePackage(requestId, worldGeneration, documentGeneration, std::move(level), *m_control->Catalog);
 		auto run = std::make_unique<SceneLoadRun>(m_control->Io, m_control->Cpu, m_control->ParentStop, std::move(work));
 		run->Prepare();
-		m_control->RequestId = requestId;
 		m_control->Current = std::move(run);
 		m_control->Current->Submit();
 	}
@@ -66,18 +64,9 @@ namespace Assets
 		{
 			return std::nullopt;
 		}
-		auto completion = run->TakeCompletion(m_control->RequestId);
+		auto completion = run->TakeCompletion();
 		run.reset();
 		return completion;
-	}
-
-	LevelLoadOperationProgress SceneLoadExecutor::GetProgress() const noexcept
-	{
-		if (m_control->Current)
-		{
-			return m_control->Current->GetProgress(m_control->RequestId);
-		}
-		return {.RequestId = m_control->RequestId};
 	}
 
 	std::uint64_t SceneLoadExecutor::GetCatalogGeneration() const noexcept

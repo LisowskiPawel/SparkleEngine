@@ -12,63 +12,36 @@
 
 namespace SparkleLauncher
 {
-	static LauncherOperationResult BuildOperationResult(const OperationRecord& operation)
-	{
-		LauncherOperationResult result;
-		result.GpuCrash = operation.GpuCrash;
-		result.ShaderExportPath = QString::fromStdWString(operation.ShaderExportPath.wstring());
-		result.Status = operation.Status;
-		result.ExitCode = operation.ExitCode;
-		if (!operation.LogPath.empty())
-		{
-			result.LogPath = QString::fromStdString(operation.LogPath.string());
-		}
-		if (operation.Failure.has_value())
-		{
-			result.ProblemKind = QString::fromStdString(ToString(operation.Failure->Kind));
-			result.Problem = QString::fromStdString(operation.Failure->Summary);
-			result.ExpectedAction = QString::fromStdString(operation.Failure->ExpectedAction);
-		}
-		return result;
-	}
-
 	LauncherBackend::LauncherBackend(QObject* parent) :
 	    QObject(parent)
 	{
-		qRegisterMetaType<LauncherOperationResult>();
+		qRegisterMetaType<OperationRecord>();
 		m_operationService = std::make_unique<LauncherOperationService>();
-		PopulateOperationCatalog();
 	}
 
 	LauncherBackend::~LauncherBackend() = default;
 
-	const QVector<LauncherOperationDescriptor>& LauncherBackend::Operations() const
-	{
-		return m_operations;
-	}
-
 	void LauncherBackend::RunOperation(LauncherOperationRequest request)
 	{
 		const QString runId = request.RunId.isEmpty() ? request.OperationId : request.RunId;
-		const LauncherOperationDescriptor* operation = FindOperation(request.OperationId);
-		if (operation == nullptr)
+		const auto displayName = FindLauncherOperationDisplayName(request.OperationId.toStdString());
+		if (!displayName)
 		{
 			OperationRecord rejected = MakeOperationRecord(request.OperationId.toStdString(), request.OperationId.toStdString());
 			SetOperationFailure(rejected, OperationProblemKind::Planning, "Unknown launcher operation.", "Select an available workflow, refresh the launcher, then retry.");
 			MarkOperationFinished(rejected, OperationStatus::Failed);
-			emit OperationFinished(runId, request.OperationId, request.OperationId, BuildOperationResult(rejected));
+			emit OperationFinished(runId, rejected);
 			return;
 		}
 
-		emit OperationStarted(runId, operation->Id, operation->DisplayName);
-		const QString title = operation->DisplayName;
-		const QString operationIdText = operation->Id;
+		const QString title = QString::fromUtf8(displayName->data(), static_cast<qsizetype>(displayName->size()));
+		emit OperationStarted(runId, title);
 
 		m_operationService->Launch(
 		    std::move(request),
 		    title.toStdString(),
-		    [this, runId, operationIdText](std::string_view output) { QueueOperationOutput(runId, operationIdText, std::string(output)); },
-		    [this, runId, operationIdText, title](const OperationRecord& record) { QueueOperationFinished(runId, operationIdText, title, record); });
+		    [this, runId](std::string_view output) { QueueOperationOutput(runId, std::string(output)); },
+		    [this, runId](OperationRecord record) { QueueOperationFinished(runId, std::move(record)); });
 	}
 
 	bool LauncherBackend::ObserveGpuCrash(GpuCrashIncident incident, std::function<void(const QString&)> completion)
@@ -91,75 +64,48 @@ namespace SparkleLauncher
 		return !runId.isEmpty() && m_operationService->Cancel(runId.toStdString());
 	}
 
-	void LauncherBackend::QueueOperationOutput(QString runId, QString operationId, std::string outputText)
+	void LauncherBackend::QueueOperationOutput(QString runId, std::string outputText)
 	{
 		QMetaObject::invokeMethod(
 		    this,
-		    [this, runId = std::move(runId), operationId = std::move(operationId), outputText = std::move(outputText)]
+		    [this, runId = std::move(runId), outputText = std::move(outputText)]
 		    {
 			    m_progressDecoders[runId].Consume(
 			        outputText,
-			        [this, &runId, &operationId](std::string_view output)
+			        [this, &runId](std::string_view output)
 			        {
 				        const auto text = QString::fromUtf8(output.data(), static_cast<qsizetype>(output.size()));
-				        emit OperationOutputReceived(runId, operationId, text);
+				        emit OperationOutputReceived(runId, text);
 			        },
-			        [this, &runId, &operationId](const ToolWorkProgress& progress)
+			        [this, &runId](const ToolWorkProgress& progress)
 			        {
 				        const auto phase = QString::fromUtf8(progress.phase.data(), static_cast<qsizetype>(progress.phase.size()));
 
-				        emit OperationProgressReceived(runId, operationId, phase, static_cast<quint64>(progress.completed), static_cast<quint64>(progress.total));
+				        emit OperationProgressReceived(runId, phase, static_cast<quint64>(progress.completed), static_cast<quint64>(progress.total));
 			        });
 		    },
 		    Qt::QueuedConnection);
 	}
 
-	void LauncherBackend::QueueOperationFinished(QString runId, QString operationId, QString title, const OperationRecord& record)
+	void LauncherBackend::QueueOperationFinished(QString runId, OperationRecord record)
 	{
-		const LauncherOperationResult result = BuildOperationResult(record);
-
 		QMetaObject::invokeMethod(
 		    this,
-		    [this, runId = std::move(runId), operationId = std::move(operationId), title = std::move(title), result]
+		    [this, runId = std::move(runId), record = std::move(record)]
 		    {
 			    auto progressDecoder = m_progressDecoders.find(runId);
 			    if (progressDecoder != m_progressDecoders.end())
 			    {
 				    progressDecoder->Flush(
-				        [this, &runId, &operationId](std::string_view output)
+				        [this, &runId](std::string_view output)
 				        {
 					        const auto text = QString::fromUtf8(output.data(), static_cast<qsizetype>(output.size()));
-					        emit OperationOutputReceived(runId, operationId, text);
+					        emit OperationOutputReceived(runId, text);
 				        });
 				    m_progressDecoders.erase(progressDecoder);
 			    }
-			    emit OperationFinished(runId, operationId, title, result);
+			    emit OperationFinished(runId, record);
 		    },
 		    Qt::QueuedConnection);
-	}
-
-	void LauncherBackend::PopulateOperationCatalog()
-	{
-		m_operations.clear();
-
-		VisitLauncherOperationDefinitions(
-		    [this](const auto& definition)
-		    {
-			    m_operations.push_back(
-			        {QString::fromStdString(definition.Id), QString::fromStdString(definition.Group), QString::fromStdString(definition.DisplayName), QString::fromStdString(definition.Description)});
-		    });
-	}
-
-	const LauncherOperationDescriptor* LauncherBackend::FindOperation(const QString& operationId) const
-	{
-		for (const LauncherOperationDescriptor& operation : m_operations)
-		{
-			if (operation.Id == operationId)
-			{
-				return &operation;
-			}
-		}
-
-		return nullptr;
 	}
 }

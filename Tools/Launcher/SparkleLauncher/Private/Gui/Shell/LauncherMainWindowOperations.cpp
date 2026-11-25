@@ -117,18 +117,6 @@ namespace SparkleLauncher
 		StartOperation(std::move(request), "Clean " + DisplayNameForOperation(m_selectedOperationId));
 	}
 
-	const LauncherOperationDescriptor* LauncherMainWindow::FindOperationDescriptor(const QString& operationId) const
-	{
-		for (const LauncherOperationDescriptor& operation : m_backend.Operations())
-		{
-			if (operation.Id == operationId)
-			{
-				return &operation;
-			}
-		}
-		return nullptr;
-	}
-
 	QString LauncherMainWindow::DisplayNameForOperation(const QString& operationId) const
 	{
 		QString overrideName = LauncherOperationDisplayNameOverride(operationId);
@@ -136,8 +124,8 @@ namespace SparkleLauncher
 		{
 			return overrideName;
 		}
-		const LauncherOperationDescriptor* operation = FindOperationDescriptor(operationId);
-		return operation == nullptr ? operationId : operation->DisplayName;
+		const auto displayName = FindLauncherOperationDisplayName(operationId.toStdString());
+		return displayName ? QString::fromUtf8(displayName->data(), static_cast<qsizetype>(displayName->size())) : operationId;
 	}
 
 	bool LauncherMainWindow::OperationNeedsContent(const QString& operationId) const

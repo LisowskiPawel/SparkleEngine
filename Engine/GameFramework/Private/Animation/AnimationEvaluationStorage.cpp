@@ -6,6 +6,7 @@
 #include "World/ECS/Components/RenderingComponents.h"
 #include "World/ECS/EntityRegistry.h"
 #include "World/Resources/MorphWeightStorage.h"
+#include "World/Resources/SkeletonResourceStore.h"
 
 #include <algorithm>
 #include <tuple>
@@ -33,7 +34,7 @@ namespace ECS
 		m_poseWork.clear();
 		m_morphSamples.clear();
 		m_morphBindings.clear();
-		BuildAnimationWork(registry, clips, skeletons, targetGeneration);
+		BuildAnimationWork(registry, clips, targetGeneration);
 		BindMorphTargets(registry, morphWeights);
 		BindSkinningOutputs(registry, skeletons, targetGeneration);
 
@@ -42,7 +43,7 @@ namespace ECS
 		return true;
 	}
 
-	void AnimationEvaluationStorage::BuildAnimationWork(const EntityRegistry& registry, const AnimationClipResourceStore& clips, const SkeletonResourceStore& skeletons, std::uint32_t targetGeneration)
+	void AnimationEvaluationStorage::BuildAnimationWork(const EntityRegistry& registry, const AnimationClipResourceStore& clips, std::uint32_t targetGeneration)
 	{
 		const ComponentStorage<AnimationState>& animations = registry.GetStorage<AnimationState>();
 		std::vector<std::pair<EntityId, AnimationResourceHandle>> ordered;
@@ -55,27 +56,22 @@ namespace ECS
 
 		for (const auto& [entity, clipHandle] : ordered)
 		{
-			const ResolvedAnimationClip clip = clips.Resolve(clipHandle);
-			if (!clip.IsValid() || clip.TargetGeneration != targetGeneration)
+			const BoundAnimationClip* clip = clips.Resolve(clipHandle);
+			if (clip == nullptr || clip->TargetGeneration != targetGeneration)
 			{
 				continue;
 			}
 
 			const AuthoredIdentity* authored = registry.Get<AuthoredIdentity>(entity);
 			const std::uint64_t sourceInstanceId = authored == nullptr ? 0 : authored->SourceInstanceId;
-			AppendPoseWork(entity, clipHandle, clip, skeletons, sourceInstanceId);
-			AppendMorphSamples(entity, clipHandle, clip, sourceInstanceId);
+			AppendPoseWork(entity, clipHandle, *clip, sourceInstanceId);
+			AppendMorphSamples(entity, clipHandle, *clip, sourceInstanceId);
 		}
 	}
 
-	void AnimationEvaluationStorage::AppendPoseWork(
-	    EntityId entity,
-	    AnimationResourceHandle clipHandle,
-	    const ResolvedAnimationClip& clip,
-	    const SkeletonResourceStore& skeletons,
-	    std::uint64_t sourceInstanceId)
+	void AnimationEvaluationStorage::AppendPoseWork(EntityId entity, AnimationResourceHandle clipHandle, const BoundAnimationClip& clip, std::uint64_t sourceInstanceId)
 	{
-		const SkeletonResource* skeleton = skeletons.Resolve(clip.Skeleton);
+		const SkeletonResource* skeleton = clip.Skeleton;
 		if (skeleton == nullptr)
 		{
 			return;
@@ -92,11 +88,11 @@ namespace ECS
 		m_poseWork.push_back(std::move(work));
 	}
 
-	void AnimationEvaluationStorage::AppendMorphSamples(EntityId entity, AnimationResourceHandle clipHandle, const ResolvedAnimationClip& clip, std::uint64_t sourceInstanceId)
+	void AnimationEvaluationStorage::AppendMorphSamples(EntityId entity, AnimationResourceHandle clipHandle, const BoundAnimationClip& clip, std::uint64_t sourceInstanceId)
 	{
-		for (std::uint32_t trackIndex = 0; trackIndex < clip.Resource->morphTracks.size(); ++trackIndex)
+		for (std::uint32_t trackIndex = 0; trackIndex < clip.Resource.morphTracks.size(); ++trackIndex)
 		{
-			const AnimationMorphTrack& track = clip.Resource->morphTracks[trackIndex];
+			const AnimationMorphTrack& track = clip.Resource.morphTracks[trackIndex];
 			MorphSampleSlot sample{.AnimationEntity = entity, .Clip = clipHandle, .SourceInstanceId = sourceInstanceId, .TrackIndex = trackIndex, .TargetNodeIndex = track.targetNodeIndex};
 			m_morphSamples.push_back(std::move(sample));
 		}
@@ -152,7 +148,7 @@ namespace ECS
 		{
 			SkinningState updated = skinnedMeshes.GetComponents()[index];
 			updated.Pose = {};
-			const SkeletonResourceHandle skeleton = skeletons.Find(updated.SkeletonAssetId);
+			const SkeletonResource* skeleton = skeletons.Find(updated.SkeletonAssetId);
 			const AuthoredIdentity* targetIdentity = registry.Get<AuthoredIdentity>(skinnedMeshes.GetEntities()[index]);
 			for (std::uint32_t poseIndex = 0; poseIndex < m_poseWork.size(); ++poseIndex)
 			{

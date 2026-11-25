@@ -7,7 +7,7 @@
 
 namespace SparkleLauncher
 {
-	OperationRecord RunLevelRunOperationPlan(LevelRunOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
+	OperationRecord RunLauncherOperationPlan(LevelRunOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);

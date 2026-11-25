@@ -287,7 +287,7 @@ namespace SparkleLauncher
 		plan.Operation.DryRunText = dryRun.str();
 	}
 
-	BuildWorkspaceOperationPlan PlanBuildWorkspaceOperation(std::string_view operationId, const BuildWorkspaceOperationRequest& request)
+	BuildWorkspaceOperationPlan PlanLauncherOperation(std::string_view operationId, const BuildWorkspaceOperationRequest& request)
 	{
 		BuildWorkspaceOperationPlan plan;
 		const BuildWorkspaceOperationDefinition* definition = FindBuildWorkspaceOperationDefinition(operationId);

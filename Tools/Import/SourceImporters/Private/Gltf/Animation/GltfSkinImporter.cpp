@@ -4,7 +4,6 @@
 
 #include "Gltf/GltfAccessorReader.h"
 #include "Gltf/GltfCoordinateConverter.h"
-#include "Types/FindImportedSkeletonForSourceSkin.h"
 #include "Core/Public/Diagnostics/Error.h"
 
 #include <cgltf.h>
@@ -173,7 +172,7 @@ namespace GltfSkinImporter
 		}
 
 		const std::uint32_t sourceSkinIndex = static_cast<std::uint32_t>(sourceSkinIndexValue);
-		const ImportedSkeletonIndex existingSkeleton = FindImportedSkeletonForSourceSkin(importedScene, sourceSkinIndex);
+		const ImportedSkeletonIndex existingSkeleton = importedScene.FindSkeletonForSourceSkin(sourceSkinIndex);
 		if (existingSkeleton != kInvalidImportedSkeletonIndex)
 		{
 			return existingSkeleton;

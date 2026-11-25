@@ -1,30 +1,24 @@
-#include "TextureRequestPlanBuilder.h"
+#include "BuildTextureCookRequests.h"
 
 #include "Core/Public/Diagnostics/Error.h"
-#include "DefaultTextureCookRequestBuilder.h"
 #include "MaterialCooker.h"
 #include "SourceSceneImporter.h"
 #include "TextureCookRequestList.h"
+#include "Cooking/DefaultTextureCookRequestBuilder.h"
 
 #include <string>
 #include <utility>
 
-void TextureRequestPlanBuilder::CollectSceneRequests(const AssetCookerSceneEntry& sceneEntry, TextureCookRequestSet& requestSet)
-{
-	const SourceImportOutput importOutput = ImportSourceScene(sceneEntry.sourcePath);
-	MaterialCooker::AppendTextureCookRequests(importOutput, requestSet);
-}
-
-bool TextureRequestPlanBuilder::Build(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics& diagnostics, const std::filesystem::path& outputPath)
+bool BuildTextureCookRequests(std::span<const AssetCookerSceneEntry> sceneEntries, AssetCookerDiagnostics& diagnostics, const std::filesystem::path& outputPath)
 {
 	TextureCookRequestSet requestSet;
 	std::size_t failedSceneCount = 0;
-	for (std::size_t sceneIndex = 0; sceneIndex < plan.sceneEntries.size(); ++sceneIndex)
+	for (const AssetCookerSceneEntry& sceneEntry : sceneEntries)
 	{
-		const AssetCookerSceneEntry& sceneEntry = plan.sceneEntries[sceneIndex];
 		try
 		{
-			CollectSceneRequests(sceneEntry, requestSet);
+			const SourceImportOutput importOutput = ImportSourceScene(sceneEntry.sourcePath);
+			MaterialCooker::AppendTextureCookRequests(importOutput, requestSet);
 		}
 		catch (const Diagnostics::Error& error)
 		{
@@ -41,7 +35,7 @@ bool TextureRequestPlanBuilder::Build(const AssetCookerProjectCookPlan& plan, As
 
 	try
 	{
-		DefaultTextureCookRequestBuilder::AppendTo(requestSet);
+		AppendDefaultTextureCookRequests(requestSet);
 	}
 	catch (const Diagnostics::Error& error)
 	{

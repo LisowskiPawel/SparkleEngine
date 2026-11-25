@@ -5,11 +5,11 @@ namespace SparkleLauncher
 	static QString NormalizeBuildConfiguration(const QString& configuration)
 	{
 		const QString lowered = configuration.trimmed().toLower();
-		if (lowered == "debug" || lowered.startsWith("debug"))
+		if (lowered.startsWith("debug"))
 		{
 			return "debug";
 		}
-		if (lowered == "shipping" || lowered.startsWith("shipping"))
+		if (lowered.startsWith("shipping"))
 		{
 			return "shipping";
 		}
@@ -19,16 +19,6 @@ namespace SparkleLauncher
 	LauncherSettings::LauncherSettings(QObject* parent) :
 	    QObject(parent)
 	{
-	}
-
-	const QString& LauncherSettings::RunMode() const
-	{
-		return m_runMode;
-	}
-
-	const QString& LauncherSettings::BuildConfiguration() const
-	{
-		return m_buildConfiguration;
 	}
 
 	const QString& LauncherSettings::EditorProfile() const
@@ -63,75 +53,20 @@ namespace SparkleLauncher
 		return developmentProfile;
 	}
 
-	const QString& LauncherSettings::WorkspaceIde() const
-	{
-		return m_workspaceIde;
-	}
-
-	const QString& LauncherSettings::WorkspaceCompiler() const
-	{
-		return m_workspaceCompiler;
-	}
-
-	const QString& LauncherSettings::BuildScopes() const
-	{
-		return m_buildScopes;
-	}
-
-	const QString& LauncherSettings::CookScopes() const
-	{
-		return m_cookScopes;
-	}
-
-	const QString& LauncherSettings::ShaderBackend() const
-	{
-		return m_shaderBackend;
-	}
-
 	void LauncherSettings::SetShaderSymbols(bool bEnabled)
 	{
-		if (m_bShaderSymbols != bEnabled)
-		{
-			m_bShaderSymbols = bEnabled;
-			emit SettingsChanged();
-		}
-	}
-
-	const QString& LauncherSettings::GraphicsApi() const
-	{
-		return m_graphicsApi;
-	}
-
-	ExternalCaptureProvider LauncherSettings::CaptureProvider() const
-	{
-		return m_captureProvider;
+		AssignSetting(m_bShaderSymbols, bEnabled);
 	}
 
 	void LauncherSettings::SetCaptureProvider(const QString& value)
 	{
 		ExternalCaptureProvider provider;
-		if (!TryParseExternalCaptureProvider(value.toStdString(), provider) || provider == m_captureProvider)
+		if (!TryParseExternalCaptureProvider(value.toStdString(), provider))
 		{
 			return;
 		}
 
-		m_captureProvider = provider;
-		emit SettingsChanged();
-	}
-
-	RhiGpuCrashMode LauncherSettings::GpuCrashMode() const
-	{
-		return m_gpuCrashMode;
-	}
-
-	const QString& LauncherSettings::ShaderExportPath() const
-	{
-		return m_shaderExportPath;
-	}
-
-	const QString& LauncherSettings::GpuCrashInspectorPath() const
-	{
-		return m_gpuCrashInspectorPath;
+		AssignSetting(m_captureProvider, provider);
 	}
 
 	void LauncherSettings::SetGpuCrashMode(const QString& mode)
@@ -141,134 +76,66 @@ namespace SparkleLauncher
 			return;
 		}
 		const auto selected = mode == "off" ? RhiGpuCrashMode::Off : RhiGpuCrashMode::Aftermath;
-		if (m_gpuCrashMode != selected)
-		{
-			m_gpuCrashMode = selected;
-			emit SettingsChanged();
-		}
+		AssignSetting(m_gpuCrashMode, selected);
 	}
 
 	void LauncherSettings::SetShaderExportPath(const QString& path)
 	{
-		if (m_shaderExportPath != path)
-		{
-			m_shaderExportPath = path;
-			emit SettingsChanged();
-		}
+		AssignSetting(m_shaderExportPath, path);
 	}
 
 	void LauncherSettings::SetGpuCrashInspectorPath(const QString& path)
 	{
-		if (m_gpuCrashInspectorPath != path)
-		{
-			m_gpuCrashInspectorPath = path;
-			emit SettingsChanged();
-		}
-	}
-
-	const QString& LauncherSettings::CleanScope() const
-	{
-		return m_cleanScope;
+		AssignSetting(m_gpuCrashInspectorPath, path);
 	}
 
 	void LauncherSettings::SetRunMode(const QString& runMode)
 	{
 		const QString normalized = runMode.trimmed().toLower() == "game" ? QStringLiteral("game") : QStringLiteral("editor");
-		if (m_runMode == normalized)
-		{
-			return;
-		}
-
-		m_runMode = normalized;
-		emit SettingsChanged();
+		AssignSetting(m_runMode, normalized);
 	}
 
 	void LauncherSettings::SetBuildConfiguration(const QString& configuration)
 	{
 		const QString normalized = NormalizeBuildConfiguration(configuration);
-		if (m_buildConfiguration == normalized)
-		{
-			return;
-		}
-
-		m_buildConfiguration = normalized;
-		emit SettingsChanged();
+		AssignSetting(m_buildConfiguration, normalized);
 	}
 
 	void LauncherSettings::SetWorkspaceIde(const QString& ide)
 	{
-		if (m_workspaceIde == ide)
-		{
-			return;
-		}
-
-		m_workspaceIde = ide;
-		emit SettingsChanged();
+		AssignSetting(m_workspaceIde, ide);
 	}
 
 	void LauncherSettings::SetWorkspaceCompiler(const QString& compiler)
 	{
-		if (m_workspaceCompiler == compiler)
-		{
-			return;
-		}
-
-		m_workspaceCompiler = compiler;
-		emit SettingsChanged();
+		AssignSetting(m_workspaceCompiler, compiler);
 	}
 
 	void LauncherSettings::SetBuildScopes(const QString& scopes)
 	{
-		if (m_buildScopes == scopes)
-		{
-			return;
-		}
-
-		m_buildScopes = scopes;
-		emit SettingsChanged();
+		AssignSetting(m_buildScopes, scopes);
 	}
 
 	void LauncherSettings::SetCookScopes(const QString& scopes)
 	{
-		if (m_cookScopes == scopes)
-		{
-			return;
-		}
-
-		m_cookScopes = scopes;
-		emit SettingsChanged();
+		AssignSetting(m_cookScopes, scopes);
 	}
 
 	void LauncherSettings::SetShaderBackend(const QString& backend)
 	{
 		const QString normalized = backend.trimmed().toLower() == "slang" ? QStringLiteral("slang") : QStringLiteral("dxc");
-		if (m_shaderBackend == normalized)
-		{
-			return;
-		}
-		m_shaderBackend = normalized;
-		emit SettingsChanged();
+		AssignSetting(m_shaderBackend, normalized);
 	}
 
 	void LauncherSettings::SetGraphicsApi(const QString& graphicsApi)
 	{
 		const QString normalized = graphicsApi.trimmed().toLower() == "vulkan" ? QStringLiteral("vulkan") : QStringLiteral("d3d12");
-		if (m_graphicsApi == normalized)
-		{
-			return;
-		}
-		m_graphicsApi = normalized;
-		emit SettingsChanged();
+		AssignSetting(m_graphicsApi, normalized);
 	}
 
 	void LauncherSettings::SetCleanScope(const QString& scope)
 	{
-		if (m_cleanScope == scope)
-		{
-			return;
-		}
-		m_cleanScope = scope;
-		emit SettingsChanged();
+		AssignSetting(m_cleanScope, scope);
 	}
 
 }

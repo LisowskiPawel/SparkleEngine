@@ -1,12 +1,10 @@
 #pragma once
 
-#include <span>
-#include <vector>
+#include <filesystem>
 
-namespace Files
+struct CookedSceneManifestBuildData;
+
+namespace CookedSceneManifestWriter
 {
-	struct FilePublication;
+	void Write(const CookedSceneManifestBuildData& manifest, const std::filesystem::path& outputPath);
 }
-struct CookedSceneBuild;
-
-void StageCookedSceneManifestsAndRegistry(std::span<const CookedSceneBuild* const> builds, std::vector<Files::FilePublication>& outPublication);

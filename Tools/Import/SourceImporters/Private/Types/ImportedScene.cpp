@@ -4,6 +4,18 @@
 
 #include <limits>
 
+ImportedSkeletonIndex ImportedScene::FindSkeletonForSourceSkin(std::uint32_t sourceSkinIndex) const noexcept
+{
+	for (std::size_t skeletonIndex = 0; skeletonIndex < skeletons.size(); ++skeletonIndex)
+	{
+		if (skeletons[skeletonIndex].sourceSkinIndex == sourceSkinIndex)
+		{
+			return static_cast<ImportedSkeletonIndex>(skeletonIndex);
+		}
+	}
+	return kInvalidImportedSkeletonIndex;
+}
+
 std::pair<ImportedSkeletonIndex, std::uint32_t> ImportedScene::FindSkeletonJointForNode(std::uint32_t sourceNodeIndex) const noexcept
 {
 	for (std::size_t skeletonIndex = 0; skeletonIndex < skeletons.size(); ++skeletonIndex)

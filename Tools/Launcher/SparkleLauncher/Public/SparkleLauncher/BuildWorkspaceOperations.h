@@ -189,6 +189,6 @@ namespace SparkleLauncher
 	BuildToolchainStatus DetectBuildToolchain(WorkspaceIde preferredIde, WorkspaceCompiler compiler = WorkspaceCompiler::Msvc);
 	BuildFilesFreshnessStatus CheckBuildFilesFreshness(const std::filesystem::path& workspaceRoot, const BuildToolchainStatus& toolchain);
 	bool UpdateBuildFilesFreshnessStamp(const std::filesystem::path& workspaceRoot, const BuildToolchainStatus& toolchain, std::string& errorMessage);
-	BuildWorkspaceOperationPlan PlanBuildWorkspaceOperation(std::string_view operationId, const BuildWorkspaceOperationRequest& request);
-	OperationRecord RunBuildWorkspaceOperationPlan(BuildWorkspaceOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback = {}, std::stop_token cancellation = {});
+	BuildWorkspaceOperationPlan PlanLauncherOperation(std::string_view operationId, const BuildWorkspaceOperationRequest& request);
+	OperationRecord RunLauncherOperationPlan(BuildWorkspaceOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback = {}, std::stop_token cancellation = {});
 }

@@ -9,6 +9,7 @@
 #include "SparkleLauncher/LauncherProcess.h"
 
 #include <string_view>
+#include <optional>
 #include <stop_token>
 #include <variant>
 
@@ -33,6 +34,8 @@ namespace SparkleLauncher
 
 	using LauncherOperationInputs = std::variant<BuildWorkspaceOperationRequest, LevelOperationRequest, LevelRunOperationRequest, CookOperationRequest, MaintenanceOperationRequest>;
 	using LauncherOperationPlan = std::variant<BuildWorkspaceOperationPlan, LevelOperationPlan, LevelRunOperationPlan, CookOperationPlan, MaintenanceOperationPlan>;
+
+	std::optional<std::string_view> FindLauncherOperationDisplayName(std::string_view operationId);
 
 	OperationRecord ExecuteLauncherOperation(
 	    std::string_view operationId,

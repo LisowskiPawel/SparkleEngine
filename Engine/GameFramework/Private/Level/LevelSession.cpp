@@ -188,13 +188,13 @@ void LevelSession::CompleteLevelChange() noexcept
 	}
 
 	LevelAsset& level = TakeLoadingLevel(completion->RequestId);
-	if (completion->Stage == LevelLoadOperationStage::Cancelled)
+	if (completion->Status == Assets::SceneLoadStatus::Cancelled)
 	{
 		m_lastLoadDiagnostic = std::move(completion->Diagnostic);
 		m_bLevelChangeInProgress = false;
 		return;
 	}
-	if (completion->Stage != LevelLoadOperationStage::Ready)
+	if (completion->Status != Assets::SceneLoadStatus::Ready)
 	{
 		RejectLevelLoad(level, std::move(completion->Diagnostic));
 		return;
@@ -215,11 +215,6 @@ void LevelSession::CompleteLevelChange() noexcept
 		return;
 	}
 	ActivateLoadedLevel(level, std::move(*completion->Package));
-}
-
-LevelLoadOperationProgress LevelSession::GetLoadProgress() const noexcept
-{
-	return m_loadExecutor->GetProgress();
 }
 
 bool LevelSession::SaveActiveLevel() noexcept

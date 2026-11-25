@@ -26,5 +26,6 @@ struct ImportedScene
 
 	bool HasSupportedContent() const noexcept;
 
+	ImportedSkeletonIndex FindSkeletonForSourceSkin(std::uint32_t sourceSkinIndex) const noexcept;
 	std::pair<ImportedSkeletonIndex, std::uint32_t> FindSkeletonJointForNode(std::uint32_t sourceNodeIndex) const noexcept;
 };

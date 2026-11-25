@@ -11,9 +11,8 @@ namespace ECS
 	struct AnimationResourceHandle final
 	{
 		std::uint32_t Slot = (std::numeric_limits<std::uint32_t>::max)();
-		std::uint32_t Generation = 0;
 
-		constexpr bool IsValid() const noexcept { return Slot != (std::numeric_limits<std::uint32_t>::max)() && Generation != 0; }
+		constexpr bool IsValid() const noexcept { return Slot != (std::numeric_limits<std::uint32_t>::max)(); }
 
 		constexpr auto operator<=>(const AnimationResourceHandle&) const noexcept = default;
 	};

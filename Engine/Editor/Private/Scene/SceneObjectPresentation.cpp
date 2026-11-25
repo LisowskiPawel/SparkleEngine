@@ -5,49 +5,80 @@
 #include "Scene/Model/EditorSceneModel.h"
 #include "Scene/SceneObjectSelection.h"
 #include "Scene/Lighting/SceneLightDesc.h"
-#include "Style/SparkleUiPalette.h"
-
-#include <imgui.h>
 
 namespace SceneObjectPresentation
 {
-	void DrawSelectionHeader(const EditorSceneModel& model, const SceneObjectSelection& selection) noexcept
+	std::string_view Entry::GetLabel() const noexcept
 	{
-		const EditorSceneEntry* entry = model.FindEntry(selection);
-		const char* title = entry != nullptr ? entry->Label.c_str() : "No Selection";
-		const char* subtitle = entry != nullptr ? entry->TypeLabel.c_str() : "Object";
-		const EditorIcons::EditorIcon icon = SceneObjectPresentation::BuildSelectionIcon(selection, entry ? entry->LightKind : SceneLightKind::Unknown);
+		return std::visit([](const auto& label) -> std::string_view { return label; }, Label);
+	}
 
-		constexpr float kHeaderHeight = 30.0f;
-		constexpr float kHeaderPaddingX = 8.0f;
-		const float width = ImGui::GetContentRegionAvail().x;
-		const ImVec2 start = ImGui::GetCursorScreenPos();
-		const ImVec2 end(start.x + width, start.y + kHeaderHeight);
-		ImDrawList* drawList = ImGui::GetWindowDrawList();
+	Entry BuildEntry(const WorldCameraReadData& camera, std::size_t index)
+	{
+		Entry entry{std::string_view(camera.Name), "Camera", SceneObjectSelection::Camera(camera.Entity), camera.bVisible};
+		if (camera.Name.empty())
+		{
+			entry.Label = "Camera " + std::to_string(index + 1);
+		}
+		return entry;
+	}
 
-		const ImU32 backgroundColor = ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::HeaderBackgroundActive());
-		drawList->AddRectFilled(start, end, backgroundColor);
-		const ImVec2 accentEnd(start.x + 3.0f, end.y);
-		const ImU32 accentColor = ImGui::ColorConvertFloat4ToU32(SparkleUiPalette::Accent());
-		drawList->AddRectFilled(start, accentEnd, accentColor);
-		const ImVec2 topBorderEnd(end.x, start.y);
-		const ImU32 topBorderColor = SparkleUiPalette::WithAlphaU32(SparkleUiPalette::Border(), 0.52f);
-		drawList->AddLine(start, topBorderEnd, topBorderColor);
-		const ImVec2 bottomBorderStart(start.x, end.y - 1.0f);
-		const ImVec2 bottomBorderEnd(end.x, end.y - 1.0f);
-		const ImU32 bottomBorderColor = SparkleUiPalette::WithAlphaU32(SparkleUiPalette::Border(), 0.58f);
-		drawList->AddLine(bottomBorderStart, bottomBorderEnd, bottomBorderColor);
+	Entry BuildEntry(const WorldLightReadData& light, std::size_t index)
+	{
+		const SceneLightKind kind = light.Description.GetKind();
+		const char* typeLabel = GetLightTypeLabel(kind);
+		Entry entry{std::string_view(light.Description.common.name), typeLabel, SceneObjectSelection::Light(light.Entity), light.Description.common.bVisible, kind};
+		if (light.Description.common.name.empty())
+		{
+			entry.Label = std::string(typeLabel) + " " + std::to_string(index + 1);
+		}
+		return entry;
+	}
 
-		ImGui::InvisibleButton("##DetailsSelectionHeader", ImVec2(width, kHeaderHeight));
+	Entry BuildEntry(const WorldMeshReadData& mesh, std::size_t index)
+	{
+		const char* typeLabel = mesh.Kind == SceneMeshKind::Skeletal ? "Skeletal Mesh" : "Static Mesh";
+		return {"Mesh " + std::to_string(index + 1), typeLabel, SceneObjectSelection::Mesh(mesh.Entity), mesh.bVisible};
+	}
 
-		ImGui::SetCursorScreenPos(ImVec2(start.x + kHeaderPaddingX + 10.0f, start.y + 7.0f));
-		ImGui::TextUnformatted(EditorIcons::GetEditorIconGlyph(icon));
-		ImGui::SameLine(0.0f, 8.0f);
-		ImGui::TextUnformatted(title);
-		ImGui::SameLine();
-		ImGui::TextDisabled("%s", subtitle);
+	Entry BuildEntry(const std::optional<SkyEnvironment>& sky, std::size_t)
+	{
+		return {std::string_view(sky ? "Sky" : "Sky (Engine Default)"), "Sky", SceneObjectSelection::Sky(), !sky || sky->bEnabled};
+	}
 
-		ImGui::SetCursorScreenPos(ImVec2(start.x, end.y));
+	std::optional<Entry> BuildEntry(const EditorSceneModel& scene, const SceneObjectSelection& selection)
+	{
+		if (selection.type == SceneObjectType::Camera)
+		{
+			const auto* camera = scene.FindCamera(selection.entity);
+			if (camera == nullptr)
+			{
+				return std::nullopt;
+			}
+			const auto index = static_cast<std::size_t>(camera - scene.GetCameras().data());
+			return BuildEntry(*camera, index);
+		}
+		if (selection.type == SceneObjectType::Light)
+		{
+			const auto* light = scene.FindLight(selection.entity);
+			if (light == nullptr)
+			{
+				return std::nullopt;
+			}
+			const auto index = static_cast<std::size_t>(light - scene.GetLights().data());
+			return BuildEntry(*light, index);
+		}
+		if (selection.type == SceneObjectType::Mesh)
+		{
+			const auto* mesh = scene.FindMesh(selection.entity);
+			if (mesh == nullptr)
+			{
+				return std::nullopt;
+			}
+			const auto index = static_cast<std::size_t>(mesh - scene.GetMeshes().data());
+			return BuildEntry(*mesh, index);
+		}
+		return selection.type == SceneObjectType::Sky ? std::optional(BuildEntry(scene.GetSkyEnvironment(), 0)) : std::nullopt;
 	}
 
 	EditorIcons::EditorIcon GetLightIcon(SceneLightKind kind) noexcept
@@ -84,16 +115,6 @@ namespace SceneObjectPresentation
 			default:
 				return "Light";
 		}
-	}
-
-	std::string BuildLightLabel(const SceneLightDesc& light, std::size_t lightIndex)
-	{
-		if (!light.common.name.empty())
-		{
-			return light.common.name;
-		}
-
-		return std::string(GetLightTypeLabel(light.GetKind())) + " " + std::to_string(lightIndex + 1);
 	}
 
 	EditorIcons::EditorIcon BuildSelectionIcon(const SceneObjectSelection& selection, SceneLightKind lightKind) noexcept

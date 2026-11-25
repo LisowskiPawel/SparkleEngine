@@ -1,6 +1,9 @@
 #include "PCH.h"
 
 #include "World/Resources/AnimationClipResourceStore.h"
+#include "World/Resources/SkeletonResourceStore.h"
+
+#include <utility>
 
 namespace ECS
 {
@@ -11,18 +14,18 @@ namespace ECS
 			return {};
 		}
 		const auto slot = static_cast<std::uint32_t>(m_entries.size());
-		m_entries.push_back(Entry{.Resource = std::move(clip)});
-		return AnimationResourceHandle{slot, m_entries.back().Generation};
+		m_entries.push_back(BoundAnimationClip{.Resource = std::move(clip)});
+		return AnimationResourceHandle{slot};
 	}
 
-	ResolvedAnimationClip AnimationClipResourceStore::Resolve(AnimationResourceHandle handle) const noexcept
+	const BoundAnimationClip* AnimationClipResourceStore::Resolve(AnimationResourceHandle handle) const noexcept
 	{
-		if (!handle.IsValid() || handle.Slot >= m_entries.size())
+		if (handle.Slot >= m_entries.size())
 		{
-			return {};
+			return nullptr;
 		}
-		const Entry& entry = m_entries[handle.Slot];
-		return entry.Generation == handle.Generation ? ResolvedAnimationClip{&entry.Resource, entry.Skeleton, entry.TargetGeneration} : ResolvedAnimationClip{};
+		const BoundAnimationClip& entry = m_entries[handle.Slot];
+		return entry.TargetGeneration != 0 ? &entry : nullptr;
 	}
 
 	bool AnimationClipResourceStore::ResolveTargets(const SkeletonResourceStore& skeletons, std::uint32_t targetGeneration) noexcept
@@ -31,7 +34,7 @@ namespace ECS
 		{
 			return false;
 		}
-		for (Entry& entry : m_entries)
+		for (BoundAnimationClip& entry : m_entries)
 		{
 			entry.Skeleton = skeletons.Find(entry.Resource.targetSkeletonAssetId);
 			entry.TargetGeneration = targetGeneration;

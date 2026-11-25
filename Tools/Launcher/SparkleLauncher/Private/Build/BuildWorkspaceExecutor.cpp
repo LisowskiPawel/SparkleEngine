@@ -192,12 +192,13 @@ namespace SparkleLauncher
 			return false;
 		}
 
-		if (const std::optional<std::string> dependencyValidationFailure = ValidateRequestedSourceDependencyAfterConfigure(plan))
+		const std::optional<std::string> requestedDependencyFailure = ValidateRequestedSourceDependencyAfterConfigure(plan);
+		if (requestedDependencyFailure)
 		{
 			SetOperationFailure(
 			    operation,
 			    OperationProblemKind::OutputValidation,
-			    *dependencyValidationFailure,
+			    *requestedDependencyFailure,
 			    "Correct the first dependency sync error in the named log, then retry this dependency Sync.");
 
 			MarkOperationFinished(operation, OperationStatus::Failed, 0);
@@ -206,12 +207,13 @@ namespace SparkleLauncher
 
 		if (step.bUpdatesBuildFilesFreshness)
 		{
-			if (const std::optional<std::string> dependencyValidationFailure = ValidateEnabledSourceDependenciesAfterConfigure(plan))
+			const std::optional<std::string> enabledDependencyFailure = ValidateEnabledSourceDependenciesAfterConfigure(plan);
+			if (enabledDependencyFailure)
 			{
 				SetOperationFailure(
 				    operation,
 				    OperationProblemKind::OutputValidation,
-				    *dependencyValidationFailure,
+				    *enabledDependencyFailure,
 				    "Correct the first dependency configure error in the named log, then retry Sync Code.");
 
 				MarkOperationFinished(operation, OperationStatus::Failed, 0);
@@ -229,7 +231,7 @@ namespace SparkleLauncher
 		return true;
 	}
 
-	OperationRecord RunBuildWorkspaceOperationPlan(BuildWorkspaceOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
+	OperationRecord RunLauncherOperationPlan(BuildWorkspaceOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback, std::stop_token cancellation)
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);

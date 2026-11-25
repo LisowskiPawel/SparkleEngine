@@ -1,11 +1,5 @@
 #pragma once
 
-#include "TextureCookRequestList.h"
+class TextureCookRequestSet;
 
-class DefaultTextureCookRequestBuilder final
-{
-public:
-	DefaultTextureCookRequestBuilder() = delete;
-
-	static void AppendTo(TextureCookRequestSet& requestSet);
-};
+void AppendDefaultTextureCookRequests(TextureCookRequestSet& requestSet);

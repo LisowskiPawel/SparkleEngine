@@ -323,7 +323,7 @@ namespace SparkleLauncher
 
 		const BuildWorkspaceOperationRequest request = BuildWorkspacePlanRequest(m_workspaceRoot, m_contentModel, m_settings);
 
-		const BuildWorkspaceOperationPlan plan = PlanBuildWorkspaceOperation(operationId.toStdString(), request);
+		const BuildWorkspaceOperationPlan plan = PlanLauncherOperation(operationId.toStdString(), request);
 		const QString workspaceIdeName = ResolveSelectedWorkspaceIdeName(m_settings);
 		if (operationId == "workspace.sync-code" || operationId == "workspace.generate-build-files")
 		{
@@ -333,9 +333,13 @@ namespace SparkleLauncher
 		{
 			AddWorkspaceBuildIssues(layout, request, plan);
 		}
-		else if (operationId.startsWith("workspace.build") || operationId == "cook.tools.prepare" || operationId == "launcher.build.self")
+		else
 		{
-			AddBuildReadinessStatus(layout, plan);
+			const bool bWorkspaceBuild = operationId.startsWith("workspace.build");
+			if (bWorkspaceBuild || operationId == "cook.tools.prepare" || operationId == "launcher.build.self")
+			{
+				AddBuildReadinessStatus(layout, plan);
+			}
 		}
 	}
 
@@ -343,7 +347,7 @@ namespace SparkleLauncher
 	{
 		const LauncherOperationRequest operationRequest = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, operationId);
 		const auto& cookRequest = std::get<CookOperationRequest>(operationRequest.Inputs);
-		const CookOperationPlan cookPlan = PlanCookOperation(operationId.toStdString(), cookRequest);
+		const CookOperationPlan cookPlan = PlanLauncherOperation(operationId.toStdString(), cookRequest);
 		QVBoxLayout* issueLayout = nullptr;
 
 		const auto ensureIssueLayout = [&]() -> QVBoxLayout*

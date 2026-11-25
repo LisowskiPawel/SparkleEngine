@@ -1,7 +1,7 @@
 #include "Cooking/AssetCookStages.h"
 #include "Core/Public/Strings/StringUtils.h"
 #include "Dispatch/AssetCookerToolProcess.h"
-#include "Cooking/TextureRequestPlanBuilder.h"
+#include "Cooking/BuildTextureCookRequests.h"
 
 #include <chrono>
 #include <system_error>
@@ -67,7 +67,7 @@ bool CookTextures(const AssetCookerProjectCookPlan& plan, AssetCookerDiagnostics
 		return false;
 	}
 
-	if (!TextureRequestPlanBuilder::Build(plan, diagnostics, requestFile.GetPath()))
+	if (!BuildTextureCookRequests(plan.sceneEntries, diagnostics, requestFile.GetPath()))
 	{
 		return false;
 	}

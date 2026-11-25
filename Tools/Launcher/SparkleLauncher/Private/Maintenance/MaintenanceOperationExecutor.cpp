@@ -23,7 +23,7 @@ namespace SparkleLauncher
 		return summary;
 	}
 
-	OperationRecord RunMaintenanceOperationPlan(MaintenanceOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback)
+	OperationRecord RunLauncherOperationPlan(MaintenanceOperationPlan plan, const Process::ChildProcessOutputCallback& outputCallback)
 	{
 		OperationRecord operation = plan.Operation;
 		MarkOperationStarted(operation, operation.LogPath);

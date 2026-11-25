@@ -84,7 +84,7 @@ namespace ECS
 
 	GameWorldSystemExecution::GameWorldSystemExecution(GameWorldState& state, const GameWorldSystemExecutionContext& context) :
 	    m_camera(state.m_registry, state.m_activeCamera, context.Camera),
-	    m_animation(state.m_registry, context.Resources.AnimationClips, context.Resources.Skeletons, state.m_animationEvaluation, state.m_morphWeights, context.Camera.DeltaSeconds),
+	    m_animation(state.m_registry, context.Resources.AnimationClips, state.m_animationEvaluation, state.m_morphWeights, context.Camera.DeltaSeconds),
 	    m_transform(state.m_registry, state.m_transformWork),
 	    m_extraction(state.m_registry, state.m_meshResources, context.Resources.Skeletons, state.m_extraction.GetMeshSlots()),
 	    m_state(state)

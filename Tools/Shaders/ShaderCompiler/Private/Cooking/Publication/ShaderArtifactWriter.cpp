@@ -5,8 +5,7 @@
 #include "Cooking/Publication/ReflectionSerializer.h"
 #include "Cooking/Planning/ShaderCookPipelinePlan.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Files/BinaryStreamWriter.h"
-#include "Core/Public/Files/FileUtils.h"
+#include "Core/Public/Files/BinaryFileWriter.h"
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Strings/StringTableBuilder.h"
 #include "RHI/Public/Shaders/GlobalShaderMap.h"
@@ -14,7 +13,6 @@
 #include <algorithm>
 #include <cstdint>
 #include <filesystem>
-#include <fstream>
 #include <format>
 #include <map>
 #include <span>
@@ -354,26 +352,19 @@ namespace ShaderArtifactWriter
 		mapHeader.PushConstantRangeRecordCount = static_cast<std::uint32_t>(reflection.pushConstantRanges.size());
 		mapHeader.SpecializationConstantRecordCount = static_cast<std::uint32_t>(reflection.specializationConstants.size());
 		mapHeader.StringTableSizeInBytes = tables.Strings.SizeInBytes();
-		std::ofstream output;
-		std::string error;
-		const bool bOutputOpened = Files::TryOpenBinaryOutput(path, output, error);
-		const bool bHeaderWritten = bOutputOpened && Files::BinaryStreamWriter::WriteValue(output, mapHeader, error);
-		const bool bEntriesWritten = bHeaderWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Entries, error);
-		const bool bBindingsWritten = bEntriesWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Bindings, error);
-		const bool bReflectionWritten = bBindingsWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.reflectionRecords, error);
-		const bool bResourcesWritten = bReflectionWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.resourceBindings, error);
-		const bool bConstantBuffersWritten = bResourcesWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.constantBuffers, error);
-		const bool bConstantMembersWritten = bConstantBuffersWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.constantBufferMembers, error);
-		const bool bInputElementsWritten = bConstantMembersWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.inputElements, error);
-		const bool bPushConstantsWritten = bInputElementsWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.pushConstantRanges, error);
-		const bool bSpecializationConstantsWritten = bPushConstantsWritten && Files::BinaryStreamWriter::WriteArray(output, reflection.specializationConstants, error);
-		const bool bStringsWritten = bSpecializationConstantsWritten && Files::BinaryStreamWriter::WriteArray(output, tables.Strings.GetBytes(), error);
-		const bool bOutputClosed = bStringsWritten && Files::TryCloseOutput(output, path, error);
-
-		if (!bOutputClosed)
-		{
-			throw Diagnostics::Error(error);
-		}
+		Files::WriteBinaryFile(
+		    path,
+		    mapHeader,
+		    tables.Entries,
+		    tables.Bindings,
+		    reflection.reflectionRecords,
+		    reflection.resourceBindings,
+		    reflection.constantBuffers,
+		    reflection.constantBufferMembers,
+		    reflection.inputElements,
+		    reflection.pushConstantRanges,
+		    reflection.specializationConstants,
+		    tables.Strings.GetBytes());
 	}
 
 	static void WriteLibrary(const std::filesystem::path& path, std::uint64_t publicationHash, const std::vector<CookedShaderCodeRecord>& records, const std::vector<std::uint8_t>& code)
@@ -383,18 +374,7 @@ namespace ShaderArtifactWriter
 		libraryHeader.PublicationHash = publicationHash;
 		libraryHeader.CodeBlobSizeInBytes = static_cast<std::uint32_t>(code.size());
 
-		std::ofstream output;
-		std::string error;
-		const bool bOutputOpened = Files::TryOpenBinaryOutput(path, output, error);
-		const bool bHeaderWritten = bOutputOpened && Files::BinaryStreamWriter::WriteValue(output, libraryHeader, error);
-		const bool bRecordsWritten = bHeaderWritten && Files::BinaryStreamWriter::WriteArray(output, records, error);
-		const bool bCodeWritten = bRecordsWritten && Files::BinaryStreamWriter::WriteArray(output, code, error);
-		const bool bOutputClosed = bCodeWritten && Files::TryCloseOutput(output, path, error);
-
-		if (!bOutputClosed)
-		{
-			throw Diagnostics::Error(error);
-		}
+		Files::WriteBinaryFile(path, libraryHeader, records, code);
 	}
 
 	static ShaderCookOutput WriteArtifacts(std::vector<ArtifactEntry> entries, const std::filesystem::path& mapPath, const std::filesystem::path& libraryPath)

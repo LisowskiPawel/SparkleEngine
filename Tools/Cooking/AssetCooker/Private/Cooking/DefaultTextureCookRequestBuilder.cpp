@@ -1,12 +1,14 @@
-#include "DefaultTextureCookRequestBuilder.h"
-#include "Core/Public/Paths/CookedAssetPaths.h"
+#include "Cooking/DefaultTextureCookRequestBuilder.h"
 
-#include "Core/Public/Assets/DefaultTexture.h"
 #include "Core/Public/Diagnostics/Error.h"
+#include "Core/Public/Assets/DefaultTexture.h"
+#include "Core/Public/Paths/CookedAssetPaths.h"
 #include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Hash/HashUtils.h"
+#include "TextureCookRequestList.h"
 
 #include <array>
+#include <string>
 #include <string_view>
 #include <system_error>
 
@@ -14,72 +16,22 @@ struct DefaultTextureCookDesc final
 {
 	std::string_view SourceRelativePath;
 	DefaultTexture Product;
-	TextureColorSpace ColorSpace;
-	TextureColorProcessingPolicy ColorProcessingPolicy;
-	TextureGroup Group;
-	TextureDimension Dimension;
+	TextureColorSpace ColorSpace = TextureColorSpace::Srgb;
+	TextureColorProcessingPolicy ColorProcessingPolicy = TextureColorProcessingPolicy::SrgbLinearize;
+	TextureGroup Group = TextureGroup::Diffuse;
 };
 
 static constexpr std::array DefaultTextures = {
-    DefaultTextureCookDesc{
-        "Assets/Textures/Defaults/default_checkerboard.png",
-        DefaultTexture::Checkerboard,
-        TextureColorSpace::Srgb,
-        TextureColorProcessingPolicy::SrgbLinearize,
-        TextureGroup::Diffuse,
-        TextureDimension::Texture2D},
-    DefaultTextureCookDesc{
-        "Assets/Textures/Defaults/default_white.png",
-        DefaultTexture::White,
-        TextureColorSpace::Srgb,
-        TextureColorProcessingPolicy::SrgbLinearize,
-        TextureGroup::Diffuse,
-        TextureDimension::Texture2D},
-    DefaultTextureCookDesc{
-        "Assets/Textures/Defaults/default_black.png",
-        DefaultTexture::Black,
-        TextureColorSpace::Srgb,
-        TextureColorProcessingPolicy::SrgbLinearize,
-        TextureGroup::Diffuse,
-        TextureDimension::Texture2D},
-    DefaultTextureCookDesc{
-        "Assets/Textures/Defaults/default_red.png",
-        DefaultTexture::Red,
-        TextureColorSpace::Srgb,
-        TextureColorProcessingPolicy::SrgbLinearize,
-        TextureGroup::Diffuse,
-        TextureDimension::Texture2D},
-    DefaultTextureCookDesc{
-        "Assets/Textures/Defaults/default_green.png",
-        DefaultTexture::Green,
-        TextureColorSpace::Srgb,
-        TextureColorProcessingPolicy::SrgbLinearize,
-        TextureGroup::Diffuse,
-        TextureDimension::Texture2D},
-    DefaultTextureCookDesc{
-        "Assets/Textures/Defaults/default_blue.png",
-        DefaultTexture::Blue,
-        TextureColorSpace::Srgb,
-        TextureColorProcessingPolicy::SrgbLinearize,
-        TextureGroup::Diffuse,
-        TextureDimension::Texture2D},
-    DefaultTextureCookDesc{
-        "Assets/Textures/Defaults/default_normal.png",
-        DefaultTexture::Normal,
-        TextureColorSpace::Linear,
-        TextureColorProcessingPolicy::Linear,
-        TextureGroup::NormalMap,
-        TextureDimension::Texture2D},
-    DefaultTextureCookDesc{
-        "Assets/Textures/Sky/evening_road_01_puresky_4k.exr",
-        DefaultTexture::Sky,
-        TextureColorSpace::Linear,
-        TextureColorProcessingPolicy::Linear,
-        TextureGroup::HdrColor,
-        TextureDimension::Texture2D},
-};
+    DefaultTextureCookDesc{"Assets/Textures/Defaults/default_checkerboard.png", DefaultTexture::Checkerboard},
+    DefaultTextureCookDesc{"Assets/Textures/Defaults/default_white.png", DefaultTexture::White},
+    DefaultTextureCookDesc{"Assets/Textures/Defaults/default_black.png", DefaultTexture::Black},
+    DefaultTextureCookDesc{"Assets/Textures/Defaults/default_red.png", DefaultTexture::Red},
+    DefaultTextureCookDesc{"Assets/Textures/Defaults/default_green.png", DefaultTexture::Green},
+    DefaultTextureCookDesc{"Assets/Textures/Defaults/default_blue.png", DefaultTexture::Blue},
+    DefaultTextureCookDesc{"Assets/Textures/Defaults/default_normal.png", DefaultTexture::Normal, TextureColorSpace::Linear, TextureColorProcessingPolicy::Linear, TextureGroup::NormalMap},
+    DefaultTextureCookDesc{"Assets/Textures/Sky/evening_road_01_puresky_4k.exr", DefaultTexture::Sky, TextureColorSpace::Linear, TextureColorProcessingPolicy::Linear, TextureGroup::HdrColor}};
 
-static void AppendRequest(const DefaultTextureCookDesc& description, TextureCookRequestSet& requestSet)
+static TextureCookRequest BuildRequest(const DefaultTextureCookDesc& description)
 {
 	const std::filesystem::path sourcePath = (Filesystem::GetEnginePath() / std::filesystem::path(description.SourceRelativePath)).lexically_normal();
 	std::error_code errorCode;
@@ -97,15 +49,16 @@ static void AppendRequest(const DefaultTextureCookDesc& description, TextureCook
 	request.policy.mipPolicy = TextureMipPolicy::Generate;
 	request.policy.colorProcessingPolicy = description.ColorProcessingPolicy;
 	request.policy.textureGroup = description.Group;
-	request.policy.dimension = description.Dimension;
+	request.policy.dimension = TextureDimension::Texture2D;
 	request.policy.channelMask = TextureChannelMask::Rgba;
-	requestSet.Add(request);
+	return request;
 }
 
-void DefaultTextureCookRequestBuilder::AppendTo(TextureCookRequestSet& requestSet)
+void AppendDefaultTextureCookRequests(TextureCookRequestSet& requestSet)
 {
-	for (const DefaultTextureCookDesc& texture : DefaultTextures)
+	for (const DefaultTextureCookDesc& description : DefaultTextures)
 	{
-		AppendRequest(texture, requestSet);
+		const TextureCookRequest request = BuildRequest(description);
+		requestSet.Add(request);
 	}
 }

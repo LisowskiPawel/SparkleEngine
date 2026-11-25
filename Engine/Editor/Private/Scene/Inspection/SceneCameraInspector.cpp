@@ -34,7 +34,7 @@ namespace SceneCameraInspector
 
 		if (EditSceneTransform(after, {0.0f, 0.0f, -4.0f}))
 		{
-			(void) transactionHistory.Execute({0, SetLocalTransformCommand{camera.Entity, after}}, {0, SetLocalTransformCommand{camera.Entity, camera.LocalTransform}}, generation, "camera-transform");
+			(void) transactionHistory.Execute(SetLocalTransformCommand{camera.Entity, after}, SetLocalTransformCommand{camera.Entity, camera.LocalTransform}, generation, "camera-transform");
 		}
 	}
 
@@ -61,8 +61,7 @@ namespace SceneCameraInspector
 
 		if (bChanged)
 		{
-			(void) transactionHistory
-			    .Execute({0, SetCameraDescriptionCommand{camera.Entity, after}}, {0, SetCameraDescriptionCommand{camera.Entity, camera.Description}}, generation, "camera-description");
+			(void) transactionHistory.Execute(SetCameraDescriptionCommand{camera.Entity, after}, SetCameraDescriptionCommand{camera.Entity, camera.Description}, generation, "camera-description");
 		}
 	}
 
@@ -79,8 +78,7 @@ namespace SceneCameraInspector
 		const bool bDefaultVisible = true;
 		if (EditorWidgets::EditDetailsCheckbox("Visible", bVisible, &bDefaultVisible))
 		{
-			(void)
-			    transactionHistory.Execute({0, SetEntityVisibilityCommand{camera.Entity, bVisible}}, {0, SetEntityVisibilityCommand{camera.Entity, camera.bVisible}}, generation, "camera-visibility");
+			(void) transactionHistory.Execute(SetEntityVisibilityCommand{camera.Entity, bVisible}, SetEntityVisibilityCommand{camera.Entity, camera.bVisible}, generation, "camera-visibility");
 		}
 	}
 }

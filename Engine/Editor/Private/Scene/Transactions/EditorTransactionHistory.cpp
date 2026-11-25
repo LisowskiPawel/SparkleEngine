@@ -41,9 +41,9 @@ void EditorTransactionHistory::DismissLastResult() noexcept
 	m_lastResult.reset();
 }
 
-WorldEditResult EditorTransactionHistory::Submit(WorldEditCommand command, std::uint64_t worldGeneration)
+WorldEditResult EditorTransactionHistory::Submit(WorldEditPayload payload, std::uint64_t worldGeneration)
 {
-	command.RequestId = m_nextRequestId++;
+	WorldEditCommand command{.RequestId = m_nextRequestId++, .Payload = std::move(payload)};
 	if (!m_submit)
 	{
 		return {command.RequestId, WorldEditResultStatus::Rejected, "The editor command boundary is unavailable."};
@@ -67,7 +67,7 @@ void EditorTransactionHistory::InvalidateForWorldGeneration(std::uint64_t worldG
 	}
 }
 
-WorldEditResult EditorTransactionHistory::Execute(WorldEditCommand forward, WorldEditCommand inverse, std::uint64_t worldGeneration, std::string coalescingKey)
+WorldEditResult EditorTransactionHistory::Execute(WorldEditPayload forward, WorldEditPayload inverse, std::uint64_t worldGeneration, std::string coalescingKey)
 {
 	InvalidateForWorldGeneration(worldGeneration);
 	WorldEditResult result = Submit(forward, worldGeneration);
@@ -80,7 +80,7 @@ WorldEditResult EditorTransactionHistory::Execute(WorldEditCommand forward, Worl
 	const bool bInteractionContinues = m_bCoalescing && !coalescingKey.empty();
 	const bool bHasPreviousInteraction = bInteractionContinues && m_position != 0;
 	const bool bMatchesPreviousKey = bHasPreviousInteraction && m_transactions[m_position - 1].CoalescingKey == coalescingKey;
-	const bool bCanCoalesce = bMatchesPreviousKey && AffectsSameTarget(m_transactions[m_position - 1].Forward.Payload, forward.Payload);
+	const bool bCanCoalesce = bMatchesPreviousKey && AffectsSameTarget(m_transactions[m_position - 1].Forward, forward);
 	m_transactions.erase(m_transactions.begin() + m_position, m_transactions.end());
 
 	if (bCanCoalesce)

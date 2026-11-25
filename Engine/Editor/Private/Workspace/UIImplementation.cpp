@@ -48,14 +48,14 @@ const ViewportRenderRequest& UI::Implementation::GetViewportRenderRequest() cons
 RenderViewCameraData UI::Implementation::UpdateViewportCamera(const CameraInputIntent& intent, float deltaSeconds)
 {
 	m_scene.Refresh();
-	const EditorSceneModel* model = m_scene.GetModel();
-	if (model == nullptr)
+	const EditorSceneModel& model = m_scene.GetModel();
+	if (!model.HasWorld())
 	{
 		return {};
 	}
 
 	const RenderViewportExtent extent = GetViewportRenderRequest().Extent;
-	m_viewportSession->SynchronizeWorld(model->GetCameras(), model->GetWorldGeneration());
+	m_viewportSession->SynchronizeWorld(model.GetCameras(), model.GetWorldGeneration());
 	const RenderViewCameraData camera = m_viewportSession->UpdateCamera(intent, deltaSeconds, extent);
 	m_viewportPanel->SetExposureOverrides(m_viewportSession->GetSettings().Exposure);
 	return camera;

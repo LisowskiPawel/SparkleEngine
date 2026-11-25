@@ -2,7 +2,6 @@
 
 #include "GameFramework/Public/GameFrameworkAPI.h"
 #include "Level/LevelChangeEvents.h"
-#include "Level/LevelLoadOperation.h"
 
 #include <memory>
 #include <cstdint>
@@ -43,8 +42,6 @@ public:
 	LevelChangeEvents& GetLevelChangeEvents() noexcept { return m_levelChangeEvents; }
 
 	const LevelChangeEvents& GetLevelChangeEvents() const noexcept { return m_levelChangeEvents; }
-
-	LevelLoadOperationProgress GetLoadProgress() const noexcept;
 
 	std::string_view GetLastLoadDiagnostic() const noexcept { return m_lastLoadDiagnostic; }
 

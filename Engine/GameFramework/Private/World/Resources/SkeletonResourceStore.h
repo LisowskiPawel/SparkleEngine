@@ -3,39 +3,19 @@
 #include "Animation/SkeletonResource.h"
 
 #include <cstddef>
-#include <compare>
-#include <cstdint>
-#include <limits>
 #include <unordered_map>
 
 #include <vector>
-
-struct SkeletonResourceHandle final
-{
-	std::uint32_t Slot = (std::numeric_limits<std::uint32_t>::max)();
-	std::uint32_t Generation = 0;
-
-	constexpr bool IsValid() const noexcept { return Slot != (std::numeric_limits<std::uint32_t>::max)() && Generation != 0; }
-
-	constexpr auto operator<=>(const SkeletonResourceHandle&) const noexcept = default;
-};
 
 class SkeletonResourceStore final
 {
 public:
 	void Append(std::vector<SkeletonResource> skeletons);
-	SkeletonResourceHandle Find(Assets::CookedAssetId skeletonAssetId) const noexcept;
-	const SkeletonResource* Resolve(SkeletonResourceHandle handle) const noexcept;
+	const SkeletonResource* Find(Assets::CookedAssetId skeletonAssetId) const noexcept;
 
-	std::size_t GetCount() const noexcept { return m_entries.size(); }
+	std::size_t GetCount() const noexcept { return m_resources.size(); }
 
 private:
-	struct Entry final
-	{
-		SkeletonResource Resource;
-		std::uint32_t Generation = 1;
-	};
-
-	std::vector<Entry> m_entries;
-	std::unordered_map<Assets::CookedAssetId, SkeletonResourceHandle> m_byAssetId;
+	// Entries are append-only. Node addresses survive insertion and rehash until this world is retired.
+	std::unordered_map<Assets::CookedAssetId, SkeletonResource> m_resources;
 };

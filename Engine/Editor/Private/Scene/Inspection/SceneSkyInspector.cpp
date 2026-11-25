@@ -18,7 +18,7 @@ void SceneSkyInspector::Build(const std::optional<SkyEnvironment>& current, Edit
 		if (EditorWidgets::EditDetailsCheckbox("Override Default", bHasSky, &bDefaultHasSky))
 		{
 			std::optional<SkyEnvironment> after = bHasSky ? std::optional<SkyEnvironment>{SkyEnvironment{}} : std::nullopt;
-			(void) transactionHistory.Execute({0, SetSkyEnvironmentCommand{after}}, {0, SetSkyEnvironmentCommand{current}}, generation);
+			(void) transactionHistory.Execute(SetSkyEnvironmentCommand{after}, SetSkyEnvironmentCommand{current}, generation);
 		}
 		if (!bHasSky)
 		{
@@ -65,6 +65,6 @@ void SceneSkyInspector::Build(const std::optional<SkyEnvironment>& current, Edit
 	}
 	if (bChanged)
 	{
-		(void) transactionHistory.Execute({0, SetSkyEnvironmentCommand{SkyEnvironment{after}}}, {0, SetSkyEnvironmentCommand{current}}, generation, "sky-environment");
+		(void) transactionHistory.Execute(SetSkyEnvironmentCommand{SkyEnvironment{after}}, SetSkyEnvironmentCommand{current}, generation, "sky-environment");
 	}
 }
