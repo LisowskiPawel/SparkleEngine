@@ -57,15 +57,8 @@ Projects/Showcase/Launcher/Thumbnails/ModernSponza* export-ignore
 # Excluded development content with unqualified public-source receipts.
 Projects/Showcase/Assets/Meshes/DamagedHelmet export-ignore
 Projects/Showcase/Assets/Textures/DamagedHelmet export-ignore
-Projects/Showcase/Launcher/Thumbnails/AnisotropyBarnLamp.jpg export-ignore
 Projects/Showcase/Launcher/Thumbnails/BistroExterior.jpg export-ignore
 Projects/Showcase/Launcher/Thumbnails/BistroInteriorWine.jpg export-ignore
 Projects/Showcase/Launcher/Thumbnails/DamagedHelmet.jpg export-ignore
-Projects/Showcase/Launcher/Thumbnails/JungleRuins.jpg export-ignore
 Projects/Showcase/Launcher/Thumbnails/ModernSponzaCandles.jpg export-ignore
 Projects/Showcase/Launcher/Thumbnails/ModernSponzaKnight.jpg export-ignore
-Projects/Showcase/Launcher/Thumbnails/SanMiguelHigh.jpg export-ignore
-Projects/Showcase/Launcher/Thumbnails/SanMiguelLow.jpg export-ignore
-Projects/Showcase/Launcher/Thumbnails/SheenCloth.jpg export-ignore
-Projects/Showcase/Launcher/Thumbnails/StanfordBunnySubsurface.jpg export-ignore
-Projects/Showcase/Launcher/Thumbnails/StanfordDragonSubsurface.jpg export-ignore

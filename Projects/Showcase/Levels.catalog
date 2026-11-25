@@ -7,19 +7,6 @@ ReleaseSupported = true
 Selected = true
 
 [Level]
-Id = ModernSponza
-DisplayName = Modern Sponza
-Description = Explore Intel's modern reimagining of Sponza with its complete colorful curtain treatment.
-Source = Levels/ModernSponza.level
-Thumbnail = Launcher/Thumbnails/ModernSponza.jpg
-SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html
-AssetPack = ModernSponzaCurtains
-Family = Modern Sponza
-VariantKind = Base
-ReleaseSupported = true
-Selected = false
-
-[Level]
 Id = ModernSponzaCandles
 DisplayName = Modern Sponza: Emissive Candles
 Description = Fill Modern Sponza with thousands of emissive candles for demanding lighting tests.
@@ -46,17 +33,6 @@ ReleaseSupported = false
 Selected = false
 
 [Level]
-Id = JungleRuins
-DisplayName = Jungle Ruins
-Description = Discover a dense jungle temple environment authored as a large USD scene.
-Source = Levels/JungleRuins.level
-Thumbnail = Launcher/Thumbnails/JungleRuins.jpg
-SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html
-AssetPack = JungleRuins
-ReleaseSupported = false
-Selected = false
-
-[Level]
 Id = BistroExterior
 DisplayName = Bistro: Exterior
 Description = Explore NVIDIA's richly detailed outdoor Bistro environment.
@@ -78,32 +54,6 @@ Thumbnail = Launcher/Thumbnails/BistroInteriorWine.jpg
 SourcePage = https://developer.nvidia.com/orca/amazon-lumberyard-bistro
 AssetPack = Bistro
 Family = Bistro
-VariantKind = SceneVariant
-ReleaseSupported = false
-Selected = false
-
-[Level]
-Id = SanMiguelHigh
-DisplayName = San Miguel: High
-Description = Use the full-detail San Miguel environment for large-scene rendering work.
-Source = Levels/SanMiguelHigh.level
-Thumbnail = Launcher/Thumbnails/SanMiguelHigh.jpg
-SourcePage = https://casual-effects.com/g3d/data10/index.html
-AssetPack = SanMiguel
-Family = San Miguel
-VariantKind = Base
-ReleaseSupported = false
-Selected = false
-
-[Level]
-Id = SanMiguelLow
-DisplayName = San Miguel: Low
-Description = Use the lighter San Miguel scene variation for faster iteration.
-Source = Levels/SanMiguelLow.level
-Thumbnail = Launcher/Thumbnails/SanMiguelLow.jpg
-SourcePage = https://casual-effects.com/g3d/data10/index.html
-AssetPack = SanMiguel
-Family = San Miguel
 VariantKind = SceneVariant
 ReleaseSupported = false
 Selected = false
@@ -160,16 +110,6 @@ ReleaseSupported = true
 Selected = false
 
 [Level]
-Id = DiffuseTransmissionPlant
-DisplayName = Diffuse Transmission Plant
-Description = Study diffuse transmission and layered plant materials in a focused scene.
-Source = Levels/DiffuseTransmissionPlant.level
-Thumbnail = Launcher/Thumbnails/DiffuseTransmissionPlant.jpg
-SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/DiffuseTransmissionPlant
-ReleaseSupported = true
-Selected = false
-
-[Level]
 Id = CesiumMan
 DisplayName = Cesium Man
 Description = Explore an animated glTF character sample with skinning and authored materials.
@@ -177,58 +117,6 @@ Source = Levels/CesiumMan.level
 Thumbnail = Launcher/Thumbnails/CesiumMan.jpg
 SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CesiumMan
 ReleaseSupported = true
-Selected = false
-
-[Level]
-Id = StanfordBunnySubsurface
-DisplayName = Stanford Bunny: Subsurface
-Description = Stanford Bunny geometry preview with generic shading; subsurface authoring and lighting are pending.
-Source = Levels/StanfordBunnySubsurface.level
-Thumbnail = Launcher/Thumbnails/StanfordBunnySubsurface.jpg
-SourcePage = https://graphics.stanford.edu/data/3Dscanrep/#bunny
-AssetPack = StanfordBunny
-Family = Subsurface
-VariantKind = Base
-ReleaseSupported = false
-Selected = false
-
-[Level]
-Id = StanfordDragonSubsurface
-DisplayName = Stanford Dragon: Subsurface
-Description = Stanford Dragon geometry preview with generic shading; subsurface authoring and lighting are pending.
-Source = Levels/StanfordDragonSubsurface.level
-Thumbnail = Launcher/Thumbnails/StanfordDragonSubsurface.jpg
-SourcePage = https://graphics.stanford.edu/data/3Dscanrep/#dragon
-AssetPack = StanfordDragon
-Family = Subsurface
-VariantKind = Base
-ReleaseSupported = false
-Selected = false
-
-[Level]
-Id = AnisotropyBarnLamp
-DisplayName = Anisotropy Barn Lamp
-Description = Khronos barn lamp with generic shading; anisotropy, clearcoat, transmission, and volume are pending.
-Source = Levels/AnisotropyBarnLamp.level
-Thumbnail = Launcher/Thumbnails/AnisotropyBarnLamp.jpg
-SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/AnisotropyBarnLamp
-AssetPack = AnisotropyBarnLamp
-Family = Material Reference
-VariantKind = Base
-ReleaseSupported = false
-Selected = false
-
-[Level]
-Id = SheenCloth
-DisplayName = Sheen Cloth
-Description = Microsoft's cloth model with generic shading; the sheen lighting lobe is pending.
-Source = Levels/SheenCloth.level
-Thumbnail = Launcher/Thumbnails/SheenCloth.jpg
-SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/SheenCloth
-AssetPack = SheenCloth
-Family = Material Reference
-VariantKind = Base
-ReleaseSupported = false
 Selected = false
 
 [AssetPack]
@@ -248,93 +136,6 @@ License = CC BY 4.0
 External = true
 DownloadSupported = true
 GameSupported = true
-
-[AssetPack]
-Id = StanfordBunny
-DisplayName = Stanford Bunny
-Root = Assets/Meshes/StanfordBunny/Publisher/bunny
-ExtractRoot = Assets/Meshes/StanfordBunny/Publisher
-Required = reconstruction/bun_zipper.ply
-Kind = Scene
-SourceUrl = https://graphics.stanford.edu/pub/3Dscanrep/bunny.tar.gz
-SourcePage = https://graphics.stanford.edu/data/3Dscanrep/#bunny
-Archive = stanford-bunny-1998-12-05.tar.gz
-ArchiveBytes = 4894286
-ArchiveSha256 = a5720bd96d158df403d153381b8411a727a1d73cff2f33dc9b212d6f75455b84
-Version = Archive revision 1998-12-05
-License = Stanford Bunny terms permit use and redistribution; credit Stanford Computer Graphics Laboratory
-External = true
-DownloadSupported = true
-GameSupported = true
-
-[AssetPack]
-Id = StanfordDragon
-DisplayName = Stanford Dragon
-Root = Assets/Meshes/StanfordDragon/Publisher/dragon_recon
-ExtractRoot = Assets/Meshes/StanfordDragon/Publisher
-Required = dragon_vrip.ply
-Kind = Scene
-SourceUrl = https://graphics.stanford.edu/pub/3Dscanrep/dragon/dragon_recon.tar.gz
-SourcePage = https://graphics.stanford.edu/data/3Dscanrep/#dragon
-Archive = stanford-dragon-reconstruction-1996-08-15.tar.gz
-ArchiveBytes = 11197764
-ArchiveSha256 = 74ac1d90989c9b1732edee82d57e9ce71452144cf4355f108d8c9c616d28d02f
-Version = Archive revision 1996-08-15
-License = Stanford research-use and redistribution terms; noncommercial restriction applies; credit Stanford Computer Graphics Laboratory
-External = true
-DownloadSupported = true
-GameSupported = true
-
-[AssetPack]
-Id = AnisotropyBarnLamp
-DisplayName = Anisotropy Barn Lamp
-Root = Assets/Meshes/AnisotropyBarnLamp/Publisher
-ExtractRoot = Assets/Meshes/AnisotropyBarnLamp/Publisher
-Required = .sparkle-acquisition.txt
-Kind = Scene
-SourceUrl = https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/AnisotropyBarnLamp/glTF/
-SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/AnisotropyBarnLamp
-SourceFiles = Assets/Meshes/AnisotropyBarnLamp/SourceFiles.txt
-Version = glTF-Sample-Assets edc7c9e67c639d230715049ee31f9a96a6babbbe
-License = CC BY 4.0; copyright 2023 Wayfair LLC; model and textures by Eric Chadwick
-External = true
-DownloadSupported = true
-GameSupported = true
-
-[AssetPack]
-Id = SheenCloth
-DisplayName = Sheen Cloth
-Root = Assets/Meshes/SheenCloth/Publisher
-ExtractRoot = Assets/Meshes/SheenCloth/Publisher
-Required = .sparkle-acquisition.txt
-Kind = Scene
-SourceUrl = https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/SheenCloth/glTF/
-SourcePage = https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/SheenCloth
-SourceFiles = Assets/Meshes/SheenCloth/SourceFiles.txt
-Version = glTF-Sample-Assets edc7c9e67c639d230715049ee31f9a96a6babbbe
-License = CC0 1.0; donated by Microsoft for glTF testing
-External = true
-DownloadSupported = true
-GameSupported = true
-
-[AssetPack]
-Id = SanMiguel
-DisplayName = San Miguel 2.0
-Root = Assets/Meshes/SanMiguel
-ExtractRoot = Assets/Meshes/SanMiguel
-Required = san-miguel.obj
-Kind = Scene
-SourceUrl = https://casual-effects.com/g3d/data10/research/model/San_Miguel/San_Miguel.zip
-SourcePage = https://casual-effects.com/g3d/data10/index.html
-Archive = San_Miguel.zip
-ArchiveBytes = 535519642
-ArchiveSha256 = 85874077735808150e679b3c71d70a37a270cb8833f4911325aa1099da3f7d4a
-Version = 2.0 (2017-07-02)
-License = CC BY 3.0
-GameBlocker = Deterministic OBJ/MTL/PNG-to-glTF conversion is not implemented yet.
-External = true
-DownloadSupported = true
-GameSupported = false
 
 [AssetPack]
 Id = LPSHead
@@ -410,46 +211,6 @@ DownloadSupported = true
 GameSupported = true
 
 [AssetPack]
-Id = ModernSponzaIvy
-DisplayName = Ivy
-Root = Assets/Meshes/ModernSponza/AddOns/Ivy/pkg_b_ivy
-ExtractRoot = Assets/Meshes/ModernSponza/AddOns/Ivy
-Required = NewSponza_IvyGrowth_glTF.gltf
-Parent = ModernSponzaCurtains
-Kind = AddOn
-SourceUrl = https://cdrdv2.intel.com/v1/dl/getContent/726656
-SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html
-Archive = pkg_b_ivy1.zip
-ArchiveBytes = 1383921436
-Version = Intel GPU Research Samples 2025-06-16
-License = Creative Commons Attribution; verify embedded archive terms
-GameBlocker = Foliage-density, residency, and geometry-scaling support are not implemented yet.
-DownloadBlocker = Future foliage-density, residency, and geometry-scaling support is required.
-External = true
-DownloadSupported = false
-GameSupported = false
-
-[AssetPack]
-Id = ModernSponzaTrees
-DisplayName = Trees
-Root = Assets/Meshes/ModernSponza/AddOns/Trees/pkg_c_trees
-ExtractRoot = Assets/Meshes/ModernSponza/AddOns/Trees
-Required = NewSponza_CypressTree_glTF.gltf
-Parent = ModernSponzaCurtains
-Kind = AddOn
-SourceUrl = https://cdrdv2.intel.com/v1/dl/getContent/726662
-SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html
-Archive = pkg_c_trees.zip
-ArchiveBytes = 951147802
-Version = Intel GPU Research Samples 2025-06-16
-License = Creative Commons Attribution; verify embedded archive terms
-GameBlocker = Alpha-card foliage and transparent-material rendering are not implemented yet.
-DownloadBlocker = Future alpha-card foliage and transparency support is required.
-External = true
-DownloadSupported = false
-GameSupported = false
-
-[AssetPack]
 Id = ModernSponzaCandles
 DisplayName = Emissive Candles
 Root = Assets/Meshes/ModernSponza/AddOns/Candles/pkg_d_10k_candles
@@ -486,65 +247,6 @@ License = Creative Commons Attribution; verify embedded archive terms
 External = true
 DownloadSupported = true
 GameSupported = true
-
-[AssetPack]
-Id = ModernSponzaFlood
-DisplayName = Flood
-Root = Assets/Meshes/ModernSponza/AddOns/Flood/pkg_f_flood
-ExtractRoot = Assets/Meshes/ModernSponza/AddOns/Flood
-Required = abc/sponza_flood_left_final_slow_v0011.abc
-Parent = ModernSponzaCurtains
-Kind = AddOn
-SourceUrl = https://cdrdv2.intel.com/v1/dl/getContent/742225
-SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html
-Archive = pkg_f_flood1.zip
-ArchiveBytes = 2928478705
-Version = Intel GPU Research Samples 2025-06-16
-License = Creative Commons Attribution; verify embedded archive terms
-GameBlocker = Alembic animation, water shading, and simulation playback are not implemented yet.
-DownloadBlocker = Future Alembic animation, water shading, and simulation playback support is required.
-External = true
-DownloadSupported = false
-GameSupported = false
-
-[AssetPack]
-Id = ModernSponzaExplosion
-DisplayName = Volumetric Explosion
-Root = Assets/Meshes/ModernSponza/AddOns/Explosion/pkg_g_explosion
-ExtractRoot = Assets/Meshes/ModernSponza/AddOns/Explosion
-Required = vdb/explosion_v0007/explosion_v0007.0001.vdb
-Parent = ModernSponzaCurtains
-Kind = AddOn
-SourceUrl = https://download.intel.com/developer-assets/PKG_G_Explosion.zip
-SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html
-Archive = PKG_G_Explosion.zip
-ArchiveBytes = 9805168555
-Version = Intel GPU Research Samples 2025-06-16
-License = Creative Commons Attribution; verify embedded archive terms
-GameBlocker = OpenVDB import, volume rendering, and sequence streaming are not implemented yet.
-DownloadBlocker = Future OpenVDB import, volume rendering, and sequence streaming support is required.
-External = true
-DownloadSupported = false
-GameSupported = false
-
-[AssetPack]
-Id = JungleRuins
-DisplayName = Jungle Ruins
-Root = Assets/Meshes/JungleRuins/JungleRuins
-ExtractRoot = Assets/Meshes/JungleRuins
-Required = USD/JungleRuins_Karma.usda
-Kind = Scene
-SourceUrl = https://cdrdv2.intel.com/v1/dl/getContent/844047
-SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html
-Archive = JungleRuins_1_0_1b.zip
-ArchiveBytes = 4254165506
-ArchiveSha256 = f6b44e81af0515161eb9e2a5cf6f7c24bb82beda439fb8e82c4e5ad479881bee
-Version = 1.0.1b
-License = Creative Commons Attribution; verify embedded archive terms
-GameBlocker = USD composition and virtualized or out-of-core geometry support are not implemented yet.
-External = true
-DownloadSupported = true
-GameSupported = false
 
 [AssetPack]
 Id = Sponza

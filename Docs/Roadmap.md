@@ -65,7 +65,7 @@ Target D3D12, real-time Lit, VSync On, automatic histogram exposure, ACES approx
 
 ## After release
 
-Use the retained Bistro/Sponza and selected diagnostic/animation scenes with reproducible content, cameras and suitable comparison results. San Miguel is selected for removal. Continue with two related bodies of work:
+Use the retained Bistro/Sponza and selected diagnostic/animation scenes with reproducible content, cameras and suitable comparison results. Continue with two related bodies of work:
 
 - **Classical graphics:** CPU preparation, GPU shader and resource-lifetime studies, useful offline analysis and one difficult incident.
 - **Owned neural graphics:** independently checked external or analytic diffuse-indirect labels, separate datasets, one fixed model, checked GPU kernels and held-out quality, cost, failure and package results.
