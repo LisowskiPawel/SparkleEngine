@@ -104,6 +104,17 @@ Primary examples behind the [integration scope decisions](Implementation/Portfol
 
 Check the actual licenses: [oneTBB](https://github.com/uxlfoundation/oneTBB/blob/master/LICENSE.txt), [SDL](https://github.com/libsdl-org/SDL/blob/main/LICENSE.txt), [FlatBuffers](https://github.com/google/flatbuffers/blob/master/LICENSE), [volk](https://github.com/zeux/volk/blob/master/LICENSE.md), [RTXDI runtime](https://github.com/NVIDIA-RTX/RTXDI-Library/blob/main/LICENSE.txt), [NRD](https://github.com/NVIDIA-RTX/NRD/blob/master/LICENSE.txt) and each selected AMD/Intel SDK artifact. Public source, sample licensing and runtime redistribution are separate facts.
 
+### Windows build and Rider selection
+
+The current [build-stack decision](Implementation/PortfolioScopeDecisions.md#recommended-windows-build-stack) applies these precedents to the installed Windows machine; they are not a measured Sparkle speedup or a company-wide NVIDIA tool mandate.
+
+| Primary source | Decision relevance |
+| --- | --- |
+| [Rider 2026.1 CMake support](https://www.jetbrains.com/rider/whatsnew/2026-1/) | Direct CMake opening/editing/building became available as Beta. Installed Rider is 2026.1.2; Sparkle navigation/build/native debug and its six profiles still need qualification. Earlier .sln-only advice does not establish the current feature boundary. |
+| [CMake Ninja Multi-Config](https://cmake.org/cmake/help/v4.3/generator/Ninja%20Multi-Config.html), [Ninja execution/pools](https://ninja-build.org/manual.html) | Keep one tree with explicit --config selection and bounded native scheduling. Plain Ninja uses one build type per tree. Actual elapsed time and memory remain local measurements. |
+| [Falcor pinned Windows presets](https://github.com/NVIDIAGameWorks/Falcor/blob/759aad033ff610fb0d82c74f7e0a508d0096d5f2/CMakePresets.json) | NVIDIA graphics-project precedent for Ninja Multi-Config on Windows, alongside a VS preset. The Windows Ninja preset uses MSVC; it does not justify claiming an internal clang-cl standard. |
+| [clang-cl configuration](https://clang.llvm.org/docs/UsersManual.html#clang-cl), [Windows ABI compatibility](https://clang.llvm.org/docs/MSVCCompatibility.html), [lld-link DLL/PDB support](https://lld.llvm.org/windows_support.html) | Native Clang can retain Microsoft-compatible libraries/runtime/SDK. Ninja needs explicit compiler/environment selection. DLL exports, PDB/source debugging and crash identity must be verified for the selected stack. |
+
 ## Tools and APIs
 
 - [Nsight shader profiling](https://docs.nvidia.com/nsight-graphics/UserGuide/shader-profiler.html): connect the executed kernel and source identity to measured hypotheses; native-ISA access is not assumed.

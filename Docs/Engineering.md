@@ -6,11 +6,11 @@ This guide covers your maintainer setup, module boundaries, development and vali
 
 ## Build and run
 
-Target workflow: Rider is the sole maintainer IDE, Sparkle engine modules use shared/DLL linkage and private PCHs, and build/cook/sync remain maintainer tools. The reviewer receives a complete prebuilt Launcher/Editor/Game inspection bundle with no development prerequisites. These are selected cleanup requirements, not a claim that the migration is implemented. The recorded commands below describe the existing Windows generator/toolchain path; Visual Studio-format build files may still be needed by Rider and do not imply retaining Visual Studio as a supported IDE. Follow the [explicit IDE/build-tool boundary](Implementation/PortfolioScopeDecisions.md#rider-and-visual-studio-removal-boundary) before removing generator/discovery code.
+Target workflow: Rider is the sole maintainer IDE, Sparkle engine modules use shared/DLL linkage and private PCHs, and build/cook/sync remain maintainer tools. The reviewer receives a complete prebuilt Launcher/Editor/Game inspection bundle with no development prerequisites. These are selected cleanup requirements, not a claim that the migration is implemented. The selected native build stack is **clang-cl + Ninja Multi-Config + Rider direct CMake**, with lld-link preferred after DLL/PDB qualification. Keep the Microsoft-compatible SDK/STL/CRT and Qt kit. The recorded commands below describe the existing Visual Studio-generator baseline; migration to the selected stack has not been implemented or qualified. Follow the [explicit IDE/build-tool boundary](Implementation/PortfolioScopeDecisions.md#rider-and-visual-studio-removal-boundary) before removing generator/discovery code.
 
 ### Requirements
 
-The recorded Windows toolchain is:
+The recorded Windows baseline is below. This is existing build evidence, not a second compiler/IDE support commitment:
 
 | Tool | Version |
 | --- | --- |
@@ -20,15 +20,15 @@ The recorded Windows toolchain is:
 | Qt | 6.11.1, MSVC x64 |
 | Vulkan SDK | 1.4.350.0, with Slang 2026.8 and DXC 1.9.0.5347 |
 
-Other combinations need separate testing. These versions describe the recorded setup, not the latest available releases.
+Observed candidate tools on 25 November: **clang-cl/lld-link 22.1.3, Ninja 1.13.2 and Rider 2026.1.2**; the installed CMake remains 4.3.3. The [build-stack recommendation](Implementation/PortfolioScopeDecisions.md#recommended-windows-build-stack) compares generators, names the retained Windows compatibility inputs and leaves Rider/native-debug/DLL qualification open. These versions describe the observed setup, not the latest available releases.
 
 The offline shader tool stages ShaderMake, `dxc.exe`, `slangc.exe` and their DLL/module payloads through its CMake owner. `DXC_SDK_ROOT`, `SLANG_SDK_ROOT` and `SPIRV_TOOLS_SDK_ROOT` select explicit SDK inputs; ShaderMake does not acquire compilers. The tool's `slang-standard-module-*` trees are managed SDK payload: unchanged preparation preserves them; SDK changes repair/prune their contents. Slang 2026.8 full-PDB CLI export needs the pinned [loop-location](../ThirdParty/slang/Patches/SlangLoopSourceLocations.patch) and [debug-format](../ThirdParty/slang/Patches/SlangDebugInformationFormat.patch) corrections. Use short paths: the SDK directory exporter can omit long-path artifacts, which the cooker rejects. Ordinary SDK setup does not amend qualified GPU-crash receipts.
 
-The project and standalone Launcher minimum is CMake 3.30, including its configuration-aware transitive dependency metadata; the [Visual Studio 18 2026 generator](https://cmake.org/cmake/help/latest/generator/Visual%20Studio%2018%202026.html) below requires 4.2+. Launcher uses four build jobs; direct builds select `--parallel`. Private PCHs do not replace explicit includes.
+The project and standalone Launcher minimum is CMake 3.30, including its configuration-aware transitive dependency metadata; the [Visual Studio 18 2026 generator](https://cmake.org/cmake/help/latest/generator/Visual%20Studio%2018%202026.html) below requires 4.2+. Launcher currently uses four top-level build jobs, with separate MSVC/Visual Studio per-project compile policy. The proposed Ninja starting bound on this 16-core/32-thread, approximately 64-GB machine is 16 compile jobs and at most two links, subject to timing/peak-memory checks. It is not a measured optimum. Private PCHs do not replace explicit includes.
 
 ### Build Launcher
 
-Use a short checkout path. Run these commands from the repository root with your Qt path. Stop if a command fails.
+These are the **current baseline commands**, retained until the Clang/Ninja migration is qualified; they are not the selected future workflow. Use a short checkout path. Run them from the repository root with your Qt path. Stop if a command fails.
 
 ```powershell
 cmake -S Tools/Launcher -B build/private/tools/SparkleLauncher -G "Visual Studio 18 2026" -A x64 -DCMAKE_PREFIX_PATH=C:/Qt/6.11.1/msvc2022_64
