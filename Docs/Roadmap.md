@@ -1,6 +1,6 @@
 # Roadmap
 
-[Scope decisions](Implementation/PortfolioScopeDecisions.md) | [Goals](Goals.md)
+[Scope decisions](Implementation/PortfolioScopeDecisions.md) | [Goals](Goals.md) | [Module implementation plans](Implementation/PortfolioReduction/README.md)
 
 ## Current priority
 
@@ -15,6 +15,10 @@ Reuse earlier design decisions and shader-identity results when their inputs sti
 For GPU-crash diagnostics, preserve breadcrumbs/semantic markers, DRED, supported Vulkan checkpoints, Aftermath callbacks, matched shader/symbol data and bounded native collection/dump completion. Retain debugger/tool launch and Editor crash-mode startup. Remove only the extra Launcher incident workflow identified in the [explicit preservation/removal table](Implementation/PortfolioScopeDecisions.md#gpu-crash-diagnostics-preservation-and-removal). Show exact files/functions before implementation cuts and verify usable native crash output afterward. Existing evidence applies only at its tested identities; source inspection and a successful launch do not qualify breadcrumb or crash-dump correctness.
 
 ## Before the first release
+
+Showcase is the only supported user project for all cleanup decisions. Retire general multi-project selection/discovery while preserving internal Engine/shared-shader boundaries, standalone Launcher, selected scenes and bounded parallel preparation. Knight and CesiumMan animation must survive any curve/clip narrowing; retain required support if equivalence is not proven. The [scope decisions](Implementation/PortfolioScopeDecisions.md) define the exact conditional cuts.
+
+Preserve a separate game thread and a separate render thread with explicit handoff, bounded frame lead and safe CPU/GPU resource lifetime. GameFramework cleanup removes cross-pool per-asset loading, whole-world transaction staging and shared cross-scene resource stores; it does not remove engine multithreading. Use one load coordinator with bounded parallel I/O/decode jobs, data-oriented level-owned reusable resources and one prepared scene per level. Retain parallel world/animation/extraction work, renderer preparation/command recording and RHI per-worker context ownership. Removing multithreading or serializing independent work is prohibited as a cleanup strategy. Editor/UI affinity, immutable observations and game-thread edit ownership remain explicit; multiple GPU queues and fence-governed retirement remain protected. Scene replacement can fail into an explicit empty/loading state instead of restoring the previous world. Simplify the level parser/writer while retaining selected save fields; move Ozz offline construction to cooking. The module decisions own these planned changes.
 
 Build and delivery target shared/DLL engine modules with private PCHs and a proven **clang-cl + Ninja Multi-Config + Rider CMake** maintainer workflow. Prefer lld-link after native DLL/PDB qualification. Retire cl.exe selection, Visual Studio IDE integration and the Visual Studio/MSBuild generator after proving the replacement; retain required Windows SDK/STL/CRT/Qt inputs and environment discovery. Generator migration and build-job tuning remain unimplemented acceptance work. Ship a complete offline inspection bundle for Launcher, Editor and Game; reviewers do not acquire sources or build/cook. Keep those tools for your iteration, not as reviewer prerequisites. See the [build/package boundary](Implementation/PortfolioScopeDecisions.md#cmake-packaging-and-repository-automation).
 

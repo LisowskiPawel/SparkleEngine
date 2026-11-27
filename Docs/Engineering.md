@@ -1,10 +1,12 @@
 # Developer guide
 
-[Goals](Goals.md) | [Code style](CodeStyle.md)
+[Goals](Goals.md) | [Code style](CodeStyle.md) | [Module implementation plans](Implementation/PortfolioReduction/README.md)
 
 This guide covers your maintainer setup, module boundaries, development and validation. Reviewers use the prebuilt Launcher Quick Start, explore Editor/Game and inspect matching source; they do not need to follow the build/cook instructions. For current work and release limits, see the [roadmap](Roadmap.md).
 
 ## Build and run
+
+Showcase is the only supported user project for all cleanup decisions. Retire general multi-project selection/discovery while preserving internal Engine/shared-shader boundaries, standalone Launcher, selected scenes and bounded parallel preparation. Knight and CesiumMan animation must survive any curve/clip narrowing; retain required support if equivalence is not proven. The [scope decisions](Implementation/PortfolioScopeDecisions.md) define the exact conditional cuts.
 
 Target workflow: Rider is the sole maintainer IDE, Sparkle engine modules use shared/DLL linkage and private PCHs, and build/cook/sync remain maintainer tools. The reviewer receives a complete prebuilt Launcher/Editor/Game inspection bundle with no development prerequisites. These are selected cleanup requirements, not a claim that the migration is implemented. The selected native build stack is **clang-cl + Ninja Multi-Config + Rider direct CMake**, with lld-link preferred after DLL/PDB qualification. Keep the Microsoft-compatible SDK/STL/CRT and Qt kit. The recorded commands below describe the existing Visual Studio-generator baseline; migration to the selected stack has not been implemented or qualified. Follow the [explicit IDE/build-tool boundary](Implementation/PortfolioScopeDecisions.md#rider-and-visual-studio-removal-boundary) before removing generator/discovery code.
 
@@ -88,9 +90,11 @@ Keep feature state and mechanism in one predictable location. New caches, queues
 
 ### Execution ownership
 
+Preserve a separate game thread and a separate render thread with explicit handoff, bounded frame lead and safe CPU/GPU resource lifetime. GameFramework cleanup removes cross-pool per-asset loading, whole-world transaction staging and shared cross-scene resource stores; it does not remove engine multithreading. Use one load coordinator with bounded parallel I/O/decode jobs, data-oriented level-owned reusable resources and one prepared scene per level. Retain parallel world/animation/extraction work, renderer preparation/command recording and RHI per-worker context ownership. Removing multithreading or serializing independent work is prohibited as a cleanup strategy. Editor/UI affinity, immutable observations and game-thread edit ownership remain explicit; multiple GPU queues and fence-governed retirement remain protected. Scene replacement can fail into an explicit empty/loading state instead of restoring the previous world. Simplify the level parser/writer while retaining selected save fields; move Ozz offline construction to cooking. The module decisions own these planned changes.
+
 Application owns separate enkiTS frame, background and I/O resources; callers borrow them through explicit composition. Use the selected native C interface directly for ranges, dependencies, pinned work and completion. Keep standard stop tokens, typed results, bounded admission, process supervision and publication with the domain owner. The dependency recipe identifies the maintained fork and validates its exact source/patch bytes.
 
-All-zero worker configuration uses direct caller-thread kernels before asynchronous initialization. Threaded composition requires positive non-aliased resources, a global maximum of 256 native workers and the accounted external coordinator slot. Preserve logical partition caps and stable aggregation independently of native range grain. Register a foreign thread with only one pool at a time; release frame registration before cache joins that need sequential I/O/background registration.
+The existing all-zero worker configuration uses direct caller-thread kernels before asynchronous initialization; this is a diagnostic/reference contract, not the selected production cleanup design. Threaded composition requires positive non-aliased resources, a global maximum of 256 native workers and the accounted external coordinator slot. Preserve logical partition caps and stable aggregation independently of native range grain. Register a foreign thread with only one pool at a time; release frame registration before cache joins that need sequential I/O/background registration.
 
 Published results and cancellation are not physical completion. Keep task arguments, callbacks, mapped inputs and reservations alive until every native reader settles. Explicitly seal admission and join in the owning close path; invoke standard stop callbacks outside locks they can reenter. Launcher destruction belongs to its creator thread. RHI fences retain GPU resources independently of CPU task completion. After GPU drain, settle the incident writer's ten-second deadline before cache or Editor-operation joins can block on its I/O worker; a missed deadline retains live storage through fatal process exit.
 
@@ -140,7 +144,7 @@ Validate immutable inputs at admission and express guaranteed presence through r
 
 Reject invalid/unsupported input before partial scheduling or publication where possible. Dummy values, clears, copies and swallowed errors cannot substitute for required work.
 
-Editor navigation changes the viewport session, not authored cameras or undo history. Typed commands change world state; only explicit Save All writes the selected authored level. Failed edits, saves and replacement loads preserve the accepted state.
+Editor navigation changes the viewport session, not authored cameras or undo history. Typed commands change world state; only explicit Save All writes the selected authored level. Failed edits and saves preserve accepted authored state/output. Under the selected GF-09 lifecycle, failed replacement loads may leave an explicit empty/loading state rather than restore the previous world; safe reader handoff, partial-construction cleanup and GPU retirement remain required.
 
 ### Compatibility
 
@@ -172,7 +176,7 @@ Entry points validate inputs and compose subject-owned capabilities; keep proces
 
 The supported lighting scope is the real-time path tracer alone; the existing Reference implementation is scheduled for removal. Correctness comparisons may use analytic cases or independently produced external results with stated limits; they must not require retaining that renderer or its checkpoints/convergence system.
 
-Fix inputs, settings, warm-up, repeats, image domain and reference uncertainty before measuring. Report frame-time distributions, memory, overhead and whether cost improves, stays bounded or remains unmeasured. Remove unnecessary work before parallelizing.
+Fix inputs, settings, warm-up, repeats, image domain and reference uncertainty before measuring. Report frame-time distributions, memory, overhead and whether cost improves, stays bounded or remains unmeasured. Remove unnecessary work while preserving and improving dependency-correct parallel execution; do not serialize retained work to reduce code.
 
 Keep runs/machines separate. Choose absolute/relative thresholds and statistics accounting for correlated frames. An interval crossing a threshold is inconclusive. Worst-frame comparisons need equal sample counts or an explicit model; pooled percentiles cannot replace stable runs and correct images.
 
@@ -182,7 +186,7 @@ Separate native captures from optimized timing; match frames, shaders and symbol
 
 Run loads level definitions and cooked dependencies without requiring raw assets or source-selection flags. Reviewer Quick Start selects a supplied map and launches Editor or Game. Approved rendering/effect changes, scene inspection, movement and basic animation must use prepared data without a compiler/cooker. The supported reload/reset workflow returns to supplied defaults. Your development Launcher retains build/cook/sync/clean; missing developer tools do not make a complete runtime bundle unready.
 
-Prepare the release base with a complete build and cook. [ReleaseProducts.cmake](../CMake/Packaging/ReleaseProducts.cmake) declares `release_package`; [Package.ps1](../CMake/Packaging/Package.ps1) requires canonical `build/`, reviewed `SPARKLE_RELEASE_INPUTS`, matching source/product hashes and the final `--shader-symbols` export. It publishes an **unsigned internal** archive with a path, SHA-256, manifest, SBOM and provenance. Staging rejects changed qualified bytes. Signing and public-release qualification remain open in [Roadmap](Roadmap.md#before-the-first-release).
+Prepare the release base with a complete build and cook. [ReleaseProducts.cmake](../CMake/Packaging/ReleaseProducts.cmake) declares `release_package`; [Package.ps1](../CMake/Packaging/Package.ps1) requires canonical `build/`, reviewed `SPARKLE_RELEASE_INPUTS`, matching source/product hashes and the final `--shader-symbols` export. The current implementation publishes an **unsigned internal** archive with a path, SHA-256, manifest, SBOM and provenance. The selected BU-08 reduction replaces the bespoke SBOM/provenance workflow with bounded inventory/identity/notices under [BuildPackaging stage 3](Implementation/PortfolioReduction/BuildPackaging.md); do not treat the old format as a new target requirement. Staging rejects changed qualified bytes. Signing and public-release qualification remain open in [Roadmap](Roadmap.md#before-the-first-release).
 
 The combined package requires **both ShippingEditor and ShippingGame inventories**. Multi-config builds produce both; a single Shipping configuration supplies only its own inventory.
 

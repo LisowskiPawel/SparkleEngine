@@ -4,7 +4,7 @@
 
 Sources behind the project guides, including dated role and professional studies. Pinned links identify the studied revision; check current prerequisites, licenses and fixes before reuse. Project rules and decisions remain in their owning guides.
 
-The [module footprint and scope decisions](Implementation/PortfolioScopeDecisions.md#where-the-code-footprint-actually-is) connect the current measured code footprint, named cut candidates and retained boundaries to these practices and [Goals](Goals.md).
+The [module footprint and scope decisions](Implementation/PortfolioScopeDecisions.md#where-the-code-footprint-actually-is) connect the measured code footprint and retained boundaries to these practices and [Goals](Goals.md). The [staged module plans](Implementation/PortfolioReduction/README.md) apply them through dominant system owners, complete removals and measured refactoring.
 
 ## Contents
 

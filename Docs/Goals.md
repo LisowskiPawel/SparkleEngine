@@ -1,6 +1,6 @@
 # Goals
 
-[Scope decisions](Implementation/PortfolioScopeDecisions.md) | [Roadmap](Roadmap.md)
+[Scope decisions](Implementation/PortfolioScopeDecisions.md) | [Roadmap](Roadmap.md) | [Module implementation plans](Implementation/PortfolioReduction/README.md)
 
 ## Target persona
 
@@ -22,6 +22,10 @@ The [role sources](References.md#role-sources) explain this choice. Compiler eng
 - **Leave less complexity.** Remove replaced code, duplicate state and unnecessary maintenance.
 
 ## Product scope
+
+Showcase is the only supported user project for all cleanup decisions. Retire general multi-project selection/discovery while preserving internal Engine/shared-shader boundaries, standalone Launcher, selected scenes and bounded parallel preparation. Knight and CesiumMan animation must survive any curve/clip narrowing; retain required support if equivalence is not proven. The [scope decisions](Implementation/PortfolioScopeDecisions.md) define the exact conditional cuts.
+
+Preserve a separate game thread and a separate render thread with explicit handoff, bounded frame lead and safe CPU/GPU resource lifetime. GameFramework cleanup removes cross-pool per-asset loading, whole-world transaction staging and shared cross-scene resource stores; it does not remove engine multithreading. Use one load coordinator with bounded parallel I/O/decode jobs, data-oriented level-owned reusable resources and one prepared scene per level. Retain parallel world/animation/extraction work, renderer preparation/command recording and RHI per-worker context ownership. Removing multithreading or serializing independent work is prohibited as a cleanup strategy. Editor/UI affinity, immutable observations and game-thread edit ownership remain explicit; multiple GPU queues and fence-governed retirement remain protected. Scene replacement can fail into an explicit empty/loading state instead of restoring the previous world. Simplify the level parser/writer while retaining selected save fields; move Ozz offline construction to cooking. The module decisions own these planned changes.
 
 Real-time path tracing is the only lighting path supported by Sparkle. Remove the independent Reference path tracer, its render mode, accumulation/convergence state, checkpoints/resume, dedicated exports and UI, shaders, resources and release requirements. Validate the retained renderer through bounded analytic checks, native signals/captures and suitable external comparisons; do not maintain a second Sparkle renderer for validation.
 
@@ -45,7 +49,7 @@ Packaged use must work offline after extraction, without accounts, telemetry, un
 
 The [level catalog](../Projects/Showcase/Levels.catalog) identifies intended release scenes and previews. Catalog flags establish neither qualification nor asset rights; see [distribution requirements](Engineering.md#build-and-delivery).
 
-The selected scene set is Empty, CornellBox, classic Sponza, BistroExterior, BistroInteriorWine, ModernSponzaKnight, ModernSponzaCandles, CesiumMan, LPSHead, DamagedHelmet and ABeautifulGame. The other scene entries are retired; Modern Sponza base and Curtains assets remain dependencies of Knight/Candles. Stanford Bunny/Dragon are retired because their current route requires PLY; readmission requires a reproducible supported non-PLY route. The [scene decisions](Implementation/PortfolioScopeDecisions.md#showcase-scenes-and-conversion-scripts) own that boundary.
+The selected scene set is Empty, CornellBox, classic Sponza, BistroExterior, BistroInteriorWine, ModernSponzaKnight, CesiumMan, LPSHead, DamagedHelmet and ABeautifulGame. The other scene entries are retired; Modern Sponza keeps only the Knight variant: prepare one cooked scene from its required base/Curtains/Knight sources; retire Candles and general runtime multi-asset level composition. Stanford Bunny/Dragon are retired because their current route requires PLY; readmission requires a reproducible supported non-PLY route. PLY import is selected for removal; Assimp remains required by the retained Bistro/Knight FBX pipeline. The [scene decisions](Implementation/PortfolioScopeDecisions.md#showcase-scenes-and-conversion-scripts) own that boundary.
 
 Keep ownership of the RHI, frame graph, graphics API/resource lifetime and real-time path tracer. Simplify support code and delegate selected production algorithms through the [integration scope decisions](Implementation/PortfolioScopeDecisions.md#third-party-integration-maintenance), focusing personal research on the three cases and crediting upstream work. [Roadmap](Roadmap.md#supporting-system-simplification) sets priorities.
 
