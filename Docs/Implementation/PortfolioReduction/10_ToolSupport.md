@@ -51,7 +51,7 @@ These are source-audit seeds for the owning stages, including indirect code/buil
 
 ## Stage 0: freeze the actual responsibility and smaller target
 
-Trace ProjectLevelCatalog reader/validator, Core root helpers, Launcher project and content resolution, cook planning and CMake project discovery. Separate family/variant presentation from actual base/Curtains/Knight dependency edges. Existing catalog still contains Candles until Showcase stage 1; do not confuse checkout data with the ten-map target.
+Trace ProjectLevelCatalog reader/validator, Core root helpers, Launcher project and content resolution, cook planning and CMake project discovery. Separate family/variant presentation from the Base/Curtains/Knight dependency edges in the ten-map catalog.
 
 Start at these current sources (entry/retirement seeds, not a blind delete list):
 

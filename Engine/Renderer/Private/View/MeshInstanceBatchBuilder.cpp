@@ -1,6 +1,7 @@
 #include "PCH.h"
 
 #include "View/MeshInstanceBatchBuilder.h"
+#include "Debug/RendererCVars.h"
 
 #include <algorithm>
 #include <array>
@@ -25,7 +26,6 @@ void MeshInstanceBatchBuilder::Build(
     std::span<const MeshRenderItem> renderItems,
     std::span<const PreparedRenderPrimitive> primitives,
     std::span<const RenderMeshInstanceGroup> instanceGroups,
-    bool bEnableAutoBatching,
     MeshInstanceBatchBuildResult& result)
 {
 	BuildScratch& scratch = *m_scratch;
@@ -36,7 +36,7 @@ void MeshInstanceBatchBuilder::Build(
 	CollectPreservedGroupItems(renderItems, instanceGroups.size(), scratch);
 	AppendPreservedGroups(renderItems, primitives, instanceGroups, scratch, result);
 	PartitionRemainingItems(renderItems, scratch);
-	AppendOpaqueBatches(renderItems, primitives, bEnableAutoBatching, scratch, result);
+	AppendOpaqueBatches(renderItems, primitives, scratch, result);
 	AppendTransparentBatches(renderItems, primitives, scratch, result);
 }
 
@@ -61,7 +61,6 @@ void MeshInstanceBatchBuilder::CollectValidItems(
     std::size_t instanceGroupCount,
     BuildScratch& scratch)
 {
-
 	scratch.ValidItemIndices.reserve(renderItems.size());
 	for (std::size_t itemIndex = 0u; itemIndex < renderItems.size(); ++itemIndex)
 	{
@@ -143,7 +142,6 @@ void MeshInstanceBatchBuilder::PartitionRemainingItems(std::span<const MeshRende
 void MeshInstanceBatchBuilder::AppendOpaqueBatches(
     std::span<const MeshRenderItem> renderItems,
     std::span<const PreparedRenderPrimitive> primitives,
-    bool bEnableAutoBatching,
     BuildScratch& scratch,
     MeshInstanceBatchBuildResult& result)
 {
@@ -152,6 +150,7 @@ void MeshInstanceBatchBuilder::AppendOpaqueBatches(
 	    scratch.OpaqueItems.end(),
 	    [&renderItems, &primitives](std::size_t lhs, std::size_t rhs) { return OpaqueItemLess(renderItems[lhs], renderItems[rhs], primitives); });
 
+	const bool bEnableAutoBatching = CVarRendererMeshAutoBatching.Get();
 	for (std::size_t begin = 0u; begin < scratch.OpaqueItems.size();)
 	{
 		std::size_t end = begin + 1u;
@@ -187,10 +186,7 @@ void MeshInstanceBatchBuilder::AppendTransparentBatches(
 	}
 }
 
-bool MeshInstanceBatchBuilder::IsValidCandidate(
-    const MeshRenderItem& item,
-    std::span<const PreparedRenderPrimitive> primitives,
-    std::size_t instanceGroupCount) noexcept
+bool MeshInstanceBatchBuilder::IsValidCandidate(const MeshRenderItem& item, std::span<const PreparedRenderPrimitive> primitives, std::size_t instanceGroupCount) noexcept
 {
 	if (item.Classification == RenderMaterialClassification::Rejected)
 	{

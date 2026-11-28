@@ -46,7 +46,6 @@ struct ImportedMeshGeometry
 struct ImportedMeshPrimitive
 {
 	ImportedMeshGeometry geometry;
-	std::string displayName;
 	std::uint32_t sourceMeshIndex = 0;
 	std::uint32_t sourcePrimitiveIndex = 0;
 };

@@ -2,7 +2,6 @@
 
 #include "View/RenderViewPreparation.h"
 
-#include "Debug/RendererCVars.h"
 #include "Scene/Preparation/PreparedRenderScene.h"
 #include "View/RenderView.h"
 #include "View/RenderViewState.h"
@@ -94,12 +93,7 @@ void RenderViewPreparation::BuildMeshBatches(const PreparedRenderScene& prepared
 	m_batchResult.RasterInstanceIndices = std::move(view.rasterPrimitiveIndices);
 	m_batchResult.Batches = std::move(view.meshInstanceBatches);
 
-	m_batchBuilder.Build(
-	    m_run.Items,
-	    preparedScene.primitives,
-	    preparedScene.instanceGroups,
-	    CVarRendererMeshAutoBatching.Get(),
-	    m_batchResult);
+	m_batchBuilder.Build(m_run.Items, preparedScene.primitives, preparedScene.instanceGroups, m_batchResult);
 
 	view.rasterPrimitiveIndices = std::move(m_batchResult.RasterInstanceIndices);
 	view.meshInstanceBatches = std::move(m_batchResult.Batches);

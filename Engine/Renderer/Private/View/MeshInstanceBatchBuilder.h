@@ -41,7 +41,7 @@ public:
 	    std::span<const MeshRenderItem> renderItems,
 	    std::span<const PreparedRenderPrimitive> primitives,
 	    std::span<const RenderMeshInstanceGroup> instanceGroups,
-	    bool bEnableAutoBatching,
+
 	    MeshInstanceBatchBuildResult& result);
 
 private:
@@ -59,11 +59,7 @@ private:
 	};
 
 	static void ResetBuild(BuildScratch& scratch, MeshInstanceBatchBuildResult& result);
-	static void CollectValidItems(
-	    std::span<const MeshRenderItem> renderItems,
-	    std::span<const PreparedRenderPrimitive> primitives,
-	    std::size_t instanceGroupCount,
-	    BuildScratch& scratch);
+	static void CollectValidItems(std::span<const MeshRenderItem> renderItems, std::span<const PreparedRenderPrimitive> primitives, std::size_t instanceGroupCount, BuildScratch& scratch);
 	static void CollectPreservedGroupItems(std::span<const MeshRenderItem> renderItems, std::size_t instanceGroupCount, BuildScratch& scratch);
 	static void AppendPreservedGroups(
 	    std::span<const MeshRenderItem> renderItems,
@@ -75,18 +71,11 @@ private:
 	static void AppendOpaqueBatches(
 	    std::span<const MeshRenderItem> renderItems,
 	    std::span<const PreparedRenderPrimitive> primitives,
-	    bool bEnableAutoBatching,
+
 	    BuildScratch& scratch,
 	    MeshInstanceBatchBuildResult& result);
-	static void AppendTransparentBatches(
-	    std::span<const MeshRenderItem> renderItems,
-	    std::span<const PreparedRenderPrimitive> primitives,
-	    BuildScratch& scratch,
-	    MeshInstanceBatchBuildResult& result);
-	static bool IsValidCandidate(
-	    const MeshRenderItem& item,
-	    std::span<const PreparedRenderPrimitive> primitives,
-	    std::size_t instanceGroupCount) noexcept;
+	static void AppendTransparentBatches(std::span<const MeshRenderItem> renderItems, std::span<const PreparedRenderPrimitive> primitives, BuildScratch& scratch, MeshInstanceBatchBuildResult& result);
+	static bool IsValidCandidate(const MeshRenderItem& item, std::span<const PreparedRenderPrimitive> primitives, std::size_t instanceGroupCount) noexcept;
 	static BatchKey MakeBatchKey(const MeshRenderItem& item, std::span<const PreparedRenderPrimitive> primitives) noexcept;
 	static bool BatchKeyLess(const BatchKey& lhs, const BatchKey& rhs) noexcept;
 	static bool CanShareBatch(const MeshRenderItem& lhs, const MeshRenderItem& rhs, std::span<const PreparedRenderPrimitive> primitives) noexcept;

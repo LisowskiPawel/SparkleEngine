@@ -59,6 +59,7 @@ public:
 private:
 	friend class D3D12RenderDeviceServices;
 	friend class D3D12ResourceService;
+	friend class D3D12TextureReadback;
 
 	struct Impl;
 	std::unique_ptr<D3D12GpuAllocationRecord> CreateResource(

@@ -64,6 +64,7 @@ public:
 	void FlushPendingReleases() noexcept;
 
 private:
+	friend class VulkanTextureReadback;
 	friend class VulkanRenderCommandList;
 	friend class VulkanRenderDeviceServices;
 

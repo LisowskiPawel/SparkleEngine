@@ -29,7 +29,6 @@ private:
 	static void AppendTriangleIndices(const aiMesh& mesh, ImportedMeshGeometry& meshGeometry);
 	static ImportedMaterialIndex ResolveMaterialIndex(const aiMesh& mesh, const ImportedScene& importedScene);
 	static ImportedMeshPrimitiveIndex FindImportedPrimitiveIndex(const ImportedScene& scene, std::uint32_t sourceMeshIndex) noexcept;
-	static std::string BuildMeshDisplayName(const aiNode& node, const aiMesh& mesh);
 	static std::string GetNodeName(const aiNode& node);
 	static std::string GetMeshName(const aiMesh& mesh);
 };

@@ -78,7 +78,6 @@ void AssimpGeometryImporter::AppendMeshInstance(
 
 		ImportedMeshPrimitive primitiveEntry;
 		primitiveEntry.geometry = std::move(meshGeometry);
-		primitiveEntry.displayName = BuildMeshDisplayName(node, mesh);
 		primitiveEntry.sourceMeshIndex = sourceMeshIndex;
 		primitiveEntry.sourcePrimitiveIndex = 0;
 		importedPrimitiveIndex = static_cast<ImportedMeshPrimitiveIndex>(importedScene.meshPrimitives.size());
@@ -212,21 +211,6 @@ ImportedMaterialIndex AssimpGeometryImporter::ResolveMaterialIndex(const aiMesh&
 	}
 
 	throw Diagnostics::Error(std::format("Assimp mesh '{}' references unknown material index {}.", GetMeshName(mesh), mesh.mMaterialIndex));
-}
-
-std::string AssimpGeometryImporter::BuildMeshDisplayName(const aiNode& node, const aiMesh& mesh)
-{
-	std::string nodeName = GetNodeName(node);
-	std::string meshName = GetMeshName(mesh);
-	if (nodeName == meshName || meshName == "<unnamed-mesh>")
-	{
-		return nodeName;
-	}
-	if (nodeName == "<unnamed-node>")
-	{
-		return meshName;
-	}
-	return std::format("{} / {}", nodeName, meshName);
 }
 
 std::string AssimpGeometryImporter::GetNodeName(const aiNode& node)

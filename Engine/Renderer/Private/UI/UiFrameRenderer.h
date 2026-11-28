@@ -21,7 +21,6 @@ public:
 	UiFrameRenderer(const UiFrameRenderer&) = delete;
 	UiFrameRenderer& operator=(const UiFrameRenderer&) = delete;
 
-
 	UiTextureHandle GetViewportTexture() const noexcept { return m_viewportTexture; }
 
 	void BeginFrame() noexcept;

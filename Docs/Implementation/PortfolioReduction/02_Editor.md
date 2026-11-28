@@ -56,11 +56,11 @@ These are source-audit seeds for the owning stages, including indirect code/buil
 
 ## Stage 0: freeze the actual responsibility and smaller target
 
-Trace AssetInspection and ShaderTools panels to their Application/Renderer producers before cutting. Separate console completion from console execution/history. For ED-23, inspect existing source/reimport identity and LevelWorldProjection: Save All currently saves lighting/sky/active-camera description, not every object edit. Freeze screenshots and a transform/visibility/material-variant edit/reload example.
+The [Stage 0 evidence](../../../build/validation/portfolio-editor-stage0-20261128/REPORT.md) records the former inspection panels and their Application/Renderer producers. Separate console completion from console execution/history. For ED-23, inspect existing source/reimport identity and LevelWorldProjection. Save All currently saves lighting, sky and the active camera description. Freeze screenshots and a transform/visibility/material-variant edit/reload example.
 
 Start at these current sources (entry/retirement seeds, not a blind delete list):
 
-- [Engine/Editor/Private/AssetInspection](../../../Engine/Editor/Private/AssetInspection)
+- [Editor workspace composition](../../../Engine/Editor/Private/Workspace)
 - [Engine/Editor/Private/Viewport](../../../Engine/Editor/Private/Viewport)
 - [Engine/GameFramework/Private/Level/LevelWorldProjection.cpp](../../../Engine/GameFramework/Private/Level/LevelWorldProjection.cpp)
 
@@ -90,6 +90,8 @@ Deliver the concrete design/ownership map, bounded change and net footprint budg
 ## Stage 1: Delete mesh, texture and shader inspection subsystems
 
 Decisions: ED-12, ED-13, ED-14.
+
+The [Stage 1 evidence](../../../build/validation/portfolio-editor-stage1-20261128/REPORT.md) records the retirement, retained File > Shaders actions, and open qualification checks.
 
 **Implementation prompt:**
 

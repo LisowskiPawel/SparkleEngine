@@ -14,12 +14,7 @@ struct RenderControlError final
 	std::string Message;
 };
 
-using RenderControlResult = std::variant<
-    std::monostate,
-    RenderControlError,
-    RendererMemoryDiagnosticsSnapshot,
-    CVarControlResult,
-    EngineRenderingSettingsState>;
+using RenderControlResult = std::variant<std::monostate, RenderControlError, RendererMemoryDiagnosticsSnapshot, CVarControlResult, EngineRenderingSettingsState>;
 
 class RenderControlCompletion final
 {

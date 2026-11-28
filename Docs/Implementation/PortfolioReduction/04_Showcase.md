@@ -2,9 +2,9 @@
 
 [Execution order and shared delivery rules](README.md) | [Closed scope record](../PortfolioScopeDecisions.md) | [Engineering](../../Engineering.md)
 
-Status: remaining retirement-snapshot cleanup and Stages 2-3. Source/design identities and checks are in [ignored stage evidence](../../../build/validation/portfolio-reduction/showcase-stage-1/REPORT.md). The [shared stage protocol](README.md#stage-protocol) applies without duplication here; remove each verified stage in the delivery change.
+Status: Stages 2?3 remain. The [shared stage protocol](README.md#stage-protocol) applies.
 
-**Execution order: 04 of 21 (first focused visit).** Finish Stage 1 cleanup in Wave 1. Resume / dependency: Stage 2 within SceneCooker stage 2; stage 3 in Wave 5. Follow the [stage queue](README.md#suggested-execution-order); do not finish this whole file before a listed prerequisite. Dominant owners may change this module earlier as part of a complete system.
+**Execution order: 04 of 21.** Run Stage 2 within SceneCooker Stage 2 and Stage 3 in Wave 5. Follow the [stage queue](README.md#suggested-execution-order).
 
 ## Outcome and ownership
 
@@ -31,29 +31,11 @@ Apply the [shared before/after design gate](README.md#reshape-the-surviving-desi
 
 Containing module baseline: **15 files / 762 physical code/script lines**. No assigned whole-file or shared-span source retirement remains. Budget the fixed preparation and all changed callers in the SceneCooker stage 2 vertical change; count moved/replacement code and report asset bytes separately from native code savings.
 
-## Named retirement closure
-
-These are source-audit seeds for the owning stages, including indirect code/build/data paths. Follow the shared last-consumer fixed-point procedure; names alone are not a blind delete list. Refresh actual callers before editing. Remove a closure row only when its owning stage is verified complete; split a partially delivered row rather than retain a completed diary. Full third-party runtime/build removals require their own last-consumer proof.
-
-| Decision / owning stage | Direct system and secondary retirement to close | Protected surviving consumers / boundary |
-| --- | --- | --- |
-| PR-07; stage 1 | Delete only the twelve files in this stage's ignored `retired-content` snapshot once execution policy permits cleanup, then verify its absence and prune Stage 1. | Modern Sponza base/Curtains/Knight inputs and licenses; unrelated/historical evidence and arbitrary downloads/captures are outside this final cleanup. |
-
-## Stage 1: finish exclusive retirement-snapshot cleanup
-
-Decisions: PR-07.
-
-Automatic approval review rejected both guarded recursive deletion and an explicit single-file deletion with `blocked by policy`. The exclusive pack and preview are outside the active source tree in ignored `build/validation/portfolio-reduction/showcase-stage-1/retired-content/`; no disk-space saving is claimed. Do not repeat the delivered catalog/level/acquisition cut.
-
-**Implementation prompt:**
-
-```text
-Finish Stage 1 of Docs/Implementation/PortfolioReduction/04_Showcase.md: remove only its inventoried retired-content snapshot when execution policy permits. Read the ignored Stage 1 receipt and manifest, refresh identities, verify all twelve target files and their contained non-reparse paths, and preserve unrelated/historical material. Do not bypass a deletion rejection. Verify the snapshot is absent, recheck the ten-level/seven-pack catalog and unchanged Knight dependencies, record the actual reclaimed bytes, then remove Stage 1 and its closure row. No production refactor, compatibility route, new tests or broader cleanup is authorized by this remaining action.
-```
-
 ## Stage 2: Reproduce one prepared Knight product and explicit scene paths
 
 Decisions: PR-08.
+
+The current Knight FBX cooks without skin weights, a skeleton or a clip. The publisher’s animated Maya scene contains weight assignments and is a candidate for a corrected FBX export. Verify the export through the existing importer before migrating the prepared scene.
 
 **Implementation prompt:**
 

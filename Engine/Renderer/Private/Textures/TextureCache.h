@@ -43,7 +43,6 @@ enum class TextureId : std::uint8_t
 class TextureCache final
 {
 public:
-
 	TextureCache(
 	    RhiResourceService& resourceService,
 	    RhiDescriptorService& descriptorService,
@@ -72,7 +71,6 @@ public:
 	const RendererTexture* ResolveTextureReferenceOrSemanticDefault(const Assets::CookedTextureReference* textureReference, DefaultTexture defaultType) const;
 
 	std::uint64_t GetBindingRevision() const noexcept { return m_bindingRevision; }
-
 
 private:
 	using TextureKey = std::wstring;

@@ -48,8 +48,6 @@ namespace EditorIcons
 		Copy,
 		Console,
 
-
-
 		Sort
 	};
 	const char* GetEditorIconGlyph(EditorIcon icon) noexcept;

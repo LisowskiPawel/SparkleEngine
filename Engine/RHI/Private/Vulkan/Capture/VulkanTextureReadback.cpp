@@ -140,8 +140,15 @@ bool VulkanTextureReadback::RecordReadbackCopy(PendingReadback& pending) noexcep
 
 bool VulkanTextureReadback::SubmitReadback(PendingReadback& pending) noexcept
 {
+	VulkanRecordingResourceUseToken sourceUse = m_memoryAllocator.RetainRecordingResource(pending.Request.Resource);
+	if (!sourceUse)
+	{
+		sourceUse = m_memoryAllocator.RetainCoordinatorRecordingResource(pending.Request.Resource);
+	}
+
 	const VulkanQueueSubmission submission{.CommandBuffers = std::span<const VkCommandBuffer>(&pending.CommandBuffer, 1)};
 	pending.Submission = m_rhi.GetCommandQueue(ERhiQueueType::Graphics).Submit(submission);
+	m_memoryAllocator.ReleaseRecordingResource(sourceUse, pending.Submission);
 	return pending.Submission.IsValid();
 }
 

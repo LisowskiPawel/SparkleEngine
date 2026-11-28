@@ -147,7 +147,6 @@ ImportedMeshPrimitiveIndex GltfGeometryImporter::ResolveImportedPrimitive(
 
 	ImportedMeshPrimitive primitiveEntry;
 	primitiveEntry.geometry = std::move(meshGeometry);
-	primitiveEntry.displayName = primitiveLabel;
 	primitiveEntry.sourceMeshIndex = sourceMeshIndex;
 	primitiveEntry.sourcePrimitiveIndex = primitiveIndex;
 	const ImportedMeshPrimitiveIndex importedPrimitiveIndex = static_cast<ImportedMeshPrimitiveIndex>(importedScene.meshPrimitives.size());

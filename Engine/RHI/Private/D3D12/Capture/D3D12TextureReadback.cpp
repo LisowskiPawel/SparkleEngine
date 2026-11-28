@@ -114,8 +114,15 @@ bool D3D12TextureReadback::RecordReadbackCopy(PendingReadback& pending) noexcept
 
 bool D3D12TextureReadback::SubmitReadback(PendingReadback& pending) noexcept
 {
+	D3D12RecordingResourceUseToken sourceUse = m_memoryAllocator.RetainRecordingResource(pending.Request.Resource);
+	if (!sourceUse)
+	{
+		sourceUse = m_memoryAllocator.RetainCoordinatorRecordingResource(pending.Request.Resource);
+	}
+
 	ID3D12CommandList* const commandLists[] = {pending.CommandList.Get()};
 	pending.Submission = m_rhi.SubmitCommandLists(ERhiQueueType::Graphics, commandLists);
+	m_memoryAllocator.ReleaseRecordingResource(sourceUse, pending.Submission);
 	return pending.Submission.IsValid();
 }
 
