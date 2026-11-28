@@ -26,7 +26,6 @@ namespace SparkleLauncher
 	class LauncherContentModel;
 	class LauncherSettings;
 	class LauncherActivityPanel;
-	class LauncherGpuCrashPanel;
 	class LauncherWorkflowPanel;
 	class LauncherSceneCatalog;
 	class LauncherWorkspaceSetup;
@@ -97,7 +96,6 @@ namespace SparkleLauncher
 		QPushButton* m_runButton = nullptr;
 		QFrame* m_actionMetaPanel = nullptr;
 		LauncherActivityPanel* m_activityPanel = nullptr;
-		LauncherGpuCrashPanel* m_gpuCrashPanel = nullptr;
 		QString m_selectedOperationId;
 		bool m_bIsRebuildingOptions = false;
 		bool m_bIsApplyingUiRefresh = false;

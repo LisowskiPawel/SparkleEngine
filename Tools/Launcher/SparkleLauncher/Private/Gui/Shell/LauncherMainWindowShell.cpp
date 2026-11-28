@@ -164,12 +164,12 @@ namespace SparkleLauncher
 		m_captureProviderCombo->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
 		addContextItem("GPU Capture", *m_captureProviderCombo, LauncherUi::ContextSelector::CaptureComboWidth, LauncherUi::ContextSelector::CaptureComboWidth);
 		const bool bHasBuildSources = HasBuildSources(m_workspaceRoot);
-		m_gpuCrashPanel = new LauncherGpuCrashPanel(bHasBuildSources, m_settings, panel);
-		for (QWidget* widget : m_gpuCrashPanel->GetFocusableWidgets())
+		auto* gpuCrashPanel = new LauncherGpuCrashPanel(bHasBuildSources, m_settings, panel);
+		for (QWidget* widget : gpuCrashPanel->GetFocusableWidgets())
 		{
 			RegisterFocusable(widget);
 		}
-		rowLayout->addWidget(m_gpuCrashPanel, 0, Qt::AlignVCenter);
+		rowLayout->addWidget(gpuCrashPanel, 0, Qt::AlignVCenter);
 		addGroupDivider();
 
 		m_buildConfigurationCombo = CreateContextCombo(&LauncherSettings::SetBuildConfiguration);

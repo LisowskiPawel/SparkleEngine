@@ -57,11 +57,6 @@ namespace SparkleLauncher
 		return true;
 	}
 
-	static std::filesystem::path ReadGpuCrashAnnouncement(std::string_view output)
-	{
-		return ReadProcessOutputPath(output, "SPARKLE_GPU_CRASH_INCIDENT ");
-	}
-
 	static bool IsLocalGpuCrashManifest(const std::filesystem::path& manifestPath)
 	{
 		const bool bInvalidLocation = !manifestPath.is_absolute() || manifestPath.filename() != "incident.json";
@@ -231,7 +226,7 @@ namespace SparkleLauncher
 
 	Process::ChildReadinessDecision VerifyGpuCrashReadiness(const GpuCrashReadinessExpectation& expected, std::uint32_t childPid, std::string_view output, std::string& error)
 	{
-		const auto manifestPath = ReadGpuCrashAnnouncement(output);
+		const auto manifestPath = ReadProcessOutputPath(output, "SPARKLE_GPU_CRASH_INCIDENT ");
 		const auto document = ReadGpuCrashSnapshot(manifestPath, expected.SessionId, childPid);
 		const auto state = document.is_null() ? std::string{} : document.at("state").get<std::string>();
 		if (state.empty() || state == "Preparing" || state == "Unavailable")

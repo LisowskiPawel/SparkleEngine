@@ -35,7 +35,7 @@ Containing module baseline: **15 files / 762 physical code/script lines**. No as
 
 Decisions: PR-08.
 
-The current Knight FBX cooks without skin weights, a skeleton or a clip. The publisher’s animated Maya scene contains weight assignments and is a candidate for a corrected FBX export. Verify the export through the existing importer before migrating the prepared scene.
+The current Knight FBX cooks without skin weights, a skeleton or a clip. Recover the skin from the matching Body, Shield and Sword data in the publisher’s Arnold Maya ASCII file. Prove the joint bind transforms and motion through the existing importer before migrating the prepared scene. The FBX and Maya ASCII data are already in the acquired Knight pack.
 
 **Implementation prompt:**
 
@@ -48,7 +48,7 @@ Participation boundary: execute the shared one-product migration inside **SceneC
 
 
 
-Implement the small project-owned fixed preparation entry consumed by SceneCooker stage 2. Inputs are Base/main_sponza/NewSponza_Main_glTF_003.gltf, AddOns/Curtains/pkg_a_curtains/NewSponza_Curtains_glTF.gltf and AddOns/Knight/pkg_e_knight_anim/Exports/FBX/Knight_USD_002.fbx. Keep the routine readable and specific; no generic recipe parser. Update all retained level inputs to the explicit source/prepared-scene contracts selected by AssetCooker.
+Implement the small project-owned fixed preparation entry consumed by SceneCooker stage 2. Inputs are Base/main_sponza/NewSponza_Main_glTF_003.gltf, AddOns/Curtains/pkg_a_curtains/NewSponza_Curtains_glTF.gltf and AddOns/Knight/pkg_e_knight_anim/Exports/FBX/Knight_USD_002.fbx. Recover the missing skin bindings from Scenes/knight_ARNOLD_ANIM_002.rnd.ma in that same Knight pack during offline preparation. Keep the routine readable and specific. Update all retained level inputs to the explicit source/prepared-scene contracts selected by AssetCooker.
 
 Implementation rules:
 - Apply this plan's Adapt the surviving design contract to surviving APIs, data, states, orchestration and callers. Use its bounded reference lessons; remove assumptions made obsolete by this stage.
