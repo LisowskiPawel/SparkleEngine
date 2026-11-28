@@ -22,10 +22,8 @@ public:
 	ConsoleSession& operator=(ConsoleSession&&) = delete;
 
 	void SubmitLine(std::string_view line);
-	std::vector<std::string> CompleteLine(std::string_view line) const;
 
 	void Append(ConsoleOutputRecord record);
-	void AddOutput(ConsoleCommandSeverity severity, std::string text);
 	void ClearOutput() noexcept;
 
 	std::optional<std::string> NavigateHistoryPrevious(std::string_view currentLine);
@@ -34,6 +32,8 @@ public:
 	const std::vector<ConsoleOutputRecord>& GetOutputRecords() const noexcept { return m_outputRecords; }
 
 private:
+	void AddOutput(ConsoleCommandSeverity severity, std::string text);
+
 	static constexpr std::size_t kMaxOutputRecords = 512;
 
 	ConsoleCommandActions m_actions;

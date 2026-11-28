@@ -33,6 +33,14 @@ static void ValidateLevel(const ProjectLevelCatalogEntry& level, const std::file
 	{
 		throw Diagnostics::Error(std::format("Catalog level '{}' must use Levels/<id>.level.", level.id));
 	}
+	if (!level.sceneSourcePath.empty())
+	{
+		const auto meshRelativePath = level.sceneSourcePath.lexically_relative(projectRoot / "Assets" / "Meshes");
+		if (meshRelativePath.empty() || *meshRelativePath.begin() == "..")
+		{
+			throw Diagnostics::Error(std::format("Catalog level '{}' SceneSource must remain under Assets/Meshes.", level.id));
+		}
+	}
 }
 
 static void ValidateAssetPackIdentity(const ProjectLevelCatalog& catalog, const ProjectAssetPack& pack)

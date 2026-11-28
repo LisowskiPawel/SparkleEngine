@@ -13,6 +13,7 @@ struct ProjectLevelCatalogEntry final
 	std::string displayName;
 	std::string description;
 	std::filesystem::path sourcePath;
+	std::filesystem::path sceneSourcePath;
 	std::filesystem::path thumbnailPath;
 	std::string sourcePageUrl;
 	std::string assetPackId;

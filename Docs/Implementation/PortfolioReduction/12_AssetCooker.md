@@ -120,6 +120,8 @@ Deliver the complete change and identity-bound commands/results, manual responsi
 
 Decisions: AC-07.
 
+The project cook planner now admits exact sources and checks their bindings through the shared level parser. The remaining Stage 2 work is to consume the qualified Knight preparation and migrate the planner to the final prepared-scene identities.
+
 **Implementation prompt:**
 
 ```text
@@ -131,7 +133,7 @@ Participation boundary: execute the shared one-product migration inside **SceneC
 
 
 
-Replace extension probing with explicit supported paths. With SceneCooker stage 2/Showcase, consume the fixed Knight recipe and one prepared scene per level. Update all source admission/catalog/cook references together; preserve stable identity and relocatable contained paths. Remove old ambiguity/probing policy after consumers migrate, with no compatibility aliases.
+With SceneCooker stage 2 and Showcase, consume the fixed Knight preparation and one prepared scene per level. Migrate the planner's binding validation, cook requests and output identities together. Preserve stable saved identities and relocatable contained paths.
 
 Implementation rules:
 - Apply this plan's Adapt the surviving design contract to surviving APIs, data, states, orchestration and callers. Use its bounded reference lessons; remove assumptions made obsolete by this stage.

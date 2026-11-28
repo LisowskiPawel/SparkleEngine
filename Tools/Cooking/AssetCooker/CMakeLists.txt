@@ -5,7 +5,6 @@ set(ASSET_COOKER_CORE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/BuildTextureCookRequests.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/DefaultTextureCookRequestBuilder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Diagnostics/AssetCookerDiagnostics.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Discovery/CatalogedLevelSceneReader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Planning/ProjectCookPlanner.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dispatch/AssetCookerDispatcher.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/CookShaders.cpp
@@ -22,7 +21,6 @@ set(ASSET_COOKER_CORE_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/BuildTextureCookRequests.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/DefaultTextureCookRequestBuilder.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Diagnostics/AssetCookerDiagnostics.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Discovery/CatalogedLevelSceneReader.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Planning/ProjectCookPlanner.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Dispatch/AssetCookerDispatcher.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cooking/AssetCookStages.h
@@ -49,6 +47,7 @@ target_include_directories(AssetCookerCore
         ${CMAKE_CURRENT_SOURCE_DIR}/Private
         ${CMAKE_SOURCE_DIR}/Engine
         ${CMAKE_SOURCE_DIR}/Engine/Core/Public/Diagnostics
+        ${CMAKE_SOURCE_DIR}/Projects/Showcase/AssetPreparation
 )
 
 target_compile_features(AssetCookerCore PRIVATE cxx_std_20)

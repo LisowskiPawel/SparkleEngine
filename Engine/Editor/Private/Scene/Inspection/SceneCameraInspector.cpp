@@ -10,20 +10,20 @@
 
 namespace SceneCameraInspector
 {
-	static void BuildTransformCategory(const std::string& filter, const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept;
-	static void BuildCameraCategory(const std::string& filter, const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept;
-	static void BuildAdvancedParametersCategory(const std::string& filter, const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept;
+	static void BuildTransformCategory(const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept;
+	static void BuildCameraCategory(const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept;
+	static void BuildAdvancedParametersCategory(const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept;
 
-	void Build(const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation, const std::string& filter) noexcept
+	void Build(const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		BuildTransformCategory(filter, camera, transactionHistory, generation);
-		BuildCameraCategory(filter, camera, transactionHistory, generation);
-		BuildAdvancedParametersCategory(filter, camera, transactionHistory, generation);
+		BuildTransformCategory(camera, transactionHistory, generation);
+		BuildCameraCategory(camera, transactionHistory, generation);
+		BuildAdvancedParametersCategory(camera, transactionHistory, generation);
 	}
 
-	static void BuildTransformCategory(const std::string& filter, const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
+	static void BuildTransformCategory(const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool bTransformOpen = EditorWidgets::DrawDetailsCategory("Transform", filter, "location rotation scale position");
+		const bool bTransformOpen = EditorWidgets::DrawDetailsCategory("Transform");
 
 		if (!bTransformOpen)
 		{
@@ -38,9 +38,9 @@ namespace SceneCameraInspector
 		}
 	}
 
-	static void BuildCameraCategory(const std::string& filter, const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
+	static void BuildCameraCategory(const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool bCameraOpen = EditorWidgets::DrawDetailsCategory("Camera", filter, "field of view near clip far clip aspect ratio");
+		const bool bCameraOpen = EditorWidgets::DrawDetailsCategory("Camera");
 
 		if (!bCameraOpen)
 		{
@@ -65,9 +65,9 @@ namespace SceneCameraInspector
 		}
 	}
 
-	static void BuildAdvancedParametersCategory(const std::string& filter, const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
+	static void BuildAdvancedParametersCategory(const WorldCameraReadData& camera, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool bAdvancedOpen = EditorWidgets::DrawDetailsCategory("Advanced", filter, "visible visibility hidden", false);
+		const bool bAdvancedOpen = EditorWidgets::DrawDetailsCategory("Advanced", false);
 
 		if (!bAdvancedOpen)
 		{

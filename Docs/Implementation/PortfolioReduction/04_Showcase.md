@@ -35,6 +35,8 @@ Containing module baseline: **15 files / 762 physical code/script lines**. No as
 
 Decisions: PR-08.
 
+AssetCooker now takes one exact catalog source per ordinary scene and three exact inputs from the Showcase-owned Knight source list. The cook planner checks the existing level bindings through GameFramework's level parser. The remaining migration is the qualified one-product preparation and its runtime and packaging consumers.
+
 The local recovery experiment cooked eight skinned Knight meshes and no clip. The main FBX animates control nodes while its weighted joints have constant curves. An offline fit against the acquired USD samples recovered some rigid joint motion but exceeded the position bound on mixed-weight vertices. Qualify complete deformation-joint motion against the authored samples before migrating the prepared scene.
 
 **Implementation prompt:**
@@ -48,7 +50,7 @@ Participation boundary: execute the shared one-product migration inside **SceneC
 
 
 
-Implement the small project-owned fixed preparation entry consumed by SceneCooker stage 2. Inputs are Base/main_sponza/NewSponza_Main_glTF_003.gltf, AddOns/Curtains/pkg_a_curtains/NewSponza_Curtains_glTF.gltf and AddOns/Knight/pkg_e_knight_anim/Exports/FBX/Knight_USD_002.fbx. Recover the missing skin weights and bind matrices offline using Scenes/knight_ARNOLD_ANIM_002.rnd.ma and Scenes/knight_USD_PREVIEW_SURFACE_ANIM_002.rnd.ma in that same Knight pack. Bind the hashes of the qualified recovery inputs to the preparation identity. Keep the routine readable and specific. Update all retained level inputs to the explicit source/prepared-scene contracts selected by AssetCooker.
+Build the fixed preparation entry around the exact inputs in Projects/Showcase/AssetPreparation/KnightSceneSources.h. Recover the missing skin weights and bind matrices offline using Scenes/knight_ARNOLD_ANIM_002.rnd.ma and Scenes/knight_USD_PREVIEW_SURFACE_ANIM_002.rnd.ma in that same Knight pack. Bind the hashes of the qualified recovery inputs and deformation motion to the preparation identity. Keep the routine readable and specific. Migrate the retained levels to the explicit prepared-scene contract.
 
 Implementation rules:
 - Apply this plan's Adapt the surviving design contract to surviving APIs, data, states, orchestration and callers. Use its bounded reference lessons; remove assumptions made obsolete by this stage.

@@ -17,11 +17,6 @@ namespace Strings
 		return character == ' ' || character == '\t' || character == '\r' || character == '\n';
 	}
 
-	bool ContainsAsciiWhitespace(std::string_view str) noexcept
-	{
-		return std::ranges::any_of(str, IsAsciiWhitespace);
-	}
-
 	bool IsNullTerminated(std::span<const char> buffer) noexcept
 	{
 		return std::ranges::any_of(buffer, [](const char character) { return character == '\0'; });

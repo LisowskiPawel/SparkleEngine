@@ -23,12 +23,12 @@ namespace SceneLightInspector
 	static constexpr float kDirectionSliderMax = 1.0f;
 	static constexpr float kRangeSliderMax = 500.0f;
 
-	static bool BuildLightCommonCategory(const std::string& filterText, SceneLightDesc& lightDesc) noexcept;
-	static bool BuildDirectionalLightTransformCategory(const std::string& filterText, SceneDirectionalLightDesc& lightDesc) noexcept;
-	static bool BuildDirectionalLightCategory(const std::string& filterText, SceneDirectionalLightDesc& lightDesc) noexcept;
-	static bool BuildPointLightCategory(const std::string& filterText, PointLightDesc& lightDesc) noexcept;
-	static bool BuildSpotLightCategory(const std::string& filterText, SpotLightDesc& lightDesc) noexcept;
-	static bool BuildRectLightCategory(const std::string& filterText, RectLightDesc& lightDesc) noexcept;
+	static bool BuildLightCommonCategory(SceneLightDesc& lightDesc) noexcept;
+	static bool BuildDirectionalLightTransformCategory(SceneDirectionalLightDesc& lightDesc) noexcept;
+	static bool BuildDirectionalLightCategory(SceneDirectionalLightDesc& lightDesc) noexcept;
+	static bool BuildPointLightCategory(PointLightDesc& lightDesc) noexcept;
+	static bool BuildSpotLightCategory(SpotLightDesc& lightDesc) noexcept;
+	static bool BuildRectLightCategory(RectLightDesc& lightDesc) noexcept;
 
 	static bool EditLuminousIntensity(float& value) noexcept
 	{
@@ -94,36 +94,36 @@ namespace SceneLightInspector
 		return false;
 	}
 
-	static bool BuildLightTypeCategories(const std::string& filterText, SceneLightDesc& lightDesc) noexcept
+	static bool BuildLightTypeCategories(SceneLightDesc& lightDesc) noexcept
 	{
 		if (SceneDirectionalLightDesc* directional = lightDesc.GetDirectional())
 		{
-			bool bChanged = BuildDirectionalLightTransformCategory(filterText, *directional);
-			bChanged |= BuildDirectionalLightCategory(filterText, *directional);
+			bool bChanged = BuildDirectionalLightTransformCategory(*directional);
+			bChanged |= BuildDirectionalLightCategory(*directional);
 			return bChanged;
 		}
 		else if (PointLightDesc* point = lightDesc.GetPoint())
 		{
-			return BuildPointLightCategory(filterText, *point);
+			return BuildPointLightCategory(*point);
 		}
 		else if (SpotLightDesc* spot = lightDesc.GetSpot())
 		{
-			return BuildSpotLightCategory(filterText, *spot);
+			return BuildSpotLightCategory(*spot);
 		}
 		else if (RectLightDesc* rect = lightDesc.GetRect())
 		{
-			return BuildRectLightCategory(filterText, *rect);
+			return BuildRectLightCategory(*rect);
 		}
 
 		return false;
 	}
 
-	void Build(const SceneLightDesc& sceneLight, EntityId lightEntity, EditorTransactionHistory& transactionHistory, std::uint64_t worldGeneration, const std::string& filterText) noexcept
+	void Build(const SceneLightDesc& sceneLight, EntityId lightEntity, EditorTransactionHistory& transactionHistory, std::uint64_t worldGeneration) noexcept
 	{
 		SceneLightDesc lightDesc = sceneLight;
-		bool bChanged = BuildLightCommonCategory(filterText, lightDesc);
+		bool bChanged = BuildLightCommonCategory(lightDesc);
 
-		bChanged |= BuildLightTypeCategories(filterText, lightDesc);
+		bChanged |= BuildLightTypeCategories(lightDesc);
 
 		if (!bChanged)
 		{
@@ -132,10 +132,10 @@ namespace SceneLightInspector
 		(void) transactionHistory.Execute(SetLightDescriptionCommand{lightEntity, std::move(lightDesc)}, SetLightDescriptionCommand{lightEntity, sceneLight}, worldGeneration, "light-description");
 	}
 
-	static bool BuildLightCommonCategory(const std::string& filterText, SceneLightDesc& lightDesc) noexcept
+	static bool BuildLightCommonCategory(SceneLightDesc& lightDesc) noexcept
 	{
 		bool bChanged = false;
-		const bool bLightOpen = EditorWidgets::DrawDetailsCategory("Light", filterText, "color visible visibility rendering");
+		const bool bLightOpen = EditorWidgets::DrawDetailsCategory("Light");
 
 		if (!bLightOpen)
 		{
@@ -160,9 +160,9 @@ namespace SceneLightInspector
 		return bChanged;
 	}
 
-	static bool BuildDirectionalLightTransformCategory(const std::string& filterText, SceneDirectionalLightDesc& lightDesc) noexcept
+	static bool BuildDirectionalLightTransformCategory(SceneDirectionalLightDesc& lightDesc) noexcept
 	{
-		const bool bTransformOpen = EditorWidgets::DrawDetailsCategory("Transform", filterText, "rotation direction transform");
+		const bool bTransformOpen = EditorWidgets::DrawDetailsCategory("Transform");
 
 		if (!bTransformOpen)
 		{
@@ -181,10 +181,10 @@ namespace SceneLightInspector
 		return false;
 	}
 
-	static bool BuildDirectionalLightCategory(const std::string& filterText, SceneDirectionalLightDesc& lightDesc) noexcept
+	static bool BuildDirectionalLightCategory(SceneDirectionalLightDesc& lightDesc) noexcept
 	{
 		bool bChanged = false;
-		const bool bDirectionalLightOpen = EditorWidgets::DrawDetailsCategory("Directional Light", filterText, "illuminance lux angular size direction cast shadow rendering");
+		const bool bDirectionalLightOpen = EditorWidgets::DrawDetailsCategory("Directional Light");
 
 		if (!bDirectionalLightOpen)
 		{
@@ -223,10 +223,10 @@ namespace SceneLightInspector
 		return bChanged;
 	}
 
-	static bool BuildPointLightCategory(const std::string& filterText, PointLightDesc& lightDesc) noexcept
+	static bool BuildPointLightCategory(PointLightDesc& lightDesc) noexcept
 	{
 		bool bChanged = false;
-		const bool bPointLightOpen = EditorWidgets::DrawDetailsCategory("Point Light", filterText, "luminous intensity candela range radius distance attenuation point");
+		const bool bPointLightOpen = EditorWidgets::DrawDetailsCategory("Point Light");
 
 		if (!bPointLightOpen)
 		{
@@ -241,10 +241,10 @@ namespace SceneLightInspector
 		return bChanged;
 	}
 
-	static bool BuildSpotLightCategory(const std::string& filterText, SpotLightDesc& lightDesc) noexcept
+	static bool BuildSpotLightCategory(SpotLightDesc& lightDesc) noexcept
 	{
 		bool bChanged = false;
-		const bool bSpotLightOpen = EditorWidgets::DrawDetailsCategory("Spot Light", filterText, "luminous intensity candela direction range radius distance attenuation inner outer angle spot");
+		const bool bSpotLightOpen = EditorWidgets::DrawDetailsCategory("Spot Light");
 
 		if (!bSpotLightOpen)
 		{
@@ -281,10 +281,10 @@ namespace SceneLightInspector
 		return bChanged;
 	}
 
-	static bool BuildRectLightCategory(const std::string& filterText, RectLightDesc& lightDesc) noexcept
+	static bool BuildRectLightCategory(RectLightDesc& lightDesc) noexcept
 	{
 		bool bChanged = false;
-		const bool bRectLightOpen = EditorWidgets::DrawDetailsCategory("Rect Light", filterText, "luminance candela square meter direction tangent width height area rectangle quad shadow");
+		const bool bRectLightOpen = EditorWidgets::DrawDetailsCategory("Rect Light");
 
 		if (!bRectLightOpen)
 		{

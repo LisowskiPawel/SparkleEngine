@@ -3,6 +3,7 @@
 #include "Level/Parsing/LevelParser.h"
 
 #include "Level/LevelAsset.h"
+#include "Level/LevelDocumentReader.h"
 #include "Level/Parsing/LevelDocumentFormat.h"
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/FileUtils.h"

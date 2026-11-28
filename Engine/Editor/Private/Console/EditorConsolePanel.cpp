@@ -11,8 +11,8 @@
 #include <imgui.h>
 
 #include <algorithm>
+#include <cstddef>
 #include <optional>
-#include <utility>
 
 EditorConsolePanel::EditorConsolePanel(ConsoleSession& session) noexcept :
     m_session(session)
@@ -37,38 +37,6 @@ void EditorConsolePanel::BuildContent(bool bDisableInteraction)
 	DrawScrollback();
 	ImGui::Separator();
 	DrawInputLine(bDisableInteraction);
-	DrawAutocompletePreview();
-}
-
-int EditorConsolePanel::HandleInputTextCallback(ImGuiInputTextCallbackData* data)
-{
-	if (data == nullptr || data->UserData == nullptr)
-	{
-		return 0;
-	}
-
-	auto* panel = static_cast<EditorConsolePanel*>(data->UserData);
-	if (data->EventFlag == ImGuiInputTextFlags_CallbackHistory)
-	{
-		return panel->HandleHistoryCallback(*data);
-	}
-	if (data->EventFlag == ImGuiInputTextFlags_CallbackCompletion)
-	{
-		return panel->HandleCompletionCallback(*data);
-	}
-	return 0;
-}
-
-std::size_t EditorConsolePanel::FindCompletionTokenStart(const std::string& input) noexcept
-{
-	for (std::size_t index = input.size(); index > 0; --index)
-	{
-		if (Strings::IsAsciiWhitespace(input[index - 1]))
-		{
-			return index;
-		}
-	}
-	return 0;
 }
 
 void EditorConsolePanel::ReplaceInputText(ImGuiInputTextCallbackData& data, const std::string& text)
@@ -77,50 +45,29 @@ void EditorConsolePanel::ReplaceInputText(ImGuiInputTextCallbackData& data, cons
 	data.InsertChars(0, text.c_str());
 }
 
-int EditorConsolePanel::HandleHistoryCallback(ImGuiInputTextCallbackData& data)
+int EditorConsolePanel::HandleInputHistory(ImGuiInputTextCallbackData* callbackData)
 {
+	if (callbackData == nullptr || callbackData->UserData == nullptr)
+	{
+		return 0;
+	}
+
+	ImGuiInputTextCallbackData& data = *callbackData;
+	ConsoleSession& session = static_cast<EditorConsolePanel*>(data.UserData)->m_session;
 	std::optional<std::string> replacement;
 	if (data.EventKey == ImGuiKey_UpArrow)
 	{
 		const std::string_view currentLine(data.Buf, static_cast<std::size_t>(data.BufTextLen));
-		replacement = m_session.NavigateHistoryPrevious(currentLine);
+		replacement = session.NavigateHistoryPrevious(currentLine);
 	}
 	else if (data.EventKey == ImGuiKey_DownArrow)
 	{
-		replacement = m_session.NavigateHistoryNext();
+		replacement = session.NavigateHistoryNext();
 	}
 
 	if (replacement)
 	{
 		ReplaceInputText(data, *replacement);
-	}
-	return 0;
-}
-
-int EditorConsolePanel::HandleCompletionCallback(ImGuiInputTextCallbackData& data)
-{
-	const std::string input(data.Buf, static_cast<std::size_t>(data.BufTextLen));
-	const std::vector<std::string> completions = m_session.CompleteLine(input);
-	if (completions.empty())
-	{
-		return 0;
-	}
-
-	if (completions.size() > 1)
-	{
-		std::string completionList = BuildCompletionList(completions);
-		m_session.AddOutput(ConsoleCommandSeverity::Info, std::move(completionList));
-		return 0;
-	}
-
-	const std::size_t replaceStart = FindCompletionTokenStart(input);
-	const int replaceOffset = static_cast<int>(replaceStart);
-	const int replaceLength = data.BufTextLen - replaceOffset;
-	data.DeleteChars(replaceOffset, replaceLength);
-	data.InsertChars(replaceOffset, completions.front().c_str());
-	if (replaceStart == 0)
-	{
-		data.InsertChars(data.BufTextLen, " ");
 	}
 	return 0;
 }
@@ -217,8 +164,8 @@ void EditorConsolePanel::DrawInputLine(bool bDisableInteraction)
 
 	ImGui::SetNextItemWidth(-1.0f);
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, SparkleUiPalette::ConsoleInputBackground());
-	const ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory | ImGuiInputTextFlags_CallbackCompletion;
-	const bool bConsoleCommandSubmitted = ImGui::InputTextWithHint("##EditorConsoleCommandInput", "Enter command", m_inputBuffer.data(), m_inputBuffer.size(), flags, &HandleInputTextCallback, this);
+	const ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory;
+	const bool bConsoleCommandSubmitted = ImGui::InputTextWithHint("##EditorConsoleCommandInput", "Enter command", m_inputBuffer.data(), m_inputBuffer.size(), flags, &HandleInputHistory, this);
 
 	if (bConsoleCommandSubmitted)
 	{
@@ -226,34 +173,6 @@ void EditorConsolePanel::DrawInputLine(bool bDisableInteraction)
 	}
 	ImGui::PopStyleColor();
 	ImGui::EndDisabled();
-}
-
-void EditorConsolePanel::DrawAutocompletePreview()
-{
-	const std::vector<std::string> completions = GetCurrentCompletions();
-	if (completions.empty())
-	{
-		return;
-	}
-
-	ImGui::TextDisabled("Matches: ");
-	ImGui::SameLine();
-	const std::size_t maxPreviewCount = (std::min) (completions.size(), static_cast<std::size_t>(6));
-	for (std::size_t index = 0; index < maxPreviewCount; ++index)
-	{
-		if (index > 0)
-		{
-			ImGui::SameLine();
-			ImGui::TextDisabled("|");
-			ImGui::SameLine();
-		}
-		ImGui::TextDisabled("%s", completions[index].c_str());
-	}
-	if (completions.size() > maxPreviewCount)
-	{
-		ImGui::SameLine();
-		ImGui::TextDisabled("(+%zu)", completions.size() - maxPreviewCount);
-	}
 }
 
 void EditorConsolePanel::BuildOutputTextBuffer(std::string_view filter)
@@ -271,29 +190,4 @@ void EditorConsolePanel::BuildOutputTextBuffer(std::string_view filter)
 	}
 
 	m_outputTextBuffer.push_back('\0');
-}
-
-std::vector<std::string> EditorConsolePanel::GetCurrentCompletions() const
-{
-	if (m_inputBuffer[0] == '\0')
-	{
-		return {};
-	}
-	return m_session.CompleteLine(m_inputBuffer.data());
-}
-
-std::string EditorConsolePanel::BuildCompletionList(const std::vector<std::string>& completions) const
-{
-	std::string output = "matches:";
-	const std::size_t maxOutputCount = (std::min) (completions.size(), static_cast<std::size_t>(12));
-	for (std::size_t index = 0; index < maxOutputCount; ++index)
-	{
-		output += ' ';
-		output += completions[index];
-	}
-	if (completions.size() > maxOutputCount)
-	{
-		output += " ...";
-	}
-	return output;
 }

@@ -10,22 +10,22 @@
 
 namespace SceneMeshInspector
 {
-	static void BuildTransformCategory(const std::string& filter, const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept;
-	static void BuildMeshCategory(const std::string& filter, const WorldMeshReadData& mesh) noexcept;
-	static void BuildAdvancedParametersCategory(const std::string& filter, const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept;
-	static void BuildMaterialsCategory(const std::string& filter, const WorldMeshReadData& mesh) noexcept;
+	static void BuildTransformCategory(const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept;
+	static void BuildMeshCategory(const WorldMeshReadData& mesh) noexcept;
+	static void BuildAdvancedParametersCategory(const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept;
+	static void BuildMaterialsCategory(const WorldMeshReadData& mesh) noexcept;
 
-	void Build(const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation, const std::string& filter) noexcept
+	void Build(const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		BuildTransformCategory(filter, mesh, transactionHistory, generation);
-		BuildMeshCategory(filter, mesh);
-		BuildAdvancedParametersCategory(filter, mesh, transactionHistory, generation);
-		BuildMaterialsCategory(filter, mesh);
+		BuildTransformCategory(mesh, transactionHistory, generation);
+		BuildMeshCategory(mesh);
+		BuildAdvancedParametersCategory(mesh, transactionHistory, generation);
+		BuildMaterialsCategory(mesh);
 	}
 
-	static void BuildTransformCategory(const std::string& filter, const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
+	static void BuildTransformCategory(const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool bTransformOpen = EditorWidgets::DrawDetailsCategory("Transform", filter, "location rotation scale transform");
+		const bool bTransformOpen = EditorWidgets::DrawDetailsCategory("Transform");
 
 		if (!bTransformOpen)
 		{
@@ -39,9 +39,9 @@ namespace SceneMeshInspector
 		}
 	}
 
-	static void BuildMeshCategory(const std::string& filter, const WorldMeshReadData& mesh) noexcept
+	static void BuildMeshCategory(const WorldMeshReadData& mesh) noexcept
 	{
-		const bool bMeshOpen = EditorWidgets::DrawDetailsCategory("Mesh", filter, "type asset rendering skeletal static");
+		const bool bMeshOpen = EditorWidgets::DrawDetailsCategory("Mesh");
 
 		if (!bMeshOpen)
 		{
@@ -55,9 +55,9 @@ namespace SceneMeshInspector
 		EditorWidgets::DrawDetailsValueRow("Asset Id", value);
 	}
 
-	static void BuildAdvancedParametersCategory(const std::string& filter, const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
+	static void BuildAdvancedParametersCategory(const WorldMeshReadData& mesh, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 	{
-		const bool bAdvancedOpen = EditorWidgets::DrawDetailsCategory("Advanced", filter, "visible visibility hidden", false);
+		const bool bAdvancedOpen = EditorWidgets::DrawDetailsCategory("Advanced", false);
 
 		if (!bAdvancedOpen)
 		{
@@ -72,9 +72,9 @@ namespace SceneMeshInspector
 		}
 	}
 
-	static void BuildMaterialsCategory(const std::string& filter, const WorldMeshReadData& mesh) noexcept
+	static void BuildMaterialsCategory(const WorldMeshReadData& mesh) noexcept
 	{
-		const bool bMaterialsOpen = EditorWidgets::DrawDetailsCategory("Materials", filter, "element material slot surface");
+		const bool bMaterialsOpen = EditorWidgets::DrawDetailsCategory("Materials");
 
 		if (!bMaterialsOpen)
 		{

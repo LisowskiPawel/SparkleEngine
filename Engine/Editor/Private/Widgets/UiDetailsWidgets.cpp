@@ -1,5 +1,4 @@
 #include "PCH.h"
-#include "Core/Public/Strings/StringUtils.h"
 #include "Widgets/UiDetailsWidgets.h"
 #include "Widgets/UiIconWidgets.h"
 
@@ -171,13 +170,8 @@ namespace EditorWidgets
 		ImGui::PopID();
 	}
 
-	bool DrawDetailsCategory(const char* title, std::string_view filterText, const char* keywords, bool bDefaultOpen)
+	bool DrawDetailsCategory(const char* title, bool bDefaultOpen)
 	{
-		if (!MatchesDetailsFilter(filterText, title, keywords))
-		{
-			return false;
-		}
-
 		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Framed;
 		if (bDefaultOpen)
 		{
@@ -318,15 +312,5 @@ namespace EditorWidgets
 
 		EndDetailsRow();
 		return bChanged;
-	}
-
-	bool MatchesDetailsFilter(std::string_view filterText, const char* title, const char* keywords) noexcept
-	{
-		if (filterText.empty())
-		{
-			return true;
-		}
-		const bool bTitleMatches = Strings::ContainsIgnoreCase(title, filterText);
-		return bTitleMatches || Strings::ContainsIgnoreCase(keywords, filterText);
 	}
 }

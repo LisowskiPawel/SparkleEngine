@@ -3,15 +3,24 @@
 #include "Settings/Rendering/RenderingSettingsUi.h"
 
 #include "Style/SparkleUiPalette.h"
-#include "Widgets/UiDetailsWidgets.h"
+#include "Core/Public/Strings/StringUtils.h"
+
+#include <cfloat>
+
+#include <imgui.h>
 
 namespace RenderingSettingsUi
 {
 	bool BeginSettingsCategory(const char* filterText, const char* label, const char* keywords)
 	{
-		if (filterText != nullptr && !EditorWidgets::MatchesDetailsFilter(filterText, label, keywords))
+		const bool bSearchActive = filterText != nullptr && *filterText != '\0';
+		if (bSearchActive)
 		{
-			return false;
+			const bool bCategoryMatches = Strings::ContainsIgnoreCase(label, filterText) || Strings::ContainsIgnoreCase(keywords, filterText);
+			if (!bCategoryMatches)
+			{
+				return false;
+			}
 		}
 
 		ImGui::PushStyleColor(ImGuiCol_Header, SparkleUiPalette::HeaderBackground());

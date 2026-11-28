@@ -188,6 +188,15 @@ void ProjectLevelCatalogReader::ParseLevelField(std::string_view key, std::strin
 	{
 		m_currentLevel->sourcePath = ResolveProjectPath(value);
 	}
+	else if (key == "SceneSource")
+	{
+		const std::filesystem::path path(Strings::UnquoteCopy(value));
+		if (path.has_root_path() || !path.has_extension())
+		{
+			throw Diagnostics::Error("SceneSource requires a project-relative file path with an extension.");
+		}
+		m_currentLevel->sceneSourcePath = (m_projectRoot / path).lexically_normal();
+	}
 	else if (key == "Thumbnail")
 	{
 		m_currentLevel->thumbnailPath = ResolveProjectPath(value);

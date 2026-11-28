@@ -6,11 +6,12 @@
 #include "World/SkyEnvironment.h"
 
 #include <algorithm>
+#include <string>
 
-void SceneSkyInspector::Build(const std::optional<SkyEnvironment>& current, EditorTransactionHistory& transactionHistory, std::uint64_t generation, const std::string& filter) noexcept
+void SceneSkyInspector::Build(const std::optional<SkyEnvironment>& current, EditorTransactionHistory& transactionHistory, std::uint64_t generation) noexcept
 {
 	bool bHasSky = current.has_value();
-	const bool bSkyOpen = EditorWidgets::DrawDetailsCategory("Sky", filter, "override default texture color brightness enabled visible");
+	const bool bSkyOpen = EditorWidgets::DrawDetailsCategory("Sky");
 
 	if (bSkyOpen)
 	{
@@ -32,7 +33,7 @@ void SceneSkyInspector::Build(const std::optional<SkyEnvironment>& current, Edit
 
 	SceneSkyDesc after = *current;
 	bool bChanged = false;
-	const bool bRenderingOpen = EditorWidgets::DrawDetailsCategory("Rendering", filter, "sky texture color brightness enabled visible");
+	const bool bRenderingOpen = EditorWidgets::DrawDetailsCategory("Rendering");
 
 	if (bRenderingOpen)
 	{

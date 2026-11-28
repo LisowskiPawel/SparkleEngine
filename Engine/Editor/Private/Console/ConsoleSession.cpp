@@ -36,11 +36,6 @@ void ConsoleSession::SubmitLine(std::string_view line)
 	}
 }
 
-std::vector<std::string> ConsoleSession::CompleteLine(std::string_view line) const
-{
-	return CompleteConsoleLine(line);
-}
-
 void ConsoleSession::Append(ConsoleOutputRecord record)
 {
 	m_outputRecords.push_back(std::move(record));

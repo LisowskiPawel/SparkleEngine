@@ -13,33 +13,14 @@
 #include "Widgets/UiDetailsWidgets.h"
 
 #include <algorithm>
-#include <string>
 #include <optional>
 
 #include <imgui.h>
-#include <misc/cpp/imgui_stdlib.h>
 
 SceneInspectorPanel::SceneInspectorPanel(EditorSceneSession& scene, float widthPixels) noexcept :
     m_scene(scene),
     m_widthPixels(widthPixels)
 {
-}
-
-void SceneInspectorPanel::BuildDetailsToolbar() noexcept
-{
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8.0f, 5.0f));
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
-	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.055f, 0.058f, 0.064f, 1.0f));
-	ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.075f, 0.080f, 0.090f, 1.0f));
-	ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.070f, 0.095f, 0.130f, 1.0f));
-	const ImU32 borderColor = SparkleUiPalette::WithAlphaU32(SparkleUiPalette::Border(), 0.70f);
-	ImGui::PushStyleColor(ImGuiCol_Border, borderColor);
-	ImGui::SetNextItemWidth(-1.0f);
-	const std::string searchHint = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Search, "Search");
-	ImGui::InputTextWithHint("##DetailsFilter", searchHint.c_str(), &m_filterText);
-	ImGui::PopStyleColor(4);
-	ImGui::PopStyleVar(3);
 }
 
 void SceneInspectorPanel::SetTopInset(float topInsetPixels) noexcept
@@ -93,28 +74,27 @@ void SceneInspectorPanel::BuildSelectionInspector() noexcept
 	const SceneObjectSelection& selection = m_scene.GetSelection();
 	EditorTransactionHistory& history = m_scene.GetHistory();
 	DrawSelectionHeader();
-	BuildDetailsToolbar();
 	switch (selection.type)
 	{
 		case SceneObjectType::Camera:
 			if (const WorldCameraReadData* camera = model.FindCamera(selection.entity))
 			{
-				SceneCameraInspector::Build(*camera, history, model.GetWorldGeneration(), m_filterText);
+				SceneCameraInspector::Build(*camera, history, model.GetWorldGeneration());
 			}
 			break;
 		case SceneObjectType::Light:
 			if (const WorldLightReadData* light = model.FindLight(selection.entity))
 			{
-				SceneLightInspector::Build(light->Description, light->Entity, history, model.GetWorldGeneration(), m_filterText);
+				SceneLightInspector::Build(light->Description, light->Entity, history, model.GetWorldGeneration());
 			}
 			break;
 		case SceneObjectType::Sky:
-			SceneSkyInspector::Build(model.GetSkyEnvironment(), history, model.GetWorldGeneration(), m_filterText);
+			SceneSkyInspector::Build(model.GetSkyEnvironment(), history, model.GetWorldGeneration());
 			break;
 		case SceneObjectType::Mesh:
 			if (const WorldMeshReadData* mesh = model.FindMesh(selection.entity))
 			{
-				SceneMeshInspector::Build(*mesh, history, model.GetWorldGeneration(), m_filterText);
+				SceneMeshInspector::Build(*mesh, history, model.GetWorldGeneration());
 			}
 			break;
 		case SceneObjectType::None:

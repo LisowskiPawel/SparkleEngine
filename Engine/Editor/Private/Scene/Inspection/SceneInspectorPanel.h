@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 class EditorSceneSession;
 
 class SceneInspectorPanel final
@@ -17,7 +15,6 @@ public:
 
 private:
 	void BeginWindow() noexcept;
-	void BuildDetailsToolbar() noexcept;
 	void BuildInspectorTabs() noexcept;
 	void DrawSelectionHeader() noexcept;
 	void BuildSelectionInspector() noexcept;
@@ -26,5 +23,4 @@ private:
 	EditorSceneSession& m_scene;
 	float m_widthPixels = 560.0f;
 	float m_topInsetPixels = 0.0f;
-	std::string m_filterText;
 };

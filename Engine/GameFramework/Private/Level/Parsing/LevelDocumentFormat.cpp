@@ -1,5 +1,6 @@
 #include "PCH.h"
 #include "Level/Parsing/LevelDocumentFormat.h"
+#include "Level/LevelDocumentReader.h"
 
 #include "Level/Parsing/CameraSectionParser.h"
 #include "Level/Parsing/LevelParserCommon.h"

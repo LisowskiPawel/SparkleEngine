@@ -15,7 +15,6 @@
 namespace Strings
 {
 	SPARKLE_CORE_API bool IsAsciiWhitespace(char character) noexcept;
-	SPARKLE_CORE_API bool ContainsAsciiWhitespace(std::string_view str) noexcept;
 	SPARKLE_CORE_API bool IsNullTerminated(std::span<const char> buffer) noexcept;
 	SPARKLE_CORE_API bool IsValidUtf8(std::string_view text) noexcept;
 	SPARKLE_CORE_API bool AppendUtf8CodePoint(std::uint32_t codePoint, std::string& output);

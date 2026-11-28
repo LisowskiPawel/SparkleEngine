@@ -1,10 +1,8 @@
 #pragma once
 
-#include <cstddef>
 #include <array>
 #include <string>
 #include <string_view>
-#include <vector>
 
 class ConsoleSession;
 struct ImGuiInputTextCallbackData;
@@ -27,20 +25,14 @@ private:
 	void DrawDockHeader(bool bDisableInteraction);
 	void UpdateDockInteraction(float availableHeight, bool bDisableInteraction);
 	void Clear() noexcept;
-	static int HandleInputTextCallback(ImGuiInputTextCallbackData* data);
-	static std::size_t FindCompletionTokenStart(const std::string& input) noexcept;
+	static int HandleInputHistory(ImGuiInputTextCallbackData* data);
 	static void ReplaceInputText(ImGuiInputTextCallbackData& data, const std::string& text);
 
-	int HandleHistoryCallback(ImGuiInputTextCallbackData& data);
-	int HandleCompletionCallback(ImGuiInputTextCallbackData& data);
 	void SubmitInput();
 	void DrawToolbar(bool bDisableInteraction);
 	void DrawScrollback();
 	void DrawInputLine(bool bDisableInteraction);
-	void DrawAutocompletePreview();
 	void BuildOutputTextBuffer(std::string_view filter);
-	std::vector<std::string> GetCurrentCompletions() const;
-	std::string BuildCompletionList(const std::vector<std::string>& completions) const;
 
 	ConsoleSession& m_session;
 	std::string m_outputTextBuffer;

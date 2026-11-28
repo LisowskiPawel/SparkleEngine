@@ -2,8 +2,6 @@
 
 #include "Console/ConsoleCVarCommands.h"
 
-#include "Core/Public/Console/CVar.h"
-#include "Core/Public/Console/CVarRegistry.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 #include <utility>
@@ -76,19 +74,6 @@ static ConsoleCommandResult FormatControlResult(CVarControlResult result)
 		output += FormatCVar(value);
 	}
 	return output.empty() ? ConsoleCommandResult::Warning("no CVars matched") : ConsoleCommandResult::Success(std::move(output));
-}
-
-std::vector<std::string> CompleteConsoleCVarName(const ConsoleVariableRegistry& cvarRegistry, std::string_view prefix)
-{
-	std::vector<std::string> completions;
-	for (const ConsoleVariableBase* variable : cvarRegistry.GetVariables())
-	{
-		if (variable != nullptr && Strings::StartsWithIgnoreCase(variable->GetName(), prefix))
-		{
-			completions.emplace_back(variable->GetName());
-		}
-	}
-	return completions;
 }
 
 static std::string FormatCVar(const CVarControlValue& variable)
