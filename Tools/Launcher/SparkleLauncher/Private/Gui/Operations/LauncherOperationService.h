@@ -2,7 +2,6 @@
 
 #include "Gui/Operations/LauncherOperationRequest.h"
 #include "SparkleLauncher/OperationModel.h"
-#include "SparkleLauncher/LauncherProcess.h"
 
 #include <functional>
 #include <memory>

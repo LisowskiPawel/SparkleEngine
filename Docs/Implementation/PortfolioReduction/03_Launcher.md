@@ -2,7 +2,7 @@
 
 [Execution order and shared delivery rules](README.md) | [Closed scope record](../PortfolioScopeDecisions.md) | [Engineering](../../Engineering.md)
 
-Status: active; only remaining delivery work is listed below. The [shared stage protocol](README.md#stage-protocol) applies. [Design checkpoint](../../../build/validation/portfolio-reduction/launcher-stage0/REPORT.md) | [Retirement evidence](../../../build/validation/portfolio-reduction/launcher-stage1/REPORT.md).
+Status: active; only remaining delivery work is listed below. The [shared stage protocol](README.md#stage-protocol) applies. [Design checkpoint](../../../build/validation/portfolio-reduction/launcher-stage0/REPORT.md) | [Stage 1 evidence](../../../build/validation/portfolio-reduction/launcher-stage1/REPORT.md) | [Stage 2 evidence](../../../build/validation/portfolio-reduction/launcher-stage2/REPORT.md).
 
 **Execution order: 03 of 21.** Finish Stage 1's remaining cleanup, then resume Stage 2 in Wave 3 after BuildPackaging stage 1; stages 3-4 in Wave 6. Follow the [stage queue](README.md#suggested-execution-order); do not finish this whole file before a listed prerequisite. Dominant owners may change this module earlier as part of a complete system.
 
@@ -31,20 +31,18 @@ Apply the [shared before/after design gate](README.md#reshape-the-surviving-desi
 
 ## Footprint and reduction obligation
 
-Current containing scope: **194 files / 18,079 physical code/build-script lines**, bound to the [retirement receipt](../../../build/validation/portfolio-reduction/launcher-stage1/REPORT.md). Uncompleted allocations from the original [ledger](README.md#footprint-and-size-targets): **2 whole files / 239 lines**, plus **167 shared lines in 3 files**. These remain conditional gross candidates, not guaranteed net savings; include replacements/callers and moved code. Data-only changes do not count as native code savings.
+Current containing scope: **193 files / 17,761 physical code/build-script lines**, bound to the [Stage 2 receipt](../../../build/validation/portfolio-reduction/launcher-stage2/REPORT.md). Refresh remaining Stage 3-4 replacement scopes before implementation; the original [ledger](README.md#footprint-and-size-targets) is a dated gross allocation, not guaranteed net savings. Include replacements/callers and moved code; data-only changes do not count as native code savings.
 
 Historical overlapping replacement baselines from 25 November (refresh before each remaining stage; **not deletable totals**):
 
 | Decision | Existing shared/replacement scope |
 | --- | --- |
 | LA-03 | 35 files / 3,924 lines |
-| LA-15 | 7 files / 1,077 lines |
 | LA-19 | 5 files / 494 lines |
 | LA-21 | 3 files / 667 lines |
 | LA-23 | 3 files / 716 lines |
 | LA-24 | 6 files / 778 lines |
 | LA-25 | 18 files / 1,773 lines |
-| AP-07 | 10 files / 1,725 lines |
 
 ## Named retirement closure
 
@@ -52,7 +50,7 @@ These are source-audit seeds for the owning stages, including indirect code/buil
 
 | Decision / owning stage | Direct system and secondary retirement to close | Protected surviving consumers / boundary |
 | --- | --- | --- |
-| LA-15, AP-07; stage 2 | Launcher incident polling/catalog/inspection/recovery and extra Application incident presentation transport. Trace Public/SparkleLauncher/GpuCrashIncident.h, LauncherCore.cmake, LauncherGpuCrashPanel/OperationService, OpenGpuCrash.ps1 -> GpuCrashIncident.ps1 and extra manifest/state readers. Remove only the managed inspection chain and its script/deployment/UI callers; split mixed native collection files by function. | Native GpuCrashIncidentSink/Files portions required for dump persistence, marker sidecars, callbacks, matching native/shader inputs and bounded collection settlement; external debugger launch and readiness. |
+| LA-15, AP-07; stage 2 | Qualify the retained native fault path on both APIs at the final selected build/shader/SDK/source identity and finish temporary cleanup; see the [bound receipt](../../../build/validation/portfolio-reduction/launcher-stage2/REPORT.md). | Native input/readiness checks, callbacks, dump/marker sidecars, matched native/shader symbols, bounded collection settlement and explicit debugger launch remain protected. |
 | LA-19; stage 3 | Build/State duplicate source-list freshness/signature authority. Trace BuildFilesFreshness, BuildFreshnessSignature, BuildWorkspaceStateFiles and their planner/readiness/cache users. Remove only bookkeeping replaced by native CMake/Ninja dependency/regeneration and minimal incompatible-cache identity. | Actual artifact availability, source/recipe/SDK invalidation and cache incompatibility errors; no history-based readiness. |
 | LA-20; stage 3 | NativeBuildOutputReset automatic toolchain-change wipe path. Remove reset plan/step/state triggers, stale reset reason/flags, UI status and old toolchain-difference branches; retain a helper only if another selected Clean workflow truly consumes it. | Explicit controlled native Clean, source/download caches, real incompatible-cache rejection and task/process settlement. |
 | LA-21; stage 3 | Stored multi-run history and history browser. Trace LauncherActivityPanel, operation/session serialization, activity row/time/log readers, GUI signals and shell activity consumers. Retire only history storage/presentation after current progress/failure consumers have direct ownership. | Active concurrent operation state, cancellation/settlement, useful current logs and artifact-derived readiness for external builds/cooks/dependencies. |
@@ -69,39 +67,14 @@ Launcher scene-view qualification retains physical fractional/mixed-DPI, assisti
 
 The production retirement and bounded controls passed; only required temporary cleanup remains. Remove the Stage 1 probe sources/build tree, controlled fixtures and probe setup/CLI scripts listed in the [cleanup receipt](../../../build/validation/portfolio-reduction/launcher-stage1/temporary-cleanup.json), then verify their absence and prune this stage and its queue entry. Automatic approval review rejected both cleanup commands as “blocked by policy”; no more specific reason was supplied. Existing user state and historical validation are outside this cleanup. This does not reopen the delivered production work or qualify later stages.
 
-## Stage 2: Delete managed post-crash incident workflow end to end
+## Stage 2: Qualify retained native GPU diagnostics and remove probes
 
-Decisions: LA-15, AP-07.
+Decisions: LA-15, AP-07. Remaining exits are bound in the [Stage 2 receipt](../../../build/validation/portfolio-reduction/launcher-stage2/REPORT.md); the source retirement is not a native-fault qualification.
 
-**Implementation prompt:**
+- After BuildPackaging stage 1, identify the final native exe/DLL/PDB, shader export/library, SDK/driver/source and both API candidates. Choose the dedicated opt-in fault reproduction, then demonstrate usable externally readable dump, breadcrumb/marker/native diagnostics and matched shader/debug/symbol data on D3D12 and Vulkan independently. Exercise marker lifetime across command-list reuse/frames in flight and bounded callback/writer completion during loss/shutdown, including the declared failure controls. Application/RHI runtime signoff belongs in the same revision-bound receipt; successful startup, parser checks or builds do not pass it.
+- Remove only the temporary Stage 2 probe/setup/fixture paths in the [cleanup receipt](../../../build/validation/portfolio-reduction/launcher-stage2/temporary-cleanup.json), verify absence and recheck the affected source/build/runtime closure. Automatic approval review rejected deletion of the test symlink as "blocked by policy"; no more specific reason was supplied. Preserve existing tests, historical evidence and native incident/user data.
 
-```text
-Implement Stage 2 of Docs/Implementation/PortfolioReduction/03_Launcher.md: Delete managed post-crash incident workflow end to end.
-Read that plan, its Stage 0 evidence/dependencies, Docs/Implementation/PortfolioReduction/README.md, and Docs/CodeStyle.md, Docs/Engineering.md, Docs/Goals.md, Docs/References.md and Docs/Roadmap.md. Refresh actual source/callers and preserve unrelated/concurrent changes. Scope stays within the recorded decisions. Exhaust this stage's named retirement closure/participation: follow both outgoing dependencies and incoming users through code/data/build/runtime/docs, repeating until no newly orphaned owned node remains. Keep one owner per system.
-
-Required delivery:
-Own this cross-module removal through Application and CMake diagnostics scripts. Remove ReadGpuCrashState/ReadGpuCrashCollectionState, incident polling/list/catalog/inspection/recovery UI and commands, and otherwise unused application incident-report transport. Split mixed functions before deleting. Keep configured external tool launch and Editor crash-mode startup; retain native callbacks, dump/marker writing and bounded collection completion.
-
-Implementation rules:
-- Apply this plan's Adapt the surviving design contract to surviving APIs, data, states, orchestration and callers. Use its bounded reference lessons; remove assumptions made obsolete by this stage.
-- Enforce every CodeStyle.md rule. Each changed function has one cohesive responsibility/invariant and an intent-based name. Orchestration states domain steps with explicit inputs/results; implementation operations own substantial I/O, decoding, math, validation, native or UI details. Do not create forwarding-only/numbered helpers or context/service bags to imitate separation.
-- Complete the cross-module producer/consumer change, registrations, settings/CLI/UI, schemas, build/dependency/package membership and docs. No legacy or backward-compatibility support for replaced owned contracts: no aliases, migrations, version gates, disabled stubs, old readers or dual implementations. Regenerate disposable output. Preserve required selected external SDK/ABI contracts.
-- Preserve parallel work, data-oriented layout, separate game/render ownership, immutable publication, worker settlement and GPU queue/fence lifetime. Simplify mechanisms, never concurrency or a retained feature.
-
-Acceptance criteria:
-- Prove the applicable survivor-design checks through real retained callers; show the before/after contracts and net result. Justify unchanged boundaries by retained invariants; no unused general protocol or replacement framework.
-- Produce an exact removed-function versus retained-native-function list. An opt-in native fault on each supported backend yields usable matched dump/breadcrumb/marker/symbol data; ordinary map launch requires no crash monitor. A successful startup alone does not pass this stage. Application/RHI protected owners sign off through the same revision-bound receipt.
-- Review each changed function and neighboring callers for responsibility, abstraction level, naming and actual data/lifetime ownership; remove duplicated policy/state and now-unused files/APIs. Run CMake/CodeStyle.ps1 -Mode Check -Path "<repo-relative-file>" for each changed owned C++/header/shader with clang-format 22.1.3, plus git diff --check. Use documentation/language checks for other files; formatting alone cannot pass the responsibility review.
-- Run the stage's positive and failure/lifetime checks on identified inputs and the affected real targets/APIs. An absent observation remains open. Provide a closure manifest classifying every discovered node as retired, retained with a named live consumer, or unresolved (stage stays open). No obsolete caller, registration, output expectation or compatibility route remains; include replacement/addition/moved code in the net footprint result.
-
-Failure modes to reject:
-- Old general machinery survives with fewer users, callers still carry retired policy, or code moves without exploiting the reduced scope.
-- Incident UI retirement also removes native callbacks, breadcrumb/marker sidecars or collection waits.
-- Ordinary startup succeeds but native fault data cannot resolve this build/shader/source identity.
-- Renaming/moving code without simplification, mixed-responsibility functions, a surviving old/new path, serial replacement or premature CPU/GPU destruction fails delivery. Orphan helpers, target edges, feature flags, generated products or docs left behind after the visible feature disappears also fail delivery.
-
-Deliver the complete change and identity-bound commands/results, manual responsibility review, net code/state/API/dependency delta and remaining limits in ignored stage evidence. Remove temporary probes; do not add permanent test-only infrastructure. For a failed conditional cut, remove the failed candidate, keep one authorized working path and leave the cut open; do not ship a compatibility fallback. Prune only the stage whose acceptance actually passed and repair links.
-```
+Prune this stage and its queue/closure entry only after these exits pass. Keep native callbacks, dump/marker writing, exact launch readiness, bounded collection and explicit configured debugger launch intact; no managed incident workflow or compatibility path is to be reintroduced.
 
 ## Stage 3: Replace build/status bookkeeping with a small execution flow
 

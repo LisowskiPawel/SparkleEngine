@@ -2,13 +2,13 @@
 
 [Execution order and shared delivery rules](README.md) | [Closed scope record](../PortfolioScopeDecisions.md) | [Engineering](../../Engineering.md)
 
-Status: planned, source inspected on 25 November 2026 at `039d7b802` with the current documentation working tree. No stage is delivered by writing this plan. The [shared stage protocol](README.md#stage-protocol) applies without duplication here; remove each verified stage in the delivery change.
+Use the [shared stage protocol](README.md#stage-protocol) and [frozen design and check inputs](../../../build/validation/portfolio-editor-stage0-20261128/REPORT.md). The remaining gates are listed in execution order.
 
-**Execution order: 02 of 21 (first focused visit).** Start: Stages 0-2 in Wave 1. Resume / dependency: Stages 3-4 in Wave 6, with GameFramework stage 3 and its loading contract. Follow the [stage queue](README.md#suggested-execution-order); do not finish this whole file before a listed prerequisite. Dominant owners may change this module earlier as part of a complete system.
+**Execution order: 02 of 21 (first focused visit).** Continue with Stages 1?2 in Wave 1. Resume / dependency: Stages 3-4 in Wave 6, with GameFramework stage 3 and its loading contract. Follow the [stage queue](README.md#suggested-execution-order); do not finish this whole file before a listed prerequisite. Dominant owners may change this module earlier as part of a complete system.
 
 ## Outcome and ownership
 
-Keep a polished scene-inspection/editing frontend while deleting optional asset/shader tools and making the remaining state flow readable.
+Keep a polished scene-inspection and editing frontend with a direct path from immutable observations to game-owned edits and approved persistence.
 
 **Retain:** Outliner, live transforms/visibility/material variants/cameras/lights, render/effect controls, undo/redo and drag coalescing, console execution/history, compile/reload, screenshot/capture launch, preferences, custom title bar and existing generated icons. Maintainer saves persist approved fields; reviewer changes remain in-session.
 
@@ -18,7 +18,7 @@ Dominant execution owner for: ED-01, ED-02, ED-03, ED-04, ED-05, ED-06, ED-07, E
 
 ## Adapt the surviving design
 
-- **Remaining frontend:** after inspector/search/completion removal, narrow panel registration, selection/query contracts and frame data to the outliner, selected property controls, rendering options and console execution/history. Delete diagnostic-only request plumbing; do not retain a general inspector protocol with empty providers. Keep custom chrome/icons and the accepted controls.
+- **Remaining frontend:** narrow selection/query contracts and frame data to the outliner, selected property controls, rendering options and console execution/history. Keep custom chrome/icons and the accepted controls.
 - **One edit/save path:** immutable world observations feed the UI; typed edits are applied by the game owner. Maintainer persistence uses source-qualified identities and one narrow level writer. Reviewer edits stay in-session. Keep undo/coalescing and asynchronous preparation without copying the world or creating a second authoring model.
 
 **Structural acceptance:** follow selection -> observation -> edit -> publication -> undo and maintainer save through real callers. Confirm package edits reset, no retired query/update work runs per frame, and added ED-23 code is charged to the footprint. Reject a UI-owned world mirror or a compatibility persistence layer.
@@ -35,8 +35,6 @@ Measured containing scopes that need a smaller replacement (overlapping; **not d
 
 | Decision | Existing shared/replacement scope |
 | --- | --- |
-| ED-12 | 2 files / 49 lines |
-| ED-13 | 2 files / 49 lines |
 | ED-19 | 14 files / 1,293 lines |
 | ED-24 | 2 files / 497 lines |
 
@@ -46,82 +44,19 @@ These are source-audit seeds for the owning stages, including indirect code/buil
 
 | Decision / owning stage | Direct system and secondary retirement to close | Protected surviving consumers / boundary |
 | --- | --- | --- |
-| ED-12; stage 1 | Mesh inspection/preview UI and exclusive diagnostic producers. Close collectors/panel models/formatting and preview-only GPU buffers/shaders/textures/capture wiring through Application/Renderer; remove unused icon/menu/registration/build/deployment entries. Check shared diagnostic formatting against ED-13. | Ordinary meshes/materials, world extraction, retained signal views, native GPU captures and parallel upload/preparation. |
-| ED-13; stage 1 | Texture inspection UI and exclusive diagnostic producers. Follow selected-texture state, thumbnail/preview exports, residency-formatting helpers, readback consumers and Application/Renderer APIs to their final users; remove orphan helpers after ED-12 too. | Actual texture residency/cache/upload, material/default textures, capture readback with retained users and runtime memory/lifetime correctness. |
-| ED-14; stage 1 | Shader inspector/list/export frontend. Retire ShaderToolsPanel/ShaderArtifactInspection UI-only adapters, menu/status/preference fields and exclusive Application export APIs; coordinate with ShaderCompiler report removal and Reference exports. | Editor compile/reload, compiler failures, runtime reflection/ABI and exact debugger code/symbol/source artifacts. |
 | ED-19; stage 2 | Per-property search/filter mechanism. Remove inspector query state, recursive property search/visibility metadata, filter callbacks/widgets and copied filtered views with no remaining user. | Outliner selection/search where separately retained, fixed property sections, useful text input and game-owned edits. |
 | ED-20; stage 2 | Console completion functions/UI. Retire CompleteConsoleLine/CompleteConsoleCVarName, completion result/state/cursor paths and callback wiring in Core/Editor only when exclusive. | Console registration/execution/help/errors, history and CVar get/set; Launcher operation history is a different system. |
 | ED-24; stage 3 | Reviewer-bundle scene writes and package authoring path. Close Save action/capability/writability derivation, path resolution and writer dispatch in shipped hosts so runtime edits cannot mutate supplied files. Delete any package-only persistence path after maintainer saves use one projection. | ED-22/23 explicit writable-source saves, live edits/undo, per-user settings and reload/reset; do not delete the shared level writer. |
 | ED-23; stage 3 | Do not grow a second save/session/persistence framework while adding the approved overrides: consolidate source-qualified identity, projection and writer callers; remove obsolete save-field mirrors. | This is accepted new implementation work, not a deletion credit. Preserve correct identity, undo, explicit maintainer saves and reviewer in-session edits. |
 
-## Stage 0: freeze the actual responsibility and smaller target
-
-The [Stage 0 evidence](../../../build/validation/portfolio-editor-stage0-20261128/REPORT.md) records the former inspection panels and their Application/Renderer producers. Separate console completion from console execution/history. For ED-23, inspect existing source/reimport identity and LevelWorldProjection. Save All currently saves lighting, sky and the active camera description. Freeze screenshots and a transform/visibility/material-variant edit/reload example.
-
-Start at these current sources (entry/retirement seeds, not a blind delete list):
-
-- [Editor workspace composition](../../../Engine/Editor/Private/Workspace)
-- [Engine/Editor/Private/Viewport](../../../Engine/Editor/Private/Viewport)
-- [Engine/GameFramework/Private/Level/LevelWorldProjection.cpp](../../../Engine/GameFramework/Private/Level/LevelWorldProjection.cpp)
-
-Before coding, apply the shared Stage 0 protocol to the complete producers/callers and write the minimal target ownership/data-flow sketch plus measured deletion/replacement budget. Preserve every 🟢 contract; ⚫* cuts stay conditional. Inputs and requirements not exercised by the source audit remain unqualified. Reject a candidate that removes useful parallel work, duplicates state or merely moves the same code.
-
-**Implementation prompt:**
-
-```text
-Prepare Stage 0 of Docs/Implementation/PortfolioReduction/02_Editor.md: freeze the actual responsibility and smaller target.
-Read this module's outcome, retained contracts, source entry points and Stage 0 questions; read Docs/CodeStyle.md, Docs/Engineering.md, Docs/Goals.md, Docs/References.md, Docs/Roadmap.md and Docs/Implementation/PortfolioReduction/README.md. Refresh current HEAD/working-tree identities and respect concurrent work. Audit the named retirement closure/participation in this plan, including narrowed retained capabilities; prepare a transitive retire/retain-with-consumer/unresolved manifest and rerun it after each layer disappears. Do not implement the production refactor in this stage.
-
-Acceptance criteria:
-- Specify this plan's Adapt the surviving design contract: vanished assumption, concrete smaller API/data/control flow, caller changes, selected reference lesson and local limits. Budget all replacement/caller code and name the retained behavior/failure check.
-- an actionable producer/consumer and lifetime map, final-consumer classification, specific changed files/targets, scoped correctness/performance bounds and a proposed net reduction. This is the implementer's concrete design checkpoint, not a request for a new framework or approval ceremony.
-- Map each proposed changed function to one cohesive responsibility/owner and an intent-based name; distinguish workflow orchestration from implementation mechanisms. Specify callers/contracts/files/build outputs to retire and the sole target path; no legacy/backward-compatibility reader, alias, migration, disabled stub or old/new implementation may be planned.
-- Define stage-specific success, invalid-input/failure/cancellation/lifetime checks and measured bounds before coding; retain all approved parallel/data-oriented/game/render/RHI contracts. No unsupported performance or qualification claim.
-
-Failure modes to reject:
-- The feature disappears but surviving contracts retain obsolete generality, or an upstream framework is copied without a local invariant.
-- Historical Editor paths, footprint counts or old receipts are treated as current without tracing actual callers/build inputs.
-- Mixed retained/retired responsibilities or CPU/GPU reader lifetimes are omitted, leaving no safe complete-system cut or measurable replacement budget.
-- A generic wrapper/framework, serial execution, retained compatibility path or source relocation is substituted for a smaller complete design. A first-order-only dependency scan is insufficient.
-
-Deliver the concrete design/ownership map, bounded change and net footprint budget, planned checks and open conditions in ignored stage evidence. Keep CodeStyle's function/namespace/layout rules explicit in the design; permanent test-only additions are not authorized. Do not close an unproven implementation stage or change a recorded decision.
-```
-
 ## Stage 1: Delete mesh, texture and shader inspection subsystems
 
-Decisions: ED-12, ED-13, ED-14.
+Decisions: ED-12, ED-13, ED-14. The [retirement receipt](../../../build/validation/portfolio-editor-stage1-20261128/REPORT.md) and [DLL follow-up](../../../build/validation/portfolio-editor-stage1-followup-20261128/REPORT.md) bind the completed work. Finish qualification against the current source/build and matching cooked inputs.
 
-The [Stage 1 evidence](../../../build/validation/portfolio-editor-stage1-20261128/REPORT.md) records the retirement, retained File > Shaders actions, and open qualification checks.
-
-**Implementation prompt:**
-
-```text
-Implement Stage 1 of Docs/Implementation/PortfolioReduction/02_Editor.md: Delete mesh, texture and shader inspection subsystems.
-Read that plan, its Stage 0 evidence/dependencies, Docs/Implementation/PortfolioReduction/README.md, and Docs/CodeStyle.md, Docs/Engineering.md, Docs/Goals.md, Docs/References.md and Docs/Roadmap.md. Refresh actual source/callers and preserve unrelated/concurrent changes. Scope stays within the recorded decisions. Exhaust this stage's named retirement closure/participation: follow both outgoing dependencies and incoming users through code/data/build/runtime/docs, repeating until no newly orphaned owned node remains. Keep one owner per system.
-
-Required delivery:
-Remove panels, preview rendering/tool actions, selection models and their exclusive diagnostic collectors. Follow dependencies into Application/Renderer/Core and remove now-unconsumed producers, registrations and includes in the same stage. Renderer-owned Reference overlay removal belongs to Renderer stage 1. Keep ordinary runtime mesh/texture/shader data, residency, useful errors, signal views and external native captures.
-
-Implementation rules:
-- Apply this plan's Adapt the surviving design contract to surviving APIs, data, states, orchestration and callers. Use its bounded reference lessons; remove assumptions made obsolete by this stage.
-- Enforce every CodeStyle.md rule. Each changed function has one cohesive responsibility/invariant and an intent-based name. Orchestration states domain steps with explicit inputs/results; implementation operations own substantial I/O, decoding, math, validation, native or UI details. Do not create forwarding-only/numbered helpers or context/service bags to imitate separation.
-- Complete the cross-module producer/consumer change, registrations, settings/CLI/UI, schemas, build/dependency/package membership and docs. No legacy or backward-compatibility support for replaced owned contracts: no aliases, migrations, version gates, disabled stubs, old readers or dual implementations. Regenerate disposable output. Preserve required selected external SDK/ABI contracts.
-- Preserve parallel work, data-oriented layout, separate game/render ownership, immutable publication, worker settlement and GPU queue/fence lifetime. Simplify mechanisms, never concurrency or a retained feature.
-
-Acceptance criteria:
-- Prove the applicable survivor-design checks through real retained callers; show the before/after contracts and net result. Justify unchanged boundaries by retained invariants; no unused general protocol or replacement framework.
-- Editor starts and renders retained maps without retired panels/preview paths. Compile/reload and native capture still work. Search confirms old panel producers have no retained consumer; removal does not serialize asset preparation or damage GPU resource lifetime. Build after regenerating source membership.
-- Review each changed function and neighboring callers for responsibility, abstraction level, naming and actual data/lifetime ownership; remove duplicated policy/state and now-unused files/APIs. Run CMake/CodeStyle.ps1 -Mode Check -Path "<repo-relative-file>" for each changed owned C++/header/shader with clang-format 22.1.3, plus git diff --check. Use documentation/language checks for other files; formatting alone cannot pass the responsibility review.
-- Run the stage's positive and failure/lifetime checks on identified inputs and the affected real targets/APIs. An absent observation remains open. Provide a closure manifest classifying every discovered node as retired, retained with a named live consumer, or unresolved (stage stays open). No obsolete caller, registration, output expectation or compatibility route remains; include replacement/addition/moved code in the net footprint result.
-
-Failure modes to reject:
-- Old general machinery survives with fewer users, callers still carry retired policy, or code moves without exploiting the reduced scope.
-- An optional panel survives through hidden actions/collectors or retired build membership.
-- Removing its producer breaks retained signal views, shader reload, asynchronous residency or native capture.
-- Renaming/moving code without simplification, mixed-responsibility functions, a surviving old/new path, serial replacement or premature CPU/GPU destruction fails delivery. Orphan helpers, target edges, feature flags, generated products or docs left behind after the visible feature disappears also fail delivery.
-
-Deliver the complete change and identity-bound commands/results, manual responsibility review, net code/state/API/dependency delta and remaining limits in ignored stage evidence. Remove temporary probes; do not add permanent test-only infrastructure. For a failed conditional cut, remove the failed candidate, keep one authorized working path and leave the cut open; do not ship a compatibility fallback. Prune only the stage whose acceptance actually passed and repair links.
-```
+1. Inspect a staged reviewer package for required runtime binaries and the absence of retired inspection files and sidecars. Finish selected-stack qualification with BuildPackaging when that identity is available.
+2. Exercise the remaining view and lifetime cases on D3D12 and Vulkan. Check D3D12 GBuffer Diffuse, atlas growth and stale handles, and resize, minimize, map change and close during delayed viewport readback or texture upload. Show independent worker overlap with the frozen settings. Observe native replay and any required provider cells. Keep the final external consumer of the exported memory snapshot unresolved until its owner supplies evidence.
+3. Reject malformed reflection through the real shader reload owner and confirm that the accepted generation remains usable.
+4. Rebuild the frozen pre-cut source for the original visual reference and collect matched candidate images, load/frame percentiles and allocation observations on the frozen map matrix. Apply the [recorded sampling rules and bounds](../../../build/validation/portfolio-editor-stage0-20261128/CHECKS.md#inputs-and-numeric-bounds-fixed-before-a-candidate). Record unsupported cells explicitly and retain their gates. Once the outstanding cells pass, remove this stage and repair the queue links.
 
 ## Stage 2: Remove property search and console completion
 
@@ -160,6 +95,8 @@ Deliver the complete change and identity-bound commands/results, manual responsi
 ## Stage 3: Bound maintainer persistence and forbid package authoring
 
 Decisions: ED-22, ED-23, ED-24.
+
+Refresh the prepared source/reimport identity and run the [frozen transform, visibility and material-variant example](../../../build/validation/portfolio-editor-stage0-20261128/example.json) through the real importer, cook, Editor edit and reload flow. Capture the current baseline before changing the save path. The source audit records that Save All currently projects lighting, sky and the active camera description.
 
 **Implementation prompt:**
 

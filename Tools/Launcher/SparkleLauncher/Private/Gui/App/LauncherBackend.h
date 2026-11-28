@@ -3,7 +3,6 @@
 #include "Gui/Operations/LauncherOperationRequest.h"
 #include "Gui/Operations/LauncherProgressStreamDecoder.h"
 #include "SparkleLauncher/OperationModel.h"
-#include "SparkleLauncher/LauncherProcess.h"
 
 #include <QtCore/QHash>
 #include <QtCore/QMetaType>

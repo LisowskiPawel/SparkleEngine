@@ -127,24 +127,30 @@ public:
 		const aiNode* targetNode = scene.mRootNode->FindNode(sourceChannel.mNodeName);
 		if (targetNode == nullptr)
 		{
-			throw Diagnostics::Error("FBX animation channel targets an unknown node.");
+			throw Diagnostics::Error(std::format("FBX take '{}' targets unknown node '{}'.", clip.name, sourceChannel.mNodeName.C_Str()));
 		}
 
 		const std::uint32_t targetNodeIndex = AssimpNodeTransformConverter::FindNodeIndex(scene, *targetNode);
 		if (targetNodeIndex == (std::numeric_limits<std::uint32_t>::max)())
 		{
-			throw Diagnostics::Error("FBX animation channel target has no source-node index.");
+			throw Diagnostics::Error(std::format("FBX take '{}' targets node '{}' without a source-node index.", clip.name, sourceChannel.mNodeName.C_Str()));
 		}
 
 		const auto [targetSkeletonIndex, targetJointIndex] = importedScene.FindSkeletonJointForNode(targetNodeIndex);
 		if (targetSkeletonIndex == (std::numeric_limits<std::uint32_t>::max)() || targetJointIndex == (std::numeric_limits<std::uint32_t>::max)())
 		{
-			throw Diagnostics::Error("FBX animation channel target is not owned by an imported skeleton.");
+			throw Diagnostics::Error(std::format("FBX take '{}' targets node '{}' outside the imported skeletons.", clip.name, sourceChannel.mNodeName.C_Str()));
 		}
 
 		if (clip.targetSkeletonIndex != (std::numeric_limits<std::uint32_t>::max)() && clip.targetSkeletonIndex != targetSkeletonIndex)
 		{
-			throw Diagnostics::Error("FBX animation channels span multiple skeletons.");
+			throw Diagnostics::Error(
+			    std::format(
+			        "FBX take '{}' targets node '{}' on skeleton {}, but earlier channels target skeleton {}.",
+			        clip.name,
+			        sourceChannel.mNodeName.C_Str(),
+			        targetSkeletonIndex,
+			        clip.targetSkeletonIndex));
 		}
 		clip.targetSkeletonIndex = targetSkeletonIndex;
 
