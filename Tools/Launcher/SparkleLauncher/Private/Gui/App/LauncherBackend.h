@@ -10,7 +10,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-#include <functional>
 #include <memory>
 #include <string>
 
@@ -28,7 +27,6 @@ namespace SparkleLauncher
 
 		void RunOperation(LauncherOperationRequest request);
 		bool CancelOperation(const QString& runId);
-		bool ObserveGpuCrash(GpuCrashIncident incident, std::function<void(const QString&)> completion);
 
 	signals:
 		void OperationStarted(const QString& runId, const QString& title);

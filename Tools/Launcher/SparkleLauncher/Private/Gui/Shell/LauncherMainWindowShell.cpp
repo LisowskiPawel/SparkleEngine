@@ -163,7 +163,8 @@ namespace SparkleLauncher
 		m_captureProviderCombo->setToolTip("Attach a capture tool when the Editor starts.");
 		m_captureProviderCombo->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
 		addContextItem("GPU Capture", *m_captureProviderCombo, LauncherUi::ContextSelector::CaptureComboWidth, LauncherUi::ContextSelector::CaptureComboWidth);
-		m_gpuCrashPanel = new LauncherGpuCrashPanel(m_workspaceRoot, m_settings, m_backend, panel);
+		const bool bHasBuildSources = HasBuildSources(m_workspaceRoot);
+		m_gpuCrashPanel = new LauncherGpuCrashPanel(bHasBuildSources, m_settings, panel);
 		for (QWidget* widget : m_gpuCrashPanel->GetFocusableWidgets())
 		{
 			RegisterFocusable(widget);

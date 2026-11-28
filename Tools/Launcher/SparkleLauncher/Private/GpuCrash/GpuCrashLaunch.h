@@ -9,7 +9,6 @@
 
 namespace SparkleLauncher
 {
-	struct GpuCrashIncident;
 	struct LevelRunOperationPlan;
 
 	struct GpuCrashReadinessExpectation final
@@ -22,8 +21,5 @@ namespace SparkleLauncher
 	};
 
 	bool PrepareGpuCrashLaunch(LevelRunOperationPlan& plan);
-	std::filesystem::path ReadGpuCrashAnnouncement(std::string_view output);
 	Process::ChildReadinessDecision VerifyGpuCrashReadiness(const GpuCrashReadinessExpectation& expected, std::uint32_t childPid, std::string_view output, std::string& error);
-	std::string ReadGpuCrashState(const std::filesystem::path& manifestPath, std::string_view sessionId, std::uint32_t childPid);
-	std::string ReadGpuCrashCollectionState(const GpuCrashIncident& incident);
 }

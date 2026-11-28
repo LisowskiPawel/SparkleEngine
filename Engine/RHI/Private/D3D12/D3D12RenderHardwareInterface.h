@@ -88,10 +88,10 @@ private:
 	bool BuildPtlas(ID3D12GraphicsCommandList7* commandList, const RhiPtlasBuildCommandDesc& desc) const noexcept;
 
 	std::unique_ptr<D3D12InteropService> m_interopService;
-	std::unique_ptr<RhiCaptureService> m_captureService;
 	std::unique_ptr<RhiPresentationServiceAdapter<D3D12BackBufferPresentation>> m_presentationService;
 	std::unique_ptr<RhiPipelineService> m_pipelineService;
 	std::unique_ptr<D3D12ResourceService> m_resourceService;
+	std::unique_ptr<RhiCaptureService> m_captureService;
 	std::unique_ptr<D3D12RayTracingServices> m_rayTracingServices;
 	D3D12Rhi* m_rhi = nullptr;
 	D3D12DescriptorHeapManager* m_descriptorHeapManager = nullptr;

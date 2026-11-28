@@ -11,13 +11,14 @@
 
 class D3D12Rhi;
 class D3D12GpuMemoryAllocator;
+class D3D12ResourceService;
 
 template <typename Implementation> class RhiCaptureServiceAdapter;
 
 class D3D12TextureReadback final
 {
 public:
-	explicit D3D12TextureReadback(D3D12Rhi& rhi, D3D12GpuMemoryAllocator& memoryAllocator) noexcept;
+	explicit D3D12TextureReadback(D3D12Rhi& rhi, D3D12GpuMemoryAllocator& memoryAllocator, D3D12ResourceService& resourceService) noexcept;
 	~D3D12TextureReadback() noexcept;
 
 private:
@@ -35,11 +36,15 @@ private:
 
 	D3D12Rhi& m_rhi;
 	D3D12GpuMemoryAllocator& m_memoryAllocator;
+	D3D12ResourceService& m_resourceService;
 	std::uint64_t m_nextTicket = 1;
 };
 
 struct D3D12TextureReadback::PendingReadback final
 {
+	~PendingReadback() noexcept;
+
+	D3D12ResourceService* ResourceService = nullptr;
 	RhiCaptureTicket Ticket;
 	RhiTextureCaptureRequest Request;
 	RhiSubmissionToken Submission;

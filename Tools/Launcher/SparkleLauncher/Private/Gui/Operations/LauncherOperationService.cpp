@@ -1,6 +1,5 @@
 #include "Gui/Operations/LauncherOperationService.h"
 #include "Operations/LauncherOperationExecution.h"
-#include "GpuCrash/GpuCrashLaunch.h"
 #include <TaskScheduler_c.h>
 #include "Core/Public/Diagnostics/Verify.h"
 #include "Core/Public/Diagnostics/Logger.h"
@@ -32,8 +31,6 @@ namespace SparkleLauncher
 			OperationRecord Record;
 			OutputCallback Output;
 			CompletionCallback Completion;
-			std::optional<GpuCrashIncident> Incident;
-			std::function<void(std::string)> Observation;
 			std::stop_source Stop;
 			enkiPinnedTask* Work = nullptr;
 			enkiCompletionAction* Cleanup = nullptr;
@@ -114,20 +111,11 @@ namespace SparkleLauncher
 				{
 					return;
 				}
-				if (run.Incident)
-				{
-					run.Observation(ReadGpuCrashCollectionState(*run.Incident));
-					return;
-				}
 				const auto operationId = run.Request.OperationId.toStdString();
 				run.Record = ExecuteLauncherOperation(operationId, run.Request.Inputs, run.Stop.get_token(), run.Output);
 			}
 			catch (const std::exception& error)
 			{
-				if (run.Incident)
-				{
-					return;
-				}
 				try
 				{
 					SetOperationFailure(run.Record, OperationProblemKind::Internal, error.what(), "Resolve the reported error, then retry.");
@@ -139,10 +127,6 @@ namespace SparkleLauncher
 			}
 			catch (...)
 			{
-				if (run.Incident)
-				{
-					return;
-				}
 				try
 				{
 					SetOperationFailure(run.Record, OperationProblemKind::Internal, "Unhandled Launcher operation exception.", "Restart Sparkle Launcher before retrying.");
@@ -157,10 +141,6 @@ namespace SparkleLauncher
 		static void Complete(void* argument, std::uint32_t) noexcept
 		{
 			auto& run = *static_cast<Run*>(argument);
-			if (run.Incident)
-			{
-				return;
-			}
 			try
 			{
 				if (run.Record.Status == OperationStatus::Pending)
@@ -285,23 +265,4 @@ namespace SparkleLauncher
 		return true;
 	}
 
-	bool LauncherOperationService::ObserveGpuCrash(GpuCrashIncident incident, std::function<void(std::string)> completion)
-	{
-		auto& owner = *m_implementation;
-		auto run = std::make_unique<Implementation::Run>();
-		run->Owner = &owner;
-		run->Incident = std::move(incident);
-		run->Observation = std::move(completion);
-		std::unique_lock lock(owner.Mutex);
-		if (owner.bClosing || owner.Runs.size() == Implementation::MaximumRuns)
-		{
-			return false;
-		}
-		owner.Prepare(*run);
-		auto* work = run->Work;
-		owner.Runs.push_back(std::move(run));
-		lock.unlock();
-		enkiAddPinnedTask(owner.Scheduler, work);
-		return true;
-	}
 }

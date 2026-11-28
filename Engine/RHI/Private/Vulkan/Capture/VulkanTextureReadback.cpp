@@ -45,6 +45,11 @@ static void RecordTransition(VkCommandBuffer commandBuffer, VkImage image, Resou
 
 VulkanTextureReadback::PendingReadback::~PendingReadback() noexcept
 {
+	if (Buffer != nullptr)
+	{
+		MemoryAllocator->QueueDestroyResource(std::move(Buffer));
+	}
+
 	if (Device == VK_NULL_HANDLE)
 	{
 		return;
@@ -75,6 +80,7 @@ std::unique_ptr<VulkanTextureReadback::PendingReadback> VulkanTextureReadback::P
 	}
 
 	auto pending = std::make_unique<PendingReadback>();
+	pending->MemoryAllocator = &m_memoryAllocator;
 	pending->Ticket = RhiCaptureTicket{m_nextTicket++};
 	pending->Request = request;
 	pending->RowPitch = request.Width * PixelFormatBytesPerTexel(request.SourceFormat);

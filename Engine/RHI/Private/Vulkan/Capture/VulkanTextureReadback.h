@@ -46,6 +46,7 @@ struct VulkanTextureReadback::PendingReadback final
 	PendingReadback(PendingReadback&&) = delete;
 	PendingReadback& operator=(PendingReadback&&) = delete;
 
+	VulkanGpuMemoryAllocator* MemoryAllocator = nullptr;
 	VkDevice Device = VK_NULL_HANDLE;
 	RhiCaptureTicket Ticket;
 	RhiTextureCaptureRequest Request;

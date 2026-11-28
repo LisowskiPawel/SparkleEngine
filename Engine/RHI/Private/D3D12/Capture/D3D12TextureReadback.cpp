@@ -6,16 +6,26 @@
 #include "D3D12/D3D12TypeConversions.h"
 #include "D3D12/Device/D3D12Rhi.h"
 #include "D3D12/Memory/D3D12GpuMemoryAllocator.h"
+#include "D3D12/Resources/D3D12ResourceService.h"
 
 #include <cstring>
 
-D3D12TextureReadback::D3D12TextureReadback(D3D12Rhi& rhi, D3D12GpuMemoryAllocator& memoryAllocator) noexcept :
+D3D12TextureReadback::D3D12TextureReadback(D3D12Rhi& rhi, D3D12GpuMemoryAllocator& memoryAllocator, D3D12ResourceService& resourceService) noexcept :
     m_rhi(rhi),
-    m_memoryAllocator(memoryAllocator)
+    m_memoryAllocator(memoryAllocator),
+    m_resourceService(resourceService)
 {
 }
 
 D3D12TextureReadback::~D3D12TextureReadback() noexcept = default;
+
+D3D12TextureReadback::PendingReadback::~PendingReadback() noexcept
+{
+	if (Buffer != nullptr)
+	{
+		ResourceService->ReleaseOwnedResource(MakeD3D12OwnedResourceHandle(std::move(Buffer)));
+	}
+}
 
 static void RecordTransition(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, ResourceState before, ResourceState after) noexcept
 {
@@ -54,6 +64,7 @@ std::unique_ptr<D3D12TextureReadback::PendingReadback> D3D12TextureReadback::Pre
 	}
 
 	auto pending = std::make_unique<PendingReadback>();
+	pending->ResourceService = &m_resourceService;
 	pending->Ticket = RhiCaptureTicket{m_nextTicket++};
 	pending->Request = request;
 	UINT rowCount = 0;

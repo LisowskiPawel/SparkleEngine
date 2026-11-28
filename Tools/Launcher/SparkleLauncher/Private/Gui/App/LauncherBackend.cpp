@@ -44,21 +44,6 @@ namespace SparkleLauncher
 		    [this, runId](OperationRecord record) { QueueOperationFinished(runId, std::move(record)); });
 	}
 
-	bool LauncherBackend::ObserveGpuCrash(GpuCrashIncident incident, std::function<void(const QString&)> completion)
-	{
-		return m_operationService->ObserveGpuCrash(
-		    std::move(incident),
-		    [this, completion = std::move(completion)](std::string state)
-		    {
-			    const auto stateText = QString::fromStdString(state);
-			    auto notifyCompletion = [completion, stateText]()
-			    {
-				    completion(stateText);
-			    };
-			    QMetaObject::invokeMethod(this, std::move(notifyCompletion), Qt::QueuedConnection);
-		    });
-	}
-
 	bool LauncherBackend::CancelOperation(const QString& runId)
 	{
 		return !runId.isEmpty() && m_operationService->Cancel(runId.toStdString());

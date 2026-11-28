@@ -2,7 +2,6 @@
 #include "Core/Public/Hash/FileHash.h"
 
 #include "SparkleLauncher/LevelRunOperations.h"
-#include "SparkleLauncher/GpuCrashIncident.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Hash/HashUtils.h"
 #include "Core/Public/Identifiers/Uuid.h"
@@ -58,7 +57,7 @@ namespace SparkleLauncher
 		return true;
 	}
 
-	std::filesystem::path ReadGpuCrashAnnouncement(std::string_view output)
+	static std::filesystem::path ReadGpuCrashAnnouncement(std::string_view output)
 	{
 		return ReadProcessOutputPath(output, "SPARKLE_GPU_CRASH_INCIDENT ");
 	}
@@ -227,48 +226,6 @@ namespace SparkleLauncher
 		catch (const std::exception&)
 		{
 			return {};
-		}
-	}
-
-	std::string ReadGpuCrashState(const std::filesystem::path& manifestPath, std::string_view sessionId, std::uint32_t childPid)
-	{
-		const auto document = ReadGpuCrashSnapshot(manifestPath, sessionId, childPid);
-		return document.is_null() ? std::string{} : document.at("state").get<std::string>();
-	}
-
-	std::string ReadGpuCrashCollectionState(const GpuCrashIncident& incident)
-	{
-		try
-		{
-			auto state = ReadGpuCrashState(incident.ManifestPath, incident.SessionId, incident.ChildPid);
-			if (state.empty())
-			{
-				return "Unavailable or stale manifest";
-			}
-			if (state == "Ready" || state == "Preparing" || state == "Collecting")
-			{
-				const HANDLE child = OpenProcess(SYNCHRONIZE, FALSE, incident.ChildPid);
-				if (child == nullptr)
-				{
-					return "Incomplete or process unavailable; last state " + state;
-				}
-
-				const DWORD observation = WaitForSingleObject(child, 0);
-				CloseHandle(child);
-				if (observation == WAIT_OBJECT_0)
-				{
-					return "Incomplete; child exited after " + state;
-				}
-				if (observation != WAIT_TIMEOUT)
-				{
-					return "Process observation unavailable; last state " + state;
-				}
-			}
-			return state;
-		}
-		catch (...)
-		{
-			return "Incident observation unavailable";
 		}
 	}
 

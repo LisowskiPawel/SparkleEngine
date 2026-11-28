@@ -1,7 +1,6 @@
 #include "SparkleLauncher/LevelRunOperations.h"
 
 #include "Operations/LauncherOperationProgress.h"
-#include "GpuCrash/GpuCrashLaunch.h"
 
 #include <optional>
 
@@ -31,14 +30,6 @@ namespace SparkleLauncher
 		operation.LogPath = request.LogPath;
 
 		const Process::ChildProcessResult result = RunLauncherProcess(request);
-		if (plan.Request.GpuCrashMode == RhiGpuCrashMode::Aftermath)
-		{
-			const auto path = ReadGpuCrashAnnouncement(result.CapturedOutput);
-			if (!ReadGpuCrashState(path, plan.SessionId, result.ProcessId).empty())
-			{
-				operation.GpuCrash = GpuCrashIncident{path, plan.SessionId, result.ProcessId};
-			}
-		}
 		if (!result.bReady || !result.Succeeded())
 		{
 			if (result.bCancelled)
