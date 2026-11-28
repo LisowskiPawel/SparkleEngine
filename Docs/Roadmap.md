@@ -1,47 +1,32 @@
 # Roadmap
 
-[Scope decisions](Implementation/PortfolioScopeDecisions.md) | [Goals](Goals.md) | [Module implementation plans](Implementation/PortfolioReduction/README.md)
+[Goals](Goals.md) | [Engineering](Engineering.md) | [Implementation plans](Implementation/PortfolioReduction/README.md)
+
+This roadmap sets outcome priorities and product limits. The implementation plans own module order, active blockers, qualification protocols and results; planned scope is not evidence of completion.
 
 ## Current priority
 
-The delivery journey is prebuilt bundle -> Launcher Quick Start -> supplied map -> Editor or Game -> supported controls/effects and source inspection. You are the only developer and use the source-workspace Launcher for iteration. Preserve those developer tools without making them prerequisites for the reviewer. The [workflow acceptance table](Implementation/PortfolioScopeDecisions.md#acceptance-by-workflow) separates the two responsibilities.
+Finish a smaller, understandable engine whose retained behavior works end to end. Reduce support-system complexity while preserving owned rendering, concurrency, native diagnostics and the selected portfolio capabilities.
 
-The selected scope uses the real-time path tracer as the only lighting path. Remove the Reference renderer and its dedicated infrastructure through the [cross-module removal decision](Implementation/PortfolioScopeDecisions.md#reference-path-tracer-removal-across-modules). This is a planned removal, not a claim that source retirement is complete.
-
-Recover the real-time Sponza image using one fixed camera and identified source, content and settings. Inspect raw signals before and after display processing; use bounded analytic checks and suitable external comparisons to find the first incorrect stage. Retire Reference-only defects and convergence/export work; preserve repairs required by the retained real-time frame.
-
-Reuse earlier design decisions and shader-identity results when their inputs still match. Current real-time radiance and the replacement release package still need validation.
-
-For GPU-crash diagnostics, preserve breadcrumbs/semantic markers, DRED, supported Vulkan checkpoints, Aftermath callbacks, matched shader/symbol data and bounded native collection/dump completion. Retain debugger/tool launch and Editor crash-mode startup. Remove only the extra Launcher incident workflow identified in the [explicit preservation/removal table](Implementation/PortfolioScopeDecisions.md#gpu-crash-diagnostics-preservation-and-removal). Show exact files/functions before implementation cuts and verify usable native crash output afterward. Existing evidence applies only at its tested identities; source inspection and a successful launch do not qualify breadcrumb or crash-dump correctness.
+The delivery path is prepared bundle -> Launcher -> supplied scene -> Editor or Game -> rendering controls and matching source. Keep the maintainer's preparation workflow separate from reviewer prerequisites.
 
 ## Before the first release
 
-Showcase is the only supported user project for all cleanup decisions. Retire general multi-project selection/discovery while preserving internal Engine/shared-shader boundaries, standalone Launcher, selected scenes and bounded parallel preparation. Knight and CesiumMan animation must survive any curve/clip narrowing; retain required support if equivalence is not proven. The [scope decisions](Implementation/PortfolioScopeDecisions.md) define the exact conditional cuts.
+1. **Focus the engine.** Complete approved removals and reshape surviving systems around the reduced scope, preserving thread, data and resource-lifetime boundaries.
+2. **Establish correct rendering.** Verify the real-time lighting path, scene/material meaning, animation, temporal behavior and image quality on both APIs.
+3. **Make inspection useful.** Provide intentional scene defaults, runtime controls, native debugging and clear source/architecture entry points.
+4. **Meet product limits.** Measure frame time, startup, cancellation, memory and stability under declared conditions.
+5. **Qualify delivery.** Verify the actual complete bundle offline on a clean system, separately from maintainer build/cook reproduction. Resolve rights, notices, signing and download identity before public release.
 
-Preserve a separate game thread and a separate render thread with explicit handoff, bounded frame lead and safe CPU/GPU resource lifetime. GameFramework cleanup removes cross-pool per-asset loading, whole-world transaction staging and shared cross-scene resource stores; it does not remove engine multithreading. Use one load coordinator with bounded parallel I/O/decode jobs, data-oriented level-owned reusable resources and one prepared scene per level. Retain parallel world/animation/extraction work, renderer preparation/command recording and RHI per-worker context ownership. Removing multithreading or serializing independent work is prohibited as a cleanup strategy. Editor/UI affinity, immutable observations and game-thread edit ownership remain explicit; multiple GPU queues and fence-governed retirement remain protected. Scene replacement can fail into an explicit empty/loading state instead of restoring the previous world. Simplify the level parser/writer while retaining selected save fields; move Ozz offline construction to cooking. The module decisions own these planned changes.
-
-Build and delivery target shared/DLL engine modules with private PCHs and a proven **clang-cl + Ninja Multi-Config + Rider CMake** maintainer workflow. Prefer lld-link after native DLL/PDB qualification. Retire cl.exe selection, Visual Studio IDE integration and the Visual Studio/MSBuild generator after proving the replacement; retain required Windows SDK/STL/CRT/Qt inputs and environment discovery. Generator migration and build-job tuning remain unimplemented acceptance work. Ship a complete offline inspection bundle for Launcher, Editor and Game; reviewers do not acquire sources or build/cook. Keep those tools for your iteration, not as reviewer prerequisites. See the [build/package boundary](Implementation/PortfolioScopeDecisions.md#cmake-packaging-and-repository-automation).
-
-The selected cleanup retains both native backends, multiple GPU queues, shader-target enumeration and basic skeletal animation for Knight; morph targets/weights and PTLAS are retired from the target scope. Keep required Knight FBX/base-scene dependencies and validate moving/skinned geometry in the real-time path tracer. The [module decisions](Implementation/PortfolioScopeDecisions.md) own the exact retained boundaries.
-
-1. **Finish rendering.** Validate the sole real-time lighting path, frame/scene lifetime, geometry and materials, raw lighting, temporal behavior, exposure/reconstruction, display effects and the complete frame.
-2. **Check the scenes.** Fix starting cameras/settings, inspect content/materials, compare with suitable controls and resolve image defects, including motion. Exercise reviewer map selection, Editor/Game launch, approved options/effects/debug views and return to supplied state without a build/cook step.
-3. **Measure the frame.** Meet the 30 FPS requirement, memory limits and stability checks on the supported system. Test D3D12 and Vulkan separately.
-4. **Test the package.** Freeze the repaired package and reproduce the reviewer prebuilt workflow: standard-user clean-machine/offline launch, all three products, selected scenes, symbols where promised, failures and recovery. Check your maintainer build/cook workflow separately; reviewer source builds are not a release gate. ShaderMake code/build/CLI checks do not qualify development Editor reload/cancel/close, D3D12/Vulkan pipelines or native shader-source correlation; verify retained developer functionality, compiler/SDK delivery for your workflow and the frozen compiler cost cells against the [bound qualification record](../build/validation/shadermake/stage-2/20261122-next/qualification.json) and [remaining constraints](../build/validation/shadermake/closeout-20261122/qualification-handoff.md). Do not require compiler/SDK setup merely to run the inspection bundle.
-5. **Publish.** Complete rights/notices/provenance, Windows signing/timestamping, review of signed files and verification after download. Check the final package's custom SPDX license text, [matching Qt source companions and library replacement](../CMake/Notices/Qt/README.md), and each SDK's redistribution terms.
-6. **Close the release.** Resolve blockers, finish your maintainer checks and rehearse the reviewer walkthrough. Include matching source links, application entry points and a concise architecture/data-flow guide; no other developer's installation or source build is required before starting the next program.
-
-Scene exports and unsigned archives may support feature testing before publication approval; qualify the final package's actual files separately. The earlier package has a scene-publication interruption defect; package removal was outside its tested scope. Repairs need a newly tested archive; image, performance, native-API, reproduction and publication gates remain open. Later RELAX and renderer extensions are not release prerequisites.
+Keep unmet image, performance, native-API, diagnostics and package gates open until observed on the affected final identities. Earlier source/build or focused feature results do not establish release readiness. Later research and optional renderer extensions are not first-release prerequisites.
 
 ## Release requirements
 
 ### Hardware
 
-The first benchmark system is the Ryzen 9 8940HX / GeForce RTX 5070 Ti Laptop machine with about 64 GiB RAM, 12 GiB GPU memory and NVMe storage. Record its actual OS, driver and build with every result.
-
 General prerequisites are Windows 11 x64 24H2 or newer, four physical cores/eight threads with SSE4.1, 16 GiB RAM and 8 GiB GPU memory. These floors do not establish support for a lower-end machine.
 
-D3D12 requires feature level 12_1, Shader Model 6.6 and DXR 1.1. Vulkan requires 1.3 and the full rendering/RT, layout, descriptor, address and synchronization feature set used by the frame. The [device selector](../Engine/RHI/Private/Vulkan/Device/VulkanDeviceBootstrap.cpp) owns detailed admission checks; version support alone does not qualify the full frame. Report missing requirements before attempting the unsupported path.
+D3D12 requires feature level 12_1, Shader Model 6.6 and DXR 1.1. Vulkan requires 1.3 and the full rendering/RT, layout, descriptor, address and synchronization feature set used by the frame. Version support alone does not qualify the full rendering feature set. Report missing requirements before attempting the unsupported path.
 
 ### Time, memory and storage
 
@@ -55,51 +40,32 @@ D3D12 requires feature level 12_1, Shader Model 6.6 and DXR 1.1. Vulkan requires
 | Source preparation | Cold sync/configure/build/cook 120 minutes; warm no-change replay 15 minutes; peak system memory 32 GiB and working storage 100 GiB |
 | Local Launcher readiness refresh | 5 seconds, with download/process time reported separately |
 
-The total bundle and selected scene content size still need an agreed accounting method, using the current scene decisions rather than the former seven-scene assumption. The Game limits alone do not establish a limit for that combined package. Reference accumulation/convergence requirements are retired; the retained lighting renderer is subject to the real-time frame requirement.
+The Game size limits do not establish a combined-bundle limit. Measure and report the complete bundle separately.
 
 ### Frame-rate test
 
-Use ShippingGame at 1920x1080 with the declared native real-time Lit or DLSS Quality/Ray Reconstruction configuration, SDR output and the retired lens effects absent. Disable VSync and validation for measurement. After settling, warm up for at least 300 frames, then measure at least 300 valid frames. Repeat three times per scene and backend.
-
-Presented, CPU and GPU 95th-percentile frame times must each be at most 33.33 ms. Report tails, exclusions, load time, memory and thermal behavior. Generated frames, dynamic quality, silent fallback or changing quality after measurement cannot satisfy the target.
+Target at least 30 FPS at 1920x1080 under declared quality settings: presented, CPU and GPU 95th-percentile frame times must each be at most 33.33 ms. Qualify both APIs without reducing promised quality or counting generated frames. The execution plan owns the fixed measurement protocol and environment.
 
 ### Starting settings
 
-Target D3D12, real-time Lit, VSync On, automatic histogram exposure, ACES approximation, SDR and neutral grading. HDR display, vignette and chromatic aberration are selected for removal, not optional starting modes; existing source/settings still need implementation cleanup. VSync off is a benchmark setting, not a change to the default. Retain both GBuffer algorithms and existing subsurface shading within that frame.
+Ship intentional, documented defaults and a reliable return to the supplied state. Keep normal presentation settings distinct from controlled benchmark settings.
 
 ## After release
 
-Use the retained Bistro/Sponza and selected diagnostic/animation scenes with reproducible content, cameras and suitable comparison results. Continue with two related bodies of work:
+Develop two connected bodies of evidence: classical CPU/GPU/resource-lifetime studies with a difficult debugging case, then owned neural graphics with checked data, models, operators and held-out evaluation. Model production follows the classical-study results; final reproduction should explain both bodies of work.
 
-- **Classical graphics:** CPU preparation, GPU shader and resource-lifetime studies, useful offline analysis and one difficult incident.
-- **Owned neural graphics:** independently checked external or analytic diffuse-indirect labels, separate datasets, one fixed model, checked GPU kernels and held-out quality, cost, failure and package results.
+Strengthen lighting/sampling and materials before extending reconstruction and caches. Qualify the retained DLSS path, then selected NRD/RELAX and AMD FSR work; XeSS remains a deferred comparison. Broader volumetrics, SHaRC, NRC and neural texture compression follow their required inputs. Finish SHaRC, including delivery and reproduction, before NRC production; neural texture compression requires the classical results and need not wait for NRC.
 
-Model production starts after the classical-study technical results are ready. Final documented reproduction happens later, when both bodies of work can be included in the portfolio.
-
-The renderer work follows this order:
-
-1. Select one production sampling owner per stage within the real-time path tracer, including the bounded RTXDI replacement investigation; finish selected direct/indirect light/path improvements and base, anisotropic and coated materials. No independent Reference renderer or second lighting path is retained. Focused research must fit the selected real-time path or wait until after cleanup.
-2. Qualify the existing DLSS path, integrate one NRD/RELAX path and the selected AMD FSR upscaler, then check affected guides, temporal behavior, native APIs and delivery. XeSS remains a deferred comparison; the owned model is independent of this step.
-3. Bounded volumetrics, SHaRC, NRC and neural texture compression as their inputs become ready. **Finish SHaRC, including package and reproduction results, before NRC production.** Neural texture compression requires the classical-study results and does not wait for NRC.
-
-PTLAS is removed from the selected scope; do not preserve it as an unresolved hardware gate. Test retained features individually before the selected combined configuration.
-
-Use the [case framework](Goals.md#the-three-cases) to explain completed technical results and guide later work, subject to the open DO-01/DO-02 scope decisions. You reproduce development experiments; reviewers can explore the prepared runtime and inspect the matching code/evidence. Independent source builds, external adoption and second-context use are optional evidence, not prerequisites for the inspection workflow.
+Use the [case framework](Goals.md#the-three-cases) to explain useful results and guide later development. Additional research, external adoption and another developer's source build are optional evidence, not prerequisites for inspecting the portfolio.
 
 ## Supporting-system simplification
 
-Launcher scene-view qualification retains physical fractional/mixed-DPI, assistive-technology and broader GUI/GPU/profile/capture/package checks as **UNVERIFIED** in the [bound delivery record](../build/validation/launcher-item-views/candidate-20261122/REPORT.md). Its required temporary cleanup, recorded with that evidence, remains open after automatic approval review rejected deletion; this adds no release prerequisite.
+Reduce maintained support code before adding optional capabilities. Retain a supporting system only for a real rendering, iteration, diagnostic or reproduction need. Prefer complete removals and direct library mechanisms over replacement frameworks; account for replacement and moved code in net savings.
 
-Reduce maintained native support code before adding optional rendering SDK capabilities. Task-runtime replacement and SDL3 window/input code delivery are complete; this does not close broader product qualification, and no SDL3 net line saving is claimed. Compiler preprocessing reuse remains conditional under CP-04. Other replacements require a demonstrated net win. The [module scope decisions](Implementation/PortfolioScopeDecisions.md#where-the-code-footprint-actually-is) now own named cuts, retained boundaries and conditional replacements; [Engineering](Engineering.md#module-boundaries) owns integration/lifetime rules. These simplifications add no new first-release prerequisites.
-
-Task-runtime code delivery closes with actual owner/capacity/lifetime checks and retirement of the local runtime. The [final record](../build/validation/task-runtime/close-20261122/REPORT.md) and [frozen comparison limits](../build/validation/task-runtime/close-20261122/QUALIFICATION-LIMITS.md) retain unrun timing, frame distributions, memory, cancellation latency, full build/package growth and relocated/clean-machine delivery. New ShaderMake/Slang debug exports need GPU-diagnostics qualification at their actual source/tool/SDK identity; rejecting old receipts remains required. Static/shared and focused D3D12/Vulkan owner checks do not certify broader release behavior. Cost targets missed for added code, API, state and cleanup; the net retirement result is separate. These are existing product/integration qualification responsibilities, without a replacement implementation plan or a new first-release prerequisite.
-
-Window/input product qualification retains the [frozen comparison limits](../build/validation/window-input/stage-1-20261122/PROTOCOL.md) and [bound observations](../build/validation/window-input/delivery-20261122/REPORT.md). Focused 100% single-monitor, input, native chrome, both API capture/GPU replay and delivery results do not certify 150/200% or mixed-DPI displays, physical slow/fast/edge-crossing response, layout/IME/clipboard, full profile/image/startup/frame/memory distributions, or relocated package/clean-machine delivery; these remain UNVERIFIED. Preserve the failed Vulkan device-loss run with a preceding RenderDoc replay active and the replay-GUI loading/cleanup issue separately from passing isolated captures and CLI replays. Broader product/tool qualification stays here and in the report, without a replacement implementation plan.
-
-Keep product blockers open through final qualification: raster/ray material parity for UV transforms, address modes and occlusion strength; the unresolved Vulkan swapchain allocation failure; and full image/package/reproduction checks on both APIs. Isolated cooker or sampling results do not close those gates. See the retained [texture-cooking boundary](Implementation/PortfolioScopeDecisions.md#texturecooker).
+The [accepted scope](Implementation/PortfolioScopeDecisions.md) owns exact selections and conditional cuts. Module plans own execution and outstanding qualification; this roadmap does not duplicate their stage lists or delivery histories.
 
 ## Choosing the next task
 
-Prefer an unmet dependency, a useful rendering improvement or a focused simplification. Reuse earlier results when their inputs still match.
+Prefer an unmet dependency, a useful rendering improvement or a simplification that closes an evidence gap. Choose a bounded outcome and meaningful acceptance before implementation; reuse earlier observations only while their relevant inputs remain valid.
 
-Use the [performance method](Engineering.md#performance-and-images) for measurements and the [capability goals](Goals.md#technical-development) to choose evidence worth keeping. Analyze existing exports before adding diagnostics infrastructure.
+Use the [performance method](Engineering.md#performance-and-images) and [capability goals](Goals.md#technical-development) to choose evidence worth keeping. Analyze available results before adding more diagnostics infrastructure.

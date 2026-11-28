@@ -8,7 +8,7 @@ Become a graphics systems engineer who can take a rendering or GPU-compute probl
 
 The focus is real-time rendering and developer technology: explicit graphics APIs, shaders, CPU/GPU architecture, concurrency, debugging and neural graphics. SparkleEngine provides a place to develop that depth and demonstrate it through a small number of complete examples.
 
-The long-term target is principal-level responsibility: choose consequential problems, set technical direction, carry uncertain work into production and help other engineers succeed. Build on the existing rendering and technical-art background. Use the [dated professional baseline](References.md#professional-baseline) when reviewing progress.
+The long-term target is principal-level responsibility: choose consequential problems, set technical direction, carry uncertain work into production and help other engineers succeed. Build on the existing rendering and technical-art background. Use the [dated professional baseline](Studies/CareerAndPortfolio.md#professional-baseline) when reviewing progress.
 
 The [role sources](References.md#role-sources) explain this choice. Compiler engineering, driver development, research science and graphics tools have distinct requirements; develop relevant depth without adding an engine subsystem for every role term.
 
@@ -23,37 +23,17 @@ The [role sources](References.md#role-sources) explain this choice. Compiler eng
 
 ## Product scope
 
-Showcase is the only supported user project for all cleanup decisions. Retire general multi-project selection/discovery while preserving internal Engine/shared-shader boundaries, standalone Launcher, selected scenes and bounded parallel preparation. Knight and CesiumMan animation must survive any curve/clip narrowing; retain required support if equivalence is not proven. The [scope decisions](Implementation/PortfolioScopeDecisions.md) define the exact conditional cuts.
+Sparkle is a personally owned rendering portfolio, maintained by one developer. Keep a reduced suite with distinct Launcher, Editor and Game, one Showcase project and a deliberately selected scene set. Exact capability and content decisions live in the [scope record](Implementation/PortfolioScopeDecisions.md).
 
-Preserve a separate game thread and a separate render thread with explicit handoff, bounded frame lead and safe CPU/GPU resource lifetime. GameFramework cleanup removes cross-pool per-asset loading, whole-world transaction staging and shared cross-scene resource stores; it does not remove engine multithreading. Use one load coordinator with bounded parallel I/O/decode jobs, data-oriented level-owned reusable resources and one prepared scene per level. Retain parallel world/animation/extraction work, renderer preparation/command recording and RHI per-worker context ownership. Removing multithreading or serializing independent work is prohibited as a cleanup strategy. Editor/UI affinity, immutable observations and game-thread edit ownership remain explicit; multiple GPU queues and fence-governed retirement remain protected. Scene replacement can fail into an explicit empty/loading state instead of restoring the previous world. Simplify the level parser/writer while retaining selected save fields; move Ozz offline construction to cooking. The module decisions own these planned changes.
+Reviewers choose a supplied map in Launcher, explore Editor/Game and rendering controls, then inspect matching source. They receive a complete offline bundle and a concise architecture walkthrough; they do not build, cook or install a development environment. The maintainer retains efficient preparation, iteration and debugging workflows.
 
-Real-time path tracing is the only lighting path supported by Sparkle. Remove the independent Reference path tracer, its render mode, accumulation/convergence state, checkpoints/resume, dedicated exports and UI, shaders, resources and release requirements. Validate the retained renderer through bounded analytic checks, native signals/captures and suitable external comparisons; do not maintain a second Sparkle renderer for validation.
+Real-time path tracing is the only supported lighting path. Retain ownership of the renderer, frame graph, graphics API integration and resource lifetime on D3D12 and Vulkan. Preserve basic skeletal motion, selected material/rendering capabilities and useful native GPU diagnostics, including breadcrumbs and usable crash data.
 
-Launcher is the reviewer's Quick Start entry point: choose a supplied map and open Editor or Game. Editor exposes the selected scene inspection/editing, rendering options/effects and debug views; Game presents the scene with camera input. Those runtime controls use prepared shaders/content. All three target Windows, with separate D3D12 and Vulkan validation.
+Preserve separate game and render ownership, data-oriented storage, useful parallel work, multiple GPU queues and safe immutable handoffs. Smaller support systems must strengthen this architecture and remain understandable enough to modify manually.
 
-Retain basic skeletal clip playback/skinning for the Knight scene and simple movement examples; remove morph targets and morph weights. General animation authoring is outside this cleanup. Keep both native backends, multiple GPU queues and shader-target enumeration, with explicit cross-queue synchronization and lifetime ownership.
+The first release targets Windows with English keyboard/mouse input on one windowed or borderless display. Support 100%, 150% and 200% DPI; display resolution is independent of benchmark resolution. Controllers, exclusive fullscreen and VR are outside the release. Packaged use is offline, without accounts, telemetry, automatic downloads or crash uploads; acquisition is explicit.
 
-Keep the owned frame graph, rasterized and ray-traced GBuffer alternatives, and existing subsurface shading within the single real-time lighting path. Retain ReSTIR indirect lighting, TLAS refit, DLSS Super Resolution/Ray Reconstruction, exposure controls and useful signal views. Remove HDR display modes, vignette and chromatic aberration; HDR/EXR content inputs remain a separate capability. Optional automatic mesh batching is selected for removal subject to its recorded workload/cost check; authored instance groups remain.
-
-Launcher can start configured GPU debugging tools and launch Editor in GPU-crash debugging mode. Breadcrumbs and semantic GPU markers are required: preserve D3D12 DRED, supported Vulkan checkpoints, Aftermath integration, matched debug data, native fault collection and safe dump completion. Remove extra Launcher incident monitoring/presentation and managed analysis/recovery workflows. Native diagnostic collection after a fault remains essential; external tools perform investigation.
-
-The release target is a complete prebuilt Launcher/Editor/Game inspection bundle with approved cooked content, engine DLLs and required runtime dependencies. Reviewers extract and run it without an IDE, compiler, source acquisition or cooking. It is a portfolio demonstration, not a developer SDK. Public package validation and redistribution rights remain open.
-
-You are the sole maintainer/developer and Rider is the only supported IDE. Use clang-cl as the only native C/C++ compiler; the recommended single generator is Ninja Multi-Config through Rider direct CMake. Preserve required Windows SDK, Microsoft-compatible STL/CRT and Qt inputs while retiring the cl.exe frontend and Visual Studio/MSBuild generator choices after migration qualification. Keep shared/DLL engine modules, private per-module PCHs and efficient incremental builds. Your source-workspace Launcher retains preparation, dependency/content sync, build, cook, clean and debugging controls. Reviewers are not expected to iterate code, shaders or content. Remove Visual Studio IDE integration; qualify the selected CMake route before retiring its old project/build machinery. The [module decisions](Implementation/PortfolioScopeDecisions.md#who-the-engine-serves) own the audience and capability boundaries.
-
-The public walkthrough covers launch, map selection, Editor/Game controls, supported rendering effects, known limits and return to supplied defaults. Matching source provides a concise architecture/data-flow map and clear entry points for inspecting your design. No developer installation, contributor onboarding or public engine SDK is required to review it. Missing development tools must not block a prepared scene's runtime readiness.
-
-The first release uses English keyboard/mouse input on one windowed or borderless display. Check UI at 100%, 150% and 200% DPI. The user's display resolution is independent of the benchmark resolution. Controllers, exclusive fullscreen and VR are outside this release.
-
-Packaged use must work offline after extraction, without accounts, telemetry, unattended downloads or crash uploads. Source and content acquisition are explicit. No ongoing support service or response deadline is promised.
-
-The [level catalog](../Projects/Showcase/Levels.catalog) identifies intended release scenes and previews. Catalog flags establish neither qualification nor asset rights; see [distribution requirements](Engineering.md#build-and-delivery).
-
-The selected scene set is Empty, CornellBox, classic Sponza, BistroExterior, BistroInteriorWine, ModernSponzaKnight, CesiumMan, LPSHead, DamagedHelmet and ABeautifulGame. The other scene entries are retired; Modern Sponza keeps only the Knight variant: prepare one cooked scene from its required base/Curtains/Knight sources; retire Candles and general runtime multi-asset level composition. Stanford Bunny/Dragon are retired because their current route requires PLY; readmission requires a reproducible supported non-PLY route. PLY import is selected for removal; Assimp remains required by the retained Bistro/Knight FBX pipeline. The [scene decisions](Implementation/PortfolioScopeDecisions.md#showcase-scenes-and-conversion-scripts) own that boundary.
-
-Keep ownership of the RHI, frame graph, graphics API/resource lifetime and real-time path tracer. Simplify support code and delegate selected production algorithms through the [integration scope decisions](Implementation/PortfolioScopeDecisions.md#third-party-integration-maintenance), focusing personal research on the three cases and crediting upstream work. [Roadmap](Roadmap.md#supporting-system-simplification) sets priorities.
-
-Keep supporting systems as small as the rendering and reproduction workflows allow. General gameplay, physics, networking, audio, scripting, plugin SDKs, installers/updaters, Linux, extra hardware campaigns, geometry caches, frame generation, GPU-driven geometry, atmosphere/clouds/imported volumes, broad authoring or diagnostics tools and general ML runtimes are outside the selected work.
+No general gameplay platform, contributor SDK, installer/updater or support service is required. Optional research and additional experiment repositories follow a focused, usable engine. [Roadmap](Roadmap.md) owns outcome order and product limits; [Engineering](Engineering.md) owns design and delivery principles.
 
 ## Technical development
 
@@ -103,13 +83,11 @@ The [product scope](#product-scope) selects retained engine features; [Roadmap](
 
 ### Professional qualifications
 
-The supplied principal role asks for a relevant master's degree or equivalent experience and **15 or more years of relevant work or research**. The research-productization role asks for **at least five full-time years of efficient HLSL SM6/GLSL/Slang and modern C++17 or newer**, with its own academic preferences. Other descriptions distinguish essentials from preferred experience; retain that distinction when assessing a role.
-
-Track degree subject/level, employment duration, shipped-product contribution, partner collaboration, review/mentoring impact, spoken English and willingness to travel through the CV, talks, recommendations and permitted professional examples. Some roles also ask for Linux, Windows/Linux driver development, HIP/CUDA/OpenCL or console/CPU/GPU ISA experience. Record those as role-specific requirements and evidence gaps without expanding the engine automatically. The repository complements this professional record.
+Assess role-specific essentials, preferred experience and equivalent qualifications against current source material and your professional record. Track shipped contributions, technical direction, collaboration, communication and mentoring alongside repository evidence. A job-description term does not automatically justify another engine subsystem; dated examples remain in the [career study](Studies/CareerAndPortfolio.md).
 
 ## The three cases
 
-Use these as a framework for explaining your work and longer-term growth. Reviewer Quick Start is the prepared engine and its code guide, not a request to run research, build shaders or prepare datasets. The separate narrative/future-scope decisions remain in the module checklist.
+Use these as a framework for explaining your work and longer-term growth. Reviewer Quick Start is the prepared engine and its code guide, not a request to run research, build shaders or prepare datasets. These are explanatory and longer-term development themes, not additional engine-release prerequisites.
 
 1. **Content to correct pixel.** Follow an asset and material through cooking, shading and checked raw output. Include selected material and bounded volumetric work, with a defined reference domain and uncertainty.
 2. **One measured frame, two APIs.** Combine CPU preparation, shader and resource-lifetime studies with a difficult incident and whole-frame results. Include relevant lighting, reconstruction, cache and acceleration-structure comparisons, plus a rejected or inconclusive alternative.
@@ -125,7 +103,7 @@ Open each case with the result, problem, constraints, personal contribution, bas
 | Reviewer running the portfolio | 30 minutes | Quick Start, map selection, Editor/Game controls, supported effects/options, expected results and troubleshooting; no development setup |
 | Reviewer inspecting the code | As needed | Matching source, application entry points, module ownership/data flow and explanations of important decisions; no requirement to build |
 
-Prepare a landing/Quick Start page, complete inspection bundle, concise architecture guide, matching source links and selected code/capture/result explanations. Your own build/cook commands remain documented separately. Additional case-narrative or future research prerequisites follow the still-open DO-01/DO-02 scope decisions; the runtime walkthrough itself does not require a reviewer to develop anything.
+Prepare a landing/Quick Start page, complete inspection bundle, concise architecture guide, matching source links and selected code/capture/result explanations. Your own build/cook commands remain documented separately. A reviewer can assess the prepared walkthrough and source without taking part in development or future research.
 
 ## Review and transfer
 
@@ -139,7 +117,7 @@ Label self-review, assisted reproduction and external adoption accurately. Exter
 
 ## Reviewing progress
 
-Compare past work, present evidence and the next investment against the capabilities above. Start from the [July 2026 CV snapshot](References.md#professional-baseline), then update the assessment from actual work and permitted professional records.
+Compare past work, present evidence and the next investment against the capabilities above. Start from the [July 2026 CV snapshot](Studies/CareerAndPortfolio.md#professional-baseline), then update the assessment from actual work and permitted professional records.
 
 | Review | Record |
 | --- | --- |

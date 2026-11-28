@@ -53,6 +53,14 @@ Use `nullptr`, scoped enums, explicit constructors, domain values and designated
 
 Use a short local lambda when clearer; name substantial validation, conversion or control flow. Prefer direct value bindings; keep cohesive initialization with its owner instead of adding factory/getter pairs or forwarding functions.
 
+### Function responsibility and orchestration
+
+Each function owns one cohesive responsibility or invariant, expressed by an intent-based name. Its operations belong at one useful level of abstraction. A workflow function shows the ordered domain steps and their explicit inputs/results; substantial I/O, decoding, algorithms, native calls and UI mechanics belong to cohesive operations with their actual owner. Do not mix workflow selection with the detailed implementation of each step in a large function.
+
+Extract by responsibility and shared lifetime, not by arbitrary line count. Keep small related work together; do not replace a large function with numbered fragments, forwarding-only helpers, one-method classes or generic context/service bags. Inspect callers and neighboring implementations to remove duplicate policy, derived state and representations with the refactor.
+
+Review every changed function manually for purpose, abstraction level, ownership, naming, data flow and failure behavior before running mechanical checks. Formatting success does not establish single responsibility or correct separation of orchestration and mechanisms.
+
 ### Enums
 
 Declare an explicit underlying type. Use `std::uint8_t` for bounded internal sets that fit. Wider storage needs a current flags, cooked, shader, native or serialized requirement; review callers/layouts and regenerate changed output. Do not rely on default `int` or hypothetical future values.
@@ -87,7 +95,7 @@ Future fields, naming symmetry and member-access appearance are insufficient. Re
 
 Types, functions, methods and enum values use `UpperCamelCase`; parameters/locals use `lowerCamelCase`; private members use `m_`. **All boolean variables, fields, constants and atomics use `bUpperCamelCase`**, preserving existing scope prefixes such as `m_bReady` and `s_bReady`. External serialized/native names remain exact.
 
-Use the surrounding context without repeating an operation's entire name. Acronyms use `Rhi/Gpu/Io`; macros serve build/export/preprocessor requirements. Write TLAS/PTLAS in prose/UI and `Tlas/Ptlas` in C++.
+Use the surrounding context without repeating an operation's entire name. Acronyms use `Rhi/Gpu/Io`; macros serve build/export/preprocessor requirements. Preserve standard technical acronyms in prose; apply the project casing convention in code.
 
 Avoid vague `Manager/Helper/Util/Data/Info`, unsupported `ThreadSafe/LockFree/Async` claims and replacement `New/*2/Legacy` names.
 
@@ -106,13 +114,9 @@ Avoid vague `Manager/Helper/Util/Data/Info`, unsupported `ThreadSafe/LockFree/As
 | Extract / Retire | Derive a representation / delay reuse until completion |
 | Find / Resolve | Search for an existing match / determine a canonical value; neither implies load/open/acquire |
 
-Distinguish persistent authoring GUIDs, source/reimport keys, runtime `EntityId`, separate `RenderObjectId`, contiguous indices and content hashes.
+Distinguish authored identity, source identity, runtime identity, contiguous storage indices and content hashes. Names must expose the difference.
 
-Keep `RenderFrame` for frame-slot scene/view data and `RenderFrameGraph*` for topology/resources. `PassCommandContext` is narrower than `RenderCommandContext`; native recording contexts stay backend-private. Name queues for their payload. Avoid general context/service/resource bags.
-
-Neutral APIs use `RenderPipeline`, `GraphicsPipelineDesc/ComputePipelineDesc`, `Create*Pipeline`, `SetPipeline`, `renderTarget(s)` and `depthStencil`; PSO/RTV/DSV stay native. Use `GpuMesh/GpuMeshCache` and `commandContext`, not `GPU*/cmd`. `WorkspaceRoot` includes extracted products; `RepositoryRoot` refers to source/provenance.
-
-Keep physical units and CPU/shader names explicit: illuminance/intensity/luminance, radians, `DeltaTimeSeconds`, `FovY/NearZ/FarZ`, `WorldMatrix/PreviousWorldMatrix/WorldInverseTranspose`, directional temporal matrices, `CurrentJitterNdc/PreviousJitterNdc`, `ViewportSizeInv`, `JointMatrix/Skinning/SkinInfluence`, `MorphTarget/MorphWeight` and `GpuSceneSlot`. A GPU slot is not identity. Rename mirrors together and check layout and target compilation.
+Make physical units, coordinate spaces, temporal direction and CPU/shader vocabulary explicit and consistent. Storage slots are not identity. Rename producers and consumers together and verify the affected layouts and compilation targets.
 
 ## Coordinates and units
 
@@ -144,15 +148,6 @@ Include direct dependencies and forward-declare when valid. Keep PCH assumptions
 
 Use `Windows.h` or the project wrapper instead of SDK implementation headers. Preserve include groups/order; detailed ordering remains open. Remove unused includes and update CMake, source groups, exports, package rules and callers when moving files.
 
-Check every added/modified source, header and shader after the responsibility review:
-
-```powershell
-CMake\CodeStyle.bat -Mode Check -Path "<repo-relative-file>"
-git diff --check
-```
-
-Repeat per file. Use `-Staged` only when it covers the whole change; it checks working-tree content, so inspect the actual index for partial staging.
-
-Record the tool, coverage, mechanical result and manual layout review. Repeat affected checks after edits and identify unchecked files. Documentation changes use documentation checks.
+Enforce the rules for every added or modified source, header and shader. Review responsibility and logical grouping as well as mechanical formatting; repeat affected checks after edits and identify unchecked files. Use the repository style tooling, and keep its exact invocation with the build workflow. Documentation changes use documentation checks.
 
 Follow the [responsibility review](Engineering.md#module-boundaries) as well as mechanical checks. External examples do not override these conventions; update the guide and executable checks together when accepting a rule.

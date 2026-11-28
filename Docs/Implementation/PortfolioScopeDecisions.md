@@ -843,6 +843,8 @@ For each accepted cut, list the actual producer, consumers, state lifetime, buil
 
 ## Precise deletion names and protected neighbors
 
+Every approved removal and narrowed retained mechanism now has a dominant-owner closure/participation entry in the [module plans](PortfolioReduction/README.md#transitive-retirement-closure-repeat-to-a-fixed-point). Include indirect helpers, build/SDK components, generated products and validation/docs callers; this worksheet's candidate files are not a complete deletion manifest. Preserve live shared consumers and prove final closure during implementation.
+
 Use the decision ID and the full capability name when discussing a cut. Broad words below are search terms, not deletion boundaries. A file containing both responsibilities must be narrowed before removal.
 
 | Name of the removable item | Explicitly retained neighbor |
