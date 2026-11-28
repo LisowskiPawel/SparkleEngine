@@ -4,7 +4,6 @@
 #include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Paths/FileSystemPaths.h"
 #include "Core/Public/Paths/PathUtils.h"
-#include "KnightSceneSources.h"
 #include "Level/LevelDocumentReader.h"
 #include "ProjectLevelCatalog.h"
 #include "SourceSceneImporter.h"
@@ -176,27 +175,13 @@ static void ValidateSceneBindings(const ProjectLevelCatalogEntry& level, const s
 	}
 }
 
-static void CollectLevelSceneEntries(const ProjectLevelCatalogEntry& level, const std::filesystem::path& meshRoot, bool bShowcase, std::map<std::string, AssetCookerSceneEntry>& entries)
+static void CollectLevelSceneEntries(const ProjectLevelCatalogEntry& level, const std::filesystem::path& meshRoot, std::map<std::string, AssetCookerSceneEntry>& entries)
 {
-	const bool bKnight = bShowcase && level.id == "ModernSponzaKnight";
-	const bool bEmpty = level.id == "Empty";
-	if (level.sceneSourcePath.empty() != (bKnight || bEmpty))
-	{
-		throw Diagnostics::Error(std::format("Level '{}' has an invalid SceneSource declaration.", level.id));
-	}
-
 	std::vector<std::string> expectedIds;
-	if (bKnight)
+	expectedIds.reserve(level.sceneSourcePaths.size());
+	for (const std::filesystem::path& sourcePath : level.sceneSourcePaths)
 	{
-		expectedIds.reserve(Showcase::KnightSceneSources.size());
-		for (const std::string_view source : Showcase::KnightSceneSources)
-		{
-			expectedIds.push_back(AdmitSceneSource(meshRoot, meshRoot / source, entries));
-		}
-	}
-	else if (!bEmpty)
-	{
-		expectedIds.push_back(AdmitSceneSource(meshRoot, level.sceneSourcePath, entries));
+		expectedIds.push_back(AdmitSceneSource(meshRoot, sourcePath, entries));
 	}
 	ValidateSceneBindings(level, expectedIds);
 }
@@ -204,7 +189,6 @@ static void CollectLevelSceneEntries(const ProjectLevelCatalogEntry& level, cons
 bool ProjectCookPlanner::CollectSceneEntries(const std::filesystem::path& projectRoot, std::vector<AssetCookerSceneEntry>& outEntries, AssetCookerDiagnostics& diagnostics)
 {
 	const std::filesystem::path meshRoot = Paths::Normalize(projectRoot / "Assets" / "Meshes");
-	const bool bShowcase = projectRoot.filename() == "Showcase";
 	std::map<std::string, AssetCookerSceneEntry> entries;
 	try
 	{
@@ -215,7 +199,7 @@ bool ProjectCookPlanner::CollectSceneEntries(const std::filesystem::path& projec
 			{
 				continue;
 			}
-			CollectLevelSceneEntries(level, meshRoot, bShowcase, entries);
+			CollectLevelSceneEntries(level, meshRoot, entries);
 			if (!catalog.HasLevelSourceInputs(level))
 			{
 				throw Diagnostics::Error(std::format("Catalog level '{}' is unavailable: '{}'.", level.id, level.sourcePath.string()));

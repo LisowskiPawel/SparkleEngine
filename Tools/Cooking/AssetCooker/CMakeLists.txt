@@ -47,7 +47,6 @@ target_include_directories(AssetCookerCore
         ${CMAKE_CURRENT_SOURCE_DIR}/Private
         ${CMAKE_SOURCE_DIR}/Engine
         ${CMAKE_SOURCE_DIR}/Engine/Core/Public/Diagnostics
-        ${CMAKE_SOURCE_DIR}/Projects/Showcase/AssetPreparation
 )
 
 target_compile_features(AssetCookerCore PRIVATE cxx_std_20)

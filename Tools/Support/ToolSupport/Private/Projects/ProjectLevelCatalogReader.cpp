@@ -131,7 +131,8 @@ void ProjectLevelCatalogReader::ParseLine(std::string line)
 	{
 		throw Diagnostics::Error("Catalog field name is empty.");
 	}
-	if (!m_sectionFields.emplace(key).second)
+	const bool bRepeatable = m_section == Section::Level && key == "SceneSource";
+	if (!bRepeatable && !m_sectionFields.emplace(key).second)
 	{
 		throw Diagnostics::Error(std::format("Catalog section repeats field '{}'.", key));
 	}
@@ -195,7 +196,7 @@ void ProjectLevelCatalogReader::ParseLevelField(std::string_view key, std::strin
 		{
 			throw Diagnostics::Error("SceneSource requires a project-relative file path with an extension.");
 		}
-		m_currentLevel->sceneSourcePath = (m_projectRoot / path).lexically_normal();
+		m_currentLevel->sceneSourcePaths.push_back((m_projectRoot / path).lexically_normal());
 	}
 	else if (key == "Thumbnail")
 	{

@@ -2,9 +2,9 @@
 
 [Execution order and shared delivery rules](README.md) | [Closed scope record](../PortfolioScopeDecisions.md) | [Engineering](../../Engineering.md)
 
-Status: active; only remaining delivery work is listed below. The [shared stage protocol](README.md#stage-protocol) applies. [Design checkpoint](../../../build/validation/portfolio-reduction/launcher-stage0/REPORT.md) | [Stage 1 evidence](../../../build/validation/portfolio-reduction/launcher-stage1/REPORT.md) | [Stage 2 evidence](../../../build/validation/portfolio-reduction/launcher-stage2/REPORT.md).
+Status: active. [Shared stage protocol](README.md#stage-protocol) | [Design checkpoint](../../../build/validation/portfolio-reduction/launcher-stage0/REPORT.md) | [Stage 1 closeout](../../../build/validation/portfolio-reduction/launcher-stage1/CLOSEOUT.md) | [Stage 2 evidence](../../../build/validation/portfolio-reduction/launcher-stage2/REPORT.md)
 
-**Execution order: 03 of 21.** Finish Stage 1's remaining cleanup, then resume Stage 2 in Wave 3 after BuildPackaging stage 1; stages 3-4 in Wave 6. Follow the [stage queue](README.md#suggested-execution-order); do not finish this whole file before a listed prerequisite. Dominant owners may change this module earlier as part of a complete system.
+**Execution order: 03 of 21.** Resume Stage 2 in Wave 3 after BuildPackaging Stage 1. Stages 3–4 follow in Wave 6. See the [stage queue](README.md#suggested-execution-order).
 
 ## Outcome and ownership
 
@@ -50,7 +50,7 @@ These are source-audit seeds for the owning stages, including indirect code/buil
 
 | Decision / owning stage | Direct system and secondary retirement to close | Protected surviving consumers / boundary |
 | --- | --- | --- |
-| LA-15, AP-07; stage 2 | Qualify the retained native fault path on both APIs at the final selected build/shader/SDK/source identity and finish temporary cleanup; see the [bound receipt](../../../build/validation/portfolio-reduction/launcher-stage2/REPORT.md). | Native input/readiness checks, callbacks, dump/marker sidecars, matched native/shader symbols, bounded collection settlement and explicit debugger launch remain protected. |
+| LA-15, AP-07; stage 2 | Qualify the retained native fault path on both APIs at the final selected build/shader/SDK/source identity. [Stage 2 receipt](../../../build/validation/portfolio-reduction/launcher-stage2/REPORT.md) | Native input/readiness checks, callbacks, dump/marker sidecars, matched native/shader symbols, bounded collection settlement and explicit debugger launch remain protected. |
 | LA-19; stage 3 | Build/State duplicate source-list freshness/signature authority. Trace BuildFilesFreshness, BuildFreshnessSignature, BuildWorkspaceStateFiles and their planner/readiness/cache users. Remove only bookkeeping replaced by native CMake/Ninja dependency/regeneration and minimal incompatible-cache identity. | Actual artifact availability, source/recipe/SDK invalidation and cache incompatibility errors; no history-based readiness. |
 | LA-20; stage 3 | NativeBuildOutputReset automatic toolchain-change wipe path. Remove reset plan/step/state triggers, stale reset reason/flags, UI status and old toolchain-difference branches; retain a helper only if another selected Clean workflow truly consumes it. | Explicit controlled native Clean, source/download caches, real incompatible-cache rejection and task/process settlement. |
 | LA-21; stage 3 | Stored multi-run history and history browser. Trace LauncherActivityPanel, operation/session serialization, activity row/time/log readers, GUI signals and shell activity consumers. Retire only history storage/presentation after current progress/failure consumers have direct ownership. | Active concurrent operation state, cancellation/settlement, useful current logs and artifact-derived readiness for external builds/cooks/dependencies. |
@@ -61,20 +61,14 @@ These are source-audit seeds for the owning stages, including indirect code/buil
 
 ## Outstanding qualification from earlier UI delivery
 
-Launcher scene-view qualification retains physical fractional/mixed-DPI, assistive-technology and broader GUI/GPU/profile/capture/package checks as **UNVERIFIED** in the [bound delivery record](../../../build/validation/launcher-item-views/candidate-20261122/REPORT.md). Its required temporary cleanup, recorded with that evidence, remains open after automatic approval review rejected deletion; this adds no release prerequisite.
+Launcher scene-view qualification still requires physical fractional/mixed-DPI, assistive-technology and broader GUI/GPU/profile/capture/package checks. [Bound delivery record](../../../build/validation/launcher-item-views/candidate-20261122/REPORT.md)
 
-## Stage 1: Remove temporary validation probes
+## Stage 2: Qualify retained native GPU diagnostics
 
-The production retirement and bounded controls passed; only required temporary cleanup remains. Remove the Stage 1 probe sources/build tree, controlled fixtures and probe setup/CLI scripts listed in the [cleanup receipt](../../../build/validation/portfolio-reduction/launcher-stage1/temporary-cleanup.json), then verify their absence and prune this stage and its queue entry. Automatic approval review rejected both cleanup commands as “blocked by policy”; no more specific reason was supplied. Existing user state and historical validation are outside this cleanup. This does not reopen the delivered production work or qualify later stages.
+Decisions: LA-15, AP-07. [Stage 2 qualification status](../../../build/validation/portfolio-reduction/launcher-stage2/CLOSEOUT.md)
 
-## Stage 2: Qualify retained native GPU diagnostics and remove probes
-
-Decisions: LA-15, AP-07. Remaining exits are bound in the [Stage 2 receipt](../../../build/validation/portfolio-reduction/launcher-stage2/REPORT.md); the source retirement is not a native-fault qualification.
-
-- After BuildPackaging stage 1, identify the final native exe/DLL/PDB, shader export/library, SDK/driver/source and both API candidates. Choose the dedicated opt-in fault reproduction, then demonstrate usable externally readable dump, breadcrumb/marker/native diagnostics and matched shader/debug/symbol data on D3D12 and Vulkan independently. Exercise marker lifetime across command-list reuse/frames in flight and bounded callback/writer completion during loss/shutdown, including the declared failure controls. Application/RHI runtime signoff belongs in the same revision-bound receipt; successful startup, parser checks or builds do not pass it.
-- Remove only the temporary Stage 2 probe/setup/fixture paths in the [cleanup receipt](../../../build/validation/portfolio-reduction/launcher-stage2/temporary-cleanup.json), verify absence and recheck the affected source/build/runtime closure. Automatic approval review rejected deletion of the test symlink as "blocked by policy"; no more specific reason was supplied. Preserve existing tests, historical evidence and native incident/user data.
-
-Prune this stage and its queue/closure entry only after these exits pass. Keep native callbacks, dump/marker writing, exact launch readiness, bounded collection and explicit configured debugger launch intact; no managed incident workflow or compatibility path is to be reintroduced.
+- After BuildPackaging Stage 1, identify the final native exe/DLL/PDB, shader export/library, SDK/driver/source and both API candidates. Choose the dedicated opt-in fault reproduction, then demonstrate usable externally readable dump, breadcrumb/marker/native diagnostics and matched shader/debug/symbol data on D3D12 and Vulkan independently. Exercise marker lifetime across command-list reuse/frames in flight and bounded callback/writer completion during loss/shutdown, including the declared failure controls. Record Application/RHI runtime signoff in the same revision-bound receipt.
+Prune this stage and its queue and closure entries after native qualification passes. Preserve native callbacks, dump and marker writing, exact launch readiness, bounded collection and explicit configured debugger launch.
 
 ## Stage 3: Replace build/status bookkeeping with a small execution flow
 

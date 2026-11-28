@@ -112,7 +112,7 @@ private:
 	void UnloadAll() noexcept;
 	std::vector<RhiResourceHandle> LoadSceneTextures(RenderCommandList& commandList);
 	bool HasPendingSceneTextureUploads() const noexcept;
-	void RequestTexture(const ResolvedTexturePath& source, std::uint32_t generation);
+	void QueueSceneTexture(const ResolvedTexturePath& source, std::uint32_t generation);
 	void CancelRequest(TextureRequest& request) noexcept;
 	void LaunchPendingRequests();
 	void ConsumeCompletedRequests() noexcept;

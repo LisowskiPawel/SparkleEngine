@@ -18,7 +18,7 @@ Dominant execution owner for: GF-13, GF-14, SC-01, SC-02, SC-03. Cross-module de
 
 ## Adapt the surviving design
 
-- **Prepared runtime data:** own source-to-runtime Ozz construction and the fixed Base/Curtains/Knight preparation recipe. Emit one scene with ready runtime skeleton/clip data; update runtime loading, manifests and source dependency identity together. The fixed recipe belongs at cooking, without a general composition graph, scripting language or old runtime composer.
+- **Prepared runtime data:** own source-to-runtime Ozz construction and the flat assembly of project-declared inputs. Emit one scene with ready runtime skeleton/clip data. Update runtime loading, manifests and source dependency identity together. Showcase data owns asset identities and paths. Cooking needs only the declared inputs and product identity.
 - **One checked scene contract:** narrow indices, resource references, metadata and writer/parser intermediates after morph/composition cuts. Keep reusable within-scene resources, authored cameras/lights and skeletal rebasing correct. Conditional curve/resampler removal follows native animation equivalence; retain the minimum required single working path if it fails.
 
 **Structural acceptance:** reproduce Knight from admitted sources, check units/joints/material/camera/light rebasing and run Knight/Cesium animation through threaded loading and rendering. Confirm GameFramework no longer constructs offline Ozz data or interprets a source list. Flattening by duplication or hiding composition in runtime adapters fails.
@@ -128,7 +128,7 @@ Implement Stage 2 of Docs/Implementation/PortfolioReduction/14_SceneCooker.md: D
 Read that plan, its Stage 0 evidence/dependencies, Docs/Implementation/PortfolioReduction/README.md, and Docs/CodeStyle.md, Docs/Engineering.md, Docs/Goals.md, Docs/References.md and Docs/Roadmap.md. Refresh actual source/callers and preserve unrelated/concurrent changes. Scope stays within the recorded decisions. Exhaust this stage's named retirement closure/participation: follow both outgoing dependencies and incoming users through code/data/build/runtime/docs, repeating until no newly orphaned owned node remains. Keep one owner per system.
 
 Required delivery:
-Own the vertical cut through Showcase fixed preparation, AssetCooker, runtime level/loader and relevant Editor saved identities. Use a small project-owned fixed recipe over base, Curtains and Knight; no general recipe language, streaming framework or runtime add-on registry. Flatten/rebase all references and preserve skeletal animation, imported cameras/lights, materials/UVs, units and authored transforms. Runtime levels then reference one prepared scene product; remove general multi-asset document/list/loading branches after all retained maps migrate.
+Own the vertical cut through Showcase preparation, AssetCooker, runtime level/loader and relevant Editor saved identities. Use Showcase's declared Base, Curtains and Knight inputs through asset-independent cooking code. Flatten and rebase all references and preserve skeletal animation, imported cameras/lights, materials/UVs, units and authored transforms. Runtime levels then reference one prepared scene product. Remove multi-asset document and loading branches after all retained maps migrate.
 
 Implementation rules:
 - Apply this plan's Adapt the surviving design contract to surviving APIs, data, states, orchestration and callers. Use its bounded reference lessons; remove assumptions made obsolete by this stage.

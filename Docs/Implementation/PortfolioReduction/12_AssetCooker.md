@@ -120,7 +120,7 @@ Deliver the complete change and identity-bound commands/results, manual responsi
 
 Decisions: AC-07.
 
-The project cook planner now admits exact sources and checks their bindings through the shared level parser. The remaining Stage 2 work is to consume the qualified Knight preparation and migrate the planner to the final prepared-scene identities.
+The project cook planner now admits the catalog's exact sources and checks their bindings through the shared level parser. The remaining Stage 2 work is to consume the qualified preparation through the same asset-independent workflow and migrate the planner to the final prepared-scene identities.
 
 **Implementation prompt:**
 

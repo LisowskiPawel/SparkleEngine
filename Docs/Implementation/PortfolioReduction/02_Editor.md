@@ -35,7 +35,6 @@ Measured containing scopes that need a smaller replacement (overlapping; **not d
 
 | Decision | Existing shared/replacement scope |
 | --- | --- |
-| ED-19 | 14 files / 1,293 lines |
 | ED-24 | 2 files / 497 lines |
 
 ## Named retirement closure
@@ -44,8 +43,6 @@ These are source-audit seeds for the owning stages, including indirect code/buil
 
 | Decision / owning stage | Direct system and secondary retirement to close | Protected surviving consumers / boundary |
 | --- | --- | --- |
-| ED-19; stage 2 | Per-property search/filter mechanism. Remove inspector query state, recursive property search/visibility metadata, filter callbacks/widgets and copied filtered views with no remaining user. | Outliner selection/search where separately retained, fixed property sections, useful text input and game-owned edits. |
-| ED-20; stage 2 | Console completion functions/UI. Retire CompleteConsoleLine/CompleteConsoleCVarName, completion result/state/cursor paths and callback wiring in Core/Editor only when exclusive. | Console registration/execution/help/errors, history and CVar get/set; Launcher operation history is a different system. |
 | ED-24; stage 3 | Reviewer-bundle scene writes and package authoring path. Close Save action/capability/writability derivation, path resolution and writer dispatch in shipped hosts so runtime edits cannot mutate supplied files. Delete any package-only persistence path after maintainer saves use one projection. | ED-22/23 explicit writable-source saves, live edits/undo, per-user settings and reload/reset; do not delete the shared level writer. |
 | ED-23; stage 3 | Do not grow a second save/session/persistence framework while adding the approved overrides: consolidate source-qualified identity, projection and writer callers; remove obsolete save-field mirrors. | This is accepted new implementation work, not a deletion credit. Preserve correct identity, undo, explicit maintainer saves and reviewer in-session edits. |
 
@@ -60,37 +57,10 @@ Decisions: ED-12, ED-13, ED-14. The [retirement receipt](../../../build/validati
 
 ## Stage 2: Remove property search and console completion
 
-Decisions: ED-19, ED-20.
+Decisions: ED-19, ED-20. The [Stage 2 receipt](../../../build/validation/portfolio-editor-stage2-20261128/REPORT.md) records the cut, build and passing checks. Finish the remaining interactive qualification on the current candidate.
 
-**Implementation prompt:**
-
-```text
-Implement Stage 2 of Docs/Implementation/PortfolioReduction/02_Editor.md: Remove property search and console completion.
-Read that plan, its Stage 0 evidence/dependencies, Docs/Implementation/PortfolioReduction/README.md, and Docs/CodeStyle.md, Docs/Engineering.md, Docs/Goals.md, Docs/References.md and Docs/Roadmap.md. Refresh actual source/callers and preserve unrelated/concurrent changes. Scope stays within the recorded decisions. Exhaust this stage's named retirement closure/participation: follow both outgoing dependencies and incoming users through code/data/build/runtime/docs, repeating until no newly orphaned owned node remains. Keep one owner per system.
-
-Required delivery:
-Delete per-property query plumbing and CompleteConsoleLine/CompleteConsoleCVarName plus completion-only UI/state. Retain fixed property sections, outliner selection, input parsing, command/CVar execution, console history, help and useful failures. Remove redundant view/filter copies rather than replacing search with another generic query layer.
-
-Implementation rules:
-- Apply this plan's Adapt the surviving design contract to surviving APIs, data, states, orchestration and callers. Use its bounded reference lessons; remove assumptions made obsolete by this stage.
-- Enforce every CodeStyle.md rule. Each changed function has one cohesive responsibility/invariant and an intent-based name. Orchestration states domain steps with explicit inputs/results; implementation operations own substantial I/O, decoding, math, validation, native or UI details. Do not create forwarding-only/numbered helpers or context/service bags to imitate separation.
-- Complete the cross-module producer/consumer change, registrations, settings/CLI/UI, schemas, build/dependency/package membership and docs. No legacy or backward-compatibility support for replaced owned contracts: no aliases, migrations, version gates, disabled stubs, old readers or dual implementations. Regenerate disposable output. Preserve required selected external SDK/ABI contracts.
-- Preserve parallel work, data-oriented layout, separate game/render ownership, immutable publication, worker settlement and GPU queue/fence lifetime. Simplify mechanisms, never concurrency or a retained feature.
-
-Acceptance criteria:
-- Prove the applicable survivor-design checks through real retained callers; show the before/after contracts and net result. Justify unchanged boundaries by retained invariants; no unused general protocol or replacement framework.
-- Fixed inspectors still expose every kept control. Commands and CVars execute, retain history and report errors; completion/search UI and exclusive producers are gone. Retained immutable view and game-thread mutation boundaries pass focused edit checks.
-- Review each changed function and neighboring callers for responsibility, abstraction level, naming and actual data/lifetime ownership; remove duplicated policy/state and now-unused files/APIs. Run CMake/CodeStyle.ps1 -Mode Check -Path "<repo-relative-file>" for each changed owned C++/header/shader with clang-format 22.1.3, plus git diff --check. Use documentation/language checks for other files; formatting alone cannot pass the responsibility review.
-- Run the stage's positive and failure/lifetime checks on identified inputs and the affected real targets/APIs. An absent observation remains open. Provide a closure manifest classifying every discovered node as retired, retained with a named live consumer, or unresolved (stage stays open). No obsolete caller, registration, output expectation or compatibility route remains; include replacement/addition/moved code in the net footprint result.
-
-Failure modes to reject:
-- Old general machinery survives with fewer users, callers still carry retired policy, or code moves without exploiting the reduced scope.
-- Search/completion removal also deletes console history, command execution or kept properties.
-- Fixed inspectors cannot expose retained controls, or edits bypass game-thread ownership.
-- Renaming/moving code without simplification, mixed-responsibility functions, a surviving old/new path, serial replacement or premature CPU/GPU destruction fails delivery. Orphan helpers, target edges, feature flags, generated products or docs left behind after the visible feature disappears also fail delivery.
-
-Deliver the complete change and identity-bound commands/results, manual responsibility review, net code/state/API/dependency delta and remaining limits in ignored stage evidence. Remove temporary probes; do not add permanent test-only infrastructure. For a failed conditional cut, remove the failed candidate, keep one authorized working path and leave the cut open; do not ship a compatibility fallback. Prune only the stage whose acceptance actually passed and repair links.
-```
+1. Exercise the retained Details controls with camera, light, sky, static and skeletal mesh, and variant selections. Confirm typed edit and publication through the selected controls, selection change ending a drag, separate entities with the same interaction key, generation replacement, and initial variant undo.
+2. Verify the retained Outliner and Settings search widgets, console filter/copy/clear, keyboard Up/Down with draft restoration, and visible command failures. Exercise live compile with and without symbols and confirm explicit reload through the actual shader owner. The [frozen checks](../../../build/validation/portfolio-editor-stage0-20261128/CHECKS.md#stage-2) specify the unobserved input cases.
 
 ## Stage 3: Bound maintainer persistence and forbid package authoring
 

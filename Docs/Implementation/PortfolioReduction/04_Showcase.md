@@ -35,7 +35,7 @@ Containing module baseline: **15 files / 762 physical code/script lines**. No as
 
 Decisions: PR-08.
 
-AssetCooker now takes one exact catalog source per ordinary scene and three exact inputs from the Showcase-owned Knight source list. The cook planner checks the existing level bindings through GameFramework's level parser. The remaining migration is the qualified one-product preparation and its runtime and packaging consumers.
+Showcase declares exact inputs in `Levels.catalog`. The cook planner checks those inputs against level bindings through GameFramework's level parser. The remaining migration is the qualified one-product preparation and its runtime and packaging consumers.
 
 The local recovery experiment cooked eight skinned Knight meshes and no clip. The main FBX animates control nodes while its weighted joints have constant curves. An offline fit against the acquired USD samples recovered some rigid joint motion but exceeded the position bound on mixed-weight vertices. Qualify complete deformation-joint motion against the authored samples before migrating the prepared scene.
 
@@ -50,7 +50,7 @@ Participation boundary: execute the shared one-product migration inside **SceneC
 
 
 
-Build the fixed preparation entry around the exact inputs in Projects/Showcase/AssetPreparation/KnightSceneSources.h. Recover the missing skin weights and bind matrices offline using Scenes/knight_ARNOLD_ANIM_002.rnd.ma and Scenes/knight_USD_PREVIEW_SURFACE_ANIM_002.rnd.ma in that same Knight pack. Bind the hashes of the qualified recovery inputs and deformation motion to the preparation identity. Keep the routine readable and specific. Migrate the retained levels to the explicit prepared-scene contract.
+Use the Knight entry in Projects/Showcase/Levels.catalog as the source declaration. Recover the missing skin weights and bind matrices offline using Scenes/knight_ARNOLD_ANIM_002.rnd.ma and Scenes/knight_USD_PREVIEW_SURFACE_ANIM_002.rnd.ma in that same Knight pack. Bind the hashes of the qualified recovery inputs and deformation motion to the preparation identity. Keep asset identities and paths in project data and use asset-independent cooking code. Migrate the retained levels to the explicit prepared-scene contract.
 
 Implementation rules:
 - Apply this plan's Adapt the surviving design contract to surviving APIs, data, states, orchestration and callers. Use its bounded reference lessons; remove assumptions made obsolete by this stage.

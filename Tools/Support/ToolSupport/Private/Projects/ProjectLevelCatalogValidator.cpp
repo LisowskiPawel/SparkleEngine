@@ -33,12 +33,18 @@ static void ValidateLevel(const ProjectLevelCatalogEntry& level, const std::file
 	{
 		throw Diagnostics::Error(std::format("Catalog level '{}' must use Levels/<id>.level.", level.id));
 	}
-	if (!level.sceneSourcePath.empty())
+	const std::filesystem::path meshRoot = projectRoot / "Assets" / "Meshes";
+	std::unordered_set<std::filesystem::path> sceneSources;
+	for (const std::filesystem::path& sceneSource : level.sceneSourcePaths)
 	{
-		const auto meshRelativePath = level.sceneSourcePath.lexically_relative(projectRoot / "Assets" / "Meshes");
+		const auto meshRelativePath = sceneSource.lexically_relative(meshRoot);
 		if (meshRelativePath.empty() || *meshRelativePath.begin() == "..")
 		{
 			throw Diagnostics::Error(std::format("Catalog level '{}' SceneSource must remain under Assets/Meshes.", level.id));
+		}
+		if (!sceneSources.insert(sceneSource).second)
+		{
+			throw Diagnostics::Error(std::format("Catalog level '{}' repeats SceneSource '{}'.", level.id, meshRelativePath.generic_string()));
 		}
 	}
 }

@@ -69,7 +69,7 @@ void TextureCache::LoadDefaultTextures(RenderCommandList& commandList, std::vect
 	++m_bindingRevision;
 }
 
-void TextureCache::RequestTexture(const ResolvedTexturePath& source, std::uint32_t generation)
+void TextureCache::QueueSceneTexture(const ResolvedTexturePath& source, std::uint32_t generation)
 {
 	if (m_defaultTextures.contains(source.CacheKey))
 	{
@@ -88,18 +88,11 @@ void TextureCache::RequestTexture(const ResolvedTexturePath& source, std::uint32
 	const auto& budget = m_residency.GetBudget();
 	const auto maximumDecodedBytes = std::min(budget.MaximumDecodedBytes, budget.MaximumPendingUploadBytes);
 	const auto decodeReservationBytes = GetCookedTextureDecodeReservation(source.Path, maximumDecodedBytes);
-	const std::optional<AssetGenerationHandle> handle = m_residency.BeginGeneration(MakeAssetKey(source.CacheKey), generation);
-	if (!handle)
-	{
-		Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "Texture generation could not enter residency.");
-	}
-
 	TextureRequest request;
 	request.Source = source;
-	request.Generation = *handle;
+	request.Generation = {.AssetKey = MakeAssetKey(source.CacheKey), .Generation = generation};
 	request.DecodeReservationBytes = decodeReservationBytes;
 	m_requests.push_back(std::move(request));
-	LaunchPendingRequests();
 }
 
 void TextureCache::CancelRequest(TextureRequest& request) noexcept
@@ -134,7 +127,7 @@ void TextureCache::SynchronizeSceneTextures(const RenderTextureTable& textures)
 		}
 
 		m_wantedPathTextureKeys.insert(source->CacheKey);
-		RequestTexture(*source, generation);
+		QueueSceneTexture(*source, generation);
 	}
 
 	for (TextureRequest& request : m_requests)
@@ -181,8 +174,24 @@ void TextureCache::LaunchPendingRequests()
 		{
 			return;
 		}
-		const bool bPending = m_residency.GetState(request.Generation) == AssetResidencyState::Reading && request.bWanted;
-		if (request.Load || !bPending)
+		if (request.Load || !request.bWanted)
+		{
+			continue;
+		}
+
+		const AssetResidencyState state = m_residency.GetState(request.Generation);
+		if (state == AssetResidencyState::Unloaded)
+		{
+			if (!m_residency.HasRequestCapacity())
+			{
+				continue;
+			}
+			if (!m_residency.BeginGeneration(request.Generation.AssetKey, request.Generation.Generation))
+			{
+				Diagnostics::Fatal(g_textureCacheLogger, __FILE__, __LINE__, "Texture generation could not enter residency.");
+			}
+		}
+		else if (state != AssetResidencyState::Reading)
 		{
 			continue;
 		}
@@ -259,7 +268,10 @@ void TextureCache::ConsumeCompletedRequests() noexcept
 	        [this](const TextureRequest& request) noexcept
 	        {
 		        const AssetResidencyState state = m_residency.GetState(request.Generation);
-		        return !request.Load && !request.Decoded && !request.Uploaded && state == AssetResidencyState::Retired;
+		        const bool bHasCpuWork = request.Load || request.Decoded.has_value();
+		        const bool bHasWork = bHasCpuWork || request.Uploaded.has_value();
+		        const bool bSettled = !request.bWanted || state == AssetResidencyState::Retired;
+		        return !bHasWork && bSettled;
 	        }),
 	    m_requests.end());
 }
