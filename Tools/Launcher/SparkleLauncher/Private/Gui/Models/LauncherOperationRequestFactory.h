@@ -17,7 +17,6 @@ namespace SparkleLauncher
 	WorkspaceIde ResolveSelectedWorkspaceIde(const LauncherSettings& settings);
 	QString ResolveSelectedWorkspaceIdeName(const LauncherSettings& settings);
 	WorkspaceCompiler ResolveSelectedWorkspaceCompiler(const LauncherSettings& settings);
-	bool RequestsLauncherRebuild(const LauncherOperationRequest& request);
 
 	BuildWorkspaceOperationRequest BuildWorkspacePlanRequest(const std::filesystem::path& workspaceRoot, const LauncherContentModel& contentModel, const LauncherSettings& settings);
 
@@ -31,14 +30,12 @@ namespace SparkleLauncher
 	    const std::filesystem::path& workspaceRoot,
 	    const LauncherContentModel& contentModel,
 	    const LauncherSettings& settings,
-	    const std::filesystem::path& runningLauncherPath,
 	    const QString& operationId);
 
 	LauncherOperationRequest BuildActionCleanOperationRequest(
 	    const std::filesystem::path& workspaceRoot,
 	    const LauncherContentModel& contentModel,
 	    const LauncherSettings& settings,
-	    const std::filesystem::path& runningLauncherPath,
 	    const QString& operationId);
 
 	LauncherOperationRequest BuildScopedCleanOperationRequest(

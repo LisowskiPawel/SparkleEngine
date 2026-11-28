@@ -121,13 +121,6 @@ namespace SparkleLauncher
 		return QString();
 	}
 
-	void LauncherWorkspaceSetup::InstallHostTool(const ToolchainItemStatus& item)
-	{
-		LauncherOperationRequest request = BuildLauncherOperationRequest(m_workspaceRoot, m_contentModel, m_settings, "workspace.install-host-tool");
-		std::get<BuildWorkspaceOperationRequest>(request.Inputs).HostToolId = item.Id;
-		m_startOperation(std::move(request), "Install " + QString::fromStdString(item.DisplayName));
-	}
-
 	QPushButton* LauncherWorkspaceSetup::CreateHostToolActionButton(const ToolchainItemStatus& item)
 	{
 		const std::optional<WorkspaceCompiler> compiler = item.Compiler;
@@ -136,35 +129,19 @@ namespace SparkleLauncher
 		{
 			return nullptr;
 		}
-		if (item.State != ToolchainItemState::Found && !item.bCanInstall)
+		if (item.State != ToolchainItemState::Found)
 		{
 			return nullptr;
 		}
 
-		const bool bInstall = item.State != ToolchainItemState::Found;
-		const QString label = bInstall ? QStringLiteral("Install") : QStringLiteral("Use");
 		const QString displayName = QString::fromStdString(item.DisplayName);
 		QPushButton* button = new QPushButton(&m_dialogParent);
-		ApplyStatusActionButtonPresentation(*button, label, bInstall ? QStringLiteral("warning") : QStringLiteral("neutral"));
-		button->setAccessibleName(label + " " + displayName);
-		button->setToolTip(bInstall ? "Install " + displayName + ". It becomes selectable after detection confirms the installation." : "Select " + displayName + " for launcher builds.");
+		ApplyStatusActionButtonPresentation(*button, "Use", "neutral");
+		button->setAccessibleName("Use " + displayName);
+		button->setToolTip("Select " + displayName + " for launcher builds.");
 		emit FocusableWidgetCreated(button);
 
-		connect(
-		    button,
-		    &QPushButton::clicked,
-		    this,
-		    [this, item, compiler, bInstall]()
-		    {
-			    if (bInstall)
-			    {
-				    InstallHostTool(item);
-			    }
-			    else if (compiler.has_value())
-			    {
-				    emit CompilerSelected(*compiler);
-			    }
-		    });
+		connect(button, &QPushButton::clicked, this, [this, compiler]() { emit CompilerSelected(*compiler); });
 
 		return button;
 	}
@@ -335,7 +312,7 @@ namespace SparkleLauncher
 		else
 		{
 			const bool bWorkspaceBuild = operationId.startsWith("workspace.build");
-			if (bWorkspaceBuild || operationId == "cook.tools.prepare" || operationId == "launcher.build.self")
+			if (bWorkspaceBuild || operationId == "cook.tools.prepare")
 			{
 				AddBuildReadinessStatus(layout, plan);
 			}

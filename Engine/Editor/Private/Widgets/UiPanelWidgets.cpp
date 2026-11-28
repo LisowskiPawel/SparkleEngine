@@ -6,12 +6,8 @@
 
 #include <imgui.h>
 
-#include <algorithm>
-
 namespace EditorWidgets
 {
-	static constexpr float PropertyLabelWidth = 78.0f;
-
 	static void PushFontIfAvailable(ImFont* font)
 	{
 		if (font != nullptr)
@@ -59,48 +55,11 @@ namespace EditorWidgets
 		ImGui::SetCursorScreenPos(ImVec2(start.x, end.y + 4.0f));
 	}
 
-	static void DrawRightAlignedText(const char* value)
-	{
-		const float valueWidth = ImGui::CalcTextSize(value).x;
-		const float currentX = ImGui::GetCursorPosX();
-		const float offset = (std::max) (0.0f, ImGui::GetContentRegionAvail().x - valueWidth);
-		ImGui::SetCursorPosX(currentX + offset);
-		ImGui::TextUnformatted(value);
-	}
-
 	void DrawPanelHeader(const char* title, const char* subtitle)
 	{
 		ImFont* headingFont = SparkleUiTheme::GetHeadingFont();
 		ImFont* monoFont = SparkleUiTheme::GetMonoFont();
 		DrawHeaderBar(title, subtitle, 24.0f, SparkleUiPalette::PanelHeaderBackground(), SparkleUiPalette::PanelHeaderBorder(), headingFont, monoFont, ImVec2(8.0f, 3.0f));
-	}
-
-	void DrawKeyValueRow(const char* label, const char* value)
-	{
-		ImFont* monoFont = SparkleUiTheme::GetMonoFont();
-		ImGui::PushID(label);
-		const bool bPropertyTableOpen = ImGui::BeginTable("##kv_row", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoPadOuterX | ImGuiTableFlags_NoPadInnerX);
-
-		if (bPropertyTableOpen)
-		{
-			ImGui::TableSetupColumn("label", ImGuiTableColumnFlags_WidthFixed, PropertyLabelWidth);
-			ImGui::TableSetupColumn("value", ImGuiTableColumnFlags_WidthStretch);
-			ImGui::TableNextRow();
-
-			ImGui::TableSetColumnIndex(0);
-			ImGui::AlignTextToFramePadding();
-			PushFontIfAvailable(monoFont);
-			ImGui::TextDisabled("%s", label);
-			PopFontIfAvailable(monoFont);
-
-			ImGui::TableSetColumnIndex(1);
-			PushFontIfAvailable(monoFont);
-			DrawRightAlignedText(value);
-			PopFontIfAvailable(monoFont);
-
-			ImGui::EndTable();
-		}
-		ImGui::PopID();
 	}
 
 	bool DrawFilterChip(const char* label, bool bActive) noexcept

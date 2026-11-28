@@ -22,9 +22,9 @@ This produces reviewer-ready engineering evidence, not a guarantee of a principa
 
 Live source basis: `039d7b802fbf2f3f46a076a4157c8e43ee27f662`, 25 November 2026, with the finalized documentation working tree. All **2,201 counted code/script files / 159,223 physical lines** still match their earlier file hashes. Renderer/RHI contain 74,620 lines together; the other counted code contains 84,603. Shader source (7,544 lines) and maintained patch text (1,071 lines) are separate. Fetched vendors, generated products, raw assets and these docs are not authored engine-code savings.
 
-The approved cuts identify **138 distinct whole-file candidates / 9,509 existing lines**, plus **446 distinct lines in shared files**, before replacement/caller cleanup. Whole-file candidates split into **8,909 code/script lines**, **579 shader lines**, and **21 other text lines**. Do not subtract shader/data lines from the code-only 159,223 baseline. Candidates include gated cuts: they are a gross retirement pool, not a promised final reduction or permission to delete the file without checking remaining consumers.
+The remaining approved cuts identify **137 distinct whole-file candidates / 9,488 existing lines**, plus **416 distinct lines in shared files**, before replacement/caller cleanup. Whole-file candidates split into **8,909 code/script lines** and **579 shader lines**. Do not subtract shader/data lines from the code-only 159,223 baseline. Candidates include gated cuts: they are a gross retirement pool, not a promised final reduction or permission to delete the file without checking remaining consumers.
 
-The plan refreshes the Candles catalog spans by record identity; older catalog line numbers are stale. Completed KTX/earlier scene cuts are excluded. Reference/Application exports, PLY/RV-05 and other aliases are counted once. Containing rewrite scopes in module docs overlap and must never be added as guaranteed savings.
+Completed scene/KTX cuts are excluded. Reference/Application exports, PLY/RV-05 and other aliases are counted once. Containing rewrite scopes in module docs overlap and must never be added as guaranteed savings.
 
 **Planning objective:** first close complete removals and use the resulting architecture to pursue substantial net reduction in the largest support owners. A useful stretch review target is **20% of the 84,603 non-Renderer/RHI lines (about 16,900)**; this is a design target, not an evidence-backed forecast. A 50% repository reduction is not supported by the present choices: much Renderer/RHI and several support capabilities are explicitly retained. Do not promise that number or remove multithreading/features to manufacture it.
 
@@ -41,7 +41,7 @@ The IDs in this table cover all 194 decision rows once. A module plan includes r
 | [01. Renderer](01_Renderer.md) | AP-03, RE-01, RE-02, RE-03, RE-04, RE-05, RE-06, RE-07, RE-08, RE-09, RE-10, RE-11, RE-12, RE-13, RE-14, RE-15 | 53 / 3,095 | 57 |
 | [02. Editor](02_Editor.md) | ED-01, ED-02, ED-03, ED-04, ED-05, ED-06, ED-07, ED-08, ED-09, ED-10, ED-11, ED-12, ED-13, ED-14, ED-15, ED-16, ED-17, ED-18, ED-19, ED-20, ED-21, ED-22, ED-23, ED-24 | 24 / 2,394 | 35 |
 | [03. Launcher](03_Launcher.md) | LA-01, LA-02, LA-03, LA-05, LA-06, LA-07, LA-08, LA-09, LA-10, LA-11, LA-12, LA-13, LA-14, LA-15, LA-16, LA-19, LA-20, LA-21, LA-22, LA-23, LA-24, LA-25, LA-26, LA-27, LA-28, AP-07, RV-01 | 8 / 639 | 239 |
-| [04. Showcase content and conversion scripts](04_Showcase.md) | PR-01, PR-02, PR-03, PR-04, PR-05, PR-07, PR-08, PR-11, PR-12, PR-15, PR-16 | 1 / 21 | 30 |
+| [04. Showcase content and conversion scripts](04_Showcase.md) | PR-01, PR-02, PR-03, PR-04, PR-05, PR-07, PR-08, PR-11, PR-12, PR-15, PR-16 | 0 / 0 | 0 |
 | [05. GameFramework and scene runtime](05_GameFramework.md) | GF-01, GF-02, GF-03, GF-04, GF-05, GF-06, GF-07, GF-08, GF-09, GF-10, GF-11, GF-12, GF-15, GF-16, RV-02, RV-03 | 8 / 355 | 1 |
 | [06. RHI](06_RHI.md) | RH-01, RH-02, RH-03, RH-04, RH-05, RH-06, RH-07, RH-08, RH-09, TP-05 | 26 / 2,332 | 0 |
 | [07. SourceImporters](07_SourceImporters.md) | IM-01, IM-02, IM-03, IM-04, IM-05, IM-06, IM-07, IM-08, IM-09, RV-04, RV-05 | 4 / 269 | 0 |
@@ -185,7 +185,7 @@ IM-08/IM-09/SC-03 and SceneCooker/Ozz/flattening changes are conditional on nati
 
 Five cells were still `-` in the frozen worksheet: **BU-05, BU-06, DO-01, DO-02, DO-03**. No new deletion or release prerequisite is inferred from them. Preserve current prepared-product import until BU-05 is explicitly decided; preserve local style tools as required by your earlier instructions/Engineering while BU-06's worksheet cell is blank. Do not make three case studies or future neural features a new prerequisite. Existing Engineering rules already require pruning completed implementation stages; DO-03's final worksheet-retention choice is not needed to begin approved removals. These recording gaps do not block independent authorized work.
 
-Already completed KTX/earlier scene removals, task-runtime replacement and SDL3 replacement are not reopened as implementation stages. Their current product qualification limitations remain in Roadmap. Candles, PLY and the new source/build/runtime cuts still exist in source and are planned, not delivered.
+Already completed scene/KTX removals, task-runtime replacement and SDL3 replacement are not reopened as implementation stages. Their product qualification limitations remain with their owning plans. PLY and the remaining source/build/runtime cuts still exist in source and are planned, not delivered. An owning stage retains only unmet cleanup or qualification work after a partial delivery.
 
 ## Final reduced-engine gate
 
@@ -219,6 +219,6 @@ Keep product blockers open through final qualification: raster/ray material pari
 
 `build/validation/portfolio-module-plans-20261125/` stores scope/source hashes, unique retirement allocation, full decision-to-stage ownership and review results. All 194 worksheet IDs and all 66 approved removal IDs are mapped exactly once. Older file-level selections were rechecked against current source; retired level records are excluded and Candles catalog spans were remeasured. These are source-planning receipts only; no implementation/build/cook/GPU/package acceptance was run by generating these plans.
 
-Prompt revision: 28 November 2026. All 76 remaining stages (21 Stage 0 checks and 55 delivery stages) have individual prompts, acceptance criteria and specific failure modes. Historical source/footprint observations above remain dated; this revision does not qualify implementation behavior.
+Prompt revision: 28 November 2026. All 75 remaining stages (20 Stage 0 checks and 55 delivery stages) have individual prompts, acceptance criteria and specific failure modes. Historical source/footprint observations above remain dated; this revision does not qualify implementation behavior.
 
 Survivor-design revision: 28 November 2026. All 21 module plans specify structural adaptations and checks; every stage prompt enforces the applicable design. Primary-source reference lessons and limits are linked above. `build/validation/portfolio-survivor-design-20261128/` records the documentation comparison, decision/stage/closure preservation and link/source checks; no production change or runtime acceptance is implied.

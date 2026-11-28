@@ -12,7 +12,6 @@
 #include "RHI/Public/Descriptors/RhiDescriptorService.h"
 #include "RHI/Public/Resources/RhiResourceService.h"
 #include "RHI/Public/Resources/RhiUploadService.h"
-#include "Textures/TextureDiagnosticsSnapshotBuilder.h"
 
 #include <algorithm>
 #include <array>
@@ -28,7 +27,6 @@ TextureCache::TextureCache(
     enkiTaskScheduler* io,
     enkiTaskScheduler* cpu) :
     m_resourceService(resourceService),
-    m_descriptorService(descriptorService),
     m_textureFactory(resourceService, descriptorService, uploadService),
     m_submissions(submissions),
     m_io(io),
@@ -258,18 +256,4 @@ const RendererTexture* TextureCache::ResolveTextureReferenceOrSemanticDefault(co
 	}
 
 	return FindPathTexture(DefaultTextures::GetPath(defaultType));
-}
-
-TextureDiagnosticsSnapshot TextureCache::CaptureDiagnosticsSnapshot(const PreviewTextureResolver& resolvePreviewTexture) const
-{
-	TextureDiagnosticsSnapshotBuilder builder(m_descriptorService, resolvePreviewTexture, m_defaultTextures.size() + m_pathTextures.size());
-	for (const auto& [cacheKey, texture] : m_defaultTextures)
-	{
-		builder.Add(texture, TextureDiagnosticsKind::DefaultPath, std::filesystem::path(cacheKey).generic_string(), false);
-	}
-	for (const auto& [cacheKey, texture] : m_pathTextures)
-	{
-		builder.Add(texture.Texture, TextureDiagnosticsKind::Scene, std::filesystem::path(cacheKey).generic_string(), true);
-	}
-	return std::move(builder).Build();
 }

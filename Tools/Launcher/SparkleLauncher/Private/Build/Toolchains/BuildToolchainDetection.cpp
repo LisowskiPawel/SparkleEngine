@@ -1,7 +1,6 @@
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 
 #include "Build/Toolchains/CMakeGeneratorModel.h"
-#include "Build/Toolchains/HostToolInstaller.h"
 #include "Build/Toolchains/QtToolchainDiscovery.h"
 #include "Build/Toolchains/ShaderCompilerSdkDiscovery.h"
 #include "Build/Toolchains/VisualStudioToolchainDiscovery.h"
@@ -115,7 +114,6 @@ namespace SparkleLauncher
 		status.VswherePath = visualStudio.DiscoveryPath;
 		status.VisualStudioPath = visualStudio.InstallationPath;
 		status.VisualStudioIdePath = visualStudio.IdePath;
-		status.VisualStudioInstallerPath = visualStudio.InstallerPath;
 		status.ClangClPath = visualStudio.ClangClPath;
 		status.WindowsSdkVersion = visualStudio.WindowsSdkVersion;
 
@@ -201,16 +199,6 @@ namespace SparkleLauncher
 		if (bVulkanSdkRequired)
 		{
 			status.bConfigurePrerequisitesAvailable = status.bConfigurePrerequisitesAvailable && vulkanSdk.bAvailable;
-		}
-
-		for (ToolchainItemStatus& item : status.Items)
-		{
-			item.bCanInstall = CanInstallHostTool(item.Id, status);
-			if (item.Id == "clangcl" && item.State != ToolchainItemState::Found)
-			{
-				item.Detail = item.bCanInstall ? "Not installed. The launcher can add the Visual Studio clang-cl component."
-				                               : "Not installed and no supported launcher installer is available on this machine.";
-			}
 		}
 
 		status.bRequiredToolsAvailable = AreRequiredToolsAvailable(status.Items);

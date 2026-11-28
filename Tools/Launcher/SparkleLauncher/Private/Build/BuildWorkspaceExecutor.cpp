@@ -74,29 +74,6 @@ namespace SparkleLauncher
 		return summary.str();
 	}
 
-	static std::optional<std::string> ValidateRequestedHostToolAfterInstall(const BuildWorkspaceOperationPlan& plan)
-	{
-		if (plan.Kind != BuildWorkspaceOperationKind::InstallHostTool)
-		{
-			return std::nullopt;
-		}
-
-		const BuildToolchainStatus refreshedToolchain = DetectBuildToolchain(plan.Request.PreferredIde, plan.Request.Compiler);
-
-		const auto installedTool = std::find_if(
-		    refreshedToolchain.Items.begin(),
-		    refreshedToolchain.Items.end(),
-		    [&plan](const ToolchainItemStatus& item) { return item.Id == plan.Request.HostToolId; });
-
-		if (installedTool != refreshedToolchain.Items.end() && installedTool->State == ToolchainItemState::Found)
-		{
-			return std::nullopt;
-		}
-
-		const std::string displayName = installedTool == refreshedToolchain.Items.end() ? plan.Request.HostToolId : installedTool->DisplayName;
-		return "The installer completed, but " + displayName + " is still unavailable. The required compiler or toolchain component was not installed.";
-	}
-
 	static bool PrepareBuildWorkspaceStep(
 	    const BuildWorkspaceOperationPlan& plan,
 	    const BuildWorkspaceOperationStep& step,
@@ -179,19 +156,6 @@ namespace SparkleLauncher
 
 	static bool ValidateBuildWorkspaceStep(const BuildWorkspaceOperationPlan& plan, const BuildWorkspaceOperationStep& step, OperationRecord& operation)
 	{
-		if (const std::optional<std::string> hostToolValidationFailure = ValidateRequestedHostToolAfterInstall(plan))
-		{
-			SetOperationFailure(
-			    operation,
-			    OperationProblemKind::OutputValidation,
-			    *hostToolValidationFailure,
-			    "Review the installer result, ensure the requested compiler and Visual Studio toolset are selected, then retry "
-			    "Install.");
-
-			MarkOperationFinished(operation, OperationStatus::Failed, 0);
-			return false;
-		}
-
 		const std::optional<std::string> requestedDependencyFailure = ValidateRequestedSourceDependencyAfterConfigure(plan);
 		if (requestedDependencyFailure)
 		{

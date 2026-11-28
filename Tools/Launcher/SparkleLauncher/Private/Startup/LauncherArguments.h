@@ -18,7 +18,6 @@ namespace SparkleLauncher
 		std::string GameProfile = "DevelopmentGame";
 		WorkspaceIde WorkspaceIdePreference = WorkspaceIde::VisualStudio;
 		WorkspaceCompiler WorkspaceCompilerPreference = WorkspaceCompiler::Msvc;
-		std::string DryRunOperationId;
 		std::string RunOperationId;
 		std::string LevelId;
 		LevelRunMode Product = LevelRunMode::Editor;

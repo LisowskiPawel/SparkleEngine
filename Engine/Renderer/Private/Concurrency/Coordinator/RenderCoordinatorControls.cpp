@@ -39,46 +39,11 @@ std::uint64_t RenderCoordinator::GetShaderGeneration() const noexcept
 	return m_config.IsThreaded() ? m_shaderGeneration.load(std::memory_order_acquire) : GetSerialContext().GetShaderGeneration();
 }
 
-ShaderDiagnosticsSnapshot RenderCoordinator::CaptureShaderDiagnostics()
-{
-	m_producerOwner.AssertAccess();
-	RenderDiagnosticsCommand command{RenderDiagnosticsRequestKind::Shaders, 0, std::make_shared<RenderControlCompletion>()};
-	RenderControlResult result = ExecuteSynchronousControl(std::move(command));
-	return ExtractControlResult<ShaderDiagnosticsSnapshot>(std::move(result));
-}
-
-MeshDiagnosticsSnapshot RenderCoordinator::CaptureMeshDiagnostics()
-{
-	m_producerOwner.AssertAccess();
-
-	RenderDiagnosticsCommand command{RenderDiagnosticsRequestKind::Meshes, 0, std::make_shared<RenderControlCompletion>()};
-	RenderControlResult result = ExecuteSynchronousControl(std::move(command));
-	return ExtractControlResult<MeshDiagnosticsSnapshot>(std::move(result));
-}
-
-MeshPreviewGeometry RenderCoordinator::CaptureMeshPreview(std::uintptr_t meshRuntimeId)
-{
-	m_producerOwner.AssertAccess();
-
-	RenderDiagnosticsCommand command{RenderDiagnosticsRequestKind::MeshPreview, meshRuntimeId, std::make_shared<RenderControlCompletion>()};
-	RenderControlResult result = ExecuteSynchronousControl(std::move(command));
-	return ExtractControlResult<MeshPreviewGeometry>(std::move(result));
-}
-
-TextureDiagnosticsSnapshot RenderCoordinator::CaptureTextureDiagnostics()
-{
-	m_producerOwner.AssertAccess();
-
-	RenderDiagnosticsCommand command{RenderDiagnosticsRequestKind::Textures, 0, std::make_shared<RenderControlCompletion>()};
-	RenderControlResult result = ExecuteSynchronousControl(std::move(command));
-	return ExtractControlResult<TextureDiagnosticsSnapshot>(std::move(result));
-}
-
 RendererMemoryDiagnosticsSnapshot RenderCoordinator::CaptureMemoryDiagnostics()
 {
 	m_producerOwner.AssertAccess();
 
-	RenderDiagnosticsCommand command{RenderDiagnosticsRequestKind::Memory, 0, std::make_shared<RenderControlCompletion>()};
+	RenderMemoryDiagnosticsCommand command{std::make_shared<RenderControlCompletion>()};
 	RenderControlResult result = ExecuteSynchronousControl(std::move(command));
 	return ExtractControlResult<RendererMemoryDiagnosticsSnapshot>(std::move(result));
 }

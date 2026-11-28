@@ -4,12 +4,8 @@
 #include "Core/Public/Console/ConsoleOutput.h"
 
 #include "EditorAPI.h"
-#include "Renderer/Public/Diagnostics/MeshPreviewGeometry.h"
-#include "Renderer/Public/Diagnostics/ShaderDiagnostics.h"
 #include "Renderer/Public/UI/UiRenderPacket.h"
 #include "Renderer/Public/Settings/EngineRenderingSettings.h"
-#include "Renderer/Public/Meshes/MeshDiagnostics.h"
-#include "Renderer/Public/Resources/Textures/TextureDiagnostics.h"
 #include "Renderer/Public/Viewport/ViewportContracts.h"
 #include "Viewport/ViewportOutputAction.h"
 #include "Viewport/ViewportOverlay.h"
@@ -44,14 +40,6 @@ struct EditorHostServices final
 	InputSystem& Input;
 };
 
-struct EditorDiagnosticsProviders final
-{
-	std::function<ShaderDiagnosticsSnapshot()> Shaders;
-	std::function<MeshDiagnosticsSnapshot()> MeshDiagnostics;
-	std::function<TextureDiagnosticsSnapshot()> TextureDiagnostics;
-	std::function<MeshPreviewGeometry(std::uintptr_t)> MeshPreview;
-};
-
 class SPARKLE_EDITOR_API UI final
 {
 public:
@@ -70,9 +58,7 @@ public:
 	void SetViewportOverlay(std::unique_ptr<ViewportOverlay> overlay) noexcept;
 	void SetViewportRenderProducts(const ViewportRenderProducts& products) noexcept;
 	void SetViewportFinalColorTexture(UiTextureHandle texture) noexcept;
-	void SetDiagnosticsProviders(EditorDiagnosticsProviders providers);
 	void SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler);
-	void SetShaderCompileStatus(bool bBusy, std::string_view message = {});
 	void AppendConsoleOutput(ConsoleOutputRecord record, bool bShowConsole = false);
 	bool ConsumeShaderReloadRequest() noexcept;
 	ViewportOutputAction ConsumeViewportOutputAction() noexcept;

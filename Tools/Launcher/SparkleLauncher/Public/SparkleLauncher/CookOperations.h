@@ -38,7 +38,6 @@ namespace SparkleLauncher
 	{
 		CookOperationKind Kind = CookOperationKind::CookAllAssets;
 		std::string Id;
-		std::string Group;
 		std::string DisplayName;
 		std::string Description;
 	};
@@ -76,7 +75,6 @@ namespace SparkleLauncher
 		std::vector<std::filesystem::path> RequiredToolPaths;
 		std::filesystem::path CookedOutputDirectory;
 		std::vector<CookOperationStep> Steps;
-		std::vector<std::string> PlannedEffects;
 		std::vector<std::string> ReadinessMessages;
 		bool bCanRun = false;
 	};

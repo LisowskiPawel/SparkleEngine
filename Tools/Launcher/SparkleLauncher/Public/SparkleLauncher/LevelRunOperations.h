@@ -25,7 +25,6 @@ namespace SparkleLauncher
 	struct LevelRunOperationDefinition
 	{
 		std::string Id;
-		std::string Group;
 		std::string DisplayName;
 		std::string Description;
 	};
@@ -56,7 +55,6 @@ namespace SparkleLauncher
 		std::string TargetName;
 		std::string SessionId;
 		LevelRunOperationStep Step;
-		std::vector<std::string> PlannedEffects;
 		std::vector<std::string> ReadinessMessages;
 		bool bCanRun = false;
 	};

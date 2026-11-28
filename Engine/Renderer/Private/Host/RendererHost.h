@@ -11,7 +11,6 @@ class RendererExecutionContext;
 struct enkiTaskScheduler;
 class Window;
 struct RendererMemoryDiagnosticsSnapshot;
-struct ShaderDiagnosticsSnapshot;
 struct RhiDeviceLaunch;
 
 class RendererHost final
@@ -30,7 +29,6 @@ private:
 
 	std::unique_ptr<FramePipeline> CreateFramePipeline(enkiTaskScheduler* io, enkiTaskScheduler* cpu, enkiTaskScheduler* frameScheduler, bool bEnableUiRenderPackets);
 	void ReloadShaders();
-	ShaderDiagnosticsSnapshot CaptureShaderDiagnostics() const;
 	std::uint64_t GetShaderGeneration() const noexcept;
 	RendererMemoryDiagnosticsSnapshot CaptureMemoryDiagnostics() const;
 	void SettleForShutdown() noexcept;

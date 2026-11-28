@@ -12,7 +12,6 @@
 
 #include <algorithm>
 #include <optional>
-#include <sstream>
 #include <system_error>
 
 namespace SparkleLauncher
@@ -121,28 +120,6 @@ namespace SparkleLauncher
 		return bProductReady && bCookedContentReady;
 	}
 
-	static std::string BuildRunDryRunText(const LevelRunOperationPlan& plan, std::string_view displayName)
-	{
-		std::ostringstream dryRun;
-		dryRun << "Dry-run plan for " << displayName << ":";
-		if (plan.bCanRun)
-		{
-			const LevelRunOperationStep& step = plan.Step;
-			dryRun << "\n  " << step.DisplayName << ": " << BuildDisplayCommandLine(step.Request.ExecutablePath, step.Request.Arguments);
-			dryRun << "\n    Working directory: " << Strings::ToNarrow(plan.Step.Request.WorkingDirectory.wstring());
-			dryRun << "\n    Env: SPARKLE_STARTUP_LEVEL=" << plan.Request.LevelId;
-			if (!step.Request.LogPath.empty())
-			{
-				dryRun << "\n    Log: " << Strings::ToNarrow(step.Request.LogPath.wstring());
-			}
-		}
-		else
-		{
-			dryRun << "\n  No command step is available until readiness issues are resolved.";
-		}
-		return dryRun.str();
-	}
-
 	std::string_view ToString(LevelRunMode mode) noexcept
 	{
 		switch (mode)
@@ -159,7 +136,7 @@ namespace SparkleLauncher
 	const std::vector<LevelRunOperationDefinition>& GetLevelRunOperationDefinitions()
 	{
 		static const std::vector<LevelRunOperationDefinition> definitions = {
-		    {"levels.run", "Levels", "Run Level", "Open a catalog level in the selected product after its prerequisites are ready."},
+		    {"levels.run", "Run Level", "Open a catalog level in the selected product after its prerequisites are ready."},
 		};
 
 		return definitions;
@@ -186,14 +163,6 @@ namespace SparkleLauncher
 
 		plan.Request = request;
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
-
-		plan.Operation.Inputs = {
-		    {"content", plan.Request.ContentId},
-		    {"runMode", std::string(ToString(plan.Request.RunMode))},
-		    {"profile", plan.Request.ProductProfile},
-		    {"level", plan.Request.LevelId},
-		    {"graphicsApi", plan.Request.GraphicsApi},
-		    {"captureProvider", std::string(ExternalCaptureProviderToString(plan.Request.CaptureProvider))}};
 
 		if (plan.Request.LevelId.empty())
 		{
@@ -231,18 +200,11 @@ namespace SparkleLauncher
 
 		plan.bCanRun = InspectRunReadiness(plan);
 
-		plan.PlannedEffects.push_back(
-		    "Run level " + plan.Request.LevelId + " in " + Strings::ToNarrow(plan.Step.Request.ExecutablePath.wstring()) + " from " + Strings::ToNarrow(plan.Step.Request.WorkingDirectory.wstring())
-		    + ".");
-
-		plan.PlannedEffects.push_back("Use graphics API: " + plan.Request.GraphicsApi + ".");
-
 		if (plan.bCanRun)
 		{
 			ConfigureLevelRunStep(plan);
 		}
 
-		plan.Operation.DryRunText = BuildRunDryRunText(plan, definition->DisplayName);
 		return plan;
 	}
 }

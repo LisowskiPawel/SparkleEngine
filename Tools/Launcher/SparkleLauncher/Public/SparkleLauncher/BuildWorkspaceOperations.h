@@ -36,7 +36,6 @@ namespace SparkleLauncher
 		std::filesystem::path Path;
 		std::string Detail;
 		std::optional<WorkspaceCompiler> Compiler;
-		bool bCanInstall = false;
 	};
 
 	struct BuildToolchainStatus
@@ -52,7 +51,6 @@ namespace SparkleLauncher
 		std::filesystem::path VswherePath;
 		std::filesystem::path VisualStudioPath;
 		std::filesystem::path VisualStudioIdePath;
-		std::filesystem::path VisualStudioInstallerPath;
 		std::filesystem::path ClangClPath;
 		std::filesystem::path QtRootPath;
 		std::filesystem::path QtQmakePath;
@@ -109,29 +107,24 @@ namespace SparkleLauncher
 		SyncCode,
 		GenerateBuildFiles,
 		BuildWorkspace,
-		CompileLauncher,
 		CompileEditor,
 		CompileGame,
-		BuildCookTools,
-		InstallHostTool
+		BuildCookTools
 	};
 
 	enum class BuildWorkspaceScope : std::uint8_t
 	{
 		Editor,
 		Game,
-		CookTools,
-		Launcher
+		CookTools
 	};
 
 	struct BuildWorkspaceOperationDefinition
 	{
 		BuildWorkspaceOperationKind Kind = BuildWorkspaceOperationKind::SyncCode;
 		std::string Id;
-		std::string Group;
 		std::string DisplayName;
 		std::string Description;
-		bool bReplacesLauncherArtifact = false;
 	};
 
 	struct BuildWorkspaceOperationRequest
@@ -143,9 +136,7 @@ namespace SparkleLauncher
 		WorkspaceIde PreferredIde = WorkspaceIde::VisualStudio;
 		WorkspaceCompiler Compiler = WorkspaceCompiler::Msvc;
 		std::vector<BuildWorkspaceScope> SelectedScopes = {BuildWorkspaceScope::Editor, BuildWorkspaceScope::Game, BuildWorkspaceScope::CookTools};
-		std::vector<std::string> SelectedTargets;
 		std::string SourceDependencyId;
-		std::string HostToolId;
 		bool bForceConfigure = false;
 	};
 
@@ -166,17 +157,14 @@ namespace SparkleLauncher
 		BuildFilesFreshnessStatus Freshness;
 		SourceDependencyInventoryStatus SourceDependencies;
 		std::vector<BuildWorkspaceOperationStep> Steps;
-		std::vector<std::string> PlannedEffects;
 		std::vector<std::string> ReadinessMessages;
 		bool bCanRun = false;
 	};
 
-	std::string BuildWorkspaceScopeId(BuildWorkspaceScope scope);
 	bool HasSelectedBuildScope(const BuildWorkspaceOperationRequest& request, BuildWorkspaceScope scope);
 	std::vector<std::string> ResolveWorkspaceBuildTargets(const BuildWorkspaceOperationPlan& plan, BuildWorkspaceScope scope);
 	bool TryParseBuildWorkspaceScope(std::string_view text, BuildWorkspaceScope& outScope);
 	std::string DisplayName(WorkspaceIde ide);
-	std::string WorkspaceIdeCommandLineValue(WorkspaceIde ide);
 	bool TryParseWorkspaceIde(std::string_view text, WorkspaceIde& outIde);
 	std::string DisplayName(WorkspaceCompiler compiler);
 	std::string WorkspaceCompilerCommandLineValue(WorkspaceCompiler compiler);

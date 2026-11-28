@@ -1,30 +1,14 @@
 #include "SparkleLauncher/BuildWorkspaceOperations.h"
 
 #include "Workspace/LauncherProductPaths.h"
-#include "Build/NativeBuildOutputReset.h"
 #include "Build/BuildWorkspaceProcessRequests.h"
-#include "Build/Toolchains/HostToolInstaller.h"
 #include "Core/Public/Diagnostics/Error.h"
-#include "Core/Public/Strings/StringUtils.h"
 #include "ToolOutputPaths.h"
 
 #include <algorithm>
-#include <optional>
-#include <sstream>
-#include <utility>
 
 namespace SparkleLauncher
 {
-	static void AddReadiness(BuildWorkspaceOperationPlan& plan, std::string message)
-	{
-		plan.ReadinessMessages.push_back(std::move(message));
-	}
-
-	static void AddPlannedEffect(BuildWorkspaceOperationPlan& plan, std::string message)
-	{
-		plan.PlannedEffects.push_back(std::move(message));
-	}
-
 	static bool RequireCurrentWorkspace(BuildWorkspaceOperationPlan& plan)
 	{
 		if (plan.Freshness.bCurrent)
@@ -32,7 +16,7 @@ namespace SparkleLauncher
 			return true;
 		}
 
-		AddReadiness(plan, "Generated build files are not current. Run Generate Build Files first.");
+		plan.ReadinessMessages.push_back("Generated build files are not current. Run Generate Build Files first.");
 		return false;
 	}
 
@@ -43,7 +27,7 @@ namespace SparkleLauncher
 			return true;
 		}
 
-		AddReadiness(plan, "Enabled workspace configure prerequisites are incomplete.");
+		plan.ReadinessMessages.push_back("Enabled workspace configure prerequisites are incomplete.");
 		for (const ToolchainItemStatus& item : plan.Toolchain.Items)
 		{
 			const bool bUnresolvedRequiredToolId = item.Id == "shader-compiler-sdk" || item.Id == "vulkan-sdk";
@@ -52,7 +36,7 @@ namespace SparkleLauncher
 
 			if (bUnresolvedRequiredTool)
 			{
-				AddReadiness(plan, item.Detail);
+				plan.ReadinessMessages.push_back(item.Detail);
 			}
 		}
 		return false;
@@ -65,45 +49,15 @@ namespace SparkleLauncher
 			return true;
 		}
 
-		AddReadiness(plan, "Enabled repository dependencies are incomplete. Run Sync Code before local build workflows.");
+		plan.ReadinessMessages.push_back("Enabled repository dependencies are incomplete. Run Sync Code before local build workflows.");
 		return false;
-	}
-
-	static bool AdmitHostToolInstallation(BuildWorkspaceOperationPlan& plan)
-	{
-		const BuildWorkspaceOperationRequest& request = plan.Request;
-		const HostToolInstallerDefinition* installer = FindHostToolInstaller(request.HostToolId);
-		if (installer == nullptr)
-		{
-			AddReadiness(plan, "No launcher installer is registered for host tool '" + request.HostToolId + "'.");
-			return false;
-		}
-
-		const auto status = std::find_if(plan.Toolchain.Items.begin(), plan.Toolchain.Items.end(), [&request](const ToolchainItemStatus& item) { return item.Id == request.HostToolId; });
-		if (status != plan.Toolchain.Items.end() && status->State == ToolchainItemState::Found)
-		{
-			AddReadiness(plan, installer->DisplayName + " is already installed.");
-			return false;
-		}
-		if (!CanInstallHostTool(request.HostToolId, plan.Toolchain))
-		{
-			AddReadiness(plan, "The registered launcher installer for " + installer->DisplayName + " is unavailable on this machine.");
-			return false;
-		}
-
-		AddPlannedEffect(plan, installer->InstallEffect);
-		return true;
 	}
 
 	static bool AdmitWorkspaceOperation(BuildWorkspaceOperationPlan& plan)
 	{
-		if (plan.Kind == BuildWorkspaceOperationKind::InstallHostTool)
-		{
-			return AdmitHostToolInstallation(plan);
-		}
 		if (!plan.Toolchain.bRequiredToolsAvailable)
 		{
-			AddReadiness(plan, "Required host prerequisites are missing or unsupported.");
+			plan.ReadinessMessages.push_back("Required host prerequisites are missing or unsupported.");
 			return false;
 		}
 
@@ -114,47 +68,24 @@ namespace SparkleLauncher
 				{
 					return false;
 				}
-				AddPlannedEffect(plan, "Validate pinned source dependencies and acquire missing caches.");
 				return true;
 			case BuildWorkspaceOperationKind::GenerateBuildFiles:
-				if (!RequireConfigurePrerequisites(plan))
-				{
-					return false;
-				}
-				if (HasIncompleteEnabledSourceDependencies(plan))
-				{
-					AddPlannedEffect(plan, "Repair incomplete enabled source dependency caches while refreshing generated workspace files.");
-				}
-				if (RequiresNativeBuildOutputReset(plan.Freshness.State))
-				{
-					AddPlannedEffect(plan, "Reset compiler-produced outputs that are incompatible with the selected toolchain while preserving source caches and cooked content.");
-				}
-				return true;
+				return RequireConfigurePrerequisites(plan);
 			case BuildWorkspaceOperationKind::BuildWorkspace:
 				if (plan.Request.SelectedScopes.empty())
 				{
-					AddReadiness(plan, "Select at least one workspace build scope.");
+					plan.ReadinessMessages.push_back("Select at least one workspace build scope.");
 					return false;
 				}
 				if (!RequireSyncedSourceDependencies(plan) || !RequireConfigurePrerequisites(plan))
 				{
 					return false;
 				}
-				if (BuildWorkspaceOperationRequiresConfigureStep(plan) && RequiresNativeBuildOutputReset(plan.Freshness.State))
-				{
-					AddPlannedEffect(plan, "Reset compiler-produced outputs that are incompatible with the selected toolchain while preserving source caches and cooked content.");
-				}
-				AddPlannedEffect(plan, "Build the selected workspace products in dependency order using incremental CMake builds.");
-				return true;
-			case BuildWorkspaceOperationKind::CompileLauncher:
-				AddPlannedEffect(plan, "Configure the Launcher-owned product graph, then rebuild its executable and deployed support files.");
 				return true;
 			case BuildWorkspaceOperationKind::CompileEditor:
 			case BuildWorkspaceOperationKind::CompileGame:
 			case BuildWorkspaceOperationKind::BuildCookTools:
 				return RequireSyncedSourceDependencies(plan) && RequireConfigurePrerequisites(plan) && RequireCurrentWorkspace(plan);
-			case BuildWorkspaceOperationKind::InstallHostTool:
-				return false;
 		}
 		return false;
 	}
@@ -162,32 +93,18 @@ namespace SparkleLauncher
 	const std::vector<BuildWorkspaceOperationDefinition>& GetBuildWorkspaceOperationDefinitions()
 	{
 		static const std::vector<BuildWorkspaceOperationDefinition> definitions = {
-		    {BuildWorkspaceOperationKind::SyncCode,
-		        "workspace.sync-code",
-		        "Sync",
-		        "Sync Code",
-		        "Download enabled repository dependencies and refresh workspace configure state; registered host-tool actions remain "
-		        "available "
-		        "on the same page."},
+		    {BuildWorkspaceOperationKind::SyncCode, "workspace.sync-code", "Sync Code", "Download enabled repository dependencies and refresh workspace configure state."},
 		    {BuildWorkspaceOperationKind::GenerateBuildFiles,
 		        "workspace.generate-build-files",
-		        "Build",
 		        "Generate Build Files",
 		        "Refresh generated CMake and IDE build files for the selected generator, platform, toolset, and Qt kit."},
 		    {BuildWorkspaceOperationKind::BuildWorkspace,
 		        "workspace.build",
-		        "Build",
 		        "Build Workspace",
-		        "Build the selected editor, game, cooking-tool, and launcher scopes; refresh generated workspace files when needed."},
-		    {BuildWorkspaceOperationKind::CompileLauncher, "launcher.build.self", "Build", "Build Launcher", "Optional local rebuild of Sparkle Launcher for development or customization.", true},
-		    {BuildWorkspaceOperationKind::CompileEditor, "workspace.build.editor", "Build", "Build Editor", "Optional local rebuild of the editor target."},
-		    {BuildWorkspaceOperationKind::CompileGame, "workspace.build.game", "Build", "Build Game", "Optional local rebuild of the game target."},
-		    {BuildWorkspaceOperationKind::BuildCookTools, "cook.tools.prepare", "Build", "Build Cooking Tools", "Optional local build of tools required by recook workflows."},
-		    {BuildWorkspaceOperationKind::InstallHostTool,
-		        "workspace.install-host-tool",
-		        "Setup",
-		        "Install Host Tool",
-		        "Install a registered host tool through its launcher-owned installation provider."},
+		        "Build the selected editor, game and cooking-tool scopes; refresh generated workspace files when needed."},
+		    {BuildWorkspaceOperationKind::CompileEditor, "workspace.build.editor", "Build Editor", "Optional local rebuild of the editor target."},
+		    {BuildWorkspaceOperationKind::CompileGame, "workspace.build.game", "Build Game", "Optional local rebuild of the game target."},
+		    {BuildWorkspaceOperationKind::BuildCookTools, "cook.tools.prepare", "Build Cooking Tools", "Optional local build of tools required by recook workflows."},
 		};
 
 		return definitions;
@@ -200,34 +117,6 @@ namespace SparkleLauncher
 		return found == definitions.end() ? nullptr : &*found;
 	}
 
-	static void RecordBuildInputs(BuildWorkspaceOperationPlan& plan)
-	{
-		const BuildWorkspaceOperationRequest& request = plan.Request;
-		plan.Operation.Inputs.push_back({"content", request.ContentId});
-		plan.Operation.Inputs.push_back({"editorProfile", request.EditorProfile});
-		plan.Operation.Inputs.push_back({"gameProfile", request.GameProfile});
-		plan.Operation.Inputs.push_back({"workspaceIde", WorkspaceIdeCommandLineValue(request.PreferredIde)});
-		plan.Operation.Inputs.push_back({"workspaceCompiler", WorkspaceCompilerCommandLineValue(request.Compiler)});
-		if (plan.Kind == BuildWorkspaceOperationKind::BuildWorkspace && !request.SelectedScopes.empty())
-		{
-			std::vector<std::string> scopeIds;
-			scopeIds.reserve(request.SelectedScopes.size());
-			for (const BuildWorkspaceScope scope : request.SelectedScopes)
-			{
-				scopeIds.push_back(BuildWorkspaceScopeId(scope));
-			}
-			plan.Operation.Inputs.push_back({"buildScopes", Strings::Join(scopeIds, ",")});
-		}
-		if (!request.SourceDependencyId.empty())
-		{
-			plan.Operation.Inputs.push_back({"sourceDependency", request.SourceDependencyId});
-		}
-		if (!request.HostToolId.empty())
-		{
-			plan.Operation.Inputs.push_back({"hostTool", request.HostToolId});
-		}
-	}
-
 	static void InspectWorkspacePrerequisites(BuildWorkspaceOperationPlan& plan)
 	{
 		const BuildWorkspaceOperationRequest& request = plan.Request;
@@ -236,55 +125,29 @@ namespace SparkleLauncher
 		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(request.WorkspaceRoot);
 		plan.SourceDependencies = InspectSourceDependencyCache(workspaceOutputs.DependencyCacheRoot);
 
-		AddReadiness(plan, plan.Toolchain.bRequiredToolsAvailable ? "Required toolchain is available." : "Required toolchain is incomplete.");
-		AddReadiness(plan, plan.Freshness.Summary);
+		plan.ReadinessMessages.push_back(plan.Toolchain.bRequiredToolsAvailable ? "Required toolchain is available." : "Required toolchain is incomplete.");
+		plan.ReadinessMessages.push_back(plan.Freshness.Summary);
 		if (!plan.SourceDependencies.bAllEnabledDependenciesReady)
 		{
 			for (const std::string& message : plan.SourceDependencies.ReadinessMessages)
 			{
-				AddReadiness(plan, message);
+				plan.ReadinessMessages.push_back(message);
 			}
 		}
 	}
 
-	static void BuildExecutablePreview(BuildWorkspaceOperationPlan& plan)
+	static void PrepareBuildSteps(BuildWorkspaceOperationPlan& plan)
 	{
 		try
 		{
 			plan.Steps = BuildProcessStepsForPlan(plan);
-			for (const BuildWorkspaceOperationStep& step : plan.Steps)
-			{
-				if (plan.Kind != BuildWorkspaceOperationKind::InstallHostTool)
-				{
-					AddPlannedEffect(plan, step.DisplayName + ".");
-				}
-			}
 		}
 		catch (const Diagnostics::Error& error)
 		{
 			plan.bCanRun = false;
 			plan.Steps.clear();
-			AddReadiness(plan, std::string("Operation planning failed: ") + error.what());
+			plan.ReadinessMessages.push_back(std::string("Operation planning failed: ") + error.what());
 		}
-	}
-
-	static void DescribeBuildDryRun(BuildWorkspaceOperationPlan& plan, std::string_view displayName)
-	{
-		std::ostringstream dryRun;
-		dryRun << "Dry-run plan for " << displayName << ":";
-		for (const BuildWorkspaceOperationStep& step : plan.Steps)
-		{
-			dryRun << "\n  " << step.DisplayName << ": " << BuildDisplayCommandLine(step.Request.ExecutablePath, step.Request.Arguments);
-			if (!step.Request.LogPath.empty())
-			{
-				dryRun << "\n    Log: " << step.Request.LogPath.string();
-			}
-		}
-		if (plan.Steps.empty())
-		{
-			dryRun << "\n  No command step required.";
-		}
-		plan.Operation.DryRunText = dryRun.str();
 	}
 
 	BuildWorkspaceOperationPlan PlanLauncherOperation(std::string_view operationId, const BuildWorkspaceOperationRequest& request)
@@ -295,18 +158,17 @@ namespace SparkleLauncher
 		{
 			plan.Operation = MakeOperationRecord(std::string(operationId), "Unknown build operation");
 			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Unknown build/workspace operation id.", "Choose a registered Build or Sync operation, then retry.");
-			AddReadiness(plan, plan.Operation.Failure->Summary);
+			plan.ReadinessMessages.push_back(plan.Operation.Failure->Summary);
 			return plan;
 		}
 
 		plan.Kind = definition->Kind;
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
 		plan.Request = request;
-		RecordBuildInputs(plan);
 		if (!HasBuildSources(request.WorkspaceRoot))
 		{
 			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Source workspace operations are unavailable in a portable package.", "Use a source checkout for this operation.");
-			AddReadiness(plan, plan.Operation.Failure->Summary);
+			plan.ReadinessMessages.push_back(plan.Operation.Failure->Summary);
 			return plan;
 		}
 
@@ -314,9 +176,8 @@ namespace SparkleLauncher
 		plan.bCanRun = AdmitWorkspaceOperation(plan);
 		if (plan.bCanRun)
 		{
-			BuildExecutablePreview(plan);
+			PrepareBuildSteps(plan);
 		}
-		DescribeBuildDryRun(plan, definition->DisplayName);
 		return plan;
 	}
 }

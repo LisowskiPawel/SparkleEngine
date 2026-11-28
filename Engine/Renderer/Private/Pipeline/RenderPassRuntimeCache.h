@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Pipeline/RenderPassRuntimeStorage.h"
-#include "Renderer/Public/Diagnostics/ShaderDiagnostics.h"
 #include "RHI/Public/Commands/RhiQueue.h"
 
 #include <cassert>
@@ -25,7 +24,6 @@ public:
 
 	std::uint64_t GetShaderGeneration() const noexcept;
 	std::uint64_t GetShaderPublicationHash() const noexcept;
-	ShaderDiagnosticsSnapshot CaptureShaderDiagnostics() const;
 	void ReloadShaders();
 	void PollRetiredGenerations() noexcept;
 

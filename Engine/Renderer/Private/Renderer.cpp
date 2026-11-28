@@ -1,6 +1,5 @@
 #include "PCH.h"
 #include "Renderer.h"
-#include "Renderer/Public/Resources/Textures/TextureDiagnostics.h"
 
 #include "Concurrency/Coordinator/RenderCoordinator.h"
 #include "GameFramework/Public/Rendering/RenderFrameSubmission.h"
@@ -72,29 +71,9 @@ std::uint64_t Renderer::GetShaderGeneration() const noexcept
 	return m_state->Coordinator->GetShaderGeneration();
 }
 
-ShaderDiagnosticsSnapshot Renderer::CaptureShaderDiagnostics() const
-{
-	return m_state->Coordinator->CaptureShaderDiagnostics();
-}
-
-MeshDiagnosticsSnapshot Renderer::CaptureMeshDiagnostics() const
-{
-	return m_state->Coordinator->CaptureMeshDiagnostics();
-}
-
-TextureDiagnosticsSnapshot Renderer::CaptureTextureDiagnostics() const
-{
-	return m_state->Coordinator->CaptureTextureDiagnostics();
-}
-
 RendererMemoryDiagnosticsSnapshot Renderer::CaptureMemoryDiagnostics() const
 {
 	return m_state->Coordinator->CaptureMemoryDiagnostics();
-}
-
-MeshPreviewGeometry Renderer::CaptureMeshPreview(std::uintptr_t meshRuntimeId) const
-{
-	return m_state->Coordinator->CaptureMeshPreview(meshRuntimeId);
 }
 
 void Renderer::SubmitRenderFrame(RenderFrameSubmission submission) noexcept

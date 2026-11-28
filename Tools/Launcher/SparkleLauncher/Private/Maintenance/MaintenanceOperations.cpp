@@ -74,7 +74,7 @@ namespace SparkleLauncher
 	const std::vector<MaintenanceOperationDefinition>& GetMaintenanceOperationDefinitions()
 	{
 		static const std::vector<MaintenanceOperationDefinition> definitions = {
-		    {"workspace.clean", "Clean", "Clean Workspace", "Remove generated files for the selected confirmed scope."},
+		    {"workspace.clean", "Clean Workspace", "Remove generated files for the selected confirmed scope."},
 		};
 
 		return definitions;

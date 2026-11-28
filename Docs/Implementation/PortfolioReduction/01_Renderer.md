@@ -2,7 +2,7 @@
 
 [Execution order and shared delivery rules](README.md) | [Closed scope record](../PortfolioScopeDecisions.md) | [Engineering](../../Engineering.md)
 
-Status: planned, source inspected on 25 November 2026 at `039d7b802` with the current documentation working tree. No stage is delivered by writing this plan. The [shared stage protocol](README.md#stage-protocol) applies without duplication here; remove each verified stage in the delivery change.
+Remaining: the Stage 0 real-time baseline and **four delivery stages (1-4)**. The [shared stage protocol](README.md#stage-protocol) applies: remove each verified stage in its delivery change; partial stages list only unmet work.
 
 **Execution order: 01 of 21 (first focused visit).** Start: Stages 0-1 in Wave 1. Resume / dependency: Stages 2-4 in Wave 7, after runtime/content contracts are narrowed. Follow the [stage queue](README.md#suggested-execution-order); do not finish this whole file before a listed prerequisite. Dominant owners may change this module earlier as part of a complete system.
 
@@ -58,39 +58,29 @@ Keep `RenderFrame` for frame-slot scene/view data and `RenderFrameGraph*` for to
 
 Recover the real-time Sponza image using one fixed camera and identified source, content and settings. Inspect raw signals before and after display processing; use bounded analytic checks and suitable external comparisons to find the first incorrect stage. Retire Reference-only defects and convergence/export work; preserve repairs required by the retained real-time frame.
 
-## Stage 0: freeze the actual responsibility and smaller target
+## Stage 0: freeze the remaining real-time baseline
 
-Map every ReferencePathTracer type, render mode, session/accumulation/checkpoint/export setting, shader registration and Application/Editor caller. Classify shared EXR/readback/capture/lighting code by its remaining real-time consumer; do not remove TinyEXR or general readback by folder label. Freeze representative real-time raw signals/camera/settings before touching mode selection.
+Use the [source/design checkpoint](../../../build/validation/portfolio-reduction/renderer-stage-0/REPORT.md), [closure manifest](../../../build/validation/portfolio-reduction/renderer-stage-0/closure.csv), [frozen inputs](../../../build/validation/portfolio-reduction/renderer-stage-0/frozen-inputs.json) and [comparison/failure checks](../../../build/validation/portfolio-reduction/renderer-stage-0/CHECKS.md). Refresh identities and revisit affected audit findings only when their source contract changed.
 
-Start at these current sources (entry/retirement seeds, not a blind delete list):
-
-- [Engine/Renderer/Private/Passes/Lighting/ReferencePathTracer](../../../Engine/Renderer/Private/Passes/Lighting/ReferencePathTracer)
-- [Engine/Application/Private/Editor/ReferencePathTracer](../../../Engine/Application/Private/Editor/ReferencePathTracer)
-- [Engine/Editor/Private/Viewport/ReferencePathTracer](../../../Engine/Editor/Private/Viewport/ReferencePathTracer)
-- [Engine/Assets/Shaders/Passes/Lighting/ReferencePathTracer](../../../Engine/Assets/Shaders/Passes/Lighting/ReferencePathTracer)
-- [Engine/Application/Private/Editor/Capture/ImageEncoding.cpp](../../../Engine/Application/Private/Editor/Capture/ImageEncoding.cpp)
-
-Before coding, apply the shared Stage 0 protocol to the complete producers/callers and write the minimal target ownership/data-flow sketch plus measured deletion/replacement budget. Preserve every 🟢 contract; ⚫* cuts stay conditional. Inputs and requirements not exercised by the source audit remain unqualified. Reject a candidate that removes useful parallel work, duplicates state or merely moves the same code.
+Before touching mode selection, capture the representative real-time raw signals with the identified cameras/settings on D3D12 and Vulkan. Resolve the raw Radiance export/reader-lifetime question through its actual graph/readback owners. Keep missing observations and existing rendering failures unqualified; planned checks and frozen input text are not rendered baselines.
 
 **Implementation prompt:**
 
 ```text
-Prepare Stage 0 of Docs/Implementation/PortfolioReduction/01_Renderer.md: freeze the actual responsibility and smaller target.
-Read this module's outcome, retained contracts, source entry points and Stage 0 questions; read Docs/CodeStyle.md, Docs/Engineering.md, Docs/Goals.md, Docs/References.md, Docs/Roadmap.md and Docs/Implementation/PortfolioReduction/README.md. Refresh current HEAD/working-tree identities and respect concurrent work. Audit the named retirement closure/participation in this plan, including narrowed retained capabilities; prepare a transitive retire/retain-with-consumer/unresolved manifest and rerun it after each layer disappears. Do not implement the production refactor in this stage.
+Finish the remaining Stage 0 baseline in Docs/Implementation/PortfolioReduction/01_Renderer.md.
+Read the linked source/design checkpoint, closure manifest, frozen inputs and CHECKS.md, this plan's retained contracts, the shared stage protocol and current five guides. Refresh HEAD/working-tree and relevant source/content/SDK/cooked identities; preserve concurrent work and do not compete with another build. Revisit the design/ownership/budget only where changed inputs invalidate it. Do not implement the Reference retirement in this stage.
 
 Acceptance criteria:
-- Specify this plan's Adapt the surviving design contract: vanished assumption, concrete smaller API/data/control flow, caller changes, selected reference lesson and local limits. Budget all replacement/caller code and name the retained behavior/failure check.
-- an actionable producer/consumer and lifetime map, final-consumer classification, specific changed files/targets, scoped correctness/performance bounds and a proposed net reduction. This is the implementer's concrete design checkpoint, not a request for a new framework or approval ceremony.
-- Map each proposed changed function to one cohesive responsibility/owner and an intent-based name; distinguish workflow orchestration from implementation mechanisms. Specify callers/contracts/files/build outputs to retire and the sole target path; no legacy/backward-compatibility reader, alias, migration, disabled stub or old/new implementation may be planned.
-- Define stage-specific success, invalid-input/failure/cancellation/lifetime checks and measured bounds before coding; retain all approved parallel/data-oriented/game/render/RHI contracts. No unsupported performance or qualification claim.
+- Acquire identified real-time raw/output observations through existing readback/native capture owners for the frozen Empty/CornellBox, Sponza, Knight/Cesium, Bistro and subsurface cases, on both APIs and both GBuffer routes. Record failed or unavailable cases explicitly; never substitute a different scene or an encoded screenshot for the required raw signal.
+- Bind camera, resolved settings, frame/history/random inputs, source/content/shader/native identities and each observation to the existing numeric checks before a Stage 1 candidate. Keep known image/material/Vulkan defects and any unrun cost/failure checks open.
+- Establish the allocation and queue/fence lifetime of real-time Radiance through transient aliasing, graph replacement and delayed readback. Record the resulting ownership conclusion and any necessary bounded repair in the existing design/budget; do not add another accumulator, copied state store or synchronous replacement.
 
 Failure modes to reject:
-- The feature disappears but surviving contracts retain obsolete generality, or an upstream framework is copied without a local invariant.
-- Historical Renderer paths, footprint counts or old receipts are treated as current without tracing actual callers/build inputs.
-- Mixed retained/retired responsibilities or CPU/GPU reader lifetimes are omitted, leaving no safe complete-system cut or measurable replacement budget.
-- A generic wrapper/framework, serial execution, retained compatibility path or source relocation is substituted for a smaller complete design. A first-order-only dependency scan is insufficient.
+- Source/input hashes, a build, process launch or capture request are reported as an observed raw-image baseline.
+- A corrupt or mismatched baseline is labelled correct, missing coverage is silently waived, or image/cost bounds change after candidate results.
+- Raw product metadata is treated as ownership, useful parallel work is serialized, or ordinary capture/TinyEXR/retained lighting loses its consumer or lifetime guarantee.
 
-Deliver the concrete design/ownership map, bounded change and net footprint budget, planned checks and open conditions in ignored stage evidence. Keep CodeStyle's function/namespace/layout rules explicit in the design; permanent test-only additions are not authorized. Do not close an unproven implementation stage or change a recorded decision.
+Record commands, observations and remaining limits in ignored stage evidence linked above. Follow CodeStyle's function/namespace/layout rules for any necessary baseline repair; permanent test-only additions are not authorized. Remove this Stage 0 section only when its remaining exits pass. Do not close Stage 1 or change a recorded decision.
 ```
 
 ## Stage 1: Delete the independent Reference renderer as one system

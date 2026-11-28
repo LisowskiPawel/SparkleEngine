@@ -32,23 +32,6 @@ namespace SparkleLauncher
 		return OperationDestructiveScope::None;
 	}
 
-	static void RecordMaintenanceInputs(MaintenanceOperationPlan& plan)
-	{
-		plan.Operation.Inputs.push_back({"content", plan.Request.ContentId});
-		plan.Operation.Inputs.push_back({"editorProfile", plan.Request.EditorProfile});
-		for (const MaintenanceCleanPathSpec& target : plan.Request.RequestedCleanTargets)
-		{
-			plan.Operation.Inputs.push_back({"cleanTarget", target.Path.string()});
-		}
-		if (!plan.Request.bCleanLevelContent)
-		{
-			for (const CleanScope scope : ResolveRequestedCleanScopes(plan.Request))
-			{
-				plan.Operation.Inputs.push_back({"cleanScope", ToString(scope)});
-			}
-		}
-	}
-
 	static bool PrepareMaintenanceRequest(MaintenanceOperationPlan& plan)
 	{
 		if (!HasBuildSources(plan.Request.WorkspaceRoot))
@@ -111,10 +94,8 @@ namespace SparkleLauncher
 			{
 				return plan;
 			}
-			RecordMaintenanceInputs(plan);
 			InspectMaintenanceCleanTargets(plan);
 			AdmitMaintenanceClean(plan);
-			DescribeMaintenancePlan(plan);
 		}
 		catch (const Diagnostics::Error& error)
 		{

@@ -18,9 +18,6 @@ enum class RenderViewKind : std::uint8_t
 {
 	Game = 0,
 	Scene = 1,
-	Preview = 2,
-	Thumbnail = 3,
-	Debug = 4,
 };
 
 enum class RenderOutputFlags : std::uint16_t

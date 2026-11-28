@@ -11,7 +11,6 @@
 
 #include <nlohmann/json.hpp>
 #include "Workspace/LauncherProductPaths.h"
-#include "Core/Public/Paths/ProductUserStatePaths.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 #include <Windows.h>
@@ -56,9 +55,6 @@ namespace SparkleLauncher
 		}
 		plan.SessionId = Identifiers::CreateUuidV4String();
 		plan.ReadinessMessages.emplace_back("Aftermath inputs will be qualified by the child before devices; native collection is not active yet.");
-		const auto state = Filesystem::ResolveDevelopmentProductUserStatePaths(plan.Request.WorkspaceRoot, plan.Request.ContentId);
-		const auto incidentRoot = state.CrashesRoot / "GpuCrash";
-		plan.PlannedEffects.emplace_back("Reserve one private incident slot beneath " + Strings::ToNarrow(incidentRoot.wstring()) + ".");
 		return true;
 	}
 

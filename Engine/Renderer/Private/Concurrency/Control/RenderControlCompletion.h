@@ -1,10 +1,6 @@
 #pragma once
 
-#include "Diagnostics/MeshPreviewGeometry.h"
 #include "Diagnostics/RendererMemoryDiagnostics.h"
-#include "Diagnostics/ShaderDiagnostics.h"
-#include "Meshes/MeshDiagnostics.h"
-#include "Resources/Textures/TextureDiagnostics.h"
 #include "Core/Public/Console/CVarControl.h"
 #include "Renderer/Public/Settings/EngineRenderingSettings.h"
 
@@ -21,11 +17,7 @@ struct RenderControlError final
 using RenderControlResult = std::variant<
     std::monostate,
     RenderControlError,
-    MeshDiagnosticsSnapshot,
-    MeshPreviewGeometry,
-    TextureDiagnosticsSnapshot,
     RendererMemoryDiagnosticsSnapshot,
-    ShaderDiagnosticsSnapshot,
     CVarControlResult,
     EngineRenderingSettingsState>;
 

@@ -14,7 +14,6 @@ namespace SparkleLauncher
 	struct LevelOperationDefinition
 	{
 		std::string Id;
-		std::string Group;
 		std::string DisplayName;
 		std::string Description;
 	};
@@ -39,7 +38,6 @@ namespace SparkleLauncher
 		LevelOperationRequest Request;
 		std::filesystem::path CMakePath;
 		std::vector<LevelOperationStep> Steps;
-		std::vector<std::string> PlannedEffects;
 		std::vector<std::string> ReadinessMessages;
 		bool bCanRun = false;
 	};

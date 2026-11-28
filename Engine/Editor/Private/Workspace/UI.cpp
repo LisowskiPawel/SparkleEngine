@@ -36,19 +36,9 @@ void UI::SetViewportFinalColorTexture(UiTextureHandle texture) noexcept
 	m_implementation->SetViewportFinalColorTexture(texture);
 }
 
-void UI::SetDiagnosticsProviders(EditorDiagnosticsProviders providers)
-{
-	m_implementation->SetDiagnosticsProviders(std::move(providers));
-}
-
 void UI::SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler)
 {
 	m_implementation->SetShaderCompileHandler(std::move(handler));
-}
-
-void UI::SetShaderCompileStatus(bool bBusy, std::string_view message)
-{
-	m_implementation->SetShaderCompileStatus(bBusy, message);
 }
 
 void UI::AppendConsoleOutput(ConsoleOutputRecord record, bool bShowConsole)

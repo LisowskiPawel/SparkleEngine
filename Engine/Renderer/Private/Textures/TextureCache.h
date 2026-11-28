@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Textures/DefaultTextures.h"
-#include "Renderer/Public/Resources/Textures/TextureDiagnostics.h"
 #include "Rendering/RenderResourceTables.h"
 #include "Resources/Residency/AssetResidency.h"
 #include "RHI/Public/Resources/RhiResourceHandles.h"
@@ -44,7 +43,6 @@ enum class TextureId : std::uint8_t
 class TextureCache final
 {
 public:
-	using PreviewTextureResolver = TexturePreviewHandleResolver;
 
 	TextureCache(
 	    RhiResourceService& resourceService,
@@ -75,7 +73,6 @@ public:
 
 	std::uint64_t GetBindingRevision() const noexcept { return m_bindingRevision; }
 
-	TextureDiagnosticsSnapshot CaptureDiagnosticsSnapshot(const PreviewTextureResolver& resolvePreviewTexture) const;
 
 private:
 	using TextureKey = std::wstring;
@@ -134,7 +131,6 @@ private:
 	static std::uint64_t MakeAssetKey(const TextureKey& cacheKey);
 
 	RhiResourceService& m_resourceService;
-	RhiDescriptorService& m_descriptorService;
 	RendererTextureFactory m_textureFactory;
 	RhiCommandSubmissionService& m_submissions;
 	enkiTaskScheduler* m_io;

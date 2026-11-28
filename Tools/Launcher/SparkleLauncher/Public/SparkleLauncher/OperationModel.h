@@ -8,7 +8,6 @@
 #include <filesystem>
 #include <optional>
 #include <string>
-#include <vector>
 
 namespace SparkleLauncher
 {
@@ -54,23 +53,15 @@ namespace SparkleLauncher
 		std::string ExpectedAction;
 	};
 
-	struct OperationInput
-	{
-		std::string Name;
-		std::string Value;
-	};
-
 	struct OperationRecord
 	{
 		std::string Id;
 		std::string DisplayName;
-		std::vector<OperationInput> Inputs;
 		OperationStatus Status = OperationStatus::Pending;
 		std::filesystem::path LogPath;
 		std::chrono::system_clock::time_point StartTime;
 		std::chrono::system_clock::time_point EndTime;
 		std::optional<int> ExitCode;
-		std::string DryRunText;
 		OperationDestructiveScope DestructiveScope = OperationDestructiveScope::None;
 		bool bRequiresConfirmation = false;
 		std::optional<OperationFailure> Failure;

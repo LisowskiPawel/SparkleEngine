@@ -25,4 +25,11 @@ void ExportViewportFrameProducts(FrameGraphBuilder& builder, const RenderFrameGr
 	{
 		builder.ExportTexture(resources.ViewportProducts.Normals, "Viewport.Normals");
 	}
+
+	const bool bExportRadiance = HasAnyRenderOutputFlags(settings.RequestedOutputs, RenderOutputFlags::Radiance) && resources.ViewportProducts.Radiance.IsValid();
+
+	if (bExportRadiance)
+	{
+		builder.ExportTexture(resources.ViewportProducts.Radiance, "Viewport.Radiance");
+	}
 }

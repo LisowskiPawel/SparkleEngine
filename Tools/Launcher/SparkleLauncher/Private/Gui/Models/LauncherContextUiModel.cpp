@@ -114,9 +114,7 @@ namespace SparkleLauncher
 		        bMsvcAvailable},
 		    {"clang-cl",
 		        "clang-cl",
-		        bClangClAvailable ? PathDetail(toolchain.ClangClPath, QStringLiteral("clang-cl is installed."))
-		                          : (clangCl != nullptr && clangCl->bCanInstall ? QStringLiteral("Open Sync > Sync Code and choose Install for clang-cl.")
-		                                                                        : QStringLiteral("Install the Visual Studio clang-cl component, then reactivate the launcher.")),
+		        bClangClAvailable ? PathDetail(toolchain.ClangClPath, QStringLiteral("clang-cl is installed.")) : QStringLiteral("Install clang-cl outside Launcher, then reactivate the launcher."),
 		        bClangClAvailable},
 		};
 	}

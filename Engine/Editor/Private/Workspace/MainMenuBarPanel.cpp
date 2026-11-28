@@ -27,19 +27,14 @@ void MainMenuBarPanel::SetWindow(Window* window) noexcept
 	m_window = window;
 }
 
-void MainMenuBarPanel::SetShaderToolsOpenHandler(std::function<void()> handler)
+void MainMenuBarPanel::SetShaderCompileHandler(std::function<void(bool)> handler)
 {
-	m_shaderToolsOpenHandler = std::move(handler);
+	m_shaderCompileHandler = std::move(handler);
 }
 
-void MainMenuBarPanel::SetMeshToolsOpenHandler(std::function<void()> handler)
+void MainMenuBarPanel::SetShaderReloadHandler(std::function<void()> handler)
 {
-	m_meshToolsOpenHandler = std::move(handler);
-}
-
-void MainMenuBarPanel::SetTextureToolsOpenHandler(std::function<void()> handler)
-{
-	m_textureToolsOpenHandler = std::move(handler);
+	m_shaderReloadHandler = std::move(handler);
 }
 
 void MainMenuBarPanel::SetSettingsOpenHandler(std::function<void()> handler)
@@ -85,7 +80,7 @@ void MainMenuBarPanel::BuildOpenLevelMenu() noexcept
 	}
 }
 
-void MainMenuBarPanel::BuildFileMenu() noexcept
+void MainMenuBarPanel::BuildFileMenu()
 {
 	const bool bHasLevelSession = m_levelSession != nullptr;
 	const bool bHasActiveLevel = bHasLevelSession && m_levelSession->HasActiveLevel();
@@ -109,11 +104,39 @@ void MainMenuBarPanel::BuildFileMenu() noexcept
 	{
 		m_viewportCaptureHandler();
 	}
+
+	BuildShaderMenu();
 	ImGui::Separator();
 	if (ImGui::MenuItem("Quit", "Alt+F4", false, m_window != nullptr))
 	{
 		m_window->RequestClose();
 	}
+}
+
+void MainMenuBarPanel::BuildShaderMenu()
+{
+	const std::string label = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Shader, "Shaders");
+	if (!ImGui::BeginMenu(label.c_str()))
+	{
+		return;
+	}
+
+	const bool bCanCompile = static_cast<bool>(m_shaderCompileHandler);
+	if (ImGui::MenuItem("Recompile Shaders", nullptr, false, bCanCompile))
+	{
+		m_shaderCompileHandler(false);
+	}
+	if (ImGui::MenuItem("Recompile with Symbols", nullptr, false, bCanCompile))
+	{
+		m_shaderCompileHandler(true);
+	}
+
+	const std::string reloadLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Reload, "Reload Cooked Shaders");
+	if (ImGui::MenuItem(reloadLabel.c_str(), nullptr, false, static_cast<bool>(m_shaderReloadHandler)))
+	{
+		m_shaderReloadHandler();
+	}
+	ImGui::EndMenu();
 }
 
 void MainMenuBarPanel::BuildWindowsMenu() noexcept
@@ -129,29 +152,9 @@ void MainMenuBarPanel::BuildWindowsMenu() noexcept
 	{
 		m_settingsOpenHandler();
 	}
-
-	ImGui::Separator();
-
-	const std::string shadersLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Shader, "Shaders");
-	if (ImGui::MenuItem(shadersLabel.c_str(), nullptr, false, static_cast<bool>(m_shaderToolsOpenHandler)))
-	{
-		m_shaderToolsOpenHandler();
-	}
-
-	const std::string meshesLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::StaticMesh, "Meshes");
-	if (ImGui::MenuItem(meshesLabel.c_str(), nullptr, false, static_cast<bool>(m_meshToolsOpenHandler)))
-	{
-		m_meshToolsOpenHandler();
-	}
-
-	const std::string texturesLabel = EditorIcons::MakeIconLabel(EditorIcons::EditorIcon::Material, "Textures");
-	if (ImGui::MenuItem(texturesLabel.c_str(), nullptr, false, static_cast<bool>(m_textureToolsOpenHandler)))
-	{
-		m_textureToolsOpenHandler();
-	}
 }
 
-void MainMenuBarPanel::BuildUI() noexcept
+void MainMenuBarPanel::BuildUI()
 {
 	m_heightPixels = 0.0f;
 
@@ -203,7 +206,7 @@ void MainMenuBarPanel::BuildHelpWindow() noexcept
 		{
 			ImGui::TextWrapped(
 			    "Start Editor or Game through Sparkle Launcher. File > Open Level selects a registered level; missing cooked content fails visibly. File > Save All explicitly saves the active level "
-			    "source. Use the scene inspector for supported edits and undo/redo.");
+			    "source. Use the scene inspector for supported edits and undo/redo. File > Shaders provides compile and reload actions.");
 
 			ImGui::TextWrapped(
 			    "Hold right mouse over the viewport to look. W/A/S/D or arrows move, E/Space up, Q/C down, Shift accelerates, wheel changes speed. Esc releases the mouse. Window > Settings changes "

@@ -45,7 +45,6 @@ set(SPARKLE_LAUNCHER_CORE_BUILD_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/State/BuildFreshnessSignature.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/NativeBuildOutputReset.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/BuildToolchainDetection.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/HostToolInstaller.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/QtToolchainDiscovery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/ShaderCompilerSdkDiscovery.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/VisualStudioToolchainDiscovery.cpp
@@ -68,7 +67,6 @@ set(SPARKLE_LAUNCHER_CORE_BUILD_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/State/BuildWorkspaceStateFiles.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/CMakeGeneratorModel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/CMakeWorkflowProcessRequests.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/HostToolInstaller.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/QtToolchainDiscovery.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/ShaderCompilerSdkDiscovery.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Build/Toolchains/VisualStudioToolchainDiscovery.h
@@ -109,12 +107,10 @@ set(SPARKLE_LAUNCHER_CORE_COOK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookOperations.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookOperationPlanner.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookPlanReadiness.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookPlanPreview.cpp
 )
 
 set(SPARKLE_LAUNCHER_CORE_COOK_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookPlanReadiness.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookPlanPreview.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookedContentReadiness.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Cook/CookOperationProcessRequests.h
 )

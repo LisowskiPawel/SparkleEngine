@@ -24,15 +24,13 @@
 class CookedMeshAssetTranslation final
 {
 public:
-	static CookedMeshAssetBuild BuildAsset(const ImportedMeshPrimitive& importedPrimitive, std::size_t primitiveIndex, std::string_view sceneAssetId, const std::filesystem::path& sourcePath)
+	static CookedMeshAssetBuild BuildAsset(const ImportedMeshPrimitive& importedPrimitive, std::size_t primitiveIndex, std::string_view sceneAssetId)
 	{
 		const ImportedMeshGeometry& geometry = importedPrimitive.geometry;
 		ValidateGeometry(geometry, primitiveIndex);
 
 		CookedMeshAssetBuild asset;
 		asset.assetId = BuildMeshAssetId(sceneAssetId, primitiveIndex);
-		asset.displayName = importedPrimitive.displayName;
-		asset.sourcePath = sourcePath;
 		asset.assetKind = geometry.HasSkinInfluences() ? Assets::CookedMeshAssetKind::Skeletal : Assets::CookedMeshAssetKind::Static;
 		asset.vertices.reserve(geometry.vertices.size());
 		asset.skinInfluences.reserve(geometry.deformation.skinInfluences.size());
@@ -157,7 +155,7 @@ std::vector<CookedMeshAssetBuild> CookedMeshAssetBuilder::BuildMeshAssets(const 
 	for (std::size_t primitiveIndex = 0; primitiveIndex < importOutput.scene.meshPrimitives.size(); ++primitiveIndex)
 	{
 		const ImportedMeshPrimitive& importedPrimitive = importOutput.scene.meshPrimitives[primitiveIndex];
-		auto asset = CookedMeshAssetTranslation::BuildAsset(importedPrimitive, primitiveIndex, sceneAssetId, importOutput.GetSourcePath());
+		auto asset = CookedMeshAssetTranslation::BuildAsset(importedPrimitive, primitiveIndex, sceneAssetId);
 		assets.push_back(std::move(asset));
 	}
 

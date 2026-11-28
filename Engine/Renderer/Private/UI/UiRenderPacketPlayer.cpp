@@ -1,7 +1,6 @@
 #include "PCH.h"
 #include "UI/UiRenderPacketPlayer.h"
 
-#include "UI/UiTextureRegistry.h"
 #include "RHI/Public/UI/RhiImGuiRenderer.h"
 
 #include <imgui.h>
@@ -51,7 +50,7 @@ void UiRenderPacketPlayer::SynchronizeTextures(const UiRenderPacket& packet, Rhi
 	RetireReleasedTextures();
 }
 
-void UiRenderPacketPlayer::Render(const UiRenderPacket& packet, const UiTextureRegistry& textures, RhiImGuiRenderer& renderer, RenderCommandList& commandList)
+void UiRenderPacketPlayer::Render(const UiRenderPacket& packet, UiTextureHandle viewportTexture, std::uint64_t viewportTextureId, RhiImGuiRenderer& renderer, RenderCommandList& commandList)
 {
 	if (!packet.HasDrawData())
 	{
@@ -61,7 +60,7 @@ void UiRenderPacketPlayer::Render(const UiRenderPacket& packet, const UiTextureR
 	PrepareDrawLists(packet.DrawLists.size());
 	for (std::size_t drawListIndex = 0; drawListIndex < packet.DrawLists.size(); ++drawListIndex)
 	{
-		CopyDrawList(packet, packet.DrawLists[drawListIndex], drawListIndex, textures);
+		CopyDrawList(packet, packet.DrawLists[drawListIndex], drawListIndex, viewportTexture, viewportTextureId);
 	}
 
 	PrepareDrawData(packet);
@@ -204,7 +203,7 @@ void UiRenderPacketPlayer::PrepareDrawLists(std::size_t drawListCount)
 	}
 }
 
-void UiRenderPacketPlayer::CopyDrawList(const UiRenderPacket& packet, const UiDrawList& packetList, std::size_t drawListIndex, const UiTextureRegistry& textures)
+void UiRenderPacketPlayer::CopyDrawList(const UiRenderPacket& packet, const UiDrawList& packetList, std::size_t drawListIndex, UiTextureHandle viewportTexture, std::uint64_t viewportTextureId)
 {
 	ImDrawList& drawList = *m_storage->DrawLists[drawListIndex];
 	drawList.VtxBuffer.resize(packetList.VertexCount);
@@ -233,7 +232,7 @@ void UiRenderPacketPlayer::CopyDrawList(const UiRenderPacket& packet, const UiDr
 		}
 		else
 		{
-			const std::uint64_t textureId = textures.Resolve(source.TextureHandle);
+			const std::uint64_t textureId = source.TextureHandle == viewportTexture ? viewportTextureId : 0u;
 			command.TexRef = ImTextureRef(static_cast<ImTextureID>(textureId));
 			if (textureId == 0u && source.Kind == UiDrawCommandKind::Draw)
 			{

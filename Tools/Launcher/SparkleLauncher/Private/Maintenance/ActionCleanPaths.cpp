@@ -26,39 +26,13 @@ namespace SparkleLauncher
 		paths.push_back({std::move(displayName), std::move(path), std::move(detail)});
 	}
 
-	static void AppendTargetFiles(
-	    std::vector<MaintenanceCleanPathSpec>& paths,
-	    const SparkleTools::ToolTargetOutputPaths& outputs,
-	    const std::string& target,
-	    const std::string& detail,
-	    const std::filesystem::path& preservedPath = {})
+	static void AppendTargetFiles(std::vector<MaintenanceCleanPathSpec>& paths, const SparkleTools::ToolTargetOutputPaths& outputs, const std::string& target, const std::string& detail)
 	{
 		const auto executable = outputs.BinaryDirectory / (target + ".exe");
-		if (preservedPath.empty() || executable != preservedPath)
-		{
-			AppendCleanPath(paths, target + " executable", executable, detail);
-		}
+		AppendCleanPath(paths, target + " executable", executable, detail);
 		AppendCleanPath(paths, target + " program database", outputs.SymbolDirectory / (target + ".pdb"), detail);
 		AppendCleanPath(paths, target + " import library", outputs.LibraryDirectory / (target + ".lib"), detail);
 		AppendCleanPath(paths, target + " compile database", outputs.SymbolDirectory / "obj" / (target + ".pdb"), detail);
-	}
-
-	static void AppendLauncherCleanPaths(const ActionCleanTargetRequest& request, const SparkleTools::ToolOutputPaths& outputs, std::vector<MaintenanceCleanPathSpec>& paths)
-	{
-		if (request.OperationId != "launcher.build.self" && !IncludesBuildScope(request, BuildWorkspaceScope::Launcher))
-		{
-			return;
-		}
-
-		const auto launcher = outputs.LauncherTargetOutputs(request.EditorProfile);
-		AppendTargetFiles(paths, launcher, "SparkleLauncher", "Launcher direct build outputs. The currently running launcher executable is preserved until restart.", request.RunningLauncherPath);
-		AppendCleanPath(paths, "SparkleLauncherCore library", launcher.LibraryDirectory / "SparkleLauncherCore.lib", "Launcher support library built for the selected editor profile.");
-
-		AppendCleanPath(
-		    paths,
-		    "SparkleLauncherCore program database",
-		    launcher.SymbolDirectory / "obj" / "SparkleLauncherCore.pdb",
-		    "Launcher support library debug symbols built for the selected editor profile.");
 	}
 
 	static void AppendProjectCleanPaths(
@@ -99,7 +73,6 @@ namespace SparkleLauncher
 
 	static void AppendBuildCleanPaths(const ActionCleanTargetRequest& request, const SparkleTools::ToolOutputPaths& outputs, std::vector<MaintenanceCleanPathSpec>& paths)
 	{
-		AppendLauncherCleanPaths(request, outputs, paths);
 		if (request.OperationId == "workspace.build.editor" || IncludesBuildScope(request, BuildWorkspaceScope::Editor))
 		{
 			AppendProjectCleanPaths(request, outputs, request.EditorProfile, "Editor target outputs.", paths);
@@ -169,8 +142,8 @@ namespace SparkleLauncher
 
 	bool SupportsActionSpecificClean(std::string_view operationId)
 	{
-		return operationId == "launcher.build.self" || operationId.starts_with("workspace.build") || operationId == "cook.tools.prepare" || operationId == "cook.workspace" || operationId == "cook.all"
-		    || operationId == "cook.shaders" || operationId == "cook.textures" || operationId == "cook.assets";
+		return operationId.starts_with("workspace.build") || operationId == "cook.tools.prepare" || operationId == "cook.workspace" || operationId == "cook.all" || operationId == "cook.shaders"
+		    || operationId == "cook.textures" || operationId == "cook.assets";
 	}
 
 	std::vector<MaintenanceCleanPathSpec> BuildActionCleanPaths(const ActionCleanTargetRequest& request)

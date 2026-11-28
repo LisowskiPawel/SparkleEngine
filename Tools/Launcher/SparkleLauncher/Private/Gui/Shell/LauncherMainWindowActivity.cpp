@@ -49,11 +49,5 @@ namespace SparkleLauncher
 		{
 			ScheduleUiRefresh(true);
 		}
-
-		const bool bLauncherRestartPending = m_pendingRestartRunIds.removeAll(runId) > 0;
-		if (bSucceeded && bLauncherRestartPending)
-		{
-			PromptForLauncherRestart();
-		}
 	}
 }

@@ -60,7 +60,6 @@ namespace SparkleLauncher
 		void RefreshSourceDependencyRows();
 		void SyncSourceDependency(const SourceDependencyEntry& dependency);
 		void CleanSourceDependency(const SourceDependencyEntry& dependency);
-		void InstallHostTool(const ToolchainItemStatus& item);
 		QPushButton* CreateHostToolActionButton(const ToolchainItemStatus& item);
 		void AddHostToolStatusRow(QVBoxLayout& layout, const ToolchainItemStatus& item);
 		void AddBuildFilesStatus(QVBoxLayout& layout, const BuildFilesFreshnessStatus& freshness, bool bOfferRefresh);

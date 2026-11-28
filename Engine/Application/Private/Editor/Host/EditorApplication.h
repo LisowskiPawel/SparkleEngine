@@ -34,7 +34,6 @@ private:
 	void InitializeGameApplication();
 	void InitializeEditorOperations();
 	void InitializeUi();
-	void ConfigureUiDiagnostics(Renderer& renderer);
 	void Restart();
 	RenderViewCameraData UpdateViewportCamera();
 	void ReloadShaders(Renderer& renderer);

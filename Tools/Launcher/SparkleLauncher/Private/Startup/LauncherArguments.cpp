@@ -1,6 +1,7 @@
 #include "Startup/LauncherArguments.h"
 
 #include "SparkleLauncher/BuildProfileCatalog.h"
+#include "Operations/LauncherOperationExecution.h"
 #include "Core/Public/Strings/StringUtils.h"
 
 #include <CLI/CLI.hpp>
@@ -122,12 +123,6 @@ namespace SparkleLauncher
 		app.option_defaults()->group("Operations");
 		guiOptions->option_defaults()->group("Operations");
 
-		app.add_option("--dry-run", arguments.DryRunOperationId, "Preview an operation; defaults to workspace.sync-code when its ID is omitted.")
-		    ->expected(0, 1)
-		    ->default_str("workspace.sync-code")
-		    ->transform(CLI::Validator(RestoreArgumentValue, ""))
-		    ->type_name("ID");
-
 		app.add_option("--run", arguments.RunOperationId, "Execute an operation.")->check(CLI::Validator(ValidateOperationId, ""))->type_name("ID");
 
 		guiOptions->add_flag("--shader-symbols", arguments.bShaderSymbols, "Export symbols with cook.shaders, cook.all or cook.workspace.");
@@ -176,6 +171,18 @@ namespace SparkleLauncher
 			if (bKnownOption && !bGuiOption)
 			{
 				return true;
+			}
+		}
+		for (int index = 1; index < argc; ++index)
+		{
+			const CLI::Option* option = app.get_option_no_throw(argv[index]);
+			if (option == nullptr)
+			{
+				return true;
+			}
+			if (option->get_expected_min() > 0 && index + 1 < argc)
+			{
+				++index;
 			}
 		}
 		return false;
@@ -228,20 +235,10 @@ namespace SparkleLauncher
 				break;
 			}
 			arguments.push_back(argument);
-			const bool bRequiresValue = option->get_expected_min() > 0;
 			const bool bHasNextArgument = index + 1 < argc;
-			const bool bAcceptsValue = option->get_expected_max() > 0 && bHasNextArgument;
-			const bool bOptionalValue = bAcceptsValue && argv[index + 1][0] != '-';
-			if (bHasNextArgument && (bRequiresValue || bOptionalValue))
+			if (bHasNextArgument && option->get_expected_min() > 0)
 			{
-				// Protect explicit empty optional values from matching an unnamed option group.
-				const std::string value(argv[++index]);
-				arguments.push_back(bRequiresValue ? value : " " + value);
-			}
-			else if (option->get_expected_max() > 0 && !bRequiresValue)
-			{
-				// CLI11 may consume an unknown option as an optional value. Resolve omission from its declaration.
-				arguments.push_back(option->get_default_str());
+				arguments.emplace_back(argv[++index]);
 			}
 		}
 		std::ranges::reverse(arguments);
@@ -250,14 +247,7 @@ namespace SparkleLauncher
 
 	static bool ValidateLauncherOperationArguments(const LauncherShellArguments& arguments, std::ostream& error)
 	{
-		const bool bHasDryRun = !arguments.DryRunOperationId.empty();
-		const bool bHasRun = !arguments.RunOperationId.empty();
-		if (bHasDryRun && bHasRun)
-		{
-			error << "SparkleLauncher: --dry-run and --run are mutually exclusive.\n";
-			return false;
-		}
-		const std::string& operationId = bHasRun ? arguments.RunOperationId : arguments.DryRunOperationId;
+		const std::string& operationId = arguments.RunOperationId;
 		if (arguments.bShaderSymbols)
 		{
 			const bool bShaderCook = operationId == "cook.shaders" || operationId == "cook.all";
@@ -312,5 +302,7 @@ namespace SparkleLauncher
 		CLI::App app("Build, cook and run Sparkle workspaces.", "SparkleLauncher");
 		ConfigureLauncherOptions(app, arguments);
 		output << app.help();
+		output << "\nOperations:\n";
+		VisitLauncherOperationDefinitions([&output](const auto& definition) { output << "  " << definition.Id << "  " << definition.Description << '\n'; });
 	}
 }

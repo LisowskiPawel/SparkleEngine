@@ -70,11 +70,11 @@ namespace SparkleLauncher
 	const std::vector<CookOperationDefinition>& GetCookOperationDefinitions()
 	{
 		static const std::vector<CookOperationDefinition> definitions = {
-		    {CookOperationKind::CookWorkspace, "cook.workspace", "Cook", "Cook Workspace", "Cook the selected shader, texture, and scene outputs as one request."},
-		    {CookOperationKind::CookAllAssets, "cook.all", "Cook", "Cook All", "Prepare all selected level assets."},
-		    {CookOperationKind::CookShaders, "cook.shaders", "Cook", "Cook Shaders", "Validate and prepare the shader map and code library."},
-		    {CookOperationKind::BuildTextures, "cook.textures", "Cook", "Cook Textures", "Prepare texture assets for Editor and Game."},
-		    {CookOperationKind::BuildSceneAssets, "cook.assets", "Cook", "Cook Scenes And Meshes", "Prepare scene, mesh, and material assets for Editor and Game."},
+		    {CookOperationKind::CookWorkspace, "cook.workspace", "Cook Workspace", "Cook the selected shader, texture, and scene outputs as one request."},
+		    {CookOperationKind::CookAllAssets, "cook.all", "Cook All", "Prepare all selected level assets."},
+		    {CookOperationKind::CookShaders, "cook.shaders", "Cook Shaders", "Validate and prepare the shader map and code library."},
+		    {CookOperationKind::BuildTextures, "cook.textures", "Cook Textures", "Prepare texture assets for Editor and Game."},
+		    {CookOperationKind::BuildSceneAssets, "cook.assets", "Cook Scenes And Meshes", "Prepare scene, mesh, and material assets for Editor and Game."},
 		};
 
 		return definitions;

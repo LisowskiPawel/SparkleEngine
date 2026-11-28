@@ -19,15 +19,12 @@ namespace EditorIcons
 		Sky,
 		StaticMesh,
 		SkinnedMesh,
-		Material,
 		EyeVisible,
 		EyeHidden,
 		Reset,
-		Filter,
 		Settings,
 		Save,
 		Shader,
-		Refresh,
 		Reload,
 		Search,
 		Level,
@@ -50,13 +47,11 @@ namespace EditorIcons
 		Clear,
 		Copy,
 		Console,
-		SourceFile,
-		Reflection,
-		Disassembly,
-		CompileRequest,
+
+
+
 		Sort
 	};
-
 	const char* GetEditorIconGlyph(EditorIcon icon) noexcept;
 	std::string MakeIconLabel(EditorIcon icon, const char* label);
 }

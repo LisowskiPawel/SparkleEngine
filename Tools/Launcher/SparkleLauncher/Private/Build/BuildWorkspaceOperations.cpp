@@ -27,8 +27,6 @@ namespace SparkleLauncher
 	{
 		switch (scope)
 		{
-			case BuildWorkspaceScope::Launcher:
-				return {"SparkleLauncher"};
 			case BuildWorkspaceScope::CookTools:
 			{
 				std::vector<std::string> targets;
@@ -44,10 +42,6 @@ namespace SparkleLauncher
 			case BuildWorkspaceScope::Editor:
 			case BuildWorkspaceScope::Game:
 			{
-				if (plan.Kind != BuildWorkspaceOperationKind::BuildWorkspace && !plan.Request.SelectedTargets.empty())
-				{
-					return plan.Request.SelectedTargets;
-				}
 				const std::string& profileName = scope == BuildWorkspaceScope::Editor ? plan.Request.EditorProfile : plan.Request.GameProfile;
 				const std::optional<BuildProfile> profile = FindBuildProfile(profileName);
 				if (!profile.has_value())
@@ -63,23 +57,6 @@ namespace SparkleLauncher
 	bool HasSelectedBuildScope(const BuildWorkspaceOperationRequest& request, BuildWorkspaceScope scope)
 	{
 		return std::find(request.SelectedScopes.begin(), request.SelectedScopes.end(), scope) != request.SelectedScopes.end();
-	}
-
-	std::string BuildWorkspaceScopeId(BuildWorkspaceScope scope)
-	{
-		switch (scope)
-		{
-			case BuildWorkspaceScope::Editor:
-				return "editor";
-			case BuildWorkspaceScope::Game:
-				return "game";
-			case BuildWorkspaceScope::CookTools:
-				return "cook-tools";
-			case BuildWorkspaceScope::Launcher:
-				return "launcher";
-		}
-
-		return "unknown";
 	}
 
 	bool TryParseBuildWorkspaceScope(std::string_view text, BuildWorkspaceScope& outScope)
@@ -99,11 +76,6 @@ namespace SparkleLauncher
 			outScope = BuildWorkspaceScope::CookTools;
 			return true;
 		}
-		if (text == "launcher")
-		{
-			outScope = BuildWorkspaceScope::Launcher;
-			return true;
-		}
 		return false;
 	}
 
@@ -118,19 +90,6 @@ namespace SparkleLauncher
 		}
 
 		return "Unknown";
-	}
-
-	std::string WorkspaceIdeCommandLineValue(WorkspaceIde ide)
-	{
-		switch (ide)
-		{
-			case WorkspaceIde::VisualStudio:
-				return "visual-studio";
-			case WorkspaceIde::Rider:
-				return "rider";
-		}
-
-		return "unknown";
 	}
 
 	bool TryParseWorkspaceIde(std::string_view text, WorkspaceIde& outIde)
@@ -203,8 +162,6 @@ namespace SparkleLauncher
 				return true;
 			case BuildWorkspaceOperationKind::BuildWorkspace:
 				return plan.Request.bForceConfigure || !plan.Freshness.bCurrent;
-			case BuildWorkspaceOperationKind::InstallHostTool:
-				return false;
 			default:
 				return false;
 		}

@@ -14,8 +14,7 @@ namespace SparkleLauncher
 #endif
 		if (ShouldRunLauncherShell(argc, argv))
 		{
-			const LauncherShell shell;
-			return shell.Run(argc, argv, std::cout, std::cerr);
+			return RunLauncherShell(argc, argv, std::cout, std::cerr);
 		}
 		return RunLauncherGui(argc, argv);
 	}

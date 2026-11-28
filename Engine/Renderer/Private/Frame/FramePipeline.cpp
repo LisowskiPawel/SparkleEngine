@@ -1,7 +1,6 @@
 #include "PCH.h"
 #include "Frame/FramePipeline.h"
 
-#include "Diagnostics/MeshDiagnosticsCollector.h"
 #include "UI/UiFrameRenderer.h"
 #include "Frame/RenderFrame.h"
 #include "Frame/RenderFrameTime.h"
@@ -101,21 +100,6 @@ bool FramePipeline::BeginViewportCapture(ViewportCaptureId id, const ViewportCap
 std::vector<ViewportCaptureCompletion> FramePipeline::TakeCompletedViewportCaptures()
 {
 	return m_viewportCaptureService->TakeCompletedCaptures();
-}
-
-MeshDiagnosticsSnapshot FramePipeline::CaptureMeshDiagnostics() const
-{
-	return CollectMeshDiagnostics(*m_renderScene, m_gpuMeshCache.get());
-}
-
-MeshPreviewGeometry FramePipeline::CaptureMeshPreview(std::uintptr_t meshRuntimeId) const
-{
-	return CollectMeshPreviewGeometry(*m_renderScene, meshRuntimeId);
-}
-
-TextureDiagnosticsSnapshot FramePipeline::CaptureTextureDiagnostics()
-{
-	return m_textureCache->CaptureDiagnosticsSnapshot([this](std::uint64_t nativeTextureId) { return m_uiFrameRenderer->RegisterUiTexture(nativeTextureId); });
 }
 
 void FramePipeline::RequestResize(RenderViewportExtent extent, bool bMinimized) noexcept

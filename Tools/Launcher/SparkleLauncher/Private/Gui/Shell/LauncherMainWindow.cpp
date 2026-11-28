@@ -397,8 +397,7 @@ namespace SparkleLauncher
 		std::vector<MaintenanceCleanPathSpec> cleanTargets;
 		if (SupportsActionSpecificClean(m_selectedOperationId.toStdString()))
 		{
-			const std::filesystem::path launcherPath(QCoreApplication::applicationFilePath().toStdString());
-			const auto cleanRequest = BuildActionCleanTargetRequest(m_workspaceRoot, m_contentModel, m_settings, launcherPath, m_selectedOperationId);
+			const auto cleanRequest = BuildActionCleanTargetRequest(m_workspaceRoot, m_contentModel, m_settings, m_selectedOperationId);
 			cleanTargets = BuildActionCleanPaths(cleanRequest);
 		}
 
@@ -471,7 +470,7 @@ namespace SparkleLauncher
 			{
 				actionIcon = LauncherIcon::Sync;
 			}
-			else if (operationId.startsWith("workspace.build") || operationId == "launcher.build.self")
+			else if (operationId.startsWith("workspace.build"))
 			{
 				actionIcon = LauncherIcon::Build;
 			}

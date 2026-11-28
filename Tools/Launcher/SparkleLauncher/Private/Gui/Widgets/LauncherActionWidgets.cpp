@@ -44,7 +44,7 @@ namespace SparkleLauncher
 			return "Generate";
 		}
 		const bool bWorkspaceBuild = operationId == "workspace.build" || operationId.startsWith("workspace.build.");
-		const bool bToolBuild = operationId == "launcher.build.self" || operationId == "cook.tools.prepare";
+		const bool bToolBuild = operationId == "cook.tools.prepare";
 		if (bWorkspaceBuild || bToolBuild)
 		{
 			return "Build";

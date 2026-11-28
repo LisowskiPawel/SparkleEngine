@@ -11,9 +11,6 @@
 #include "Scene/Inspection/SceneInspectorPanel.h"
 #include "Scene/SceneOutlinerPanel.h"
 #include "Settings/SettingsPanel.h"
-#include "AssetInspection/UsedMeshesPanel.h"
-#include "Shaders/ShaderToolsPanel.h"
-#include "AssetInspection/UsedTexturesPanel.h"
 #include "Viewport/ViewportPanel.h"
 #include "Viewport/ViewportToolbar.h"
 #include "Timer.h"
@@ -44,7 +41,7 @@ void UI::Implementation::Build()
 	BuildSceneOutliner(bDisableInteraction, mainMenuBarHeight);
 	BuildCenterWorkspace(bDisableInteraction, mainMenuBarHeight);
 	BuildSceneInspector(bDisableInteraction, mainMenuBarHeight);
-	BuildUtilityPanels(bDisableInteraction);
+	m_settingsPanel->BuildUI(bDisableInteraction);
 
 	m_mainMenuBar->BuildOverlays();
 
@@ -155,12 +152,4 @@ void UI::Implementation::BuildSceneInspector(bool bDisableInteraction, float mai
 {
 	m_sceneInspectorPanel->SetTopInset(mainMenuBarHeight);
 	m_sceneInspectorPanel->BuildUI(bDisableInteraction);
-}
-
-void UI::Implementation::BuildUtilityPanels(bool bDisableInteraction)
-{
-	m_shaderToolsPanel->BuildUI(bDisableInteraction);
-	m_usedMeshesPanel->BuildUI(bDisableInteraction);
-	m_usedTexturesPanel->BuildUI(bDisableInteraction);
-	m_settingsPanel->BuildUI(bDisableInteraction);
 }

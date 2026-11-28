@@ -11,9 +11,6 @@
 #include "Scene/Inspection/SceneInspectorPanel.h"
 #include "Scene/SceneOutlinerPanel.h"
 #include "Settings/SettingsPanel.h"
-#include "AssetInspection/UsedMeshesPanel.h"
-#include "Shaders/ShaderToolsPanel.h"
-#include "AssetInspection/UsedTexturesPanel.h"
 #include "Viewport/ViewportPanel.h"
 #include "Viewport/ViewportToolbar.h"
 #include "Settings/EngineRenderingSettingsController.h"
@@ -49,7 +46,6 @@ void UI::Implementation::InitializeWorkspace(std::function<void()> requestRestar
 {
 	InitializeCorePanels(std::move(requestRestart));
 	InitializeViewport();
-	InitializeAssetPanels();
 	InitializeScenePanels();
 	ConfigureMainMenuBarWindowActions();
 }
@@ -71,14 +67,6 @@ void UI::Implementation::InitializeViewport()
 	m_viewportPanel->SetExposureOverrides(m_viewportSession->GetSettings().Exposure);
 }
 
-void UI::Implementation::InitializeAssetPanels()
-{
-	m_shaderToolsPanel = std::make_unique<ShaderToolsPanel>();
-	m_usedMeshesPanel = std::make_unique<UsedMeshesPanel>();
-	m_usedTexturesPanel = std::make_unique<UsedTexturesPanel>();
-	m_shaderToolsPanel->SetReloadHandler([this]() { m_bShaderReloadRequested = true; });
-}
-
 void UI::Implementation::InitializeScenePanels()
 {
 	m_sceneOutlinerPanel = std::make_unique<SceneOutlinerPanel>(m_scene, EditorWorkspaceLayout::SceneOutlinerWidth);
@@ -87,9 +75,7 @@ void UI::Implementation::InitializeScenePanels()
 
 void UI::Implementation::ConfigureMainMenuBarWindowActions()
 {
-	m_mainMenuBar->SetShaderToolsOpenHandler([this]() { m_shaderToolsPanel->SetOpen(true); });
-	m_mainMenuBar->SetTextureToolsOpenHandler([this]() { m_usedTexturesPanel->SetOpen(true); });
-	m_mainMenuBar->SetMeshToolsOpenHandler([this]() { m_usedMeshesPanel->SetOpen(true); });
+	m_mainMenuBar->SetShaderReloadHandler([this]() { m_bShaderReloadRequested = true; });
 	m_mainMenuBar->SetSettingsOpenHandler([this]() { m_settingsPanel->SetOpen(true); });
 	m_mainMenuBar->SetViewportCaptureHandler([this]() { m_viewportPanel->RequestOutputAction(ViewportOutputAction::CapturePresentation); });
 	m_mainMenuBar->SetConsoleOpenHandler([this]() { m_editorConsoleSystem->OpenConsole(); });

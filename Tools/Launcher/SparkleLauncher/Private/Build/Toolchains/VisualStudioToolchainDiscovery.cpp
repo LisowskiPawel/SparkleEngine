@@ -123,19 +123,6 @@ namespace SparkleLauncher
 		return !path.empty() && std::filesystem::is_directory(path, errorCode) ? std::optional<std::filesystem::path>(path) : std::nullopt;
 	}
 
-	static std::optional<std::filesystem::path> ResolveVisualStudioInstallerPath()
-	{
-		const std::optional<std::filesystem::path> programFiles = ResolveProgramFilesX86();
-		if (!programFiles.has_value())
-		{
-			return std::nullopt;
-		}
-
-		const std::filesystem::path path = *programFiles / "Microsoft Visual Studio" / "Installer" / "setup.exe";
-		std::error_code errorCode;
-		return std::filesystem::is_regular_file(path, errorCode) ? std::optional<std::filesystem::path>(path) : std::nullopt;
-	}
-
 	static std::optional<std::filesystem::path> FindVisualStudioClangCl(const std::filesystem::path& installationPath)
 	{
 		if (installationPath.empty())
@@ -200,7 +187,6 @@ namespace SparkleLauncher
 		const auto queriedInstallation = QueryVisualStudioInstallWithCppTools(discovery.DiscoveryPath).value_or(std::filesystem::path());
 		discovery.InstallationPath = installation.value_or(queriedInstallation);
 		discovery.IdePath = FindVisualStudioIde(discovery.InstallationPath).value_or(std::filesystem::path());
-		discovery.InstallerPath = ResolveVisualStudioInstallerPath().value_or(std::filesystem::path());
 		discovery.ClangClPath = FindVisualStudioClangCl(discovery.InstallationPath).value_or(std::filesystem::path());
 		discovery.WindowsSdkVersion = FindWindowsSdkVersion().value_or(std::string());
 		return discovery;

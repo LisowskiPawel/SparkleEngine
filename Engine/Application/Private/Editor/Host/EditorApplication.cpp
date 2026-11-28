@@ -200,22 +200,10 @@ void EditorApplication::InitializeUi()
 
 	m_ui = std::make_unique<UI>(std::move(hostServices));
 
-	ConfigureUiDiagnostics(renderer);
 	if (m_shaderCompileOperation)
 	{
 		m_ui->SetShaderCompileHandler([this](bool bGenerateSymbols) { return m_shaderCompileOperation->Request(bGenerateSymbols); });
 	}
-}
-
-void EditorApplication::ConfigureUiDiagnostics(Renderer& renderer)
-{
-	EditorDiagnosticsProviders providers{
-	    .Shaders = [&renderer]() { return renderer.CaptureShaderDiagnostics(); },
-	    .MeshDiagnostics = [&renderer]() { return renderer.CaptureMeshDiagnostics(); },
-	    .TextureDiagnostics = [&renderer]() { return renderer.CaptureTextureDiagnostics(); },
-	    .MeshPreview = [&renderer](std::uintptr_t meshRuntimeId) { return renderer.CaptureMeshPreview(meshRuntimeId); }};
-
-	m_ui->SetDiagnosticsProviders(std::move(providers));
 }
 
 void EditorApplication::Restart()

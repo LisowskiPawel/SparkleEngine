@@ -10,20 +10,13 @@
 #include "Workspace/LauncherProductPaths.h"
 
 #include <algorithm>
-#include <sstream>
-#include <utility>
 
 namespace SparkleLauncher
 {
-	static void AddReadiness(LevelOperationPlan& plan, std::string message)
-	{
-		plan.ReadinessMessages.push_back(std::move(message));
-	}
-
 	const std::vector<LevelOperationDefinition>& GetLevelOperationDefinitions()
 	{
 		static const std::vector<LevelOperationDefinition> definitions = {
-		    {"levels.sync", "Levels", "Sync Levels", "Select levels and acquire their asset packs without changing code, workspace, or SDK dependencies."},
+		    {"levels.sync", "Sync Levels", "Select levels and acquire their asset packs without changing code, workspace, or SDK dependencies."},
 		};
 
 		return definitions;
@@ -65,62 +58,23 @@ namespace SparkleLauncher
 		const bool bScriptPresent = std::filesystem::is_regular_file(plan.Request.WorkspaceRoot / "Tools/Launcher/SparkleLauncher/Scripts/SyncAssetPack.cmake", error);
 		if (!bScriptPresent || error)
 		{
-			AddReadiness(plan, "Asset sync requires the source acquisition script. Open the matching source checkout to use this developer tool.");
+			plan.ReadinessMessages.push_back("Asset sync requires the source acquisition script. Open the matching source checkout to use this developer tool.");
 			return false;
 		}
 		const ToolResolveResult cmake = ResolveKnownTool(KnownTool::CMake);
 		if (!cmake.bFound)
 		{
-			AddReadiness(plan, cmake.FailureReason);
+			plan.ReadinessMessages.push_back(cmake.FailureReason);
 			return false;
 		}
 		if (plan.Request.ContentId.empty())
 		{
-			AddReadiness(plan, "Workspace content is unavailable for level synchronization.");
+			plan.ReadinessMessages.push_back("Workspace content is unavailable for level synchronization.");
 			return false;
 		}
 		plan.CMakePath = cmake.Path;
-		AddReadiness(plan, "CMake is available for level asset acquisition.");
+		plan.ReadinessMessages.push_back("CMake is available for level asset acquisition.");
 		return true;
-	}
-
-	static void RecordLevelSyncInputs(LevelOperationPlan& plan)
-	{
-		plan.Operation.Inputs.push_back({"content", plan.Request.ContentId});
-		std::string levels;
-		for (const std::string& levelId : plan.Request.RequestedLevelIds)
-		{
-			if (!levels.empty())
-			{
-				levels += ", ";
-			}
-			levels += levelId;
-		}
-		if (!levels.empty())
-		{
-			plan.Operation.Inputs.push_back({"levels", std::move(levels)});
-		}
-	}
-
-	static void DescribeLevelSync(LevelOperationPlan& plan)
-	{
-		plan.PlannedEffects.push_back(
-		    plan.Request.bSelectAvailableLevels          ? "Acquire all available supported levels and select them only after acquisition succeeds."
-		        : plan.Request.RequestedLevelIds.empty() ? "Acquire asset packs referenced by selected maps; unselected packs remain untouched."
-		                                                 : "Acquire asset packs referenced by the requested maps; map selection and Game support remain unchanged.");
-
-		std::ostringstream dryRun;
-		dryRun << "Dry-run plan for " << plan.Operation.DisplayName << ":";
-		for (const LevelOperationStep& step : plan.Steps)
-		{
-			dryRun << "\n  " << step.DisplayName << ": " << BuildDisplayCommandLine(step.Request.ExecutablePath, step.Request.Arguments);
-			dryRun << "\n    Log: " << step.Request.LogPath.string();
-		}
-		if (plan.Steps.empty())
-		{
-			dryRun << (plan.bCanRun ? "\n  All requested level asset packs are already present." : "\n  No acquisition step available until readiness issues are resolved.");
-		}
-		plan.Operation.DryRunText = dryRun.str();
 	}
 
 	LevelOperationPlan PlanLauncherOperation(std::string_view operationId, const LevelOperationRequest& request)
@@ -131,7 +85,7 @@ namespace SparkleLauncher
 		{
 			plan.Operation = MakeOperationRecord(std::string(operationId), "Unknown level operation");
 			SetOperationFailure(plan.Operation, OperationProblemKind::Planning, "Unknown level operation id.", "Choose a registered level Sync operation, then retry.");
-			AddReadiness(plan, plan.Operation.Failure->Summary);
+			plan.ReadinessMessages.push_back(plan.Operation.Failure->Summary);
 			return plan;
 		}
 		plan.Request = request;
@@ -143,15 +97,13 @@ namespace SparkleLauncher
 		try
 		{
 			ResolveAvailableLevels(plan);
-			RecordLevelSyncInputs(plan);
 			plan.Steps = BuildLevelOperationSteps(plan);
 			plan.bCanRun = true;
 		}
 		catch (const Diagnostics::Error& error)
 		{
-			AddReadiness(plan, error.what());
+			plan.ReadinessMessages.push_back(error.what());
 		}
-		DescribeLevelSync(plan);
 		return plan;
 	}
 }

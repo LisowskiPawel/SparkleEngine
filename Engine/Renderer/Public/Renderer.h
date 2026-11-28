@@ -2,7 +2,6 @@
 
 #include "RendererAPI.h"
 #include "Concurrency/RendererExecutionConfig.h"
-#include "Resources/Textures/TextureDiagnostics.h"
 
 #include <cstdint>
 #include <memory>
@@ -18,9 +17,6 @@ struct EngineRenderingSettingsState;
 struct ViewportPresentationSnapshot;
 struct CVarControlRequest;
 struct CVarControlResult;
-struct ShaderDiagnosticsSnapshot;
-struct MeshDiagnosticsSnapshot;
-struct MeshPreviewGeometry;
 struct RendererMemoryDiagnosticsSnapshot;
 struct ViewportCaptureAdmission;
 struct ViewportCaptureRequest;
@@ -54,10 +50,6 @@ public:
 
 	void ReloadShaders();
 	std::uint64_t GetShaderGeneration() const noexcept;
-	ShaderDiagnosticsSnapshot CaptureShaderDiagnostics() const;
-	MeshDiagnosticsSnapshot CaptureMeshDiagnostics() const;
-	MeshPreviewGeometry CaptureMeshPreview(std::uintptr_t meshRuntimeId) const;
-	TextureDiagnosticsSnapshot CaptureTextureDiagnostics() const;
 	RendererMemoryDiagnosticsSnapshot CaptureMemoryDiagnostics() const;
 	ViewportCaptureAdmission RequestViewportCapture(ViewportCaptureRequest request) noexcept;
 	bool TryTakeViewportCapture(ViewportCaptureId id, ViewportCaptureReadback& readback) noexcept;

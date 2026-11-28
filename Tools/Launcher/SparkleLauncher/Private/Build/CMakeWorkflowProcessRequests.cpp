@@ -93,49 +93,6 @@ namespace SparkleLauncher
 		return process;
 	}
 
-	Process::ChildProcessRequest MakeCMakeLauncherConfigureRequest(
-	    const std::filesystem::path& workspaceRoot,
-	    const BuildToolchainStatus& toolchain,
-	    std::string_view operationId,
-	    std::string_view logFileName)
-	{
-		const SparkleTools::ToolOutputPaths outputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
-		Process::ChildProcessRequest process = MakeCMakeConfigureRequest(workspaceRoot, toolchain, operationId, logFileName);
-		if (!process.Arguments.empty())
-		{
-			process.Arguments.pop_back();
-		}
-		process.WorkingDirectory = workspaceRoot;
-		process.Arguments.push_back("-S");
-		process.Arguments.push_back(Strings::ToNarrow((workspaceRoot / "Tools" / "Launcher").wstring()));
-		process.Arguments.push_back("-B");
-		process.Arguments.push_back(Strings::ToNarrow(outputs.LauncherBuildDirectory().wstring()));
-		return process;
-	}
-
-	Process::ChildProcessRequest MakeCMakeLauncherBuildRequest(
-	    const std::filesystem::path& workspaceRoot,
-	    const BuildToolchainStatus& toolchain,
-	    std::string_view operationId,
-	    std::string_view profileName,
-	    std::string_view logFileName)
-	{
-		const SparkleTools::ToolOutputPaths outputs = SparkleTools::ResolveToolOutputPaths(workspaceRoot);
-		Process::ChildProcessRequest process;
-		process.ExecutablePath = toolchain.CMakePath;
-		process.WorkingDirectory = workspaceRoot;
-		process.LogPath = ResolveLauncherOperationLogPath(workspaceRoot, operationId, logFileName);
-		process.Arguments = {"--build", Strings::ToNarrow(outputs.LauncherBuildDirectory().wstring()), "--config", std::string(profileName), "--target", "SparkleLauncher"};
-		process.Arguments.insert(process.Arguments.end(), {"--parallel", "4"});
-		if (CMakeGeneratorUsesMsBuildArguments(toolchain.Generator))
-		{
-			process.Arguments.push_back("--");
-			const std::vector<std::string> buildToolArguments = GetDefaultBuildToolArguments();
-			process.Arguments.insert(process.Arguments.end(), buildToolArguments.begin(), buildToolArguments.end());
-		}
-		return process;
-	}
-
 	Process::ChildProcessRequest MakeCMakeDependencySyncRequest(
 	    const std::filesystem::path& workspaceRoot,
 	    const BuildToolchainStatus& toolchain,

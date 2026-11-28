@@ -1,7 +1,6 @@
 #include "PCH.h"
 #include "UI/UiFrameRenderer.h"
 
-#include "UI/UiTextureRegistry.h"
 #include "Frame/Graph/RenderProductGraphHandle.h"
 #include "FrameGraph/FrameGraph.h"
 #include "Renderer/Public/UI/UiRenderPacket.h"
@@ -16,7 +15,6 @@
 UiFrameRenderer::UiFrameRenderer(RenderDeviceServices& deviceServices, bool bOwnsBackend) :
     m_deviceServices(deviceServices),
     m_packetPlayer(std::make_unique<UiRenderPacketPlayer>()),
-    m_textureRegistry(std::make_unique<UiTextureRegistry>()),
     m_bOwnsBackend(bOwnsBackend)
 {
 	if (m_bOwnsBackend)
@@ -34,11 +32,6 @@ UiFrameRenderer::~UiFrameRenderer() noexcept
 	}
 }
 
-UiTextureHandle UiFrameRenderer::RegisterUiTexture(std::uint64_t nativeTextureId) noexcept
-{
-	return m_textureRegistry->Register(nativeTextureId);
-}
-
 void UiFrameRenderer::BeginFrame() noexcept
 {
 	if (m_bOwnsBackend)
@@ -53,8 +46,8 @@ void UiFrameRenderer::Render(const UiRenderPacket& packet, FrameGraph* frameGrap
 
 	if (packet.PresentationMode != UiPresentationMode::Viewport)
 	{
-		m_textureRegistry->RetireViewportTexture();
 		m_viewportTexture = {};
+		m_viewportTextureId = 0;
 	}
 	switch (packet.PresentationMode)
 	{
@@ -82,19 +75,15 @@ bool UiFrameRenderer::BeginViewportPresentation(FrameGraph& frameGraph, Viewport
 	const FrameGraphResourceHandle resource = ToFrameGraphResourceHandle(product->Handle);
 	const RhiGpuDescriptorHandle shaderResourceView = frameGraph.ResolveShaderResourceView(FrameGraphTextureHandle{resource});
 	const std::uint64_t textureId = m_deviceServices.GetImGuiRenderer().ResolveTextureId(shaderResourceView);
-	if (textureId == 0u)
+	const UiTextureHandle viewportTexture = UiTextureHandle::Viewport(viewportProducts.GetGeneration());
+	if (textureId == 0u || !viewportTexture)
 	{
-		m_viewportTexture = {};
 		TransitionViewportProduct(frameGraph, viewportProducts, ResourceState::Common);
 		return false;
 	}
 
-	m_viewportTexture = m_textureRegistry->PublishViewportTexture(textureId, viewportProducts.GetGeneration());
-	if (!m_viewportTexture)
-	{
-		TransitionViewportProduct(frameGraph, viewportProducts, ResourceState::Common);
-		return false;
-	}
+	m_viewportTexture = viewportTexture;
+	m_viewportTextureId = textureId;
 	return true;
 }
 
@@ -105,12 +94,12 @@ void UiFrameRenderer::EndViewportPresentation(FrameGraph& frameGraph, const View
 
 void UiFrameRenderer::RenderViewport(const UiRenderPacket& packet, FrameGraph* frameGraph, ViewportRenderProducts& viewportProducts) noexcept
 {
-	const bool bPresentingViewportGetGeneration = frameGraph != nullptr && packet.ViewportGeneration == viewportProducts.GetGeneration();
-	const bool bPresentingViewport = bPresentingViewportGetGeneration && (BeginViewportPresentation(*frameGraph, viewportProducts));
+	const bool bMatchingViewportGeneration = frameGraph != nullptr && packet.ViewportGeneration == viewportProducts.GetGeneration();
+	const bool bPresentingViewport = bMatchingViewportGeneration && (BeginViewportPresentation(*frameGraph, viewportProducts));
 	if (!bPresentingViewport)
 	{
-		m_textureRegistry->RetireViewportTexture();
 		m_viewportTexture = {};
+		m_viewportTextureId = 0;
 	}
 
 	if (packet.HasDrawData())
@@ -142,7 +131,7 @@ void UiFrameRenderer::RenderHostOverlay(const UiRenderPacket& packet) noexcept
 
 void UiFrameRenderer::Play(const UiRenderPacket& packet) noexcept
 {
-	m_packetPlayer->Render(packet, *m_textureRegistry, m_deviceServices.GetImGuiRenderer(), m_deviceServices.GetCurrentGraphicsCommandList());
+	m_packetPlayer->Render(packet, m_viewportTexture, m_viewportTextureId, m_deviceServices.GetImGuiRenderer(), m_deviceServices.GetCurrentGraphicsCommandList());
 }
 
 void UiFrameRenderer::TransitionViewportProduct(FrameGraph& frameGraph, const ViewportRenderProducts& viewportProducts, ResourceState after) noexcept

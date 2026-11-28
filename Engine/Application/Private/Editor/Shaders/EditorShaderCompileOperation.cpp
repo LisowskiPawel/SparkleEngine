@@ -133,10 +133,8 @@ void EditorShaderCompileOperation::Update(UI& ui, Renderer& renderer)
 				result = ConsoleCommandResult::Error("Shader reload failed: " + std::string(error.what()));
 			}
 		}
-		ui.SetShaderCompileStatus(false, result.Message);
 		ui.AppendConsoleOutput({result.Severity, std::move(result.Message)}, !result.bSucceeded);
 	}
-	ui.SetShaderCompileStatus(m_operation != nullptr);
 }
 
 void EditorShaderCompileOperation::PrepareNativeWork(Compile& compile)

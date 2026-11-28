@@ -1,7 +1,6 @@
 #include "Maintenance/MaintenanceCleanPreview.h"
 #include "Maintenance/MaintenanceCleanSteps.h"
 
-#include <sstream>
 #include <system_error>
 #include <utility>
 
@@ -102,44 +101,4 @@ namespace SparkleLauncher
 		}
 	}
 
-	static std::string FormatCleanTargetStats(const MaintenanceCleanTarget& target)
-	{
-		if (!target.bExists)
-		{
-			return "not present";
-		}
-
-		return std::to_string(target.FileCount) + " files, " + std::to_string(target.DirectoryCount) + " directories, " + std::to_string(target.ByteCount) + " bytes";
-	}
-
-	void DescribeMaintenancePlan(MaintenanceOperationPlan& plan)
-	{
-		for (const MaintenanceCleanTarget& target : plan.CleanTargets)
-		{
-			plan.PlannedEffects.push_back(target.DisplayName + ": " + target.Path.string() + " (" + target.Detail + "; " + FormatCleanTargetStats(target) + ")");
-		}
-		if (plan.Request.bCleanLevelContent)
-		{
-			plan.PlannedEffects.push_back("Deselect catalog levels after their extracted content is cleaned; cached archives are preserved.");
-		}
-		std::ostringstream dryRun;
-		dryRun << "Dry-run plan for " << plan.Operation.DisplayName << ":";
-		if (plan.Operation.bRequiresConfirmation)
-		{
-			dryRun << "\n  Confirmation required for clean scope: " << ToString(plan.Request.RequestedCleanScope);
-		}
-		const auto steps = plan.bCanRun ? BuildMaintenanceCleanSteps(plan) : std::vector<MaintenanceCleanStep>{};
-		for (const MaintenanceCleanStep& step : steps)
-		{
-			dryRun << "\n  " << step.DisplayName << ": Delete " << step.DestructivePath.string();
-			dryRun << "\n    Scope: " << step.DestructivePath.string();
-		}
-		if (steps.empty())
-		{
-			dryRun
-			    << (plan.Request.bCleanLevelContent && plan.bCanRun ? "\n  No extracted content requires deletion; catalog selection will be cleared."
-			                                                        : "\n  No command step available until readiness issues are resolved.");
-		}
-		plan.Operation.DryRunText = dryRun.str();
-	}
 }

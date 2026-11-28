@@ -12,9 +12,6 @@
 #include "Scene/SceneOutlinerPanel.h"
 #include "Settings/SettingsPanel.h"
 #include "Settings/EngineRenderingSettingsController.h"
-#include "AssetInspection/UsedMeshesPanel.h"
-#include "Shaders/ShaderToolsPanel.h"
-#include "AssetInspection/UsedTexturesPanel.h"
 #include "Viewport/ViewportPanel.h"
 #include "Viewport/ViewportToolbar.h"
 #include "Renderer/Public/UI/UiTextureHandle.h"
@@ -77,14 +74,6 @@ void UI::Implementation::SetViewportFinalColorTexture(UiTextureHandle texture) n
 	m_viewportPanel->SetFinalColorTexture(texture);
 }
 
-void UI::Implementation::SetDiagnosticsProviders(EditorDiagnosticsProviders providers)
-{
-	m_shaderToolsPanel->SetDiagnosticsProvider(std::move(providers.Shaders));
-	m_usedMeshesPanel->SetDiagnosticsProvider(std::move(providers.MeshDiagnostics));
-	m_usedMeshesPanel->SetPreviewGeometryProvider(std::move(providers.MeshPreview));
-	m_usedTexturesPanel->SetDiagnosticsProvider(std::move(providers.TextureDiagnostics));
-}
-
 bool UI::Implementation::ConsumeShaderReloadRequest() noexcept
 {
 	const bool bRequested = m_bShaderReloadRequested;
@@ -94,13 +83,20 @@ bool UI::Implementation::ConsumeShaderReloadRequest() noexcept
 
 void UI::Implementation::SetShaderCompileHandler(std::function<ConsoleCommandResult(bool)> handler)
 {
-	m_shaderToolsPanel->SetCompileHandler(handler);
+	if (handler)
+	{
+		m_mainMenuBar->SetShaderCompileHandler(
+		    [this, compile = handler](bool bGenerateSymbols)
+		    {
+			    ConsoleCommandResult result = compile(bGenerateSymbols);
+			    AppendConsoleOutput({result.Severity, std::move(result.Message)}, true);
+		    });
+	}
+	else
+	{
+		m_mainMenuBar->SetShaderCompileHandler({});
+	}
 	m_editorConsoleSystem->SetShaderCompileHandler(std::move(handler));
-}
-
-void UI::Implementation::SetShaderCompileStatus(bool bBusy, std::string_view message)
-{
-	m_shaderToolsPanel->SetCompileStatus(bBusy, message);
 }
 
 ViewportOutputAction UI::Implementation::ConsumeViewportOutputAction() noexcept

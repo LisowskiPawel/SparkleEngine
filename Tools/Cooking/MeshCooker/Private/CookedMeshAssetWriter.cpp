@@ -3,13 +3,10 @@
 #include "CookedMeshAssetWriter.h"
 
 #include "CookedMeshAssetBuild.h"
-#include "Core/Public/Diagnostics/Error.h"
 #include "Core/Public/Files/BinaryFileWriter.h"
 #include "Core/Public/Files/FileUtils.h"
 #include "Core/Public/Files/FileSetPublication.h"
-#include "Core/Public/Formatting/HexFormat.h"
 
-#include <nlohmann/json.hpp>
 #include "Core/Public/Paths/CookedAssetPaths.h"
 
 #include <cstdint>
@@ -19,26 +16,19 @@ namespace CookedMeshAssetWriter
 {
 	static void StageMeshAsset(const CookedMeshAssetBuild& meshAsset, std::vector<Files::FilePublication>& outPublication);
 	static void WriteMeshAsset(const CookedMeshAssetBuild& meshAsset, const std::filesystem::path& outputPath);
-	static void WriteMeshMetadata(const CookedMeshAssetBuild& meshAsset, const std::filesystem::path& outputPath);
 	static Assets::CookedMeshAssetHeader BuildHeader(const CookedMeshAssetBuild& meshAsset) noexcept;
-	static std::filesystem::path BuildMetadataPath(Assets::CookedAssetId assetId);
 }
 
 void CookedMeshAssetWriter::StageMeshAsset(const CookedMeshAssetBuild& meshAsset, std::vector<Files::FilePublication>& outPublication)
 {
 	const std::filesystem::path outputPath = Paths::CookedMeshAsset(meshAsset.assetId);
 	const std::filesystem::path stagedOutputPath = Files::BuildTemporaryPath(outputPath, ".cook-generation");
-	const std::filesystem::path metadataPath = BuildMetadataPath(meshAsset.assetId);
-	const std::filesystem::path stagedMetadataPath = Files::BuildTemporaryPath(metadataPath, ".cook-generation");
 
 	Files::CleanupTemporaryFile(stagedOutputPath);
-	Files::CleanupTemporaryFile(stagedMetadataPath);
 
 	outPublication.push_back({stagedOutputPath, outputPath});
-	outPublication.push_back({stagedMetadataPath, metadataPath});
 
 	WriteMeshAsset(meshAsset, stagedOutputPath);
-	WriteMeshMetadata(meshAsset, stagedMetadataPath);
 }
 
 void CookedMeshAssetWriter::WriteMeshAsset(const CookedMeshAssetBuild& meshAsset, const std::filesystem::path& outputPath)
@@ -46,21 +36,6 @@ void CookedMeshAssetWriter::WriteMeshAsset(const CookedMeshAssetBuild& meshAsset
 	const Assets::CookedMeshAssetHeader header = BuildHeader(meshAsset);
 
 	Files::WriteBinaryFile(outputPath, header, meshAsset.vertices, meshAsset.indices, meshAsset.skinInfluences, meshAsset.morphTargets, meshAsset.morphTargetDeltas);
-}
-
-void CookedMeshAssetWriter::WriteMeshMetadata(const CookedMeshAssetBuild& meshAsset, const std::filesystem::path& outputPath)
-{
-	const nlohmann::json metadata{
-	    {"schema", "cooked-mesh-metadata"},
-	    {"assetId", Formatting::FormatHexUInt64(meshAsset.assetId)},
-	    {"displayName", meshAsset.displayName},
-	    {"source", meshAsset.sourcePath.generic_string()}};
-
-	std::string errorMessage;
-	if (!Files::TryWriteAllText(outputPath, metadata.dump(2) + "\n", errorMessage))
-	{
-		throw Diagnostics::Error(errorMessage);
-	}
 }
 
 Assets::CookedMeshAssetHeader CookedMeshAssetWriter::BuildHeader(const CookedMeshAssetBuild& meshAsset) noexcept
@@ -80,13 +55,6 @@ Assets::CookedMeshAssetHeader CookedMeshAssetWriter::BuildHeader(const CookedMes
 	    .flags = (meshAsset.HasSkinInfluences() ? static_cast<std::uint32_t>(Assets::CookedMeshAssetFlag::HasSkinInfluences) : 0u)
 	        | (meshAsset.HasMorphTargets() ? static_cast<std::uint32_t>(Assets::CookedMeshAssetFlag::HasMorphTargets) : 0u),
 	    .assetKind = meshAsset.assetKind};
-}
-
-std::filesystem::path CookedMeshAssetWriter::BuildMetadataPath(Assets::CookedAssetId assetId)
-{
-	std::filesystem::path metadataPath = Paths::CookedMeshAsset(assetId);
-	metadataPath += ".meta.json";
-	return metadataPath;
 }
 
 void CookedMeshAssetWriter::StageMeshAssets(const std::vector<CookedMeshAssetBuild>& meshAssets, std::vector<Files::FilePublication>& outPublication)

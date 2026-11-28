@@ -13,14 +13,6 @@ enum class RenderMaterialClassification : std::uint8_t
 	Rejected
 };
 
-enum class MeshInstanceBatchSource : std::uint32_t
-{
-	PreservedGroup = 0,
-	AuthoredGroup = 1,
-	AutoBatch = 2,
-	SingleInstance = 3,
-};
-
 struct MeshInstanceBatch final
 {
 	GpuMeshHandle Mesh;
@@ -29,5 +21,4 @@ struct MeshInstanceBatch final
 	std::uint32_t instanceCount = 0;
 	RenderMeshKind meshKind = RenderMeshKind::Static;
 	RenderMaterialClassification materialClassification = RenderMaterialClassification::Rejected;
-	MeshInstanceBatchSource source = MeshInstanceBatchSource::AutoBatch;
 };

@@ -1,7 +1,7 @@
 #include "SparkleLauncher/CookOperations.h"
 
 #include "Cook/CookPlanReadiness.h"
-#include "Cook/CookPlanPreview.h"
+#include "Cook/CookOperationProcessRequests.h"
 
 namespace SparkleLauncher
 {
@@ -21,12 +21,19 @@ namespace SparkleLauncher
 		plan.Request = request;
 		plan.Operation = MakeOperationRecord(definition->Id, definition->DisplayName);
 		PrepareCookPlanInputs(plan);
-		RecordCookInputs(plan);
+		if (request.Mode == CookMode::Force)
+		{
+			plan.Operation.DestructiveScope = OperationDestructiveScope::CookedOutputs;
+			plan.Operation.bRequiresConfirmation = true;
+		}
 
 		const bool bInputsReady = CheckCookInputs(plan);
 		const bool bConfirmed = CheckCookConfirmation(plan);
 		plan.bCanRun = bInputsReady && bConfirmed;
-		PopulateCookPreview(plan, definition->DisplayName, bInputsReady);
+		if (bInputsReady)
+		{
+			plan.Steps = BuildCookProcessStepsForPlan(plan);
+		}
 		return plan;
 	}
 

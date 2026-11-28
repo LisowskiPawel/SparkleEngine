@@ -110,23 +110,6 @@ namespace SparkleLauncher
 			return ExtractBuildFailureDetail(text);
 		}
 
-		const bool bInstallerBlockedByRunningProcess = step.Id == "install-host-tool"
-		    && text.find("Visual Studio Installer could not continue because Visual Studio or an MSBuild process is running.") != std::string::npos;
-
-		if (bInstallerBlockedByRunningProcess)
-		{
-			return "Visual Studio or MSBuild is running. Close active IDEs and builds, then retry.";
-		}
-		if (step.Id == "install-host-tool")
-		{
-			static constexpr std::string_view installerFailurePrefix = "Visual Studio Installer exited with code ";
-			const std::size_t failureStart = text.find(installerFailurePrefix);
-			if (failureStart != std::string::npos)
-			{
-				const std::size_t failureEnd = text.find_first_of("\r\n", failureStart);
-				return std::string(text.substr(failureStart, failureEnd - failureStart));
-			}
-		}
 		return {};
 	}
 
@@ -145,19 +128,11 @@ namespace SparkleLauncher
 		{
 			return detail.empty() ? "Build targets failed." : "Build targets failed: " + detail;
 		}
-		if (step.Id == "install-host-tool")
-		{
-			return detail.empty() ? "Host tool installation failed." : "Host tool installation failed: " + detail;
-		}
 		return detail.empty() ? step.DisplayName + " failed." : step.DisplayName + " failed: " + detail;
 	}
 
 	std::string BuildWorkspaceRecoveryAction(const BuildWorkspaceOperationStep& step)
 	{
-		if (step.Id == "install-host-tool")
-		{
-			return "Close active Visual Studio builds, correct the first installer error in the named log, then retry Install.";
-		}
 		if (step.Id == "configure")
 		{
 			return "Correct the first configure or dependency error in the named log, then retry Generate Build Files.";

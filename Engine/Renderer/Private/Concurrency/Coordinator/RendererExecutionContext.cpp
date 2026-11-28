@@ -93,9 +93,9 @@ void RendererExecutionContext::ExecuteControl(RendererExecutionControl control) 
 		    {
 			    CompleteShaderReload(command);
 		    }
-		    else if constexpr (std::is_same_v<TCommand, RenderDiagnosticsCommand>)
+		    else if constexpr (std::is_same_v<TCommand, RenderMemoryDiagnosticsCommand>)
 		    {
-			    CompleteDiagnostics(command);
+			    CompleteMemoryDiagnostics(command);
 		    }
 		    else if constexpr (std::is_same_v<TCommand, RenderCaptureCommand>)
 		    {
@@ -164,24 +164,7 @@ std::uint64_t RendererExecutionContext::GetShaderGeneration() const noexcept
 	return m_rendererHost->GetShaderGeneration();
 }
 
-void RendererExecutionContext::CompleteDiagnostics(const RenderDiagnosticsCommand& command)
+void RendererExecutionContext::CompleteMemoryDiagnostics(const RenderMemoryDiagnosticsCommand& command)
 {
-	switch (command.Kind)
-	{
-		case RenderDiagnosticsRequestKind::Meshes:
-			command.Completion->Complete(m_pipeline->CaptureMeshDiagnostics());
-			break;
-		case RenderDiagnosticsRequestKind::MeshPreview:
-			command.Completion->Complete(m_pipeline->CaptureMeshPreview(command.MeshRuntimeId));
-			break;
-		case RenderDiagnosticsRequestKind::Textures:
-			command.Completion->Complete(m_pipeline->CaptureTextureDiagnostics());
-			break;
-		case RenderDiagnosticsRequestKind::Shaders:
-			command.Completion->Complete(m_rendererHost->CaptureShaderDiagnostics());
-			break;
-		case RenderDiagnosticsRequestKind::Memory:
-			command.Completion->Complete(m_rendererHost->CaptureMemoryDiagnostics());
-			break;
-	}
+	command.Completion->Complete(m_rendererHost->CaptureMemoryDiagnostics());
 }

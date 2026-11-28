@@ -17,25 +17,6 @@ namespace EditorWidgets
 		drawList->AddText(textPosition, color, glyph);
 	}
 
-	bool DrawEditorIconButton(EditorIcons::EditorIcon icon, const char* id, const char* tooltip)
-	{
-		ImGui::PushID(id);
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2.0f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, SparkleUiPalette::ButtonBackgroundHovered());
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, SparkleUiPalette::ButtonBackgroundActive());
-		ImGui::PushStyleColor(ImGuiCol_Text, SparkleUiPalette::TextMuted());
-		const bool bPressed = ImGui::Button(EditorIcons::GetEditorIconGlyph(icon), ImVec2(EditorIconSize, EditorIconSize));
-		if (tooltip != nullptr && tooltip[0] != '\0' && ImGui::IsItemHovered())
-		{
-			ImGui::SetTooltip("%s", tooltip);
-		}
-		ImGui::PopStyleColor(4);
-		ImGui::PopStyleVar();
-		ImGui::PopID();
-		return bPressed;
-	}
-
 	bool DrawCenteredVisibilityIconButton(const char* id, bool bVisible) noexcept
 	{
 		const float availableWidth = ImGui::GetContentRegionAvail().x;

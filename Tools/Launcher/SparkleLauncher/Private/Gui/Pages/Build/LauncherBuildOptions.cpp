@@ -48,20 +48,9 @@ namespace SparkleLauncher
 		    scopeBoxes,
 		    registerFocusable);
 
-		AddWorkflowScopeRow(
-		    *selectionLayout,
-		    "Launcher",
-		    "launcher",
-		    "Sparkle Launcher; the new build is used after restart.",
-		    settings.EditorProfile(),
-		    true,
-		    selectedScopes,
-		    scopeBoxes,
-		    registerFocusable);
-
 		buildLayout->addWidget(selectionPanel);
 
-		AddWorkflowAutomationNote(*buildLayout, "CMake refreshes stale build files and skips current targets.");
+		AddWorkflowAutomationNote(*buildLayout, "CMake refreshes stale build files and skips current targets. To rebuild Launcher, close it and build SparkleLauncher with CMake.");
 
 		const auto commitSelection = [&settings, scopeBoxes, selectionChanged](bool)
 		{

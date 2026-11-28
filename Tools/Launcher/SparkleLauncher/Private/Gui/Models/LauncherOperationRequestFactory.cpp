@@ -65,22 +65,6 @@ namespace SparkleLauncher
 		return request;
 	}
 
-	bool RequestsLauncherRebuild(const LauncherOperationRequest& request)
-	{
-		if (request.OperationId == "launcher.build.self")
-		{
-			return true;
-		}
-
-		const auto* build = std::get_if<BuildWorkspaceOperationRequest>(&request.Inputs);
-		if (request.OperationId != "workspace.build" || build == nullptr)
-		{
-			return false;
-		}
-
-		return HasSelectedBuildScope(*build, BuildWorkspaceScope::Launcher);
-	}
-
 	LauncherOperationRequest BuildLauncherOperationRequest(
 	    const std::filesystem::path& workspaceRoot,
 	    const LauncherContentModel& contentModel,
@@ -140,12 +124,10 @@ namespace SparkleLauncher
 	    const std::filesystem::path& workspaceRoot,
 	    const LauncherContentModel& contentModel,
 	    const LauncherSettings& settings,
-	    const std::filesystem::path& runningLauncherPath,
 	    const QString& operationId)
 	{
 		return ActionCleanTargetRequest{
 		    workspaceRoot,
-		    runningLauncherPath,
 		    operationId.toStdString(),
 		    contentModel.ContentId().toStdString(),
 		    settings.EditorProfile().toStdString(),
@@ -158,11 +140,10 @@ namespace SparkleLauncher
 	    const std::filesystem::path& workspaceRoot,
 	    const LauncherContentModel& contentModel,
 	    const LauncherSettings& settings,
-	    const std::filesystem::path& runningLauncherPath,
 	    const QString& operationId)
 	{
 		LauncherOperationRequest request = BuildLauncherOperationRequest(workspaceRoot, contentModel, settings, "workspace.clean");
-		const ActionCleanTargetRequest cleanRequest = BuildActionCleanTargetRequest(workspaceRoot, contentModel, settings, runningLauncherPath, operationId);
+		const ActionCleanTargetRequest cleanRequest = BuildActionCleanTargetRequest(workspaceRoot, contentModel, settings, operationId);
 		std::get<MaintenanceOperationRequest>(request.Inputs).RequestedCleanTargets = BuildActionCleanPaths(cleanRequest);
 		return request;
 	}

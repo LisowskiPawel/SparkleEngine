@@ -25,19 +25,8 @@ struct RenderReloadShadersCommand final
 	std::shared_ptr<RenderControlCompletion> Completion;
 };
 
-enum class RenderDiagnosticsRequestKind : std::uint8_t
+struct RenderMemoryDiagnosticsCommand final
 {
-	Meshes,
-	Shaders,
-	MeshPreview,
-	Textures,
-	Memory,
-};
-
-struct RenderDiagnosticsCommand final
-{
-	RenderDiagnosticsRequestKind Kind = RenderDiagnosticsRequestKind::Meshes;
-	std::uintptr_t MeshRuntimeId = 0;
 	std::shared_ptr<RenderControlCompletion> Completion;
 };
 
@@ -67,7 +56,7 @@ using RendererExecutionControl = std::variant<
     RenderResizeCommand,
     RenderViewportCommand,
     RenderReloadShadersCommand,
-    RenderDiagnosticsCommand,
+    RenderMemoryDiagnosticsCommand,
     RenderCaptureCommand,
     RenderSettingsChangedCommand,
     RenderCVarCommand,

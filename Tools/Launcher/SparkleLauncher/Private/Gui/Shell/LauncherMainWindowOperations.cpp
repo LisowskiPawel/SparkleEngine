@@ -14,12 +14,8 @@
 #include "Gui/Models/LauncherWorkflowCatalog.h"
 
 #include "SparkleLauncher/CookOperations.h"
-#include "ToolOutputPaths.h"
 
 #include <QtCore/QCoreApplication>
-#include <QtCore/QProcess>
-#include <QtCore/QRegularExpression>
-#include <QtWidgets/QMessageBox>
 
 #include <filesystem>
 #include <utility>
@@ -97,8 +93,7 @@ namespace SparkleLauncher
 			return;
 		}
 
-		const std::filesystem::path launcherPath(QCoreApplication::applicationFilePath().toStdString());
-		LauncherOperationRequest request = BuildActionCleanOperationRequest(m_workspaceRoot, m_contentModel, m_settings, launcherPath, m_selectedOperationId);
+		LauncherOperationRequest request = BuildActionCleanOperationRequest(m_workspaceRoot, m_contentModel, m_settings, m_selectedOperationId);
 
 		if (std::get<MaintenanceOperationRequest>(request.Inputs).RequestedCleanTargets.empty())
 		{
@@ -144,34 +139,6 @@ namespace SparkleLauncher
 		    || FindCookOperationDefinition(operationId.toStdString()) != nullptr;
 	}
 
-	void LauncherMainWindow::PromptForLauncherRestart()
-	{
-		const QMessageBox::StandardButton result = QMessageBox::question(
-		    this,
-		    "Launcher Rebuilt",
-		    "Sparkle Launcher was rebuilt successfully. Restart now to run the new binary?",
-		    QMessageBox::Yes | QMessageBox::No,
-		    QMessageBox::Yes);
-
-		if (result != QMessageBox::Yes)
-		{
-			return;
-		}
-
-		const SparkleTools::ToolOutputPaths workspaceOutputs = SparkleTools::ResolveToolOutputPaths(m_workspaceRoot);
-		const SparkleTools::ToolTargetOutputPaths launcherOutputs = workspaceOutputs.LauncherTargetOutputs(m_settings.EditorProfile().toStdString());
-		const std::filesystem::path relaunchedExecutablePath = launcherOutputs.BinaryDirectory / std::filesystem::path(QCoreApplication::applicationFilePath().toStdString()).filename();
-		const QString executablePath = QString::fromStdString(relaunchedExecutablePath.string());
-		const bool bStarted = QProcess::startDetached(executablePath, {});
-		if (!bStarted)
-		{
-			QMessageBox::warning(this, "Restart Failed", "The rebuilt launcher is ready, but the restart command could not be started.");
-			return;
-		}
-
-		QCoreApplication::quit();
-	}
-
 	QString LauncherMainWindow::CreateRunId()
 	{
 		return QStringLiteral("run-%1").arg(++m_nextRunIndex, 4, 10, QChar('0'));
@@ -184,10 +151,6 @@ namespace SparkleLauncher
 			request.RunId = CreateRunId();
 		}
 		const QString runId = request.RunId;
-		if (RequestsLauncherRebuild(request) && !m_pendingRestartRunIds.contains(runId))
-		{
-			m_pendingRestartRunIds.push_back(runId);
-		}
 		m_activityPanel->RegisterRun(request.RunId, title);
 		m_workspaceSetup->TrackSourceDependencyRun(request, runId);
 		m_backend.RunOperation(std::move(request));

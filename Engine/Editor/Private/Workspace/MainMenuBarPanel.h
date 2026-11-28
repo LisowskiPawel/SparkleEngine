@@ -18,19 +18,19 @@ public:
 
 	void SetLevelSession(LevelSession* levelSession) noexcept;
 	void SetWindow(Window* window) noexcept;
-	void SetShaderToolsOpenHandler(std::function<void()> handler);
-	void SetMeshToolsOpenHandler(std::function<void()> handler);
-	void SetTextureToolsOpenHandler(std::function<void()> handler);
+	void SetShaderCompileHandler(std::function<void(bool)> handler);
+	void SetShaderReloadHandler(std::function<void()> handler);
 	void SetSettingsOpenHandler(std::function<void()> handler);
 	void SetConsoleOpenHandler(std::function<void()> handler);
 	void SetViewportCaptureHandler(std::function<void()> handler);
-	void BuildUI() noexcept;
+	void BuildUI();
 	void BuildOverlays() noexcept;
 
 	float GetHeight() const noexcept { return m_heightPixels; }
 
 private:
-	void BuildFileMenu() noexcept;
+	void BuildShaderMenu();
+	void BuildFileMenu();
 	void BuildWindowsMenu() noexcept;
 	void BuildHelpWindow() noexcept;
 	void BuildLevelStatus() noexcept;
@@ -38,9 +38,8 @@ private:
 
 	LevelSession* m_levelSession = nullptr;
 	Window* m_window = nullptr;
-	std::function<void()> m_shaderToolsOpenHandler;
-	std::function<void()> m_meshToolsOpenHandler;
-	std::function<void()> m_textureToolsOpenHandler;
+	std::function<void(bool)> m_shaderCompileHandler;
+	std::function<void()> m_shaderReloadHandler;
 	std::function<void()> m_settingsOpenHandler;
 	std::function<void()> m_consoleOpenHandler;
 	std::function<void()> m_viewportCaptureHandler;

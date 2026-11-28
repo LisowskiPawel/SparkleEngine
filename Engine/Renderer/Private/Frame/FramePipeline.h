@@ -6,7 +6,6 @@
 #include "Passes/Lighting/Restir/RestirLightingHistory.h"
 #include "Providers/ImageProviderGraphKey.h"
 #include "Renderer/Public/Settings/EngineRenderingRayTracingTypes.h"
-#include "Renderer/Public/Resources/Textures/TextureDiagnostics.h"
 #include "Viewport/ViewportCaptureCompletion.h"
 #include "Viewport/ViewportContracts.h"
 #include "Renderer/Public/UI/UiTextureHandle.h"
@@ -40,8 +39,6 @@ class Window;
 struct RenderFrameTime;
 struct RenderViewInput;
 struct UiRenderPacket;
-struct MeshDiagnosticsSnapshot;
-struct MeshPreviewGeometry;
 enum class RenderViewInvalidationReason : std::uint32_t;
 
 class FramePipeline final
@@ -82,9 +79,6 @@ private:
 
 	bool BeginViewportCapture(ViewportCaptureId id, const ViewportCaptureRequest& request) noexcept;
 	std::vector<ViewportCaptureCompletion> TakeCompletedViewportCaptures();
-	MeshDiagnosticsSnapshot CaptureMeshDiagnostics() const;
-	MeshPreviewGeometry CaptureMeshPreview(std::uintptr_t meshRuntimeId) const;
-	TextureDiagnosticsSnapshot CaptureTextureDiagnostics();
 	void InitializeRenderFrames();
 	void PrepareFrameGraph(const RenderFrame& frame);
 	RenderFrameGraphResources BuildRenderFrameGraph(FrameGraphBuilder& builder, const RenderFrame& frame);

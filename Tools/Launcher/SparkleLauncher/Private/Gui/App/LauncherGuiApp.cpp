@@ -5,7 +5,6 @@
 #include "Gui/Models/LauncherContentModel.h"
 #include "Workspace/LauncherRootResolver.h"
 #include "Gui/App/LauncherSettings.h"
-#include "Startup/LauncherShadowExecution.h"
 #include "Startup/LauncherArguments.h"
 #include "SparkleLauncher/WorkspaceLocator.h"
 
@@ -91,17 +90,6 @@ namespace SparkleLauncher
 			    QStringLiteral("Sparkle Launcher"),
 			    QString::fromStdString("Launcher startup failed. Repository working directory could not be selected: " + workspaceRoot.string()));
 
-			return 1;
-		}
-
-		const LauncherShadowStartResult shadow = StartLauncherShadow(workspaceRoot, {"--root", workspaceRoot.string()}, LauncherShadowCompletionPolicy::ReleaseCallingArtifact);
-		if (shadow.State == LauncherShadowStartState::Started)
-		{
-			return shadow.ExitCode;
-		}
-		if (shadow.State == LauncherShadowStartState::Failed)
-		{
-			QMessageBox::critical(nullptr, QStringLiteral("Sparkle Launcher"), QString::fromStdString(shadow.ErrorMessage));
 			return 1;
 		}
 

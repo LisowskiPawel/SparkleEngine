@@ -1,6 +1,5 @@
 #include "Gui/Operations/LauncherOperationConfirmation.h"
 #include "Gui/Operations/LauncherOperationRequest.h"
-#include "Gui/Models/LauncherCleanUiModel.h"
 #include <QtCore/QStringList>
 #include <QtWidgets/QMessageBox>
 
@@ -15,36 +14,18 @@ namespace SparkleLauncher
 		}
 
 		const bool bCustomCleanRequested = clean->bCleanLevelContent || !clean->RequestedCleanTargets.empty();
-		QStringList scopeNames;
-		if (clean->bCleanLevelContent)
+		const auto plan = PlanLauncherOperation("workspace.clean", *clean);
+		if (plan.Operation.Failure)
 		{
-			const auto plan = PlanLauncherOperation("workspace.clean", *clean);
-			if (plan.Operation.Failure.has_value())
-			{
-				QMessageBox::warning(&parent, "Level content could not be resolved", QString::fromStdString(plan.Operation.Failure->Summary));
-				return false;
-			}
-			for (const auto& target : plan.CleanTargets)
-			{
-				scopeNames.push_back(QString::fromStdString(target.DisplayName) + "\n" + QString::fromStdString(target.Path.string()));
-			}
+			QMessageBox::warning(&parent, "Clean targets could not be resolved", QString::fromStdString(plan.Operation.Failure->Summary));
+			return false;
 		}
-		else if (bCustomCleanRequested)
+		QStringList targets;
+		for (const auto& target : plan.CleanTargets)
 		{
-			for (const MaintenanceCleanPathSpec& target : clean->RequestedCleanTargets)
-			{
-				scopeNames.push_back(QString::fromStdString(target.DisplayName) + "\n" + QString::fromStdWString(target.Path.wstring()));
-			}
+			targets.push_back(QString::fromStdString(target.DisplayName) + "\n" + QString::fromStdWString(target.Path.wstring()) + "\n" + QString::fromStdString(target.Detail));
 		}
-		else
-		{
-			for (const CleanScope scope : clean->RequestedCleanScopes)
-			{
-				scopeNames.push_back(CleanScopeDisplayName(QString::fromUtf8(CleanScopeId(scope))));
-			}
-		}
-
-		QString message = bCustomCleanRequested ? "Generated outputs to clean:\n\n" + scopeNames.join("\n\n") : "Clean scopes:\n" + scopeNames.join('\n');
+		QString message = "Targets to clean:\n\n" + targets.join("\n\n");
 
 		message += bCustomCleanRequested ? "\n\nThis removes only the generated outputs mapped to the selected action. Continue?"
 		                                 : "\n\nThis removes generated files for the selected scope. Continue?";

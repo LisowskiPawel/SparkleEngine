@@ -30,24 +30,18 @@ namespace EditorIcons
 				return "\xef\x86\xb2";
 			case EditorIcon::SkinnedMesh:
 				return "\xef\x86\x83";
-			case EditorIcon::Material:
-				return "\xef\x94\xbf";
 			case EditorIcon::EyeVisible:
 				return "\xef\x81\xae";
 			case EditorIcon::EyeHidden:
 				return "\xef\x81\xb0";
 			case EditorIcon::Reset:
 				return "\xef\x83\xa2";
-			case EditorIcon::Filter:
-				return "\xef\x82\xb0";
 			case EditorIcon::Settings:
 				return "\xef\x80\x93";
 			case EditorIcon::Save:
 				return "\xef\x83\x87";
 			case EditorIcon::Shader:
 				return "\xef\x8b\x9b";
-			case EditorIcon::Refresh:
-				return "\xef\x80\xa1";
 			case EditorIcon::Reload:
 				return "\xef\x87\x80";
 			case EditorIcon::Search:
@@ -92,14 +86,6 @@ namespace EditorIcons
 				return "\xef\x83\x85";
 			case EditorIcon::Console:
 				return "\xef\x84\xa0";
-			case EditorIcon::SourceFile:
-				return "\xef\x87\x89";
-			case EditorIcon::Reflection:
-				return "\xef\x82\xae";
-			case EditorIcon::Disassembly:
-				return "\xef\x84\xa0";
-			case EditorIcon::CompileRequest:
-				return "\xef\x91\xad";
 			case EditorIcon::Sort:
 				return "\xef\x85\xa0";
 			case EditorIcon::None:

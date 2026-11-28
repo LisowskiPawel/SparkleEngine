@@ -39,7 +39,6 @@ target_link_libraries(MeshCooker
     PRIVATE
         SourceImporters
         ToolSupport
-        nlohmann_json::nlohmann_json
 )
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/Public PREFIX "Public" FILES ${MESH_COOKER_PUBLIC_HEADERS})

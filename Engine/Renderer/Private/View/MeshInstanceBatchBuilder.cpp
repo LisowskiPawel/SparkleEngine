@@ -25,27 +25,25 @@ void MeshInstanceBatchBuilder::Build(
     std::span<const MeshRenderItem> renderItems,
     std::span<const PreparedRenderPrimitive> primitives,
     std::span<const RenderMeshInstanceGroup> instanceGroups,
-    const MeshInstanceBatchBuildOptions& options,
+    bool bEnableAutoBatching,
     MeshInstanceBatchBuildResult& result)
 {
 	BuildScratch& scratch = *m_scratch;
 
 	ResetBuild(scratch, result);
 
-	CollectValidItems(renderItems, primitives, instanceGroups.size(), options, scratch, result);
+	CollectValidItems(renderItems, primitives, instanceGroups.size(), scratch);
 	CollectPreservedGroupItems(renderItems, instanceGroups.size(), scratch);
-	AppendPreservedGroups(renderItems, primitives, instanceGroups, options, scratch, result);
+	AppendPreservedGroups(renderItems, primitives, instanceGroups, scratch, result);
 	PartitionRemainingItems(renderItems, scratch);
-	AppendOpaqueBatches(renderItems, primitives, options, scratch, result);
-	AppendTransparentBatches(renderItems, primitives, options, scratch, result);
-	FinalizeDiagnostics(options, scratch, result);
+	AppendOpaqueBatches(renderItems, primitives, bEnableAutoBatching, scratch, result);
+	AppendTransparentBatches(renderItems, primitives, scratch, result);
 }
 
 void MeshInstanceBatchBuilder::ResetBuild(BuildScratch& scratch, MeshInstanceBatchBuildResult& result)
 {
 	result.RasterInstanceIndices.clear();
 	result.Batches.clear();
-	result.Diagnostics = {};
 
 	scratch.ValidItemIndices.clear();
 	scratch.ConsumedItems.clear();
@@ -61,19 +59,13 @@ void MeshInstanceBatchBuilder::CollectValidItems(
     std::span<const MeshRenderItem> renderItems,
     std::span<const PreparedRenderPrimitive> primitives,
     std::size_t instanceGroupCount,
-    const MeshInstanceBatchBuildOptions& options,
-    BuildScratch& scratch,
-    MeshInstanceBatchBuildResult& result)
+    BuildScratch& scratch)
 {
-	if (options.bCollectDiagnostics)
-	{
-		result.Diagnostics.CandidateItemCount = static_cast<std::uint32_t>(renderItems.size());
-	}
 
 	scratch.ValidItemIndices.reserve(renderItems.size());
 	for (std::size_t itemIndex = 0u; itemIndex < renderItems.size(); ++itemIndex)
 	{
-		if (IsValidCandidate(renderItems[itemIndex], primitives, instanceGroupCount, options, result.Diagnostics))
+		if (IsValidCandidate(renderItems[itemIndex], primitives, instanceGroupCount))
 		{
 			scratch.ValidItemIndices.push_back(itemIndex);
 		}
@@ -100,7 +92,6 @@ void MeshInstanceBatchBuilder::AppendPreservedGroups(
     std::span<const MeshRenderItem> renderItems,
     std::span<const PreparedRenderPrimitive> primitives,
     std::span<const RenderMeshInstanceGroup> instanceGroups,
-    const MeshInstanceBatchBuildOptions& options,
     BuildScratch& scratch,
     MeshInstanceBatchBuildResult& result)
 {
@@ -120,14 +111,10 @@ void MeshInstanceBatchBuilder::AppendPreservedGroups(
 
 		if (!bCompatible)
 		{
-			if (options.bCollectDiagnostics)
-			{
-				++result.Diagnostics.RejectedIncompatibleGroupCount;
-			}
 			continue;
 		}
 
-		AppendBatch(renderItems, primitives, items, ResolvePreservedGroupSource(group.groupKind), options.bCollectDiagnostics, result);
+		AppendBatch(renderItems, primitives, items, result);
 		for (const std::size_t itemIndex : items)
 		{
 			scratch.ConsumedItems[itemIndex] = true;
@@ -156,7 +143,7 @@ void MeshInstanceBatchBuilder::PartitionRemainingItems(std::span<const MeshRende
 void MeshInstanceBatchBuilder::AppendOpaqueBatches(
     std::span<const MeshRenderItem> renderItems,
     std::span<const PreparedRenderPrimitive> primitives,
-    const MeshInstanceBatchBuildOptions& options,
+    bool bEnableAutoBatching,
     BuildScratch& scratch,
     MeshInstanceBatchBuildResult& result)
 {
@@ -168,7 +155,7 @@ void MeshInstanceBatchBuilder::AppendOpaqueBatches(
 	for (std::size_t begin = 0u; begin < scratch.OpaqueItems.size();)
 	{
 		std::size_t end = begin + 1u;
-		if (options.bEnableAutoBatching)
+		if (bEnableAutoBatching)
 		{
 			while (end < scratch.OpaqueItems.size() && CanShareBatch(renderItems[scratch.OpaqueItems[begin]], renderItems[scratch.OpaqueItems[end]], primitives))
 			{
@@ -177,7 +164,7 @@ void MeshInstanceBatchBuilder::AppendOpaqueBatches(
 		}
 
 		const std::span<const std::size_t> batchItems{scratch.OpaqueItems.data() + begin, end - begin};
-		AppendBatch(renderItems, primitives, batchItems, batchItems.size() > 1u ? MeshInstanceBatchSource::AutoBatch : MeshInstanceBatchSource::SingleInstance, options.bCollectDiagnostics, result);
+		AppendBatch(renderItems, primitives, batchItems, result);
 		begin = end;
 	}
 }
@@ -185,7 +172,6 @@ void MeshInstanceBatchBuilder::AppendOpaqueBatches(
 void MeshInstanceBatchBuilder::AppendTransparentBatches(
     std::span<const MeshRenderItem> renderItems,
     std::span<const PreparedRenderPrimitive> primitives,
-    const MeshInstanceBatchBuildOptions& options,
     BuildScratch& scratch,
     MeshInstanceBatchBuildResult& result)
 {
@@ -197,27 +183,14 @@ void MeshInstanceBatchBuilder::AppendTransparentBatches(
 	for (const std::size_t itemIndex : scratch.TransparentItems)
 	{
 		const std::array<std::size_t, 1> single{itemIndex};
-		AppendBatch(renderItems, primitives, single, MeshInstanceBatchSource::SingleInstance, options.bCollectDiagnostics, result);
+		AppendBatch(renderItems, primitives, single, result);
 	}
-}
-
-void MeshInstanceBatchBuilder::FinalizeDiagnostics(const MeshInstanceBatchBuildOptions& options, const BuildScratch& scratch, MeshInstanceBatchBuildResult& result) noexcept
-{
-	if (!options.bCollectDiagnostics)
-	{
-		return;
-	}
-
-	result.Diagnostics.RenderableInstanceCount = static_cast<std::uint32_t>(scratch.ValidItemIndices.size());
-	result.Diagnostics.MeshBatchCount = static_cast<std::uint32_t>(result.Batches.size());
 }
 
 bool MeshInstanceBatchBuilder::IsValidCandidate(
     const MeshRenderItem& item,
     std::span<const PreparedRenderPrimitive> primitives,
-    std::size_t instanceGroupCount,
-    const MeshInstanceBatchBuildOptions& options,
-    MeshGeometryInstancingDiagnostics& diagnostics) noexcept
+    std::size_t instanceGroupCount) noexcept
 {
 	if (item.Classification == RenderMaterialClassification::Rejected)
 	{
@@ -226,29 +199,14 @@ bool MeshInstanceBatchBuilder::IsValidCandidate(
 
 	if (item.DrawIndex >= primitives.size() || !primitives[item.DrawIndex].Draw.Geometry.Mesh)
 	{
-		if (options.bCollectDiagnostics)
-		{
-			++diagnostics.RejectedCandidateCount;
-			++diagnostics.RejectedMissingGpuMeshCount;
-		}
 		return false;
 	}
 	if (item.InstanceGroupIndex != kInvalidRenderMeshInstanceGroupIndex && item.InstanceGroupIndex >= instanceGroupCount)
 	{
-		if (options.bCollectDiagnostics)
-		{
-			++diagnostics.RejectedCandidateCount;
-			++diagnostics.RejectedInvalidInstanceGroupCount;
-		}
 		return false;
 	}
-	if (options.bRequireMaterialBindingSet && !item.Material)
+	if (!item.Material)
 	{
-		if (options.bCollectDiagnostics)
-		{
-			++diagnostics.RejectedCandidateCount;
-			++diagnostics.RejectedInvalidMaterialCount;
-		}
 		return false;
 	}
 	return true;
@@ -336,17 +294,10 @@ bool MeshInstanceBatchBuilder::TransparentItemLess(const MeshRenderItem& lhs, co
 	return lhs.Object < rhs.Object;
 }
 
-MeshInstanceBatchSource MeshInstanceBatchBuilder::ResolvePreservedGroupSource(RenderMeshInstanceGroupKind groupKind) noexcept
-{
-	return groupKind == RenderMeshInstanceGroupKind::AuthoredInstanceGroup ? MeshInstanceBatchSource::AuthoredGroup : MeshInstanceBatchSource::PreservedGroup;
-}
-
 void MeshInstanceBatchBuilder::AppendBatch(
     std::span<const MeshRenderItem> renderItems,
     std::span<const PreparedRenderPrimitive> primitives,
     std::span<const std::size_t> itemIndices,
-    MeshInstanceBatchSource source,
-    bool bCollectDiagnostics,
     MeshInstanceBatchBuildResult& result)
 {
 	if (itemIndices.empty())
@@ -369,32 +320,5 @@ void MeshInstanceBatchBuilder::AppendBatch(
 	        .firstInstance = firstInstance,
 	        .instanceCount = static_cast<std::uint32_t>(itemIndices.size()),
 	        .meshKind = firstDraw.Geometry.MeshKind,
-	        .materialClassification = renderItems[itemIndices.front()].Classification,
-	        .source = source});
-
-	if (!bCollectDiagnostics)
-	{
-		return;
-	}
-
-	const std::uint32_t instanceCount = static_cast<std::uint32_t>(itemIndices.size());
-	result.Diagnostics.SubmittedInstanceCount += instanceCount;
-	result.Diagnostics.EstimatedGBufferDrawCallsSaved += instanceCount - 1u;
-	result.Diagnostics.MinInstancesPerBatch = result.Diagnostics.MinInstancesPerBatch == 0u ? instanceCount : (std::min) (result.Diagnostics.MinInstancesPerBatch, instanceCount);
-	result.Diagnostics.MaxInstancesPerBatch = (std::max) (result.Diagnostics.MaxInstancesPerBatch, instanceCount);
-	switch (source)
-	{
-		case MeshInstanceBatchSource::AuthoredGroup:
-			++result.Diagnostics.AuthoredBatchCount;
-			break;
-		case MeshInstanceBatchSource::PreservedGroup:
-			++result.Diagnostics.PreservedGroupBatchCount;
-			break;
-		case MeshInstanceBatchSource::AutoBatch:
-			++result.Diagnostics.AutoBatchCount;
-			break;
-		case MeshInstanceBatchSource::SingleInstance:
-			++result.Diagnostics.SingleInstanceBatchCount;
-			break;
-	}
+	        .materialClassification = renderItems[itemIndices.front()].Classification});
 }

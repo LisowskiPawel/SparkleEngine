@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <memory>
 
-class UiTextureRegistry;
 class FrameGraph;
 class RenderDeviceServices;
 class UiRenderPacketPlayer;
@@ -22,7 +21,6 @@ public:
 	UiFrameRenderer(const UiFrameRenderer&) = delete;
 	UiFrameRenderer& operator=(const UiFrameRenderer&) = delete;
 
-	UiTextureHandle RegisterUiTexture(std::uint64_t nativeTextureId) noexcept;
 
 	UiTextureHandle GetViewportTexture() const noexcept { return m_viewportTexture; }
 
@@ -39,7 +37,7 @@ private:
 
 	RenderDeviceServices& m_deviceServices;
 	std::unique_ptr<UiRenderPacketPlayer> m_packetPlayer;
-	std::unique_ptr<UiTextureRegistry> m_textureRegistry;
 	UiTextureHandle m_viewportTexture;
+	std::uint64_t m_viewportTextureId = 0;
 	bool m_bOwnsBackend = false;
 };

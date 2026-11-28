@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Renderer/Public/Meshes/MeshDiagnostics.h"
 #include "Rendering/RenderObjectId.h"
 #include "Scene/Materials/MaterialData.h"
 #include "Scene/Preparation/Geometry/RenderPrimitivePreparation.h"
@@ -23,18 +22,10 @@ struct MeshRenderItem final
 	float CameraDistanceSquared = 0.0f;
 };
 
-struct MeshInstanceBatchBuildOptions final
-{
-	bool bEnableAutoBatching = true;
-	bool bRequireMaterialBindingSet = true;
-	bool bCollectDiagnostics = false;
-};
-
 struct MeshInstanceBatchBuildResult final
 {
 	std::vector<std::uint32_t> RasterInstanceIndices;
 	std::vector<MeshInstanceBatch> Batches;
-	MeshGeometryInstancingDiagnostics Diagnostics;
 };
 
 class MeshInstanceBatchBuilder final
@@ -50,7 +41,7 @@ public:
 	    std::span<const MeshRenderItem> renderItems,
 	    std::span<const PreparedRenderPrimitive> primitives,
 	    std::span<const RenderMeshInstanceGroup> instanceGroups,
-	    const MeshInstanceBatchBuildOptions& options,
+	    bool bEnableAutoBatching,
 	    MeshInstanceBatchBuildResult& result);
 
 private:
@@ -72,49 +63,39 @@ private:
 	    std::span<const MeshRenderItem> renderItems,
 	    std::span<const PreparedRenderPrimitive> primitives,
 	    std::size_t instanceGroupCount,
-	    const MeshInstanceBatchBuildOptions& options,
-	    BuildScratch& scratch,
-	    MeshInstanceBatchBuildResult& result);
+	    BuildScratch& scratch);
 	static void CollectPreservedGroupItems(std::span<const MeshRenderItem> renderItems, std::size_t instanceGroupCount, BuildScratch& scratch);
 	static void AppendPreservedGroups(
 	    std::span<const MeshRenderItem> renderItems,
 	    std::span<const PreparedRenderPrimitive> primitives,
 	    std::span<const RenderMeshInstanceGroup> instanceGroups,
-	    const MeshInstanceBatchBuildOptions& options,
 	    BuildScratch& scratch,
 	    MeshInstanceBatchBuildResult& result);
 	static void PartitionRemainingItems(std::span<const MeshRenderItem> renderItems, BuildScratch& scratch);
 	static void AppendOpaqueBatches(
 	    std::span<const MeshRenderItem> renderItems,
 	    std::span<const PreparedRenderPrimitive> primitives,
-	    const MeshInstanceBatchBuildOptions& options,
+	    bool bEnableAutoBatching,
 	    BuildScratch& scratch,
 	    MeshInstanceBatchBuildResult& result);
 	static void AppendTransparentBatches(
 	    std::span<const MeshRenderItem> renderItems,
 	    std::span<const PreparedRenderPrimitive> primitives,
-	    const MeshInstanceBatchBuildOptions& options,
 	    BuildScratch& scratch,
 	    MeshInstanceBatchBuildResult& result);
-	static void FinalizeDiagnostics(const MeshInstanceBatchBuildOptions& options, const BuildScratch& scratch, MeshInstanceBatchBuildResult& result) noexcept;
 	static bool IsValidCandidate(
 	    const MeshRenderItem& item,
 	    std::span<const PreparedRenderPrimitive> primitives,
-	    std::size_t instanceGroupCount,
-	    const MeshInstanceBatchBuildOptions& options,
-	    MeshGeometryInstancingDiagnostics& diagnostics) noexcept;
+	    std::size_t instanceGroupCount) noexcept;
 	static BatchKey MakeBatchKey(const MeshRenderItem& item, std::span<const PreparedRenderPrimitive> primitives) noexcept;
 	static bool BatchKeyLess(const BatchKey& lhs, const BatchKey& rhs) noexcept;
 	static bool CanShareBatch(const MeshRenderItem& lhs, const MeshRenderItem& rhs, std::span<const PreparedRenderPrimitive> primitives) noexcept;
 	static bool OpaqueItemLess(const MeshRenderItem& lhs, const MeshRenderItem& rhs, std::span<const PreparedRenderPrimitive> primitives) noexcept;
 	static bool TransparentItemLess(const MeshRenderItem& lhs, const MeshRenderItem& rhs) noexcept;
-	static MeshInstanceBatchSource ResolvePreservedGroupSource(RenderMeshInstanceGroupKind groupKind) noexcept;
 	static void AppendBatch(
 	    std::span<const MeshRenderItem> renderItems,
 	    std::span<const PreparedRenderPrimitive> primitives,
 	    std::span<const std::size_t> itemIndices,
-	    MeshInstanceBatchSource source,
-	    bool bCollectDiagnostics,
 	    MeshInstanceBatchBuildResult& result);
 
 	std::unique_ptr<BuildScratch> m_scratch;

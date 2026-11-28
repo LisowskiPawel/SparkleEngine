@@ -36,7 +36,7 @@ private:
 	std::vector<ViewportCaptureCompletion> TakeCompletedViewportCaptures();
 	std::uint64_t GetShaderGeneration() const noexcept;
 	void CompleteShaderReload(const RenderReloadShadersCommand& command) noexcept;
-	void CompleteDiagnostics(const RenderDiagnosticsCommand& command);
+	void CompleteMemoryDiagnostics(const RenderMemoryDiagnosticsCommand& command);
 
 	Threading::OwnerThread m_owner{"RenderCoordinator renderer state"};
 	std::unique_ptr<RendererHost> m_rendererHost;

@@ -7,19 +7,6 @@ ReleaseSupported = true
 Selected = true
 
 [Level]
-Id = ModernSponzaCandles
-DisplayName = Modern Sponza: Emissive Candles
-Description = Fill Modern Sponza with thousands of emissive candles for demanding lighting tests.
-Source = Levels/ModernSponzaCandles.level
-Thumbnail = Launcher/Thumbnails/ModernSponzaCandles.jpg
-SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html
-AssetPack = ModernSponzaCandles
-Family = Modern Sponza
-VariantKind = AddOn
-ReleaseSupported = false
-Selected = false
-
-[Level]
 Id = ModernSponzaKnight
 DisplayName = Modern Sponza: Animated Knight
 Description = Add an animated knight character to the Modern Sponza environment.
@@ -204,25 +191,6 @@ SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/
 Archive = pkg_a_curtains.zip
 ArchiveBytes = 786898766
 ArchiveSha256 = 3ba96e967c8f5ad0a133309cedb342e3563f9cccb42d04e188f55c0f2125bb65
-Version = Intel GPU Research Samples 2025-06-16
-License = Creative Commons Attribution; verify embedded archive terms
-External = true
-DownloadSupported = true
-GameSupported = true
-
-[AssetPack]
-Id = ModernSponzaCandles
-DisplayName = Emissive Candles
-Root = Assets/Meshes/ModernSponza/AddOns/Candles/pkg_d_10k_candles
-ExtractRoot = Assets/Meshes/ModernSponza/AddOns/Candles
-Required = NewSponza_4_Combined_glTF.gltf
-Parent = ModernSponzaCurtains
-Kind = AddOn
-SourceUrl = https://cdrdv2.intel.com/v1/dl/getContent/726676
-SourcePage = https://www.intel.com/content/www/us/en/developer/topic-technology/graphics-research/samples.html
-Archive = pkg_d_10k_candles.zip
-ArchiveBytes = 3190731713
-ArchiveSha256 = f8a43d972f377e7eb25e52fdc92faed425ad001a4516e0ecef436ff2f8663396
 Version = Intel GPU Research Samples 2025-06-16
 License = Creative Commons Attribution; verify embedded archive terms
 External = true

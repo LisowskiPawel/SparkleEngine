@@ -70,7 +70,6 @@ namespace SparkleLauncher
 		void UpdateWorkflowRunAvailability();
 		QString DisplayNameForOperation(const QString& operationId) const;
 		bool OperationNeedsContent(const QString& operationId) const;
-		void PromptForLauncherRestart();
 		QString CreateRunId();
 		QString StartOperation(LauncherOperationRequest request, const QString& title);
 		void SetSelectedOperation(const QString& operationId);
@@ -106,6 +105,5 @@ namespace SparkleLauncher
 		bool m_bRefreshContentRequested = false;
 		qint64 m_lastActivationRefreshMs = 0;
 		int m_nextRunIndex = 0;
-		QStringList m_pendingRestartRunIds;
 	};
 }

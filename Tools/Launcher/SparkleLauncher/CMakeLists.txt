@@ -82,21 +82,13 @@ set(SPARKLE_LAUNCHER_GUI_HEADERS
 
 set(SPARKLE_LAUNCHER_PRIVATE_SOURCES
     ${SPARKLE_LAUNCHER_GUI_SOURCES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Startup/LauncherShadowExecution.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShell.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellModel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellOperations.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellPresentation.cpp
 )
 
 set(SPARKLE_LAUNCHER_PRIVATE_HEADERS
     ${SPARKLE_LAUNCHER_GUI_HEADERS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Startup/LauncherShadowExecution.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Startup/LauncherArguments.h
     ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShell.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellModel.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellOperations.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/Shell/LauncherShellPresentation.h
 )
 
 add_executable(SparkleLauncher WIN32

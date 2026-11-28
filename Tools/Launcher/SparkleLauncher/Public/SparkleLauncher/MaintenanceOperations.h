@@ -28,7 +28,6 @@ namespace SparkleLauncher
 	struct MaintenanceOperationDefinition
 	{
 		std::string Id;
-		std::string Group;
 		std::string DisplayName;
 		std::string Description;
 	};
@@ -58,7 +57,6 @@ namespace SparkleLauncher
 	struct ActionCleanTargetRequest
 	{
 		std::filesystem::path WorkspaceRoot;
-		std::filesystem::path RunningLauncherPath;
 		std::string OperationId;
 		std::string ContentId;
 		std::string EditorProfile;
@@ -88,7 +86,6 @@ namespace SparkleLauncher
 		OperationRecord Operation;
 		MaintenanceOperationRequest Request;
 		std::vector<MaintenanceCleanTarget> CleanTargets;
-		std::vector<std::string> PlannedEffects;
 		std::vector<std::string> ReadinessMessages;
 		bool bCanRun = false;
 	};
